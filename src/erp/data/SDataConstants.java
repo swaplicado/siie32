@@ -242,17 +242,19 @@ public abstract class SDataConstants {
     public static final int ITMU_ITEM_BARC = 205011;
     public static final int ITMU_CFG_ITEM_LAN = 205012;
     public static final int ITMU_CFG_ITEM_BP = 205013;
+    public static final int ITMU_MATCH_ITEM_CPT_BP = 205051;
     public static final int ITMU_TP_UNIT = 205014;
     public static final int ITMU_TP_LEV = 205015;
     public static final int ITMU_UNIT = 205016;
     public static final int ITMU_TP_VAR = 205017;
     public static final int ITMU_VAR = 205018;
-    public static final int ITMU_BRD = 205019;
-    public static final int ITMU_MFR = 205020;
-    public static final int ITMU_EMT = 205021;
     public static final int ITMU_TP_BRD = 205022;
-    public static final int ITMU_TP_EMT = 205023;
+    public static final int ITMU_BRD = 205019;
     public static final int ITMU_TP_MFR = 205024;
+    public static final int ITMU_MFR = 205020;
+    public static final int ITMU_TP_EMT = 205023;
+    public static final int ITMU_EMT = 205021;
+    public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 205151;
 
     public static final int ITMX_ITEM_BY_KEY = 205501;
     public static final int ITMX_ITEM_BY_NAME = 205502;

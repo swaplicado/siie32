@@ -1316,6 +1316,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setBizPartner(resulSet.getString("bp"));
                     layoutBankRow.setBizPartnerKey(resulSet.getString("bp_key"));
                     layoutBankRow.setBeneficiaryFiscalId(resulSet.getString("fiscal_id"));
+                    layoutBankRow.setBizPartnerBranchId(resulSet.getInt("id_bpb"));
                     
                     layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), 0d, mnDpsCurrencyId, 1d));
                     layoutBankRow.setBalanceTotByBizPartner(0);
@@ -1599,7 +1600,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         
                         if (maAllLayoutBankRows != null) {
                             for (SLayoutBankRow layoutBankRowInArray : maAllLayoutBankRows) {
-                                if (SLibUtils.compareKeys(key, layoutBankRowInArray.getRowPrimaryKey())) {
+                                if (SLibUtils.compareKeys(key, new int[] { layoutBankRowInArray.getBizPartnerId() })) {
                                     docsFound++; 
                                     layoutBankRowInArray.setForPayment(true);
                                     layoutBankRowInArray.setPayed((boolean) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
@@ -1715,6 +1716,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             SLayoutBankRow layoutBankRowInGrid = (SLayoutBankRow) gridRow;
             
             for (SLayoutBankRow layoutBankRowInArray : maAllLayoutBankRows) {
+                if (layoutBankRowInArray.isForPayment()) {
+                    System.out.println("");
+                }
                 if (layoutBankRowInArray.isForPayment() && SLibUtils.compareKeys(layoutBankRowInArray.getRowPrimaryKey(), layoutBankRowInGrid.getRowPrimaryKey())) {
                     SLayoutBankXmlRow layoutBankXmlRow = new SLayoutBankXmlRow();
 

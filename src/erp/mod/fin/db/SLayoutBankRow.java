@@ -41,6 +41,7 @@ public class SLayoutBankRow implements SGridRow {
     protected String msSantanderBankCode;
     protected String msBajioBankCode;
     protected String msBajioBankAlias;
+    protected int mnBizPartnerBranchId; 
     protected int mnDpsYearId;
     protected int mnDpsDocId;
     protected String msDpsType;
@@ -119,6 +120,7 @@ public class SLayoutBankRow implements SGridRow {
         msSantanderBankCode = "";
         msBajioBankCode = "";
         msBajioBankAlias = "";
+        mnBizPartnerBranchId = 0;
         mnDpsYearId = 0;
         mnDpsDocId = 0;
         msDpsType = "";
@@ -186,6 +188,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setSantanderBankCode(String s) { msSantanderBankCode = s; }
     public void setBajioBankCode(String s) { msBajioBankCode = s; }
     public void setBajioBankAlias(String s) { msBajioBankAlias = s; }
+    public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
     public void setDpsYearId(int n) { mnDpsYearId = n; }
     public void setDpsDocId(int n) { mnDpsDocId = n; }
     public void setDpsType(String s) { msDpsType = s; }
@@ -254,6 +257,7 @@ public class SLayoutBankRow implements SGridRow {
     public String getSantanderBankCode() { return msSantanderBankCode; }
     public String getBajioBankCode() { return msBajioBankCode; }
     public String getBajioBankAlias() { return msBajioBankAlias; }
+    public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
     public int getDpsYearId() { return mnDpsYearId; }
     public int getDpsDocId() { return mnDpsDocId; }
     public String getDpsType() { return msDpsType; }
@@ -349,7 +353,7 @@ public class SLayoutBankRow implements SGridRow {
                 key = new int[] { mnDpsYearId, mnDpsDocId };
                 break;
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
-                key = new int[] { mnBizPartnerId };
+                key = new int[] { mnBizPartnerId, mnBizPartnerBranchId };
                 break;
             default:
         }

@@ -67,49 +67,32 @@ public abstract class SItemUtilities {
      * Obtiene el ID el empate preexistente.
      * @param client
      * @param conceptKey
+     * @param conceptProdServ
      * @param bizPartnerId
      * @return ID del empate preexistente. En caso de no existir, se devuelve cero. 
      */
-    public static int getMatchItemBizPartnerId(final SClientInterface client, final String conceptKey, final int bizPartnerId){
-        int id = 0;
-        
-        try {
-            String sql = "SELECT id_match FROM erp.itmu_match_item_cpt_bp "
-                    + "WHERE cpt_key = '" + conceptKey + "' "
-                    + "AND fid_bp = " + bizPartnerId + " ";
-            try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
-                if(resultSet.next()){
-                    id = resultSet.getInt(1);
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.printException(SBpsUtils.class.getName(), e);
-        }
-        
-        return id;
+    public static int getMatchItemBizPartnerId(final SClientInterface client, final String conceptKey, final String conceptProdServ, final int bizPartnerId){
+        return getMatchItemBizPartnerId(client, conceptKey, conceptProdServ, bizPartnerId, 0);
     }
     
     /**
      * Obtiene el ID el empate preexistente.
      * @param client
      * @param conceptKey
+     * @param conceptProdServ
      * @param bizPartnerId
      * @param itemId
-     * @param taxRegId
-     * @param unitId
      * @return ID del empate preexistente. En caso de no existir, se devuelve cero. 
      */
-    public static int getMatchItemBizPartnerId(final SClientInterface client, final String conceptKey, final int bizPartnerId, final int itemId, final int unitId, final int taxRegId) {
+    public static int getMatchItemBizPartnerId(final SClientInterface client, final String conceptKey, final String conceptProdServ, final int bizPartnerId, final int itemId) {
         int id = 0;
         
         try {
             String sql = "SELECT id_match FROM erp.itmu_match_item_cpt_bp "
                     + "WHERE cpt_key = '" + conceptKey + "' "
+                    + "AND cpt_prod_serv = '" + conceptProdServ + "' "
                     + "AND fid_bp = " + bizPartnerId + " "
-                    + "AND fid_item = " + itemId + " "
-                    + "AND fid_unit = " + unitId + " "
-                    + "AND fid_tax_reg = " + taxRegId + " ";
+                    + (itemId != 0 ? "AND fid_item = " + itemId + " " : "");
             try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
                 if (resultSet.next()){
                     id = resultSet.getInt(1);

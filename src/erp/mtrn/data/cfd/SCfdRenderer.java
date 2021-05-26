@@ -125,6 +125,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
 
         // validar receptor del CFDI:
         
+        int idEmisor = 0;
         if(!validation.getIsError()) {
             String receptor;
 
@@ -150,7 +151,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                     emisor = comprobante.getEltEmisor().getAttNombre().getString() + " (" + comprobante.getEltEmisor().getAttRfc().getString() + ")";
                 }
 
-                int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
+                idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
                         comprobante.getEltEmisor().getAttRfc().getString(), "", 0);
 
                 if (idEmisor == 0) {
@@ -200,7 +201,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         if (!validation.getIsError()) {
             int[] key;
             SDataDps dps;
-            key = SDataUtilities.obtainDpsKey(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_DOC);
+            key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, new int[] { idEmisor });
             if (key != null) {
                 dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
                 //moDps.poliza contable año-mes sucursal poliz, num de poliza getdbmsregisrtry

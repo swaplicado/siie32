@@ -200,6 +200,8 @@ public abstract class SModConsts {
     public static final int ITMU_TP_EMT = 1052510;
     public static final int ITMU_EMT = 1052511;
 
+    public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
+
     /*
      * Finance
      */
@@ -656,6 +658,7 @@ public abstract class SModConsts {
     public static final int HRS_UMA = 2063073;
     public static final int HRS_UMI = 2063074;
     public static final int HRS_TP_LOAN_ADJ = 2063076;
+    public static final int HRS_DEP_CC = 2063079;
     public static final int HRS_EMP_MEMBER = 2063080;
     public static final int HRS_EMP_LOG_HIRE = 2063081;
     public static final int HRS_EMP_LOG_WAGE = 2063082;
@@ -868,6 +871,8 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_TP_EMT, "erp.itmu_tp_emt");
         TablesMap.put(ITMU_EMT, "erp.itmu_emt");
 
+        TablesMap.put(ITMU_MATCH_ITEM_CPT_BP_COMP, "itmu_match_item_cpt_bp_comp");
+        
         TablesMap.put(FINS_TP_BKR, "erp.fins_tp_bkr");
         TablesMap.put(FINS_TP_ACC_MOV, "erp.fins_tp_acc_mov");
         TablesMap.put(FINS_CL_ACC_MOV, "erp.fins_cl_acc_mov");
@@ -1246,6 +1251,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_UMA, "hrs_uma");
         TablesMap.put(HRS_UMI, "hrs_umi");
         TablesMap.put(HRS_TP_LOAN_ADJ, "hrs_tp_loan_adj");
+        TablesMap.put(HRS_DEP_CC, "hrs_dep_cc");
         TablesMap.put(HRS_EMP_MEMBER, "hrs_emp_member");
         TablesMap.put(HRS_EMP_LOG_HIRE, "hrs_emp_log_hire");
         TablesMap.put(HRS_EMP_LOG_WAGE, "hrs_emp_log_wage");

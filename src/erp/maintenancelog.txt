@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 183.0/ 2021-05-25
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se modificó la generación del layout DIOT para que no se repitan los RFC agregados manualmente a las pólizas y los que tienen movimientos de IVA acreditable vía documentos.
+2) Se agregaron los botones de copiar y pegar renglón en la forma de importación de facturas desde XML.
+3) Se modificó en la base de datos los campos de "ítem de referencia" y "centro de costo" para hacer el match de ítems para la importación de facturas XML.
+4) Se agregó un botón en la forma de DPS para ingresar la fecha de vencimiento y en base a ella calcular los días de crédito deseados.
+
+================================================================================
 SIIE 3.2 182.0/ 2021-05-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
