@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SViewBenefit extends SGridPaneView implements ActionListener {
 
@@ -185,7 +185,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         msSql = "SELECT "
                 + "bp.id_bp AS _emp_id, bp.bp AS _emp_name, CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.b_act AS _emp_act, "
                 + "e.fk_tp_pay AS _pay_tp_id, tp.name AS _pay_tp_name, "
-                + "e.dt_ben AS _emp_dt_ben, e.dt_dis_n AS _emp_dt_dis_n, ";
+                + "e.dt_ben AS _emp_dt_ben, e.dt_dis_n AS _emp_dt_dis_n, cc.fk_cc AS _fk_cc, ";
         
         // # cut off date:
         String sqlCutoff = "IF(e.b_act, " + cutoff + ", e.dt_dis_n)";
@@ -324,6 +324,8 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON e.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
+                + "INNER JOIN erp.HRSU_DEP AS dep "
+                + "INNER JOIN HRS_DEP_CC AS cc ON cc.id_dep = dep.id_dep "
                 + ""
                 // # retrieve current benefit payed:
                 + "LEFT OUTER JOIN ("
@@ -415,6 +417,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_sen_as_months", "Antigüedad meses", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_sen_raw", "Antigüedad años", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_day_name", "Tabla " + benefit));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_fk_cc", "Centro de costo "));
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_bon_name", "Tabla prima vacacional"));

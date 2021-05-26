@@ -23,6 +23,7 @@ import erp.mod.hrs.db.SDbConditionalEarning;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbDepartment;
+import erp.mod.hrs.db.SDbDepartmentCenterCost;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeDismissalType;
@@ -71,6 +72,7 @@ import erp.mod.hrs.form.SFormConfig;
 import erp.mod.hrs.form.SFormCutoffCalendar;
 import erp.mod.hrs.form.SFormDeduction;
 import erp.mod.hrs.form.SFormDepartment;
+import erp.mod.hrs.form.SFormDepartmentCenterCost;
 import erp.mod.hrs.form.SFormEarning;
 import erp.mod.hrs.form.SFormEmployeeDismissalType;
 import erp.mod.hrs.form.SFormEmployeeType;
@@ -110,11 +112,12 @@ import erp.mod.hrs.view.SViewConditionalEarning;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
+import erp.mod.hrs.view.SViewDepartmentCC;
 import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
 import erp.mod.hrs.view.SViewEmployeeIdse;
-//import erp.mod.hrs.view.SViewEmployeeSua;
+import erp.mod.hrs.view.SViewEmployeeSua;
 import erp.mod.hrs.view.SViewEmployeeType;
 import erp.mod.hrs.view.SViewEmployeeWageLog;
 import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
@@ -181,6 +184,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormWorkerType moFormWorkerType;
     private SFormMwzType moFormMwzType;
     private SFormDepartment moFormDepartment;
+    private SFormDepartmentCenterCost moFormDepartmentCenterCost;;
     private SFormPosition moFormPosition;
     private SFormShift moFormShift;
     private SFormConfig moFormConfig;
@@ -421,6 +425,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSU_SHT:
                 registry = new SDbShift();
+                break;
+            case SModConsts.HRS_DEP_CC:
+                registry = new SDbDepartmentCenterCost();
                 break;
             case SModConsts.HRSU_EMP:
                 registry = new SDbEmployee();
@@ -775,7 +782,7 @@ public class SModuleHrs extends SGuiModule {
                        + "IF(id_tp_con = 3, 'BAJA', "
                        + "IF(id_tp_con = 4, 'MOVIMIENTOS AFILIATORIOS', "
                        + "IF(id_tp_con = 5, 'INCAPACIDAD', "
-                       + "IF(id_tp_con = 6, 'AUSEBTISMO', '')))))) " + SDbConsts.FIELD_ITEM + " " 
+                       + "IF(id_tp_con = 6, 'AUSENTISMO', '')))))) " + SDbConsts.FIELD_ITEM + " " 
                        + "FROM erp.hrss_tp_con " 
                        + "WHERE id_tp_con <= 6;";
                 break;
@@ -870,6 +877,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSU_SHT:
                 view = new SViewShift(miClient, "Turnos");
                 break;
+            case SModConsts.HRS_DEP_CC:
+                view = new SViewDepartmentCC(miClient, "Departamentos con centro de costo");
+                break;
             case SModConsts.HRS_CFG:
                 view = new SViewConfig(miClient, "Configuración módulo");
                 break;
@@ -931,7 +941,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewEmployeeHireLog(miClient, "Bitácora altas y bajas");
                 break;
             case SModConsts.HRS_EMP_LOG_SUA:
-//                view = new SViewEmployeeSua(miClient, "Bitácora empleados SUA");
+                view = new SViewEmployeeSua(miClient, "Bitácora empleados SUA");
                 break;
             case SModConsts.HRS_EMP_LOG_IDSE:
                 view = new SViewEmployeeIdse(miClient, "Bitácora empleados IDSE");
@@ -1182,6 +1192,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSU_SHT:
                 if (moFormShift == null) moFormShift = new SFormShift(miClient, "Turno");
                 form = moFormShift;
+                break;
+            case SModConsts.HRS_DEP_CC:
+                if (moFormDepartmentCenterCost == null) moFormDepartmentCenterCost = new SFormDepartmentCenterCost(miClient, "Departamentos con centros costo");
+                form = moFormDepartmentCenterCost;
                 break;
             case SModConsts.HRS_CFG:
                 if (moFormConfig == null) moFormConfig = new SFormConfig(miClient, "Configuración");

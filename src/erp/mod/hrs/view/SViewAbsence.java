@@ -9,6 +9,7 @@ import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.form.SDialogAbsenceMovesCardex;
+import erp.mod.hrs.form.SDialogLayoutEmployee;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -33,16 +34,20 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SViewAbsence extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     private JButton jbCloseAbsence;
     private JButton jbShowCardex;
+    private JButton jbShowInability;
+    private JButton jbShowInabilityMov;
+    private JButton jbShowAbsence;
     private SGridFilterPanelEmployee moFilterEmployee;
     private SGridFilterPanel moFilterAbsenceClass;
     private SGridFilterPanel moFilterBusinessPartner;
+    private SDialogLayoutEmployee moDialogLayoutEmployee;
     
     private SDialogAbsenceMovesCardex moDialogAbsenceMovesCardex;
 
@@ -62,6 +67,9 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         
         jbCloseAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Cerrar incidencia", this);
         jbShowCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
+        jbShowInability = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col.gif")), "Importación de datos de incapacidades", this);
+        jbShowInabilityMov = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col_cash.gif")), "Importación de movimientos de datos de incapacidades", this);
+        jbShowAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_pay_cash.gif")), "Importación de datos de ausentismo", this);
         
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         moFilterEmployee.initFilter(null);
@@ -77,6 +85,9 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseAbsence);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowInability);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowInabilityMov);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowAbsence);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterAbsenceClass);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterBusinessPartner);
@@ -138,6 +149,45 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
 
                 moDialogAbsenceMovesCardex.setValue(SModConsts.HRS_ABS, absence);
                 moDialogAbsenceMovesCardex.setVisible(true);
+            }
+        }
+    }
+    
+    private void actionLayoutEmployeeInability() {
+        if (jbShowInability.isEnabled()) {
+            try {
+                moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_INABILITY_IMP);
+                moDialogLayoutEmployee.resetForm();
+                moDialogLayoutEmployee.setVisible(true);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
+    private void actionLayoutEmployeeInabilityMov() {
+        if (jbShowInability.isEnabled()) {
+            try {
+                moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_INABILITY);
+                moDialogLayoutEmployee.resetForm();
+                moDialogLayoutEmployee.setVisible(true);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
+    private void actionLayoutEmployeeAbsence() {
+        if (jbShowInability.isEnabled()) {
+            try {
+                moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_TRUANCY);
+                moDialogLayoutEmployee.resetForm();
+                moDialogLayoutEmployee.setVisible(true);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
             }
         }
     }
@@ -286,6 +336,14 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
             }
             else if (button == jbShowCardex) {
                 actionShowCardex();
+            }else if (button == jbShowInability) {
+                actionLayoutEmployeeInability();
+            }
+            else if (button == jbShowInabilityMov) {
+                actionLayoutEmployeeInabilityMov();
+            }
+            else if (button == jbShowAbsence) {
+                actionLayoutEmployeeAbsence();
             }
         }
     }

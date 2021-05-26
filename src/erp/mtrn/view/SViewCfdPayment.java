@@ -25,10 +25,12 @@ import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -36,6 +38,8 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
+import sa.lib.srv.SSrvLock;
+import sa.lib.srv.SSrvUtils;
 
 /**
  * User view for management of database registries of CFDI of Payments.
@@ -316,6 +320,20 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                         boolean annul = true;
                         SGuiParams params = new SGuiParams();
                         SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                        ArrayList pkPolicy = SDataDps.getUsePolicy(miClient.getSession(), cfd.getPkCfdId());
+                        boolean isCopy = false;
+                        boolean mbIsFormReadOnly = false;
+                        SSrvLock lock = null;
+
+                        for (int x = 0; x < pkPolicy.size() -1; x++) {
+                            if (pkPolicy.get(x) != null) {
+                                if (!mbIsFormReadOnly && !isCopy) {
+                                    // Attempt to gain data lock:
+
+                                    lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, pkPolicy.get(x), 7200000);
+                                }
+                            }
+                        }
 
                         if (cfd.isCfdi()) {
                             annul = false;

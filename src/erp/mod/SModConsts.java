@@ -627,6 +627,7 @@ public abstract class SModConsts {
     public static final int HRSU_DEP = 2062031;
     public static final int HRSU_POS = 2062032;
     public static final int HRSU_SHT = 2062033;
+    public static final int HRS_DEP_CC = 2062034;
     public static final int HRSU_EMP = 2062051;
     public static final int HRSU_EMP_REL = 2062052;
     public static final int HRSU_EMP_SUA = 2062053;

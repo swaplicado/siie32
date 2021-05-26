@@ -363,6 +363,11 @@ public class SModuleFin extends SGuiModule {
                 sql = "SELECT id_tax_grp AS " + SDbConsts.FIELD_ID + "1, tax_grp AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY tax_grp, id_tax_grp ";
                 break;
+            case SModConsts.FIN_CC:
+                settings = new SGuiCatalogueSettings("Centro de costo", 1);
+                sql = "SELECT id_cc AS " + SDbConsts.FIELD_ID + "1, pk_cc AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM fin_cc WHERE b_del = 0 ORDER BY id_cc ";
+                break;
             case SModConsts.FIN_ACC_CASH:
                 settings = new SGuiCatalogueSettings("Cuenta de dinero", 2);
                 settings.setCodeApplying(true);

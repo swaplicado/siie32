@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Sergio Flores, Claudio Peña
  */
 public class SDbAbsence extends SDbRegistryUser implements SGridRow {
 
@@ -30,6 +30,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     protected Date mtDateStart;
     protected Date mtDateEnd;
     protected int mnEffectiveDays;
+    protected String msDisRisk;
+    protected String msDisSequel;
+    protected String msDisControl;
     protected int mnBenefitsYear;
     protected int mnBenefitsAnniversary;
     protected String msNotes;
@@ -82,6 +85,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
     public void setEffectiveDays(int n) { mnEffectiveDays = n; }
+    public void setDisRisk(String s) { msDisRisk = s; }
+    public void setDisSequel(String s) { msDisSequel = s; }
+    public void setDisControl(String s) { msDisControl = s; }
     public void setBenefitsYear(int n) { mnBenefitsYear = n; }
     public void setBenefitsAnniversary(int n) { mnBenefitsAnniversary = n; }
     public void setNotes(String s) { msNotes = s; }
@@ -105,6 +111,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
     public int getEffectiveDays() { return mnEffectiveDays; }
+    public String getDisRisk() { return msDisRisk; }
+    public String getDisSequel() { return msDisSequel; }
+    public String getDisControl() { return msDisControl; }
     public int getBenefitsYear() { return mnBenefitsYear; }
     public int getBenefitsAnniversary() { return mnBenefitsAnniversary; }
     public String getNotes() { return msNotes; }
@@ -250,6 +259,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         mtDateStart = null;
         mtDateEnd = null;
         mnEffectiveDays = 0;
+        msDisRisk = "";
+        msDisSequel = "";
+        msDisControl = "";
         mnBenefitsYear = 0;
         mnBenefitsAnniversary = 0;
         msNotes = "";
@@ -326,6 +338,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             mtDateStart = resultSet.getDate("dt_sta");
             mtDateEnd = resultSet.getDate("dt_end");
             mnEffectiveDays = resultSet.getInt("eff_day");
+            msDisRisk = resultSet.getString("dis_risk");
+            msDisSequel = resultSet.getString("dis_sequel");
+            msDisControl = resultSet.getString("dis_control");
             mnBenefitsYear = resultSet.getInt("ben_year");
             mnBenefitsAnniversary = resultSet.getInt("ben_ann");
             msNotes = resultSet.getString("nts");
@@ -378,6 +393,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
                     mnEffectiveDays + ", " +
+                    "'" + msDisRisk + "', " +
+                    "'" + msDisSequel + "', " +
+                    "'" + msDisControl + "', " +
                     mnBenefitsYear + ", " + 
                     mnBenefitsAnniversary + ", " + 
                     "'" + msNotes + "', " +
@@ -408,6 +426,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "dt_end = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
                     "eff_day = " + mnEffectiveDays + ", " +
+                    "dis_risk = '" + msDisRisk + "', " +
+                    "dis_sequel = '" + msDisSequel + "', " +
+                    "dis_control = '" + msDisControl + "', " +
                     "ben_year = " + mnBenefitsYear + ", " +
                     "ben_ann = " + mnBenefitsAnniversary + ", " +
                     "nts = '" + msNotes + "', " +
@@ -450,6 +471,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         registry.setDateStart(this.getDateStart());
         registry.setDateEnd(this.getDateEnd());
         registry.setEffectiveDays(this.getEffectiveDays());
+        registry.setDisRisk(this.getDisRisk());
+        registry.setDisSequel(this.getDisSequel());
+        registry.setDisControl(this.getDisControl());
         registry.setBenefitsYear(this.getBenefitsYear());
         registry.setBenefitsAnniversary(this.getBenefitsAnniversary());
         registry.setNotes(this.getNotes());
@@ -548,6 +572,15 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                 value = mnEffectiveDays;
                 break;
             case 6:
+                value = msDisRisk;
+                break;
+            case 7:
+                value = msDisSequel;
+                break;
+            case 8:
+                value = msDisControl;
+                break;
+            case 9:
                 value = mnAuxPendingDays;
                 break;
             default:
@@ -566,6 +599,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             case 4:
             case 5:
             case 6:
+            case 7:
+            case 8:
+            case 9:
                 break;
             default:
         }
