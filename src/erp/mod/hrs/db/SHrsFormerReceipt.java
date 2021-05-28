@@ -49,7 +49,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected String msEmpleadoNum;
     protected String msEmpleadoCurp;
     protected int mnTipoRegimen;
-    protected String msTipoRegimen;
+    protected String msTipoRegimenCode;
     protected String msNumSeguridadSocial;
     protected Date mtFechaPago;
     protected Date mtFechaInicialPago;
@@ -85,7 +85,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected String msConfirmacion;
     protected String msRegimenFiscal;
     protected String msCfdiRelacionadosTipoRelacion;
-    protected ArrayList<String> maCrdiRelacionados;
+    protected ArrayList<String> maCfdiRelacionados;
 
     protected int mnAuxEmpleadoId;
     protected double mdAuxSueldoMensual;
@@ -102,7 +102,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         msEmpleadoNum = "";
         msEmpleadoCurp = "";
         mnTipoRegimen = 0;
-        msTipoRegimen = "";
+        msTipoRegimenCode = "";
         msNumSeguridadSocial = "";
         mtFechaPago = null;
         mtFechaInicialPago = null;
@@ -138,7 +138,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         msConfirmacion = "";
         msRegimenFiscal = "";
         msCfdiRelacionadosTipoRelacion = "";
-        maCrdiRelacionados = new ArrayList<>();
+        maCfdiRelacionados = new ArrayList<>();
 
         mnAuxEmpleadoId = 0;
         mdAuxSueldoMensual = 0;
@@ -152,8 +152,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public void setRegistroPatronal(String s) { msRegistroPatronal = s; }
     public void setEmpleadoNum(String s) { msEmpleadoNum = s; }
     public void setEmpleadoCurp(String s) { msEmpleadoCurp = s; }
-    public void setTipoRegimen(int n) { mnTipoRegimen = n; }
-    public void setTipoRegimen(String s) { msTipoRegimen = s; }
+    public void setTipoRegimen(int n) { mnTipoRegimen = n; setTipoRegimenCode((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE)); }
+    public void setTipoRegimenCode(String s) { msTipoRegimenCode = s; }
     public void setNumSeguridadSocial(String s) { msNumSeguridadSocial = s; }
     public void setFechaPago(Date t) { mtFechaPago = t; }
     public void setFechaInicialPago(Date t) { mtFechaInicialPago = t; }
@@ -165,13 +165,13 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public void setFechaInicioRelLaboral(Date t) { mtFechaInicioRelLaboral = t; }
     public void setAntiguedad(int n) { mnAntiguedad = n; }
     public void setPuesto(String s) { msPuesto = s; }
-    public void setRiesgoPuesto(int n) { mnRiesgoPuesto = n; }
-    public void setRiesgoPuesto(String s) { msRiesgoPuesto = s; }
     public void setTipoContrato(String s) { msTipoContrato = s; }
     public void setSindicalizado(String s) { msSindicalizado = s; }
     public void setTipoJornada(String s) { msTipoJornada = s; }
     public void setPeriodicidadPago(String s) { msPeriodicidadPago = s; }
     public void setSalarioBaseCotApor(double d) { mdSalarioBaseCotApor = d; }
+    public void setRiesgoPuesto(int n) { mnRiesgoPuesto = n; }
+    public void setRiesgoPuesto(String s) { msRiesgoPuesto = s; }
     public void setSalarioDiarioIntegrado(double d) { mdSalarioDiarioIntegrado = d; }
     public void setClaveEstado(String s) { msClaveEstado = s; }
 
@@ -201,6 +201,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public String getEmpleadoNum() { return msEmpleadoNum; }
     public String getEmpleadoCurp() { return msEmpleadoCurp; }
     public int getTipoRegimen() { return mnTipoRegimen; }
+    public String getTipoRegimenCode() { return msTipoRegimenCode; }
     public String getNumSeguridadSocial() { return msNumSeguridadSocial; }
     public Date getFechaPago() { return mtFechaPago; }
     public Date getFechaInicialPago() { return mtFechaInicialPago; }
@@ -235,7 +236,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public String getConfirmacion() { return msConfirmacion; }
     public String getRegimenFiscal() { return msRegimenFiscal; }
     //public String getCfdiRelacionadosTipoRelacion() { return msCfdiRelacionadosTipoRelacion; } // implemented within interface SCfdXmlCfdi33
-    //public ArrayList<String> getCfdiRelacionados() { return maCrdiRelacionados; } // implemented within interface SCfdXmlCfdi33
+    //public ArrayList<String> getCfdiRelacionados() { return maCfdiRelacionados; } // implemented within interface SCfdXmlCfdi33
 
     public int getAuxEmpleadoId() { return mnAuxEmpleadoId; }
     public double getAuxSueldoMensual() { return mdAuxSueldoMensual; }
@@ -252,12 +253,10 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
     
     private boolean isRecruitmentSchemeForEmployment() {
-        String tipoRegimen = (String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE);
-        
-        return tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenSueldos) || 
-                tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenJubilados) || 
-                tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenPensionados) || 
-                tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenJubiladosOPensionados);
+        return msTipoRegimenCode.equals(DCfdi33Catalogs.ClaveTipoRegimenSueldos) || 
+                msTipoRegimenCode.equals(DCfdi33Catalogs.ClaveTipoRegimenJubilados) || 
+                msTipoRegimenCode.equals(DCfdi33Catalogs.ClaveTipoRegimenPensionados) || 
+                msTipoRegimenCode.equals(DCfdi33Catalogs.ClaveTipoRegimenJubiladosOPensionados);
     }
     
     private String composeKey(final String key, final int minLen) {
@@ -578,14 +577,14 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         // Validate recruitment scheme:
         
         if (isTypeContractForEmployment() && !isRecruitmentSchemeForEmployment()) {
-            throw new Exception("El tipo régimen de contratación del empleado en el CFDI no corresponde a una relación laboral subordinada.");
+            throw new Exception("El régimen de contratación del empleado en el CFDI (clave: '" + msTipoRegimenCode + "') no corresponde a una relación laboral subordinada (clave tipo contrato: '" + msTipoContrato + "').");
         }
         
         if (!isTypeContractForEmployment() && isRecruitmentSchemeForEmployment()) {
-            throw new Exception("El tipo régimen de contratación del empleado en el CFDI no corresponde a un esquema insubordinado.");
+            throw new Exception("El régimen de contratación del empleado en el CFDI (clave: '" + msTipoRegimenCode + "') no corresponde a un esquema insubordinado (clave tipo contrato: '" + msTipoContrato + "').");
         }
         
-        receptor.getAttTipoRegimen().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE));
+        receptor.getAttTipoRegimen().setString(msTipoRegimenCode);
         
         // Validate length the account bank:
         
@@ -867,7 +866,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     
     @Override
     public ArrayList<String> getCfdiRelacionados() { // CFDI 3.3
-        return maCrdiRelacionados;
+        return maCfdiRelacionados;
     }
 
     @Override

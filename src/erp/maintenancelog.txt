@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 183.1/ 2021-05-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Clarificación de mensajes de error en la validación entre el régimen de contratación y el tipo de contrato al timbrar CFDI de recibo de nómina.
+
+================================================================================
 SIIE 3.2 183.0/ 2021-05-27
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
