@@ -130,13 +130,14 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected java.lang.String msDbmsItemAux;
     protected java.lang.String msDbmsTax;
     protected java.lang.String msDbmsDps;
-    protected int mnDbmsXmlFilesNumber;
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
     protected erp.mfin.data.SDataCheck moDbmsCheck;
+    protected int mnDbmsXmlFilesNumber;
     protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
-
+    protected HashSet<erp.mtrn.data.SDataCfd> maAuxDataCfdToDel;
+            
     protected int mnAuxCheckNumber;
     protected java.util.Date mtAuxDateCfd;
 
@@ -326,6 +327,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
     public void setDbmsCheck(erp.mfin.data.SDataCheck o) { moDbmsCheck = o; }
     public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
+    public void setAuxDataCfdToDel(HashSet<erp.mtrn.data.SDataCfd> a ) { maAuxDataCfdToDel = a; }
 
     public java.lang.String getDbmsAccount() { return msDbmsAccount; }
     public java.lang.String getDbmsAccountComplement() { return msDbmsAccountComplement; }
@@ -352,6 +354,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
     public erp.mfin.data.SDataCheck getDbmsCheck() { return moDbmsCheck; }
     public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
+    public HashSet<erp.mtrn.data.SDataCfd> getAuxDataCfdToDel() { return maAuxDataCfdToDel; }
 
     public void setAuxCheckNumber(int n) { mnAuxCheckNumber = n; }
     public void setAuxDateCfd(java.util.Date t) { mtAuxDateCfd = t; }
@@ -513,6 +516,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         mnDbmsXmlFilesNumber = 0;
         moDbmsCheck = null;
         maDbmsDataCfd = new HashSet<>();
+        maAuxDataCfdToDel = new HashSet<>();
 
         mnAuxCheckNumber = 0;
         mtAuxDateCfd = null;
@@ -962,6 +966,11 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 // Save XML associated:
                 
                 for (SDataCfd cfd : maDbmsDataCfd) {
+                    cfd.setFkFinRecordYearId_n(0);
+                    cfd.setFkFinRecordPeriodId_n(0);
+                    cfd.setFkFinRecordBookkeepingCenterId_n(0);
+                    cfd.setFkFinRecordRecordTypeId_n("");
+                    cfd.setFkFinRecordNumberId_n(0);
                     cfd.setFkRecordYearId_n(mnPkYearId);
                     cfd.setFkRecordPeriodId_n(mnPkPeriodId);
                     cfd.setFkRecordBookkeepingCenterId_n(mnPkBookkeepingCenterId);
@@ -970,6 +979,21 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     cfd.setFkRecordEntryId_n(mnPkEntryId);
                     cfd.setTimestamp(mtAuxDateCfd);
 
+                    if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+                
+                // Delete XML:
+                
+                for (SDataCfd cfd : maAuxDataCfdToDel) {
+                    cfd.setFkRecordYearId_n(0);
+                    cfd.setFkRecordPeriodId_n(0);
+                    cfd.setFkRecordBookkeepingCenterId_n(0);
+                    cfd.setFkRecordRecordTypeId_n("");
+                    cfd.setFkRecordNumberId_n(0);
+                    cfd.setFkRecordEntryId_n(0);
+                    
                     if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }

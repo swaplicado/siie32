@@ -2915,6 +2915,27 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moRecordEntry.setFkDpsAdjustmentDocId_n(0);
         }
         
+        
+        // obtain XML to delete:
+        
+        for (SDataCfd cfdAux : moRecordEntry.getDbmsDataCfds()) {
+            if (maCfdRecordRows.isEmpty()) {
+                moRecordEntry.getAuxDataCfdToDel().add(cfdAux);
+            }
+            else {
+                boolean found = false;
+                for (SDataCfdRecordRow row : maCfdRecordRows) {
+                    if (SLibUtilities.compareKeys(new int[] { row.getCfdId() }, new int[] { cfdAux.getPkCfdId() })) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    moRecordEntry.getAuxDataCfdToDel().add(cfdAux);
+                }
+            }
+        }
+        
         // process added XML files of CFDI:
         
         ArrayList<SDataCfd> cfds = new ArrayList<>();

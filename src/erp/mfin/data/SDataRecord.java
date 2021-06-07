@@ -10,10 +10,12 @@ import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import static erp.mfin.data.SDataRecordEntry.LEN_CONCEPT;
+import erp.mtrn.data.SDataCfd;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashSet;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -30,7 +32,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -67,6 +69,10 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     protected java.lang.String msDbmsCompanyBranchCode;
     protected erp.mfin.data.SDataAccountCash moDbmsDataAccountCash;
     protected java.util.Vector<erp.mfin.data.SDataRecordEntry> mvDbmsRecordEntries;
+    
+    protected int mnDbmsXmlFilesNumber;
+    protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
+    protected HashSet<erp.mtrn.data.SDataCfd> maAuxDataCfdToDel;
 
     public SDataRecord() {
         super(SDataConstants.FIN_REC);
@@ -173,11 +179,17 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     public void setDbmsDataAccountCash(erp.mfin.data.SDataAccountCash o) { moDbmsDataAccountCash = o; }
     public void setDbmsBookkeepingCenterCode(java.lang.String s) { msDbmsBookkeepingCenterCode = s; }
     public void setDbmsCompanyBranchCode(java.lang.String s) { msDbmsCompanyBranchCode = s; }
+    public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
+    public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
+    public void setAuxDataCfdToDel(HashSet<erp.mtrn.data.SDataCfd> a ) { maAuxDataCfdToDel = a; }
     
     public java.lang.String getDbmsBookkeepingCenterCode() { return msDbmsBookkeepingCenterCode; }
     public java.lang.String getDbmsCompanyBranchCode() { return msDbmsCompanyBranchCode; }
     public erp.mfin.data.SDataAccountCash getDbmsDataAccountCash() { return moDbmsDataAccountCash; }
     public java.util.Vector<SDataRecordEntry> getDbmsRecordEntries() { return mvDbmsRecordEntries; }
+    public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
+    public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
+    public HashSet<erp.mtrn.data.SDataCfd> getAuxDataCfdToDel() { return maAuxDataCfdToDel; }
 
     /**
      * Composes record period in format yyyy-mm (i.e., year-month).
@@ -289,6 +301,9 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         msDbmsCompanyBranchCode = "";
         moDbmsDataAccountCash = null;
         mvDbmsRecordEntries.clear();
+        mnDbmsXmlFilesNumber = 0;
+        maDbmsDataCfd = new HashSet<>();
+        maAuxDataCfdToDel = new HashSet<>();
     }
 
     @Override
@@ -372,7 +387,16 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
                         mvDbmsRecordEntries.add(entry);
                     }
                 }
-
+                
+                // CFD
+                
+                sql = "SELECT id_cfd FROM trn_cfd WHERE fid_fin_rec_year_n = " + key[0] + " AND fid_fin_rec_per_n = " + key[1] + " AND "
+                        + "fid_fin_rec_bkc_n = " + key[2] + " AND fid_fin_rec_tp_rec_n = '" + key[3] + "' AND "
+                        + "fid_fin_rec_num_n = " + key[4] + ";";
+                readXml(statement, sql);
+                
+                mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
+ 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -387,6 +411,23 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         }
 
         return mnLastDbActionResult;
+    }
+    
+    private void readXml(Statement statement, String sql) throws Exception {
+        SDataCfd cfd;
+        Statement statementAux = statement.getConnection().createStatement();
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfd = new SDataCfd();
+                if (cfd.read(new int[] { resultSet.getInt("id_cfd") }, statementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                
+                if (!cfd.getDocXmlName().isEmpty()) {
+                    maDbmsDataCfd.add(cfd);
+                }
+            }
+        }
     }
 
     /**
@@ -463,6 +504,41 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
                             if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                             }
+                        }
+                    }
+                    
+                    // Save XML associated:
+                
+                    for (SDataCfd cfd : maDbmsDataCfd) {
+                        cfd.setFkFinRecordYearId_n(mnPkYearId);
+                        cfd.setFkFinRecordPeriodId_n(mnPkPeriodId);
+                        cfd.setFkFinRecordBookkeepingCenterId_n(mnPkBookkeepingCenterId);
+                        cfd.setFkFinRecordRecordTypeId_n(msPkRecordTypeId);
+                        cfd.setFkFinRecordNumberId_n(mnPkNumberId);
+                        cfd.setFkRecordYearId_n(0);
+                        cfd.setFkRecordPeriodId_n(0);
+                        cfd.setFkRecordBookkeepingCenterId_n(0);
+                        cfd.setFkRecordRecordTypeId_n("");
+                        cfd.setFkRecordNumberId_n(0);
+                        cfd.setFkRecordEntryId_n(0);
+                        cfd.setTimestamp(mtDate);
+                        
+                        if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                    }
+                    
+                    // Delete XML:
+                    
+                    for (SDataCfd cfd : maAuxDataCfdToDel) {
+                        cfd.setFkFinRecordYearId_n(0);
+                        cfd.setFkFinRecordPeriodId_n(0);
+                        cfd.setFkFinRecordBookkeepingCenterId_n(0);
+                        cfd.setFkFinRecordRecordTypeId_n("");
+                        cfd.setFkFinRecordNumberId_n(0);
+                        
+                        if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
                     }
 

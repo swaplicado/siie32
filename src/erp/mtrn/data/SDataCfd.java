@@ -96,6 +96,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkFactoringBankId_n;
     protected int mnFkDpsYearId_n;
     protected int mnFkDpsDocId_n;
+    protected int mnFkFinRecordYearId_n;
+    protected int mnFkFinRecordPeriodId_n;
+    protected int mnFkFinRecordBookkeepingCenterId_n;
+    protected java.lang.String msFkFinRecordRecordTypeId_n;
+    protected int mnFkFinRecordNumberId_n;
     protected int mnFkRecordYearId_n;
     protected int mnFkRecordPeriodId_n;
     protected int mnFkRecordBookkeepingCenterId_n;
@@ -227,6 +232,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkFactoringBankId_n(int n) { mnFkFactoringBankId_n = n; }
     public void setFkDpsYearId_n(int n) { mnFkDpsYearId_n = n; }
     public void setFkDpsDocId_n(int n) { mnFkDpsDocId_n = n; }
+    public void setFkFinRecordYearId_n(int n) { mnFkFinRecordYearId_n = n; }
+    public void setFkFinRecordPeriodId_n(int n) { mnFkFinRecordPeriodId_n = n; }
+    public void setFkFinRecordBookkeepingCenterId_n(int n) { mnFkFinRecordBookkeepingCenterId_n = n; }
+    public void setFkFinRecordRecordTypeId_n(java.lang.String s) { msFkFinRecordRecordTypeId_n = s; }
+    public void setFkFinRecordNumberId_n(int n) { mnFkFinRecordNumberId_n = n; }
     public void setFkRecordYearId_n(int n) { mnFkRecordYearId_n = n; }
     public void setFkRecordPeriodId_n(int n) { mnFkRecordPeriodId_n = n; }
     public void setFkRecordBookkeepingCenterId_n(int n) { mnFkRecordBookkeepingCenterId_n = n; }
@@ -286,6 +296,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkFactoringBankId_n() { return mnFkFactoringBankId_n; }
     public int getFkDpsYearId_n() { return mnFkDpsYearId_n; }
     public int getFkDpsDocId_n() { return mnFkDpsDocId_n; }
+    public int getFkFinRecordYearId_n() { return mnFkFinRecordYearId_n; }
+    public int getFkFinRecordPeriodId_n() { return mnFkFinRecordPeriodId_n; }
+    public int getFkFinRecordBookkeepingCenterId_n() { return mnFkFinRecordBookkeepingCenterId_n; }
+    public java.lang.String getFkFinRecordRecordTypeId_n() { return msFkFinRecordRecordTypeId_n; }
+    public int getFkFinRecordNumberId_n() { return mnFkFinRecordNumberId_n; }
     public int getFkRecordYearId_n() { return mnFkRecordYearId_n; }
     public int getFkRecordPeriodId_n() { return mnFkRecordPeriodId_n; }
     public int getFkRecordBookkeepingCenterId_n() { return mnFkRecordBookkeepingCenterId_n; }
@@ -458,6 +473,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkFactoringBankId_n = 0;
         mnFkDpsYearId_n = 0;
         mnFkDpsDocId_n = 0;
+        mnFkFinRecordYearId_n = 0;
+        mnFkFinRecordPeriodId_n = 0;
+        mnFkFinRecordBookkeepingCenterId_n = 0;
+        msFkFinRecordRecordTypeId_n = "";
+        mnFkFinRecordNumberId_n = 0;
         mnFkRecordYearId_n = 0;
         mnFkRecordPeriodId_n = 0;
         mnFkRecordBookkeepingCenterId_n = 0;
@@ -539,6 +559,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkFactoringBankId_n = resultSet.getInt("fid_fact_bank_n");
                 mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
                 mnFkDpsDocId_n = resultSet.getInt("fid_dps_doc_n");
+                mnFkFinRecordYearId_n = resultSet.getInt("fid_fin_rec_year_n");
+                mnFkFinRecordPeriodId_n = resultSet.getInt("fid_fin_rec_per_n");
+                mnFkFinRecordBookkeepingCenterId_n = resultSet.getInt("fid_fin_rec_bkc_n");
+                msFkFinRecordRecordTypeId_n = resultSet.getString("fid_fin_rec_tp_rec_n");
+                mnFkFinRecordNumberId_n = resultSet.getInt("fid_fin_rec_num_n");
                 mnFkRecordYearId_n = resultSet.getInt("fid_rec_year_n");
                 mnFkRecordPeriodId_n = resultSet.getInt("fid_rec_per_n");
                 mnFkRecordBookkeepingCenterId_n = resultSet.getInt("fid_rec_bkc_n");
@@ -640,13 +665,15 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "ts, cert_num, str_signed, signature, doc_xml_uuid, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
                         "xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
                         "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_fact_bank_n, fid_dps_year_n, fid_dps_doc_n, " +
+                        "fid_fin_rec_year_n, fid_fin_rec_per_n, fid_fin_rec_bkc_n, fid_fin_rec_tp_rec_n, fid_fin_rec_num_n, " + 
                         "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
                         "fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
                         "VALUES (" + mnPkCfdId + ", ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, " +
                         "NOW(), NOW())";
                 sqlComp = "INSERT INTO " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
                         "(id_cfd, doc_xml, doc_xml_name, ack_can_xml, ack_can_pdf_n) " + 
@@ -659,7 +686,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
                         "uuid = ?, qrc_n = ?, can_st = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
                         "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, fid_fact_bank_n = ?, " +
-                        "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
+                        "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_fin_rec_year_n = ?, fid_fin_rec_per_n = ?, fid_fin_rec_bkc_n = ?, fid_fin_rec_tp_rec_n = ?, fid_fin_rec_num_n = ?, " + 
+                        "fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
                         "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
                         "WHERE id_cfd = " + mnPkCfdId + " "; 
                 sqlComp = "UPDATE " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
@@ -737,6 +765,21 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             else {
                 preparedStatement.setInt(index++, mnFkDpsYearId_n);
                 preparedStatement.setInt(index++, mnFkDpsDocId_n);
+            }
+            
+            if (mnFkFinRecordYearId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+                preparedStatement.setNull(index++, java.sql.Types.CHAR);
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkFinRecordYearId_n);
+                preparedStatement.setInt(index++, mnFkFinRecordPeriodId_n);
+                preparedStatement.setInt(index++, mnFkFinRecordBookkeepingCenterId_n);
+                preparedStatement.setString(index++, msFkFinRecordRecordTypeId_n);
+                preparedStatement.setInt(index++, mnFkFinRecordNumberId_n);
             }
             
             if (mnFkRecordYearId_n == SLibConsts.UNDEFINED) {

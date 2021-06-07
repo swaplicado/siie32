@@ -401,7 +401,8 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
                 "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, " +
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_num, " +
                 "SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, SUM(re.debit) - SUM(re.credit) AS f_balance, " +
-                "((SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_rec_year_n AND r.id_per = c.fid_rec_per_n AND r.id_bkc = c.fid_rec_bkc_n AND r.id_tp_rec = c.fid_rec_tp_rec_n AND r.id_num = c.fid_rec_num_n) + " +
+                "((SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_fin_rec_year_n AND r.id_per = c.fid_fin_rec_per_n AND r.id_bkc = c.fid_fin_rec_bkc_n AND r.id_tp_rec = c.fid_fin_rec_tp_rec_n AND r.id_num = c.fid_fin_rec_num_n) + " +
+                "(SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_rec_year_n AND r.id_per = c.fid_rec_per_n AND r.id_bkc = c.fid_rec_bkc_n AND r.id_tp_rec = c.fid_rec_tp_rec_n AND r.id_num = c.fid_rec_num_n) + " +
                 "(SELECT COUNT(DISTINCT re1.fid_dps_year_n, re1.fid_dps_doc_n) FROM fin_rec_ety AS re1, trn_cfd AS c WHERE NOT re1.b_del AND r.id_year = re1.id_year AND r.id_per = re1.id_per AND r.id_bkc = re1.id_bkc AND r.id_tp_rec = re1.id_tp_rec AND r.id_num = re1.id_num AND " +
                 " re1.fid_dps_year_n = c.fid_dps_year_n AND re1.fid_dps_doc_n = c.fid_dps_doc_n) + " +
                 "(SELECT COUNT(DISTINCT re1.fid_cfd_n) FROM fin_rec_ety AS re1, trn_cfd AS c WHERE NOT re1.b_del AND r.id_year = re1.id_year AND r.id_per = re1.id_per AND r.id_bkc = re1.id_bkc AND r.id_tp_rec = re1.id_tp_rec AND r.id_num = re1.id_num " +

@@ -15,6 +15,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -25,17 +26,19 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
- * @author Irving Sánchez
+ * @author Irving Sánchez, Isabel Servín
  */
 public class SDialogRecordEntryXml extends javax.swing.JDialog implements ActionListener {
 
     private int mnFormResult;
-    private erp.client.SClientInterface miClient;
-    private ArrayList<SDataCfdRecordRow> maRows;
+    private final erp.client.SClientInterface miClient;
+    private final ArrayList<SDataCfdRecordRow> maRows;
     private erp.lib.table.STablePane moPaneCfdRecordRows;
     
     /**
      * Creates new form SDialogRecordEntryDps
+     * @param client
+     * @param cfdRows
      */
     public SDialogRecordEntryXml(erp.client.SClientInterface client, ArrayList<SDataCfdRecordRow> cfdRows) {
         super(client.getFrame(), true);
@@ -62,6 +65,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         jPanel4 = new javax.swing.JPanel();
         jbRowAdd = new javax.swing.JButton();
         jbRowRemove = new javax.swing.JButton();
+        jbRowRemoveAll = new javax.swing.JButton();
         jpGrid = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -70,7 +74,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         setPreferredSize(new java.awt.Dimension(400, 250));
         setResizable(false);
 
-        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Documentos XML de la partida"));
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Documentos XML de la partida:"));
         jPanel11.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setPreferredSize(new java.awt.Dimension(468, 33));
@@ -99,6 +103,11 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         jbRowRemove.setToolTipText("Eliminar archivo XML");
         jbRowRemove.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jbRowRemove);
+
+        jbRowRemoveAll.setText("Eliminar todos");
+        jbRowRemoveAll.setToolTipText("Eliminar todos los archivos XML");
+        jbRowRemoveAll.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jbRowRemoveAll);
 
         jpPanel33.add(jPanel4, java.awt.BorderLayout.NORTH);
 
@@ -132,6 +141,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
 
         jbRowAdd.addActionListener(this);
         jbRowRemove.addActionListener(this);
+        jbRowRemoveAll.addActionListener(this);
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         
@@ -151,12 +161,16 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
+        miClient.getFileChooser().setMultiSelectionEnabled(true);
 
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                if (SCfdUtils.validateCfdiReceptor(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
-                    maRows.add(new SDataCfdRecordRow(maRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
-                    populateGridRows();
+                File[] files = miClient.getFileChooser().getSelectedFiles();
+                for (File file : files) {
+                    if (SCfdUtils.validateCfdiReceptor(miClient, file.getAbsolutePath())) {
+                        maRows.add(new SDataCfdRecordRow(maRows.size() + 1, 0, file.getName(), file.getAbsolutePath()));
+                        populateGridRows();
+                    }
                 }
             }
             miClient.getFileChooser().resetChoosableFileFilters();
@@ -167,26 +181,20 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         }
     }
     
-    private void actionRowRemove () {
-        int index = 0;
-        SDataCfdRecordRow recordRow = null;
-        ArrayList<SDataCfdRecordRow> deleteRows = null;
+    private void actionRowRemove() {
+        int index;
+        SDataCfdRecordRow recordRow;
+        ArrayList<SDataCfdRecordRow> deleteRows;
         
         index = moPaneCfdRecordRows.getTable().getSelectedRow();
-        deleteRows = new ArrayList<SDataCfdRecordRow>();
+        deleteRows = new ArrayList<>();
         if (index != -1) {
             if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
                 recordRow = (SDataCfdRecordRow) moPaneCfdRecordRows.getTableRow(index);
                 
                 for (SDataCfdRecordRow row : maRows) {
                     if (row.getMoveId() == recordRow.getMoveId()) {
-                        if (row.getCfdId() == SLibConstants.UNDEFINED) {
-                            deleteRows.add(row);
-                        }
-                        else {
-                            row.setNameXml("");
-                            row.setPathXml("");
-                        }
+                        deleteRows.add(row);
                         break;
                     }
                 }
@@ -196,6 +204,13 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
                 
                 populateGridRows();
             }
+        }
+    }
+    
+    private void actionRowRemoveAll() {
+        if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+            maRows.clear();
+            populateGridRows();
         }
     }
     
@@ -228,6 +243,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRowAdd;
     private javax.swing.JButton jbRowRemove;
+    private javax.swing.JButton jbRowRemoveAll;
     private javax.swing.JPanel jpGrid;
     private javax.swing.JPanel jpPanel33;
     // End of variables declaration//GEN-END:variables
@@ -240,8 +256,11 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
                 actionRowAdd();
             } 
             else if (button == jbRowRemove) {
-                actionRowRemove ();
+                actionRowRemove();
             } 
+            else if (button == jbRowRemoveAll) {
+                actionRowRemoveAll();
+            }
             else if (button == jbOk) {
                 actionOk();
             }  

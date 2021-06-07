@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 184.0/ 2021-06-07
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó la posibilidad de agregar uno o varios XML al encabezado de una póliza contable.
+2) Se agregó la funcionalidad de poder traspasar archivos XML de un encabezado de la póliza a una partida y viceversa.
+
+================================================================================
 SIIE 3.2 183.1/ 2021-05-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

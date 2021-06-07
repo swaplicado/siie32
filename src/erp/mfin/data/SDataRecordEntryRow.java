@@ -27,6 +27,15 @@ public final class SDataRecordEntryRow extends erp.lib.table.STableRow {
         return ((SDataRecordEntry) moData).getDbmsDataCfds();
     }
     
+    /**
+     * Devuelve una lista con los CFDs del registro que se van a eliminar.
+     * @return HashSet.
+     */
+    public HashSet<SDataCfd> getCfdsToDel() {
+        return ((SDataRecordEntry) moData).getAuxDataCfdToDel();
+    }
+    
+    
     @Override
     public void prepareTableRow() {
         SDataRecordEntry entry = (SDataRecordEntry) moData;

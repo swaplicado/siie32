@@ -22,10 +22,12 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
 import erp.mfin.data.SDataAccountCash;
+import erp.mfin.data.SDataCfdRecordRow;
 import erp.mfin.data.SDataCheck;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataRecordEntryRow;
+import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinConsts;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
@@ -33,6 +35,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -44,6 +48,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.xml.SXmlUtils;
 
 /**
  *
@@ -87,6 +92,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private boolean mbParamIsReadOnly;
     private boolean mbOriginalIsDeleted;
     private java.lang.String msAuxLastEntryConcept;
+    
+    private ArrayList<SDataCfdRecordRow> maCfdRecordRows = null;
+    private boolean mbIsXmlTranfer = false;
 
     /** Creates new form SFormRecord
      * @param client */
@@ -126,6 +134,11 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jlConcept = new javax.swing.JLabel();
         jtfConcept = new javax.swing.JTextField();
         jckIsRecordConceptCopyEnabled = new javax.swing.JCheckBox();
+        jlConcept1 = new javax.swing.JLabel();
+        jtfXmlFilesNumber = new javax.swing.JTextField();
+        jbFileXmlAdd = new javax.swing.JButton();
+        jbGetXml = new javax.swing.JButton();
+        jbRecordToRecordEntry = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jlFkAccountCashId_n = new javax.swing.JLabel();
         jcbFkAccountCashId_n = new javax.swing.JComboBox<SFormComponentItem>();
@@ -167,7 +180,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jsEntry2 = new javax.swing.JSeparator();
         jbEntryViewSum = new javax.swing.JButton();
         jsEntry4 = new javax.swing.JSeparator();
-        jbGetXml = new javax.swing.JButton();
+        jbGetRowXml = new javax.swing.JButton();
         jsEntry3 = new javax.swing.JSeparator();
         jtbEntryDeletedFilter = new javax.swing.JToggleButton();
         jpCommands12 = new javax.swing.JPanel();
@@ -309,7 +322,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jPanel7.add(jlConcept);
 
         jtfConcept.setText("CONCEPT");
-        jtfConcept.setPreferredSize(new java.awt.Dimension(450, 23));
+        jtfConcept.setPreferredSize(new java.awt.Dimension(280, 23));
         jPanel7.add(jtfConcept);
 
         jckIsRecordConceptCopyEnabled.setText("Copiar");
@@ -318,6 +331,34 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jckIsRecordConceptCopyEnabled.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jckIsRecordConceptCopyEnabled.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(jckIsRecordConceptCopyEnabled);
+
+        jlConcept1.setText("  Archivos XML:");
+        jlConcept1.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel7.add(jlConcept1);
+
+        jtfXmlFilesNumber.setEditable(false);
+        jtfXmlFilesNumber.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfXmlFilesNumber.setText("100");
+        jtfXmlFilesNumber.setToolTipText("Número de archivos XML");
+        jtfXmlFilesNumber.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel7.add(jtfXmlFilesNumber);
+
+        jbFileXmlAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add.gif"))); // NOI18N
+        jbFileXmlAdd.setToolTipText("Agregar archivos XML");
+        jbFileXmlAdd.setFocusable(false);
+        jbFileXmlAdd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbFileXmlAdd);
+
+        jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
+        jbGetXml.setToolTipText("Descargar archivos XML");
+        jbGetXml.setFocusable(false);
+        jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbGetXml);
+
+        jbRecordToRecordEntry.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif"))); // NOI18N
+        jbRecordToRecordEntry.setToolTipText("Transferir CFD a una partida");
+        jbRecordToRecordEntry.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbRecordToRecordEntry);
 
         jpRecord1.add(jPanel7);
 
@@ -515,10 +556,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jsEntry4.setPreferredSize(new java.awt.Dimension(3, 23));
         jpCommands11.add(jsEntry4);
 
-        jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
-        jbGetXml.setToolTipText("Obtener CFDI del renglón");
-        jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpCommands11.add(jbGetXml);
+        jbGetRowXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
+        jbGetRowXml.setToolTipText("Obtener CFDI del renglón");
+        jbGetRowXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCommands11.add(jbGetRowXml);
 
         jsEntry3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jsEntry3.setPreferredSize(new java.awt.Dimension(3, 23));
@@ -834,7 +875,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moFieldIsAdjustmentAudit = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsAdjustmentAudit);
         moFieldFkAccountCashId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkAccountCashId_n, jlFkAccountCashId_n);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
-
+        
         mvFields.add(moFieldDate);
         mvFields.add(moFieldConcept);
         mvFields.add(moFieldFkAccountCashId_n);
@@ -911,6 +952,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         jbDate.addActionListener(this);
+        jbFileXmlAdd.addActionListener(this);
         jbEntryNew.addActionListener(this);
         jbEntryNewCopy.addActionListener(this);
         jbEntryNewInsert.addActionListener(this);
@@ -919,7 +961,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbEntryMoveDown.addActionListener(this);
         jbEntryMoveUp.addActionListener(this);
         jbEntryViewSum.addActionListener(this);
-        jbGetXml.addActionListener(this); 
+        jbGetXml.addActionListener(this);
+        jbRecordToRecordEntry.addActionListener(this);
+        jbGetRowXml.addActionListener(this); 
         jtbEntryDeletedFilter.addActionListener(this);
         
         jbMoneyIn.addActionListener(this);
@@ -1118,7 +1162,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             jftDate.requestFocus();
         }
     }
-
+    
     private void actionPerformedEntryNew() {
         if (jbEntryNew.isEnabled()) {
             SDataRecordEntry entry = null;
@@ -1400,8 +1444,80 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
     
+    private void actionFileXmlAdd () {
+        SDialogRecordEntryXml recordDps;
+        ArrayList<SDataCfdRecordRow> aCfdRecordRows;
+        
+        aCfdRecordRows = new ArrayList<>();
+        
+        for (SDataCfdRecordRow row : maCfdRecordRows) {
+            aCfdRecordRows.add(new SDataCfdRecordRow(row.getMoveId(), row.getCfdId(), row.getNameXml(), row.getPathXml()));
+        }
+        
+        recordDps = new SDialogRecordEntryXml(miClient, aCfdRecordRows);
+        recordDps.setVisible(true);
+        
+        if (recordDps.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            maCfdRecordRows.clear();
+            maCfdRecordRows = recordDps.getGridRows();
+        }
+        mbIsXmlTranfer = false;
+        updateFilesXmlInfo();
+    }
+    
     private void actionPerformedGetXml() {
         if (jbGetXml.isEnabled()) {
+            try {
+            HashSet<SDataCfd> cfds = new HashSet<>();
+            maCfdRecordRows.stream().map((cfdRecordRow) -> (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, new int[] { cfdRecordRow.getCfdId() }, SLibConstants.EXEC_MODE_SILENT)).forEach((cfd) -> {
+                cfds.add(cfd);
+            });
+            SCfdUtils.getXmlCfds(miClient, cfds);
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+        }
+    }
+    
+    private void actionPerformedRecordToRecordEntry() {
+        SDialogRecordXml recordDps;
+        ArrayList<SDataCfdRecordRow> aCfdRecordRows;
+        
+        aCfdRecordRows = new ArrayList<>();
+        
+        for (SDataCfdRecordRow row : maCfdRecordRows) {
+            aCfdRecordRows.add(new SDataCfdRecordRow(row.getMoveId(), row.getCfdId(), row.getNameXml(), row.getPathXml()));
+        }
+        
+        if (!moRecord.getDbmsRecordEntries().isEmpty()) {
+            recordDps = new SDialogRecordXml(miClient, moRecord.getDbmsRecordEntries(), aCfdRecordRows);
+            recordDps.setVisible(true);
+
+            if (recordDps.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                maCfdRecordRows.clear();
+                maCfdRecordRows = recordDps.getGridRecordRows();
+                ArrayList<SDataRecordEntryRow> recordEntriesRows = recordDps.getGridRecordEntryRows();
+                for (SDataRecordEntry entry : moRecord.getDbmsRecordEntries()){
+                    for (SDataRecordEntryRow recordEntryRow : recordEntriesRows) {
+                        if (SLibUtilities.compareKeys(entry.getPrimaryKey(), recordEntryRow.getPrimaryKey())) {
+                            entry.setDbmsXmlFilesNumber(recordEntryRow.getCfds().size());
+                            break;
+                        }
+                    }
+                }
+                mbIsXmlTranfer = true;
+            }
+            updateFilesXmlInfo();
+            renderEntries(true);
+        }
+        else {
+            miClient.showMsgBoxWarning("La póliza contable no tiene partidas activas.");
+        }
+    }
+    
+    private void actionPerformedGetRowXml() {
+        if (jbGetRowXml.isEnabled()) {
             if (moPaneGridEntries.getSelectedTableRow() == null || moPaneGridEntries.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -1717,6 +1833,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             }
         }
     }
+    
+    private void updateFilesXmlInfo() {
+        int countFilesXml = 0;
+        
+        countFilesXml = maCfdRecordRows.stream().filter((row) -> (!row.getNameXml().isEmpty())).map((_item) -> 1).reduce(countFilesXml, Integer::sum);
+        jtfXmlFilesNumber.setText(countFilesXml + "");
+    }
 
     public void publicActionEntryNew() {
         actionPerformedEntryNew();
@@ -1793,6 +1916,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbEntryNewCopy;
     private javax.swing.JButton jbEntryNewInsert;
     private javax.swing.JButton jbEntryViewSum;
+    private javax.swing.JButton jbFileXmlAdd;
+    private javax.swing.JButton jbGetRowXml;
     private javax.swing.JButton jbGetXml;
     private javax.swing.JButton jbMiAdvanceCus;
     private javax.swing.JButton jbMiAdvanceSupDev;
@@ -1815,6 +1940,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbMoneyOutPaymentSup;
     private javax.swing.JButton jbMoneyOutTransfer;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbRecordToRecordEntry;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkAccountCashId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbGuiConceptPolicy;
     private javax.swing.JCheckBox jckIsAdjustmentAudit;
@@ -1828,6 +1954,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JLabel jlBalance;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlConcept;
+    private javax.swing.JLabel jlConcept1;
     private javax.swing.JLabel jlCredit;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDebit;
@@ -1870,6 +1997,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JTextField jtfDebit;
     private javax.swing.JTextField jtfPeriod;
     private javax.swing.JTextField jtfPkNumberId;
+    private javax.swing.JTextField jtfXmlFilesNumber;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -1911,6 +2039,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jtfConcept.setFocusable(true);
         
         jbDate.setEnabled(true);
+        jbFileXmlAdd.setEnabled(true);
         jbEntryNew.setEnabled(true);
         jbEntryNewInsert.setEnabled(true);
         jbEntryNewCopy.setEnabled(true);
@@ -1960,6 +2089,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jckIsDeleted.setEnabled(true);
         jckIsAdjustmentYearEnd.setEnabled(true);
         jckIsAdjustmentAudit.setEnabled(true);
+        
+        maCfdRecordRows = new ArrayList<>();
+        jtfXmlFilesNumber.setText("0");
 
         calculateBalance();
         renderPeriod();
@@ -2102,6 +2234,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             jtfConcept.setEnabled(false);
             
             jbDate.setEnabled(false);
+            jbFileXmlAdd.setEnabled(false);
             jbEntryNew.setEnabled(false);
             jbEntryNewInsert.setEnabled(false);
             jbEntryNewCopy.setEnabled(false);
@@ -2169,6 +2302,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             jckIsAdjustmentYearEnd.setEnabled(!isReadOnly);
             jckIsAdjustmentAudit.setEnabled(!isReadOnly);
         }
+        
+        if (moRecord.getDbmsDataCfds().size() > 0) {
+            for (SDataCfd cfd : moRecord.getDbmsDataCfds()) {
+                maCfdRecordRows.add(new SDataCfdRecordRow(maCfdRecordRows.size() + 1, cfd.getPkCfdId(), cfd.getDocXmlName(), ""));
+            }
+            updateFilesXmlInfo();
+        }
 
         calculateBalance();
         renderPeriod();
@@ -2199,6 +2339,104 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 moRecord.getDbmsRecordEntries().add((SDataRecordEntry) row.getData());
             }
         }
+        
+        // obtain XML to delete:
+        
+        if (!mbIsXmlTranfer) {
+            for (SDataCfd cfdAux : moRecord.getDbmsDataCfds()) {
+                if (maCfdRecordRows.isEmpty()) {
+                    moRecord.getAuxDataCfdToDel().add(cfdAux);
+                }
+                else {
+                    boolean found = false;
+                    for (SDataCfdRecordRow row : maCfdRecordRows) {
+                        if (SLibUtilities.compareKeys(new int[] { row.getCfdId() }, new int[] { cfdAux.getPkCfdId() })) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        moRecord.getAuxDataCfdToDel().add(cfdAux);
+                    }
+                }
+            }
+        }
+        
+        // process added XML files of CFDI:
+        
+        ArrayList<SDataCfd> cfds = new ArrayList<>();
+        
+        for (SDataCfdRecordRow row : maCfdRecordRows) {
+            SDataCfd cfd = null;
+            
+            boolean found = false;
+            for (SDataCfd cfdAux : moRecord.getDbmsDataCfds()) {
+                if (SLibUtilities.compareKeys(new int[] { row.getCfdId() }, new int[] { cfdAux.getPkCfdId() })) {
+                    cfd = cfdAux;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                if (row.getCfdId() != 0 && !row.getNameXml().isEmpty()) {
+                    cfd = (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, new int[] { row.getCfdId() }, SLibConstants.EXEC_MODE_SILENT);
+                }
+            }
+            
+            if (!row.getNameXml().isEmpty()) {
+                try {
+                    if (cfd == null) {
+                        String xml;
+                        xml = SXmlUtils.readXml(row.getPathXml());
+                        
+                        cfd = new SDataCfd();
+                        cfd.setCertNumber("");
+                        cfd.setStringSigned("");
+                        cfd.setSignature("");
+                        cfd.setDocXml(xml);
+                        cfd.setDocXmlName(row.getNameXml());
+                        cfd.setIsConsistent(true);
+                        cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
+                        cfd.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_NA);
+                        cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
+                        cfd.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
+                        cfd.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
+                        cfd.setFkUserProcessingId(miClient.getSession().getUser().getPkUserId());
+                        cfd.setFkUserDeliveryId(miClient.getSession().getUser().getPkUserId());
+                    }
+                }
+                catch (FileNotFoundException e) {
+                    SLibUtilities.renderException(this, e);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+            else {
+                try {
+                    if (row.getNameXml().length() == 0 && cfd != null) {
+                        cfd.setDocXml("");
+                        cfd.setDocXmlName("");
+                        cfd.setIsConsistent(true);
+                        cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+            
+            if (cfd != null) {
+                cfds.add(cfd);
+            }
+        }
+        
+        moRecord.getDbmsDataCfds().clear();
+        if (cfds.size() > 0) {
+            moRecord.getDbmsDataCfds().addAll(cfds);
+        }
+        
+        moRecord.setDbmsXmlFilesNumber(Integer.parseInt(jtfXmlFilesNumber.getText()));
 
         return moRecord;
     }
@@ -2263,6 +2501,15 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             }
             else if (button == jbGetXml) {
                 actionPerformedGetXml();
+            }
+            else if (button == jbFileXmlAdd) {
+                actionFileXmlAdd();
+            }
+            else if (button == jbGetRowXml) {
+                actionPerformedGetRowXml();
+            }
+            else if (button == jbRecordToRecordEntry) {
+                actionPerformedRecordToRecordEntry();
             }
             
             else if (button == jbMoneyIn) {
