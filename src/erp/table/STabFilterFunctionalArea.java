@@ -10,7 +10,6 @@
 package erp.table;
 
 import erp.lib.SLibConstants;
-import erp.lib.table.STableSetting;
 import erp.mtrn.form.SDialogFilterFunctionalArea;
 import erp.mtrn.utils.STrnFunAreasUtils;
 
@@ -87,11 +86,6 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, mnDataType, manDataFilter);
         renderText();
-        
-        moSetting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_AREA, msFunctionalAreasIds);
-        
-        moSetting.setSetting(msFunctionalAreasIds);
-        moTab.updateSetting(moSetting);
     }
 
     private void actionFunctionalArea() {
