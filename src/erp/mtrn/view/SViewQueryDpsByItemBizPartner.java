@@ -29,7 +29,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -43,15 +43,21 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
     private javax.swing.JButton jbAccountCostCenter;
 
     private boolean mbHasRightAuthor = false;
+    
+    private boolean mbIsDoc = false;
+    private boolean mbIsDocAdj = false;
 
-    public SViewQueryDpsByItemBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01);
+    public SViewQueryDpsByItemBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
+        super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01, auxType02);
         initComponents();
     }
 
     private void initComponents() {
-        int levelDoc = SDataConstantsSys.UNDEFINED;
+        int levelDoc;
         maoTableColumns = null;
+        
+        mbIsDoc = mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC;
+        mbIsDocAdj = mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ADJ;
 
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
         moPanelFilterItem = new SPanelFilterItem(miClient, this, true);
@@ -98,7 +104,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
     }
 
     private void renderTableColumns() {
-        int i = 0;
+        int i;
 
         moTablePane.reset();
 
@@ -207,11 +213,11 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
 
     @Override
     public void createSqlQuery() {
-        java.util.Date[] range = null;
+        java.util.Date[] range;
         String sqlWhere = "";
         String sqlBizPartner = "";
         String sqlDatePeriod = "";
-        STableSetting setting = null;
+        STableSetting setting;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
@@ -245,6 +251,20 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         if (sqlWhere.length() == 0 && sqlBizPartner.length() == 0 && SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_FIL, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL })) {
             sqlWhere = " AND de.fid_item = " + SLibConstants.UNDEFINED + " ";
         }
+        
+        int[] trn_tp_dps = null; 
+        if (isPurchase() && mbIsDoc) {
+            trn_tp_dps = SDataConstantsSys.TRNU_TP_DPS_PUR_INV;
+        }
+        else if (isPurchase() && mbIsDocAdj) {
+            trn_tp_dps = SDataConstantsSys.TRNU_TP_DPS_PUR_CN;
+        }
+        else if (!isPurchase() && mbIsDoc) {
+            trn_tp_dps = SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+        }
+        else if (!isPurchase() && mbIsDocAdj) {
+            trn_tp_dps = SDataConstantsSys.TRNU_TP_DPS_SAL_CN;
+        }
 
 //        renderTableColumns();
 
@@ -266,9 +286,9 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
                 "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
                 "LEFT OUTER JOIN fin_bkc AS rbc ON r.id_bkc = rbc.id_bkc " +
                 "LEFT OUTER JOIN erp.bpsu_bpb AS rcb ON r.fid_cob = rcb.id_bpb " +
-                "WHERE  d.b_del = 0 AND de.b_del = 0 AND d.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " " +
-                "AND d.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " " +
-                "AND d.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " " +
+                "WHERE  d.b_del = 0 AND de.b_del = 0 AND d.fid_ct_dps = " + trn_tp_dps[0] + " " +
+                "AND d.fid_cl_dps = " + trn_tp_dps[1] + " " +
+                "AND d.fid_tp_dps = " + trn_tp_dps[2] + " " +
                 "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
                 sqlDatePeriod + sqlWhere + (mbHasRightAuthor ? " AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() + " " : " ");
     }

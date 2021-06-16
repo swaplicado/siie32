@@ -122,6 +122,12 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                 validation.setMessage("No se puede importar el CFDI ya que su estatus es : " + cfdiStatus + ".");
             }
         }
+        
+        if (!validation.getIsError()) {
+            if (!comprobante.getAttTipoDeComprobante().getString().toUpperCase().equals("I")) {
+                validation.setMessage("No se puede importar el CFDI ya que no es una factura de ingresos.");
+            }
+        }
 
         // validar receptor del CFDI:
         

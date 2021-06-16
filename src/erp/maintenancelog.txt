@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 184.1/ 2021-06-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se creó en los módulos de compras y ventas la vista de "Notas de crédito a detalle".
+2) Se organizaron por orden alfabético las listas que aparecen en la forma de captura de usuarios.
+3) Se agregó la condición que al importar una factura desde un XML, está debe de ser una factura de ingresos.
+4) Se agregó el botón de copiar partida en la forma de captura de DPS.
+
+================================================================================
 SIIE 3.2 184.0/ 2021-06-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

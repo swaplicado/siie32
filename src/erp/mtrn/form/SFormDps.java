@@ -491,6 +491,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpEntriesControls = new javax.swing.JPanel();
         jpEntriesControlsWest = new javax.swing.JPanel();
         jbEntryNew = new javax.swing.JButton();
+        jbEntryCopy = new javax.swing.JButton();
         jbEntryEdit = new javax.swing.JButton();
         jbEntryDelete = new javax.swing.JButton();
         jsEntry01 = new javax.swing.JSeparator();
@@ -1558,6 +1559,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryNew.setToolTipText("Crear partida [Ctrl + N]");
         jbEntryNew.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryNew);
+
+        jbEntryCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_copy.gif"))); // NOI18N
+        jbEntryCopy.setToolTipText("Copiar partida");
+        jbEntryCopy.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbEntryCopy);
 
         jbEntryEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
         jbEntryEdit.setToolTipText("Modificar partida [Ctrl + M]");
@@ -3233,6 +3239,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbComputeTotal.addActionListener(this);
         jbPrepayments.addActionListener(this);
         jbEntryNew.addActionListener(this);
+        jbEntryCopy.addActionListener(this);
         jbEntryEdit.addActionListener(this);
         jbEntryDelete.addActionListener(this);
         jbEntryDiscountRetailChain.addActionListener(this);
@@ -4939,6 +4946,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckRecordUser.setEnabled(mbIsDpsInvoice || mbIsDpsAdjustment);
 
         jbEntryNew.setEnabled(!mbIsDpsAdjustment);
+        jbEntryCopy.setEnabled(!mbIsDpsAdjustment);
         jbEntryDiscountRetailChain.setEnabled(mbIsDpsAdjustment);
         jbEntryImportFromDps.setEnabled(mbIsDpsOrder || mbIsDpsInvoice || mbIsDpsAdjustment);
         jbEntryWizard.setEnabled(!mbIsDpsAdjustment);
@@ -5020,6 +5028,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jckIsCopy.setEnabled(false);
 
             jbEntryNew.setEnabled(false);
+            jbEntryCopy.setEnabled(false);
             jbEntryDelete.setEnabled(false);
             jbEntryDiscountRetailChain.setEnabled(false);
             jbEntryImportFromDps.setEnabled(false);
@@ -7128,14 +7137,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                                 renderEntries();
                                 calculateTotal();
-                                oDpsSource.getDbmsDataCfd().getUuid();
                                 if (mbIsDpsAdjustment) {
                                    jcbCfdiRelationType.setSelectedIndex(1);
-                                   if (jtfCfdiCfdiRelated.getText().equals("")) {
-                                        jtfCfdiCfdiRelated.setText(oDpsSource.getDbmsDataCfd().getUuid());
-                                   }
-                                   else {
-                                       jtfCfdiCfdiRelated.setText(jtfCfdiCfdiRelated.getText() + ";" + oDpsSource.getDbmsDataCfd().getUuid());
+                                   if (oDpsSource.getDbmsDataCfd() != null) {
+                                       if (jtfCfdiCfdiRelated.getText().equals("")) {
+                                            jtfCfdiCfdiRelated.setText(oDpsSource.getDbmsDataCfd().getUuid());
+                                       }
+                                       else {
+                                           jtfCfdiCfdiRelated.setText(jtfCfdiCfdiRelated.getText() + ";" + oDpsSource.getDbmsDataCfd().getUuid());
+                                       }
                                    }
                                 }              
                                 
@@ -7230,6 +7240,44 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else {
                     moDialogShowDocumentLinks.setFormVisible(true);
                 }
+            }
+        }
+    }
+    
+    private void actionEntryCopy() {
+        if (jbEntryCopy.isEnabled()) {
+            try {
+                int links;
+                int index = moPaneGridEntries.getTable().getSelectedRow();
+                SDataDpsEntry entry;
+
+                if (index != -1) {
+                    entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(index).getData()).clone();
+
+                    if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
+                        updateDpsWithCurrentFormData();
+                    }
+
+                    links = entry.getDbmsDpsAdjustmentsAsDps().size();
+                    links += entry.getDbmsDpsAdjustmentsAsAdjustment().size();
+                    links += entry.getDbmsDpsLinksAsSource().size();
+                    links += entry.getDbmsDpsLinksAsDestiny().size();
+                    
+                    if (links == 0) {
+                        entry.setPkEntryId(0);
+                        moPaneGridEntries.addTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                        renderEntries();
+                        calculateTotal();
+                        updateDpsEntryCfdiSettings();
+                        moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("No se puede copiar esta partida ya que tiene documentos vinculados");
+                    }
+                }
+            } 
+            catch (Exception e) {
+                miClient.showMsgBoxWarning(e.getMessage()); 
             }
         }
     }
@@ -8385,6 +8433,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbDeleteFileXml;
     private javax.swing.JButton jbEdit;
     private javax.swing.JButton jbEditHelp;
+    private javax.swing.JButton jbEntryCopy;
     private javax.swing.JButton jbEntryDelete;
     private javax.swing.JButton jbEntryDiscountRetailChain;
     private javax.swing.JButton jbEntryEdit;
@@ -10199,6 +10248,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbEntryNew) {
                     actionEntryNew();
+                }
+                else if (button == jbEntryCopy) {
+                    actionEntryCopy();
                 }
                 else if (button == jbEntryEdit) {
                     actionEntryEdit();

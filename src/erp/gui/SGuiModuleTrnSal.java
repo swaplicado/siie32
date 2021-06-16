@@ -154,6 +154,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCfdiMassiveValidation;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
+    private javax.swing.JMenuItem jmiDpsAdjEntry;
     private javax.swing.JMenuItem jmiDpsAdjDocAnn;
     private javax.swing.JMenuItem jmiDpsAdjMailPending;
     private javax.swing.JMenuItem jmiDpsAdjMailSent;
@@ -452,6 +453,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
+        jmiDpsAdjEntry = new JMenuItem("Notas de crédito de ventas a detalle");
         jmiDpsAdjDocAnn = new JMenuItem("Notas de crédito anuladas");
         jmiDpsAdjMailPending = new JMenuItem("Notas de crédito por enviar por correo-e");
         jmiDpsAdjMailSent = new JMenuItem("Notas de crédito enviadas por correo-e");
@@ -459,6 +461,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsApproved = new JMenuItem("Notas de crédito aceptadas por web-service");
         jmiDpsAdjWsRejected = new JMenuItem("Notas de crédito rechazadas por web-service");
         jmDpsAdj.add(jmiDpsAdjDoc);
+        jmDpsAdj.add(jmiDpsAdjEntry);
         jmDpsAdj.addSeparator();
         jmDpsAdj.add(jmiDpsAdjDocAnn);
         jmDpsAdj.addSeparator();
@@ -727,6 +730,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDelAckOk.addActionListener(this);
         jmiCfdiMassiveValidation.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
+        jmiDpsAdjEntry.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
         jmiDpsAdjMailPending.addActionListener(this);
         jmiDpsAdjMailSent.addActionListener(this);
@@ -860,6 +864,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjEntry.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDocAnn.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjMailPending.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjMailSent.setEnabled(hasRightDocTransactionAdjust);
@@ -1480,10 +1485,16 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             oViewClass = erp.mtrn.view.SViewQueryDpsByItemBizPartner.class;
 
                             if (auxType01 == SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL) {
-                                sViewTitle = "VTA - Facturas (detalle)";
+                                sViewTitle = "VTA - ";
                             }
                             else {
                                 sViewTitle = getViewTitle(auxType01);
+                            }
+                            if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_DOC) {
+                                sViewTitle += "Facturas (detalle)";
+                            }
+                            else if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_ADJ) {
+                                sViewTitle += "Notas crédito (detalle)";
                             }
                             break;
                         default:
@@ -1832,7 +1843,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntry) {
-               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL);
+               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntryRef) {
                 showView(SDataConstants.TRNX_DPS_ETY_REF, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
@@ -1896,6 +1907,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+            }
+            else if (item == jmiDpsAdjEntry) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjDocAnn) {
                 showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);

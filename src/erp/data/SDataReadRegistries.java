@@ -20,7 +20,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class SDataReadRegistries {
 
@@ -42,7 +42,7 @@ public abstract class SDataReadRegistries {
                 break;
 
             case SDataConstants.CFGU_CO:
-                sql = "SELECT id_co AS id_1 FROM erp.cfgu_co WHERE b_del = 0 ORDER BY id_co ";
+                sql = "SELECT id_co AS id_1 FROM erp.cfgu_co WHERE b_del = 0 ORDER BY co, id_co ";
                 packet = new Object[] { 1, sql, erp.mcfg.data.SDataCompany.class, true };
                 break;
 
@@ -61,7 +61,7 @@ public abstract class SDataReadRegistries {
             case SDataConstants.BPSU_BPB:
                 sql = "SELECT id_bpb AS id_1 FROM erp.bpsu_bpb " +
                         "WHERE b_del = 0 AND fid_bp = " + ((int[]) filterKey)[0] + " " +
-                        "ORDER BY fid_tp_bpb, bpb, id_bpb ";
+                        "ORDER BY bpb, fid_tp_bpb, bpb, id_bpb ";
                 packet = new Object[] { 1, sql, erp.mbps.data.SDataBizPartnerBranch.class, true };
                 break;
 
@@ -115,6 +115,10 @@ public abstract class SDataReadRegistries {
 
     /**
      * Pretended to be call by ERP Server.
+     * @param statement
+     * @param registryType
+     * @param filterKey
+     * @return 
      */
     @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.lib.data.SDataRegistry> readRegistries(java.sql.Statement statement, int registryType, java.lang.Object filterKey) {
@@ -185,6 +189,10 @@ public abstract class SDataReadRegistries {
 
     /**
      * Pretended to be call by ERP Client.
+     * @param client
+     * @param registryType
+     * @param filterKey
+     * @return 
      */
     @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.lib.data.SDataRegistry> readRegistries(erp.client.SClientInterface client, int registryType, java.lang.Object filterKey) {

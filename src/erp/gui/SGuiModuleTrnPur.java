@@ -127,6 +127,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsDocRemission;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
+    private javax.swing.JMenuItem jmiDpsAdjEntry;
     private javax.swing.JMenuItem jmiDpsAdjDocAnn;
     private javax.swing.JMenu jmStkDvy;
     private javax.swing.JMenuItem jmiStkDvyPend;
@@ -389,8 +390,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de compras");
+        jmiDpsAdjEntry = new JMenuItem("Notas de crédito de compras a detalle");
         jmiDpsAdjDocAnn = new JMenuItem("Notas de crédito anuladas");
         jmDpsAdj.add(jmiDpsAdjDoc);
+        jmDpsAdj.add(jmiDpsAdjEntry);
         jmDpsAdj.addSeparator();
         jmDpsAdj.add(jmiDpsAdjDocAnn);
 
@@ -625,6 +628,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDocRemission.addActionListener(this);
         jmiCfdiMassiveValidation.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
+        jmiDpsAdjEntry.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
         jmiStkDvyPendEntry.addActionListener(this);
@@ -746,6 +750,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
+        jmiDpsAdjEntry.setEnabled(hasRightDocTransactionAdjust); 
         jmiDpsAdjDocAnn.setEnabled(hasRightDocTransactionAdjust);
 
         jmStkDvy.setEnabled(hasRightInventoryIn);
@@ -1275,10 +1280,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                             oViewClass = erp.mtrn.view.SViewQueryDpsByItemBizPartner.class;
                             
                             if (auxType01 == SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_ALL) {
-                                sViewTitle = "CPA - Facturas (detalle)";
+                                sViewTitle = "CPA - ";
                             }
                             else {
                                 sViewTitle = getViewTitle(auxType01);
+                            }
+                            if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_DOC) {
+                                sViewTitle += "Facturas (detalle)";
+                            }
+                            else if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_ADJ) {
+                                sViewTitle += "Notas crédito (detalle)";
                             }
                             break;
                         default:
@@ -1482,7 +1493,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntry) {
-                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_ALL);
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntryRef) {
                 showView(SDataConstants.TRNX_DPS_ETY_REF, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_DOC);
@@ -1531,6 +1542,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+            }
+            else if (item == jmiDpsAdjEntry) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjDocAnn) {
                 showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ADJ);
