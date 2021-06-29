@@ -72,7 +72,7 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
         }
         
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
         
         mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);

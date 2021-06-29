@@ -21,7 +21,6 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
-import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogContractAnalysis;
@@ -43,7 +42,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Sergio Flores, Daniel López
+ * @author Sergio Flores, Daniel López, Sergio Flores
  */
 public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -170,7 +169,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);

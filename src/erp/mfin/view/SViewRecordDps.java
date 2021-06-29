@@ -13,7 +13,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.mcfg.data.SDataParamsCompany;
-import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
@@ -23,7 +22,7 @@ import javax.swing.JToggleButton;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewRecordDps extends erp.lib.table.STableTab {
 
@@ -50,7 +49,7 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
         mbShowRecordAdjAudit = true;
 
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);

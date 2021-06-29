@@ -23,8 +23,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
 import erp.mitm.data.SDataUnitType;
-import erp.mod.SModConsts;
-import erp.mtrn.utils.STrnFunAreasUtils;
+import erp.mtrn.data.STrnFunctionalAreaUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -317,12 +316,11 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
 
         setModalityType(ModalityType.MODELESS);
         
-        //Áreas funcionales
+        // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, SModConsts.CFGU_FUNC, manDataFilter);
-        
-        renderText();
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, manDataFilter);
+        renderFunctionalArea();
     }
 
     private void windowActivated() {
@@ -496,12 +494,12 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
-            renderText();
+            renderFunctionalArea();
         }
     }
     
-    private void renderText() {
-        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter((SClientInterface) miClient, mnFunctionalAreaId);
+    private void renderFunctionalArea() {
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, mnFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
         
         jtfFunctionalArea.setText(texts[1]);

@@ -707,7 +707,7 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
             if (! validation.getIsError()) {
                 // Validate account type percentages:
                 boolean[] c3 = new boolean[] {false, false, false};
-                ArrayList<int[]> taxes = new ArrayList();
+                ArrayList<int[]> taxes = new ArrayList<>();
                 for (i = 0; i < moPaneEntries.getTableGuiRowCount() && !validation.getIsError(); i++) {
                     entry = (SDataAccountBizPartnerEntry) ((SDataAccountBizPartnerEntryRow) moPaneEntries.getTableRow(i)).getData();
                     switch (entry.getFkBookkeepingRegistryTypeId()) {

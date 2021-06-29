@@ -13,7 +13,6 @@ import erp.lib.table.STabFilterYear;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
-import erp.mod.SModConsts;
 import erp.mod.trn.db.STrnConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCurrency;
@@ -26,7 +25,7 @@ import java.util.Locale;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
 
@@ -67,7 +66,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
         moTabFilterCurrency = new STabFilterCurrency(miClient, this);
         moTabFilterRelatedParts = new STabFilterRelatedParts(miClient, this);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
         
         mnYear = miClient.getSessionXXX().getWorkingYear();
         mnType = 0;

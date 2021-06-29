@@ -842,7 +842,7 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlFkLanguageId">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Idioma: *"/>
+                            <Property name="text" type="java.lang.String" value="Idioma doc.: *"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -870,7 +870,7 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlFkDpsNatureId">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Naturaleza: *"/>
+                            <Property name="text" type="java.lang.String" value="Naturaleza doc.: *"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -895,7 +895,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlFkFunctionalArea">
+                        <Component class="javax.swing.JLabel" name="jlFkFunctionalAreaId">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="&#xc1;rea funcional: *"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -903,7 +903,7 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JComboBox" name="jcbFkFunctionalArea">
+                        <Component class="javax.swing.JComboBox" name="jcbFkFunctionalAreaId">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[150, 23]"/>

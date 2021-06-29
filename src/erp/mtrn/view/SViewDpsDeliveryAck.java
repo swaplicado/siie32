@@ -20,7 +20,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mod.SModConsts;
 import erp.mtrn.data.STrnDeliveryAckUtilities;
 import erp.mtrn.form.SDialogDpsDeliveryAckReasign;
 import erp.mtrn.form.SDialogDpsDeliveryAckSend;
@@ -36,7 +35,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Daniel López
+ * @author Daniel López, Sergio Flores
  */
 public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -92,7 +91,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
             default:
         }
         
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         mjbDeliveryAckClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
         mjbDeliveryAckOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));

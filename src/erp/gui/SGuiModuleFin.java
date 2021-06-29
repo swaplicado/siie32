@@ -105,7 +105,7 @@ import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogRepFinStatements;
 import erp.mod.fin.form.SDialogRepMovsFileCvs;
 import erp.mod.fin.form.SDialogRepMovsIncExp;
-import erp.mod.fin.form.SDialogReportTaxPending;
+import erp.mod.fin.form.SDialogRepTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mtrn.data.SDataCtr;
@@ -2258,10 +2258,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogDiotLayout(miClient).setVisible(true);
             }
             else if (item == jmiRepFiscalTaxPendSal) {
-                new SDialogReportTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_SAL, SDataRepConstants.REP_TAX_PND_SAL).setVisible(true);
+                new SDialogRepTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_SAL, SDataRepConstants.REP_TAX_PND_SAL).setVisible(true);
             }
             else if (item == jmiRepFiscalTaxPendPur) {
-                new SDialogReportTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_PUR, SDataRepConstants.REP_TAX_PND_PUR).setVisible(true);
+                new SDialogRepTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_PUR, SDataRepConstants.REP_TAX_PND_PUR).setVisible(true);
             }
             else if (item == jmiRepFiscalXmlFiles) {
                 new SDialogFiscalXmlFile(miClient.getSession().getClient(), SDataRepConstants.REP_XML_FIL).setVisible(true);

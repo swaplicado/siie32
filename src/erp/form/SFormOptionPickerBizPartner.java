@@ -22,13 +22,12 @@ import erp.mod.bps.db.SBpsUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
-import java.sql.ResultSet;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 

@@ -18,7 +18,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
@@ -29,7 +28,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Edwin Carmona, Isabel Servín
+ * @author Edwin Carmona, Isabel Servín, Sergio Flores
  *
  */
 public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
@@ -68,7 +67,7 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();

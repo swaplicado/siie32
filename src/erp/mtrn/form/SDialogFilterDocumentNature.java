@@ -102,7 +102,7 @@ public class SDialogFilterDocumentNature extends javax.swing.JDialog implements 
 
         jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jckSelectedAll.setText("Todas las naturalezas de documento");
+        jckSelectedAll.setText("Todas las naturalezas de documentos");
         jckSelectedAll.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jckSelectedAllItemStateChanged(evt);
@@ -112,8 +112,8 @@ public class SDialogFilterDocumentNature extends javax.swing.JDialog implements 
 
         jPanel4.setLayout(new java.awt.BorderLayout(5, 0));
 
-        jlDocumentNature.setText("Naturaleza de documento:");
-        jlDocumentNature.setPreferredSize(new java.awt.Dimension(150, 14));
+        jlDocumentNature.setText("Naturaleza doc.:");
+        jlDocumentNature.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlDocumentNature, java.awt.BorderLayout.LINE_START);
 
         jPanel5.setLayout(new java.awt.BorderLayout(5, 0));
@@ -122,7 +122,7 @@ public class SDialogFilterDocumentNature extends javax.swing.JDialog implements 
         jPanel5.add(jcbDocumentNature, java.awt.BorderLayout.CENTER);
 
         jbDocumentNature.setText("jButton1");
-        jbDocumentNature.setToolTipText("Seleccionar tipo de documento");
+        jbDocumentNature.setToolTipText("Seleccionar naturaleza de documento");
         jbDocumentNature.setFocusable(false);
         jbDocumentNature.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel5.add(jbDocumentNature, java.awt.BorderLayout.EAST);
@@ -135,8 +135,8 @@ public class SDialogFilterDocumentNature extends javax.swing.JDialog implements 
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-546)/2, (screenSize.height-334)/2, 546, 334);
+        setSize(new java.awt.Dimension(488, 334));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jckSelectedAllItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckSelectedAllItemStateChanged

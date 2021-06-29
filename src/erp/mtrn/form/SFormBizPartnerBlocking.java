@@ -244,6 +244,7 @@ public class SFormBizPartnerBlocking extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId, mnParamCategoryBpId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstants.BPSX_BP_SUP : SDataConstants.BPSX_BP_CUS);
     }

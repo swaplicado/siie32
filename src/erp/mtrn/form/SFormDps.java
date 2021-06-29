@@ -420,8 +420,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlFkDpsNatureId = new javax.swing.JLabel();
         jcbFkDpsNatureId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel92 = new javax.swing.JPanel();
-        jlFkFunctionalArea = new javax.swing.JLabel();
-        jcbFkFunctionalArea = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkFunctionalAreaId = new javax.swing.JLabel();
+        jcbFkFunctionalAreaId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel30 = new javax.swing.JPanel();
         jckIsAudited = new javax.swing.JCheckBox();
         jckIsSystem = new javax.swing.JCheckBox();
@@ -1164,7 +1164,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkLanguageId.setText("Idioma: *");
+        jlFkLanguageId.setText("Idioma doc.: *");
         jlFkLanguageId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel26.add(jlFkLanguageId);
 
@@ -1176,7 +1176,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkDpsNatureId.setText("Naturaleza: *");
+        jlFkDpsNatureId.setText("Naturaleza doc.: *");
         jlFkDpsNatureId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel33.add(jlFkDpsNatureId);
 
@@ -1187,12 +1187,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel92.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkFunctionalArea.setText("Área funcional: *");
-        jlFkFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel92.add(jlFkFunctionalArea);
+        jlFkFunctionalAreaId.setText("Área funcional: *");
+        jlFkFunctionalAreaId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel92.add(jlFkFunctionalAreaId);
 
-        jcbFkFunctionalArea.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel92.add(jcbFkFunctionalArea);
+        jcbFkFunctionalAreaId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel92.add(jcbFkFunctionalAreaId);
 
         jPanel5.add(jPanel92);
 
@@ -2845,7 +2845,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdiPaymentMethod = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdiPaymentMethod, jlCfdiPaymentMethod);
         moFieldFkLanguajeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkLanguageId, jlFkLanguageId);
         moFieldFkDpsNatureId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDpsNatureId, jlFkDpsNatureId);
-        moFieldFkFunctionalAreaId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFunctionalArea, jlFkFunctionalArea);
+        moFieldFkFunctionalAreaId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFunctionalAreaId, jlFkFunctionalAreaId);
         moFieldFkCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCurrencyId, jlFkCurrencyId);
         moFieldFkCurrencyId.setPickerButton(jbFkCurrencyId);
         moFieldIsDiscountDocApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountDocApplying);
@@ -3966,7 +3966,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private boolean isApplingFunctionalAreas() {
-        return !mbIsSales && (mbIsDpsOrder || mbIsDpsInvoice) && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas();
+        return miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas();
     }
 
     private boolean isApplingCreditValidation() {
@@ -5011,7 +5011,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbDateMaturity.setEnabled(false);
             //jcbFkLanguageId.setEnabled(...); // language is not editable
             jcbFkDpsNatureId.setEnabled(false);
-            jcbFkFunctionalArea.setEnabled(false);
+            jcbFkFunctionalAreaId.setEnabled(false);
 
             jcbFkCurrencyId.setEnabled(false);
             jbFkCurrencyId.setEnabled(false);
@@ -5113,8 +5113,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //jftDateStartCredit.setFocusable(...); // status already set by previous call to method itemChangeFkPaymentTypeId()
             //jbDateStartCredit.setEnabled(...);    // status already set by previous call to method itemChangeFkPaymentTypeId()
             //jcbFkLanguageId.setEnabled(...);      // language is not editable
-            jcbFkDpsNatureId.setEnabled(true);
-            jcbFkFunctionalArea.setEnabled(isApplingFunctionalAreas() && jcbFkFunctionalArea.getItemCount() > 2);
+            jcbFkDpsNatureId.setEnabled(jcbFkDpsNatureId.getItemCount() > 2);
+            jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && jcbFkFunctionalAreaId.getItemCount() > 2);
 
             jcbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             jbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
@@ -8484,7 +8484,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCurrencyId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkDpsNatureId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkFunctionalArea;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkFunctionalAreaId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkIncotermId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkLanguageId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkModeOfTransportationTypeId;
@@ -8604,7 +8604,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlFkDpsStatus;
     private javax.swing.JLabel jlFkDpsStatusAuthorization;
     private javax.swing.JLabel jlFkDpsStatusValidity;
-    private javax.swing.JLabel jlFkFunctionalArea;
+    private javax.swing.JLabel jlFkFunctionalAreaId;
     private javax.swing.JLabel jlFkIncotermId;
     private javax.swing.JLabel jlFkLanguageId;
     private javax.swing.JLabel jlFkModeOfTransportationTypeId;
@@ -8862,7 +8862,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDateStartCredit.setFieldValue(moDps.getDate());
         moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
         moFieldFkDpsNatureId.setFieldValue(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
-        if (!isApplingFunctionalAreas() || jcbFkFunctionalArea.getItemCount() == 2) { 
+        if (!isApplingFunctionalAreas() || jcbFkFunctionalAreaId.getItemCount() == 2) { 
             moFieldFkFunctionalAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NON });
         }
         moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });
@@ -8930,10 +8930,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.populateComboBox(miClient, jcbFkDpsNatureId, SDataConstants.TRNU_DPS_NAT);
         
         if (!isApplingFunctionalAreas()) {
-            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalArea, SModConsts.CFGU_FUNC);
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC);
         }
         else {
-            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSessionXXX().getUser().getPkUserId() });
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC, new int[] { miClient.getSessionXXX().getUser().getPkUserId() });
         }
         
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
@@ -9928,7 +9928,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //moDps.setPaymentMethod(...
         //moDps.setPaymentAccount(...
         moDps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);   // all saved documents have "emited" status
-        moDps.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);   // all saved documents have "default" nature
 
         // Fields non editable in form (allready set for new documents in formReset() function):
         //moDps.setFkDpsAuthorizationStatusId(...

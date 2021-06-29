@@ -55,13 +55,16 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private int mnCompanyBranchEntityId;
     private java.util.Vector<erp.lib.table.STableRow> mvTableRows;
 
-    /** Creates new form SFormOptionPickerItems */
+    /** Creates new form SFormOptionPickerItems
+     * @param client
+     * @param type
+     */
     public SFormOptionPickerItems(erp.client.SClientInterface client, int type) {
         super(client.getFrame(), true);
         miClient = client;
         mnOptionType = type;
 
-        mvTableRows = new Vector<erp.lib.table.STableRow>();
+        mvTableRows = new Vector<>();
 
         initComponents();
         initComponentsExtra();

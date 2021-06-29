@@ -41,7 +41,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Daniel López, Claudio Peña
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores
  */
 public class SViewDeliveryQuery extends SGridPaneView implements ActionListener {
 
@@ -90,7 +90,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     

@@ -1,8 +1,16 @@
 ================================================================================
-SIIE 3.2 184.2/ 2021-06-25
-Edwin CARMONA
+SIIE 3.2 184.3/ 2021-06-29
+Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Se realiza la asignación del impuesto a la partida de la póliza si la cuenta contable tiene asignado uno en la configuración
+1) Refactorización a funcionalidad de filtros de documentos por áreas funcionales.
+2) Corrección a determinación de cuándo usar áreas funcionales en forma de captura de documentos.
+2) Mejoramiento de despliegue de naturaleza de documentos en forma de captura de documentos.
+
+================================================================================
+SIIE 3.2 184.2/ 2021-06-25
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se realiza la asignación del impuesto a la partida de la póliza si la cuenta contable tiene asignado uno en la configuración.
 
 ================================================================================
 SIIE 3.2 184.1/ 2021-06-16

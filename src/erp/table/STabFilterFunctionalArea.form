@@ -24,7 +24,7 @@
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="CODE"/>
-        <Property name="toolTipText" type="java.lang.String" value="&#xc1;rea funcional de documento"/>
+        <Property name="toolTipText" type="java.lang.String" value="&#xc1;rea funcional"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[65, 23]"/>
         </Property>

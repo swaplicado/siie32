@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SViewInvoicePending extends SGridPaneView {
 
@@ -48,7 +48,7 @@ public class SViewInvoicePending extends SGridPaneView {
         mnBizPartberId = 0;
         createGridColumns();
         
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 

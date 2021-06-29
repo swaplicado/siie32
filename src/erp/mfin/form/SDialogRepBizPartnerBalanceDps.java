@@ -21,11 +21,10 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
-import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mtrn.form.SDialogFilterFunctionalArea;
-import erp.mtrn.utils.STrnFunAreasUtils;
+import erp.mtrn.data.STrnFunctionalAreaUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -42,7 +41,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -331,12 +330,11 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
         jrbCurrencyLoc.setSelected(true);
         
-        //Áreas funcionales
+        // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
-
-        renderText();
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        renderFunctionalArea();
     }
 
     private void windowActivated() {
@@ -482,12 +480,12 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
-            renderText();
+            renderFunctionalArea();
         }
     }
     
-    private void renderText() {
-        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+    private void renderFunctionalArea() {
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
         
         jtfFunctionalArea.setText(texts[1]);

@@ -74,7 +74,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
- * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Isabel Servín, Claudio Peña, Sergio Flores
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -396,7 +396,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, mbIsEstCon ? SLibConstants.GUI_DATE_AS_YEAR : SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
         moDialogUpdateDpsDlvryAddrss = new SDialogUpdateDpsDeliveryAddress(miClient);
         moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
         moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
@@ -510,8 +510,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-                aoTableColumns = new STableColumn[49];  // extra columns for accounting record and CFD info
-            }
+            aoTableColumns = new STableColumn[49];  // extra columns for accounting record and CFD info
+        }
         else {
             aoTableColumns = new STableColumn[42];
         }

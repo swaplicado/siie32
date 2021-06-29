@@ -16,7 +16,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.STrnUtilities;
@@ -28,7 +27,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores
  */
 public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -53,7 +52,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         int i;
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         jbDeleteLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK_NO));
         jbDeleteLinks.setPreferredSize(new Dimension(23, 23));

@@ -22,8 +22,7 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataUnitType;
-import erp.mod.SModConsts;
-import erp.mtrn.utils.STrnFunAreasUtils;
+import erp.mtrn.data.STrnFunctionalAreaUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -468,12 +467,11 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         setModalityType(ModalityType.MODELESS);
         
-        //Áreas funcionales
+        // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
-
-        renderText();
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        renderFunctionalArea();
     }
 
     private void windowActivated() {
@@ -676,12 +674,12 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
-            renderText();
+            renderFunctionalArea();
         }
     }
     
-    private void renderText() {
-        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+    private void renderFunctionalArea() {
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
         
         jtfFunctionalArea.setText(texts[1]);
@@ -1101,6 +1099,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbCompanyBranch, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() });
