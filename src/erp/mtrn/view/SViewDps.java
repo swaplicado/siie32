@@ -31,6 +31,7 @@ import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mcfg.data.SDataCurrency;
 import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
 import erp.mitm.data.SDataUnit;
+import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdUtils;
@@ -1876,8 +1877,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else {
                 boolean canEmitCompMonExt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_MON_EXT).HasRight;
+                boolean canEmitCompBizPartRes = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_REST).HasRight;
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
+                SDataCustomerConfig customerConfig = (SDataCustomerConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUS, new int[] { dps.getFkBizPartnerId_r() } , SLibConstants.EXEC_MODE_SILENT);
+                
                 if (dps.getIsDeleted()) {
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
@@ -1892,6 +1895,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { dps.getFkCurrencyId() }) && !canEmitCompMonExt) {
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes en moneda extranjera.");
+                }
+                else if (customerConfig != null && customerConfig.getIsSignRestricted() && !canEmitCompBizPartRes) {
+                    miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes de clientes restringidos.");
                 }
                 else {
                     switch(dps.getDbmsDataCfd().getFkXmlTypeId()) {
