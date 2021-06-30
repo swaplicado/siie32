@@ -2727,7 +2727,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 nSortingPosition = 0;
 
-                for (SDataDpsEntry entry : mvDbmsDpsEntries) {                    
+                for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                     if (entry.getIsRegistryNew() || entry.getIsRegistryEdited()) {
                         entry.setPkYearId(mnPkYearId);
                         entry.setPkDocId(mnPkDocId);
@@ -2936,13 +2936,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     taxEmpty = true;
                                 }
                             }
-                            
                         }
                         
                         ArrayList<SFinAccountConfig> aAccCfgOperations = new ArrayList();
                         SFinAccountConfig oAccCfgOperations = null;
                         
-                        // lectura de la configuración por default (sin impuesto)
+                        // lectura de la configuración por default (sin impuesto):
                         oAccCfgOperations = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                 mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                 mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), null, oStatement));
@@ -2950,7 +2949,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         oAccCfgOperations.setTax(new int[] { 0, 0 });
                         aAccCfgOperations.add(oAccCfgOperations);
                         
-                        // se lee la configuración de los impuestos existentes en el documento
+                        // se lee la configuración de los impuestos existentes en el documento:
                         for (int[] tax : taxes) {
                             if (tax[0] == 0) {
                                 continue;
