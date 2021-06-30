@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 186.0/ 2021-06-30
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó un nuevo permiso para restringir el timbrado de los documentos de ciertos asoc. de negocios.
+2) Se agregó el campo de posiciones en la tabla de puestos.
+3) Se agregó en el módulo de RH el reporte de posiciones y vacantes. 
+4) Se restringió la modificación de los campos de serie y folio en la forma de captura de DPS cuando estos son generados automáticamente, 
+    además se añadio la actualización de estos campos cuando ya existen la serie y el folio previamente asignados.
+5) Se modificó el resultado del comando "lock" en el servidor para que se muestre la cantidad, el usuario y la sesion de los candados. 
+
+================================================================================
 SIIE 3.2 184.3/ 2021-06-29
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
