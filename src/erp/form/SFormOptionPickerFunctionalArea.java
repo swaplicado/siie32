@@ -4,20 +4,20 @@
  */
 
 /*
- * SFormOptionPickerBizPartner.java
+ * SFormOptionPickerFunctionalArea.java
  *
  * Created on 29/09/2009, 09:43:42 AM
  */
 
-package erp.gui.grid;
+package erp.form;
 
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.form.SFormComboBoxGroup;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.mod.SModConsts;
+import erp.table.SFilterConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
@@ -26,26 +26,24 @@ import sa.lib.gui.bean.SBeanFieldBoolean;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
-public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
+public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private erp.client.SClientInterface miClient;
     private int mnOptionType;
-
+    
     private int mnFormResult;
     private boolean mbFirstTime;
-    private erp.lib.form.SFormComboBoxGroup moComboBoxGroup;
 
     /**
-     * Creates new form SFormOptionPickerBizPartner
+     * Creates new form SFormOptionPickerFunctionalArea.
      * @param client ERP Client interface.
-     * @param type Constants defined in erp.data.SDataConstants: BPSX_BP_SUP, BPSX_BP_CUS.
      */
-    public SFormOptionFunAreaDialog(erp.client.SClientInterface client, int type) {
+    public SFormOptionPickerFunctionalArea(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        mnOptionType = type;
+        mnOptionType = SFilterConstants.SETTING_FILTER_FUNC_AREA;
 
         initComponents();
         initComponentsExtra();
@@ -62,13 +60,11 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
 
         jpOptionPane = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jlBizPartner1 = new javax.swing.JLabel();
-        checkIsAllAreas = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jckAllFunctionalAreas = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
-        jlFunAreas = new javax.swing.JLabel();
-        jcbFunAreas = new javax.swing.JComboBox();
-        jbFunAreas = new javax.swing.JButton();
+        jlFunctionalArea = new javax.swing.JLabel();
+        jcbFunctionalArea = new javax.swing.JComboBox();
+        jbFunctionalArea = new javax.swing.JButton();
         jpSouth = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -82,41 +78,36 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
             }
         });
 
-        jpOptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro de áreas funcionales"));
+        jpOptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro de áreas funcionales:"));
         jpOptionPane.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
+        jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jckAllFunctionalAreas.setText("Todas las áreas funcionales asignadas");
+        jckAllFunctionalAreas.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel1.add(jckAllFunctionalAreas);
 
-        jlBizPartner1.setText("Áreas funcionales asignadas:");
-        jlBizPartner1.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(jlBizPartner1);
-        jPanel3.add(checkIsAllAreas);
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel1.add(jPanel3);
+        jlFunctionalArea.setText("Área funcional:");
+        jlFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jlFunctionalArea);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlFunAreas.setText("Área funcional:");
-        jlFunAreas.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel2.add(jlFunAreas);
-
-        jcbFunAreas.setMaximumRowCount(12);
-        jcbFunAreas.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFunAreas.setPreferredSize(new java.awt.Dimension(375, 23));
-        jcbFunAreas.addKeyListener(new java.awt.event.KeyAdapter() {
+        jcbFunctionalArea.setMaximumRowCount(12);
+        jcbFunctionalArea.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFunctionalArea.setPreferredSize(new java.awt.Dimension(350, 23));
+        jcbFunctionalArea.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                jcbFunAreasKeyPressed(evt);
+                jcbFunctionalAreaKeyPressed(evt);
             }
         });
-        jPanel2.add(jcbFunAreas);
+        jPanel2.add(jcbFunctionalArea);
 
-        jbFunAreas.setText("...");
-        jbFunAreas.setToolTipText("Seleccionar asociado de negocios");
-        jbFunAreas.setFocusable(false);
-        jbFunAreas.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel2.add(jbFunAreas);
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar...");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel2.add(jbFunctionalArea);
 
         jPanel1.add(jPanel2);
 
@@ -147,16 +138,15 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
 
         getContentPane().add(jpSouth, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(600, 400));
+        setSize(new java.awt.Dimension(546, 334));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         if (mbFirstTime) {
             mbFirstTime = false;
-         }
-        SLibUtilities.requestComponentFocus(jcbFunAreas);
-
+        }
+        SLibUtilities.requestComponentFocus(jcbFunctionalArea);
     }//GEN-LAST:event_formWindowActivated
 
     private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed
@@ -167,18 +157,16 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
         actionCancel();
     }//GEN-LAST:event_jbCancelActionPerformed
 
-    private void jcbFunAreasKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jcbFunAreasKeyPressed
+    private void jcbFunctionalAreaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jcbFunctionalAreaKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_F5) {
-            actionFunArea();
+            actionFunctionalArea();
         }
-    }//GEN-LAST:event_jcbFunAreasKeyPressed
+    }//GEN-LAST:event_jcbFunctionalAreaKeyPressed
 
     private void initComponentsExtra() {
-        moComboBoxGroup = new SFormComboBoxGroup(miClient);
-
-        jcbFunAreas.addItemListener(this);
-        checkIsAllAreas.addItemListener(this);
-        jbFunAreas.addActionListener(this);
+        jcbFunctionalArea.addItemListener(this);
+        jckAllFunctionalAreas.addItemListener(this);
+        jbFunctionalArea.addActionListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -195,23 +183,23 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
         
         formRefreshOptionPane();
-        checkIsAllAreas.setSelected(true);
+        jckAllFunctionalAreas.setSelected(true);
     }
 
     private void itemStateChange() {
-        jcbFunAreas.setSelectedItem(null);
+        jcbFunctionalArea.setSelectedItem(null);
         
-        if (checkIsAllAreas.getValue()) {
-            jcbFunAreas.setEnabled(false);
-            jbFunAreas.setEnabled(false);
+        if (jckAllFunctionalAreas.isSelected()) {
+            jcbFunctionalArea.setEnabled(false);
+            jbFunctionalArea.setEnabled(false);
         }
         else {
-            jcbFunAreas.setEnabled(true);
-            jbFunAreas.setEnabled(true);
+            jcbFunctionalArea.setEnabled(true);
+            jbFunctionalArea.setEnabled(true);
         }
     }
 
-    private void actionFunArea() {
+    private void actionFunctionalArea() {
         SFormOptionPickerInterface picker = miClient.getOptionPicker(SModConsts.CFGU_FUNC);
 
         picker.formReset();
@@ -220,15 +208,15 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
         picker.setFormVisible(true);
 
         if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            SFormUtilities.locateComboBoxItem(jcbFunAreas, picker.getSelectedPrimaryKey());
-            jcbFunAreas.requestFocus();
+            SFormUtilities.locateComboBoxItem(jcbFunctionalArea, picker.getSelectedPrimaryKey());
+            jcbFunctionalArea.requestFocus();
         }
     }
 
     private void actionOk() {
-        if (! checkIsAllAreas.isSelected() && jcbFunAreas.getSelectedIndex() <= 0) {
-            miClient.showMsgBoxWarning("Se debe seleccionar una opción para el campo '" + jlFunAreas.getText() + "'.");
-            jcbFunAreas.requestFocus();
+        if (!jckAllFunctionalAreas.isSelected() && jcbFunctionalArea.getSelectedIndex() <= 0) {
+            miClient.showMsgBoxWarning("Se debe seleccionar una opción para el campo '" + jlFunctionalArea.getText() + "'.");
+            jcbFunctionalArea.requestFocus();
         }
         else {
             mnFormResult = SLibConstants.FORM_RESULT_OK;
@@ -246,33 +234,27 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private sa.lib.gui.bean.SBeanFieldBoolean checkIsAllAreas;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbFunAreas;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbFunAreas;
-    private javax.swing.JLabel jlBizPartner1;
-    private javax.swing.JLabel jlFunAreas;
+    private javax.swing.JComboBox jcbFunctionalArea;
+    private javax.swing.JCheckBox jckAllFunctionalAreas;
+    private javax.swing.JLabel jlFunctionalArea;
     private javax.swing.JPanel jpOptionPane;
     private javax.swing.JPanel jpSouth;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void formReset() {
-
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
-
-        moComboBoxGroup.reset();
     }
 
     @Override
     public void formRefreshOptionPane() {
-        moComboBoxGroup.clear();
-        moComboBoxGroup.addComboBox(SModConsts.CFGU_FUNC, jcbFunAreas, jbFunAreas, new int [] { miClient.getSession().getUser().getPkUserId() } );
+        SFormUtilities.populateComboBox(miClient, jcbFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
     }
 
     @Override
@@ -298,21 +280,21 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
     @Override
     public void setSelectedPrimaryKey(java.lang.Object pk) {
         if (pk == null) {
-            moComboBoxGroup.reset();
+            jcbFunctionalArea.setSelectedIndex(0);
         }
         else {
-            SFormUtilities.locateComboBoxItem(jcbFunAreas, new int[] { ((int[]) pk)[0] });
+            SFormUtilities.locateComboBoxItem(jcbFunctionalArea, new int[] { ((int[]) pk)[0] });
         }
     }
 
     @Override
     public java.lang.Object getSelectedPrimaryKey() {
-        if (((SFormComponentItem) jcbFunAreas.getSelectedItem()) == null  || checkIsAllAreas.isSelected()) {
+        if (((SFormComponentItem) jcbFunctionalArea.getSelectedItem()) == null  || jckAllFunctionalAreas.isSelected()) {
             return null;
         }
         
         int[] pk = new int[] {
-            ((int[]) ((SFormComponentItem) jcbFunAreas.getSelectedItem()).getPrimaryKey())[0]
+            ((int[]) ((SFormComponentItem) jcbFunctionalArea.getSelectedItem()).getPrimaryKey())[0]
         };
 
         return pk;
@@ -328,8 +310,8 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbFunAreas) {
-                actionFunArea();
+            if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }
@@ -339,10 +321,9 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
         if (e.getSource() instanceof SBeanFieldBoolean) {
             SBeanFieldBoolean checked = (SBeanFieldBoolean) e.getSource();
             
-            if (checked == checkIsAllAreas) {
+            if (checked == jckAllFunctionalAreas) {
                 itemStateChange();
             }
         }
-         
     }
 }

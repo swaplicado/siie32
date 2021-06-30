@@ -318,7 +318,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         }
         if (!contains) {
             moDocuments.add(dps);
-            ArrayList<int[]> assocDocs = new ArrayList();
+            ArrayList<int[]> assocDocs = new ArrayList<>();
             try {
                 for (int i = 0; i < dps.getDbmsDpsEntries().size(); i++) {
                     int dpsClass = dps.getDpsClassKey()[1];
@@ -537,7 +537,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     
     private void updateAssocDocuments(Object primaryKey, SRowDpsEdit rowDpsEdit) {
         int[] entryKey = (int[]) primaryKey;
-        moUpdateDocumentEntryKeys = new ArrayList();
+        moUpdateDocumentEntryKeys = new ArrayList<>();
         getUpdateEntryKeys(entryKey);
         moUpdateDocumentEntryKeys.stream().forEach((int[] updateDocumentEntryKey) -> {
             for (SDataDps document : moDocuments) {
@@ -571,7 +571,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         }
         if (!contains) {
             moUpdateDocumentEntryKeys.add(entryKey);
-            ArrayList<int[]> assocKeys = new ArrayList(); 
+            ArrayList<int[]> assocKeys = new ArrayList<>(); 
             String sql;
             try {
                 // Busqueda hacia arriba (trn_dps_dps_supply):
@@ -746,7 +746,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     public void setRegistry(SDataRegistry registry) {
         moDps = (SDataDps) registry;
         
-        moDocuments = new ArrayList();
+        moDocuments = new ArrayList<>();
         getAssociatedDocuments(moDps);
         
         mbDocuentsLockedError = lockDocuments();

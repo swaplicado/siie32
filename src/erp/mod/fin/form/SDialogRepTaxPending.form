@@ -141,7 +141,7 @@
                 <Property name="alignment" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlFunAreas">
+                <Component class="javax.swing.JLabel" name="jlFunctionalAreas">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="&#xc1;reas funcionales:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -149,7 +149,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldText" name="tfFunAreas">
+                <Component class="sa.lib.gui.bean.SBeanFieldText" name="tfFunctionalAreas">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -157,11 +157,12 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jbEditFuncArea">
+                <Component class="javax.swing.JButton" name="jbEditFunctionalArea">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="..."/>
+                    <Property name="toolTipText" type="java.lang.String" value="Seleccionar"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[30, 23]"/>
+                      <Dimension value="[23, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

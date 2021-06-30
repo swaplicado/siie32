@@ -19,9 +19,6 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
 
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -31,8 +28,7 @@ import erp.lib.form.SFormValidation;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
-import erp.mod.SModConsts;
-import erp.mtrn.utils.STrnFunAreasUtils;
+import erp.mtrn.data.STrnFunctionalAreaUtils;
 
 /**
  *
@@ -228,12 +224,11 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
 
         setModalityType(ModalityType.MODELESS);
         
-        //Áreas funcionales
+        // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
-        
-        renderText();
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        renderFunctionalArea();
     }
 
     private void windowActivated() {
@@ -333,12 +328,12 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
-            renderText();
+            renderFunctionalArea();
         }
     }
     
-    private void renderText() {
-        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+    private void renderFunctionalArea() {
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
         
         jtfFunctionalArea.setText(texts[1]);

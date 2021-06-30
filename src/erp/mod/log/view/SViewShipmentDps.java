@@ -45,7 +45,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SViewShipmentDps extends SGridPaneView implements ActionListener {
 
@@ -94,7 +94,7 @@ public class SViewShipmentDps extends SGridPaneView implements ActionListener {
         moButtonShipmentOpen = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif")), "Abrir para embarque", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moButtonShipmentOpen);
         
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
 
         switch (mnGridMode) {

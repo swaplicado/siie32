@@ -16,7 +16,6 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mfin.data.SFinUtilities;
 import erp.mitm.form.SPanelFilterItem;
-import erp.mod.SModConsts;
 import erp.mtrn.form.SDialogUpdateDpsAccountCenterCost;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
@@ -29,7 +28,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Isabel Servín, Sergio Flores
  */
 public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -63,7 +62,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         moPanelFilterItem = new SPanelFilterItem(miClient, this, true);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
         moDialogUpdateDpsAccountCostCenter = new SDialogUpdateDpsAccountCenterCost(miClient);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         jbAccountCostCenter = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bkk_csh.gif")));
         jbAccountCostCenter.setPreferredSize(new Dimension(23, 23));

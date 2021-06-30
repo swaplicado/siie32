@@ -7,6 +7,8 @@ package erp.mfin.data;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -32,5 +34,42 @@ public class SValidationUtils {
         resultSet = session.getStatement().executeQuery(sql);
         
         return ! resultSet.next();
+    }
+    
+    /**
+     * Determina la llave foránea del impuesto asignado a la cuenta contable recibida
+     * Si el impuesto es null o cero regresa un null
+     * 
+     * @param session
+     * @param acc cuenta contable en formato 'XXXX-XXXX-XXXX'
+     * @return [int] o null si no hay un impuesto asignado
+     */
+    public static int[] getTaxFkByAcc(final SGuiSession session, final String acc) {
+        String sql = "";
+        ResultSet resultSet = null;
+
+        sql = "SELECT " +
+                "    fid_tax_bas_n, " +
+                "    fid_tax_n " +
+                "FROM " +
+                "    fin_acc_bp_ety " +
+                "WHERE fid_acc = '" + acc + "';";
+        try {
+            
+            resultSet = session.getStatement().executeQuery(sql);
+            
+            if (resultSet.next()) {
+                if (resultSet.getInt("fid_tax_bas_n") == 0) {
+                    return null;
+                }
+                
+                return new int[] { resultSet.getInt("fid_tax_bas_n"), resultSet.getInt("fid_tax_n") };
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SValidationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 }

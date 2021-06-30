@@ -21,7 +21,7 @@ import sa.lib.gui.SGuiParams;
 
 /*
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SViewCreditNotesToReturn extends SGridPaneView {
     
@@ -44,7 +44,7 @@ public class SViewCreditNotesToReturn extends SGridPaneView {
         mnBizPartherId = 0;
         createGridColumns();
         
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     
@@ -73,12 +73,12 @@ public class SViewCreditNotesToReturn extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
-        String whereFunAreas = "";
+        String whereFunctionalAreas = "";
         Object filter = null;
         
         filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
         if (filter != null) {
-            whereFunAreas = " AND d.fid_func IN ( " + filter + ") ";
+            whereFunctionalAreas = " AND d.fid_func IN ( " + filter + ") ";
         }
        
         moPaneSettings = new SGridPaneSettings(2);
@@ -102,7 +102,7 @@ public class SViewCreditNotesToReturn extends SGridPaneView {
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND d.b_del = " + SDataConstantsSys.TRNX_DIOG_CST_ASIG_NA + " " +
                 "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                 "AND d.fid_ct_dps = " + SDataConstantsSys.CFGS_CT_ENT_CASH + " AND d.fid_cl_dps = " + SDataConstantsSys.CFGS_TP_REL_N_TO_M + " AND d.fid_cob = " + SDataConstantsSys.CFGS_CT_ENT_CASH + " " +
-                "AND d.fid_bp_r = " + mnBizPartherId + " " + whereFunAreas +
+                "AND d.fid_bp_r = " + mnBizPartherId + " " + whereFunctionalAreas +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
@@ -141,7 +141,7 @@ public class SViewCreditNotesToReturn extends SGridPaneView {
                "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND d.b_del = " + SDataConstantsSys.TRNX_DIOG_CST_ASIG_NA + " " +
                "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                "AND d.fid_ct_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_cl_dps =  " + SDataConstantsSys.CFGS_TP_REL_N_TO_M + " AND d.fid_cob = " + SDataConstantsSys.CFGS_CT_ENT_CASH + " " +
-               "AND d.fid_bp_r = " + mnBizPartherId + " " + whereFunAreas +
+               "AND d.fid_bp_r = " + mnBizPartherId + " " + whereFunctionalAreas +
                "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +

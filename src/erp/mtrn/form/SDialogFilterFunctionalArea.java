@@ -8,12 +8,13 @@ package erp.mtrn.form;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
+import erp.mod.SModConsts;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -31,22 +32,13 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
     /** Creates new form SDialogFilterFunctionalArea
      * @param client GUI client.
-     * @param dataType Constants defined in SDataConstants.
+     * @param userKey User key.
      */
-    public SDialogFilterFunctionalArea(erp.client.SClientInterface client, int dataType) {
-        this(client, dataType, null);
-    }
-
-    /** Creates new form SDialogFilterDocumentNature
-     * @param client GUI client.
-     * @param dataType Constants defined in SDataConstants.
-     * @param filter Filter to be used in options combo box.
-     */
-    public SDialogFilterFunctionalArea(erp.client.SClientInterface client, int dataType, int[] filter) {
+    public SDialogFilterFunctionalArea(erp.client.SClientInterface client, int[] userKey) {
         super(client.getFrame(), true);
         miClient =  client;
-        mnDataType = dataType;
-        manDataFilterKey = filter;
+        mnDataType = SModConsts.CFGU_FUNC;
+        manDataFilterKey = userKey;
 
         initComponents();
         initComponentsExtra();
@@ -69,9 +61,8 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         jckSelectedAll = new javax.swing.JCheckBox();
         jPanel4 = new javax.swing.JPanel();
         jlFunctionalArea = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
         jcbFunctionalArea = new javax.swing.JComboBox();
-        jbFuncArea = new javax.swing.JButton();
+        jbFunctionalArea = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Áreas funcionales");
@@ -96,12 +87,12 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones disponibles:"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro de áreas funcionales:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jckSelectedAll.setText("Áreas funcionales asignadas");
+        jckSelectedAll.setText("Todas las áreas funcionales asignadas");
         jckSelectedAll.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jckSelectedAllItemStateChanged(evt);
@@ -109,24 +100,21 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         });
         jPanel3.add(jckSelectedAll);
 
-        jPanel4.setLayout(new java.awt.BorderLayout(5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFunctionalArea.setText("Área funcional del documento:");
-        jlFunctionalArea.setPreferredSize(new java.awt.Dimension(150, 14));
-        jPanel4.add(jlFunctionalArea, java.awt.BorderLayout.LINE_START);
-
-        jPanel5.setLayout(new java.awt.BorderLayout(5, 0));
+        jlFunctionalArea.setText("Área funcional:");
+        jlFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlFunctionalArea);
 
         jcbFunctionalArea.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel5.add(jcbFunctionalArea, java.awt.BorderLayout.CENTER);
+        jcbFunctionalArea.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel4.add(jcbFunctionalArea);
 
-        jPanel4.add(jPanel5, java.awt.BorderLayout.CENTER);
-
-        jbFuncArea.setText("jButton1");
-        jbFuncArea.setToolTipText("Seleccionar tipo de documento");
-        jbFuncArea.setFocusable(false);
-        jbFuncArea.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel4.add(jbFuncArea, java.awt.BorderLayout.EAST);
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar...");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel4.add(jbFunctionalArea);
 
         jPanel3.add(jPanel4);
 
@@ -152,13 +140,13 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         mvFields = new Vector<>();
 
         moFieldFunctionalArea = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFunctionalArea, jlFunctionalArea);
-        moFieldFunctionalArea.setPickerButton(jbFuncArea);
+        moFieldFunctionalArea.setPickerButton(jbFunctionalArea);
 
         mvFields.add(moFieldFunctionalArea);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
-        jbFuncArea.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, SLibConstants.UNDEFINED);
@@ -179,10 +167,12 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
     private void itemStateChangedSelectedAll() {
         if (jckSelectedAll.isSelected()) {
+            jbFunctionalArea.setEnabled(false);
             jcbFunctionalArea.setEnabled(false);
             moFieldFunctionalArea.resetField();
         }
         else {
+            jbFunctionalArea.setEnabled(true);
             jcbFunctionalArea.setEnabled(true);
         }
     }
@@ -210,9 +200,8 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbFuncArea;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbOk;
     private javax.swing.JComboBox jcbFunctionalArea;
     private javax.swing.JCheckBox jckSelectedAll;
@@ -326,7 +315,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbFuncArea) {
+            else if (button == jbFunctionalArea) {
                 actionFunctionalArea();
             }
         }

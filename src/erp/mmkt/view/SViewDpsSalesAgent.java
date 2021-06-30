@@ -17,7 +17,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogUpdateDpsSalesAgentComms;
 import erp.table.SFilterConstants;
@@ -34,7 +33,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Edwin Carmona
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -92,7 +91,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstantsSys.BPSS_CT_BP_CUS);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
         moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
 
         removeTaskBarUpperComponent(jbNew);

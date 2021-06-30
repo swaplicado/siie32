@@ -12,13 +12,12 @@ import erp.lib.data.SDataSqlUtilities;
 import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
-import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterFunctionalArea;
 
 /**
  *
- * @author Daniel López
+ * @author Daniel López, Sergio Flores
  */
 public class SViewBol extends erp.lib.table.STableTab {
     
@@ -34,7 +33,7 @@ public class SViewBol extends erp.lib.table.STableTab {
         int i;
        
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_DATE);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
         
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);

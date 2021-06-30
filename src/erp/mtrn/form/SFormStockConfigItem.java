@@ -24,7 +24,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author  Juan M. Barajas Cárabes
+ * @author  Juan Barajas
  */
 public class SFormStockConfigItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 

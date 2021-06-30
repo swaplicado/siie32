@@ -12,7 +12,6 @@ import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
-import erp.mod.SModConsts;
 import erp.mod.trn.db.STrnConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCurrency;
@@ -22,7 +21,7 @@ import erp.table.STabFilterUnitType;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Edwin Carmona
+ * @author Alfonso Flores, Edwin Carmona, Sergio Flores
  */
 public class SViewQueryGlobal extends erp.lib.table.STableTab {
 
@@ -47,7 +46,7 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab {
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
         moTabFilterCurrency = new STabFilterCurrency(miClient, this);
         moTabFilterRelatedParts = new STabFilterRelatedParts(miClient, this);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);

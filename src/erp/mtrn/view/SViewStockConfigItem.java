@@ -18,7 +18,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Juan M. Barajas Cárabes
+ * @author Juan Barajas
  */
 public class SViewStockConfigItem extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 

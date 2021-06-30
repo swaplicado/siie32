@@ -537,17 +537,17 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         SFormComponentItem item = null;
         boolean isLast = false;
         boolean found = false;
-        int indexFuncArea = 0;
+        int indexFunctionalArea = 0;
         
         for (SDataUserFunctionalArea functionalArea : moUserConfigurationTransaction.getUserFunctionalArea()) {
-            indexFuncArea = 0;
+            indexFunctionalArea = 0;
             isLast = false;
             
             while (!isLast) {
-                jltFunctionalAreasSystem.setSelectedIndex(indexFuncArea);
+                jltFunctionalAreasSystem.setSelectedIndex(indexFunctionalArea);
             
                 if (jltFunctionalAreasSystem.getSelectedIndex() != -1) {
-                    item = (SFormComponentItem) jltFunctionalAreasSystem.getModel().getElementAt(indexFuncArea);
+                    item = (SFormComponentItem) jltFunctionalAreasSystem.getModel().getElementAt(indexFunctionalArea);
                 }
                 else {
                     isLast = true;
@@ -561,9 +561,9 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
                         found = true;
                     }
                 }
-                indexFuncArea++;
+                indexFunctionalArea++;
                 
-                if (found || indexFuncArea == jltFunctionalAreasSystem.getModel().getSize()) {
+                if (found || indexFunctionalArea == jltFunctionalAreasSystem.getModel().getSize()) {
                     isLast = true;
                 }
             }

@@ -13,7 +13,7 @@ import erp.lib.SLibUtilities;
 
 /**
  *
- * @author Juan M. Barajas Cárabes
+ * @author Juan Barajas
  */
 public class SProcDpsEntryDateVal extends erp.lib.data.SDataProcedure implements java.io.Serializable {
 

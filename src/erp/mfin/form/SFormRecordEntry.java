@@ -25,6 +25,7 @@ import erp.mfin.data.SDataCheck;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataTax;
+import erp.mfin.data.SValidationUtils;
 import erp.mfin.data.diot.SDiotUtils;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModSysConsts;
@@ -57,7 +58,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Edwin Carmona
  */
 public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
     
@@ -69,6 +70,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private int mnAccountSystemTypeId;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
+    private boolean mbIsTaxCfg;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -951,6 +953,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         mbIsBizPartnerRequired = false;
         mbIsItemRequired = false;
         mbIsTaxRequired = false;
+        mbIsTaxCfg = false;
         jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ":");
         bgTax.clearSelection();
 
@@ -1128,22 +1131,36 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             }
 
             // Check if it is necesary to enable tax fields:
-
-            if (isAccSysTax || isAccSysPurchases) {
+            int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moPanelFkAccountId.getFieldAccount().getString());
+            if (isAccSysTax || isAccSysPurchases || taxFk != null) {
                 mbIsTaxRequired = isAccSysTax;
                 
-                jlFkTaxId_n.setEnabled(true);
-                jcbFkTaxId_n.setEnabled(true);
-                jbFkTaxId_n.setEnabled(true);
-                jrbTaxCash.setEnabled(true);
-                jrbTaxPend.setEnabled(true);
-                
-                jrbTaxCash.setSelected(true);
+                if (taxFk != null) {
+                    mbIsTaxCfg = true;
+                    anAuxTaxKey = taxFk;
+                    jcbFkTaxId_n.setEnabled(false);
+                    jbFkTaxId_n.setEnabled(false);
+                    jrbTaxCash.setEnabled(false);
+                    jrbTaxPend.setEnabled(false);
+
+                    jrbTaxCash.setSelected(true);
+                }
+                else {
+                    mbIsTaxCfg = false;
+                    jlFkTaxId_n.setEnabled(true);
+                    jcbFkTaxId_n.setEnabled(true);
+                    jbFkTaxId_n.setEnabled(true);
+                    jrbTaxCash.setEnabled(true);
+                    jrbTaxPend.setEnabled(true);
+
+                    jrbTaxCash.setSelected(true);
+                }
 
                 SFormUtilities.populateComboBox(miClient, jcbFkTaxId_n, SDataConstants.FINX_TAX_BAS_TAX);
                 SFormUtilities.locateComboBoxItem(jcbFkTaxId_n, anAuxTaxKey);
             }
             else {
+                moFieldFkTaxId_n.resetField();
                 jlFkTaxId_n.setEnabled(false);
                 jcbFkTaxId_n.setEnabled(false);
                 jbFkTaxId_n.setEnabled(false);
@@ -2818,7 +2835,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moRecordEntry.setIsReferenceTax(false);
         }
 
-        if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0) {
+        if ((jcbFkTaxId_n.isEnabled() || mbIsTaxCfg) && jcbFkTaxId_n.getSelectedIndex() > 0) {
             moRecordEntry.setFkTaxBasicId_n(moFieldFkTaxId_n.getKeyAsIntArray()[0]);
             moRecordEntry.setFkTaxId_n(moFieldFkTaxId_n.getKeyAsIntArray()[1]);
             moRecordEntry.setDbmsTax(moFieldFkTaxId_n.getString());

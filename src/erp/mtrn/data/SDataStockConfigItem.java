@@ -14,7 +14,7 @@ import erp.lib.SLibUtilities;
 
 /**
  *
- * @author Juan M. Barajas Cárabes
+ * @author Juan Barajas
  */
 public class SDataStockConfigItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 

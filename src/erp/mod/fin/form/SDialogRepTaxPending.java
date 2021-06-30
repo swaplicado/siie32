@@ -5,11 +5,10 @@
 package erp.mod.fin.form;
 
 import erp.client.SClientInterface;
-import erp.gui.grid.SFormOptionFunAreaDialog;
+import erp.form.SFormOptionPickerFunctionalArea;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mtrn.utils.STrnFunAreasUtils;
-import erp.table.SFilterConstants;
+import erp.mtrn.data.STrnFunctionalAreaUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -24,16 +23,16 @@ import sa.lib.gui.bean.SBeanDialogReport;
  *
  * @author Sergio Flores
  */
-public class SDialogReportTaxPending extends SBeanDialogReport implements ActionListener {
+public class SDialogRepTaxPending extends SBeanDialogReport implements ActionListener {
     
     private SGuiFieldKeyGroup moFieldKeyGroup;
-    private SFormOptionFunAreaDialog moDialogFunAreas;
-    private String msAreasIds;
+    private SFormOptionPickerFunctionalArea moFunctionalAreaPicker;
+    private String msFunctionalAreaIds;
 
     /**
-     * Creates new form SDialogFiscalXmlFile
+     * Creates new form SDialogRepTaxPending
      */
-    public SDialogReportTaxPending(SGuiClient client, int dpsCategoryId, String title) {
+    public SDialogRepTaxPending(SGuiClient client, int dpsCategoryId, String title) {
         setFormSettings(client, SModConsts.FINR_DPS_TAX_PEND, dpsCategoryId, title);
         initComponents();
         initComponentsCustom();
@@ -62,9 +61,9 @@ public class SDialogReportTaxPending extends SBeanDialogReport implements Action
         moRadFilterDocPending = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadFilterDocAll = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel3 = new javax.swing.JPanel();
-        jlFunAreas = new javax.swing.JLabel();
-        tfFunAreas = new sa.lib.gui.bean.SBeanFieldText();
-        jbEditFuncArea = new javax.swing.JButton();
+        jlFunctionalAreas = new javax.swing.JLabel();
+        tfFunctionalAreas = new sa.lib.gui.bean.SBeanFieldText();
+        jbEditFunctionalArea = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.GridLayout(3, 0, 0, 5));
@@ -107,17 +106,18 @@ public class SDialogReportTaxPending extends SBeanDialogReport implements Action
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlFunAreas.setText("Áreas funcionales:");
-        jlFunAreas.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jlFunAreas);
+        jlFunctionalAreas.setText("Áreas funcionales:");
+        jlFunctionalAreas.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlFunctionalAreas);
 
-        tfFunAreas.setText("sBeanFieldText1");
-        tfFunAreas.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(tfFunAreas);
+        tfFunctionalAreas.setText("sBeanFieldText1");
+        tfFunctionalAreas.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(tfFunctionalAreas);
 
-        jbEditFuncArea.setText("...");
-        jbEditFuncArea.setPreferredSize(new java.awt.Dimension(30, 23));
-        jPanel3.add(jbEditFuncArea);
+        jbEditFunctionalArea.setText("...");
+        jbEditFunctionalArea.setToolTipText("Seleccionar");
+        jbEditFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel3.add(jbEditFunctionalArea);
 
         jPanel5.add(jPanel3);
 
@@ -132,18 +132,18 @@ public class SDialogReportTaxPending extends SBeanDialogReport implements Action
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JButton jbEditFuncArea;
+    private javax.swing.JButton jbEditFunctionalArea;
     private javax.swing.ButtonGroup jbgFilter;
     private javax.swing.ButtonGroup jbgOrderBy;
     private javax.swing.JLabel jlDate;
-    private javax.swing.JLabel jlFunAreas;
+    private javax.swing.JLabel jlFunctionalAreas;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterDocAll;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterDocPayed;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterDocPending;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByBizPartnerDoc;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByDoc;
-    private sa.lib.gui.bean.SBeanFieldText tfFunAreas;
+    private sa.lib.gui.bean.SBeanFieldText tfFunctionalAreas;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -185,30 +185,30 @@ public class SDialogReportTaxPending extends SBeanDialogReport implements Action
         
         // áreas funcionales
         moFieldKeyGroup = new SGuiFieldKeyGroup(miClient);
-        jbEditFuncArea.addActionListener(this);
-        tfFunAreas.setEditable(false);
+        jbEditFunctionalArea.addActionListener(this);
+        tfFunctionalAreas.setEditable(false);
         
         updateOptions();
         
-        msAreasIds = "";
-        moDialogFunAreas = new SFormOptionFunAreaDialog((SClientInterface) miClient, SFilterConstants.SETTING_FILTER_FUNC_AREA);
-        this.setTextToField(moDialogFunAreas.getSelectedPrimaryKey() == null ? null : ((int[]) moDialogFunAreas.getSelectedPrimaryKey()));
+        msFunctionalAreaIds = "";
+        moFunctionalAreaPicker = new SFormOptionPickerFunctionalArea((SClientInterface) miClient);
+        this.setTextToField(moFunctionalAreaPicker.getSelectedPrimaryKey() == null ? null : ((int[]) moFunctionalAreaPicker.getSelectedPrimaryKey()));
     }
     
     private void setTextToField(int[] key) {
-        tfFunAreas.setValue("");
-        msAreasIds = "";
-        int nFunArea = 0;
+        tfFunctionalAreas.setValue("");
+        msFunctionalAreaIds = "";
+        int nFunctionalArea = 0;
         
         if (key != null) {
-            nFunArea = key[0];
+            nFunctionalArea = key[0];
         }
         
-        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter((SClientInterface) miClient, nFunArea);
-        msAreasIds = texts[0];
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, nFunctionalArea);
+        msFunctionalAreaIds = texts[0];
         
-        tfFunAreas.setText(texts[1]);
-        tfFunAreas.setCaretPosition(0);
+        tfFunctionalAreas.setText(texts[1]);
+        tfFunctionalAreas.setCaretPosition(0);
     }
     
     public void updateOptions() {
@@ -217,15 +217,15 @@ public class SDialogReportTaxPending extends SBeanDialogReport implements Action
         moFieldKeyGroup.resetGroup();
     }
     
-     private void actionEditFunArea() {
-        jbEditFuncArea.setEnabled(false);
-        moDialogFunAreas.setVisible(true);
+     private void actionEditFunctionalArea() {
+        jbEditFunctionalArea.setEnabled(false);
+        moFunctionalAreaPicker.setVisible(true);
         
-        if (moDialogFunAreas.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-            this.setTextToField(moDialogFunAreas.getSelectedPrimaryKey() == null ? null : ((int[]) moDialogFunAreas.getSelectedPrimaryKey()));
+        if (moFunctionalAreaPicker.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            this.setTextToField(moFunctionalAreaPicker.getSelectedPrimaryKey() == null ? null : ((int[]) moFunctionalAreaPicker.getSelectedPrimaryKey()));
         }
         
-        jbEditFuncArea.setEnabled(true);
+        jbEditFunctionalArea.setEnabled(true);
     }
 
     /*
@@ -283,8 +283,8 @@ public class SDialogReportTaxPending extends SBeanDialogReport implements Action
             moParamsMap.put("bShowBizPartnerGroup", true);
         }
         
-        moParamsMap.put("sFuncText", tfFunAreas.getText());
-        moParamsMap.put("sSqlFunAreas", "AND d.fid_func IN ( " + msAreasIds + " ) ");
+        moParamsMap.put("sFuncText", tfFunctionalAreas.getText());
+        moParamsMap.put("sSqlFunAreas", "AND d.fid_func IN ( " + msFunctionalAreaIds + " ) ");
     }
 
     @Override
@@ -297,8 +297,8 @@ public class SDialogReportTaxPending extends SBeanDialogReport implements Action
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbEditFuncArea) {
-                actionEditFunArea();
+            if (button == jbEditFunctionalArea) {
+                actionEditFunctionalArea();
             }
         }
     }

@@ -29,7 +29,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SViewShipmentDpsCost extends SGridPaneView implements ActionListener {
 
@@ -57,7 +57,7 @@ public class SViewShipmentDpsCost extends SGridPaneView implements ActionListene
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
         }
         
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 

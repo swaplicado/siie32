@@ -120,7 +120,7 @@ public class SDialogFilterDocumentType extends javax.swing.JDialog implements er
         jPanel4.setLayout(new java.awt.BorderLayout(5, 0));
 
         jlDocumentType.setText("Tipo de documento:");
-        jlDocumentType.setPreferredSize(new java.awt.Dimension(125, 14));
+        jlDocumentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlDocumentType, java.awt.BorderLayout.LINE_START);
 
         jPanel5.setLayout(new java.awt.BorderLayout(5, 0));
@@ -142,8 +142,8 @@ public class SDialogFilterDocumentType extends javax.swing.JDialog implements er
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-488)/2, (screenSize.height-334)/2, 488, 334);
+        setSize(new java.awt.Dimension(488, 334));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jckSelectedAllItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckSelectedAllItemStateChanged
