@@ -249,6 +249,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_EST_CLO = 104056;
     public static final int PRV_SAL_DOC_ORD_CLO = 104057;
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
+    public static final int PRV_SAL_COMP_SIGN_REST = 104062;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;

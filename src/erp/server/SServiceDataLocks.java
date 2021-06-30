@@ -157,7 +157,11 @@ public class SServiceDataLocks implements Serializable {
      */
 
     public synchronized void renderLocks() {
-        moServer.renderMessageLn(msService + "Active locks: [" + mvLocks.size() + "]");
+        String message = "Active locks: [" + mvLocks.size() + "]";
+        for (SSrvLock lock : mvLocks) {
+            message += "\n lock user: [" + lock.getLockUser() + "], lock session id: [" + lock.getSessionId() + "]";
+        } 
+        moServer.renderMessageLn(msService + message);
     }
 
     public synchronized void evaluateTimeouts() {

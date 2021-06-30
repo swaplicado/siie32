@@ -30,6 +30,7 @@ import erp.mod.hrs.form.SDialogRepHrsEarningDeduction;
 import erp.mod.hrs.form.SDialogRepHrsEarningsDeductionsFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPayrollTax;
 import erp.mod.hrs.form.SDialogRepHrsPayrollWageSalaryFileCsv;
+import erp.mod.hrs.form.SDialogRepHrsPos;
 import erp.mod.hrs.form.SDialogRepVacationsFileCsv;
 import erp.mod.hrs.form.SFormCalculateNetGrossAmount;
 import javax.swing.JComponent;
@@ -163,6 +164,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepVacationsFileCsv;
     private javax.swing.JMenuItem jmiRepEmployeeActiveByPeriod;
     private javax.swing.JMenuItem jmiRepPtu;
+    private javax.swing.JMenuItem jmiRepPos;
 
     private SDialogLayoutEmployee moDialogLayoutEmployee;
 
@@ -418,6 +420,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv = new JMenuItem("Archivo CSV de vacaciones pendientes...");
         jmiRepEmployeeActiveByPeriod = new JMenuItem("Reporte de empleados activos por período...");
         jmiRepPtu = new JMenuItem("Consulta para PTU");
+        jmiRepPos = new JMenuItem("Reporte de posiciones y vacantes");
         
         //jmRep.add(jmiRepPayrollEarnings);
         //jmRep.add(jmiRepPayrollEarningsByEmployee);
@@ -435,6 +438,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.addSeparator();
         jmRep.add(jmiRepEmployeeActiveByPeriod);
         jmRep.add(jmiRepPtu);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepPos);
 
         jmiCfgTaxTable.addActionListener(this);
         jmiCfgTaxTableRow.addActionListener(this);
@@ -541,6 +546,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv.addActionListener(this);
         jmiRepEmployeeActiveByPeriod.addActionListener(this);
         jmiRepPtu.addActionListener(this);
+        jmiRepPos.addActionListener(this);
         
         jmiCfgTaxTable.setEnabled(true);
         jmiCfgTaxTableRow.setEnabled(true);
@@ -670,6 +676,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv.setEnabled(true);
         jmiRepEmployeeActiveByPeriod.setEnabled(true);
         jmiRepPtu.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
+        jmiRepPos.setEnabled(true);
         
         // GUI configuration:
         
@@ -1154,6 +1161,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepPtu) {
                 miClient.getSession().showView(SModConsts.HRSX_PTU, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiRepPos) {
+                new SDialogRepHrsPos((SGuiClient) miClient, "Reporte de posiciones y vacantes").setFormVisible(true);
             }
         }
     }

@@ -15,13 +15,14 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDbPosition extends SDbRegistryUser {
 
     protected int mnPkPositionId;
     protected String msCode;
     protected String msName;
+    protected int mnPositions;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -41,6 +42,7 @@ public class SDbPosition extends SDbRegistryUser {
     public void setPkPositionId(int n) { mnPkPositionId = n; }
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
+    public void setPositions(int n) { mnPositions = n; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkDepartmentId(int n) { mnFkDepartmentId = n; }
@@ -52,6 +54,7 @@ public class SDbPosition extends SDbRegistryUser {
     public int getPkPositionId() { return mnPkPositionId; }
     public String getCode() { return msCode; }
     public String getName() { return msName; }
+    public int getPositions() { return mnPositions; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkDepartmentId() { return mnFkDepartmentId; }
@@ -77,6 +80,7 @@ public class SDbPosition extends SDbRegistryUser {
         mnPkPositionId = 0;
         msCode = "";
         msName = "";
+        mnPositions = 0;
         mbDeleted = false;
         mbSystem = false;
         mnFkDepartmentId = 0;
@@ -131,6 +135,7 @@ public class SDbPosition extends SDbRegistryUser {
             mnPkPositionId = resultSet.getInt("id_pos");
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
+            mnPositions = resultSet.getInt("pos");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkDepartmentId = resultSet.getInt("fk_dep");
@@ -161,6 +166,7 @@ public class SDbPosition extends SDbRegistryUser {
                     mnPkPositionId + ", " +
                     "'" + msCode + "', " +
                     "'" + msName + "', " +
+                    mnPositions + ", " + 
                     (mbDeleted ? 1 : 0) + ", " +
                     (mbSystem ? 1 : 0) + ", " +
                     mnFkDepartmentId + ", " +
@@ -177,6 +183,7 @@ public class SDbPosition extends SDbRegistryUser {
                     //"id_pos = " + mnPkPositionId + ", " +
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
+                    "pos = " + mnPositions + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_dep = " + mnFkDepartmentId + ", " +
@@ -199,6 +206,7 @@ public class SDbPosition extends SDbRegistryUser {
         registry.setPkPositionId(this.getPkPositionId());
         registry.setCode(this.getCode());
         registry.setName(this.getName());
+        registry.setPositions(this.getPositions());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkDepartmentId(this.getFkDepartmentId());

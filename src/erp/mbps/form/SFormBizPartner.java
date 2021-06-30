@@ -132,6 +132,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldFkSalesSupervisorId_n;
     private erp.lib.form.SFormField moFieldIsFreeDiscountDoc;
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
+    private erp.lib.form.SFormField moFieldIsSignRestrict;
 
     private erp.mbps.data.SDataBizPartnerCategory moBizPartnerCategory;
     private erp.mbps.form.SFormBizPartnerBranch moFormBizPartnerBranch;
@@ -372,6 +373,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbFkSalesSupervisorId_n = new javax.swing.JButton();
         jckIsFreeDiscountDoc = new javax.swing.JCheckBox();
         jckIsFreeCommissions = new javax.swing.JCheckBox();
+        jckIsSignRestrict = new javax.swing.JCheckBox();
         jpCob = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
         jbNew = new javax.swing.JButton();
@@ -1080,7 +1082,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel30.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del cliente:"));
         jPanel30.setPreferredSize(new java.awt.Dimension(381, 150));
-        jPanel30.setLayout(new java.awt.GridLayout(8, 2, 5, 2));
+        jPanel30.setLayout(new java.awt.GridLayout(9, 2, 5, 2));
 
         jlFkCustomerTypeId.setText("Tipo de cliente: *");
         jPanel30.add(jlFkCustomerTypeId);
@@ -1183,6 +1185,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jckIsFreeCommissions.setText("Sin comisiones");
         jPanel30.add(jckIsFreeCommissions);
+
+        jckIsSignRestrict.setText("Restringido para el timbrado");
+        jPanel30.add(jckIsSignRestrict);
 
         jPanel21.add(jPanel30, java.awt.BorderLayout.WEST);
 
@@ -1456,6 +1461,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldIsFreeDiscountDoc.setTabbedPaneIndex(2, jTabbedPane1);
         moFieldIsFreeCommissions = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeCommissions);
         moFieldIsFreeCommissions.setTabbedPaneIndex(2, jTabbedPane1);
+        moFieldIsSignRestrict = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSignRestrict);
+        moFieldIsSignRestrict.setTabbedPaneIndex(2, jTabbedPane1);
 
         mvFields.add(moFieldFkBizPartnerIdentityTypeId);
         mvFields.add(moFieldBizPartnerCommercial);
@@ -1505,6 +1512,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCusConfig.add(moFieldFkSalesSupervisorId_n);
         mvFieldsCusConfig.add(moFieldIsFreeDiscountDoc);
         mvFieldsCusConfig.add(moFieldIsFreeCommissions);
+        mvFieldsCusConfig.add(moFieldIsSignRestrict);
 
         moFormBizPartnerBranch = new SFormBizPartnerBranch(miClient);
 
@@ -2236,6 +2244,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsFreeCommissions;
     private javax.swing.JCheckBox jckIsFreeDiscountDoc;
+    private javax.swing.JCheckBox jckIsSignRestrict;
     private javax.swing.JFormattedTextField jftAlternativeId;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
@@ -2505,6 +2514,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbFkSalesSupervisorId_n.setEnabled(true);
             jckIsFreeDiscountDoc.setEnabled(true);
             jckIsFreeCommissions.setEnabled(true);
+            jckIsSignRestrict.setEnabled(true);
             jlFkCfdAddendaTypeId.setEnabled(true);
             jcbFkCfdAddendaTypeId.setEnabled(true);
             jbEdit.setEnabled(true);
@@ -2534,6 +2544,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbFkSalesSupervisorId_n.setEnabled(false);
             jckIsFreeDiscountDoc.setEnabled(false);
             jckIsFreeCommissions.setEnabled(false);
+            jckIsSignRestrict.setEnabled(false);
             jlFkCfdAddendaTypeId.setEnabled(false);
             jcbFkCfdAddendaTypeId.setEnabled(false);
             jbEdit.setEnabled(false);
@@ -3092,6 +3103,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldFkSalesSupervisorId_n.setKey(new int[] { moCustomerConfig.getFkSalesSupervisorId_n() });
                 moFieldIsFreeDiscountDoc.setFieldValue(moCustomerConfig.getIsFreeDiscountDoc());
                 moFieldIsFreeCommissions.setFieldValue(moCustomerConfig.getIsFreeCommissions());
+                moFieldIsSignRestrict.setFieldValue(moCustomerConfig.getIsSignRestricted());
             }
 
             for (int branch = 1; branch < moBizPartner.getDbmsBizPartnerBranches().size(); branch++) {
@@ -3296,6 +3308,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moCustomerConfig.setFkSalesSupervisorId_n(moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0]);
             moCustomerConfig.setIsFreeDiscountDoc(moFieldIsFreeDiscountDoc.getBoolean());
             moCustomerConfig.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
+            moCustomerConfig.setIsSignRestricted(moFieldIsSignRestrict.getBoolean());
 
             if (moBizPartner.getDbmsBizPartnerBranches().get(0).getDbmsDataCustomerBranchConfig().isEmpty()) {
                 customerBranchConfig = new SDataCustomerBranchConfig();

@@ -137,8 +137,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jlConcept1 = new javax.swing.JLabel();
         jtfXmlFilesNumber = new javax.swing.JTextField();
         jbFileXmlAdd = new javax.swing.JButton();
-        jbGetXml = new javax.swing.JButton();
         jbRecordToRecordEntry = new javax.swing.JButton();
+        jbGetXml = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jlFkAccountCashId_n = new javax.swing.JLabel();
         jcbFkAccountCashId_n = new javax.swing.JComboBox<SFormComponentItem>();
@@ -349,16 +349,16 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbFileXmlAdd.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel7.add(jbFileXmlAdd);
 
+        jbRecordToRecordEntry.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif"))); // NOI18N
+        jbRecordToRecordEntry.setToolTipText("Transferir CFD a una partida");
+        jbRecordToRecordEntry.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbRecordToRecordEntry);
+
         jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
         jbGetXml.setToolTipText("Descargar archivos XML");
         jbGetXml.setFocusable(false);
         jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel7.add(jbGetXml);
-
-        jbRecordToRecordEntry.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif"))); // NOI18N
-        jbRecordToRecordEntry.setToolTipText("Transferir CFD a una partida");
-        jbRecordToRecordEntry.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel7.add(jbRecordToRecordEntry);
 
         jpRecord1.add(jPanel7);
 

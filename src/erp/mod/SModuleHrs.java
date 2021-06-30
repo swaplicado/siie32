@@ -173,7 +173,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Isabel Servín
  */
 public class SModuleHrs extends SGuiModule {
 
@@ -1442,6 +1442,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSR_ACT_EMP:
                 guiReport = new SGuiReport("reps/hrs_emp_act_by_period.jasper", "Reporte de empleados activos por período");
+                break;
+            case SModConsts.HRSR_POS:
+                guiReport = new SGuiReport("reps/hrsr_pos.jasper", "Reporte de posiciones");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
