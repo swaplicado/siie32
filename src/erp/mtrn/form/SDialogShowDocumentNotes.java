@@ -54,7 +54,7 @@ public class SDialogShowDocumentNotes extends javax.swing.JDialog implements erp
      */
     public SDialogShowDocumentNotes(erp.client.SClientInterface client, int typeDocument) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnParamTypeDocument = typeDocument;
 
         initComponents();

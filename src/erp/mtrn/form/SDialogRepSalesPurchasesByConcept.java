@@ -62,7 +62,7 @@ public class SDialogRepSalesPurchasesByConcept extends javax.swing.JDialog imple
     /** Creates new form SDialogRepSalesPurchasesByConcept */
     public SDialogRepSalesPurchasesByConcept(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

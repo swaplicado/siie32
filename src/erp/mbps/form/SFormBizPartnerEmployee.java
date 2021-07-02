@@ -170,7 +170,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
      */
     public SFormBizPartnerEmployee(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

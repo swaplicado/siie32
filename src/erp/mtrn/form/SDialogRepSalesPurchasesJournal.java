@@ -34,7 +34,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -54,13 +54,14 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
-    /** Creates new form SDialogRepSalesPurchasesDiary */
+    /** Creates new form SDialogRepSalesPurchasesJournal
+     * @param client GUI client.
+     */
     public SDialogRepSalesPurchasesJournal(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -230,7 +231,7 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);
         moFieldDateInitial.setPickerButton(jbDateInitial);
@@ -255,19 +256,18 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
 
         SFormUtilities.putActionMap(getRootPane(), actionOk, "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
-        AbstractAction action = new AbstractAction() {
+        AbstractAction actionCancel = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionClose(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "exit", KeyEvent.VK_ESCAPE, 0);
 
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
     }
 

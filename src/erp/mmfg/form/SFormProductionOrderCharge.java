@@ -74,7 +74,7 @@ public class SFormProductionOrderCharge extends javax.swing.JDialog implements e
     /** Creates new form SFormElement */
     public SFormProductionOrderCharge(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MFG_ORD_CHG;
 
         initComponents();

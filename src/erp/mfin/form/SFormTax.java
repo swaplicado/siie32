@@ -54,7 +54,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
     /** Creates new form SFormTax */
     public SFormTax(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_TAX;
 
         initComponents();

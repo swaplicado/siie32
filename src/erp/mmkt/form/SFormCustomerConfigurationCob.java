@@ -49,7 +49,7 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
     /** Creates new form SFormElement */
     public SFormCustomerConfigurationCob(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MKT_CFG_CUSB;
 
         initComponents();

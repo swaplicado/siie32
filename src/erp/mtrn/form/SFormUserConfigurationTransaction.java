@@ -58,7 +58,7 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
     /** Creates new form SFormUserConfigurationTransaction */
     public SFormUserConfigurationTransaction(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_USR_CFG;
 
         initComponents();

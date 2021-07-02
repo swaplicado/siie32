@@ -22,7 +22,7 @@ public class SDialogViewEmployeeImages extends javax.swing.JDialog implements ja
     /** Creates new form SDialogViewEmployeeImages */
     public SDialogViewEmployeeImages(erp.client.SClientInterface client, ImageIcon image, String title) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         moImage = image;
 
         initComponents();

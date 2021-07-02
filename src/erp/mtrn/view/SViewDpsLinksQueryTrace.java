@@ -36,11 +36,12 @@ public class SViewDpsLinksQueryTrace extends erp.lib.table.STableTab implements 
         int i;
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(moTabFilterDatePeriod);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
@@ -138,7 +139,7 @@ public class SViewDpsLinksQueryTrace extends erp.lib.table.STableTab implements 
                 sqlDatePeriod += "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctAreas += "AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

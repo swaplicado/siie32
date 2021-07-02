@@ -52,7 +52,7 @@ public class SFormStockConfig extends javax.swing.JDialog implements erp.lib.for
     /** Creates new form SFormStockConfig */
     public SFormStockConfig(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_STK_CFG;
 
         initComponents();

@@ -45,7 +45,7 @@ public class SDialogFilterDocumentNature extends javax.swing.JDialog implements 
      */
     public SDialogFilterDocumentNature(erp.client.SClientInterface client, int dataType, int[] filter) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnDataType = dataType;
         manDataFilterKey = filter;
 

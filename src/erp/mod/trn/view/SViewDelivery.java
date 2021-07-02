@@ -50,12 +50,12 @@ public class SViewDelivery extends SGridPaneView implements ActionListener {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
 
         mjPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), SUtilConsts.TXT_PRINT, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjPrint);
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     
     private boolean isSummary() {

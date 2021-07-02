@@ -50,7 +50,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
         
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isDpsPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -139,7 +139,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
                 sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlDocFunctArea += " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

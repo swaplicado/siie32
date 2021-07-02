@@ -62,7 +62,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
      */
     public SDialogPickerDps(erp.client.SClientInterface client, int optionType) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnOptionType = optionType;
         initComponents();
         initComponentsExtra();

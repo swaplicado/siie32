@@ -51,7 +51,7 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
     /** Creates new form SFormStockLot */
     public SFormStockLot(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_LOT;
 
         initComponents();

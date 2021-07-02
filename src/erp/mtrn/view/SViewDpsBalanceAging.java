@@ -46,7 +46,7 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
         moTabFilterDateType = new STabFilterDateType(this);
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
@@ -209,7 +209,7 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
                 sqlBizPartner += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND re.fid_bp_nr = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

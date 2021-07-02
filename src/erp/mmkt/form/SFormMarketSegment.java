@@ -44,7 +44,7 @@ public class SFormMarketSegment extends javax.swing.JDialog implements erp.lib.f
     /** Creates new form SFormElement */
     public SFormMarketSegment(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MKTU_MKT_SEGM;
 
         initComponents();

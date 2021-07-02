@@ -44,7 +44,7 @@ public class SFormSalesRoute extends javax.swing.JDialog implements erp.lib.form
     /** Creates new form SFormElement */
     public SFormSalesRoute(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MKTU_SAL_ROUTE;
 
         initComponents();

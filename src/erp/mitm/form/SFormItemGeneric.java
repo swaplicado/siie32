@@ -151,7 +151,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
      */
     public SFormItemGeneric(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_IGEN;
 
         initComponents();

@@ -67,7 +67,7 @@ public class SFormPriceList extends javax.swing.JDialog implements erp.lib.form.
     /** Creates new form SFormElement */
     public SFormPriceList(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MKT_PLIST;
 
         initComponents();

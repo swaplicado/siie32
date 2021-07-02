@@ -47,7 +47,7 @@ public class SFormBizPartnerBlocking extends javax.swing.JDialog implements erp.
     /** Creates new form SFormElement */
     public SFormBizPartnerBlocking(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_BP_BLOCK;
 
         initComponents();

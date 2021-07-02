@@ -9,9 +9,6 @@ import erp.form.SFormOptionPickerFunctionalArea;
 import erp.client.SClientInterface;
 import erp.mtrn.data.STrnFunctionalAreaUtils;
 import erp.table.SFilterConstants;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilter;
@@ -23,24 +20,26 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Edwin Carmona, Sergio Flores
  */
-public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilter, ActionListener {
+public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilter {
 
-    public static final int PNL_TP_COB_ENT = 1;
-    
+    private static final int TAB_SETTING_ADD = 1;
+    private static final int TAB_SETTING_UPDATE = 2;
+
     private SGuiClient miClient;
     private SGridPaneView moPaneView;
     private SFormOptionPickerFunctionalArea moFunctionalAreaPicker;
-    private String msFunctionalAreaIds;
+    private int mnCurrentFunctionalAreaId;
     
     /**
-     * Creates new form SGridFilterPanelFunctionalArea
-     * 
-     * @param client
-     * @param paneView
+     * Creates new pane view SGridFilterPanelFunctionalArea.
+     * By default, functional areas asigned to current user are set.
+     * @param client GUI client.
+     * @param paneView Pane view.
      */
     public SGridFilterPanelFunctionalArea(SGuiClient client, SGridPaneView paneView) {
         miClient = client;
         moPaneView = paneView;
+        
         initComponents();
         initComponentsCustom();
     }
@@ -54,27 +53,35 @@ public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilte
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jtfFunctionalAreas = new sa.lib.gui.bean.SBeanFieldText();
-        jbEditFunctionalAreas = new javax.swing.JButton();
+        jtfFunctionalArea = new sa.lib.gui.bean.SBeanFieldText();
+        jbFunctionalArea = new javax.swing.JButton();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfFunctionalAreas.setEditable(false);
-        jtfFunctionalAreas.setText("TEXT");
-        jtfFunctionalAreas.setToolTipText("Área funcional");
-        jtfFunctionalAreas.setPreferredSize(new java.awt.Dimension(65, 23));
-        add(jtfFunctionalAreas);
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setText("TEXT");
+        jtfFunctionalArea.setToolTipText("Área funcional");
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(65, 23));
+        add(jtfFunctionalArea);
 
-        jbEditFunctionalAreas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_edit.gif"))); // NOI18N
-        jbEditFunctionalAreas.setToolTipText("Cambiar área funcional");
-        jbEditFunctionalAreas.setPreferredSize(new java.awt.Dimension(23, 23));
-        add(jbEditFunctionalAreas);
+        jbFunctionalArea.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_filter_func.gif"))); // NOI18N
+        jbFunctionalArea.setToolTipText("Seleccionar área funcional");
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbFunctionalArea.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbFunctionalAreaActionPerformed(evt);
+            }
+        });
+        add(jbFunctionalArea);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jbFunctionalAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbFunctionalAreaActionPerformed
+        actionPerformedFunctionalArea();
+    }//GEN-LAST:event_jbFunctionalAreaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jbEditFunctionalAreas;
-    private sa.lib.gui.bean.SBeanFieldText jtfFunctionalAreas;
+    private javax.swing.JButton jbFunctionalArea;
+    private sa.lib.gui.bean.SBeanFieldText jtfFunctionalArea;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -82,39 +89,38 @@ public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilte
      */
     
     private void initComponentsCustom() {
-        jbEditFunctionalAreas.addActionListener(this);
-        msFunctionalAreaIds = "";
         moFunctionalAreaPicker = new SFormOptionPickerFunctionalArea((SClientInterface) miClient);
-        setTextToField(moFunctionalAreaPicker.getSelectedPrimaryKey() == null ? null : ((int[]) moFunctionalAreaPicker.getSelectedPrimaryKey()));
+        
+        updateAndRenderFunctionalArea(0, TAB_SETTING_ADD);
+        jbFunctionalArea.setEnabled(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas());
     }
     
-    private void setTextToField(int[] key) {
-        jtfFunctionalAreas.setValue("");
-        msFunctionalAreaIds = "";
-        int nFunctionalArea = 0;
+    private void updateAndRenderFunctionalArea(int functionalAreaId, int tabSettingAction) {
+        mnCurrentFunctionalAreaId = functionalAreaId;
         
-        if (key != null) {
-            nFunctionalArea = key[0];
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, mnCurrentFunctionalAreaId);
+        SGridFilterValue filterValue = new SGridFilterValue(SFilterConstants.SETTING_FILTER_FUNC_AREA, SGridConsts.FILTER_DATA_TYPE_TEXT, texts[0]);
+
+        if (tabSettingAction == TAB_SETTING_ADD) {
+            moPaneView.getFiltersMap().put(SFilterConstants.SETTING_FILTER_FUNC_AREA, filterValue);
+        }
+        else {
+            moPaneView.putFilter(SFilterConstants.SETTING_FILTER_FUNC_AREA, filterValue);
         }
         
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, nFunctionalArea);
-        msFunctionalAreaIds = texts[0];
-        
-        jtfFunctionalAreas.setText(texts[1]);
-        jtfFunctionalAreas.setCaretPosition(0);
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
     }
     
-    private void actionEditFunctionalArea() {
-        jbEditFunctionalAreas.setEnabled(false);
+    private void actionPerformedFunctionalArea() {
+        moFunctionalAreaPicker.formRefreshOptionPane();
+        moFunctionalAreaPicker.formReset();
+        moFunctionalAreaPicker.setSelectedPrimaryKey(new int[] { mnCurrentFunctionalAreaId });
         moFunctionalAreaPicker.setVisible(true);
         
         if (moFunctionalAreaPicker.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-            this.setTextToField(moFunctionalAreaPicker.getSelectedPrimaryKey() == null ? null : ((int[]) moFunctionalAreaPicker.getSelectedPrimaryKey()));
-            SGridFilterValue val = new SGridFilterValue(SFilterConstants.SETTING_FILTER_FUNC_AREA, SGridConsts.FILTER_DATA_TYPE_TEXT, msFunctionalAreaIds);
-            moPaneView.putFilter(SFilterConstants.SETTING_FILTER_FUNC_AREA, val);
+            updateAndRenderFunctionalArea(moFunctionalAreaPicker.getSelectedPrimaryKey() == null ? 0 : ((int[]) moFunctionalAreaPicker.getSelectedPrimaryKey())[0], TAB_SETTING_UPDATE);
         }
-        
-        jbEditFunctionalAreas.setEnabled(true);
     }
     
     /*
@@ -127,17 +133,6 @@ public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilte
     
     @Override
     public void initFilter(Object value) {
-        
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() instanceof JButton) {
-            JButton button = (JButton) e.getSource();
-            
-            if (button == jbEditFunctionalAreas) {
-                actionEditFunctionalArea();
-            }
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

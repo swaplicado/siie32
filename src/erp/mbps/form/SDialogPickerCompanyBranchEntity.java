@@ -57,7 +57,7 @@ public class SDialogPickerCompanyBranchEntity extends javax.swing.JDialog implem
     /** Creates new form SDialogPickerCompanyBranchEntity */
     public SDialogPickerCompanyBranchEntity(erp.client.SClientInterface client, int entityCategoryId) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnEntityCategoryId = entityCategoryId;
 
         initComponents();

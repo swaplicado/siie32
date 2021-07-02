@@ -202,7 +202,9 @@ public abstract class SLibConstants {
     // Fixed messages:
 
     public static final java.lang.String TXT_ALL = "(TODOS)";
+    public static final java.lang.String TXT_ALL_FEM = "(TODAS)";
     public static final java.lang.String TXT_NONE = "(NINGUNO)";
+    public static final java.lang.String TXT_NONE_FEM = "(NINGUNA)";
     public static final java.lang.String TXT_SYS_CTY = "PAÍS LOCAL";
     public static final java.lang.String TXT_SYS_CUR = "MONEDA LOCAL";
     public static final java.lang.String TXT_BENEF_ACC_DEP = "PARA ABONO EN CUENTA DEL BENEFICIARIO";

@@ -52,7 +52,7 @@ public class SFormBizPartnerAddressee extends javax.swing.JDialog implements erp
      */
     public SFormBizPartnerAddressee(erp.client.SClientInterface client, int bizPartnerType) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.BPSU_BP_ADDEE;
         mnBizPartnerType = bizPartnerType;
 

@@ -45,7 +45,7 @@ public class SFormBizPartnerBranch extends javax.swing.JDialog implements erp.li
     /** Creates new form SFormBizPartnerBranch */
     public SFormBizPartnerBranch(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.BPSU_BPB;
 
         initComponents();

@@ -59,7 +59,7 @@ public class SDialogRepSalesPurchasesComparative extends javax.swing.JDialog imp
      */
     public SDialogRepSalesPurchasesComparative(erp.client.SClientInterface client, int formType) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = formType;
 
         initComponents();

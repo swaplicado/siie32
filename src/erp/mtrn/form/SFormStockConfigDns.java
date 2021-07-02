@@ -42,7 +42,7 @@ public class SFormStockConfigDns extends javax.swing.JDialog implements erp.lib.
     /** Creates new form SFormStockConfigDns */
     public SFormStockConfigDns(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_STK_CFG_DNS;
 
         initComponents();

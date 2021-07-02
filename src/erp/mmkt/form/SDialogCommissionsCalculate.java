@@ -68,7 +68,7 @@ public class SDialogCommissionsCalculate extends javax.swing.JDialog implements 
 
     public SDialogCommissionsCalculate(erp.client.SClientInterface client, int optionType) {
         super(client.getFrame(), false); // No modal is required to print the report commissions
-        miClient =  client;
+        miClient = client;
         mnOptionType = optionType;
         initComponents();
         initComponentsExtra();

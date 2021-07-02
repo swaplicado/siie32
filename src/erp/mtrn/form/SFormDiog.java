@@ -138,7 +138,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     /** Creates new form SFormDiog */
     public SFormDiog(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_DIOG;
 
         initComponents();

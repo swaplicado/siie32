@@ -53,7 +53,7 @@ public class SDialogRepDpsShipmentItem extends javax.swing.JDialog implements er
     /** Creates new form SDialogRepDpsMoves */
     public SDialogRepDpsShipmentItem(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

@@ -82,7 +82,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     /** Creates new form SFormMoneyInOutBizPartner */
     public SFormMoneyInOutBizPartner(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

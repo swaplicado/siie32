@@ -46,7 +46,7 @@ public class SFormTaxRegion extends javax.swing.JDialog implements erp.lib.form.
     /** Creates new form SFormTaxRegion */
     public SFormTaxRegion(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_TAX_REG;
 
         initComponents();

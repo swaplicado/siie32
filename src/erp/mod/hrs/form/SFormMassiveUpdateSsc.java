@@ -85,7 +85,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
      */
     public SFormMassiveUpdateSsc(erp.client.SClientInterface client, int year, int bimester) throws Exception {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_TAX_BAS;
         
         mnYear = year;

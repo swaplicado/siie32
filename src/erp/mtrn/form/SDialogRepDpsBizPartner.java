@@ -33,7 +33,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores, Edwin Carmona
+ * @author Alfonso Flores, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -57,13 +57,14 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
-    /** Creates new form SDialogRepDpsBizPartner */
+    /** Creates new form SDialogRepDpsBizPartner
+     * @param client GUI client.
+     */
     public SDialogRepDpsBizPartner(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -288,7 +289,7 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);
         moFieldDateInitial.setPickerButton(jbDateInitial);
@@ -332,8 +333,7 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
     }
 

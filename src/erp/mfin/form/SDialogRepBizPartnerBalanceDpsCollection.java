@@ -52,10 +52,13 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
-    /** Creates new form SDialogRepBizPartnerBalanceDps */
+    /** Creates new form SDialogRepBizPartnerBalanceDpsCollection
+     * @param client
+     * @param idBizPartnerCategory
+     * @param idReport
+     */
     public SDialogRepBizPartnerBalanceDpsCollection(erp.client.SClientInterface client, int idBizPartnerCategory, int idReport) {
         super(client.getFrame(), true);
         miClient = client;
@@ -218,6 +221,7 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
 
     private void initComponentsExtra() {
         setTitle(getTitle() + (mnReportId != SDataConstantsSys.REP_FIN_BPS_BAL_COLL ? " por documento" : ""));
+        
         manSysMoveTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
         msBizPartnerCat = "CLIENTE";
         msBizPartnerCatPlural = "CLIENTES";
@@ -242,8 +246,7 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
     }
 

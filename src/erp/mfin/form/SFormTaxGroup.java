@@ -53,7 +53,7 @@ public class SFormTaxGroup extends javax.swing.JDialog implements erp.lib.form.S
     /** Creates new form SFormTaxGroup */
     public SFormTaxGroup(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FIN_TAX_GRP;
 
         initComponents();

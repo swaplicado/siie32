@@ -71,7 +71,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
         moTabFilterTypeDocument = new STabFilterDocumentType(miClient, this, SDataConstants.TRNS_TP_IOG);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         if (mnTabTypeAux01 != SLibConstants.UNDEFINED && mnTabTypeAux02 != SLibConstants.UNDEFINED) {
             moTabFilterTypeDocument.setFixedDocumentType(new int[] { mnTabTypeAux01, mnTabTypeAux02, 1 });
@@ -83,10 +83,6 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         addTaskBarUpperComponent(moTabFilterDatePeriod);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCompanyBranchEntity);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterTypeDocument);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         addTaskBarUpperSeparator();
 
@@ -142,6 +138,11 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         jbPrint.setToolTipText("Imprimir documento");
         addTaskBarUpperComponent(jbPrint);
 
+        addTaskBarUpperSeparator();
+        
+        addTaskBarUpperComponent(moTabFilterTypeDocument);
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        
         levelRightInOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_IN_INT).Level;
         levelRightOutOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_INT).Level;
 
@@ -319,7 +320,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

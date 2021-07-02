@@ -67,8 +67,9 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
@@ -76,7 +77,6 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
         addTaskBarUpperComponent(moTabFilterUser);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
-        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         STableField[] aoKeyFields = new STableField[2];
@@ -233,7 +233,7 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((Integer) setting.getSetting()) + ") ";
                 }
             }

@@ -53,7 +53,7 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
         STableColumn[] aoTableColumns = new STableColumn[7];
 
         moFormOptionPickerPriceHistory = new SFormOptionPickerPriceHistory(miClient, SDataConstants.TRNX_PRICE_HIST, mnTabTypeAux01);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
@@ -145,7 +145,7 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "item.b_del = FALSE ";
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

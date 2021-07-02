@@ -54,7 +54,7 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     */
     public SDialogUpdateDpsAccountCenterCost(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         initComponents();
         initComponentsExtra();
     }

@@ -45,7 +45,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -69,10 +69,12 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
-    /** Creates new form SDialogRepBizPartnerAccountingMoves */
+    /** Creates new form SDialogRepBizPartnerAccountingMoves
+     * @param client
+     * @param idBizPartnerCategory
+     */
     public SDialogRepBizPartnerAccountingMoves(erp.client.SClientInterface client, int idBizPartnerCategory) {
         super(client.getFrame(), false);
         miClient = client;
@@ -286,8 +288,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
     }
 

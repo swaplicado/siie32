@@ -169,11 +169,12 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(mjbClose);
         addTaskBarUpperComponent(mjbOpen);
         addTaskBarUpperSeparator();
@@ -187,13 +188,14 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewContractAnalysis);
         addTaskBarUpperComponent(mjbPrintContractMoves);
+        
         addTaskBarLowerComponent(moTabFilterUser);
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterDocumentNature);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        addTaskBarLowerComponent(moTabFilterFunctionalArea);
 
         mjbClose.setEnabled(hasRightToClose && !isViewForDocLinked());
         mjbOpen.setEnabled(hasRightToOpen && isViewForDocLinked());
@@ -533,7 +535,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + " d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

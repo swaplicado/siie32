@@ -37,7 +37,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Edwin Carmona, Claudio Peña
+ * @author Alfonso Flores, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -59,13 +59,14 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
-    /** Creates new form SDialogRepDpsList */
+    /** Creates new form SDialogRepDpsList
+     * @param client GUI client.
+     */
     public SDialogRepDpsList(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -264,7 +265,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);
         moFieldDateInitial.setPickerButton(jbDateInitial);
@@ -304,8 +305,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         
          // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
     }
 

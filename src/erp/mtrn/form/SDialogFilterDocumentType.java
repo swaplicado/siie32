@@ -52,7 +52,7 @@ public class SDialogFilterDocumentType extends javax.swing.JDialog implements er
      */
     public SDialogFilterDocumentType(erp.client.SClientInterface client, int dataType, int[] filter) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnDataType = dataType;
         manDataFilterKey = filter;
 

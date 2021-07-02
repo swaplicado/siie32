@@ -68,7 +68,7 @@ public class SFormCheckFormat extends javax.swing.JDialog implements erp.lib.for
     /** Creates new form SFormCheckFormat */
     public SFormCheckFormat(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_CHECK_FMT;
 
         initComponents();

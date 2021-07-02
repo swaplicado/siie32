@@ -91,7 +91,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
             default:
         }
         
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         mjbDeliveryAckClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
         mjbDeliveryAckOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));
@@ -134,12 +134,11 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(mjbDeliveryAckClose);
         addTaskBarUpperComponent(mjbDeliveryAckOpen);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mbIsPending ? moTabFilterDateCutOff : moTabFilterDatePeriod);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
@@ -149,6 +148,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         addTaskBarUpperComponent(mjbReasignFiles);
         addTaskBarUpperComponent(mjbViewFiles);
         addTaskBarUpperComponent(mjbSendFiles);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         if (!mbIsPending) {
             mjbDeliveryAckOpen.setEnabled(true);
@@ -369,7 +370,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + " dps.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

@@ -52,7 +52,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         int i;
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         jbDeleteLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK_NO));
         jbDeleteLinks.setPreferredSize(new Dimension(23, 23));
@@ -62,11 +62,12 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(moTabFilterDatePeriod);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
-        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbDeleteLinks);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         STableField[] aoKeyFields = new STableField[4];
         STableColumn[] aoTableColumns = new STableColumn[12];
@@ -363,7 +364,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     if (isViewFromSource()) {
                         sqlFunctAreas = "AND ds.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                     }

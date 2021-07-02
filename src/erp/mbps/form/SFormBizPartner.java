@@ -167,7 +167,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
      */
     public SFormBizPartner(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -374,6 +374,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jckIsFreeDiscountDoc = new javax.swing.JCheckBox();
         jckIsFreeCommissions = new javax.swing.JCheckBox();
         jckIsSignRestrict = new javax.swing.JCheckBox();
+        jLabel3 = new javax.swing.JLabel();
         jpCob = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
         jbNew = new javax.swing.JButton();
@@ -1186,8 +1187,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jckIsFreeCommissions.setText("Sin comisiones");
         jPanel30.add(jckIsFreeCommissions);
 
-        jckIsSignRestrict.setText("Restringido para el timbrado");
+        jckIsSignRestrict.setText("Restringido al timbrar CFDI");
         jPanel30.add(jckIsSignRestrict);
+
+        jLabel3.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel3.setText("(Se requiere privilegio específico.)");
+        jPanel30.add(jLabel3);
 
         jPanel21.add(jPanel30, java.awt.BorderLayout.WEST);
 
@@ -2123,6 +2128,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;

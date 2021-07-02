@@ -66,7 +66,7 @@ public class SFormCtr extends javax.swing.JDialog implements erp.lib.form.SFormI
     /** Creates new form SFormCtr */
     public SFormCtr(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_CTR;
 
         initComponents();

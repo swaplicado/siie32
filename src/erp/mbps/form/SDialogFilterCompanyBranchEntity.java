@@ -44,7 +44,7 @@ public class SDialogFilterCompanyBranchEntity extends javax.swing.JDialog implem
     /** Creates new form SDialogFilterCompanyBranchEntity */
     public SDialogFilterCompanyBranchEntity(erp.client.SClientInterface client, int entityCategoryId) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnEntityCategoryId = entityCategoryId;
 
         initComponents();

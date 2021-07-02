@@ -58,7 +58,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
      * @param client GUI client.
      */
     public SPanelBizPartnerBranchAddress(erp.client.SClientInterface client) {
-        miClient =  client;
+        miClient = client;
         //mnFormType = SDataConstants.BPSU_BPB_ADD;
 
         initComponents();

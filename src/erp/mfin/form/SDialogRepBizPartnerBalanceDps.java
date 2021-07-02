@@ -62,7 +62,6 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
     /** Creates new form SDialogRepBizPartnerBalanceDps */
@@ -332,8 +331,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
     }
 

@@ -1915,7 +1915,15 @@
                     </Component>
                     <Component class="javax.swing.JCheckBox" name="jckIsSignRestrict">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Restringido para el timbrado"/>
+                        <Property name="text" type="java.lang.String" value="Restringido al timbrar CFDI"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel3">
+                      <Properties>
+                        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                          <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="(Se requiere privilegio espec&#xed;fico.)"/>
                       </Properties>
                     </Component>
                   </SubComponents>

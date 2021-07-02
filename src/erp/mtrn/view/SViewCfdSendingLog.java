@@ -49,7 +49,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isCfdiPayroll() ? SDataConstants.BPSX_BP_EMP : SDataConstantsSys.BPSS_CT_BP_CUS);
@@ -59,14 +59,16 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
         removeTaskBarUpperComponent(jbDelete);
         
         addTaskBarUpperComponent(moTabFilterDatePeriod);
+        
+        if (!isCfdiPayroll()) {
+            addTaskBarUpperSeparator();
+            addTaskBarUpperComponent(moTabFilterCompanyBranch);
+        }
+        
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterBizPartner);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
-        addTaskBarUpperSeparator();
-        if (!isCfdiPayroll()) {
-            addTaskBarUpperComponent(moTabFilterCompanyBranch);
-            addTaskBarUpperSeparator();
-        }
-        addTaskBarUpperComponent(moTabFilterBizPartner);
 
         aoKeyFields = new STableField[1];
         aoTableColumns = new STableColumn[isCfdiPayroll() ? 12 : 14];
@@ -148,7 +150,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
                 sqlDatePeriod = "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), (isCfdiPayroll() ? "p.dt_end" : "d.dt"));
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

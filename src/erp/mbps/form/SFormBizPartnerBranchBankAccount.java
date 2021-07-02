@@ -94,7 +94,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     /** Creates new form SFormBizPartnerBranchBankAccount */
     public SFormBizPartnerBranchBankAccount(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         mnFormType = SDataConstants.BPSU_BANK_ACC;
 

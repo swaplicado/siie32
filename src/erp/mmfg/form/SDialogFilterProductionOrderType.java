@@ -40,7 +40,7 @@ public class SDialogFilterProductionOrderType extends javax.swing.JDialog implem
     /** Creates new form SDialogFilterProductionOrderType */
     public SDialogFilterProductionOrderType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         
         initComponents();
         initComponentsExtra();

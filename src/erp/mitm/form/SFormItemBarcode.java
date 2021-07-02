@@ -45,7 +45,7 @@ public class SFormItemBarcode extends javax.swing.JDialog implements erp.lib.for
     /** Creates new form SFormItemBarcode */
     public SFormItemBarcode(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_ITEM_BARC;
 
         initComponents();

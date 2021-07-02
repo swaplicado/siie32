@@ -91,7 +91,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstantsSys.BPSS_CT_BP_CUS);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
 
         removeTaskBarUpperComponent(jbNew);
@@ -101,19 +101,19 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         addTaskBarUpperComponent(mjbClose);
         addTaskBarUpperComponent(mjbOpen);
         addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(mjbChangeAgentSupervisor);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(mjbChangeAgentSupervisor);
-        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         mjbClose.setEnabled(true);
         mjbOpen.setEnabled(true);
@@ -298,7 +298,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
                 sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctAreas += "AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

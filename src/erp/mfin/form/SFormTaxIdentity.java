@@ -47,7 +47,7 @@ public class SFormTaxIdentity extends javax.swing.JDialog implements erp.lib.for
     /** Creates new form SFormTaxIdentity */
     public SFormTaxIdentity(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_TAX_IDY;
 
         initComponents();

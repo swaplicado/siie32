@@ -55,7 +55,7 @@ public class SFormEmployeeSBC extends javax.swing.JDialog implements erp.lib.for
 
     public SFormEmployeeSBC(erp.client.SClientInterface client,  Date dateLayoutStart, Date dateLayoutEnd) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_TAX_BAS;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");

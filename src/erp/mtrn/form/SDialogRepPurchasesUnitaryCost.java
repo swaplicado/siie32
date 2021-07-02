@@ -70,7 +70,7 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     /** Creates new form SDialogRepPurchasesUnitaryCost */
     public SDialogRepPurchasesUnitaryCost(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

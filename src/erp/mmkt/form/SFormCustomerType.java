@@ -44,7 +44,7 @@ public class SFormCustomerType extends javax.swing.JDialog implements erp.lib.fo
     /** Creates new form SFormElement */
     public SFormCustomerType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MKTU_TP_CUS;
 
         initComponents();

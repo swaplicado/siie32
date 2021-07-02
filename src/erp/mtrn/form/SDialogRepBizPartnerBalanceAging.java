@@ -39,7 +39,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author  Néstor Ávalos, Edwin Carmona, Daniel López, Sergio Flores
+ * @author  Néstor Ávalos, Daniel López, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -63,7 +63,6 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
 
@@ -470,8 +469,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
     }
 

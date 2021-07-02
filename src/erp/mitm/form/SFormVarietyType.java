@@ -45,7 +45,7 @@ public class SFormVarietyType extends javax.swing.JDialog implements erp.lib.for
     /** Creates new form SFormVarietyType */
     public SFormVarietyType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_TP_VAR;
 
         initComponents();

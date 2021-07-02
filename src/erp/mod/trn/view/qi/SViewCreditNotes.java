@@ -50,7 +50,6 @@ public class SViewCreditNotes extends SGridPaneView {
         createGridColumns();
         
         moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
-        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     

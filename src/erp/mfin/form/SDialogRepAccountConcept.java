@@ -55,7 +55,7 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
      */
     public SDialogRepAccountConcept(erp.client.SClientInterface client, int concept) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnConcept = concept;
 
         initComponents();

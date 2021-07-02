@@ -54,11 +54,12 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
         moTabFilterCurrency = new STabFilterCurrency(miClient, this);
         moTabFilterRelatedParts = new STabFilterRelatedParts(miClient, this);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(moTabFilterDatePeriodRange);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabCompanyBranch);
@@ -492,7 +493,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 sqlDatePeriod += "AND doc.dt BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctAreas += (sqlFunctAreas.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

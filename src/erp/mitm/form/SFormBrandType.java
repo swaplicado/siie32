@@ -46,7 +46,7 @@ public class SFormBrandType extends javax.swing.JDialog implements erp.lib.form.
     /** Creates new form SFormBrandType */
     public SFormBrandType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_TP_BRD;
 
         initComponents();

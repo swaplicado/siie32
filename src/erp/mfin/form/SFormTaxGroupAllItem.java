@@ -52,7 +52,7 @@ public class SFormTaxGroupAllItem extends javax.swing.JDialog implements erp.lib
     /** Creates new form SFormTaxRegion */
     public SFormTaxGroupAllItem(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINX_TAX_GRP_ALL_ITEM;
 
         initComponents();

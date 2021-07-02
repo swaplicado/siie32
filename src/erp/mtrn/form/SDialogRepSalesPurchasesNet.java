@@ -54,7 +54,7 @@ public class SDialogRepSalesPurchasesNet extends javax.swing.JDialog implements 
     /** Creates new form SDialogRepSalesPurchasesNet */
     public SDialogRepSalesPurchasesNet(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

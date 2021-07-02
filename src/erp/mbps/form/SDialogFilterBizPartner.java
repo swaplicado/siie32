@@ -42,7 +42,7 @@ public class SDialogFilterBizPartner extends javax.swing.JDialog implements erp.
     /** Creates new form SDialogFilterBizPartner */
     public SDialogFilterBizPartner(erp.client.SClientInterface client, int bprCategory) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnBizPartnerCategoryId = bprCategory;
 
         initComponents();

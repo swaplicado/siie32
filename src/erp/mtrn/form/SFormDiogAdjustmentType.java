@@ -44,7 +44,7 @@ public class SFormDiogAdjustmentType extends javax.swing.JDialog implements erp.
     /** Creates new form SFormDiogAdjustmentType */
     public SFormDiogAdjustmentType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRNU_TP_IOG_ADJ;
 
         initComponents();

@@ -55,7 +55,7 @@ public class SFormDocumentNumberSeries extends javax.swing.JDialog implements er
     /** Creates new form SFormDocumentNumberSeries */
     public SFormDocumentNumberSeries(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

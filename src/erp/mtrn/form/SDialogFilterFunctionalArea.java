@@ -14,7 +14,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -25,20 +25,15 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private int mnDataType;
-    private int[] manDataFilterKey;
     private int mnFunctionalAreaId;
     private erp.lib.form.SFormField moFieldFunctionalArea;
 
-    /** Creates new form SDialogFilterFunctionalArea
+    /** Creates new form SDialogFilterFunctionalArea.
      * @param client GUI client.
-     * @param userKey User key.
      */
-    public SDialogFilterFunctionalArea(erp.client.SClientInterface client, int[] userKey) {
+    public SDialogFilterFunctionalArea(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
-        mnDataType = SModConsts.CFGU_FUNC;
-        manDataFilterKey = userKey;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -58,7 +53,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         jbCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jckSelectedAll = new javax.swing.JCheckBox();
+        jckAllFunctionalAreas = new javax.swing.JCheckBox();
         jPanel4 = new javax.swing.JPanel();
         jlFunctionalArea = new javax.swing.JLabel();
         jcbFunctionalArea = new javax.swing.JComboBox();
@@ -92,13 +87,13 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
         jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jckSelectedAll.setText("Todas las áreas funcionales asignadas");
-        jckSelectedAll.addItemListener(new java.awt.event.ItemListener() {
+        jckAllFunctionalAreas.setText("Todas las áreas funcionales asignadas");
+        jckAllFunctionalAreas.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jckSelectedAllItemStateChanged(evt);
+                jckAllFunctionalAreasItemStateChanged(evt);
             }
         });
-        jPanel3.add(jckSelectedAll);
+        jPanel3.add(jckAllFunctionalAreas);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -108,6 +103,11 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
         jcbFunctionalArea.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFunctionalArea.setPreferredSize(new java.awt.Dimension(350, 23));
+        jcbFunctionalArea.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jcbFunctionalAreaKeyPressed(evt);
+            }
+        });
         jPanel4.add(jcbFunctionalArea);
 
         jbFunctionalArea.setText("...");
@@ -126,16 +126,35 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jckSelectedAllItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckSelectedAllItemStateChanged
-        if (!mbResetingForm) {
-            itemStateChangedSelectedAll();
-        }
-    }//GEN-LAST:event_jckSelectedAllItemStateChanged
+    private void jckAllFunctionalAreasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckAllFunctionalAreasItemStateChanged
+        eventItemStateChangedAllFunctionalAreas(evt);
+    }//GEN-LAST:event_jckAllFunctionalAreasItemStateChanged
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        windowActivated();
+        eventWindowActivatedForm();
     }//GEN-LAST:event_formWindowActivated
 
+    private void jcbFunctionalAreaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jcbFunctionalAreaKeyPressed
+        eventKeyPressedFunctionalArea(evt);
+    }//GEN-LAST:event_jcbFunctionalAreaKeyPressed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbFunctionalArea;
+    private javax.swing.JButton jbOk;
+    private javax.swing.JComboBox jcbFunctionalArea;
+    private javax.swing.JCheckBox jckAllFunctionalAreas;
+    private javax.swing.JLabel jlFunctionalArea;
+    // End of variables declaration//GEN-END:variables
+
+    /*
+     * Private methods
+     */
+    
     private void initComponentsExtra() {
         mvFields = new Vector<>();
 
@@ -149,10 +168,10 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         jbFunctionalArea.addActionListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
-        SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, SLibConstants.UNDEFINED);
+        SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
     }
 
-    private void windowActivated() {
+    private void eventWindowActivatedForm() {
         if (mbFirstTime) {
             mbFirstTime = false;
 
@@ -160,16 +179,31 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
                 jcbFunctionalArea.requestFocus();
             }
             else {
-                jckSelectedAll.requestFocus();
+                jckAllFunctionalAreas.requestFocus();
             }
         }
     }
+    
+    private void eventItemStateChangedAllFunctionalAreas(java.awt.event.ItemEvent evt) {
+        if (!mbResetingForm) {
+            itemStateChangedAllFunctionalAreas(true);
+        }
+    }
 
-    private void itemStateChangedSelectedAll() {
-        if (jckSelectedAll.isSelected()) {
+    private void eventKeyPressedFunctionalArea(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_F5) {
+            actionPerformedFunctionalArea();
+        }
+    }
+    
+    private void itemStateChangedAllFunctionalAreas(final boolean reset) {
+        if (reset) {
+            moFieldFunctionalArea.resetField();
+        }
+        
+        if (jckAllFunctionalAreas.isSelected()) {
             jbFunctionalArea.setEnabled(false);
             jcbFunctionalArea.setEnabled(false);
-            moFieldFunctionalArea.resetField();
         }
         else {
             jbFunctionalArea.setEnabled(true);
@@ -177,13 +211,44 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         }
     }
     
+    private void actionPerformedFunctionalArea() {
+        miClient.pickOption(SModConsts.CFGU_FUNC, moFieldFunctionalArea, new int[] { miClient.getSession().getUser().getPkUserId() });
+    }
+
+    /*
+     * Public methods
+     */
+    
+    /**
+     * Set ID of functional area. Can be zero meaning all asigned functional areas.
+     * @param id ID of functional area.
+     */
+    public void setFunctionalAreaId(final int id) {
+        mbResetingForm = true;
+
+        mnFunctionalAreaId = id;
+        jckAllFunctionalAreas.setSelected(mnFunctionalAreaId == 0);
+        moFieldFunctionalArea.setKey(mnFunctionalAreaId == 0 ? null : new int[] { mnFunctionalAreaId });
+        itemStateChangedAllFunctionalAreas(false);
+
+        mbResetingForm = false;
+    }
+
+    /**
+     * Get selected ID of functional area. Can be zero meaning all asigned functional areas.
+     * @return 
+     */
+    public int getFunctionalAreaId() {
+        return mnFunctionalAreaId;
+    }
+    
     public void actionOk() {
-        if (!jckSelectedAll.isSelected() && moFieldFunctionalArea.getKeyAsIntArray()[0] == 0) {
+        if (!jckAllFunctionalAreas.isSelected() && moFieldFunctionalArea.getKeyAsIntArray()[0] == 0) {
             jcbFunctionalArea.requestFocus();
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFunctionalArea.getText() + "'.");
         }
         else {
-            mnFunctionalAreaId = jckSelectedAll.isSelected() ? SLibConstants.UNDEFINED : moFieldFunctionalArea.getKeyAsIntArray()[0];
+            mnFunctionalAreaId = jckAllFunctionalAreas.isSelected() ? SLibConstants.UNDEFINED : moFieldFunctionalArea.getKeyAsIntArray()[0];
 
             mnFormResult = SLibConstants.FORM_RESULT_OK;
             setVisible(false);
@@ -194,43 +259,11 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbFunctionalArea;
-    private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbFunctionalArea;
-    private javax.swing.JCheckBox jckSelectedAll;
-    private javax.swing.JLabel jlFunctionalArea;
-    // End of variables declaration//GEN-END:variables
-
-    public void setDataFilterKey(final int[] key) {
-        manDataFilterKey = key;
-    }
-
-    public void setFunctionalAreaId(final int id) {
-        mbResetingForm = true;
-
-        mnFunctionalAreaId = id;
-        jckSelectedAll.setSelected(mnFunctionalAreaId == SLibConstants.UNDEFINED);
-        moFieldFunctionalArea.setKey(mnFunctionalAreaId == SLibConstants.UNDEFINED ? null : new int[] { mnFunctionalAreaId });
-        itemStateChangedSelectedAll();
-
-        mbResetingForm = false;
-    }
-
-    public int getFunctionalAreaId() {
-        return mnFunctionalAreaId;
-    }
     
-    private void actionFunctionalArea() {
-        miClient.pickOption(mnDataType, moFieldFunctionalArea, manDataFilterKey);
-    }
-
+    /*
+     * Protected methods
+     */
+    
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -238,20 +271,20 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
     @Override
     public void formReset() {
-        mnFormResult = SLibConstants.UNDEFINED;
-        mnFormStatus = SLibConstants.UNDEFINED;
+        mnFormResult = 0;
+        mnFormStatus = 0;
         mbFirstTime = true;
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        setFunctionalAreaId(SLibConstants.UNDEFINED);
+        setFunctionalAreaId(0);
     }
 
     @Override
     public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient, jcbFunctionalArea, mnDataType, manDataFilterKey);
+        SFormUtilities.populateComboBox(miClient, jcbFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
     }
 
     @Override
@@ -316,7 +349,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
                 actionCancel();
             }
             else if (button == jbFunctionalArea) {
-                actionFunctionalArea();
+                actionPerformedFunctionalArea();
             }
         }
     }

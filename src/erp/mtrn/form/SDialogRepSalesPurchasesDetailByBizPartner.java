@@ -35,7 +35,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -55,13 +55,14 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
-    /** Creates new form SDialogRepSalesPurchasesDetailByBizPartner */
+    /** Creates new form SDialogRepSalesPurchasesDetailByBizPartner
+     * @param client GUI client.
+     */
     public SDialogRepSalesPurchasesDetailByBizPartner(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -279,7 +280,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
     }//GEN-LAST:event_jcbUnitTypeItemStateChanged
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldDateInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateInitial, jlDateInitial);
         moFieldDateInitial.setPickerButton(jbDateInitial);
@@ -300,26 +301,25 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         jbDateEnd.addActionListener(this);
         jbFunctionalArea.addActionListener(this);
 
-        AbstractAction actionOk = new AbstractAction() {
+        AbstractAction actionPrint = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionPrint(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), actionOk, "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.putActionMap(getRootPane(), actionPrint, "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
-        AbstractAction action = new AbstractAction() {
+        AbstractAction actionExit = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionClose(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), actionExit, "exit", KeyEvent.VK_ESCAPE, 0);
 
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
     }
 

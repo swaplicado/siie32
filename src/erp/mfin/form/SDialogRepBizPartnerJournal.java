@@ -70,7 +70,7 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
     /** Creates new form SDialogRepBizPartnerAuxMoves */
     public SDialogRepBizPartnerJournal(erp.client.SClientInterface client, int idBizPartnerCategory) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnBizPartnerCategory = idBizPartnerCategory;
 
         initComponents();

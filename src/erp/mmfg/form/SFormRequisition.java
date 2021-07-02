@@ -73,7 +73,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
     /** Creates new form SFormElement */
     public SFormRequisition(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MFG_REQ;
 
         initComponents();

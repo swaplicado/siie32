@@ -113,7 +113,7 @@ public class SDialogCfdiImport extends javax.swing.JDialog implements java.awt.e
      */
     public SDialogCfdiImport(erp.client.SClientInterface client, SDataDps purchaseOrder, File cfdi) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         moPurchaseOrder = purchaseOrder;
         mbWithPurchaseOrder = moPurchaseOrder != null;
         moCfdiFile = cfdi;

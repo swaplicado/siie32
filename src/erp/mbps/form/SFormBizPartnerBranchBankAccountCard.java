@@ -48,7 +48,7 @@ public class SFormBizPartnerBranchBankAccountCard extends javax.swing.JDialog im
     /** Creates new form SFormBizPartnerBranchBankAccountCard */
     public SFormBizPartnerBranchBankAccountCard(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.BPSU_BANK_ACC_CARD;
 
         initComponents();

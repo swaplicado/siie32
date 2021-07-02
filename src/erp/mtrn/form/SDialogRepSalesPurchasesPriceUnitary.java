@@ -53,7 +53,7 @@ public class SDialogRepSalesPurchasesPriceUnitary extends javax.swing.JDialog im
     /** Creates new form SDialogRepSalesPurchasesPriceUnitary */
     public SDialogRepSalesPurchasesPriceUnitary(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

@@ -125,7 +125,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
      */
     public SFormMaintDiog(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRNX_MAINT_DIOG;
 
         initComponents();

@@ -51,7 +51,7 @@ public class SFormTaxGroupItem extends javax.swing.JDialog implements erp.lib.fo
     /** Creates new form SFormTaxRegion */
     public SFormTaxGroupItem(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FIN_TAX_GRP_ITEM;
 
         initComponents();

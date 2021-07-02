@@ -69,7 +69,7 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
     /** Creates new form SFormAccountCashTransfer */
     public SFormAccountCashTransfer(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

@@ -67,20 +67,22 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         
         moFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(mjbImport);
         addTaskBarUpperComponent(mjbSupply);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moFilterDatePeriod);
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         
         STableField[] aoKeyFields = new STableField[2];
         
@@ -249,7 +251,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
                 sqlDiogPeriod += (sqlDiogPeriod.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "g.dt");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctArea = " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

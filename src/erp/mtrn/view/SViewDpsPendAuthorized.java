@@ -139,7 +139,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         if (isViewDocsPending()) {
             moTabFilterDateCutOff = new STabFilterDateCutOff(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
@@ -607,7 +607,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctionalArea += (sqlFunctionalArea.isEmpty() ? "" : " AND ") + "d.fid_func IN ( " + ((String) setting.getSetting()) + ") ";
                 }
             }

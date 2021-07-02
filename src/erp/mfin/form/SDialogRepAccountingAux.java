@@ -60,7 +60,7 @@ public class SDialogRepAccountingAux extends javax.swing.JDialog implements erp.
     /** Creates new form SDialogRepAccountingAux */
     public SDialogRepAccountingAux(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

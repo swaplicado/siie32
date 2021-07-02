@@ -56,7 +56,7 @@ public class SFormGang extends javax.swing.JDialog implements erp.lib.form.SForm
     /** Creates new form SFormElement */
     public SFormGang(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MFGU_GANG;
 
         initComponents();

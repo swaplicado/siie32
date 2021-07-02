@@ -53,7 +53,7 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
      */
     public SDialogRecordPicker(erp.client.SClientInterface client, int type) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnOptionType = type;    // SDataConstants.FIN_REC, SDataConstants.FINX_REC_USER,
         initComponents();
         initComponentsExtra();

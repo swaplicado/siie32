@@ -46,7 +46,7 @@ public class SFormUnitType extends javax.swing.JDialog implements erp.lib.form.S
     /** Creates new form SFormUnitType */
     public SFormUnitType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_TP_UNIT;
 
         initComponents();

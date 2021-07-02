@@ -44,7 +44,7 @@ public class SDialogFilterUnitType extends javax.swing.JDialog implements erp.li
     /** Creates new form SDialogFilterUnitType */
     public SDialogFilterUnitType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

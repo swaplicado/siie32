@@ -49,7 +49,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     /** Creates new form SFormItemForeignLanguage */
     public SFormItemForeignLanguage(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_CFG_ITEM_LAN;
 
         initComponents();

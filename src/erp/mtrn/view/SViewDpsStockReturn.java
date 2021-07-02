@@ -134,7 +134,7 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterDocumentType = new STabFilterDocumentType(miClient, this, SDataConstants.TRNU_TP_DPS, new int[] { mnTabTypeAux01, mnTabTypeAux02 });
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         if (isViewForPurchases()) {
             levelRightAllDocs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
@@ -157,15 +157,14 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterDocumentType);
-        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDocumentType);
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         mjbReturn.setEnabled(isViewForReturn() && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         mjbClose.setEnabled(isViewForReturn() && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
@@ -423,7 +422,7 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
                 sqlFilter += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFilter += (sqlFilter.length() == 0 ? "" : "AND ") + " d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

@@ -37,15 +37,10 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores, Uriel Castañeda, Edwin Carmona
+ * @author Alfonso Flores, Uriel Castañeda, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
     
-    private static final int BY_OPTION_BP = 0;
-    private static final int BY_OPTION_AGT = 1;
-    private static final int BY_OPTION_GEN = 2;
-    private static final int BY_OPTION_ITM = 3;
-
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
@@ -62,17 +57,17 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private erp.lib.form.SFormField moFieldUnitType;
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
-    private int mnDataType;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
     private boolean mbParamIsSupplier;
 
-    /** Creates new form SDialogRepSalesPurchases */
+    /** Creates new form SDialogRepSalesPurchases
+     * @param client GUI client.
+     */
     public SDialogRepSalesPurchases(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -469,8 +464,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
     }
 

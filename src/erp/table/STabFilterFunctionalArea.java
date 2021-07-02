@@ -9,7 +9,6 @@
 
 package erp.table;
 
-import erp.lib.SLibConstants;
 import erp.lib.table.STableSetting;
 import erp.mtrn.form.SDialogFilterFunctionalArea;
 import erp.mtrn.data.STrnFunctionalAreaUtils;
@@ -20,25 +19,22 @@ import erp.mtrn.data.STrnFunctionalAreaUtils;
  */
 public class STabFilterFunctionalArea extends javax.swing.JPanel {
     
-    private static final int ACTION_SETTING_ADD = 1;
-    private static final int ACTION_SETTING_UPDATE = 2;
+    private static final int TAB_SETTING_ADD = 1;
+    private static final int TAB_SETTING_UPDATE = 2;
 
     private erp.client.SClientInterface miClient;
     private erp.lib.table.STableTab moTableTab;
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
-
-    private int[] manDataFilterKey;
     private int mnCurrentFunctionalAreaId;
 
-    /** Creates new form STabFilterFunctionalArea
+    /** Creates new tab filter STabFilterFunctionalArea.
+     * By default, functional areas asigned to current user are set.
      * @param client GUI client.
      * @param tableTab Table tab.
-     * @param userKey User key.
      */
-    public STabFilterFunctionalArea(erp.client.SClientInterface client, erp.lib.table.STableTab tableTab, int[] userKey) {
+    public STabFilterFunctionalArea(erp.client.SClientInterface client, erp.lib.table.STableTab tableTab) {
         miClient = client;
         moTableTab = tableTab;
-        manDataFilterKey = userKey;
 
         initComponents();
         initComponentsExtra();
@@ -65,7 +61,7 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
         add(jtfFunctionalArea);
         jtfFunctionalArea.getAccessibleContext().setAccessibleDescription("Área funcional");
 
-        jbFunctionalArea.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_filter_doc.gif"))); // NOI18N
+        jbFunctionalArea.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_filter_func.gif"))); // NOI18N
         jbFunctionalArea.setToolTipText("Seleccionar área funcional");
         jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
         jbFunctionalArea.addActionListener(new java.awt.event.ActionListener() {
@@ -78,35 +74,28 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbFunctionalAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbFunctionalAreaActionPerformed
-        actionFunctionalArea();
+        actionPerformedFunctionalArea();
     }//GEN-LAST:event_jbFunctionalAreaActionPerformed
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jbFunctionalArea;
+    private javax.swing.JTextField jtfFunctionalArea;
+    // End of variables declaration//GEN-END:variables
+
     private void initComponentsExtra() {
-        mnCurrentFunctionalAreaId = SLibConstants.UNDEFINED;
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, manDataFilterKey);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         
-        renderFunctionalArea(ACTION_SETTING_ADD);
+        updateAndRenderFunctionalArea(0, TAB_SETTING_ADD);
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
     }
 
-    private void actionFunctionalArea() {
-        moDialogFilterFunctionalArea.formRefreshCatalogues();
-        moDialogFilterFunctionalArea.formReset();
-        moDialogFilterFunctionalArea.setFunctionalAreaId(mnCurrentFunctionalAreaId);
-        moDialogFilterFunctionalArea.setFormVisible(true);
-
-        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-            renderFunctionalArea(ACTION_SETTING_UPDATE);
-        }
-    }
-
-    private void renderFunctionalArea(int actionSetting) {
-        mnCurrentFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+    private void updateAndRenderFunctionalArea(int functionalAreaId, int tabSettingAction) {
+        mnCurrentFunctionalAreaId = functionalAreaId; // preserve current functional area to be set in option picker
         
         String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnCurrentFunctionalAreaId);
+        STableSetting setting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_AREA, texts[0].equals("0") ? "" : texts[0]);
         
-        STableSetting setting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_AREA, texts[0]);
-        
-        if (actionSetting == ACTION_SETTING_ADD) {
+        if (tabSettingAction == TAB_SETTING_ADD) {
             moTableTab.addSetting(setting);
         }
         else {
@@ -117,17 +106,14 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
         jtfFunctionalArea.setCaretPosition(0);
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jbFunctionalArea;
-    private javax.swing.JTextField jtfFunctionalArea;
-    // End of variables declaration//GEN-END:variables
+    private void actionPerformedFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnCurrentFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
 
-    /**
-     * Set data filter.
-     * @param filter User key required.
-     */
-    public void setDataFilter(final int[] filter) {
-        manDataFilterKey = filter;
-        moDialogFilterFunctionalArea.setDataFilterKey(manDataFilterKey);
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            updateAndRenderFunctionalArea(moDialogFilterFunctionalArea.getFunctionalAreaId(), TAB_SETTING_UPDATE);
+        }
     }
 }

@@ -63,7 +63,7 @@ public class SFormDncDocumentNumberSeries extends javax.swing.JDialog implements
     /** Creates new form SFormDncDocumentNumberSeries */
     public SFormDncDocumentNumberSeries(erp.client.SClientInterface client, int type) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = type;
 
         initComponents();

@@ -60,7 +60,7 @@ public class SFormCommissionsSalesAgents extends javax.swing.JDialog implements 
     /** Creates new form SFormElement */
     public SFormCommissionsSalesAgents(erp.client.SClientInterface client, int formType, String title) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = formType;
 
         initComponents();

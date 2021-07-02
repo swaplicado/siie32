@@ -397,7 +397,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, mbIsEstCon ? SLibConstants.GUI_DATE_AS_YEAR : SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         moDialogUpdateDpsDlvryAddrss = new SDialogUpdateDpsDeliveryAddress(miClient);
         moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
         moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
@@ -440,11 +440,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewNotes);
         addTaskBarUpperComponent(jbViewLinks);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewContractAnalysis);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewAccountingRecord);
         addTaskBarUpperComponent(jbViewAccountingDetailsDps);
         addTaskBarUpperComponent(jbViewAccountingDetailsBizPartner);
+        
         addTaskBarLowerComponent(jbPrint);
         addTaskBarLowerComponent(jbPrintByRange);
         addTaskBarLowerComponent(jbPrintAcknowledgmentCancellation);
@@ -452,17 +454,20 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbPrintContractKgAsTon);
         addTaskBarLowerComponent(jbPrintContractMoves);
         addTaskBarLowerComponent(jbPrintOrderGoods);
+        addTaskBarLowerSeparator();
+        addTaskBarLowerComponent(jbShowCfdi);
         addTaskBarLowerComponent(jbGetXml);
         addTaskBarLowerComponent(jbGetPdf);
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
-        addTaskBarLowerComponent(jbShowCfdi);
-        addTaskBarLowerComponent(jbSignXml);
-        addTaskBarLowerComponent(jbValidateCfdi);
-        addTaskBarLowerComponent(jbGetCfdiStatus);
-        addTaskBarLowerComponent(jbSendCfdi);
         addTaskBarLowerComponent(jbRestoreCfdStamped);
         addTaskBarLowerComponent(jbRestoreCfdCancelAck);
+        addTaskBarLowerSeparator();
+        addTaskBarLowerComponent(jbSignXml);
+        addTaskBarLowerComponent(jbValidateCfdi);
         addTaskBarLowerComponent(jbResetPacFlags);
+        addTaskBarLowerComponent(jbGetCfdiStatus);
+        addTaskBarLowerSeparator();
+        addTaskBarLowerComponent(jbSendCfdi);
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterUser);
         addTaskBarLowerSeparator();
@@ -1877,7 +1882,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else {
                 boolean canEmitCompMonExt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_MON_EXT).HasRight;
-                boolean canEmitCompBizPartRes = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_REST).HasRight;
+                boolean canEmitCompSignRestricted = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_REST).HasRight;
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 SDataCustomerConfig customerConfig = (SDataCustomerConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUS, new int[] { dps.getFkBizPartnerId_r() } , SLibConstants.EXEC_MODE_SILENT);
                 
@@ -1896,7 +1901,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { dps.getFkCurrencyId() }) && !canEmitCompMonExt) {
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes en moneda extranjera.");
                 }
-                else if (customerConfig != null && customerConfig.getIsSignRestricted() && !canEmitCompBizPartRes) {
+                else if (customerConfig != null && customerConfig.getIsSignRestricted() && !canEmitCompSignRestricted) {
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes de clientes restringidos.");
                 }
                 else {
@@ -2124,7 +2129,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
@@ -2208,6 +2213,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + " " :
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1] + " ");
                 break;
+                
             default:
         }
 

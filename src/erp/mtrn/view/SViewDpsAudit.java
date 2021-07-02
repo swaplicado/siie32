@@ -122,7 +122,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -144,7 +144,6 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
         addTaskBarUpperComponent(moTabFilterUser);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
-        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         mjbAuditYes.setEnabled(isDpsAuditPending());
@@ -334,7 +333,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

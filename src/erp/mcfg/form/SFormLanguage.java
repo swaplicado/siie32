@@ -46,7 +46,7 @@ public class SFormLanguage extends javax.swing.JDialog implements erp.lib.form.S
     /** Creates new form SFormLanguage */
     public SFormLanguage(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.CFGU_LAN;
 
         initComponents();

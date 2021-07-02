@@ -44,7 +44,7 @@ public class SFormDistributionChannel extends javax.swing.JDialog implements erp
     /** Creates new form SFormElement */
     public SFormDistributionChannel(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MKTU_DIST_CHAN;
 
         initComponents();

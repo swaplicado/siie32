@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiUser;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores
+ * @author Sergio Flores, Alfonso Flores, Claudio Peña
  */
 public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     
@@ -415,7 +415,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     @Override
     public int save(java.sql.Connection connection) {
-        int param = 1;
+        int nParam = 1;
         java.lang.String sql = "";
         java.sql.ResultSet resultSet = null;
         java.sql.Statement statement = null;
@@ -429,27 +429,27 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     "{ CALL erp.usru_usr_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?) }");
-            callableStatement.setInt(param++, mnPkUserId);
-            callableStatement.setString(param++, msUser);
-            callableStatement.setString(param++, msUserPassword);
-            callableStatement.setString(param++, msEmail);
-            callableStatement.setBoolean(param++, mbIsUniversal);
-            callableStatement.setBoolean(param++, mbIsCanEdit);
-            callableStatement.setBoolean(param++, mbIsCanDelete);
-            callableStatement.setBoolean(param++, mbIsActive);
-            callableStatement.setBoolean(param++, mbIsDeleted);
-            callableStatement.setBoolean(param++, mbIsRegistryNew ? true : mbExtraIsPasswordUpdateRequired);
-            callableStatement.setInt(param++, mnFkUserTypeId);
-            if (mnFkBizPartnerId_n > 0) callableStatement.setInt(param++, mnFkBizPartnerId_n); else callableStatement.setNull(param++, java.sql.Types.INTEGER);
-            callableStatement.setInt(param++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
-            callableStatement.registerOutParameter(param++, java.sql.Types.INTEGER);
-            callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-            callableStatement.registerOutParameter(param++, java.sql.Types.CHAR);
+            callableStatement.setInt(nParam++, mnPkUserId);
+            callableStatement.setString(nParam++, msUser);
+            callableStatement.setString(nParam++, msUserPassword);
+            callableStatement.setString(nParam++, msEmail);
+            callableStatement.setBoolean(nParam++, mbIsUniversal);
+            callableStatement.setBoolean(nParam++, mbIsCanEdit);
+            callableStatement.setBoolean(nParam++, mbIsCanDelete);
+            callableStatement.setBoolean(nParam++, mbIsActive);
+            callableStatement.setBoolean(nParam++, mbIsDeleted);
+            callableStatement.setBoolean(nParam++, mbIsRegistryNew ? true : mbExtraIsPasswordUpdateRequired);
+            callableStatement.setInt(nParam++, mnFkUserTypeId);
+            if (mnFkBizPartnerId_n > 0) callableStatement.setInt(nParam++, mnFkBizPartnerId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
+            callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
+            callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+            callableStatement.registerOutParameter(nParam++, java.sql.Types.CHAR);
             callableStatement.execute();
 
-            mnPkUserId = callableStatement.getInt(param - 3);
-            mnDbmsErrorId = callableStatement.getInt(param - 2);
-            msDbmsError = callableStatement.getString(param - 1);
+            mnPkUserId = callableStatement.getInt(nParam - 3);
+            mnDbmsErrorId = callableStatement.getInt(nParam - 2);
+            msDbmsError = callableStatement.getString(nParam - 1);
 
             if (mnDbmsErrorId != 0) {
                 throw new Exception(msDbmsError);
@@ -457,14 +457,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             else {
                 // Save aswell the access permission to companies:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_co_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanies.size(); i++) {
@@ -476,14 +476,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the access permission to company branches:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_cob_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanyBranches.size(); i++) {
@@ -495,14 +495,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the access permission to branch entities:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_cob_ent_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanyBranchEntities.size(); i++) {
@@ -514,14 +514,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the access permission to branch entities universal:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_cob_ent_univ_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanyBranchEntitiesUniversal.size(); i++) {
@@ -533,14 +533,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the privileges at user level:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_prv_usr_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserPrivilegesUser.size(); i++) {
@@ -552,14 +552,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the privileges at company level:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_prv_co_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserPrivilegesCompany.size(); i++) {
@@ -571,14 +571,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the roles at user level:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_rol_usr_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserRolesUser.size(); i++) {
@@ -590,14 +590,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the roles at company level:
 
-                param = 1;
+                nParam = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_rol_co_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(param++, mnPkUserId);
-                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(nParam++, mnPkUserId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserRolesCompany.size(); i++) {
@@ -611,6 +611,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 if (moDbmsUserConfigurationTransaction == null) {
                     moDbmsUserConfigurationTransaction = new SDataUserConfigurationTransaction();
+                    moDbmsUserConfigurationTransaction.setPkUserId(mnPkUserId);
                     moDbmsUserConfigurationTransaction.setIsPurchasesItemAllApplying(true);
                     moDbmsUserConfigurationTransaction.setPurchasesOrderLimit_n(-1);
                     moDbmsUserConfigurationTransaction.setPurchasesOrderLimitMonthly_n(-1);
@@ -619,36 +620,42 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     moDbmsUserConfigurationTransaction.setSalesOrderLimit_n(-1);
                     moDbmsUserConfigurationTransaction.setSalesOrderLimitMonthly_n(-1);
                     moDbmsUserConfigurationTransaction.setSalesDocLimit_n(-1);
+                    moDbmsUserConfigurationTransaction.setCapacityVolumeMinPercentage(0);
+                    moDbmsUserConfigurationTransaction.setCapacityMassMinPercentage(0);
+                    moDbmsUserConfigurationTransaction.setFkUserNewId(mnFkUserNewId);
+                    moDbmsUserConfigurationTransaction.setFkUserEditId(mnFkUserNewId);
+                }
+                else {
+                    moDbmsUserConfigurationTransaction.setPkUserId(mnPkUserId);
+                    moDbmsUserConfigurationTransaction.setFkUserNewId(mnFkUserEditId);
+                    moDbmsUserConfigurationTransaction.setFkUserEditId(mnFkUserNewId);
                 }
 
-                moDbmsUserConfigurationTransaction.setPkUserId(mnPkUserId);
                 moDbmsUserConfigurationTransaction.setIsDeleted(mbIsDeleted);
-                moDbmsUserConfigurationTransaction.setFkUserNewId(mnFkUserEditId);
-                moDbmsUserConfigurationTransaction.setFkUserEditId(mnFkUserNewId);
 
                 if (moDbmsUserConfigurationTransaction.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                 }
-
-                // Create transactions user configuration for all existing companies:
-
-                if (mbIsRegistryNew) {
-                    statement = connection.createStatement();
-                    statementAux = statement.getConnection().createStatement();
-
-                    sql = "SELECT bd FROM erp.cfgu_co WHERE NOT b_del AND id_co <> " + mnAuxCompanyId;
-                    resultSet = statement.executeQuery(sql);
-
-                    while (resultSet.next()) {
-                        sql = "INSERT INTO " + resultSet.getString("bd") + ".trn_usr_cfg VALUES (" + 
-                                mnPkUserId + ", TRUE, 0, 0, 0, TRUE, 0, 0, 0, 0, 0, FALSE, " + 
-                                mnFkUserNewId + ", 1, 1, NOW(), NOW(), NOW());";
-                        statementAux.execute(sql);
-                    }
-                }
-
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+            }
+            
+            // Create transactions user configuration for all existing companies:
+            
+            if (mbIsRegistryNew) {
+                statement = connection.createStatement();
+                statementAux = statement.getConnection().createStatement();
+
+                sql = "SELECT bd FROM erp.cfgu_co WHERE b_del = 0 AND id_co <> " + mnAuxCompanyId;
+                resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    sql = "INSERT INTO " + resultSet.getString("bd") + ".trn_usr_cfg VALUES (" + 
+                            mnPkUserId + ", TRUE, 0, 0, 0, TRUE, 0, 0, 0, 0, 0, FALSE, " + 
+                            mnFkUserNewId + ", 1, 1, NOW(), NOW(), NOW());";
+                    statementAux.execute(sql);
+                }
             }
         }
         catch (java.sql.SQLException e) {

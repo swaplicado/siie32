@@ -62,7 +62,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         moPanelFilterItem = new SPanelFilterItem(miClient, this, true);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
         moDialogUpdateDpsAccountCostCenter = new SDialogUpdateDpsAccountCenterCost(miClient);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         jbAccountCostCenter = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bkk_csh.gif")));
         jbAccountCostCenter.setPreferredSize(new Dimension(23, 23));
@@ -81,6 +81,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(moTabFilterDatePeriodRange);
         if (SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL })) {
             addTaskBarUpperSeparator();
@@ -89,7 +90,6 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         if (SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_FIL, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL })) {
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(moPanelFilterItem);
-            addTaskBarUpperSeparator();
             addTaskBarUpperComponent(moTabFilterBizPartner);
         }
         
@@ -228,7 +228,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
                         "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]) + "' ";
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlWhere += " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

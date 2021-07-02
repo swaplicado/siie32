@@ -68,7 +68,7 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
     /** Creates new form SDialogRepStockMovesS */
     public SDialogRepStockMovesSumSum(erp.client.SClientInterface client,  int type, int type2) {
         super(client.getFrame(), false);
-        miClient =  client;
+        miClient = client;
         mnOptionType = type;
         mnOptionType2 = type2;
 

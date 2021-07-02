@@ -52,7 +52,7 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
      * @param key */
     public SDialogPrintCfdiMasive(erp.client.SClientInterface client, int[] key) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         manKey = key;
         
         initComponents();

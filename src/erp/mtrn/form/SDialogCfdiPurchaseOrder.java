@@ -75,7 +75,7 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
      * @param client */
     public SDialogCfdiPurchaseOrder(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         initComponents();
         initComponentsExtra();
     }

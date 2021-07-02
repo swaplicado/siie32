@@ -68,7 +68,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
      * @param moduleType */
     public SFormCfdiMassiveValidation(erp.client.SClientInterface client, int moduleType) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnModuleType = moduleType;
         initComponents();
         initComponentsExtra();

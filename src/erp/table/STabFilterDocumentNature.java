@@ -16,7 +16,7 @@ import erp.mtrn.form.SDialogFilterDocumentNature;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class STabFilterDocumentNature extends javax.swing.JPanel {
 
@@ -29,12 +29,21 @@ public class STabFilterDocumentNature extends javax.swing.JPanel {
     private int[] manDataFilter;
     private int mnDocumentNatureId;
 
-    /** Creates new form STabFilterDocumentNature */
+    /** Creates new form STabFilterDocumentNature.
+     * @param client GUI client.
+     * @param tableTab Table tab.
+     * @param dataType Data type.
+     */
     public STabFilterDocumentNature(erp.client.SClientInterface client, erp.lib.table.STableTab tableTab, int dataType) {
         this(client, tableTab, dataType, null);
     }
 
-    /** Creates new form STabFilterDocumentNature */
+    /** Creates new form STabFilterDocumentNature.
+     * @param client GUI client.
+     * @param tableTab Table tab.
+     * @param dataType Data type.
+     * @param dataFilter Data filter.
+     */
     public STabFilterDocumentNature(erp.client.SClientInterface client, erp.lib.table.STableTab tableTab, int dataType, int[] dataFilter) {
         miClient = client;
         moTab = tableTab;
@@ -104,7 +113,7 @@ public class STabFilterDocumentNature extends javax.swing.JPanel {
     }
 
     private void renderText() {
-        jtfDocumentNature.setText(mnDocumentNatureId == SLibConstants.UNDEFINED ? SLibConstants.TXT_ALL : SDataReadDescriptions.getCatalogueDescription(miClient, mnDataType, new int[] { mnDocumentNatureId }, SLibConstants.DESCRIPTION_CODE));
+        jtfDocumentNature.setText(mnDocumentNatureId == SLibConstants.UNDEFINED ? SLibConstants.TXT_ALL_FEM : SDataReadDescriptions.getCatalogueDescription(miClient, mnDataType, new int[] { mnDocumentNatureId }, SLibConstants.DESCRIPTION_CODE));
         jtfDocumentNature.setCaretPosition(0);
     }
 

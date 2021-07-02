@@ -41,7 +41,7 @@ public class SDialogFilterUser extends javax.swing.JDialog implements erp.lib.fo
     /** Creates new form SDialogFilterUser */
     public SDialogFilterUser(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnOptionPickerType = SDataConstants.USRU_USR;
 
         initComponents();

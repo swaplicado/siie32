@@ -98,12 +98,10 @@ public class SViewShipmentDps extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
 
         switch (mnGridMode) {
-            case  SModConsts.VIEW_SC_SUM:
+            case SModConsts.VIEW_SC_SUM:
             case SModConsts.VIEW_SC_DET:
-
                 switch (mnGridSubtype) {
                     case SModConsts.VIEW_ST_PEND:
-
                         moButtonShipmentNational.setEnabled(true);
                         moButtonShipmentInternational.setEnabled(true);
                         moButtonShipmentClose.setEnabled(true);
@@ -111,7 +109,6 @@ public class SViewShipmentDps extends SGridPaneView implements ActionListener {
                         break;
 
                     case SModConsts.VIEW_ST_DONE:
-
                         moButtonShipmentNational.setEnabled(false);
                         moButtonShipmentInternational.setEnabled(false);
                         moButtonShipmentClose.setEnabled(false);
@@ -119,10 +116,12 @@ public class SViewShipmentDps extends SGridPaneView implements ActionListener {
                         break;
 
                     default:
-
+                        // do nothing
                 }
                 break;
+                
             default:
+                // do nothing
         }
     }
 

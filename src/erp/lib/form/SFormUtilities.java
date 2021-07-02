@@ -30,6 +30,7 @@ public abstract class SFormUtilities {
      *  X   Any character or number (Character.isLetter or Character.isDigit).
      *  -   Special character '-'.
      *  /   Special character '/'.
+     * @return 
      */
     public static java.lang.String createMaskFormatter(java.lang.String maskErp) {
         String mask = SLibUtilities.textTrim(maskErp);
@@ -50,6 +51,7 @@ public abstract class SFormUtilities {
      *  m   Any number (Character.isDigit).
      *  s   Any number (Character.isDigit).
      *  a   AM or PM (Character.isLetter uppercase).
+     * @return 
      */
     public static java.lang.String createMaskFormatterDatetime(java.lang.String maskErp) {
         String mask = SLibUtilities.textTrim(maskErp);

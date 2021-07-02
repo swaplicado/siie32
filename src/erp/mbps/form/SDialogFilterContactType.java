@@ -40,7 +40,7 @@ public class SDialogFilterContactType extends javax.swing.JDialog implements erp
     /** Creates new form SDialogFilterContactType */
     public SDialogFilterContactType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         
         initComponents();
         initComponentsExtra();

@@ -48,7 +48,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
     /** Creates new form SDialogDpsActionViewLinks */
     public SDialogShowDocumentLinks(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnDialogType = SDataConstants.TRNX_DPS_ACT_VIEW_LINKS;
         initComponents();
         initComponentsExtra();

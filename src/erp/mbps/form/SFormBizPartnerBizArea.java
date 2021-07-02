@@ -46,7 +46,7 @@ public class SFormBizPartnerBizArea extends javax.swing.JDialog implements erp.l
     /** Creates new form SFormBizPartnerBizArea */
     public SFormBizPartnerBizArea(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.BPSU_BA;
 
         initComponents();

@@ -48,7 +48,7 @@ public class SFormElement extends javax.swing.JDialog implements erp.lib.form.SF
     /** Creates new form SFormElement */
     public SFormElement(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_EMT;
 
         initComponents();

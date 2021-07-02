@@ -51,7 +51,7 @@ public class SDialogDpsFinder extends javax.swing.JDialog implements erp.lib.for
      */
     public SDialogDpsFinder(erp.client.SClientInterface client, int finderType) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFinderType = finderType;
         initComponents();
         initComponentsExtra();

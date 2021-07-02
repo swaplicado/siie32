@@ -39,7 +39,7 @@ public class SDialogFilterCompanyBranch extends javax.swing.JDialog implements e
     /** Creates new form SDialogFilterCompanyBranch */
     public SDialogFilterCompanyBranch(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

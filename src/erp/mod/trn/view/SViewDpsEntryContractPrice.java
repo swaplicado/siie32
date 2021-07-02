@@ -72,9 +72,6 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
         }
         
-        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
-        
         mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);
         mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas", this);
         jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver entregas mensuales", this);
@@ -84,6 +81,9 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewDps);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewNotes);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     
     private boolean isViewForCategoryPur() {

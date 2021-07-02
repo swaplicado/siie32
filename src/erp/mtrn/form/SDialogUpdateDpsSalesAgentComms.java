@@ -42,7 +42,7 @@ public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog impleme
     /** Creates new form SDialogUpdateDpsSalesAgentComms */
     public SDialogUpdateDpsSalesAgentComms(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         initComponents();
         initComponentsExtra();
     }

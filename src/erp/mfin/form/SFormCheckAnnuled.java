@@ -55,7 +55,7 @@ public class SFormCheckAnnuled extends javax.swing.JDialog implements erp.lib.fo
     /** Creates new form SFormCheckAnnuled */
     public SFormCheckAnnuled(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FIN_CHECK;
 
         initComponents();

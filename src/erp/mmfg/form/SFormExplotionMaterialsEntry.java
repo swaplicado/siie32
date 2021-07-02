@@ -52,7 +52,7 @@ public class SFormExplotionMaterialsEntry extends javax.swing.JDialog implements
     /** Creates new form SFormElement */
     public SFormExplotionMaterialsEntry(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MFG_EXP_ETY;
 
         initComponents();

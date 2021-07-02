@@ -69,7 +69,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     /** Creates new form SFormBizPartnerAttribute */
     public SFormBizPartnerAttribute(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

@@ -77,7 +77,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
     /** Creates new form SFormItemSimplified */
     public SFormItemSimplified(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_ITEM;
 
         initComponents();

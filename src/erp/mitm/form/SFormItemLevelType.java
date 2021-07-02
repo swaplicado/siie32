@@ -43,7 +43,7 @@ public class SFormItemLevelType extends javax.swing.JDialog implements erp.lib.f
     /** Creates new form SFormUnitType */
     public SFormItemLevelType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_TP_LEV;
 
         initComponents();

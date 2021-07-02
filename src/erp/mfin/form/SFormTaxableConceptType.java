@@ -46,7 +46,7 @@ public class SFormTaxableConceptType extends javax.swing.JDialog implements erp.
     /** Creates new form SFormTaxableConceptType */
     public SFormTaxableConceptType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_TP_TAX_CPT;
 
         initComponents();

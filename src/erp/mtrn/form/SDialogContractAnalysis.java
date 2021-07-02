@@ -100,7 +100,7 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
     /** Creates new form SDialogDpsLink */
     public SDialogContractAnalysis(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         initComponents();
         initComponentsExtra();
     }

@@ -58,7 +58,7 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
      */
     public SFormItemGroup(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_IGRP;
 
         initComponents();

@@ -60,7 +60,7 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
     /** Creates new form SFormTaxGroupEntry */
     public SFormAccountTax(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FIN_ACC_TAX;
 
         initComponents();

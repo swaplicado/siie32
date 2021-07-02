@@ -47,7 +47,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
     /** Creates new form SDialogDpsLink */
     public SDialogUpdateDpsDeliveryAddress(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         initComponents();
         initComponentsExtra();
     }

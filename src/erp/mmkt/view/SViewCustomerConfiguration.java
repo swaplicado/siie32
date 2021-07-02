@@ -16,7 +16,7 @@ import erp.lib.table.STableSetting;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
 
@@ -36,7 +36,7 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[17];
+        STableColumn[] aoTableColumns = new STableColumn[19];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_cus");
@@ -47,13 +47,15 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp1.bp", "Cliente", 250);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp.tp_cus", "Tipo cliente", 150);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sg.mkt_segm", "Segmento mercado", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "su.mkt_segm_sub", "Subsegmento mercado", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dis.dist_chan", "Canal distribución", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sg.mkt_segm", "Segmento mercado", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "su.mkt_segm_sub", "Subsegmento mercado", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dis.dist_chan", "Canal distribución", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uan.usr", "Analista AN", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Agente ventas", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bps.bp", "Supervisor ventas", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_disc_doc", "S/descuento", STableConstants.WIDTH_BOOLEAN_3X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_comms", "S/comisiones", STableConstants.WIDTH_BOOLEAN_3X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_sign_restrict", "Restringido al timbrar CFDI", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_disc_doc", "S/descuento", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_comms", "S/comisiones", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp1.b_del", "Asoc. negocios eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ct.b_del", "Categoría eliminada", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
@@ -119,9 +121,9 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
             }
         }
 
-        msSql = "SELECT bp1.bp, c.id_cus, c.b_free_disc_doc, c.b_free_comms, bp1.b_del, ct.b_del, " +
+        msSql = "SELECT bp1.bp, c.id_cus, c.b_sign_restrict, c.b_free_disc_doc, c.b_free_comms, bp1.b_del, ct.b_del, ct.fid_usr_ana_n, " +
                     "tp.tp_cus, bp.bp, bps.bp, sg.mkt_segm, su.mkt_segm_sub, dis.dist_chan, c.fid_usr_edit, c.ts_new, c.ts_edit, c.ts_del, " +
-                    "un.usr, ue.usr, ud.usr " +
+                    "un.usr, ue.usr, ud.usr, uan.usr " +
                     "FROM mkt_cfg_cus AS c " +
                     "INNER JOIN erp.bpsu_bp AS bp1 ON c.id_cus = bp1.id_bp " +
                     "INNER JOIN erp.bpsu_bp_ct AS ct ON bp1.id_bp = ct.id_bp AND ct.fid_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " " +
@@ -132,8 +134,9 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
                     "INNER JOIN erp.usru_usr AS un ON c.fid_usr_new = un.id_usr " +
                     "INNER JOIN erp.usru_usr AS ue ON c.fid_usr_edit = ue.id_usr " +
                     "INNER JOIN erp.usru_usr AS ud ON c.fid_usr_del = ud.id_usr " +
-                    "LEFT JOIN erp.bpsu_bp AS bp ON c.fid_sal_agt_n = bp.id_bp " +
-                    "LEFT JOIN erp.bpsu_bp AS bps ON c.fid_sal_sup_n = bps.id_bp " +
+                    "LEFT OUTER JOIN erp.usru_usr AS uan ON ct.fid_usr_ana_n = uan.id_usr " +
+                    "LEFT OUTER JOIN erp.bpsu_bp AS bp ON c.fid_sal_agt_n = bp.id_bp " +
+                    "LEFT OUTER JOIN erp.bpsu_bp AS bps ON c.fid_sal_sup_n = bps.id_bp " +
                 (sqlWhere.length() == 0 ? "" : "WHERE bp1.b_del = 0 AND " + sqlWhere) +
                 "ORDER BY bp1.bp, tp.tp_cus; ";
     }

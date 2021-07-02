@@ -54,7 +54,7 @@ public class SDialogPayrollCfdiPicker extends javax.swing.JDialog implements erp
      */
     public SDialogPayrollCfdiPicker(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnOptionType = SDataConstants.TRN_CFD;
         initComponents();
         initComponentsExtra();

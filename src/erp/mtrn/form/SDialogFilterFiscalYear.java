@@ -44,7 +44,7 @@ public class SDialogFilterFiscalYear extends javax.swing.JDialog implements erp.
     /** Creates new form SDialogFilterFiscalYear */
     public SDialogFilterFiscalYear(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

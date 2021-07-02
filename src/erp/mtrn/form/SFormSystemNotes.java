@@ -56,7 +56,7 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
      */
     public SFormSystemNotes(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_SYS_NTS;
 
         initComponents();

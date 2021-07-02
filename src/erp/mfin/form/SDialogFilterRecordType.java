@@ -38,7 +38,7 @@ public class SDialogFilterRecordType extends javax.swing.JDialog implements erp.
     /** Creates new form SDialogFilterRecordType */
     public SDialogFilterRecordType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         initComponents();
         initComponentsExtra();
     }

@@ -49,7 +49,7 @@ public class SDialogProdOrderStockConsume extends javax.swing.JDialog implements
     /** Creates new form SDialogProdOrderStockConsume */
     public SDialogProdOrderStockConsume(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

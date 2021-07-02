@@ -60,7 +60,7 @@ public class SFormCompanyBranchEntity extends javax.swing.JDialog implements erp
     /** Creates new form SFormCompanyBranchEntity */
     public SFormCompanyBranchEntity(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.CFGU_COB_ENT;
 
         initComponents();

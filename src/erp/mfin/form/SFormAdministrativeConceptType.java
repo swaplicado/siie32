@@ -46,7 +46,7 @@ public class SFormAdministrativeConceptType extends javax.swing.JDialog implemen
     /** Creates new form SFormAdministrativeConceptType */
     public SFormAdministrativeConceptType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.FINU_TP_ADM_CPT;
 
         initComponents();

@@ -22,7 +22,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SViewStockConfig extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -71,7 +71,7 @@ public class SViewStockConfig extends erp.lib.table.STableTab implements java.aw
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[4];
-        STableColumn[] aoTableColumns = new STableColumn[19];
+        STableColumn[] aoTableColumns = new STableColumn[20];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "sc.id_item");
@@ -86,10 +86,12 @@ public class SViewStockConfig extends erp.lib.table.STableTab implements java.aw
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 300);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 300);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bb.bpb", "Sucursal", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ent", "Almacén", 150);
@@ -156,7 +158,7 @@ public class SViewStockConfig extends erp.lib.table.STableTab implements java.aw
         }
 
         msSql = "SELECT sc.id_item, sc.id_unit, sc.id_cob, sc.id_wh, sc.qty_min, sc.qty_max, sc.rop, sc.b_del, " +
-                "i.item, i.item_key, i.b_del, ig.igen, il.line, u.symbol, bb.bpb, e.ent, e.code, " +
+                "i.item, i.part_num, i.item_key, i.b_del, ig.igen, il.line, u.symbol, bb.bpb, e.ent, e.code, " +
                 "sc.ts_new, sc.ts_edit, sc.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM trn_stk_cfg AS sc " +
                 "INNER JOIN erp.itmu_item AS i ON sc.id_item = i.id_item " +

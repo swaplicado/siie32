@@ -66,7 +66,7 @@ public class SDialogRepAccountCostCenter extends javax.swing.JDialog implements 
     /** Creates new form SDialogRepAccountCostCenter */
     public SDialogRepAccountCostCenter(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

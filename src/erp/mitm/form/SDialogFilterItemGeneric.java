@@ -35,7 +35,7 @@ public class SDialogFilterItemGeneric extends javax.swing.JDialog implements erp
     /** Creates new form SDialogFilterItemGeneric */
     public SDialogFilterItemGeneric(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

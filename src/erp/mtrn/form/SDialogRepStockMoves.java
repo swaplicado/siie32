@@ -63,7 +63,7 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
     /** Creates new form SDialogRepStockMoves */
     public SDialogRepStockMoves(erp.client.SClientInterface client) {
         super(client.getFrame(), false);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();
@@ -357,12 +357,12 @@ public class SDialogRepStockMoves extends javax.swing.JDialog implements erp.lib
 
         SFormUtilities.putActionMap(getRootPane(), actionOk, "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
-        AbstractAction action = new AbstractAction() {
+        AbstractAction actionCancel = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionExit(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "exit", KeyEvent.VK_ESCAPE, 0);
     }
 
     private void windowActivated() {

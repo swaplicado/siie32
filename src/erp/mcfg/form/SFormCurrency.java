@@ -52,7 +52,7 @@ public class SFormCurrency extends javax.swing.JDialog implements erp.lib.form.S
     /** Creates new form SFormCurrency */
     public SFormCurrency(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.CFGU_CUR;
 
         initComponents();

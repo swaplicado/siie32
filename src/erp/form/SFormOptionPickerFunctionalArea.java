@@ -12,7 +12,6 @@
 package erp.form;
 
 import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
@@ -22,7 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import sa.lib.gui.bean.SBeanFieldBoolean;
+import javax.swing.JCheckBox;
 
 /**
  *
@@ -35,7 +34,10 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
     
     private int mnFormResult;
     private boolean mbFirstTime;
+    private boolean mbResetingForm;
 
+    private int mnFunctionalAreaId;
+    
     /**
      * Creates new form SFormOptionPickerFunctionalArea.
      * @param client ERP Client interface.
@@ -143,10 +145,7 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        if (mbFirstTime) {
-            mbFirstTime = false;
-        }
-        SLibUtilities.requestComponentFocus(jcbFunctionalArea);
+        eventWindowActivatedForm();
     }//GEN-LAST:event_formWindowActivated
 
     private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed
@@ -158,15 +157,29 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
     }//GEN-LAST:event_jbCancelActionPerformed
 
     private void jcbFunctionalAreaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jcbFunctionalAreaKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_F5) {
-            actionFunctionalArea();
-        }
+        eventKeyPressedFunctionalArea(evt);
     }//GEN-LAST:event_jcbFunctionalAreaKeyPressed
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbFunctionalArea;
+    private javax.swing.JButton jbOk;
+    private javax.swing.JComboBox jcbFunctionalArea;
+    private javax.swing.JCheckBox jckAllFunctionalAreas;
+    private javax.swing.JLabel jlFunctionalArea;
+    private javax.swing.JPanel jpOptionPane;
+    private javax.swing.JPanel jpSouth;
+    // End of variables declaration//GEN-END:variables
+
+    /*
+     * Private methods
+     */
+    
     private void initComponentsExtra() {
-        jcbFunctionalArea.addItemListener(this);
-        jckAllFunctionalAreas.addItemListener(this);
         jbFunctionalArea.addActionListener(this);
+        jckAllFunctionalAreas.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -186,8 +199,29 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         jckAllFunctionalAreas.setSelected(true);
     }
 
-    private void itemStateChange() {
-        jcbFunctionalArea.setSelectedItem(null);
+    private void eventWindowActivatedForm() {
+        if (mbFirstTime) {
+            mbFirstTime = false;
+            
+            if (jcbFunctionalArea.isEnabled()) {
+                jcbFunctionalArea.requestFocus();
+            }
+            else {
+                jckAllFunctionalAreas.requestFocus();
+            }
+        }
+    }
+    
+    private void eventKeyPressedFunctionalArea(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_F5) {
+            actionPerformedFunctionalArea();
+        }
+    }
+    
+    private void itemStateChangedAllFunctionalAreas(final boolean reset) {
+        if (reset) {
+            jcbFunctionalArea.setSelectedIndex(0);
+        }
         
         if (jckAllFunctionalAreas.isSelected()) {
             jcbFunctionalArea.setEnabled(false);
@@ -199,7 +233,7 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         }
     }
 
-    private void actionFunctionalArea() {
+    private void actionPerformedFunctionalArea() {
         SFormOptionPickerInterface picker = miClient.getOptionPicker(SModConsts.CFGU_FUNC);
 
         picker.formReset();
@@ -229,27 +263,15 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         setVisible(false);
     }
 
-    public void publicActionOk() {
-        actionOk();
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbFunctionalArea;
-    private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbFunctionalArea;
-    private javax.swing.JCheckBox jckAllFunctionalAreas;
-    private javax.swing.JLabel jlFunctionalArea;
-    private javax.swing.JPanel jpOptionPane;
-    private javax.swing.JPanel jpSouth;
-    // End of variables declaration//GEN-END:variables
-
     @Override
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
+        
+        jckAllFunctionalAreas.setSelected(true);
+        jcbFunctionalArea.setSelectedIndex(0);
+        
+        setSelectedPrimaryKey(null);
     }
 
     @Override
@@ -277,27 +299,42 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         
     }
 
+    /**
+     * Set ID of functional area. Can be null or zero meaning all asigned functional areas.
+     * @param pk Primary key of functional area.
+     */
     @Override
     public void setSelectedPrimaryKey(java.lang.Object pk) {
-        if (pk == null) {
+        mbResetingForm = true;
+        
+        if (pk == null || ((int[]) pk)[0] == 0) {
+            mnFunctionalAreaId = 0;
+            jckAllFunctionalAreas.setSelected(true);
             jcbFunctionalArea.setSelectedIndex(0);
         }
         else {
-            SFormUtilities.locateComboBoxItem(jcbFunctionalArea, new int[] { ((int[]) pk)[0] });
-        }
-    }
-
-    @Override
-    public java.lang.Object getSelectedPrimaryKey() {
-        if (((SFormComponentItem) jcbFunctionalArea.getSelectedItem()) == null  || jckAllFunctionalAreas.isSelected()) {
-            return null;
+            mnFunctionalAreaId = ((int[]) pk)[0];
+            jckAllFunctionalAreas.setSelected(false);
+            SFormUtilities.locateComboBoxItem(jcbFunctionalArea, new int[] { mnFunctionalAreaId });
         }
         
-        int[] pk = new int[] {
-            ((int[]) ((SFormComponentItem) jcbFunctionalArea.getSelectedItem()).getPrimaryKey())[0]
-        };
+        itemStateChangedAllFunctionalAreas(false);
 
-        return pk;
+        mbResetingForm = false;
+    }
+
+    /**
+     * Get selected ID of functional area. Can be null meaning all asigned functional areas.
+     * @return 
+     */
+    @Override
+    public java.lang.Object getSelectedPrimaryKey() {
+        if (jckAllFunctionalAreas.isSelected() || ((SFormComponentItem) jcbFunctionalArea.getSelectedItem()) == null) {
+            return null;
+        }
+        else {
+            return new int[] { ((int[]) ((SFormComponentItem) jcbFunctionalArea.getSelectedItem()).getPrimaryKey())[0] };
+        }
     }
 
     @Override
@@ -311,18 +348,20 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
             JButton button = (JButton) e.getSource();
 
             if (button == jbFunctionalArea) {
-                actionFunctionalArea();
+                actionPerformedFunctionalArea();
             }
         }
     }
 
     @Override
     public void itemStateChanged(java.awt.event.ItemEvent e) {
-        if (e.getSource() instanceof SBeanFieldBoolean) {
-            SBeanFieldBoolean checked = (SBeanFieldBoolean) e.getSource();
-            
-            if (checked == jckAllFunctionalAreas) {
-                itemStateChange();
+        if (!mbResetingForm) {
+            if (e.getSource() instanceof javax.swing.JCheckBox) {
+                JCheckBox checkBox = (JCheckBox) e.getSource();
+
+                if (checkBox == jckAllFunctionalAreas) {
+                    itemStateChangedAllFunctionalAreas(true);
+                }
             }
         }
     }

@@ -100,10 +100,8 @@ public class SViewShipmentDpsAdjustment extends SGridPaneView implements ActionL
         switch (mnGridMode) {
             case  SModConsts.VIEW_SC_SUM:
             case SModConsts.VIEW_SC_DET:
-
                 switch (mnGridSubtype) {
                     case SModConsts.VIEW_ST_PEND:
-
                         moButtonShipmentNational.setEnabled(true);
                         moButtonShipmentInternational.setEnabled(true);
                         moButtonShipmentClose.setEnabled(true);
@@ -111,7 +109,6 @@ public class SViewShipmentDpsAdjustment extends SGridPaneView implements ActionL
                         break;
 
                     case SModConsts.VIEW_ST_DONE:
-
                         moButtonShipmentNational.setEnabled(false);
                         moButtonShipmentInternational.setEnabled(false);
                         moButtonShipmentClose.setEnabled(false);
@@ -119,11 +116,12 @@ public class SViewShipmentDpsAdjustment extends SGridPaneView implements ActionL
                         break;
 
                     default:
-
+                        // do nothing
                 }
                 break;
 
             default:
+                // do nothing
         }
     }
 

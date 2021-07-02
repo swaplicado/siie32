@@ -75,7 +75,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     public SFormDpsEdit(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         mnFormType = SDataConstants.TRNX_DPS_EDIT;
-        miClient =  client;
+        miClient = client;
         initComponents();
      
         initComponentsExtra();

@@ -104,7 +104,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstantsSys.BPSS_CT_BP_CUS);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -112,20 +112,20 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
 
         addTaskBarUpperComponent(mjbSendClose);
         addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(mjbSend);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(isDpsSendPending() ? moTabFilterDateCutOff : moTabFilterDatePeriod);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterDocumentNature);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
-        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
-        addTaskBarUpperComponent(mjbSend);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDocumentNature);
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         mjbSendClose.setEnabled(isDpsSendPending());
         mjbViewDps.setEnabled(true);
@@ -230,7 +230,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlDocFunctArea += " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

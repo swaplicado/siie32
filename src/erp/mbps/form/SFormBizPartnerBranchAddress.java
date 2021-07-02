@@ -45,7 +45,7 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
     /** Creates new form SFormBizPartnerBranchAddress */
     public SFormBizPartnerBranchAddress(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.BPSU_BPB_ADD;
 
         initComponents();

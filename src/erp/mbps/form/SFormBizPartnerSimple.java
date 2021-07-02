@@ -94,7 +94,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
     /** Creates new form SFormBizPartnerSimple */
     public SFormBizPartnerSimple(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

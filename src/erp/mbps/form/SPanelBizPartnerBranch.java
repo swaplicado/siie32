@@ -94,7 +94,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
     /** Creates new form SPanelBizPartnerBranch */
     public SPanelBizPartnerBranch(erp.client.SClientInterface client) {
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.BPSU_BPB;
 
         initComponents();

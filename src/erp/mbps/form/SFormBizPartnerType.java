@@ -55,7 +55,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
     /** Creates new form SFormBizPartnerType */
     public SFormBizPartnerType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_BRD;
 
         initComponents();
@@ -370,12 +370,12 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
-        AbstractAction action = new AbstractAction() {
+        AbstractAction actionCancel = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionCancel(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), action, "cancel", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
     }
 
     private void windowActivate() {

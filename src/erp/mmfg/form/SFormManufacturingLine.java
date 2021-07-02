@@ -48,7 +48,7 @@ public class SFormManufacturingLine extends javax.swing.JDialog implements erp.l
     /** Creates new form SFormElement */
     public SFormManufacturingLine(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.MFGU_LINE;
 
         initComponents();

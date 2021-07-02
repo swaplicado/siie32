@@ -59,7 +59,7 @@ public class SDialogRepProductionOrder extends javax.swing.JDialog implements er
      */
     public SDialogRepProductionOrder(erp.client.SClientInterface client, final String sTitle, final int formType) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         this.setTitle(sTitle);
         mnFormType = formType;
 

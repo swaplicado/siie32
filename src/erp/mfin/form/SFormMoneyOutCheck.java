@@ -76,7 +76,7 @@ public class SFormMoneyOutCheck extends javax.swing.JDialog implements erp.lib.f
     /** Creates new form SFormMoneyOutCheck */
     public SFormMoneyOutCheck(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

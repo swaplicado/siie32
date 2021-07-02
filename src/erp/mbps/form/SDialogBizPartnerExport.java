@@ -47,7 +47,7 @@ public class SDialogBizPartnerExport extends javax.swing.JDialog implements erp.
     /** Creates new form SDialogBizPartnerExport */
     public SDialogBizPartnerExport(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

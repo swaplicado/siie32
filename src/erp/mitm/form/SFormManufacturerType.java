@@ -46,7 +46,7 @@ public class SFormManufacturerType extends javax.swing.JDialog implements erp.li
     /** Creates new form SFormManufacturerType */
     public SFormManufacturerType(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_TP_MFR;
 
         initComponents();

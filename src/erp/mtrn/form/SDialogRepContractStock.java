@@ -49,7 +49,7 @@ public class SDialogRepContractStock extends javax.swing.JDialog implements erp.
     /** Creates new form SDialogRepContractStock */
     public SDialogRepContractStock(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

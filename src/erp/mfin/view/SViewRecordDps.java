@@ -49,13 +49,15 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
         mbShowRecordAdjAudit = true;
 
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, new int[] { miClient.getSession().getUser().getPkUserId() });
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
+        
         addTaskBarUpperComponent(moTabFilterDatePeriodRange);
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        
+        addTaskBarUpperSeparator();
 
         jtbRecordAdjYearEnd = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/switch_adj_year_off.gif")));
         jtbRecordAdjYearEnd.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_adj_year_on.gif")));
@@ -73,6 +75,10 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
         jtbRecordAdjAudit.setSelected(true);
         addTaskBarUpperComponent(jtbRecordAdjAudit);
 
+        addTaskBarUpperSeparator();
+        
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        
         renderTableColumns();
         setIsSummaryApplying(true);
 
@@ -170,7 +176,7 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
                 sqlDatePeriod += "d.dt BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (! ((String) setting.getSetting()).isEmpty()) {
+                if (!((String) setting.getSetting()).isEmpty()) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }

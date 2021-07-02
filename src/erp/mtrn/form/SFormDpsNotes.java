@@ -51,7 +51,7 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
      */
     public SFormDpsNotes(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.TRN_DPS_NTS;
 
         initComponents();

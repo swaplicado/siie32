@@ -58,7 +58,7 @@ public class SDialogRepSalesPurchasesByLocality extends javax.swing.JDialog impl
     /** Creates new form SDialogRepSalesPurchasesByLocality */
     public SDialogRepSalesPurchasesByLocality(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

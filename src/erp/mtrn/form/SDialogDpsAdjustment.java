@@ -59,7 +59,7 @@ public class SDialogDpsAdjustment extends javax.swing.JDialog implements erp.lib
     /** Creates new form SDialogDpsAdjustment */
     public SDialogDpsAdjustment(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnOptionType = SDataConstants.TRNX_DPS_ADJ;
         initComponents();
         initComponentsExtra();

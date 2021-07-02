@@ -71,7 +71,7 @@ public final class SDialogRepRecords extends javax.swing.JDialog implements erp.
      * @param client */
     public SDialogRepRecords(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
 
         initComponents();
         initComponentsExtra();

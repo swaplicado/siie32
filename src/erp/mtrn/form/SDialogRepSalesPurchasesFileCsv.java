@@ -36,7 +36,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -60,16 +60,15 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
-    /** Creates new form SDialogRepSalesPurchasesComparative
+    /** Creates new form SDialogRepSalesPurchasesFileCsv
      * @param client ERP Client interface.
      * @param formType Constants defined in SDataConstantsSys (TRNS_CT_DPS_PUR or TRNS_CT_DPS_SAL).
      */
     public SDialogRepSalesPurchasesFileCsv(erp.client.SClientInterface client, int formType) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = formType;
 
         initComponents();
@@ -278,7 +277,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldDateBegin = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateBegin, jlDateBegin);
         moFieldDateBegin.setPickerButton(jbDateBegin);
@@ -341,8 +340,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
     }
 

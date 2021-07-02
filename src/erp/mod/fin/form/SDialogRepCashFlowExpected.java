@@ -21,17 +21,18 @@ import sa.lib.gui.bean.SBeanDialogReport;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDialogRepCashFlowExpected extends SBeanDialogReport implements ActionListener {
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
-    private int[] manDataFilter;
     private String msFunctionalAreasIds;
     
     /**
-     * Creates new form SDialogRepContractByBizPartner
+     * Creates new form SDialogRepCashFlowExpected
+     * @param client
+     * @param formSubtype
      */
     public SDialogRepCashFlowExpected(SGuiClient client, int formSubtype, String title) {
         setFormSettings(client, SModConsts.FINR_CSH_FLW_EXP, formSubtype, title);
@@ -167,8 +168,7 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport implements Act
         
         // áreas funcionales:
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
-        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, manDataFilter);
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
         
         reloadCatalogues();

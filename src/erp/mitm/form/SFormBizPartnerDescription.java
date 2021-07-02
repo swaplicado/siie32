@@ -51,7 +51,7 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
     /** Creates new form SFormBizPartnerDescription */
     public SFormBizPartnerDescription(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient =  client;
+        miClient = client;
         mnFormType = SDataConstants.ITMU_CFG_ITEM_BP;
 
         initComponents();
