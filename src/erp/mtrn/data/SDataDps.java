@@ -2440,6 +2440,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                     
                     // Read aswell Bookkeeping Number, if any (Bookkeeping Numbers implemented from SIIE release 3.2 050.03):
+                    
                     sSql = "SELECT DISTINCT fid_bkk_year_n, fid_bkk_num_n "
                             + "FROM fin_rec AS r "
                             + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
@@ -2487,7 +2488,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Read data for CFD:
 
-				sSql = "SELECT COUNT(*) "
+                sSql = "SELECT COUNT(*) "
                         + "FROM trn_dps_cfd "
                         + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oResultSet = statement.executeQuery(sSql);
@@ -2499,7 +2500,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                     }
                 }
-				sSql = "SELECT COUNT(*) "
+                
+                sSql = "SELECT COUNT(*) "
                         + "FROM " + SClientUtils.getComplementaryDbName(statement.getConnection()) + ".trn_pdf "
                         + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oResultSet = statement.executeQuery(sSql);
@@ -2936,13 +2938,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     taxEmpty = true;
                                 }
                             }
-                            
                         }
                         
                         ArrayList<SFinAccountConfig> aAccCfgOperations = new ArrayList();
                         SFinAccountConfig oAccCfgOperations = null;
                         
-                        // lectura de la configuración por default (sin impuesto)
+                        // lectura de la configuración por default (sin impuesto):
                         oAccCfgOperations = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                 mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                 mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), null, oStatement));
@@ -2950,7 +2951,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         oAccCfgOperations.setTax(new int[] { 0, 0 });
                         aAccCfgOperations.add(oAccCfgOperations);
                         
-                        // se lee la configuración de los impuestos existentes en el documento
+                        // se lee la configuración de los impuestos existentes en el documento:
                         for (int[] tax : taxes) {
                             if (tax[0] == 0) {
                                 continue;
