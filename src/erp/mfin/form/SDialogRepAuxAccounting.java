@@ -46,12 +46,12 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Isabel Servín
  */
 public class SDialogRepAuxAccounting extends JDialog implements ActionListener, ItemListener, ChangeListener {
 
     private boolean mbFirstTime;
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldEntity;
@@ -67,7 +67,8 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
     private String msCodeCcMin;
     private String msCodeCcMax;
 
-    /** Creates new form SDialogRepAuxAccounting */
+    /** Creates new form SDialogRepAuxAccounting
+     * @param client */
     public SDialogRepAuxAccounting(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -122,6 +123,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jcbEntity = new javax.swing.JComboBox();
         jbPickEntity = new javax.swing.JButton();
         jbClearEntity = new javax.swing.JButton();
+        jckShowFiscalId = new javax.swing.JCheckBox();
         jPanel17 = new javax.swing.JPanel();
         jckShowBizPartner = new javax.swing.JCheckBox();
         jlBizPartner = new javax.swing.JLabel();
@@ -298,6 +300,10 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jbClearEntity.setFocusable(false);
         jbClearEntity.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel18.add(jbClearEntity);
+
+        jckShowFiscalId.setText("RFC caja y bancos");
+        jckShowFiscalId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel18.add(jckShowFiscalId);
 
         jPanel9.add(jPanel18);
 
@@ -605,6 +611,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             map.put("sSqlItem", moFieldItem.getKeyAsIntArray()[0] == 0 ? "" : " AND re.fid_item_n = " + moFieldItem.getKeyAsIntArray()[0] + " ");
             map.put("sSqlTax", moFieldTax.getKeyAsIntArray()[0] == 0 ? "" : " AND re.fid_tax_bas_n = " + moFieldTax.getKeyAsIntArray()[0] + " AND re.fid_tax_n = " + moFieldTax.getKeyAsIntArray()[1] + " ");
             map.put("sEntity", moFieldEntity.getKeyAsIntArray()[0] == 0 ? "(TODAS)" : jcbEntity.getSelectedItem().toString());
+            map.put("bShowFiscalId", jckShowFiscalId.isSelected());
             map.put("sBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbBizPartner.getSelectedItem().toString());
             map.put("sItem", moFieldItem.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbItem.getSelectedItem().toString());
             map.put("sTax", moFieldTax.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbTax.getSelectedItem().toString());
@@ -762,6 +769,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             jcbEntity.setEnabled(false);
             jbPickEntity.setEnabled(false);
             jbClearEntity.setEnabled(false);
+            jckShowFiscalId.setEnabled(false);
             jcbEntity.setSelectedIndex(0);
         }
         else {
@@ -769,6 +777,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             jcbEntity.setEnabled(true);
             jbPickEntity.setEnabled(true);
             jbClearEntity.setEnabled(true);
+            jckShowFiscalId.setEnabled(true);
         }
     }
 
@@ -859,6 +868,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
     private javax.swing.JCheckBox jckShowBizPartner;
     private javax.swing.JCheckBox jckShowCostCenter;
     private javax.swing.JCheckBox jckShowEntity;
+    private javax.swing.JCheckBox jckShowFiscalId;
     private javax.swing.JCheckBox jckShowItems;
     private javax.swing.JCheckBox jckShowRecordAdjAudit;
     private javax.swing.JCheckBox jckShowRecordAdjYearEnd;

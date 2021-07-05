@@ -8,7 +8,9 @@ Isabel Danae GARCÍA SERVÍN
 4) Se restringió la modificación de los campos de serie y folio en la forma de captura de DPS cuando estos son generados automáticamente, 
     además se añadio la actualización de estos campos cuando ya existen la serie y el folio previamente asignados.
 5) Se modificó el resultado del comando "lock" en el servidor para que se muestre la cantidad, el usuario y la sesion de los candados.
-6) Se corrigió la actualización de documentos cuando en una misma póliza existen movimientos de distinta naturaleza del mismo documento en cuestión, p. ej., contabilizaciones de notas de crédito.
+6) Se corrigió la actualización de documentos cuando en una misma póliza existen movimientos de distinta naturaleza del mismo documento 
+    en cuestión, p. ej., contabilizaciones de notas de crédito.
+7) Se agregó el RFC en el reporte de auxiliares para las cuentas de caja y bancos.
 
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
