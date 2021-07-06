@@ -165,7 +165,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         jtfBankLayoutCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel8.add(jtfBankLayoutCurrency);
 
-        jlDpsCurrency.setText("Moneda documento:");
+        jlDpsCurrency.setText("Moneda documentos:");
         jlDpsCurrency.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel8.add(jlDpsCurrency);
 
@@ -248,8 +248,8 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
         
-        jbSave.setText("Cerrar");
-        jbCancel.setEnabled(false);
+        jbCancel.setText("Cerrar");
+        jbSave.setEnabled(false);
 
         jtfRegistryKey.setText("");
         jtfRegistryKey.setEditable(false);
@@ -340,7 +340,13 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         jtfDate.setText(SLibUtils.DateFormatDate.format(moBankLayout.getDateLayout()));
         jtfLayoutType.setText(moBankLayout.getXtaBankLayoutType());
         jtfBankLayoutCurrency.setText(bankCur.getCurrency());
-        jtfDpsCurrency.setText(((SDataCurrency) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.CFGU_CUR, new int[] { moBankLayout.getFkDpsCurrencyId() }, SLibConstants.EXEC_MODE_SILENT)).getCurrency());
+        if (getFormSubtype() == 2) {
+            jtfDpsCurrency.setText(((SDataCurrency) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.CFGU_CUR, new int[] { moBankLayout.getFkDpsCurrencyId() }, SLibConstants.EXEC_MODE_SILENT)).getCurrency());
+        }
+        else {
+            jlDpsCurrency.setEnabled(false);
+            jtfDpsCurrency.setText("");
+        }
         
         renderAccountSettings(new int[] { moBankLayout.getFkBankCompanyBranchId(), moBankLayout.getFkBankAccountCashId() });
        
