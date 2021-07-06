@@ -7,6 +7,7 @@ package erp.mbps.view;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
@@ -14,6 +15,8 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mbps.data.SDataEmployee;
+import erp.mbps.form.SFormBizPartnerEmployeeRelativesPhoto;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
@@ -45,6 +48,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
     private javax.swing.JComboBox jcbFilterPaymentType;
     private javax.swing.JButton jbClearFilterDepartament;
     private javax.swing.JButton jbClearFilterPaymentType;
+    private javax.swing.JButton jbShowPhoto;
     
     private java.lang.String msOrderKey;
 
@@ -104,6 +108,8 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         
         jbClearFilterPaymentType = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Quitar filtro periodo pago", this);
         
+        jbShowPhoto = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print_photo.gif")), "Ver foto", this);
+        
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         
@@ -115,6 +121,9 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         addTaskBarLowerComponent(jtbViewEmployeeAll);
         addTaskBarLowerComponent(jcbFilterPaymentType);
         addTaskBarLowerComponent(jbClearFilterPaymentType);
+        
+        addTaskBarLowerSeparator();
+        addTaskBarLowerComponent(jbShowPhoto);
 
         msOrderKey = "bp.bp, bp.id_bp ";
 
@@ -256,6 +265,16 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void actionShowPhoto() {
+        if (jbShowPhoto.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                SDataEmployee employee = (SDataEmployee) SDataUtilities.readRegistry(miClient, SModConsts.HRSU_EMP, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                SFormBizPartnerEmployeeRelativesPhoto photo = new SFormBizPartnerEmployeeRelativesPhoto(employee, (String)moTablePane.getSelectedTableRow().getValues().firstElement());
+                photo.setVisible(true);
+            }
         }
     }
     
@@ -420,10 +439,13 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
             JButton button = (JButton) e.getSource();
 
             if (button == jbClearFilterPaymentType) {
-                    actionClearFilterPaymentType();
+                actionClearFilterPaymentType();
             }
             else if (button == jbClearFilterDepartament) {
-                    actionClearFilterDepartament();
+                actionClearFilterDepartament();
+            }
+            else if (button == jbShowPhoto) {
+                actionShowPhoto();
             }
         }
     }
