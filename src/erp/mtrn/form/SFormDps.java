@@ -6356,6 +6356,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void actionEntryDelete() throws SQLException {
         if (jbEntryDelete.isEnabled() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
+            boolean delete = true;
             SDataDpsEntry entry = null;
             SDataDpsEntry entryComplementary = null;
             int index = moPaneGridEntries.getTable().getSelectedRow();
@@ -6364,7 +6365,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(index).getData();
 
                 if (entry.getFkDpsEntryTypeId() != SDataConstantsSys.TRNS_TP_DPS_ETY_ORDY) {
-                    miClient.showMsgBoxWarning("Solamente pueden modificarse los detalles de tipo ordinario.");
+                    miClient.showMsgBoxWarning("Solamente pueden modificarse partidas de tipo ordinario.");
                 }
                 else if (entry.getIsRegistryNew() || canDeleteEntry(entry)) {
                     if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
@@ -6373,45 +6374,53 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                         else {
                             if (mbIsDpsOrder) {
-                                if (entry.getContractPriceYear() > 0 && entry.getContractPriceMonth() > 0) {                                 
-                                    for (SGuiDpsEntryPrice entryPrice : moGuiDpsLink.pickGuiDpsSourceEntry(entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()).getGuiDpsSourceEntryPrices()) {
-                                        if (entry.getContractPriceYear() == entryPrice.getDataDpsEntryPrice().getContractPriceYear() && entry.getContractPriceMonth() == entryPrice.getDataDpsEntryPrice().getContractPriceMonth()) {
-                                            entryPrice.removeDataDpsDestinyEntry(entry);
-                                            break;
+                                if (entry.getContractPriceYear() > 0 && entry.getContractPriceMonth() > 0) {
+                                    if (!entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
+                                        for (SGuiDpsEntryPrice entryPrice : moGuiDpsLink.pickGuiDpsSourceEntry(entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()).getGuiDpsSourceEntryPrices()) {
+                                            if (entry.getContractPriceYear() == entryPrice.getDataDpsEntryPrice().getContractPriceYear() && entry.getContractPriceMonth() == entryPrice.getDataDpsEntryPrice().getContractPriceMonth()) {
+                                                entryPrice.removeDataDpsDestinyEntry(entry);
+                                                break;
+                                            }
                                         }
+                                    }
+                                    else {
+                                        delete = false;
+                                        miClient.showMsgBoxWarning("Esta partida está asignada a una entrega mensual " + SLibUtils.DecimalFormatCalendarYear.format(entry.getContractPriceYear()) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(entry.getContractPriceMonth()) +  ", ¡pero no tiene vínculos con ningún contrato!");
                                     }
                                 }
                             }
                             
-                            if (entry.getIsRegistryNew()) {
-                                moPaneGridEntries.removeTableRow(index);
-                            }
-                            else {
-                                if (entry.getIsDiscountRetailChain()) {
-                                    // Delete aswell complementary dps entry:
+                            if (delete) {
+                                if (entry.getIsRegistryNew()) {
+                                    moPaneGridEntries.removeTableRow(index);
+                                }
+                                else {
+                                    if (entry.getIsDiscountRetailChain()) {
+                                        // Delete aswell complementary dps entry:
 
-                                    entryComplementary = entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getAuxDpsEntryComplementary();
-                                    entryComplementary.setIsDeleted(true);
-                                    entryComplementary.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                                    entryComplementary.setIsRegistryEdited(true);
-                                    entryComplementary.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                                        entryComplementary = entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getAuxDpsEntryComplementary();
+                                        entryComplementary.setIsDeleted(true);
+                                        entryComplementary.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                                        entryComplementary.setIsRegistryEdited(true);
+                                        entryComplementary.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                                    }
+
+                                    entry.setIsDeleted(true);
+                                    entry.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                                    entry.setIsRegistryEdited(true);
+                                    entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+
+                                    moPaneGridEntries.setTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()), index);
                                 }
 
-                                entry.setIsDeleted(true);
-                                entry.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                                entry.setIsRegistryEdited(true);
-                                entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-
-                                moPaneGridEntries.setTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()), index);
+                                renderEntries();
+                                calculateTotal();
+                                updateDpsEntryCfdiSettings();
+                                moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
+                                if (moPaneGridEntries.getTableGuiRowCount() == 0) {
+                                    updateCurrencyFieldsStatus(true);
+                                }
                             }
-                        }
-
-                        renderEntries();
-                        calculateTotal();
-                        updateDpsEntryCfdiSettings();
-                        moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
-                        if (moPaneGridEntries.getTableGuiRowCount() == 0) {
-                            updateCurrencyFieldsStatus(true);
                         }
                     }
                 }
@@ -8253,7 +8262,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    public void publicActionDependentDelete() throws SQLException {
+    public void publicActionDependentDelete() throws SQLException, Exception {
         if (jTabbedPane.getSelectedIndex() == 0) {
             actionEntryDelete();
         }
