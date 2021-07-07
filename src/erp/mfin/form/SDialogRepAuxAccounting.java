@@ -145,6 +145,8 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jPanel8 = new javax.swing.JPanel();
         jckShowRecordAdjAudit = new javax.swing.JCheckBox();
         jckShowRecordAdjYearEnd = new javax.swing.JCheckBox();
+        jPanel19 = new javax.swing.JPanel();
+        jckStrechWithOverflow = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
@@ -244,7 +246,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel5.add(jPanel4, java.awt.BorderLayout.CENTER);
 
-        jPanel9.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel9.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -301,8 +303,8 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jbClearEntity.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel18.add(jbClearEntity);
 
-        jckShowFiscalId.setText("RFC caja y bancos");
-        jckShowFiscalId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jckShowFiscalId.setLabel("Mostrar RFC caja y bancos");
+        jckShowFiscalId.setPreferredSize(new java.awt.Dimension(160, 23));
         jPanel18.add(jckShowFiscalId);
 
         jPanel9.add(jPanel18);
@@ -401,6 +403,15 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel9.add(jPanel8);
 
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckStrechWithOverflow.setLabel("Ampliar altura del renglón del detalle para conceptos contables largos");
+        jckStrechWithOverflow.setOpaque(false);
+        jckStrechWithOverflow.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel19.add(jckStrechWithOverflow);
+
+        jPanel9.add(jPanel19);
+
         jPanel5.add(jPanel9, java.awt.BorderLayout.SOUTH);
 
         jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
@@ -431,7 +442,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(816, 538));
+        setSize(new java.awt.Dimension(816, 548));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -621,6 +632,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             map.put("bShowItem", jckShowItems.isSelected());
             map.put("bShowTax", jckShowTax.isSelected());
             map.put("bOrderItemName", miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() != SDataConstantsSys.CFGS_TP_SORT_KEY_NAME);
+            map.put("bStrechWithOverflow", jckStrechWithOverflow.isSelected());
             map.put("sSqlWhere", (!jckShowRecordAdjYearEnd.isSelected() ? " AND  b_adj_year = 0 " : "") +
                     (!jckShowRecordAdjAudit.isSelected() ? " AND  b_adj_audit = 0 " : ""));
 
@@ -841,6 +853,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -873,6 +886,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
     private javax.swing.JCheckBox jckShowRecordAdjAudit;
     private javax.swing.JCheckBox jckShowRecordAdjYearEnd;
     private javax.swing.JCheckBox jckShowTax;
+    private javax.swing.JCheckBox jckStrechWithOverflow;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlBizPartner;

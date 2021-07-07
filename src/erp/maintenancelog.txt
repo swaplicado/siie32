@@ -12,6 +12,7 @@ Isabel Danae GARCÍA SERVÍN
     en cuestión, p. ej., contabilizaciones de notas de crédito.
 7) Se agregó el RFC en el reporte de auxiliares para las cuentas de caja y bancos.
 8) Se agregó un botón a la vista de datos personales de empleados que abre una nueva ventana que muestra la foto del empleado.
+9) Se agregó la opción de sobreflujo cuando el concepto es muy largo en el reporte de auxiliares contables.
 
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
