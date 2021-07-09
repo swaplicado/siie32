@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SDataDiogMaintMovementEntryRow extends erp.lib.table.STableRow {
 
@@ -23,6 +23,7 @@ public class SDataDiogMaintMovementEntryRow extends erp.lib.table.STableRow {
         mvValues.clear();
         mvValues.add(diogEntry.getDbmsItemKey());
         mvValues.add(diogEntry.getDbmsItem());
+        mvValues.add(diogEntry.getDbmsPartNum());
         mvValues.add(diogEntry.getDbmsMaintArea());
         mvValues.add(diogEntry.getOriginalQuantity());
         mvValues.add(diogEntry.getDbmsOriginalUnitSymbol());

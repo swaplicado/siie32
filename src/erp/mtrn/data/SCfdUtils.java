@@ -2905,9 +2905,10 @@ public abstract class SCfdUtils implements Serializable {
      * @param isSingle It is true when there is one cfd
      * @param confirmSending It is true when the confirmation will be done.
      * @param catchExceptions When true all exceptions are handled internally, otherwise are shown into dialog messages.
+     * @param sendingConfirmUnneccessary It is true when the user confirmation is unnecessary.
      * @throws javax.mail.MessagingException, java.sql.SQLException
      */
-    public static void sendCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int cfdSubtype, boolean isSingle, boolean confirmSending, boolean catchExceptions) throws MessagingException, SQLException, Exception {
+    public static void sendCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int cfdSubtype, boolean isSingle, boolean confirmSending, boolean catchExceptions, boolean sendingConfirmUnneccessary) throws MessagingException, SQLException, Exception {
         boolean send = true;
         int idBizPartner = SLibConsts.UNDEFINED;
         int idBizPartnerBranch = SLibConsts.UNDEFINED;
@@ -2935,15 +2936,22 @@ public abstract class SCfdUtils implements Serializable {
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
             
-            if (confirmSending) {
-                send = STrnUtilities.confirmSend(client, TXT_SEND, cfd, null, idBizPartner, idBizPartnerBranch);
+            if (sendingConfirmUnneccessary) {
+                if (confirmSending) {
+                    send = STrnUtilities.confirmSend(client, TXT_SEND, cfd, null, idBizPartner, idBizPartnerBranch);
+                }
+            }
+            else {
+                send = true;
             }
 
             if (send) {
                 STrnUtilities.sendMailCfd(client, cfd, cfdSubtype, SLibConstants.UNDEFINED, idBizPartner, idBizPartnerBranch, catchExceptions);
-
-                if (isSingle) {
-                    client.showMsgBoxInformation("El comprobante ha sido enviado correctamente.\n");
+                
+                if (sendingConfirmUnneccessary) {
+                    if (isSingle) {
+                        client.showMsgBoxInformation("El comprobante ha sido enviado correctamente.\n");
+                    }
                 }
             }
         }
@@ -2998,7 +3006,7 @@ public abstract class SCfdUtils implements Serializable {
                         SDataCfd cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                         
                         // send CFDI:
-                        sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, cfdSubtype, false, false, true);
+                        sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, cfdSubtype, false, false, true, true);
                         signedAndSent = true;
                     }
                 }
@@ -3079,7 +3087,7 @@ public abstract class SCfdUtils implements Serializable {
                         try {
                             cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                            sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, cfdSubtype, false, false, false);
+                            sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, cfdSubtype, false, false, false, true);
                         }
                         catch (Exception e) {
                             throw new Exception("Anulado, pero no enviado: " + e.getMessage());
@@ -4915,12 +4923,12 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
-    public static void sendCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int cfdSubtype, boolean confirmationMail, boolean catchExceptions) throws Exception {
+    public static void sendCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int cfdSubtype, boolean confirmationMail, boolean catchExceptions, boolean needConfirmSending) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
-            sendCfd(client, typeCfd, cfd, cfdSubtype, true, confirmationMail, catchExceptions);
+            sendCfd(client, typeCfd, cfd, cfdSubtype, true, confirmationMail, catchExceptions, needConfirmSending);
         }
     }
 

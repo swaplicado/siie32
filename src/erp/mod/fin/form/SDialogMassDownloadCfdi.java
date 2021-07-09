@@ -691,14 +691,14 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
         }
     }
     
-    public static void fileMovePdf(File sourceFile, File destinationFile, String namePdf) {
+    private static void fileMovePdf(File sourceFile, File destinationFile, String namePdf) {
         File dataInputFile = new File (sourceFile +"/"+ namePdf);
         File fileSendPath = new File(destinationFile, namePdf);
         dataInputFile.renameTo(fileSendPath);
     
     }
 
-    public void writeXml(File routeSave, String name, String xml) throws IOException {
+    private void writeXml(File routeSave, String name, String xml) throws IOException {
         try {
             FileWriter writerFile = new FileWriter(routeSave + "/" + name , true);
             writerFile.write(xml);
@@ -906,8 +906,8 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
                     } catch (SQLException ex) {
                         Logger.getLogger(SDialogMassDownloadCfdi.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                           dispose();
-                       }            
+                    dispose();
+                }            
             }
         }
         else if (jbSave.isEnabled()) {

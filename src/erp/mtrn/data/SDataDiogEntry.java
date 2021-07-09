@@ -58,6 +58,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected int mnDbmsBookkeepingNumberId;
     protected java.lang.String msDbmsItem;
     protected java.lang.String msDbmsItemKey;
+    protected java.lang.String msDbmsPartNum;
     protected java.lang.String msDbmsUnit;
     protected java.lang.String msDbmsUnitSymbol;
     protected java.lang.String msDbmsOriginalUnit;
@@ -147,6 +148,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setDbmsBookkeepingNumberId(int n) { mnDbmsBookkeepingNumberId = n; }
     public void setDbmsItem(java.lang.String s) { msDbmsItem = s; }
     public void setDbmsItemKey(java.lang.String s) { msDbmsItemKey = s; }
+    public void setDbmsPartNum(java.lang.String s) { msDbmsPartNum = s; }
     public void setDbmsUnit(java.lang.String s) { msDbmsUnit = s; }
     public void setDbmsUnitSymbol(java.lang.String s) { msDbmsUnitSymbol = s; }
     public void setDbmsOriginalUnit(java.lang.String s) { msDbmsOriginalUnit = s; }
@@ -160,6 +162,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public int getDbmsBookkeepingNumberId() { return mnDbmsBookkeepingNumberId; }
     public java.lang.String getDbmsItem() { return msDbmsItem; }
     public java.lang.String getDbmsItemKey() { return msDbmsItemKey; }
+    public java.lang.String getDbmsPartNum() { return msDbmsPartNum; }
     public java.lang.String getDbmsUnit() { return msDbmsUnit; }
     public java.lang.String getDbmsUnitSymbol() { return msDbmsUnitSymbol; }
     public java.lang.String getDbmsOriginalUnit() { return msDbmsOriginalUnit; }
@@ -248,6 +251,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         mnDbmsBookkeepingNumberId = 0;
         msDbmsItem = "";
         msDbmsItemKey = "";
+        msDbmsPartNum = "";
         msDbmsUnit = "";
         msDbmsUnitSymbol = "";
         msDbmsOriginalUnit = "";
@@ -277,7 +281,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
         try {
             sql = "SELECT de.*, d.fid_bkk_year_n, d.fid_bkk_num_n, " +
-                    "i.item, i.item_key, u.unit, u.symbol, uo.unit, uo.symbol, ma.name, un.usr, ue.usr, ud.usr " +
+                    "i.item, i.item_key, i.part_num, u.unit, u.symbol, uo.unit, uo.symbol, ma.name, un.usr, ue.usr, ud.usr " +
                     "FROM trn_diog_ety AS de " +
                     "INNER JOIN trn_diog AS d ON de.id_year = d.id_year AND de.id_doc = d.id_doc " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
@@ -329,6 +333,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 msDbmsItem = resultSet.getString("i.item");
                 msDbmsItem = resultSet.getString("i.item");
                 msDbmsItemKey = resultSet.getString("i.item_key");
+                msDbmsPartNum = resultSet.getString("i.part_num");
                 msDbmsUnit = resultSet.getString("u.unit");
                 msDbmsUnitSymbol = resultSet.getString("u.symbol");
                 msDbmsOriginalUnit = resultSet.getString("uo.unit");
