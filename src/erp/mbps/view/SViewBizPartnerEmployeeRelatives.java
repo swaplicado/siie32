@@ -35,7 +35,7 @@ import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Claudio Peña, Sergio Flores
  */
 public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -136,7 +136,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         int column = 0;
-        STableColumn[] aoTableColumns = new STableColumn[75];
+        STableColumn[] aoTableColumns = new STableColumn[77];
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Empleado", 250);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave", 50);
         aoTableColumns[column++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
@@ -156,25 +156,27 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pos.name", "Puesto", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emp.name", "Tipo empleado", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "wrk.name", "Tipo obrero", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.county", "País", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street", "Calle", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_ext", "No. exterior", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_int", "No. interior", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.neighborhood", "Colonia", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.zip_code", "CP", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.reference", "Referencia (teléfono)", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.locality", "Localidad", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.county", "Municipio", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.state", "Estado", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.locality", "Municipio", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.locality", "Localidad", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.neighborhood", "Colonia", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street", "Calle", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_ext", "No. exterior", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_int", "No. interior", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.zip_code", "CP", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.reference", "Telefono", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cty_abbr", "País", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_mfg_ope", "Operador", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_uni", "Sindicalizado", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_par_shh", "Socio/accionista", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_rel_pty", "Parte relacionada", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "csex.name", "Sexo empleado", 75);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cblo.name", "Grupo sanguíneo empleado", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cblo.name", "Grupo sanguíneo empleado", 75);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cedu.name", "Escolaridad empleado", 75);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cmar.name", "Estado civil empleado", 75);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_pho", "Foto", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_sig", "Firma", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.place_bir", "Lugar nacimiento", 200);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.place_bir", "Lugar nacimiento", 150);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.umf", "UMF", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.mate", "Cónyuge", 200);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "er.mate_dt_bir_n", "Cónyuge nacimiento", STableConstants.WIDTH_DATE);
@@ -386,7 +388,9 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "addr.street, addr.street_num_ext, addr.street_num_int, addr.neighborhood, addr.locality, addr.county, addr.state, addr.zip_code, addr.reference, " + 
                 "img_pho_n IS NOT NULL AS _with_img_pho, img_sig_n IS NOT NULL AS _with_img_sig, " +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr, " +
-                "pay.name, emp.name, wrk.name, dep.name, pos.name, csex.name, cblo.name, " +
+                "pay.name, emp.name, wrk.name, dep.name, pos.name, " +
+                "COALESCE(cty.cty_abbr, '" + miClient.getSession().getSessionCustom().getLocalCountryCode() + "') AS _cty_abbr, " +
+                "csex.name, cblo.name, cmar.name, cedu.name, " +
                 "er.mate, er.mate_dt_bir_n, er.b_mate_dec, cmate.name, " +
                 "er.son_1, er.son_dt_bir_1_n, er.b_son_dec_1, cson1.name, " +
                 "er.son_2, er.son_dt_bir_2_n, er.b_son_dec_2, cson2.name, " +
@@ -415,9 +419,12 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "LEFT OUTER JOIN erp.hrsu_tp_wrk AS wrk ON e.fk_tp_wrk = wrk.id_tp_wrk " +
                 "LEFT OUTER JOIN erp.hrsu_dep AS dep ON e.fk_dep = dep.id_dep " +
                 "LEFT OUTER JOIN erp.hrsu_pos AS pos ON e.fk_pos = pos.id_pos " +
+                "LEFT OUTER JOIN erp.locu_cty AS cty ON addr.fid_cty_n = cty.id_cty " +
                 "LEFT OUTER JOIN erp.hrsu_emp_rel AS er ON e.id_emp = er.id_emp " +
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS csex ON e.fk_cl_cat_sex = csex.id_cl_hrs_cat AND e.fk_tp_cat_sex = csex.id_tp_hrs_cat " +
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cblo ON e.fk_cl_cat_blo = cblo.id_cl_hrs_cat AND e.fk_tp_cat_blo = cblo.id_tp_hrs_cat " +
+                "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cmar ON e.fk_cl_cat_mar = cmar.id_cl_hrs_cat AND e.fk_tp_cat_mar = cmar.id_tp_hrs_cat " +
+                "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cedu ON e.fk_cl_cat_edu = cedu.id_cl_hrs_cat AND e.fk_tp_cat_edu = cedu.id_tp_hrs_cat " +
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cmate ON er.fk_cl_cat_sex_mate = cmate.id_cl_hrs_cat AND er.fk_tp_cat_sex_mate = cmate.id_tp_hrs_cat " +
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cson1 ON er.fk_cl_cat_sex_son_1 = cson1.id_cl_hrs_cat AND er.fk_tp_cat_sex_son_1 = cson1.id_tp_hrs_cat " +
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cson2 ON er.fk_cl_cat_sex_son_2 = cson2.id_cl_hrs_cat AND er.fk_tp_cat_sex_son_2 = cson2.id_tp_hrs_cat " +

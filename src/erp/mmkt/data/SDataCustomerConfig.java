@@ -131,7 +131,7 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
             }
             else {
                 mnPkCustomerId = resultSet.getInt("id_cus");
-                mbIsSignRestricted = resultSet.getBoolean("b_sign_restrict");
+//                mbIsSignRestricted = resultSet.getBoolean("b_sign_restrict");
                 mbIsFreeDiscountDoc = resultSet.getBoolean("b_free_disc_doc");
                 mbIsFreeCommissions = resultSet.getBoolean("b_free_comms");
                 mbIsDeleted = resultSet.getBoolean("b_del");
