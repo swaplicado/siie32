@@ -3114,10 +3114,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
         
         if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP_FI);
+            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP);
         }
         else {
-            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_CUS_FI);
+            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_CUS);
         }
 
         // Pane of document entries:
@@ -9972,7 +9972,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //moDps.setFkSalesAgentBizPartnerId_n(...
 
         moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
-        moDps.setFkFunctionalAreaId(moFieldFkFunctionalAreaId.getKeyAsIntArray()[0]);
+        moDps.setFkFunctionalAreaId(jcbFkFunctionalAreaId.getSelectedIndex() <= 0 ? SModSysConsts.CFGU_FUNC_NON : moFieldFkFunctionalAreaId.getKeyAsIntArray()[0]);
         moDps.setFkDpsNatureId(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
         moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
         moDps.setFkSalesAgentId_n(mnSalesAgentId_n);

@@ -4,7 +4,7 @@
  */
 
 /*
- * SFormDifferenceIncomeExpense.java
+ * SFormExchangeRateDiff.java
  *
  * Created on 22/10/2010, 01:02:32 PM
  */
@@ -32,7 +32,7 @@ import javax.swing.AbstractAction;
  *
  * @author Alfonso Flores, Sergio Flores
  */
-public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
+public class SFormExchangeRateDiff extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -50,8 +50,8 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
     private erp.mfin.data.SDataRecordEntry moRecordEntry;
     private int mnFkUser;
 
-    /** Creates new form SFormDifferenceIncomeExpense */
-    public SFormDifferenceIncomeExpense(erp.client.SClientInterface client) {
+    /** Creates new form SFormExchangeRateDiff */
+    public SFormExchangeRateDiff(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
 
@@ -68,10 +68,7 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        jpInput = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlAccountCash = new javax.swing.JLabel();
@@ -87,6 +84,12 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
         jPanel7 = new javax.swing.JPanel();
         jlValue = new javax.swing.JLabel();
         jtfValue = new javax.swing.JTextField();
+        jpControls = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Ganacia cambiaria");
@@ -97,21 +100,8 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(492, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jPanel1.add(jbOk);
-
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jpInput.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpInput.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
@@ -180,9 +170,35 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
 
         jPanel3.add(jPanel7);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_START);
+        jpInput.add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpInput, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(492, 33));
+        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("ferd");
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel1.add(jLabel1);
+
+        jpControls.add(jPanel1);
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jPanel2.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jPanel2.add(jbCancel);
+
+        jpControls.add(jPanel2);
+
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(616, 414));
         setLocationRelativeTo(null);
@@ -193,7 +209,7 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConcept, jlConcept);
         moFieldConcept.setLengthMax(100);
@@ -258,8 +274,8 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
     private void renderCurrencySettings() {
         SDataBizPartnerBranch oBranch = null;
 
-        oBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient,
-                SDataConstants.BPSU_BPB, new int[] { moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+        oBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(
+                miClient, SDataConstants.BPSU_BPB, new int[] { moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
 
         jtfCompanyBranch.setText(oBranch.getBizPartnerBranch());
         jtfAccountCash.setText(moParamRecord.getDbmsDataAccountCash().getDbmsCompanyBranchEntity().getEntity());
@@ -364,6 +380,7 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -377,6 +394,8 @@ public class SFormDifferenceIncomeExpense extends javax.swing.JDialog implements
     private javax.swing.JLabel jlConcept;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlValue;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpInput;
     private javax.swing.JTextField jtfAccountCash;
     private javax.swing.JTextField jtfCode;
     private javax.swing.JTextField jtfCompanyBranch;

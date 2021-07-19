@@ -4,7 +4,7 @@
  */
 
 /*
- * SFormAccountCashTransfer.java
+ * SFormMoneyOutTransfer.java
  *
  * Created on 22/10/2010, 04:24:22 PM
  */
@@ -36,9 +36,9 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
-public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
+public class SFormMoneyOutTransfer extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -66,8 +66,8 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
     private erp.mcfg.data.SDataCurrency moCurrencyDestiny;
     private erp.mbps.data.SDataBizPartnerBranch moBizPartnerBranch;
 
-    /** Creates new form SFormAccountCashTransfer */
-    public SFormAccountCashTransfer(erp.client.SClientInterface client) {
+    /** Creates new form SFormMoneyOutTransfer */
+    public SFormMoneyOutTransfer(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
 
@@ -84,10 +84,7 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        jpInput = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -146,6 +143,12 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
         jPanel5 = new javax.swing.JPanel();
         jlConcept = new javax.swing.JLabel();
         jtfConcept = new javax.swing.JTextField();
+        jpControls = new javax.swing.JPanel();
+        jPanel17 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel18 = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Traspaso de efectivo");
@@ -156,22 +159,8 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(492, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
-
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jpInput.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpInput.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.BorderLayout(0, 1));
 
@@ -449,7 +438,7 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
 
         jPanel3.add(jPanel14, java.awt.BorderLayout.CENTER);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jpInput.add(jPanel3, java.awt.BorderLayout.CENTER);
 
         jPanel15.setLayout(new java.awt.GridLayout(1, 1, 0, 1));
 
@@ -465,12 +454,39 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
 
         jPanel15.add(jPanel5);
 
-        jPanel2.add(jPanel15, java.awt.BorderLayout.NORTH);
+        jpInput.add(jPanel15, java.awt.BorderLayout.NORTH);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpInput, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-395)/2, 600, 395);
+        jpControls.setPreferredSize(new java.awt.Dimension(492, 33));
+        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("fmot");
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jLabel1);
+
+        jpControls.add(jPanel17);
+
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel18.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jPanel18.add(jbCancel);
+
+        jpControls.add(jPanel18);
+
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(616, 414));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -494,7 +510,7 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
     }//GEN-LAST:event_jcbFkAccountCashDestinyIdItemStateChanged
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConcept, jlConcept);
         moFieldConcept.setLengthMax(100);
@@ -1150,7 +1166,7 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -1158,7 +1174,8 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -1198,6 +1215,8 @@ public class SFormAccountCashTransfer extends javax.swing.JDialog implements erp
     private javax.swing.JLabel jlValueCyOrigin;
     private javax.swing.JLabel jlValueDestiny;
     private javax.swing.JLabel jlValueOrigin;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpInput;
     private javax.swing.JTextField jtfAccountCashOrigin;
     private javax.swing.JTextField jtfCodeOrigin;
     private javax.swing.JTextField jtfCompanyBranch;

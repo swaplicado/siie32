@@ -16,6 +16,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComboBoxGroup;
 import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.mod.bps.db.SBpsUtils;
@@ -38,6 +39,7 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
 
     private int mnFormResult;
     private boolean mbFirstTime;
+    private erp.lib.form.SFormField moFieldFiscalId;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroup;
 
     /**
@@ -97,29 +99,35 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
         jpOptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar un asociado de negocios:"));
         jpOptionPane.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
+        jPanel1.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFiscalId.setText("Buscar RFC:");
-        jlFiscalId.setPreferredSize(new java.awt.Dimension(135, 23));
+        jlFiscalId.setText("Buscar por RFC:");
+        jlFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel2.add(jlFiscalId);
 
+        jtfFiscalId.setText("XAXX010101XXX");
         jtfFiscalId.setMinimumSize(new java.awt.Dimension(14, 23));
-        jtfFiscalId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfFiscalId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfFiscalIdActionPerformed(evt);
+            }
+        });
         jPanel2.add(jtfFiscalId);
 
         jbFiscalId.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
-        jbFiscalId.setLabel("");
+        jbFiscalId.setFocusable(false);
         jbFiscalId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel2.add(jbFiscalId);
 
         jPanel1.add(jPanel2);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartner.setText("Asociado de negocios: *");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(135, 23));
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel3.add(jlBizPartner);
 
         jcbBizPartner.setMaximumRowCount(12);
@@ -140,10 +148,10 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
 
         jPanel1.add(jPanel3);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerBranch.setText("Sucursal asociado: *");
-        jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(135, 23));
+        jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel4.add(jlBizPartnerBranch);
 
         jcbBizPartnerBranch.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -163,10 +171,10 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
 
         jPanel1.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartnerBranchAddress.setText("Domicilio de la operación: *");
-        jlBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(135, 23));
+        jlBizPartnerBranchAddress.setText("Domicilio operación: *");
+        jlBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlBizPartnerBranchAddress);
 
         jcbBizPartnerBranchAddress.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -213,16 +221,12 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
 
         getContentPane().add(jpSouth, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(600, 400));
+        setSize(new java.awt.Dimension(616, 359));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        if (mbFirstTime) {
-            mbFirstTime = false;
-         }
-        SLibUtilities.requestComponentFocus(jcbBizPartner);
-
+        windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
     private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed
@@ -251,7 +255,12 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
         }
     }//GEN-LAST:event_jcbBizPartnerBranchAddressKeyPressed
 
+    private void jtfFiscalIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfFiscalIdActionPerformed
+        actionFiscalId();
+    }//GEN-LAST:event_jtfFiscalIdActionPerformed
+
     private void initComponentsExtra() {
+        moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFiscalId, jlFiscalId);
         moComboBoxGroup = new SFormComboBoxGroup(miClient);
 
         jtfFiscalId.addFocusListener(this);
@@ -277,6 +286,13 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+    }
+    
+    private void windowActivated() {
+        if (mbFirstTime) {
+            mbFirstTime = false;
+            SLibUtilities.requestComponentFocus(jcbBizPartner);
+        }
     }
 
     private void itemStateChange() {
@@ -305,18 +321,26 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
     }
     
     private void actionFiscalId() {
-        try {
-            int idBp = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
-                        jtfFiscalId.getText(), "", 0);
-            if (idBp != 0) {
-                SFormUtilities.locateComboBoxItem(jcbBizPartner, new int[] { idBp });
-            }
-            else {
-                miClient.showMsgBoxWarning("No se encontró un asociado de negocio con el RFC indicado.");
-            }
+        if (moFieldFiscalId.getString().isEmpty()) {
+            miClient.showMsgBoxWarning("Se debe especificar un valor para el campo '" + jlFiscalId.getText() + "'.");
+            SLibUtilities.requestComponentFocus(jtfFiscalId);
         }
-        catch (Exception e) {
-            miClient.showMsgBoxWarning(e.getMessage());
+        else {
+            try {
+                int id = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), moFieldFiscalId.getString(), "", mnOptionType);
+
+                if (id != 0) {
+                    SFormUtilities.locateComboBoxItem(jcbBizPartner, new int[] { id });
+                    SLibUtilities.requestComponentFocus(jcbBizPartner);
+                }
+                else {
+                    miClient.showMsgBoxWarning("No se encontró ningún asociado de negocio con el RFC '" + moFieldFiscalId.getString() + "'.");
+                    SLibUtilities.requestComponentFocus(jtfFiscalId);
+                }
+            }
+            catch (Exception e) {
+                miClient.showMsgBoxWarning(e.getMessage());
+            }
         }
     }
 
@@ -418,12 +442,12 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
 
     @Override
     public void formReset() {
-        jtfFiscalId.setText("");
         mbResetingForm = true;
 
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
+        moFieldFiscalId.resetField();
         moComboBoxGroup.reset();
 
         mbResetingForm = false;
@@ -432,9 +456,22 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
     @Override
     public void formRefreshOptionPane() {
         mbResetingForm = true;
+        
+        int option = 0;
+        
+        switch (mnOptionType) {
+            case SDataConstants.BPSX_BP_SUP:
+                option = SDataConstants.BPSX_BP_SUP_FI;
+                break;
+            case SDataConstants.BPSX_BP_CUS:
+                option = SDataConstants.BPSX_BP_CUS_FI;
+                break;
+            default:
+                // do nothing
+        }
 
         moComboBoxGroup.clear();
-        moComboBoxGroup.addComboBox(mnOptionType, jcbBizPartner, jbBizPartner);
+        moComboBoxGroup.addComboBox(option, jcbBizPartner, jbBizPartner);
         moComboBoxGroup.addComboBox(SDataConstants.BPSU_BPB, jcbBizPartnerBranch, jbBizPartnerBranch);
         moComboBoxGroup.addComboBox(SDataConstants.BPSU_BPB_ADD, jcbBizPartnerBranchAddress, jbBizPartnerBranchAddress);
 

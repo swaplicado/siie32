@@ -300,7 +300,9 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 break;
 
             case SDataConstants.BPSX_BP_SUP:
+            case SDataConstants.BPSX_BP_SUP_FI:
             case SDataConstants.BPSX_BP_CUS:
+            case SDataConstants.BPSX_BP_CUS_FI:
             case SDataConstants.BPSX_BP_CDR:
             case SDataConstants.BPSX_BP_DBR:
                 switch (mnOptionType) {

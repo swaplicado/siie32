@@ -26,6 +26,7 @@ import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -45,12 +46,14 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private java.util.Vector<SFormField> mvFields;
 
     private erp.lib.form.SFormField moFieldSearchBizPartnerId;
-    private erp.lib.form.SFormField moFieldSearchNumberDps;
+    private erp.lib.form.SFormField moFieldSearchDpsNumber;
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDps;
     private erp.mtrn.form.SPanelDps moPanelDps;
     private int[] manParamDpsClassKey;
     private int mnOptionsBizPartnerType;
     private boolean mbIsBizPartnerRequired;
+    private int[] manCurrentBizPartnerKey;
+    private String msCurrentDpsNumber;
 
     /** Creates new form SPanelDpsFinder
      * @param client ERP Client interface.
@@ -101,12 +104,12 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jcbSearchBizPartnerId = new javax.swing.JComboBox();
         jbSearchBizPartnerId = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jlSearchNumber = new javax.swing.JLabel();
-        jtfSearchNumberSeries = new javax.swing.JTextField();
+        jlSearchDpsNumber = new javax.swing.JLabel();
+        jtfSearchDpsNumber = new javax.swing.JTextField();
         jbPickDps = new javax.swing.JButton();
-        jbDeleteDps = new javax.swing.JButton();
+        jbClearDps = new javax.swing.JButton();
         jlDummy = new javax.swing.JLabel();
-        jckIsLocalCurrency = new javax.swing.JCheckBox();
+        jckConvertToLocalCurrency = new javax.swing.JCheckBox();
         jlPanelDps = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
@@ -149,14 +152,14 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlSearchNumber.setText("Serie y folio documento:");
-        jlSearchNumber.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel2.add(jlSearchNumber);
+        jlSearchDpsNumber.setText("Serie y folio documento:");
+        jlSearchDpsNumber.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel2.add(jlSearchDpsNumber);
 
-        jtfSearchNumberSeries.setText("SERIES");
-        jtfSearchNumberSeries.setToolTipText("Formato: Serie-Folio");
-        jtfSearchNumberSeries.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel2.add(jtfSearchNumberSeries);
+        jtfSearchDpsNumber.setText("SERIES");
+        jtfSearchDpsNumber.setToolTipText("Formato: Serie-Folio");
+        jtfSearchDpsNumber.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jtfSearchDpsNumber);
 
         jbPickDps.setText("...");
         jbPickDps.setToolTipText("Buscar documento");
@@ -164,18 +167,18 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jbPickDps.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel2.add(jbPickDps);
 
-        jbDeleteDps.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbDeleteDps.setToolTipText("Limpiar");
-        jbDeleteDps.setFocusable(false);
-        jbDeleteDps.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel2.add(jbDeleteDps);
+        jbClearDps.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbClearDps.setToolTipText("Limpiar");
+        jbClearDps.setFocusable(false);
+        jbClearDps.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel2.add(jbClearDps);
 
         jlDummy.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jlDummy.setPreferredSize(new java.awt.Dimension(193, 23));
         jPanel2.add(jlDummy);
 
-        jckIsLocalCurrency.setText("Convertir a moneda local");
-        jPanel2.add(jckIsLocalCurrency);
+        jckConvertToLocalCurrency.setText("Convertir a moneda local");
+        jPanel2.add(jckConvertToLocalCurrency);
 
         jpDpsFinder.add(jPanel2);
 
@@ -201,13 +204,13 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
         moFieldSearchBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbSearchBizPartnerId, jlSearchBizPartnerId);
         moFieldSearchBizPartnerId.setPickerButton(jbSearchBizPartnerId);
-        moFieldSearchNumberDps = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSearchNumberSeries, jlSearchNumber);
-        moFieldSearchNumberDps.setLengthMax(15 + 15 + 1); // length of: document series + document number + hyphen
-        moFieldSearchNumberDps.setPickerButton(jbPickDps);
+        moFieldSearchDpsNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSearchDpsNumber, jlSearchDpsNumber);
+        moFieldSearchDpsNumber.setLengthMax(15 + 15 + 1); // length of: document series + document number + hyphen
+        moFieldSearchDpsNumber.setPickerButton(jbPickDps);
 
         mvFields = new Vector<>();
         mvFields.add(moFieldSearchBizPartnerId);
-        mvFields.add(moFieldSearchNumberDps);
+        mvFields.add(moFieldSearchDpsNumber);
 
         moDialogPickerDps = new SDialogPickerDps(miClient, mnFinderType);
 
@@ -217,10 +220,10 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
         jbSearchBizPartnerId.addActionListener(this);
         jbPickDps.addActionListener(this);
-        jbDeleteDps.addActionListener(this);
+        jbClearDps.addActionListener(this);
         jcbSearchBizPartnerId.addActionListener(this);
 
-        jtfSearchNumberSeries.addFocusListener(this);
+        jtfSearchDpsNumber.addFocusListener(this);
     }
 
     private void searchDps() {
@@ -233,58 +236,61 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         moPanelDps.setDps(null, null);
 
         try {
-            if (!moFieldSearchNumberDps.getString().isEmpty()) {
-                asNumberDps = SLibUtilities.textExplode(moFieldSearchNumberDps.getString(), "-");
+            if (!moFieldSearchDpsNumber.getString().isEmpty()) {
+                asNumberDps = SLibUtilities.textExplode(moFieldSearchDpsNumber.getString(), "-");
 
-                    if (asNumberDps.length > 1) {
-                        sNumberSeries = asNumberDps[0];
-                        sNumber = asNumberDps[1];
-                    }
-                    else {
-                        sNumber = asNumberDps[0];
-                    }
+                if (asNumberDps.length > 1) {
+                    sNumberSeries = asNumberDps[0];
+                    sNumber = asNumberDps[1];
+                }
+                else {
+                    sNumber = asNumberDps[0];
+                }
 
-                    if (mbIsBizPartnerRequired) {
-                        if (jcbSearchBizPartnerId.getSelectedIndex() > 0) {
-                            key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, sNumberSeries, sNumber, manParamDpsClassKey, moFieldSearchBizPartnerId.getKeyAsIntArray());
-                        }
-                        else if ( !SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
-                            key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
-                        }
+                if (mbIsBizPartnerRequired) {
+                    if (jcbSearchBizPartnerId.getSelectedIndex() > 0) {
+                        key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, sNumberSeries, sNumber, manParamDpsClassKey, moFieldSearchBizPartnerId.getKeyAsIntArray());
                     }
-                    else {
+                    else if ( !SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
                         key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
                     }
+                }
+                else {
+                    key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
+                }
 
-                    if (key != null) {
+                if (key != null) {
                     moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
-                        if(moDps.getDbmsDataCfd() != null) {
-                            if (!moDps.getDbmsDataCfd().getUuid().equals("") && moDps.getDbmsDataCfd().isStamped()) {
 
-                                if (mbIsBizPartnerRequired) {
-                                    moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
-                                }
+                    if(moDps.getDbmsDataCfd() != null) {
+                        if (!moDps.getDbmsDataCfd().getUuid().equals("") && moDps.getDbmsDataCfd().isStamped()) {
 
-                                moPanelDps.setDps(moDps, null);
-
-                                if (moExternalMethod != null) {
-                                    moExternalMethod.invoke(moExternalObject);
-                                }
+                            if (mbIsBizPartnerRequired) {
+                                moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
                             }
-                            else {
-                                System.err.println("La factura no esta timbrada.");
-                                JOptionPane.showMessageDialog(this, "La factura seleccionada debe estar timbrada", "Error", JOptionPane.INFORMATION_MESSAGE);
+
+                            moPanelDps.setDps(moDps, null);
+
+                            if (moExternalMethod != null) {
+                                moExternalMethod.invoke(moExternalObject);
                             }
                         }
-                    }
-                    else {
-                    key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
-                    moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
-                        if(moDps.getDbmsDataCfd() == null || moDps.getDbmsDataCfd().getUuid().isEmpty() ) {
+                        else {
                             System.err.println("La factura no esta timbrada.");
                             JOptionPane.showMessageDialog(this, "La factura seleccionada debe estar timbrada", "Error", JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
+                }
+                else {
+                    key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
+                    moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
+
+                    if(moDps.getDbmsDataCfd() == null || moDps.getDbmsDataCfd().getUuid().isEmpty() ) {
+                        System.err.println("La factura no esta timbrada.");
+                        JOptionPane.showMessageDialog(this, "La factura seleccionada debe estar timbrada", "Error", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+                
                 updateCheckLocalCurrencyStatus();
             }
         }
@@ -294,18 +300,19 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     }
 
     private void updateCheckLocalCurrencyStatus() {
-        jckIsLocalCurrency.setSelected(false);
+        jckConvertToLocalCurrency.setSelected(false);
 
         if (moDps == null) {
-            jckIsLocalCurrency.setEnabled(false);
+            jckConvertToLocalCurrency.setEnabled(false);
         }
         else {
             if (!SLibUtilities.belongsTo(manParamDpsClassKey, new int[][] { SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC })) {
-                jckIsLocalCurrency.setEnabled(moDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
+                jckConvertToLocalCurrency.setEnabled(moDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
             }
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void updateFormBizPartnerStatus() {
         if (!mbIsBizPartnerRequired) { 
             jlSearchBizPartnerId.setEnabled(false);
@@ -372,16 +379,17 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             if (mbIsBizPartnerRequired) {
                 moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
             }
-            moFieldSearchNumberDps.setFieldValue(moDps.getNumberSeries() + (moDps.getNumberSeries().length() > 0 ? "-" : "") + moDps.getNumber());
+            moFieldSearchDpsNumber.setFieldValue(moDps.getDpsNumber());
 
             if (moExternalMethod != null) {
                 try {
                     moExternalMethod.invoke(moExternalObject);
                 }
-                catch (Exception e) {
+                catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     SLibUtilities.renderException(this, e);
                 }
             }
+            
             updateCheckLocalCurrencyStatus();
         }
     }
@@ -397,38 +405,53 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private void actionDeleteDps() {
         moDps = null;
         moPanelDps.setDps(moDps, null);
-        moFieldSearchNumberDps.setFieldValue("");
+        moFieldSearchDpsNumber.setFieldValue("");
 
-        moFieldSearchNumberDps.getComponent().requestFocus();
+        moFieldSearchDpsNumber.getComponent().requestFocus();
 
         if (moExternalMethod != null) {
             try {
                 moExternalMethod.invoke(moExternalObject);
             }
-            catch (Exception e) {
+            catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 SLibUtilities.renderException(this, e);
             }
         }
+        
         updateCheckLocalCurrencyStatus();
+    }
+    
+    private void focusGainedSearchNumberSeries() {
+        manCurrentBizPartnerKey = moFieldSearchBizPartnerId.getKeyAsIntArray();
+        msCurrentDpsNumber = moFieldSearchDpsNumber.getString();
+    }
+    
+    private void focusLostSearchNumberSeries() {
+        boolean hasChangedBizPartner = !SLibUtilities.compareKeys(manCurrentBizPartnerKey, moFieldSearchBizPartnerId.getKeyAsIntArray());
+        boolean hasChangedDpsNumber = msCurrentDpsNumber != null && !msCurrentDpsNumber.equals(moFieldSearchDpsNumber.getString());
+        
+        if (hasChangedBizPartner || hasChangedDpsNumber) {
+            searchDps();
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JButton jbDeleteDps;
+    private javax.swing.JButton jbClearDps;
     private javax.swing.JButton jbPickDps;
     private javax.swing.JButton jbSearchBizPartnerId;
     private javax.swing.JComboBox jcbSearchBizPartnerId;
-    private javax.swing.JCheckBox jckIsLocalCurrency;
+    private javax.swing.JCheckBox jckConvertToLocalCurrency;
     private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlPanelDps;
     private javax.swing.JLabel jlSearchBizPartnerId;
     private javax.swing.JLabel jlSearchDpsClass;
-    private javax.swing.JLabel jlSearchNumber;
+    private javax.swing.JLabel jlSearchDpsNumber;
     private javax.swing.JPanel jpDpsFinder;
     private javax.swing.JTextField jtfSearchDpsClass;
-    private javax.swing.JTextField jtfSearchNumberSeries;
+    private javax.swing.JTextField jtfSearchDpsNumber;
     // End of variables declaration//GEN-END:variables
 
     public void windowActivated() {
@@ -436,7 +459,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             jcbSearchBizPartnerId.requestFocus();
         }
         else {
-            jtfSearchNumberSeries.requestFocus();
+            jtfSearchDpsNumber.requestFocus();
         }
     }
 
@@ -470,16 +493,16 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         if (!validation.getIsError()) {
             if (moDps == null) {
                 validation.setMessage("No se ha especificado un documento válido.");
-                validation.setComponent(jtfSearchNumberSeries);
+                validation.setComponent(jtfSearchDpsNumber);
             }
             else if (moDps.getFkDpsStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                 validation.setMessage("El estatus del documento debe ser '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_ST_DPS, new int[] { SDataConstantsSys.TRNS_ST_DPS_EMITED }) + "'.");
-                validation.setComponent(jtfSearchNumberSeries);
+                validation.setComponent(jtfSearchDpsNumber);
             }
             else {
                 if (mnFinderType == SDataConstants.TRNX_DPS_PEND_LINK && moDps.getIsLinked()) {
                     validation.setMessage("El documento ya está cerrado para vinculación.");
-                    validation.setComponent(jtfSearchNumberSeries);
+                    validation.setComponent(jtfSearchDpsNumber);
                 }
             }
         }
@@ -506,7 +529,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     }
     
     public boolean getIsLocalCurrency() {
-        return jckIsLocalCurrency.isSelected();
+        return jckConvertToLocalCurrency.isSelected();
     }
 
     public erp.mtrn.data.SDataDps getDps() {
@@ -522,7 +545,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             jcbSearchBizPartnerId.requestFocus();
         }
         else {
-            jtfSearchNumberSeries.requestFocus();
+            jtfSearchDpsNumber.requestFocus();
         }
     }
 
@@ -537,22 +560,28 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             else if (button == jbPickDps) {
                 actionPickDps();
             }
-            else if (button == jbDeleteDps) {
+            else if (button == jbClearDps) {
                 actionDeleteDps();
             }
         }
         if (e.getSource() instanceof javax.swing.JComboBox) {
-                javax.swing.JComboBox comboBox = (javax.swing.JComboBox) e.getSource();
-            
-                if (comboBox == jcbSearchBizPartnerId) {
-                    actionRefreshDps();
-                }
+            javax.swing.JComboBox comboBox = (javax.swing.JComboBox) e.getSource();
+
+            if (comboBox == jcbSearchBizPartnerId) {
+                actionRefreshDps();
+            }
         }
     }
  
     @Override
     public void focusGained(FocusEvent e) {
+        if (e.getSource() instanceof JTextField) {
+            JTextField textField = (JTextField) e.getSource();
 
+            if (textField == jtfSearchDpsNumber) {
+                focusGainedSearchNumberSeries();
+            }
+        }
     }
 
     @Override
@@ -560,8 +589,8 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         if (e.getSource() instanceof JTextField) {
             JTextField textField = (JTextField) e.getSource();
 
-            if (textField == jtfSearchNumberSeries) {
-                searchDps();
+            if (textField == jtfSearchDpsNumber) {
+                focusLostSearchNumberSeries();
             }
         }
     }
