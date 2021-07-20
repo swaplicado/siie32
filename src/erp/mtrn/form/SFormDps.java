@@ -4411,7 +4411,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                 moFieldNumber.setFieldValue("" + numNew);
                 
-                jcbNumberSeries.setEnabled(false);
+                jcbNumberSeries.setEnabled(moDps.getIsRegistryNew() && jcbNumberSeries.getItemCount() > 1);
                 jtfNumber.setEnabled(false);
                 jtfNumber.setFocusable(false);
                 

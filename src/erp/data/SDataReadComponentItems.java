@@ -1341,38 +1341,40 @@ public abstract class SDataReadComponentItems {
         switch (catalogue) {
             case SDataConstants.TRNS_CT_DPS:
                 lenPk = 1;
-                sql = "SELECT id_ct_dps AS f_id_1, ct_dps AS f_item FROM erp.trns_ct_dps ORDER BY id_ct_dps ";
+                sql = "SELECT id_ct_dps AS f_id_1, ct_dps AS f_item " +
+                        "FROM erp.trns_ct_dps WHERE b_del = 0 ORDER BY id_ct_dps ";
                 text = "categoría de doc. compras-ventas";
                 break;
             case SDataConstants.TRNS_CL_DPS:
                 lenPk = 2;
                 lenFk = 1;
                 sql = "SELECT id_ct_dps AS f_id_1, id_cl_dps AS f_id_2, cl_dps AS f_item, id_ct_dps AS f_fid_1 " +
-                        "FROM erp.trns_cl_dps ORDER BY id_ct_dps, id_cl_dps ";
+                        "FROM erp.trns_cl_dps WHERE b_del = 0 ORDER BY id_ct_dps, id_cl_dps ";
                 text = "clase de doc. compras-ventas";
                 break;
             case SDataConstants.TRNS_TP_DPS_ADJ:
                 lenPk = 1;
-                sql = "SELECT id_tp_dps_adj AS f_id_1, tp_dps_adj AS f_item FROM erp.trns_tp_dps_adj WHERE b_del = 0 " +
-                        "ORDER BY id_tp_dps_adj ";
+                sql = "SELECT id_tp_dps_adj AS f_id_1, tp_dps_adj AS f_item " +
+                        "FROM erp.trns_tp_dps_adj WHERE b_del = 0 ORDER BY id_tp_dps_adj ";
                 text = "tipo de ajuste de doc. compras-ventas";
                 break;
             case SDataConstants.TRNS_STP_DPS_ADJ:
                 lenPk = 2;
-                sql = "SELECT id_tp_dps_adj AS f_id_1, id_stp_dps_adj AS f_id_2, stp_dps_adj AS f_item FROM erp.trns_stp_dps_adj WHERE b_del = 0 " +
-                        "ORDER BY id_tp_dps_adj, id_stp_dps_adj ";
+                sql = "SELECT id_tp_dps_adj AS f_id_1, id_stp_dps_adj AS f_id_2, stp_dps_adj AS f_item " +
+                        "FROM erp.trns_stp_dps_adj WHERE b_del = 0 ORDER BY id_tp_dps_adj, id_stp_dps_adj ";
                 text = "subtipo de ajuste de doc. compras-ventas";
                 break;
             case SDataConstants.TRNS_CT_IOG:
                 lenPk = 1;
-                sql = "SELECT id_ct_iog AS f_id_1, ct_iog AS f_item FROM erp.trns_ct_iog ORDER BY id_ct_iog ";
+                sql = "SELECT id_ct_iog AS f_id_1, ct_iog AS f_item " +
+                        "FROM erp.trns_ct_iog WHERE b_del = 0 ORDER BY id_ct_iog ";
                 text = "categoría de doc. inventarios";
                 break;
             case SDataConstants.TRNS_CL_IOG:
                 lenPk = 2;
                 lenFk = 1;
                 sql = "SELECT id_ct_iog AS f_id_1, id_cl_iog AS f_id_2, cl_iog AS f_item, id_ct_iog AS f_fid_1 " +
-                        "FROM erp.trns_cl_iog ORDER BY id_ct_iog, id_cl_iog ";
+                        "FROM erp.trns_cl_iog WHERE b_del = 0 ORDER BY id_ct_iog, id_cl_iog ";
                 text = "clase de doc. inventarios";
                 break;
             case SDataConstants.TRNS_TP_IOG:
@@ -1504,18 +1506,19 @@ public abstract class SDataReadComponentItems {
                     "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                     "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                     "GROUP BY d.id_year, d.id_doc, d.fid_cur " +
-                    //(pk == null ? "" : ((Integer)((Object[]) pk)[2] == SDataConstantsSys.TRNX_DPS_BAL_PAY_PEND ? "HAVING f_balance_cur <> 0 AND f_balance <> 0 " : "")) + " " +
                     "ORDER BY d.dt, d.id_year, d.id_doc, f_item ";
                 text = "doc. compras-ventas";
                 break;
             case SDataConstants.TRN_DNC_DPS:
                 lenPk = 1;
-                sql = "SELECT id_dnc AS f_id_1, dnc AS f_item FROM trn_dnc_dps ORDER BY dnc, id_dnc ";
+                sql = "SELECT id_dnc AS f_id_1, dnc AS f_item " +
+                        "FROM trn_dnc_dps WHERE b_del = 0 ORDER BY dnc, id_dnc ";
                 text = "centro de foliado de compras-ventas";
                 break;
             case SDataConstants.TRN_DNC_DIOG:
                 lenPk = 1;
-                sql = "SELECT id_dnc AS f_id_1, dnc AS f_item FROM trn_dnc_diog ORDER BY dnc, id_dnc ";
+                sql = "SELECT id_dnc AS f_id_1, dnc AS f_item " +
+                        "FROM trn_dnc_diog WHERE b_del = 0 ORDER BY dnc, id_dnc ";
                 text = "centro de foliado de inventarios";
                 break;
             case SDataConstants.TRN_DNS_DPS:
@@ -1525,6 +1528,7 @@ public abstract class SDataReadComponentItems {
                         "INNER JOIN erp.trnu_tp_dps AS t ON " +
                         "s.fid_ct_dps = t.id_ct_dps AND s.fid_cl_dps = t.id_cl_dps AND s.fid_tp_dps = t.id_tp_dps " +
                         (pk == null ? "" : "AND t.id_ct_dps = " + ((int[]) pk)[0] + " ") +
+                        "WHERE s.b_del = 0 AND t.b_del = 0 " +
                         "ORDER BY s.dns, s.id_dns, t.id_ct_dps, t.id_cl_dps, t.tp_dps ";
 
                 if (pk != null) {
@@ -1549,6 +1553,7 @@ public abstract class SDataReadComponentItems {
                         "INNER JOIN erp.trns_cl_iog AS cl ON " +
                         "s.fid_ct_iog = cl.id_ct_iog AND s.fid_cl_iog = cl.id_cl_iog " +
                         (pk == null ? "" : "AND cl.id_ct_iog = " + ((int[]) pk)[0] + " ") +
+                        "WHERE s.b_del = 0 AND cl.b_del = 0 " +
                         "ORDER BY s.dns, s.id_dns, cl.id_ct_iog, cl.cl_iog ";
                 text = "serie folios de inventarios";
                 break;

@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 186.2/ 2021-07-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al despliegue de múltiples series de folios de documentos en forma de captura de documentos, habilitándose el campo de captura cuando haya más de una serie disponible.
+2) Implementación de impresión de órdenes de servicio.
+
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Correción a vista de documentos de almacén por la incorporación del filtro de áreas funcionales.
+
+================================================================================
 SIIE 3.2 186.1/ 2021-07-19
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
