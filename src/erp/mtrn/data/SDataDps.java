@@ -5416,35 +5416,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return Functional;
     }
 
-    /**
-    * 
-    * @param session
-    * @param pkCfd
-    * @return
-    */
-    public static ArrayList<Object[]> getUsePolicy(SGuiSession session, int pkCfd) throws SQLException, Exception {
-        ResultSet resultSet = null;
-        Statement statement = session.getStatement().getConnection().createStatement();
-        java.lang.Object[] pk = new Object[5];
-        ArrayList<Object[]> keyPolicy = null;
-        keyPolicy = new ArrayList<>();
-        
-        String sql = "SELECT * FROM fin_rec_ety WHERE not b_del AND fid_cfd_n = " + pkCfd + " GROUP BY id_tp_rec, id_num; ";
-        resultSet = statement.executeQuery(sql);
-        
-        while (resultSet.next()) {
-            pk[0] = resultSet.getInt("id_year");
-            pk[1] = resultSet.getInt("id_per");
-            pk[2] = resultSet.getInt("id_bkc");
-            pk[3] = resultSet.getString("id_tp_rec");
-            pk[4] = resultSet.getInt("id_num");
-            keyPolicy.add(pk);
-            
-        }
-        
-        return keyPolicy;
-    }
-    
     /*
      * Implementation of SCfdXmlCfdi32 and SCfdXmlCfdi33:
      */

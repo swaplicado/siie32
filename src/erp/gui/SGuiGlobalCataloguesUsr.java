@@ -33,6 +33,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiUserRightRole;
     private javax.swing.JMenuItem jmiUserRightPrivilege;
     private javax.swing.JMenuItem jmiUserConfigurationTransaction;
+    private javax.swing.JMenuItem jmiUserFunctionalArea;
 
     private erp.musr.form.SFormUser moFormUser;
     private erp.musr.form.SFormUserRight moFormUserRolePrivilege;
@@ -57,6 +58,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserRightRole = new JMenuItem("Roles de usuarios");
         jmiUserRightPrivilege = new JMenuItem("Privilegios de usuarios");
         jmiUserConfigurationTransaction = new JMenuItem("Configuración de usuarios para transacciones");
+        jmiUserFunctionalArea = new JMenuItem("Usuarios vs. áreas funcionales");
 
         jmMenuUser.add(jmiUser);
         jmMenuUser.addSeparator();
@@ -69,6 +71,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmMenuUser.add(jmiUserRightPrivilege);
         jmMenuUser.addSeparator();
         jmMenuUser.add(jmiUserConfigurationTransaction);
+        jmMenuUser.add(jmiUserFunctionalArea);
 
         jmiUser.addActionListener(this);
         jmiAccessCompany.addActionListener(this);
@@ -78,6 +81,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserRightRole.addActionListener(this);
         jmiUserRightPrivilege.addActionListener(this);
         jmiUserConfigurationTransaction.addActionListener(this);
+        jmiUserFunctionalArea.addActionListener(this);
 
         moFormUser = null;
         moFormUserRolePrivilege = null;
@@ -94,6 +98,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserRightRole.setEnabled(hasRightUser);
         jmiUserRightPrivilege.setEnabled(hasRightUser);
         jmiUserConfigurationTransaction.setEnabled(hasRightUser);
+        jmiUserFunctionalArea.setEnabled(hasRightUser && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
 
         moPickerUsers = null;
     }
@@ -125,6 +130,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
                     miForm = moFormUserRolePrivilege;
                     break;
                 case SDataConstants.TRN_USR_CFG:
+                case SDataConstants.USRX_USR_FUNC:
                     if (moFormUserConfigurationTransaction == null) {
                         moFormUserConfigurationTransaction = new SFormUserConfigurationTransaction(miClient);
                     }
@@ -196,6 +202,10 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.USRX_RIGHT_PRV:
                     oViewClass = erp.musr.view.SViewUserRightPrivilege.class;
                     sViewTitle = "Privilegios usuarios";
+                    break;
+                case SDataConstants.USRX_USR_FUNC:
+                    oViewClass = erp.musr.view.SViewUserFunctionalArea.class;
+                    sViewTitle = "Usuarios vs. áreas funcionales";
                     break;
                 case SDataConstants.TRN_USR_CFG:
                     oViewClass = erp.musr.view.SViewUserConfigurationTransaction.class;
@@ -308,6 +318,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
             }
             else if (item == jmiUserConfigurationTransaction) {
                 showView(SDataConstants.TRN_USR_CFG);
+            }
+            else if (item == jmiUserFunctionalArea) {
+                showView(SDataConstants.USRX_USR_FUNC);
             }
         }
     }

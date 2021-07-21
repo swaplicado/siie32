@@ -25,7 +25,6 @@ import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
-import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
 import java.awt.Dimension;
@@ -43,7 +42,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  * User view for management of database registries of CFDI of Payments.
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Claudio Peña
  */
 public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -320,19 +319,28 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                         boolean annul = true;
                         SGuiParams params = new SGuiParams();
                         SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                        ArrayList pkPolicy = SDataDps.getUsePolicy(miClient.getSession(), cfd.getPkCfdId());
+                        ArrayList<Object[]> journalVoucherKeys = SDataCfd.getDependentJournalVoucherKeys(miClient.getSession().getStatement(), cfd.getPkCfdId());
                         boolean isCopy = false;
                         boolean mbIsFormReadOnly = false;
-                        SSrvLock lock = null;
+                        ArrayList<SSrvLock> locks = new ArrayList<>();
 
-                        for (int x = 0; x < pkPolicy.size() -1; x++) {
-                            if (pkPolicy.get(x) != null) {
-                                if (!mbIsFormReadOnly && !isCopy) {
-                                    // Attempt to gain data lock:
-
-                                    lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, pkPolicy.get(x), 7200000);
+                        try {
+                            // Attempt to gain all data locks:
+                            for (int x = 0; x < journalVoucherKeys.size(); x++) {
+                                journalVoucherKeys.get(0);
+                                if (journalVoucherKeys.get(x) != null) {
+                                    if (!mbIsFormReadOnly && !isCopy) {
+                                        SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(x), 7200000);
+                                        locks.add(lock);
+                                    }
                                 }
                             }
+                        }
+                        catch (Exception e) {
+                            for(Object lock : locks) {
+                                SSrvUtils.releaseLock(miClient.getSession(), (SSrvLock) lock);
+                            }
+                            SLibUtils.showException(this, e);
                         }
 
                         if (cfd.isCfdi()) {
@@ -503,7 +511,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    SCfdUtils.sendCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, cfd, 0, true, false);
+                    SCfdUtils.sendCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, cfd, 0, true, false, true);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);

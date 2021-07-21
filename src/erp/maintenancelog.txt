@@ -1,5 +1,17 @@
 ================================================================================
-SIIE 3.2 186.0/ 2021-07-02
+SIIE 3.2 186.1/ 2021-07-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de guardado de área funcional "no aplica" en documentos.
+2) Estandarización de diálogos de captura de movimientos de cuentas de dinero en pólizas contables.
+3) Implementación de vista "usuarios vs. áreas funcionales".
+
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Adición del ítem de referencia a la impresión de órdenes de compras.
+
+================================================================================
+SIIE 3.2 186.0/ 2021-07-13
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se agregó un nuevo permiso para restringir el timbrado de los documentos de ciertos clientes.
@@ -19,6 +31,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 1) Refactorización a funcionalidad de formas de captura y filtros de documentos por áreas funcionales.
 2) Adición de ícono para filtros de áreas funcionales e inhabilitación de botón si las áreas funcionales no están activas en la empresa.
 3) Adición de columnas cliente restringido y analista AN a vista configuración de clientes.
+4) Mejoramiento de columnas de vistas de asociados de negocios, empleados y datos personales de empleados.
 
 ================================================================================
 SIIE 3.2 184.3/ 2021-06-29

@@ -394,6 +394,23 @@ public abstract class SFormUtilities {
             }
         }
     }
+    
+    public static boolean isComboBoxItemContained(javax.swing.JComboBox comboBox, java.lang.Object key) {
+        boolean contained = false;
+
+        if (comboBox.getItemCount() > 0) {
+            for (int i = 0; i < comboBox.getItemCount(); i++) {
+                SFormComponentItem item = (SFormComponentItem) comboBox.getItemAt(i);
+
+                if (SLibUtilities.compareKeys(key, item.getPrimaryKey())) {
+                    contained = true;
+                    break;
+                }
+            }
+        }
+        
+        return contained;
+    }
 
     /**
      * @param client Client interface.
@@ -480,6 +497,23 @@ public abstract class SFormUtilities {
                 list.setSelectedIndex(-1);
             }
         }
+    }
+
+    public static boolean isListItemContained(javax.swing.JList list, java.lang.Object key) {
+        boolean contained = false;
+
+        if (list.getModel().getSize() > 0) {
+            for (int i = 0; i < list.getModel().getSize(); i++) {
+                SFormComponentItem item = (SFormComponentItem) list.getModel().getElementAt(i);
+
+                if (SLibUtilities.compareKeys(key, item.getPrimaryKey())) {
+                    contained = true;
+                    break;
+                }
+            }
+        }
+        
+        return contained;
     }
 
     public static void implementMaskFormatter(javax.swing.JFormattedTextField ftf, java.lang.String mask) {

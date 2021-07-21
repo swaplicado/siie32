@@ -117,8 +117,6 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
         int[] key = (int[]) pk;
         String sql;
         ResultSet resultSet;
-        java.sql.Statement statementAux = null;
-        SDataCustomerBranchConfig dataCustomerConfigBranch = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -167,9 +165,7 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
     @Override
     public int save(java.sql.Connection connection) {
         int nParam = 1;
-        int i = 0;
         CallableStatement callableStatement;
-        SDataCustomerBranchConfig dataCustomerConfigBranch = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
@@ -218,19 +214,4 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
     public Date getLastDbUpdate() {
         return mtUserEditTs;
     }
-
-    /*
-    public erp.mmkt.data.SDataCustomerBranchConfig getDbmsCustomerBranchConfig(int[] pk) {
-        SDataCustomerBranchConfig config = null;
-        
-        for (int i = 0; i < mvDbmsCustomerBranchConfigs.size(); i++) {
-            if (SLibUtilities.compareKeys(pk, mvDbmsCustomerBranchConfigs.get(i).getPrimaryKey())) {
-                config = mvDbmsCustomerBranchConfigs.get(i);
-                break;
-            }
-        }
-
-        return config;
-    }
-     */
 }

@@ -101,6 +101,7 @@ import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
 import erp.mod.fin.form.SDialogMassDownloadCfdi;
+import erp.mod.fin.form.SDialogMassInvoices;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogRepFinStatements;
 import erp.mod.fin.form.SDialogRepMovsFileCvs;
@@ -122,7 +123,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Claudio Peña
  */
 public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -219,6 +220,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinCfdPayment;
     private javax.swing.JMenuItem jmiFinCfdPaymentExtended;
     private javax.swing.JMenuItem jmiFinMassDownloadCfdi;
+    private javax.swing.JMenuItem jmiFinMassInvoices;
     private javax.swing.JMenuItem jmiFinImportPayments;
 
     private javax.swing.JMenu jmRep;
@@ -565,6 +567,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdPayment = new JMenuItem("CFDI recepción de pagos");
         jmiFinCfdPaymentExtended = new JMenuItem("CFDI recepción de pagos extendida");
         jmiFinMassDownloadCfdi = new JMenuItem("Descarga masiva de CFDI...");
+        jmiFinMassInvoices = new JMenuItem("Envío masivo de facturas...");
         jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
 
         jmFin.add(jmiFinExchangeRate);
@@ -586,12 +589,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.add(jmiFinItemCost);
         jmFin.addSeparator();
         jmFin.add(jmiFinCfdPayment);
-        jmiFinCfdPayment.setEnabled(false);
         jmFin.add(jmiFinCfdPaymentExtended);
-        jmiFinCfdPaymentExtended.setEnabled(false);
         jmFin.addSeparator();
         jmFin.add(jmiFinMassDownloadCfdi);
-        jmiFinMassDownloadCfdi.setEnabled(false);
+        jmFin.add(jmiFinMassInvoices);
         /* XXX Not released yet! (2018-05-03, Sergio Flores)
         jmFin.addSeparator();
         jmFin.add(jmiFinImportPayments);
@@ -880,6 +881,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdPayment.addActionListener(this);
         jmiFinCfdPaymentExtended.addActionListener(this);
         jmiFinMassDownloadCfdi.addActionListener(this);
+        jmiFinMassInvoices.addActionListener(this);
         jmiFinImportPayments.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
@@ -1083,6 +1085,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinCfdPaymentExtended.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
+        jmiFinMassInvoices.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
 
         jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);
@@ -2067,6 +2070,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinMassDownloadCfdi) {
                 new SDialogMassDownloadCfdi((SGuiClient) miClient).setVisible(true);
+            }
+            else if (item == jmiFinMassInvoices) {
+                new SDialogMassInvoices((erp.client.SClientInterface) miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
             else if (item == jmiFinImportPayments) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);

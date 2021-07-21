@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -59,7 +60,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     private final static int DATA_TYPE_TEXT = 1;
     private final static int DATA_TYPE_NUMBER = 2;
     private final static int DATA_TYPE_DATE = 3;
-    
+
     protected int mnPkCfdId;
     protected java.lang.String msSeries;
     protected int mnNumber;
@@ -1034,5 +1035,31 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msBasexUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
 
         SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
+    }
+    
+    /**
+     * Get all dependent journal voucher keys for supplied CFD.
+     * @param statement
+     * @param cfdId
+     * @return
+     * @throws java.lang.Exception
+     */
+    public static ArrayList<Object[]> getDependentJournalVoucherKeys(final Statement statement, final int cfdId) throws Exception {
+        ArrayList<Object[]> keys = new ArrayList<>();
+        String sql = "SELECT DISTINCT id_year, id_per, id_bkc, id_tp_rec, id_num "
+                + "FROM fin_rec_ety "
+                + "WHERE NOT b_del AND fid_cfd_n = " + cfdId + " "
+                + "ORDER BY id_year, id_per, id_bkc, id_tp_rec, id_num; ";
+        ResultSet resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            Object[] pk = new Object[5];
+            pk[0] = resultSet.getInt("id_year");
+            pk[1] = resultSet.getInt("id_per");
+            pk[2] = resultSet.getInt("id_bkc");
+            pk[3] = resultSet.getString("id_tp_rec");
+            pk[4] = resultSet.getInt("id_num");
+            keys.add(pk);
+        }
+        return keys;
     }
 }

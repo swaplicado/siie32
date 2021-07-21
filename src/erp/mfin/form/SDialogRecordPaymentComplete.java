@@ -102,10 +102,11 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
     private void initComponents() {
 
         jbtButtonGroup = new javax.swing.ButtonGroup();
-        jpPayment = new javax.swing.JPanel();
+        jpInput = new javax.swing.JPanel();
         jpPaymentNorth = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlAccountCash = new javax.swing.JLabel();
+        jtfCompanyBranchRo = new javax.swing.JTextField();
         jtfAccountCashRo = new javax.swing.JTextField();
         jtfAccountCashCodeRo = new javax.swing.JTextField();
         jtfAccountCashCurRo = new javax.swing.JTextField();
@@ -162,6 +163,9 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         jtfExchangeDiffRo = new javax.swing.JTextField();
         jtfExchangeDiffCurKeyRo = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -174,22 +178,28 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
             }
         });
 
-        jpPayment.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jpPayment.setLayout(new java.awt.BorderLayout());
+        jpInput.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpInput.setLayout(new java.awt.BorderLayout());
 
-        jpPaymentNorth.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la cuenta de efectivo:"));
-        jpPaymentNorth.setLayout(new java.awt.GridLayout(4, 1, 0, 1));
+        jpPaymentNorth.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la cuenta de dinero:"));
+        jpPaymentNorth.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAccountCash.setText("Cuenta de efectivo:");
+        jlAccountCash.setText("Cuenta de dinero:");
         jlAccountCash.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel11.add(jlAccountCash);
+
+        jtfCompanyBranchRo.setEditable(false);
+        jtfCompanyBranchRo.setText("COMPANY BRANCH");
+        jtfCompanyBranchRo.setFocusable(false);
+        jtfCompanyBranchRo.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel11.add(jtfCompanyBranchRo);
 
         jtfAccountCashRo.setEditable(false);
         jtfAccountCashRo.setText("CASH ACCOUNT");
         jtfAccountCashRo.setFocusable(false);
-        jtfAccountCashRo.setPreferredSize(new java.awt.Dimension(306, 23));
+        jtfAccountCashRo.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel11.add(jtfAccountCashRo);
 
         jtfAccountCashCodeRo.setEditable(false);
@@ -327,24 +337,25 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         jlDummy05.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel12.add(jlDummy05);
 
-        jckIsExchangeRatePreserverd.setText("Conservar");
+        jckIsExchangeRatePreserverd.setText("Conservar TC");
+        jckIsExchangeRatePreserverd.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel12.add(jckIsExchangeRatePreserverd);
 
         jpPaymentNorth.add(jPanel12);
 
-        jpPayment.add(jpPaymentNorth, java.awt.BorderLayout.NORTH);
+        jpInput.add(jpPaymentNorth, java.awt.BorderLayout.NORTH);
 
         jpPaymentCenter.setLayout(new java.awt.BorderLayout());
 
-        jlPanelDpsFinder.setFont(new java.awt.Font("Tahoma", 1, 14));
+        jlPanelDpsFinder.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jlPanelDpsFinder.setText("[Panel de búsqueda de documento de compras-ventas]");
         jlPanelDpsFinder.setPreferredSize(new java.awt.Dimension(100, 300));
         jpPaymentCenter.add(jlPanelDpsFinder, java.awt.BorderLayout.NORTH);
 
-        jpPayment.add(jpPaymentCenter, java.awt.BorderLayout.CENTER);
+        jpInput.add(jpPaymentCenter, java.awt.BorderLayout.CENTER);
 
         jpPaymentSouth.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del documento:"));
-        jpPaymentSouth.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
+        jpPaymentSouth.setLayout(new java.awt.GridLayout(3, 1, 0, 2));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -461,26 +472,39 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
 
         jpPaymentSouth.add(jPanel9);
 
-        jpPayment.add(jpPaymentSouth, java.awt.BorderLayout.SOUTH);
+        jpInput.add(jpPaymentSouth, java.awt.BorderLayout.SOUTH);
 
-        getContentPane().add(jpPayment, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpInput, java.awt.BorderLayout.CENTER);
 
         jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
-        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("frpc");
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jLabel1);
+
+        jpControls.add(jPanel2);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpControls.add(jbOk);
+        jPanel3.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jpControls.add(jbCancel);
+        jPanel3.add(jbCancel);
+
+        jpControls.add(jPanel3);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-800)/2, (screenSize.height-625)/2, 800, 625);
+        setSize(new java.awt.Dimension(816, 589));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -517,7 +541,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         moFieldDpsExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDpsExchangeRate, jlDpsExchangeRate);
         moFieldDpsExchangeRate.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat());
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldAccValueCy);
         mvFields.add(moFieldAccValue);
         mvFields.add(moFieldAccExchangeRateSys);
@@ -594,6 +618,8 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
     }
 
     private void renderParamSettings() {
+        SDataBizPartnerBranch branch = null;
+        
         if (moParamAccountCash == null) {
             jtfAccValueCy.setEnabled(false);
             jtfAccValue.setEnabled(false);
@@ -612,6 +638,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
             jtfAccExchangeRateSysRo.setText("");
             jtfAccExchangeRate.setText("");
 
+            jtfCompanyBranchRo.setText("");
             jtfAccountCashRo.setText("");
             jtfAccountCashCodeRo.setText("");
             jtfAccountCashCurRo.setText("");
@@ -622,12 +649,15 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
             jckIsExchangeRatePreserverd.setSelected(false);
         }
         else {
+            branch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(
+                    miClient, SDataConstants.BPSU_BPB, new int[] { moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+            
             jtfAccValueCy.setEnabled(true);
 
             moFieldAccValueCy.setFieldValue(0d);
             moFieldAccValue.setFieldValue(0d);
 
-            if (moParamAccountCash.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+            if (miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moParamAccountCash.getFkCurrencyId() })) {
                 jtfAccValue.setEnabled(false);
                 jtfAccExchangeRateSysRo.setEnabled(false);
                 jtfAccExchangeRate.setEnabled(false);
@@ -663,6 +693,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
                 }
             }
 
+            jtfCompanyBranchRo.setText(branch.getBizPartnerBranch());
             jtfAccountCashRo.setText(moParamAccountCash.getDbmsCompanyBranchEntity().getEntity());
             jtfAccountCashCodeRo.setText(moParamAccountCash.getDbmsCompanyBranchEntity().getCode());
             jtfAccountCashCurRo.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { moParamAccountCash.getFkCurrencyId() }));
@@ -1342,10 +1373,13 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -1383,7 +1417,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
     private javax.swing.JLabel jlExchangeDiff;
     private javax.swing.JLabel jlPanelDpsFinder;
     private javax.swing.JPanel jpControls;
-    private javax.swing.JPanel jpPayment;
+    private javax.swing.JPanel jpInput;
     private javax.swing.JPanel jpPaymentCenter;
     private javax.swing.JPanel jpPaymentNorth;
     private javax.swing.JPanel jpPaymentSouth;
@@ -1396,6 +1430,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
     private javax.swing.JTextField jtfAccountCashCodeRo;
     private javax.swing.JTextField jtfAccountCashCurRo;
     private javax.swing.JTextField jtfAccountCashRo;
+    private javax.swing.JTextField jtfCompanyBranchRo;
     private javax.swing.JTextField jtfDateRo;
     private javax.swing.JTextField jtfDpsExchangeRate;
     private javax.swing.JTextField jtfDpsExchangeRateSysRo;

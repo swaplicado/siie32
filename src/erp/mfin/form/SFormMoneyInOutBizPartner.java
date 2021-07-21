@@ -42,7 +42,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Juan Barajas, Isabel Servín
+ * @author Alfonso Flores, Juan Barajas, Isabel Servín, Sergio Flores
  */
 public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -97,10 +97,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        jpInput = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlAccountCash = new javax.swing.JLabel();
@@ -149,6 +146,12 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
         jPanel12 = new javax.swing.JPanel();
         jlConcept = new javax.swing.JLabel();
         jtfConcept = new javax.swing.JTextField();
+        jpControls = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Egreso por anticipo pago cliente");
@@ -159,22 +162,8 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(492, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
-
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jpInput.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpInput.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.GridLayout(11, 1, 0, 2));
 
@@ -394,9 +383,36 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
         jPanel3.add(jPanel12);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_START);
+        jpInput.add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpInput, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(492, 33));
+        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("fmiobp");
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jLabel1);
+
+        jpControls.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel16.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jPanel16.add(jbCancel);
+
+        jpControls.add(jPanel16);
+
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(616, 414));
         setLocationRelativeTo(null);
@@ -407,7 +423,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldFkBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerId, jlFkBizPartnerId);
         moFieldFkBizPartnerId.setPickerButton(jbFkBizPartnerId);
@@ -1017,13 +1033,14 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -1058,6 +1075,8 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlValue;
     private javax.swing.JLabel jlValueCy;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpInput;
     private javax.swing.JTextField jtfAccountCash;
     private javax.swing.JTextField jtfAccountCashCode;
     private javax.swing.JTextField jtfAccountCashCurrency;

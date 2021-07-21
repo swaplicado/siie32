@@ -133,6 +133,7 @@ public abstract class SDataConstants {
     public static final int USRX_RIGHT_ROL = 202503;
     public static final int USRX_TP_ROL_ALL = 202504;
     public static final int USRX_FIN_REC = 202511;
+    public static final int USRX_USR_FUNC = 202521;
 
     public static final int LOCU_CTY = 203001;
     public static final int LOCU_STA = 203002;

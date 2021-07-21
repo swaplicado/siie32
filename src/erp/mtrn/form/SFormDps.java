@@ -110,6 +110,7 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibMethod;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
@@ -280,9 +281,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private int mnCfdXmlType; // current XML type for CFD type invoice
     private double mdPrepayments;
     private double mdPrepaymentsCy;
-    private double mdOrigExchangeRate;
-    private double mdOrigDiscountDocPercentage;
-    private boolean mbOrigIsDiscountDocApplying;
+    private int mnOldFunctionalAreaId;
+    private double mdOldExchangeRate;
+    private double mdOldDiscountDocPercentage;
+    private boolean mbOldIsDiscountDocApplying;
     private boolean mbIsLocalCurrency;
     private java.lang.String msFileXmlJustLoaded;
     private File moFilePdfJustLoaded;
@@ -3114,10 +3116,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
         
         if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP_FI);
+            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP);
         }
         else {
-            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_CUS_FI);
+            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_CUS);
         }
 
         // Pane of document entries:
@@ -4038,7 +4040,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean isEntriesRecalculationNeeded() {
         boolean isUpdateNeeded = false;
 
-        if (mdOrigExchangeRate != moFieldExchangeRate.getDouble() || mdOrigDiscountDocPercentage != moFieldDiscountDocPercentage.getDouble() || mbOrigIsDiscountDocApplying != moFieldIsDiscountDocApplying.getBoolean()) {
+        if (mdOldExchangeRate != moFieldExchangeRate.getDouble() || mdOldDiscountDocPercentage != moFieldDiscountDocPercentage.getDouble() || mbOldIsDiscountDocApplying != moFieldIsDiscountDocApplying.getBoolean()) {
             isUpdateNeeded = true;
         }
 
@@ -6356,6 +6358,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void actionEntryDelete() throws SQLException {
         if (jbEntryDelete.isEnabled() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
+            boolean delete = true;
             SDataDpsEntry entry = null;
             SDataDpsEntry entryComplementary = null;
             int index = moPaneGridEntries.getTable().getSelectedRow();
@@ -6364,7 +6367,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(index).getData();
 
                 if (entry.getFkDpsEntryTypeId() != SDataConstantsSys.TRNS_TP_DPS_ETY_ORDY) {
-                    miClient.showMsgBoxWarning("Solamente pueden modificarse los detalles de tipo ordinario.");
+                    miClient.showMsgBoxWarning("Solamente pueden modificarse partidas de tipo ordinario.");
                 }
                 else if (entry.getIsRegistryNew() || canDeleteEntry(entry)) {
                     if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
@@ -6373,45 +6376,53 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                         else {
                             if (mbIsDpsOrder) {
-                                if (entry.getContractPriceYear() > 0 && entry.getContractPriceMonth() > 0) {                                 
-                                    for (SGuiDpsEntryPrice entryPrice : moGuiDpsLink.pickGuiDpsSourceEntry(entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()).getGuiDpsSourceEntryPrices()) {
-                                        if (entry.getContractPriceYear() == entryPrice.getDataDpsEntryPrice().getContractPriceYear() && entry.getContractPriceMonth() == entryPrice.getDataDpsEntryPrice().getContractPriceMonth()) {
-                                            entryPrice.removeDataDpsDestinyEntry(entry);
-                                            break;
+                                if (entry.getContractPriceYear() > 0 && entry.getContractPriceMonth() > 0) {
+                                    if (!entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
+                                        for (SGuiDpsEntryPrice entryPrice : moGuiDpsLink.pickGuiDpsSourceEntry(entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()).getGuiDpsSourceEntryPrices()) {
+                                            if (entry.getContractPriceYear() == entryPrice.getDataDpsEntryPrice().getContractPriceYear() && entry.getContractPriceMonth() == entryPrice.getDataDpsEntryPrice().getContractPriceMonth()) {
+                                                entryPrice.removeDataDpsDestinyEntry(entry);
+                                                break;
+                                            }
                                         }
+                                    }
+                                    else {
+                                        delete = false;
+                                        miClient.showMsgBoxWarning("Esta partida está asignada a una entrega mensual " + SLibUtils.DecimalFormatCalendarYear.format(entry.getContractPriceYear()) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(entry.getContractPriceMonth()) +  ", ¡pero no tiene vínculos con ningún contrato!");
                                     }
                                 }
                             }
                             
-                            if (entry.getIsRegistryNew()) {
-                                moPaneGridEntries.removeTableRow(index);
-                            }
-                            else {
-                                if (entry.getIsDiscountRetailChain()) {
-                                    // Delete aswell complementary dps entry:
+                            if (delete) {
+                                if (entry.getIsRegistryNew()) {
+                                    moPaneGridEntries.removeTableRow(index);
+                                }
+                                else {
+                                    if (entry.getIsDiscountRetailChain()) {
+                                        // Delete aswell complementary dps entry:
 
-                                    entryComplementary = entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getAuxDpsEntryComplementary();
-                                    entryComplementary.setIsDeleted(true);
-                                    entryComplementary.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                                    entryComplementary.setIsRegistryEdited(true);
-                                    entryComplementary.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                                        entryComplementary = entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getAuxDpsEntryComplementary();
+                                        entryComplementary.setIsDeleted(true);
+                                        entryComplementary.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                                        entryComplementary.setIsRegistryEdited(true);
+                                        entryComplementary.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                                    }
+
+                                    entry.setIsDeleted(true);
+                                    entry.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                                    entry.setIsRegistryEdited(true);
+                                    entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+
+                                    moPaneGridEntries.setTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()), index);
                                 }
 
-                                entry.setIsDeleted(true);
-                                entry.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                                entry.setIsRegistryEdited(true);
-                                entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-
-                                moPaneGridEntries.setTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()), index);
+                                renderEntries();
+                                calculateTotal();
+                                updateDpsEntryCfdiSettings();
+                                moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
+                                if (moPaneGridEntries.getTableGuiRowCount() == 0) {
+                                    updateCurrencyFieldsStatus(true);
+                                }
                             }
-                        }
-
-                        renderEntries();
-                        calculateTotal();
-                        updateDpsEntryCfdiSettings();
-                        moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
-                        if (moPaneGridEntries.getTableGuiRowCount() == 0) {
-                            updateCurrencyFieldsStatus(true);
                         }
                     }
                 }
@@ -8126,7 +8137,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 focusLost(new FocusEvent(this.getFocusOwner(), FocusEvent.FOCUS_LOST));
             }
 
-            jbOk.requestFocus();    // this forces all pending focus lost function to be called
+            jbOk.requestFocus(); // this forces all pending focus lost function to be called
 
             validation = formValidate();
 
@@ -8253,7 +8264,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    public void publicActionDependentDelete() throws SQLException {
+    public void publicActionDependentDelete() throws SQLException, Exception {
         if (jTabbedPane.getSelectedIndex() == 0) {
             actionEntryDelete();
         }
@@ -8866,8 +8877,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDateStartCredit.setFieldValue(moDps.getDate());
         moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
         moFieldFkDpsNatureId.setFieldValue(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
-        if (!isApplingFunctionalAreas() || jcbFkFunctionalAreaId.getItemCount() == 2) { 
+        if (!isApplingFunctionalAreas()) { 
             moFieldFkFunctionalAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NON });
+        }
+        else if (jcbFkFunctionalAreaId.getItemCount() == 2) {
+            jcbFkFunctionalAreaId.setSelectedItem(1);
         }
         moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });
         moFieldFkModeOfTransportationTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_MOT_NA });
@@ -8913,9 +8927,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEditHelp.setEnabled(false);
         jbOk.setEnabled(true);
 
-        mdOrigExchangeRate = 0;
-        mdOrigDiscountDocPercentage = 0;
-        mbOrigIsDiscountDocApplying = false;
+        mnOldFunctionalAreaId = 0;
+        mdOldExchangeRate = 0;
+        mdOldDiscountDocPercentage = 0;
+        mbOldIsDiscountDocApplying = false;
 
         mbResetingForm = false;
     }
@@ -8934,10 +8949,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.populateComboBox(miClient, jcbFkDpsNatureId, SDataConstants.TRNU_DPS_NAT);
         
         if (!isApplingFunctionalAreas()) {
-            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC);
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC); // load all functional areas, "non-applying" inclusive
         }
         else {
-            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC, new int[] { miClient.getSessionXXX().getUser().getPkUserId() });
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC, new int[] { miClient.getSessionXXX().getUser().getPkUserId() }); // load only user-asigned functional areas, "non-applying" may not be included
         }
         
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
@@ -9120,7 +9135,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             // validate other all purpose fields:
             
             if (!validation.getIsError()) {
-                if (jckRecordUser.isSelected() && moRecordUserKey == null) {
+                if (jcbFkFunctionalAreaId.getSelectedIndex() <= 0) {
+                    String message = "";
+                    if (mnOldFunctionalAreaId != 0) {
+                        message = "La opción original '" + (String) miClient.getSession().readField(SModConsts.CFGU_FUNC, new int[] { mnOldFunctionalAreaId }, SDbRegistry.FIELD_NAME) + "' "
+                                + "no está asignada al usuario '" + miClient.getSession().getUser().getName() + "'.";
+                    }
+                    validation.setMessage((!message.isEmpty() ? message + "\n" : "") + SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkFunctionalAreaId.getText() + "'.");
+                    validation.setComponent(jcbFkFunctionalAreaId);
+                }
+                else if (jckRecordUser.isSelected() && moRecordUserKey == null) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckRecordUser.getText() + "'.");
                     validation.setComponent(jbRecordManualSelect);
                 }
@@ -9613,6 +9637,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             /*
              * WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
              */
+            /*
+             * WARNING!: This last validation is the only one allowed to be at the end of this method!!!
+             */
             if (!validation.getIsError()) {
                 if (jckIsDeleted.isSelected()) {
                     if (miClient.showMsgBoxConfirm("El documento está eliminado. Puede guardarlo de nuevo como eliminado o reactivarlo.\n¿Desea reactivar el documento?") == JOptionPane.YES_OPTION) {
@@ -9873,9 +9900,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEditHelp.setEnabled(!jbEdit.isEnabled());
         jbOk.setEnabled(false);
 
-        mdOrigExchangeRate = moFieldExchangeRate.getDouble();
-        mdOrigDiscountDocPercentage = moFieldDiscountDocPercentage.getDouble();
-        mbOrigIsDiscountDocApplying = moFieldIsDiscountDocApplying.getBoolean();
+        mnOldFunctionalAreaId = moDps.getFkFunctionalAreaId();
+        mdOldExchangeRate = moFieldExchangeRate.getDouble();
+        mdOldDiscountDocPercentage = moFieldDiscountDocPercentage.getDouble();
+        mbOldIsDiscountDocApplying = moFieldIsDiscountDocApplying.getBoolean();
         
         if (moGuiDpsLink == null) {
             moGuiDpsLink = new SGuiDpsLink(miClient);
@@ -9963,7 +9991,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //moDps.setFkSalesAgentBizPartnerId_n(...
 
         moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
-        moDps.setFkFunctionalAreaId(moFieldFkFunctionalAreaId.getKeyAsIntArray()[0]);
+        moDps.setFkFunctionalAreaId(jcbFkFunctionalAreaId.getSelectedIndex() > 0 ? moFieldFkFunctionalAreaId.getKeyAsIntArray()[0] : SModSysConsts.CFGU_FUNC_NON);
         moDps.setFkDpsNatureId(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
         moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
         moDps.setFkSalesAgentId_n(mnSalesAgentId_n);
