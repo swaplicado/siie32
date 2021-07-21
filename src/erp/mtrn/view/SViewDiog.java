@@ -320,7 +320,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "dps.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "(dps.fid_func IS NULL OR dps.fid_func IN (" + ((String) setting.getSetting()) + ")) ";
                 }
             }
         }
