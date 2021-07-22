@@ -655,10 +655,17 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
     }
 
+    /**
+     * Exportación de asociados de negocios. Dependiendo del modo de uso de la vista:
+     * a) empleados: sustitución patronal de empleados dados de baja.
+     * b) asociados de negocios: creación de otras categorías de asociados de negocios.
+     */
     public void actionBizPartnerExport() {
         if (jbBizPartnerExport.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
                 if (mbIsViewEmployees) {
+                    // sustitución patronal del empleado dado de baja:
+                    
                     SDialogEmployerSubstitution dialog = new SDialogEmployerSubstitution(miClient.getSession().getClient(), "Sustitución patronal");
                     dialog.setValue(SModConsts.HRSU_EMP, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                     dialog.resetForm();
@@ -670,6 +677,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                     }
                 }
                 else {
+                    // creación de otra categoría del asociado de negocios:
+                    
                     moDialogBizPartnerExport.formReset();
                     moDialogBizPartnerExport.formRefreshCatalogues();
                     moDialogBizPartnerExport.setValue(mnBizPartnerCategory, moTablePane.getSelectedTableRow().getPrimaryKey());

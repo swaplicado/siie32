@@ -194,10 +194,10 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS))== null ? null : ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_OPEN) {
-                sqlHaving = "HAVING (v.b_clo = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal <> 0) OR (v.b_clo = 0 AND v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ")) ";
+                sqlHaving = "HAVING v.b_clo = 0 AND ((v.fk_tp_loan NOT IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal <> 0.0) OR v.fk_tp_loan IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ")) ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_CLO) {
-                sqlHaving = "HAVING (_bal = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ")) OR v.b_clo = 1 ";
+                sqlHaving = "HAVING v.b_clo = 1 OR (v.fk_tp_loan NOT IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal = 0.0) ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_ALL) {
                 sqlHaving = "";
