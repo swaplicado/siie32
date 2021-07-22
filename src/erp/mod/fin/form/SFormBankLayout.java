@@ -1587,8 +1587,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         if (isModeForTransfersOfPayments()) {
                             // DPS primary key:
                             key = new int[] {
-                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue(), 
-                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue()
+                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue(),
+                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue() 
                             };
                         }
                         else if (isModeForTransfersOfPrepayments()) {
@@ -1600,7 +1600,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         
                         if (maAllLayoutBankRows != null) {
                             for (SLayoutBankRow layoutBankRowInArray : maAllLayoutBankRows) {
-                                if (SLibUtils.compareKeys(key, new int[] { layoutBankRowInArray.getBizPartnerId() })) {
+                                if (SLibUtils.compareKeys(key, new int[] { layoutBankRowInArray.getDpsDocId(), layoutBankRowInArray.getDpsYearId() }) || SLibUtils.compareKeys(key, new int[] { layoutBankRowInArray.getBizPartnerId() })) {
                                     docsFound++; 
                                     layoutBankRowInArray.setForPayment(true);
                                     layoutBankRowInArray.setPayed((boolean) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
