@@ -689,7 +689,7 @@ public class SDbEmployee extends SDbRegistryUser {
                 hrsEmployeeHireLog.setFkUserUpdateId(SUtilConsts.USR_NA_ID);
             }
             else {
-                hrsEmployeeHireLog.setFkUserInsertId(SUtilConsts.USR_NA_ID);
+                //hrsEmployeeHireLog.setFkUserInsertId(SUtilConsts.USR_NA_ID); // preserve user of insertion
                 hrsEmployeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
             }
             
