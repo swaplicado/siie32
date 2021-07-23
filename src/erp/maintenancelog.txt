@@ -4,6 +4,12 @@ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Mejoramiento a las consultas de bitácoras de altas y bajas, de cambios de salarios y sueldos.
 
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se modificaron los mensajes en la validación de CFDIs con XML para que se muestre la serie y el folio del XML cuando no coincidan con los de la factura.
+2) Se agregó la posibilidad de agregar un guión despues del folio cuando el folio orignal este repetido.
+3) Se modificó la clase de pólizas contables para que se tome en cuenta la sucursal de la póliza en vez de la sesion de usuario.
+
 ================================================================================
 SIIE 3.2 186.2/ 2021-07-21
 Sergio Abraham FLORES GUTIÉRREZ
