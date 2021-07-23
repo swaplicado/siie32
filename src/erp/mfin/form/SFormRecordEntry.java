@@ -1183,15 +1183,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 switch (mnAccountSystemTypeId) {
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
                         mnOptionsEntityType = SDataConstants.FINX_ACC_CASH_CASH;
-                        oFilterKey = new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() };   // XXX probably filter will not be used, in order to make moves into other branch accounts
+                        oFilterKey = new int[] { moRecord.getFkCompanyBranchId() };   // XXX probably filter will not be used, in order to make moves into other branch accounts
                         break;
                     case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
                         mnOptionsEntityType = SDataConstants.FINX_ACC_CASH_BANK;
-                        oFilterKey = new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() };   // XXX probably filter will not be used, in order to make moves into other branch accounts
+                        oFilterKey = new int[] { moRecord.getFkCompanyBranchId() };   // XXX probably filter will not be used, in order to make moves into other branch accounts
                         break;
                     case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
                         mnOptionsEntityType = SDataConstants.CFGX_COB_ENT_WH;
-                        oFilterKey = new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() };   // XXX probably filter will not be used, in order to make moves into other branch inventories
+                        oFilterKey = new int[] { moRecord.getFkCompanyBranchId() };   // XXX probably filter will not be used, in order to make moves into other branch inventories
                         break;
                 }
 
