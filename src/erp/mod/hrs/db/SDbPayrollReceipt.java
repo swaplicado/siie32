@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -1024,30 +1023,29 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         
         String sql = "SELECT COUNT(*) "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " "
-            + "WHERE id_pay = " + SLibConsts.UNDEFINED + " AND id_emp = " + employeeId;
+            + "WHERE id_pay = 0 AND id_emp = " + employeeId + ";";
         
         ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next() && resultSet.getInt(1) == 0) {
-            SDbPayrollReceipt dummy = new SDbPayrollReceipt();
-            
-            dummy.setPkPayrollId(0);
-            dummy.setPkEmployeeId(employeeId);
-            dummy.setDateBenefits(SLibTimeUtils.createDate(2000, 1, 1));
-            dummy.setDateLastHire(SLibTimeUtils.createDate(2000, 1, 1));
-            dummy.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
-            dummy.setFkSalaryTypeId(SModSysConsts.HRSS_TP_SAL_FIX);
-            dummy.setFkEmployeeTypeId(SModSysConsts.HRSU_TP_EMP_NON);
-            dummy.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NON);
-            dummy.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
-            dummy.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
-            dummy.setFkPositionId(SModSysConsts.HRSU_POS_NON);
-            dummy.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
-            dummy.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
-            dummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
-            dummy.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
-            dummy.setFkWorkingDayTypeId(SModSysConsts.HRSS_TP_WORK_DAY_DIU);
+            SDbPayrollReceipt dummyPayrollReceipt = new SDbPayrollReceipt();
+            dummyPayrollReceipt.setPkPayrollId(0);
+            dummyPayrollReceipt.setPkEmployeeId(employeeId);
+            dummyPayrollReceipt.setDateBenefits(SLibTimeUtils.createDate(2000, 1, 1));
+            dummyPayrollReceipt.setDateLastHire(SLibTimeUtils.createDate(2000, 1, 1));
+            dummyPayrollReceipt.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
+            dummyPayrollReceipt.setFkSalaryTypeId(SModSysConsts.HRSS_TP_SAL_FIX);
+            dummyPayrollReceipt.setFkEmployeeTypeId(SModSysConsts.HRSU_TP_EMP_NON);
+            dummyPayrollReceipt.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NON);
+            dummyPayrollReceipt.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
+            dummyPayrollReceipt.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
+            dummyPayrollReceipt.setFkPositionId(SModSysConsts.HRSU_POS_NON);
+            dummyPayrollReceipt.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
+            dummyPayrollReceipt.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
+            dummyPayrollReceipt.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
+            dummyPayrollReceipt.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
+            dummyPayrollReceipt.setFkWorkingDayTypeId(SModSysConsts.HRSS_TP_WORK_DAY_DIU);
 
-            dummy.save(session);
+            dummyPayrollReceipt.save(session);
         }
     }
 }

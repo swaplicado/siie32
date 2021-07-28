@@ -1017,6 +1017,8 @@ public abstract class SModSysConsts {
 
     public static final int HRSU_TP_MWZ_DEF = 1;    // Default
 
+    public static final int HRSU_TP_PAY_SHT_CUS_DEF = 1;    // Default
+    
     public static final int HRSU_DEP_NON = 1;   // Non applicable
 
     public static final int HRSU_POS_NON = 1;   // Non applicable

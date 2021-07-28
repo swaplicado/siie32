@@ -732,33 +732,31 @@ public class SDbPayroll extends SDbRegistryUser {
     }
 
     public static void checkDummyRegistry(final SGuiSession session) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-        SDbPayroll registryDummy = null;
-
-        sql = "SELECT COUNT(*) "
+        String sql = "SELECT COUNT(*) "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
-            + "WHERE id_pay = " + SLibConsts.UNDEFINED;
+            + "WHERE id_pay = 0;";
         
-        resultSet = session.getStatement().executeQuery(sql);
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next() && resultSet.getInt(1) == 0) {
             // Create dbReceipt:
 
-            registryDummy = new SDbPayroll();
-            registryDummy.setAuxIsDummy(true);
-            registryDummy.setDateStart(SLibTimeUtils.createDate(2000, 1, 1));
-            registryDummy.setDateEnd(SLibTimeUtils.createDate(2000, 1, 1));
-            registryDummy.setDeleted(true);
-            registryDummy.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
-            registryDummy.setFkPaysheetTypeId(SModSysConsts.HRSS_TP_PAY_SHT_NOR);
-            registryDummy.setFkMwzTypeId(1);
-            registryDummy.setFkMwzReferenceTypeId(1);
-            registryDummy.setFkTaxComputationTypeId(SModSysConsts.HRSS_TP_TAX_COMP_WOT);
-            registryDummy.setFkTaxId(1);
-            registryDummy.setFkTaxSubsidyId(1);
-            registryDummy.setFkSsContributionId(1);
+            SDbPayroll dummyPayroll = new SDbPayroll();
+            dummyPayroll.setAuxIsDummy(true);
+            dummyPayroll.setPkPayrollId(0);
+            dummyPayroll.setDateStart(SLibTimeUtils.createDate(2000, 1, 1));
+            dummyPayroll.setDateEnd(SLibTimeUtils.createDate(2000, 1, 1));
+            dummyPayroll.setDeleted(true);
+            dummyPayroll.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
+            dummyPayroll.setFkPaysheetTypeId(SModSysConsts.HRSS_TP_PAY_SHT_NOR);
+            dummyPayroll.setFkPaysheetCustomTypeId(SModSysConsts.HRSU_TP_PAY_SHT_CUS_DEF);
+            dummyPayroll.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
+            dummyPayroll.setFkMwzReferenceTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
+            dummyPayroll.setFkTaxComputationTypeId(SModSysConsts.HRSS_TP_TAX_COMP_WOT);
+            dummyPayroll.setFkTaxId(1);
+            dummyPayroll.setFkTaxSubsidyId(1);
+            dummyPayroll.setFkSsContributionId(1);
 
-            registryDummy.save(session);
+            dummyPayroll.save(session);
         }
     }
 }
