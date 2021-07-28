@@ -3,6 +3,7 @@ SIIE 3.2 186.3/ 2021-07-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Mejoramiento a las consultas de bitácoras de altas y bajas, de cambios de salarios y sueldos.
+2) Corrección a la creación de nóminas y recibos de nómina dummies.
 
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
