@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 186.4/ 2021-07-29
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del filtro por factura en los reportes de saldos y saldos por documento.
+2) Corrección en las consultas de estadística y backorder con el filtro de áreas funcionales.
+
+================================================================================
 SIIE 3.2 186.3/ 2021-07-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

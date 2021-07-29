@@ -285,7 +285,7 @@ public class SViewQueryGlobal extends erp.lib.table.STableTab {
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlFunctAreas += (sqlFunctAreas.length() == 0 ? "" : "AND ") + "doc.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlFunctAreas += "AND doc.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_UNIT_TP) {
