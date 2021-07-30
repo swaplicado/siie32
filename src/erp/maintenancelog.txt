@@ -1,8 +1,14 @@
 ================================================================================
+SIIE 3.2 186.4/ 2021-07-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento al procesamiento de cancelaciones de CFDI para completar de inmediato los CFDI cancelables sin aceptación.
+
+================================================================================
 SIIE 3.2 186.4/ 2021-07-29
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Adición del filtro por factura en los reportes de saldos y saldos por documento.
+1) Adición del filtro por factura en los reportes de saldos de asociados de negocios, saldos por documento y pagos y cobros por período.
 2) Corrección en las consultas de estadística y backorder con el filtro de áreas funcionales.
 
 ================================================================================
