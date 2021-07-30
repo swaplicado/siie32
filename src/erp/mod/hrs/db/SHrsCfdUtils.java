@@ -238,7 +238,7 @@ public abstract class SHrsCfdUtils {
                     "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE " + nBankDefaultId + " END AS f_emp_bank, " +
                     "pr.sal, pr.wage, pr.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_ini, p.dt_end AS f_nom_fin, " +
                     "pri.dt_pay, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, " +
-                    "TIMESTAMPDIFF(DAY, emp.dt_hire, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
+                    "TIMESTAMPDIFF(DAY, pr.dt_hire, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                     "tcon.code AS f_emp_cont_tp, twkd.code AS f_emp_jorn_tp, tpay.code AS f_emp_pay, pr.sal_ssc AS f_emp_sal_bc, trsk.code AS f_emp_risk, " +
                     "IF(emp.b_uni, '" + DCfdi33Catalogs.TxtSí + "', '" + DCfdi33Catalogs.TxtNo + "') AS f_emp_union, " +
                     "NOW() AS f_emp_date_edit " +
