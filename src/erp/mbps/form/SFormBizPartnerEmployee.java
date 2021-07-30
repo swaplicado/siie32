@@ -37,6 +37,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -2276,6 +2277,31 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void focusLostSonDateBirth5() {
         jtfSonAge5.setText(SLibTimeUtils.formatAge(moFieldSonDateBirth5.getDate(), miClient.getSession().getSystemDate()));
     }
+    
+    private SFormValidation numEmpValidate(SFormValidation validation) {
+        try {
+            String sql = "SELECT b.bp FROM erp.hrsu_emp AS e " +
+                    "INNER JOIN erp.bpsu_bp AS b ON e.id_emp = b.id_bp " +
+                    "WHERE e.num = " + jftNumber.getText() + " " +
+                    "AND e.id_emp <> " + moEmployee.getPkEmployeeId() + " " +
+                    "AND NOT e.b_del;";
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            int count = 0;
+            String employees = "";
+            while (resultSet.next()) {
+                count++;
+                employees += (employees.isEmpty() ? "" : "; ") + resultSet.getString(1);
+            }
+            if (count > 0) {
+                validation.setMessage("El número de empleado '" + jftNumber.getText() + "' ya esta siendo usado por " + (count == 1 ? "el empleado:\n" : "los empleados:\n") + employees);
+                validation.setComponent(jftNumber); 
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+        return validation;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgOvertime;
@@ -2636,6 +2662,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 validation.setTabbedPaneIndex(((erp.lib.form.SFormField) mvFields.get(i)).getTabbedPaneIndex());
                 break;
             }
+        }
+        
+        if (!validation.getIsError()) {
+            validation = numEmpValidate(validation);
         }
         
         if (!validation.getIsError()) {

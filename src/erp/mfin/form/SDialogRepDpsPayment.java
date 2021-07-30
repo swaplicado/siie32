@@ -21,27 +21,37 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JComponent;
+import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
-public class SDialogRepDpsPayment extends javax.swing.JDialog {
+public class SDialogRepDpsPayment extends javax.swing.JDialog implements ItemListener {
 
-    private int mnDpsCategoryId;
+    private final int mnDpsCategoryId;
     private boolean mbFirstTime;
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDateBegin;
     private erp.lib.form.SFormField moFieldDateEnd;
+    private erp.lib.form.SFormField moFieldDateDpsBegin;
+    private erp.lib.form.SFormField moFieldDateDpsEnd;
+    private erp.lib.form.SFormField moFieldYear;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
-    /** Creates new form SDialogRepDpsPayment */
+    /** Creates new form SDialogRepDpsPayment
+     * @param client
+     * @param dpsCategoryId */
     public SDialogRepDpsPayment(erp.client.SClientInterface client, int dpsCategoryId) {
         super(client.getFrame(), true);
         miClient = client;
@@ -59,6 +69,7 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -74,6 +85,25 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jrbAllMov = new javax.swing.JRadioButton();
+        jPanel10 = new javax.swing.JPanel();
+        jrbYear = new javax.swing.JRadioButton();
+        jPanel11 = new javax.swing.JPanel();
+        jrbPeriod = new javax.swing.JRadioButton();
+        jPanel12 = new javax.swing.JPanel();
+        jlYear = new javax.swing.JLabel();
+        jtfYear = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jlDateDpsBegin = new javax.swing.JLabel();
+        jftDateDpsBegin = new javax.swing.JFormattedTextField();
+        jbDateDpsBegin = new javax.swing.JButton();
+        jPanel13 = new javax.swing.JPanel();
+        jlDateDpsEnd = new javax.swing.JLabel();
+        jftDateDpsEnd = new javax.swing.JFormattedTextField();
+        jbDateDpsEnd = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de pagos/cobros por período");
@@ -89,7 +119,7 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
 
         jPanel5.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 1));
+        jPanel6.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -144,7 +174,7 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
 
         jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jPanel2, java.awt.BorderLayout.NORTH);
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -170,8 +200,100 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro facturas:"));
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jPanel14.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        buttonGroup1.add(jrbAllMov);
+        jrbAllMov.setText("Todos los movimientos");
+        jPanel9.add(jrbAllMov);
+
+        jPanel14.add(jPanel9);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        buttonGroup1.add(jrbYear);
+        jrbYear.setText("Movimientos de facturas de un ejercicio");
+        jPanel10.add(jrbYear);
+
+        jPanel14.add(jPanel10);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        buttonGroup1.add(jrbPeriod);
+        jrbPeriod.setText("Movimientos de facturas de un periodo");
+        jPanel11.add(jrbPeriod);
+
+        jPanel14.add(jPanel11);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlYear.setText("Año facturas:");
+        jlYear.setToolTipText("");
+        jlYear.setPreferredSize(new java.awt.Dimension(145, 23));
+        jPanel12.add(jlYear);
+
+        jtfYear.setText("2000");
+        jtfYear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel12.add(jtfYear);
+
+        jPanel14.add(jPanel12);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlDateDpsBegin.setText("Fecha inicial facturas:");
+        jlDateDpsBegin.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jlDateDpsBegin);
+
+        jftDateDpsBegin.setText("dd/mm/yyyy");
+        jftDateDpsBegin.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jftDateDpsBegin);
+
+        jbDateDpsBegin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDateDpsBegin.setToolTipText("Seleccionar fecha");
+        jbDateDpsBegin.setFocusable(false);
+        jbDateDpsBegin.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbDateDpsBegin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbDateDpsBeginActionPerformed(evt);
+            }
+        });
+        jPanel4.add(jbDateDpsBegin);
+
+        jPanel14.add(jPanel4);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlDateDpsEnd.setText("Fecha final facturas:");
+        jlDateDpsEnd.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(jlDateDpsEnd);
+
+        jftDateDpsEnd.setText("dd/mm/yyyy");
+        jftDateDpsEnd.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel13.add(jftDateDpsEnd);
+
+        jbDateDpsEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDateDpsEnd.setToolTipText("Seleccionar fecha");
+        jbDateDpsEnd.setFocusable(false);
+        jbDateDpsEnd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbDateDpsEnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbDateDpsEndActionPerformed(evt);
+            }
+        });
+        jPanel13.add(jbDateDpsEnd);
+
+        jPanel14.add(jPanel13);
+
+        jPanel7.add(jPanel14, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jPanel7, java.awt.BorderLayout.CENTER);
+
+        setSize(new java.awt.Dimension(576, 389));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbPrintActionPerformed
@@ -194,6 +316,14 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
+    private void jbDateDpsBeginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbDateDpsBeginActionPerformed
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateDpsBegin.getDate(), moFieldDateDpsBegin);
+    }//GEN-LAST:event_jbDateDpsBeginActionPerformed
+
+    private void jbDateDpsEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbDateDpsEndActionPerformed
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateDpsEnd.getDate(), moFieldDateDpsEnd);
+    }//GEN-LAST:event_jbDateDpsEndActionPerformed
+
     private void initComponentsExtra() {
         mbFirstTime = true;
 
@@ -201,13 +331,29 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
         moFieldDateBegin.setPickerButton(jbDateBegin);
         moFieldDateEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateEnd, jlDateEnd);
         moFieldDateEnd.setPickerButton(jbDateEnd);
-
+        moFieldDateDpsBegin = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateDpsBegin, jlDateDpsBegin);
+        moFieldDateDpsBegin.setPickerButton(jbDateDpsBegin);
+        moFieldDateDpsEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateDpsEnd, jlDateDpsEnd);
+        moFieldDateDpsEnd.setPickerButton(jbDateDpsEnd);
+        
         moFieldDateBegin.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
-
+        moFieldDateDpsBegin.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        moFieldDateDpsEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        
+        moFieldYear = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfYear, jlYear);
+        moFieldYear.setIntegerMin(2000);
+        moFieldYear.setIntegerMax(2100);
+        moFieldYear.setMinInclusive(true);
+        moFieldYear.setMaxInclusive(true);
+        moFieldYear.setDecimalFormat(miClient.getSessionXXX().getFormatters().getYearFormat());
+       
         mvFields = new Vector<SFormField>();
         mvFields.add(moFieldDateBegin);
         mvFields.add(moFieldDateEnd);
+        mvFields.add(moFieldDateDpsBegin);
+        mvFields.add(moFieldDateDpsEnd);
+        mvFields.add(moFieldYear);
 
         switch (mnDpsCategoryId) {
             case SDataConstantsSys.TRNS_CT_DPS_PUR:
@@ -220,10 +366,23 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
             default:
                 SLibUtilities.renderException(this, new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION));
         }
+        
+        jrbAllMov.setSelected(true);
+        jtfYear.setText(miClient.getSession().getCurrentYear() + "");
 
         setModalityType(ModalityType.MODELESS);
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
+        
+        jtfYear.setEnabled(false);
+        jftDateDpsBegin.setEnabled(false);
+        jbDateDpsBegin.setEnabled(false);
+        jftDateDpsEnd.setEnabled(false);
+        jbDateDpsEnd.setEnabled(false);
+        
+        jrbAllMov.addItemListener(this);
+        jrbYear.addItemListener(this);
+        jrbPeriod.addItemListener(this);
     }
 
     private void windowActivated() {
@@ -241,7 +400,16 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
+            
+            String sqlDpsFilter = "";
+            
+            if (jrbYear.isSelected()) {
+                sqlDpsFilter = "WHERE YEAR(d.dt) = " + moFieldYear.getString() + " ";
+            }
+            else if (jrbPeriod.isSelected()) {
+                sqlDpsFilter = "WHERE d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsBegin.getDate()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsEnd.getDate()) + "' ";
+            }
+            
             map = miClient.createReportParams();
             map.put("sReportTitle", getTitle().toUpperCase());
             map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateBegin.getDate())[0]);
@@ -279,6 +447,8 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
                     new int[] { miClient.getSessionXXX().getParamsCompany().getFkBasicTaxRetained01Id_n() }));
             map.put("sBasicTaxRet02", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX_BAS,
                     new int[] { miClient.getSessionXXX().getParamsCompany().getFkBasicTaxRetained02Id_n() }));
+            
+            map.put("sSqlDpsFilter", sqlDpsFilter);
 
             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_DPS_PAY, map);
             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -317,6 +487,10 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
             else if (SLibTimeUtilities.digestYear(moFieldDateBegin.getDate())[0] != SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0]) {
                 msg = "La fecha del campo '" + jlDateBegin.getText() + "' y la del campo '" + jlDateEnd.getText() + "' deben pertenecer al mismo ejercicio.";
             }
+            
+            if (jrbPeriod.isSelected() && moFieldDateDpsBegin.getDate().after(moFieldDateDpsEnd.getDate())) {
+                msg = "La fecha del campo '" + jlDateDpsBegin.getText() + "' no puede ser posterior a la del campo '" + jlDateDpsEnd.getText() + "'.";
+            }
 
             if (msg.length() > 0) {
                 miClient.showMsgBoxWarning(msg);
@@ -330,23 +504,83 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog {
     public void actionClose() {
         setVisible(false);
     }
+    
+    private void itemStateChangedDpsFilter() {
+        if (jrbAllMov.isSelected()) {
+            jtfYear.setEnabled(false);
+            jftDateDpsBegin.setEnabled(false);
+            jbDateDpsBegin.setEnabled(false);
+            jftDateDpsEnd.setEnabled(false);
+            jbDateDpsEnd.setEnabled(false);
+        } 
+        else if (jrbYear.isSelected()) {
+            jtfYear.setEnabled(true);
+            jftDateDpsBegin.setEnabled(false);
+            jbDateDpsBegin.setEnabled(false);
+            jftDateDpsEnd.setEnabled(false);
+            jbDateDpsEnd.setEnabled(false);
+        }
+        else if (jrbPeriod.isSelected()) {
+            jtfYear.setEnabled(false);
+            jftDateDpsBegin.setEnabled(true);
+            jbDateDpsBegin.setEnabled(true);
+            jftDateDpsEnd.setEnabled(true);
+            jbDateDpsEnd.setEnabled(true);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbDateBegin;
+    private javax.swing.JButton jbDateDpsBegin;
+    private javax.swing.JButton jbDateDpsEnd;
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbPrint;
     private javax.swing.JCheckBox jckShowAgent;
     private javax.swing.JFormattedTextField jftDateBegin;
+    private javax.swing.JFormattedTextField jftDateDpsBegin;
+    private javax.swing.JFormattedTextField jftDateDpsEnd;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JLabel jlDateBegin;
+    private javax.swing.JLabel jlDateDpsBegin;
+    private javax.swing.JLabel jlDateDpsEnd;
     private javax.swing.JLabel jlDateEnd;
+    private javax.swing.JLabel jlYear;
+    private javax.swing.JRadioButton jrbAllMov;
+    private javax.swing.JRadioButton jrbPeriod;
+    private javax.swing.JRadioButton jrbYear;
+    private javax.swing.JTextField jtfYear;
     // End of variables declaration//GEN-END:variables
 
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JRadioButton) {
+            JRadioButton radioButton = (JRadioButton) e.getSource();
+            
+            if (radioButton == jrbAllMov) {
+                itemStateChangedDpsFilter();
+            }
+            else if (radioButton == jrbYear) {
+                itemStateChangedDpsFilter();
+            }
+            else if (radioButton == jrbPeriod) {
+                itemStateChangedDpsFilter();
+            }
+        }
+    }
 }

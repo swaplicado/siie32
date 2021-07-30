@@ -125,7 +125,9 @@ public class STrnFunctionalAreaUtils {
                 else {
                     functionalAreaCodesList = STrnFunctionalAreaUtils.getFunctionalAreasOfUser(client, client.getSessionXXX().getUser().getPkUserId(), STrnFunctionalAreaUtils.FUNC_AREA_CODE);
                     for (String code : functionalAreaCodesList) {
-                        codes += code + ", ";
+                        if (!code.isEmpty()) {
+                            codes += code + ", ";
+                        }
                     }
 
                     text = codes.substring(0, codes.length() - 2);
