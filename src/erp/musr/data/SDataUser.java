@@ -1137,7 +1137,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         boolean has = false;
 
         for (Integer privilege : privileges) {
-            has = getPrivilegeLevel(privilege) != SUtilConsts.LEV_NONE;
+            //has = getPrivilegeLevel(privilege) != SUtilConsts.LEV_NONE;
             break;
         }
 
@@ -1152,7 +1152,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         else {
             Integer level = moPrivilegeUser.get(privilege);
 
-            return level == null ? SUtilConsts.LEV_NONE : level;
+            //return level == null ? SUtilConsts.LEV_NONE : level;
+            return 0;
         }
     }
 

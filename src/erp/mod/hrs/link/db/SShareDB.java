@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Cesar Orozco
  */
 public class SShareDB {
 
@@ -545,6 +545,7 @@ public class SShareDB {
                 abs.fk_type_abs = res.getInt("fk_tp_abs");
                 abs.is_closed = res.getBoolean("b_clo");
                 abs.is_deleted = res.getBoolean("b_del");
+                abs.company = dbName;
 
                 lAbss.add(abs);
             }
