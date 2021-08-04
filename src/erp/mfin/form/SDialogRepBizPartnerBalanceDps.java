@@ -459,6 +459,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         jrbCurrencyLoc.setSelected(true);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -564,6 +565,16 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
                 sqlDpsFilter += "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsBegin.getDate()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsEnd.getDate()) + "' ";
             }
             
+            String areasFilter = "";
+            if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+                if (msFunctionalAreasIds.isEmpty()) {
+                    areasFilter = "";
+                }
+                else {
+                    areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                }
+            }
+            
             map = miClient.createReportParams();
             map.put("nSysMoveCatId", manSysMoveTypeKey[0]);
             map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
@@ -577,7 +588,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
             map.put("sBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? "(TODOS)" : moFieldBizPartner.getString()));
             map.put("sFilterBizPartner", filterBp);
             map.put("sFuncText", jtfFunctionalArea.getText());
-            map.put("sFilterFunctionalArea", "AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+            map.put("sFilterFunctionalArea", areasFilter);
             map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
             map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
             map.put("sCurrency", jcbCurrency.getSelectedItem().toString());

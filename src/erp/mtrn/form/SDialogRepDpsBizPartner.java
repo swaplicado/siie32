@@ -332,6 +332,7 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -358,6 +359,16 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -392,7 +403,7 @@ public class SDialogRepDpsBizPartner extends javax.swing.JDialog implements erp.
                 map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
                 map.put("sBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbBizPartner.getSelectedItem().toString());
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
                 map.put("nFidStDps", SDataConstantsSys.TRNS_ST_DPS_EMITED);
                 map.put("nFidStDpsVal", SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
                 map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);

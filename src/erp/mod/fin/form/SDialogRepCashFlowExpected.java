@@ -167,6 +167,7 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport implements Act
         jbFunctionalArea.addActionListener(this);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
@@ -206,6 +207,16 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport implements Act
 
     @Override
     public void createParamsMap() {
+        String areasFilter = "";
+        if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
+        
         moParamsMap = miClient.createReportParams();
         moParamsMap.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
         moParamsMap.put("sLocalCurrencyKey", miClient.getSession().getSessionCustom().getLocalCurrency());
@@ -225,7 +236,7 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport implements Act
         moParamsMap.put("sCompanyBranch", moKeyCompanyBranch.getSelectedIndex() > 0 ? moKeyCompanyBranch.getSelectedItem().getItem() : "(TODAS)");
         moParamsMap.put("sSqlWhereCompanyBranch", moKeyCompanyBranch.getSelectedIndex() > 0 ? " AND r.fid_cob = " + moKeyCompanyBranch.getValue()[0] : "");
         moParamsMap.put("sFuncText", jtfFunctionalArea.getText());
-        moParamsMap.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+        moParamsMap.put("sFilterFunctionalArea", areasFilter);
         moParamsMap.put("bShowDetailBp", moRadioDetailBp.isSelected());
         moParamsMap.put("bShowDetailBpDps", moRadioDetailBpDps.isSelected());
     }

@@ -245,6 +245,7 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -264,6 +265,16 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (moFieldDateEnd.getDate().compareTo(moFieldDateInitial.getDate()) < 0) {
             miClient.showMsgBoxWarning("La fecha final debe ser mayor o igual a la fecha inicial.");
@@ -286,7 +297,7 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
                 map.put("tDateInitial", moFieldDateInitial.getDate());
                 map.put("tDateEnd", moFieldDateEnd.getDate());
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, mnReportId, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
