@@ -7,7 +7,7 @@ package erp.mod.hrs.link.db;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Cesar Orozco
  */
 public class SAbsence {
     
@@ -23,6 +23,15 @@ public class SAbsence {
     protected String notes;
     protected int fk_class_abs;
     protected int fk_type_abs;
+    protected String company;
+
+    public void setCompanie(String company) {
+        this.company = company;
+    }
+
+    public String getCompanie() {
+        return company;
+    }
     protected boolean is_closed;
     protected boolean is_deleted;
 

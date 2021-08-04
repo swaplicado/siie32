@@ -306,7 +306,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
 
     @Override
     public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient, jcbPkPacId, SDataConstants.TRN_PAC);
+        //SFormUtilities.populateComboBox(miClient, jcbPkPacId, SDataConstants.TRN_PAC);
     }
 
     @Override
