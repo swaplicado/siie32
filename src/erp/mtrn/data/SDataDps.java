@@ -105,6 +105,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_CLO_COMMS = 4;
     public static final int FIELD_CLO_COMMS_USR = 5;
     public static final int FIELD_USR = 6;
+    public static final int LEN_SERIES = 15; // maximum length of number series
+    public static final int LEN_NUMBER = 15; // maximum length of number
     public static final String TXT_PREPAY_INV = "facturación anticipos";
     public static final String TXT_OPS_TYPE = "tipo de operación";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
@@ -262,6 +264,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msDbmsCurrencyKey;
     protected java.lang.String msDbmsIncotermCode;
 
+    protected boolean mbAuxIsBeingCopied;
     protected boolean mbAuxIsFormerRecordAutomatic;
     protected java.lang.Object moAuxFormerRecordKey;
     protected erp.mtrn.data.SCfdParams moAuxCfdParams;
@@ -1952,6 +1955,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsCurrencyKey(java.lang.String s) { msDbmsCurrencyKey = s; }
     public void setDbmsIncotermCode(java.lang.String s) { msDbmsIncotermCode = s; }
 
+    public void setAuxIsBeingCopied(boolean b) { mbAuxIsBeingCopied = b; }
     public void setAuxIsFormerRecordAutomatic(boolean b) { mbAuxIsFormerRecordAutomatic = b; }
     public void setAuxFormerRecordKey(java.lang.Object o) { moAuxFormerRecordKey = o; }
     public void setAuxCfdParams(erp.mtrn.data.SCfdParams o) { moAuxCfdParams = o; }
@@ -1977,6 +1981,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getDbmsCurrencyKey() { return msDbmsCurrencyKey; }
     public java.lang.String getDbmsIncotermCode() { return msDbmsIncotermCode; }
 
+    public boolean getAuxIsBeingCopied() { return mbAuxIsBeingCopied; }
     public boolean getAuxIsFormerRecordAutomatic() { return mbAuxIsFormerRecordAutomatic; }
     public java.lang.Object getAuxFormerRecordKey() { return moAuxFormerRecordKey; }
     public erp.mtrn.data.SCfdParams getAuxCfdParams() { return moAuxCfdParams; }
@@ -2168,6 +2173,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msDbmsCurrencyKey = "";
         msDbmsIncotermCode = "";
 
+        mbAuxIsBeingCopied = false;
         mbAuxIsFormerRecordAutomatic = false;
         moAuxFormerRecordKey = null;
         moAuxCfdParams = null;

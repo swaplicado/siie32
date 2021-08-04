@@ -9,7 +9,6 @@ import erp.SErpConsts;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import static erp.mfin.data.SDataRecordEntry.LEN_CONCEPT;
 import erp.mtrn.data.SDataCfd;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -87,7 +86,7 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     
     private void sanitizeData() {
         if (msConcept.length() > SDataRecordEntry.LEN_CONCEPT) {
-            msConcept = msConcept.substring(0, LEN_CONCEPT - SErpConsts.ELLIPSIS.length()).trim() + SErpConsts.ELLIPSIS;
+            msConcept = msConcept.substring(0, SDataRecordEntry.LEN_CONCEPT - SErpConsts.ELLIPSIS.length()).trim() + SErpConsts.ELLIPSIS;
         }
     }
 

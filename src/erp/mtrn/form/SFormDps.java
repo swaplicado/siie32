@@ -130,7 +130,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int TAB_CFD_ADD = 4; // CFD Addenda
     private static final int TAB_CFD_XML = 5; // CFD XML file
     
-    private static final int LEN_SERIES = 15; // maximum length of number series
     private static final int UUID_FIRST_SECC_LENGHT = 8;
 
     private int mnFormType;
@@ -2831,7 +2830,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDateDocDelivery_n.setPickerButton(jbDateDocDelivery_n);
         moFieldNumberSeries = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbNumberSeries, jlNumber);
         moFieldNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfNumber, jlNumber);
-        moFieldNumber.setLengthMax(15);
+        moFieldNumber.setLengthMax(SDataDps.LEN_NUMBER);
         moFieldNumberReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfNumberReference, jlNumber);
         moFieldNumberReference.setLengthMax(25);
         moFieldDaysOfCredit = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfDaysOfCredit, jlDaysOfCredit);
@@ -4688,7 +4687,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     private void renderPk() {
-        jtfPkRo.setText(moDps.getIsRegistryNew() || moDps.getIsCopied() ? "" : moDps.getPkYearId() + "-" + moDps.getPkDocId());
+        jtfPkRo.setText(moDps.getIsRegistryNew() ? "" : moDps.getPkYearId() + "-" + moDps.getPkDocId());
         jtfPkRo.setCaretPosition(0);
     }
 
@@ -6693,7 +6692,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     
                                     jcbFkPaymentTypeId.setEnabled(!(oDpsSource.getIsCopied() || moDps.getIsCopied()));
                                     jtfDaysOfCredit.setEditable(!(oDpsSource.getIsCopied() || moDps.getIsCopied()));
-                                    moDps.setIsCopied(oDpsSource.getIsCopied() || moDps.getIsCopied());
+                                    moDps.setIsCopied(oDpsSource.getIsCopied() || moDps.getIsCopied()); // preserve "is copied" attribute if document already is so!
                                     moDps.setFkSourceYearId_n(moDps.getFkSourceYearId_n() != SLibConstants.UNDEFINED ? moDps.getFkSourceYearId_n() : oDpsSource.getPkYearId());
                                     moDps.setFkSourceDocId_n(moDps.getFkSourceDocId_n() != SLibConstants.UNDEFINED ? moDps.getFkSourceDocId_n() : oDpsSource.getPkDocId());
 
@@ -8168,35 +8167,58 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private SFormValidation validateCfdi() {
         SFormValidation validation = new SFormValidation();
+        
         try {
-            String message = "No se puede guardar el CFDI ";
+            String message = "No se puede guardar el CFDI porque ";
             String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(moComprobante).getCfdiStatus(); 
+            
             if (!cfdiStatus.equals(SCfdConsts.STATUS_VALID)) {
-                validation.setMessage(message + "ya que su estatus es : " + cfdiStatus + ".");
+                validation.setMessage(message + "su estatus es: '" + cfdiStatus + "'.");
             }
-            if (!validation.getIsError()) {
-                if (!moBizPartner.getFiscalId().equals(moComprobante.getEltEmisor().getAttRfc().getString())) {
-                    validation.setMessage(message + "porque el emisor no corresponde al asociado de negocios seleccionado.");
+            else if (!moBizPartner.getFiscalId().equals(moComprobante.getEltEmisor().getAttRfc().getString())) {
+                validation.setMessage(message + "el RFC del emisor, '" + moComprobante.getEltEmisor().getAttRfc().getString() + "', no corresponde al RFC del asociado de negocios seleccionado, '" + moBizPartner.getFiscalId() + "'.");
+            }
+            else if (SCfdUtils.getCfdIdByUuid(miClient, msXmlUuid) != 0) {
+                validation.setMessage(message + "su UUID, '" + msXmlUuid + "', ya existe en la base de datos.");
+            }
+            else {
+                if (!moComprobante.getAttSerie().getString().isEmpty()) {
+                    String xmlSeriesTrimmed = SLibUtils.textLeft(moComprobante.getAttSerie().getString(), SDataDps.LEN_SERIES).trim();
+                    
+                    if (!xmlSeriesTrimmed.equals(jcbNumberSeries.getSelectedItem().toString())) {
+                        String errorMessage = message + "su serie, '" + moComprobante.getAttSerie().getString() + "', "
+                                + (xmlSeriesTrimmed.length() == jcbNumberSeries.getSelectedItem().toString().length() ? "" :
+                                        "\najustada a " + SDataDps.LEN_SERIES + " caracteres, sin espacios iniciales ni finales, como '" + xmlSeriesTrimmed + "', "
+                                            + "\n")
+                                + "no coincide con la serie capturada, '" + jcbNumberSeries.getSelectedItem().toString() + "'.";
+                        
+                        if (miClient.showMsgBoxConfirm(errorMessage + "\n¿Está seguro que desea dejar así la serie sin corregir esta discrepancia?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage(errorMessage);
+                        }
+                    }
                 }
-            }
-            if (!validation.getIsError()) {
-                if (SCfdUtils.getCfdIdByUuid(miClient, msXmlUuid) != 0){
-                    validation.setMessage(message + "el UUID del CFDI ya existe en la base de datos.");
-                }
-            }
-            if (!validation.getIsError()) {
-                if (!jcbNumberSeries.getSelectedItem().toString().equals(moComprobante.getAttSerie().getString())) {
-                    validation.setMessage(message + "porque el numero de serie del xml '" + moComprobante.getAttSerie().getString() + "' no coincide con la serie capturada '" + jcbNumberSeries.getSelectedItem().toString() + "'.");
-                }    
-            }
-            if (!validation.getIsError()) {
-                if (!moComprobante.getAttFolio().getString().isEmpty()) {
-                    String[] folio = jtfNumber.getText().split("-");
-                    if (!folio[0].equals(moComprobante.getAttFolio().getString())) {
-                        validation.setMessage(message + "porque el numero de folio del xml '" + moComprobante.getAttFolio().getString() + "' no coincide con el folio capturado '" + folio[0] + "'.");
+                
+                if (!validation.getIsError()) {
+                    if (!moComprobante.getAttFolio().getString().isEmpty()) {
+                        String[] dpsFolio = jtfNumber.getText().split("-"); // a hyphen can be used to differentiate the number of another existing document when needed
+                        String xmlFolioTrimmed = SLibUtils.textLeft(moComprobante.getAttFolio().getString(), SDataDps.LEN_NUMBER).trim();
+                        
+                        if (!xmlFolioTrimmed.equals(dpsFolio[0])) {
+                            String errorMessage = message + "su folio, '" + moComprobante.getAttFolio().getString() + "', "
+                                    + (xmlFolioTrimmed.length() == dpsFolio[0].length() ? "" :
+                                            "\najustado a " + SDataDps.LEN_NUMBER + " caracteres, sin espacios iniciales ni finales, como '" + xmlFolioTrimmed + "', "
+                                                + (dpsFolio.length == 1 ? "" : "descartando el texto diferenciador '" + dpsFolio[1] + "', ")
+                                                + "\n")
+                                    + "no coincide con el folio capturado, '" + dpsFolio[0] + "'.";
+                            
+                            if (miClient.showMsgBoxConfirm(errorMessage + "\n¿Está seguro que desea dejar así el folio sin corregir esta discrepancia?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage(errorMessage);
+                            }
+                        }
                     }
                 }
             }
+            
             if (validation.getIsError()) {
                 validation.setComponent(jbLoadFileXml);
             }
@@ -9032,8 +9054,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_YEAR);
                 validation.setComponent(jftDate);
             }
-            else if (jcbNumberSeries.isEditable() && moFieldNumberSeries.getString().length() > LEN_SERIES) {
-                validation.setMessage("La longitud máxima para el campo 'Serie' es " + LEN_SERIES + ".");
+            else if (jcbNumberSeries.isEditable() && moFieldNumberSeries.getString().length() > SDataDps.LEN_SERIES) { // only when combo box of number series is editable
+                validation.setMessage("La longitud máxima para el campo 'Serie' es " + SDataDps.LEN_SERIES + ".");
                 validation.setComponent(jcbNumberSeries);
             }
             else if (isCfdEmissionRequired && jcbCfdiPaymentWay.getSelectedIndex() <= 0) {
@@ -9063,26 +9085,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
 
                     if (dpsKey != null && (moDps.getIsRegistryNew() || (!SLibUtilities.compareKeys(dpsKey, moDps.getPrimaryKey())))) {
+                        // validate document number:
+                        
                         if (moDps.getIsRegistryNew() && (mbIsSales || mbIsDpsEstimate || mbIsDpsContract || mbIsDpsOrder)) {
-                            obtainNextNumber();
+                            obtainNextNumber(); // attempt to get a new number
+                            
                             dpsKey = SDataUtilities.obtainDpsKey(miClient, moFieldNumberSeries.getString(), moFieldNumber.getString(), moDpsType.getPrimaryKey());
                             if (dpsKey != null) {
-                                validation.setMessage("Ya existe otro documento '" + moDpsType.getDpsType() + "' con el folio '" + moFieldNumberSeries.getString() + (moFieldNumberSeries.getString().length() == 0 ? "" : "-") + moFieldNumber.getString() + "'.");
-                                validation.setComponent(jcbNumberSeries.isEnabled() ? jcbNumberSeries : jtfNumber);
                                 jcbNumberSeries.setEnabled(true);
                                 jtfNumber.setEnabled(true);
                                 jtfNumber.setFocusable(true);
                             }
                         }
-                        else {
+                        
+                        if (dpsKey != null) {
+                            // the number for this very document already exists!
                             SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
-                            String fecha = SLibUtils.CsvFormatDate.format(dps.getDate());
-                            validation.setMessage("Otro documento '" + moDpsType.getDpsType() + "' con fecha de '" + fecha + "' ya tiene el folio '" + moFieldNumberSeries.getString() + (moFieldNumberSeries.getString().length() == 0 ? "" : "-") + moFieldNumber.getString() + "'.");
+                            validation.setMessage("Otro documento '" + moDpsType.getDpsType() + "' del '" + SLibUtils.DateFormatDate.format(dps.getDate()) + "' ya tiene el folio '" + STrnUtils.formatDocNumber(moFieldNumberSeries.getString(), moFieldNumber.getString()) + "'.");
                             validation.setComponent(jcbNumberSeries.isEnabled() ? jcbNumberSeries : jtfNumber);
                         }
                     }
                     else if (moFieldNumberSeries.getDataType() == SLibConstants.DATA_TYPE_KEY) {
-                        // validate document numbers according to curren number series:
+                        // validate document number according to curren number series:
+                        
                         int num = SLibUtilities.parseInt(moFieldNumber.getString());
                         int numMin = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[0];
                         int numMax = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[1]; // -1 means unlimited
@@ -9613,6 +9638,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     if (!validation.getIsError() && moComprobante != null) {
                         validation = validateCfdi();
                     }
+                    
                     if (!validation.getIsError()) {
                         // credit status of business partner:
    

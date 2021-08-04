@@ -1073,13 +1073,14 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     }
 
     private void renderEntries(boolean renumber) {
-        int sortingPosition = 0;
-
         moPaneGridEntries.renderTableRows();
         
         if (renumber) {
+            int sortingPosition = 0;
+            
             for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
                 SDataRecordEntry entry = (SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData();
+                int oldSortingPosition = entry.getSortingPosition();
 
                 if (entry.getIsDeleted()) {
                     entry.setSortingPosition(0);
@@ -1088,8 +1089,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                     entry.setSortingPosition(++sortingPosition);
                 }
 
-                entry.setIsRegistryEdited(true);
-                moPaneGridEntries.getTableRow(i).prepareTableRow();
+                if (entry.getSortingPosition() != oldSortingPosition) {
+                    entry.setIsRegistryEdited(true);
+                    moPaneGridEntries.getTableRow(i).prepareTableRow();
+                }
             }
         }
     }

@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 186.5/ 2021-08-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Flexibilización de la validación de la serie y folio del XML del CFDI al agregarlo a un DPS.
+2) Mejoramiento a la actualización de la posición de ordenamiento de renglones de pólizas contables para evitar actualizar renglones de forma innecesaria.
+
+================================================================================
 SIIE 3.2 186.4/ 2021-07-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

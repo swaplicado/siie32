@@ -516,7 +516,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[48];  // extra columns for accounting record and CFD info
+            aoTableColumns = new STableColumn[50];  // extra columns for accounting record and CFD info
         }
         else {
             aoTableColumns = new STableColumn[42];
@@ -641,13 +641,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_num", "Folio ped.", STableConstants.WIDTH_DOC_NUM);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rper", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rbc_code", "Centro contable", STableConstants.WIDTH_CODE_COB);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rbkc_code", "Centro contable", STableConstants.WIDTH_CODE_COB);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rcb_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rbpb_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rnum", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
-//            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uu.usr", "Usr. timbrado", STableConstants.WIDTH_USER);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "xu.usr", "Usr. timbrado/cancelación", STableConstants.WIDTH_USER);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "x.ts_prc", "Timbrado/cancelación", STableConstants.WIDTH_DATE_TIME);
         }
 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
@@ -2158,17 +2159,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + // CFDI canceled with cancellation acknowledgment in PDF format
                 STableConstants.ICON_XML_SIGN + " " + // CFDI signed, canceled only SIIE
                 ")))))))) AS f_ico_xml, " +
-                "x.can_st, " + // cancellation status
+                "x.ts_prc, x.can_st, " + // cancellation status
                 "bp.id_bp, bp.bp, bpc.bp_key, bpb.id_bpb, bpb.bpb, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, " +
                 "'" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
                 "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr ";
 
         if (mbIsDoc || mbIsDocAdj) {
-//            msSql += ", uu.usr, " +
-            msSql += ", " +
-                    "(SELECT rbc.code FROM fin_bkc AS rbc WHERE r.id_bkc = rbc.id_bkc) AS f_rbc_code, " +
-                    "(SELECT rcb.code FROM erp.bpsu_bpb AS rcb WHERE r.fid_cob = rcb.id_bpb) AS f_rcb_code, " +
+            msSql += ", xu.usr, " +
+                    "(SELECT rbkc.code FROM fin_bkc AS rbkc WHERE rbkc.id_bkc = r.id_bkc) AS f_rbkc_code, " +
+                    "(SELECT rbpb.code FROM erp.bpsu_bpb AS rbpb WHERE rbpb.id_bpb = r.fid_cob) AS f_rbpb_code, " +
                     "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_rper, " +
                     "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rnum ";
         }
@@ -2176,8 +2176,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         msSql +=
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
-                "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " +
-                (mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
+                "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + (mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND ";
 
@@ -2235,18 +2234,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "INNER JOIN erp.usru_usr AS uc ON d.fid_usr_close = uc.id_usr " +
                 "INNER JOIN erp.usru_usr AS un ON d.fid_usr_new = un.id_usr " + (mbHasRightAuthor ? " AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() + " " : "") +
                 "INNER JOIN erp.usru_usr AS ue ON d.fid_usr_edit = ue.id_usr " +
-                "INNER JOIN erp.usru_usr AS ud ON d.fid_usr_del = ud.id_usr " +
-                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " + 
-                "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
-                "LEFT OUTER JOIN " + complementaryDbName + ".trn_pdf AS p ON d.id_year = p.id_year AND d.id_doc = p.id_doc ";
+                "INNER JOIN erp.usru_usr AS ud ON d.fid_usr_del = ud.id_usr ";
 
         if (mbIsDoc || mbIsDocAdj) {
             msSql +=
                     "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
-                    "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num "
-//                    "LEFT OUTER JOIN trn_cfd_sign_log AS sign ON sign.fid_cfd = x.id_cfd " +
-//                    "LEFT OUTER JOIN erp.usru_usr AS uu ON sign.fid_usr = uu.id_usr "
-                    ;
+                    "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+                    "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " + 
+                    "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
+                    "LEFT OUTER JOIN " + complementaryDbName + ".trn_pdf AS p ON d.id_year = p.id_year AND d.id_doc = p.id_doc " +
+                    "LEFT OUTER JOIN erp.usru_usr AS xu ON x.fid_usr_prc = xu.id_usr ";
         }
 
         msSql += (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere);
