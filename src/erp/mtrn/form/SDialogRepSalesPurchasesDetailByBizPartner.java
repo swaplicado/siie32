@@ -318,6 +318,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
@@ -358,6 +359,16 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -442,7 +453,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
                 map.put("sTitle", mbParamIsSupplier ? "DETALLADO DE COMPRAS POR " : "DETALLADO DE VENTAS POR ");
                 map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
                 map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_BPS_DETAIL, map);

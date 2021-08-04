@@ -287,6 +287,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -313,6 +314,16 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         JasperViewer jasperViewer = null;
         SDataBizPartner bizPartner = null;
         SDataBizPartnerCategory bizPartnerCategory = null;
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -346,7 +357,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             map.put("nDaysGrace", bizPartnerCategory.getEffectiveDaysOfGrace());
             map.put("sCreditType", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_TP_CRED, new int[] { bizPartnerCategory.getEffectiveCreditTypeId() }));
             map.put("sFuncText", jtfFunctionalArea.getText());
-            map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+            map.put("sFilterFunctionalArea", areasFilter);
 
             jasperPrint = SDataUtilities.fillReport(miClient, jckShowPayDays.isSelected() ? SDataConstantsSys.REP_FIN_BPS_ACC_MOV_DAY : SDataConstantsSys.REP_FIN_BPS_ACC_MOV, map);
             jasperViewer = new JasperViewer(jasperPrint, false);

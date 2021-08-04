@@ -433,6 +433,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jrbDueType30_60_90d.addItemListener(this);
         jrbDueType15_30_45d.addItemListener(this);
         jcbCurrency.addItemListener(this);
+        
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
 
         name = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG);
         jlBizPartner.setText(name + ":");
@@ -564,6 +566,16 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             bShowGarntInsur = moBoolShowAmounts.getValue();
             nReportType = bShowGarntInsur ? SDataConstantsSys.REP_FIN_BPS_ACC_AGI_CRED : SDataConstantsSys.REP_FIN_BPS_ACC_AGI;
             
+            String areasFilter = "";
+            if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+                if (msFunctionalAreasIds.isEmpty()) {
+                    areasFilter = "";
+                }
+                else {
+                    areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                }
+            }
+            
             map = miClient.createReportParams();
             map.put("sTitle", getTitle().toUpperCase());
             map.put("bShowDetail", jrbRepTypeDetail.isSelected());
@@ -587,7 +599,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             map.put("sSqlFilterCurrency", sqlFilterCurrency);
             map.put("sSqlSortBy", sqlSortBy);
             map.put("sFuncText", jtfFunctionalArea.getText());
-            map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+            map.put("sFilterFunctionalArea", areasFilter);
             map.put("bShowGarntInsur", bShowGarntInsur);
 
             // Report view:
@@ -671,6 +683,16 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
                 sqlOrderBy = "bp.bp_comm, ct.bp_key, bp.bp, bp.id_bp, ac.fid_tp_acc_r, ac.fid_cl_acc_r DESC ";
             }
         }
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         try {
             oMap = miClient.createReportParams();
@@ -695,7 +717,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             oMap.put("sSqlCob", sqlCoBranch);
             oMap.put("sSqlFilterAnalyst", sqlFilterUserAnalyst);
             oMap.put("sFuncText", jtfFunctionalArea.getText());
-            oMap.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+            oMap.put("sFilterFunctionalArea", areasFilter);
             oMap.put("sSqlOrderBy", sqlOrderBy);
             oMap.put("nTP_ACC", mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_CL_ACC_ASSET[0] : SDataConstantsSys.FINS_CL_ACC_LIABTY[0]);
             oMap.put("nCL_ACC", mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_CL_ACC_ASSET[1] : SDataConstantsSys.FINS_CL_ACC_LIABTY[1]);

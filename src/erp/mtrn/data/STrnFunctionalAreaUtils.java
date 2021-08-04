@@ -105,12 +105,16 @@ public class STrnFunctionalAreaUtils {
         ArrayList<String> functionalAreaIdsList = null;
         ArrayList<String> functionalAreaCodesList = null;
         
+        if (! client.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            return new String[] { "", "(ND)" };
+        }
+        
         if (functionalAreaId == SLibConstants.UNDEFINED) {
             functionalAreaIdsList = STrnFunctionalAreaUtils.getFunctionalAreasOfUser(client, client.getSessionXXX().getUser().getPkUserId(), STrnFunctionalAreaUtils.FUNC_AREA_ID);
             
             if (functionalAreaIdsList.isEmpty()) {
                 functionalAreaIds = "0";
-                text = "ND";
+                text = "(NINGUNA)";
             }
             else {
                 for (String id : functionalAreaIdsList) {

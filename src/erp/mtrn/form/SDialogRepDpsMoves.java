@@ -227,6 +227,7 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -252,6 +253,16 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
         JasperViewer jasperViewer = null;
         SFormValidation validation = formValidate();
         int[] year = SLibTimeUtilities.digestYear(moFieldDateInitial.getDate());
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -283,7 +294,7 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
                 map.put("nFidCtSysMov",  mbParamIsSupplier ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
                 map.put("nFidTpSysMov",  mbParamIsSupplier ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_MOV, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

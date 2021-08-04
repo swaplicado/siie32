@@ -306,6 +306,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -332,6 +333,16 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -361,7 +372,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
                 map.put("sSqlWhereSalesAgent", moFieldAgent.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_sal_agt_n = " + moFieldAgent.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereSalesRoute", moFieldRoute.getKeyAsIntArray()[0] == 0 ? "" : " AND rou.fid_sal_route = " + moFieldRoute.getKeyAsIntArray()[0]);
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
                 map.put("sTitle", mbParamIsSupplier ? " DE PROVEEDORES" : " DE CLIENTES");
                 map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
                 map.put("sBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbBizPartner.getSelectedItem().toString());
