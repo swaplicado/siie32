@@ -334,7 +334,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlFunctAreas += "AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }
@@ -345,7 +345,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND " +
                 "d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " " +
-                sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlDocNature + sqlFunctAreas + " AND d.b_audit = " + (isDpsAuditPending() ? 0 : 1) + " " +
+                sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlDocNature + sqlFunctAreas + "AND d.b_audit = " + (isDpsAuditPending() ? 0 : 1) + " " +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " +
