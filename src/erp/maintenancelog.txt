@@ -4,6 +4,11 @@ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Flexibilización de la validación de la serie y folio del XML del CFDI al agregarlo a un DPS.
 2) Mejoramiento a la actualización de la posición de ordenamiento de renglones de pólizas contables para evitar actualizar renglones de forma innecesaria.
+3) Corrección a vista de facturas por auditar por incorporación de filtro de áreas funcionales.
+
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Estandarización de criterios de filtrado de áreas funcionales en reportes de documentos.
 
 ================================================================================
 SIIE 3.2 186.4/ 2021-07-30
