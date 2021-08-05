@@ -266,6 +266,7 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
@@ -290,6 +291,16 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -329,7 +340,7 @@ public class SDialogRepSalesPurchasesJournal extends javax.swing.JDialog impleme
                 map.put("nFidClAccMovAdjDis", mbParamIsSupplier ? SDataConstantsSys.FINS_CLS_ACC_MOV_PUR_ADJ_DISC[1] : SDataConstantsSys.FINS_CLS_ACC_MOV_SAL_ADJ_DISC[1]);
                 map.put("nFidClsAccMovAdjDis", mbParamIsSupplier ? SDataConstantsSys.FINS_CLS_ACC_MOV_PUR_ADJ_DISC[2] : SDataConstantsSys.FINS_CLS_ACC_MOV_SAL_ADJ_DISC[2]);
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
                 map.put("sCurrencyErp", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
                 map.put("nFidAccountSystemCategoryId", mbParamIsSupplier ? SDataConstantsSys.FINS_CT_SYS_MOV_PUR : SDataConstantsSys.FINS_CT_SYS_MOV_SAL);
                 map.put("sMark", mbParamIsSupplier ? "" : SDataConstantsSys.TXT_UNSIGNED);

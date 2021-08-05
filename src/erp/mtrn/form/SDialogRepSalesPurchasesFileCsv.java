@@ -339,6 +339,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient);
         renderFunctionalArea();
@@ -386,6 +387,16 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         SDataUnitType unitType = null;
         Cursor cursor = getCursor();
         SFormValidation validation = formValidate();
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -482,8 +493,8 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
                             "d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " AND " +
                             "d.fid_ct_dps = " + mnFormType + " AND d.fid_cl_dps IN (" + docClass + ") AND " +
                             "d.dt BETWEEN '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateBegin.getDate()) + "' AND " +
-                            "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateEnd.getDate()) + "' AND " +
-                            "d.fid_func IN ( " + msFunctionalAreasIds + " ) " + 
+                            "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateEnd.getDate()) + "'" +
+                            areasFilter +
                             "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " + ( moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]) + " " + (jckWithoutRelatedParty.isSelected() ? " AND b.b_att_rel_pty = 0 " : "") +
                             "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                             "INNER JOIN erp.bpsu_bpb_add AS bba ON d.fid_bpb = bba.id_bpb AND d.fid_add = bba.id_add " +

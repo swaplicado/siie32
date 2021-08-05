@@ -304,6 +304,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         setModalityType(ModalityType.MODELESS);
         
          // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -330,6 +331,16 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -378,7 +389,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
                 }
                 map.put("sTurn", jcbShift.getSelectedIndex() <= 0 ? "" : jcbShift.getSelectedItem().toString());
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
                 map.put("sSqlWhereTurn", sqlWhereTurn);
 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_LIST, map);

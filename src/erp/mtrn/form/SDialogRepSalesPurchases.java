@@ -463,6 +463,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         setModalityType(ModalityType.MODELESS);
         
         // áreas funcionales:
+        jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
@@ -496,6 +497,16 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         String sCurrency = "";
         String sqlCurrency = "";
         String sSumStot = "";
+        
+        String areasFilter = "";
+        if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreasIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            }
+        }
         
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -551,7 +562,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("sSqlGroupBy", (String) createQuerySentenceValues()[0]);
                 map.put("sSqlOrderBy", (String) createQuerySentenceValues()[1]);
                 map.put("sFuncText", jtfFunctionalArea.getText());
-                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
+                map.put("sFilterFunctionalArea", areasFilter);
                 map.put("sDetailConcept", (String) createQuerySentenceValues()[2]);
                 map.put("sFilter", (String) createQuerySentenceValues()[3]);
                 map.put("nTpDetail", (Integer) createQuerySentenceValues()[4]);
