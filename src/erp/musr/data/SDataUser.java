@@ -257,11 +257,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataAccessCompany company = new SDataAccessCompany();
-                    if (company.read(new int[] { mnPkUserId, resultSet.getInt("id_co") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (company.read(new int[] { mnPkUserId, resultSet.getInt("id_co") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsAccessCompanies.add(company);
                     }
                     else {
-                        mvDbmsAccessCompanies.add(company);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -271,11 +271,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataAccessCompanyBranch branch = new SDataAccessCompanyBranch();
-                    if (branch.read(new int[] { mnPkUserId, resultSet.getInt("id_cob") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (branch.read(new int[] { mnPkUserId, resultSet.getInt("id_cob") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsAccessCompanyBranches.add(branch);
                     }
                     else {
-                        mvDbmsAccessCompanyBranches.add(branch);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -285,11 +285,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataAccessCompanyBranchEntity entity = new SDataAccessCompanyBranchEntity();
-                    if (entity.read(new int[] { mnPkUserId, resultSet.getInt("id_cob"), resultSet.getInt("id_ent") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (entity.read(new int[] { mnPkUserId, resultSet.getInt("id_cob"), resultSet.getInt("id_ent") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsAccessCompanyBranchEntities.add(entity);
                     }
                     else {
-                        mvDbmsAccessCompanyBranchEntities.add(entity);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -299,11 +299,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataAccessCompanyBranchEntityUniversal entityUniversal = new SDataAccessCompanyBranchEntityUniversal();
-                    if (entityUniversal.read(new int[] { mnPkUserId, resultSet.getInt("id_cob"), resultSet.getInt("id_ct_ent") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (entityUniversal.read(new int[] { mnPkUserId, resultSet.getInt("id_cob"), resultSet.getInt("id_ct_ent") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsAccessCompanyBranchEntitiesUniversal.add(entityUniversal);
                     }
                     else {
-                        mvDbmsAccessCompanyBranchEntitiesUniversal.add(entityUniversal);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -313,11 +313,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataUserPrivilegeUser priv = new SDataUserPrivilegeUser();
-                    if (priv.read(new int[] { mnPkUserId, resultSet.getInt("id_prv") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (priv.read(new int[] { mnPkUserId, resultSet.getInt("id_prv") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsUserPrivilegesUser.add(priv);
                     }
                     else {
-                        mvDbmsUserPrivilegesUser.add(priv);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -327,11 +327,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataUserPrivilegeCompany priv = new SDataUserPrivilegeCompany();
-                    if (priv.read(new int[] { mnPkUserId, resultSet.getInt("id_co"), resultSet.getInt("id_prv") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (priv.read(new int[] { mnPkUserId, resultSet.getInt("id_co"), resultSet.getInt("id_prv") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsUserPrivilegesCompany.add(priv);
                     }
                     else {
-                        mvDbmsUserPrivilegesCompany.add(priv);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -341,11 +341,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataUserRoleUser role = new SDataUserRoleUser();
-                    if (role.read(new int[] { mnPkUserId, resultSet.getInt("id_rol") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (role.read(new int[] { mnPkUserId, resultSet.getInt("id_rol") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsUserRolesUser.add(role);
                     }
                     else {
-                        mvDbmsUserRolesUser.add(role);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -355,11 +355,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataUserRoleCompany role = new SDataUserRoleCompany();
-                    if (role.read(new int[] { mnPkUserId, resultSet.getInt("id_co"), resultSet.getInt("id_rol") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    if (role.read(new int[] { mnPkUserId, resultSet.getInt("id_co"), resultSet.getInt("id_rol") }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        mvDbmsUserRolesCompany.add(role);
                     }
                     else {
-                        mvDbmsUserRolesCompany.add(role);
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
 
@@ -367,9 +367,12 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 sql = "SELECT id_usr FROM trn_usr_cfg WHERE id_usr = " + mnPkUserId + " ORDER BY id_usr ";
                 resultSet = statement.executeQuery(sql);
-                while (resultSet.next()) {
-                    moDbmsUserConfigurationTransaction = new SDataUserConfigurationTransaction();
-                    if (moDbmsUserConfigurationTransaction.read(new int[] { mnPkUserId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                if (resultSet.next()) {
+                    SDataUserConfigurationTransaction configuration = new SDataUserConfigurationTransaction();
+                    if (configuration.read(new int[] { mnPkUserId }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        moDbmsUserConfigurationTransaction = configuration;
+                    }
+                    else {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
