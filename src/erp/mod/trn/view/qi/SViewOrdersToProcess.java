@@ -89,7 +89,7 @@ public class SViewOrdersToProcess extends SGridPaneView {
         Object filter = null;
         
         filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
-        if (filter != null && ! ((String) filter).isEmpty()) {
+        if (filter != null && !((String) filter).isEmpty()) {
             sql += "AND d.fid_func IN ( " + filter + ") ";
         }
         

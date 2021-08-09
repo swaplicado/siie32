@@ -92,7 +92,7 @@ public class SViewCreditNotes extends SGridPaneView {
         }
         
         filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
-        if (filter != null && ! ((String) filter).isEmpty()) {
+        if (filter != null && !((String) filter).isEmpty()) {
             whereFunctionalAreas = " AND d.fid_func IN ( " + filter + ") ";
         }
             
