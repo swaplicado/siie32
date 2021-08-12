@@ -21,6 +21,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.form.SDialogCalculateIncomeTax;
+import erp.mod.hrs.form.SDialogLayoutAF02;
 import erp.mod.hrs.form.SDialogLayoutEmployee;
 import erp.mod.hrs.form.SDialogPayrollReceiptSsc;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
@@ -164,6 +165,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepVacationsFileCsv;
     private javax.swing.JMenuItem jmiRepEmployeeActiveByPeriod;
     private javax.swing.JMenuItem jmiRepPtu;
+    private javax.swing.JMenuItem jmiRepAnnexAF02;
     private javax.swing.JMenuItem jmiRepPos;
 
     private SDialogLayoutEmployee moDialogLayoutEmployee;
@@ -420,6 +422,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv = new JMenuItem("Archivo CSV de vacaciones pendientes...");
         jmiRepEmployeeActiveByPeriod = new JMenuItem("Reporte de empleados activos por período...");
         jmiRepPtu = new JMenuItem("Consulta para PTU");
+        jmiRepAnnexAF02 = new JMenuItem("Layout anexo AF02");
         jmiRepPos = new JMenuItem("Reporte de posiciones y vacantes");
         
         //jmRep.add(jmiRepPayrollEarnings);
@@ -438,6 +441,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.addSeparator();
         jmRep.add(jmiRepEmployeeActiveByPeriod);
         jmRep.add(jmiRepPtu);
+        jmRep.add(jmiRepAnnexAF02);
         jmRep.addSeparator();
         jmRep.add(jmiRepPos);
 
@@ -546,6 +550,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv.addActionListener(this);
         jmiRepEmployeeActiveByPeriod.addActionListener(this);
         jmiRepPtu.addActionListener(this);
+        jmiRepAnnexAF02.addActionListener(this);
         jmiRepPos.addActionListener(this);
         
         jmiCfgTaxTable.setEnabled(true);
@@ -676,6 +681,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv.setEnabled(true);
         jmiRepEmployeeActiveByPeriod.setEnabled(true);
         jmiRepPtu.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
+        jmiRepAnnexAF02.setEnabled((miClient.getSession().getConfigCompany().getCompanyId() == 1)); // 1 es idBp de APSA
         jmiRepPos.setEnabled(true);
         
         // GUI configuration:
@@ -1161,6 +1167,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepPtu) {
                 miClient.getSession().showView(SModConsts.HRSX_PTU, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiRepAnnexAF02) {
+                SDialogLayoutAF02 sDialogLayoutAF02 = new SDialogLayoutAF02((SGuiClient) miClient, "Layout AF02");
+                sDialogLayoutAF02.setFormVisible(true);
             }
             else if (item == jmiRepPos) {
                 new SDialogRepHrsPos((SGuiClient) miClient, "Reporte de posiciones y vacantes").setFormVisible(true);
