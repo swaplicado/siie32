@@ -164,6 +164,8 @@ public class SShareDB {
             dept.dept_name = res.getString("name");
             dept.is_deleted = res.getBoolean("b_del");
             dept.is_system = res.getBoolean("b_sys");
+            dept.head_employee_id = res.getInt("fk_emp_head_n");
+            dept.superior_department_id = res.getInt("fk_dep_sup_n");
 
             lDepts.add(dept);
         }
@@ -173,6 +175,55 @@ public class SShareDB {
         res.close();
 
         return lDepts;
+    }
+    
+    /**
+     * Retorna los puestos contemplados en SIIE
+     *
+     * @param strDate
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException
+     */
+    public ArrayList<SPosition> getPositions(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return null;
+        }
+
+        String query = "SELECT * FROM erp.hrsu_pos "
+                + "WHERE "
+                + "    (ts_usr_ins >= '" + strDate + "' "
+                + "        OR ts_usr_upd >= '" + strDate + "')";
+
+        ArrayList<SPosition> lPositions = null;
+
+        Statement st = conn.createStatement();
+        ResultSet res = st.executeQuery(query);
+
+        lPositions = new ArrayList();
+        SPosition pos = null;
+        while (res.next()) {
+            pos = new SPosition();
+
+            pos.id_position = res.getInt("id_pos");
+            pos.code = res.getString("code");
+            pos.name = res.getString("name");
+            pos.is_deleted = res.getBoolean("b_del");
+            pos.is_system = res.getBoolean("b_sys");
+            pos.fk_department = res.getInt("fk_dep");
+
+            lPositions.add(pos);
+        }
+
+        conn.close();
+        st.close();
+        res.close();
+
+        return lPositions;
     }
 
     /**
@@ -207,15 +258,21 @@ public class SShareDB {
                 + "    e.overtime, "
                 + "    e.fk_tp_pay, "
                 + "    e.fk_dep, "
+                + "    e.fk_pos, "
                 + "    e.b_act, "
-                + "    e.b_del "
+                + "    e.b_del, "
+                + "    bpcon.email_01 "
                 + "FROM "
                 + "    erp.hrsu_emp e "
                 + "        INNER JOIN "
                 + "    erp.bpsu_bp bp ON e.id_emp = bp.id_bp "
+                + "INNER JOIN "
+                + "	erp.bpsu_bpb bpb ON bp.id_bp = bpb.fid_bp "
+                + "INNER JOIN "
+                + "	erp.bpsu_bpb_con bpcon ON bpb.id_bpb = bpcon.id_bpb "
                 + "WHERE "
-                + "    (ts_usr_ins >= '" + strDate + "' "
-                + "        OR ts_usr_upd >= '" + strDate + "')"
+                + "    (e.ts_usr_ins >= '" + strDate + "' "
+                + "        OR e.ts_usr_upd >= '" + strDate + "')"
                 + "     AND bp.b_att_emp;";
 
         ArrayList<SEmployee> lEmps = null;
@@ -231,13 +288,17 @@ public class SShareDB {
 
                 emp.id_employee = res.getInt("id_emp");
                 emp.num_employee = res.getInt("num");
+                emp.lastname1 = res.getString("lastname1");
+                emp.lastname2 = res.getString("lastname2");
                 emp.lastname = res.getString("lastname");
                 emp.firstname = res.getString("firstname");
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
+                emp.email = res.getString("email_01");
                 emp.overtime_policy = res.getInt("overtime");
                 emp.way_pay = res.getInt("fk_tp_pay");
                 emp.dept_rh_id = res.getInt("fk_dep");
+                emp.siie_job_id = res.getInt("fk_pos");
                 emp.is_active = res.getBoolean("b_act");
                 emp.is_deleted = res.getBoolean("b_del");
 

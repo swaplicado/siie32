@@ -59,6 +59,7 @@ public class SUtilsJSON {
             
             objResponse.last_sync_date = lastSyncDate;
             objResponse.departments = sDb.getDepartments(lastSyncDate);
+            objResponse.positions = sDb.getPositions(lastSyncDate);
             objResponse.employees = sDb.getEmployees(lastSyncDate);
             objResponse.holidays = sDb.getAllHolidays(lastSyncDate);
             objResponse.fdys = sDb.getAllFirstDayOfYear(lastSyncDate);
