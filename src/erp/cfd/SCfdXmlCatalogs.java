@@ -5,6 +5,7 @@
  */
 package erp.cfd;
 
+import cfd.ver3.DCfdVer3Utils;
 import erp.lib.form.SFormComponentItem;
 import erp.mod.SModConsts;
 import java.io.ByteArrayInputStream;
@@ -81,7 +82,7 @@ public class SCfdXmlCatalogs {
      * @return Vector of component items.
      */
     public Vector<SFormComponentItem> getComponentItems(final int catalog, final Date date) {
-        Vector<SFormComponentItem> items = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> items = new Vector<>();
         items.add(new SFormComponentItem(new int[] {}, "(Seleccionar opción)"));
         
         ArrayList<SCfdXmlCatalogEntry> entries = mhmCatalogs.get(catalog);
@@ -104,6 +105,7 @@ public class SCfdXmlCatalogs {
      */
     public void populateComboBox(final JComboBox comboBox, final int catalog, final Date date) {
         Vector<SFormComponentItem> items = getComponentItems(catalog, date);
+        
         comboBox.removeAllItems();
         for (SFormComponentItem item : items) {
             comboBox.addItem(item);
@@ -123,6 +125,7 @@ public class SCfdXmlCatalogs {
         for (SCfdXmlCatalogEntry entry : entries) {
             if (entry.getName().compareTo(name) == 0) {
                 code = entry.getCode();
+                break;
             }
         }
         
@@ -142,6 +145,7 @@ public class SCfdXmlCatalogs {
         for (SCfdXmlCatalogEntry entry : entries) {
             if (entry.getCode().compareTo(code) == 0) {
                 name = entry.getName();
+                break;
             }
         }
         
@@ -156,6 +160,6 @@ public class SCfdXmlCatalogs {
      */
     public String composeEntryDescription(final int catalog, final String code) {
         String name = getEntryName(catalog, code);
-        return name.isEmpty() ? "" : code + " - " + name;
+        return name.isEmpty() ? "" : DCfdVer3Utils.composeCatalogDescription(code, name);
     }
 }
