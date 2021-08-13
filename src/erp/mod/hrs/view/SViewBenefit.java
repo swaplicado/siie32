@@ -324,8 +324,8 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON e.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
-                + "INNER JOIN erp.HRSU_DEP AS dep "
-                + "INNER JOIN HRS_DEP_CC AS cc ON cc.id_dep = dep.id_dep "
+                + "INNER JOIN erp.HRSU_DEP AS dep ON e.fk_dep = dep.id_dep "
+                + "LEFT OUTER JOIN HRS_DEP_CC AS cc ON cc.id_dep = dep.id_dep "
                 + ""
                 // # retrieve current benefit payed:
                 + "LEFT OUTER JOIN ("
@@ -417,7 +417,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_sen_as_months", "Antigüedad meses", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_sen_raw", "Antigüedad años", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_day_name", "Tabla " + benefit));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_fk_cc", "Centro de costo "));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_fk_cc", "Centro de costo"));
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_bon_name", "Tabla prima vacacional"));
