@@ -66,7 +66,7 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public abstract class SHrsUtils {
     
@@ -2043,7 +2043,7 @@ public abstract class SHrsUtils {
                 
                     sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM,"
                           + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, sal.id_tp_sal AS TpSalario, "
-                          + "wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.b_hire AS Motivo, hire.fk_tp_emp_dis AS Tipe, hire.dt_dis_n AS DateApplication, par.reg_ss AS Param "
+                          + "wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.b_hire AS Motivo, hire.fk_tp_emp_dis AS Tipe, emp.dt_dis_n AS DateApplication, par.reg_ss AS Param "
                           + "FROM erp.HRSU_EMP AS emp "
                           + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
                           + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
@@ -2088,6 +2088,261 @@ public abstract class SHrsUtils {
                     buffer += "\r\n";
                 }
                 
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /*
+    *
+    * @param session
+    * @param year
+    * @param period
+    * Determina los empleados pagados en el periodo
+    */
+    public static ArrayList<SDbEmployee> getEmployeesPaidInPeriodAF02(final SGuiSession session, final int year, final int period) throws Exception {
+        ArrayList<SDbEmployee> employees = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT pre.id_emp "
+                    + "FROM hrs_pay AS p "
+                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                    + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                    + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
+                    + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                    + "AND p.per_year = " + year + " AND p.per = " + period + ";" ; 
+
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SDbEmployee employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { resultSet.getInt("pre.id_emp") });
+                employees.add(employee);
+            }
+        }
+        
+        return employees;
+    }
+    
+    /*
+    *
+    * @param client
+    * @param typeLayout
+    * @param year
+    * @param period
+    * Crear el nombre del archivo AF02
+    */
+    private static String createNameAnnexed02(SGuiClient client, int typeLayout, int year, int period) throws SQLException {
+        ResultSet resultSetHeader = null;
+        String nameAnnexed02 = "";
+        String fiscal_id = "";
+        String periodN = "";
+        
+        try {           
+            String sql = "SELECT fiscal_id FROM erp.bpsu_bp b WHERE id_bp = " + client.getSession().getConfigCompany().getCompanyId() + "";
+            resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+            while (resultSetHeader.next()) {
+                 fiscal_id = resultSetHeader.getString("fiscal_id");
+            }
+                if (period < 9 || period < 0) {
+                    periodN = "0" + period;
+                }
+                else {
+                    periodN = "" + period;
+                }
+                
+            nameAnnexed02 = fiscal_id + "-AF02-" + year + periodN + "-" + typeLayout;
+        }
+        
+        catch (Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+  
+        return nameAnnexed02;
+    
+    }
+    
+    /*
+    *
+    * @param client
+    * @param year
+    * @param period
+    * @param typeLayout
+    * Crea la primera linea del archivo AF02
+    */
+    private static String createFirstLineAnnexed02(SGuiClient client, int year, int period, int typeLayout) throws SQLException {
+        ResultSet resultSetHeader = null;
+        String lineAnnexed02 = "";
+        String separator = "|";
+        String fiscal_id = "";
+        String bp = "";
+        String periodN = "";
+        SimpleDateFormat formatter = new SimpleDateFormat("dd");
+        String dateDay = formatter.format(client.getSession().getCurrentDate());
+        
+        try {
+            
+            if (period < 9 || period < 0) {
+                periodN = "0" + period;
+            }
+            else {
+                periodN = "" + period;
+            }
+            
+            String sql = "SELECT bp, fiscal_id FROM erp.bpsu_bp b WHERE id_bp =  " + client.getSession().getConfigCompany().getCompanyId() + "; ";
+            resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+            
+            while (resultSetHeader.next()) {
+                fiscal_id = resultSetHeader.getString("fiscal_id");
+                bp = resultSetHeader.getString("bp");
+            }
+
+            lineAnnexed02 = ("0000000536" + separator + fiscal_id + separator + bp + separator + "I" + separator + dateDay + periodN + year + separator +
+                   (typeLayout == 0 ? "NO" : "CO") + separator + "M" + separator + year + periodN + separator + separator + separator);
+        }
+        
+        catch (Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        return lineAnnexed02;
+        
+    }
+    
+    /*
+    *
+    * @param client
+    * @param typeLayout
+    * @param year
+    * @param period
+    * Crea la primera linea del archivo AF02
+    */
+    public static void createLayoutAnnexed02(SGuiClient client, int typeLayout, int year, int period) throws SQLException, Exception {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        Date periodEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(year, period));
+        java.lang.String buffer = "";
+        java.lang.String bufferLine = "";
+        String sql = "";
+        String fileName = "";
+        String declarantRFC = "";
+        String nameDeclarant = "";
+        String employeeRFC = "";
+        String nameEmployee = "";
+        String totalEgorations = "";
+        String exemptEgorations = "";
+        String taxedEgorations = "";
+        String taxedBonus = "";
+        String separator = "|";
+        int typeEmployee = 0;
+        double topBonusUma = (SHrsUtils.getRecentUma(client.getSession(), periodEnd) * 30);
+        double topBonusEx = 0;
+        double topBonusTa = 0;
+
+        fileName = createNameAnnexed02(client, typeLayout, year, period) + ".txt";
+
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+                ArrayList<SDbEmployee> employees = getEmployeesPaidInPeriodAF02(client.getSession(), year , period);
+                bufferLine += createFirstLineAnnexed02(client, year, period, typeLayout);
+                bufferLine += "\r\n";
+
+                for (SDbEmployee employee : employees) {
+                int pkUser = employee.getPkEmployeeId();
+                
+                    sql = "SELECT bp.fiscal_id, bp.bp, bpe.fiscal_id, concat(bpe.firstname, ' ' , bpe.lastname) AS nameEmp, SUM(pre.amt_r) AS totalPer, sch.rec_sche_cat, "
+                            + "(SELECT sum(pre.amt_r) "
+                            + "FROM hrs_pay AS p "
+                            + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                            + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
+                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                            + "AND p.per_year = " + year + " AND p.per = " + period + " "
+                            + "AND e.fk_tp_ear IN (1, 102, 109, 108) "
+                            + "AND pre.id_emp = " + pkUser + ") as totalExc, "
+                            + "(SELECT sum(pre.amt_r) "
+                            + "FROM hrs_pay AS p "
+                            + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                            + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
+                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                            + "AND p.per_year = " + year + " AND p.per = " + period + " "
+                            + "AND e.fk_tp_ear NOT IN (1, 102, 109, 108) "
+                            + "AND pre.id_emp =  " + pkUser + ") as totalGrab, "
+                            + "(SELECT sum(pre.amt_r) "
+                            + "FROM hrs_pay AS p "
+                            + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                            + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
+                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                            + "AND p.per_year = " + year + " AND p.per = " + period + " "
+                            + "AND e.fk_tp_ear IN (103) "
+                            + "AND pre.id_emp =  " + pkUser + ") as tBonus "
+                            + "FROM hrs_pay AS p "
+                            + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                            + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
+                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "INNER JOIN erp.bpsu_bp as bp "
+                            + "INNER JOIN erp.bpsu_bp as bpe "
+                            + "INNER JOIN erp.HRSS_TP_REC_SCHE AS sch ON sch.id_tp_rec_sche = emp.fk_tp_rec_sche "
+                            + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                            + "AND p.per_year = " + year + " AND p.per = " + period + " "
+                            + "AND pre.id_emp = " + pkUser + " "
+                            + "AND bp.id_bp = " + client.getSession().getConfigCompany().getCompanyId() + " "
+                            + "AND bpe.id_bp = " + pkUser + ";";
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+                    
+                    while (resultSetHeader.next()) {
+                            declarantRFC = resultSetHeader.getString("bp.fiscal_id");
+                            nameDeclarant = resultSetHeader.getString("bp.bp");
+                            employeeRFC = resultSetHeader.getString("bpe.fiscal_id");
+                            nameEmployee = resultSetHeader.getString("nameEmp");
+                            totalEgorations = resultSetHeader.getString("totalPer");
+                            exemptEgorations = resultSetHeader.getString("totalExc");
+                            taxedEgorations = resultSetHeader.getString("totalGrab");
+                            taxedBonus = resultSetHeader.getString("tBonus");
+                            typeEmployee = resultSetHeader.getInt("sch.rec_sche_cat");
+                            
+                        }
+
+                    if (Double.parseDouble((taxedBonus == null ? "0": taxedBonus)) > topBonusUma ) {
+                        topBonusEx = topBonusUma;
+                        topBonusTa = Double.parseDouble((taxedBonus == null ? "0": taxedBonus)) - topBonusUma;
+                    } else if (Double.parseDouble((taxedBonus == null ? "0": taxedBonus)) <= topBonusUma ) {
+                        topBonusEx = Double.parseDouble((taxedBonus == null ? "0": taxedBonus));
+                        topBonusTa = 0;
+                    }
+                    
+                    buffer += "0000000536" + separator;
+                    buffer += declarantRFC + separator;
+                    buffer += nameDeclarant + separator;
+                    buffer += nameEmployee + separator;
+                    buffer += totalEgorations + separator;
+                    buffer += (Double.parseDouble(exemptEgorations) + topBonusEx) + separator;
+                    buffer += (Double.parseDouble(taxedEgorations) + topBonusTa) + separator;
+                    buffer += (typeEmployee == 1 ? "S" : "A");
+                    buffer += "\r\n";
+                }
+                bw.write(bufferLine);
                 bw.write(buffer);
                 bw.flush();
                 bw.close();

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class SRootJSON {
     String last_sync_date;
     ArrayList<SDepartment> departments;
+    ArrayList<SPosition> positions;
     ArrayList<SEmployee> employees;
     ArrayList<SHoliday> holidays;
     ArrayList<SFirstDayYear> fdys;

@@ -46,6 +46,8 @@ public class SViewDepartment extends SGridPaneView {
                 + "v.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", "
+                + "COALESCE(bp.bp, '') AS emp_head, "
+                + "COALESCE(d.name, '') AS sup_dep, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -55,6 +57,10 @@ public class SViewDepartment extends SGridPaneView {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
+                + "v.fk_emp_head_n = bp.id_bp "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS d ON "
+                + "v.fk_dep_sup_n = d.id_dep "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
@@ -69,6 +75,8 @@ public class SViewDepartment extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "emp_head", "Titular"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "sup_dep", "Depto. Sup."));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_UPD_NAME, SGridConsts.COL_TITLE_USER_UPD_NAME));

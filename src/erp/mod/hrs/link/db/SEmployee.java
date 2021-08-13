@@ -12,14 +12,18 @@ package erp.mod.hrs.link.db;
 public class SEmployee {
     int id_employee;
     int num_employee;
+    String lastname1;
+    String lastname2;
     String lastname;
     String firstname;
     String admission_date;
     String leave_date;
+    String email;
     int company_id;
     int overtime_policy;
     int way_pay;
     int dept_rh_id;
+    int siie_job_id;
     boolean is_active;
     boolean is_deleted;
 
@@ -47,6 +51,22 @@ public class SEmployee {
         this.lastname = lastname;
     }
 
+    public String getLastname1() {
+        return lastname1;
+    }
+
+    public void setLastname1(String lastname1) {
+        this.lastname1 = lastname1;
+    }
+
+    public String getLastname2() {
+        return lastname2;
+    }
+
+    public void setLastname2(String lastname2) {
+        this.lastname2 = lastname2;
+    }
+
     public String getFirstname() {
         return firstname;
     }
@@ -69,6 +89,14 @@ public class SEmployee {
 
     public void setLeave_date(String leave_date) {
         this.leave_date = leave_date;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public int getCompany_id() {
@@ -101,6 +129,14 @@ public class SEmployee {
 
     public void setDept_rh_id(int dept_rh_id) {
         this.dept_rh_id = dept_rh_id;
+    }
+
+    public int getSiie_job_id() {
+        return siie_job_id;
+    }
+
+    public void setSiie_job_id(int siie_job_id) {
+        this.siie_job_id = siie_job_id;
     }
 
     public boolean isIs_active() {

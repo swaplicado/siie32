@@ -16,9 +16,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -57,6 +59,7 @@ public class SUtilsJSON {
             
             objResponse.last_sync_date = lastSyncDate;
             objResponse.departments = sDb.getDepartments(lastSyncDate);
+            objResponse.positions = sDb.getPositions(lastSyncDate);
             objResponse.employees = sDb.getEmployees(lastSyncDate);
             objResponse.holidays = sDb.getAllHolidays(lastSyncDate);
             objResponse.fdys = sDb.getAllFirstDayOfYear(lastSyncDate);
@@ -66,6 +69,40 @@ public class SUtilsJSON {
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
             return jsonInString2;
+    }
+    
+    /**
+     * Método que obtiene las fotos de los empleados subordinados del empleado que se recibe.
+     * Estas imagenes son codificadas a base64 y transfomadas a texto
+     * 
+     * @param head entero que representa el id del empleado del que se quieren obtener los subordinados
+     * 
+     * @return JSON String proveniente del objeto SPhotosResponse
+     * 
+     * https://mkyong.com/java/jackson-2-convert-java-object-to-from-json/
+     * @throws SConfigException
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     * @throws JsonProcessingException
+     * @throws UnsupportedEncodingException
+     * @throws IOException 
+     */
+    public static String getPhotos(int head) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+        
+        SPhotosResponse response = new SPhotosResponse();
+        SShareDB sDb = new SShareDB();
+        
+        SEmployeesUtils utils = new SEmployeesUtils();
+        
+        ArrayList<Integer> ids = utils.getEmployeesOfHead(head);
+        response.photos = sDb.getPhotosOfEmployees(ids);
+        
+        // Java objects to JSON string - pretty-print
+        String jsonPhotosString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
+        
+        return jsonPhotosString;
     }
     
     /**

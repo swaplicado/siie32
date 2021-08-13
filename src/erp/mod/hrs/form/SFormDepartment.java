@@ -17,7 +17,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SFormDepartment extends SBeanForm {
 
@@ -50,11 +50,17 @@ public class SFormDepartment extends SBeanForm {
         jPanel5 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel13 = new javax.swing.JPanel();
+        jlEmployee = new javax.swing.JLabel();
+        moKeyEmployee = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel6 = new javax.swing.JPanel();
+        jlDepartment = new javax.swing.JLabel();
+        moKeyDepartment = new sa.lib.gui.bean.SBeanFieldKey();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -79,30 +85,63 @@ public class SFormDepartment extends SBeanForm {
 
         jPanel2.add(jPanel5);
 
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmployee.setText("Titular:");
+        jlEmployee.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlEmployee);
+
+        moKeyEmployee.setPreferredSize(new java.awt.Dimension(325, 23));
+        jPanel13.add(moKeyEmployee);
+
+        jPanel2.add(jPanel13);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDepartment.setText("Dep. superior:");
+        jlDepartment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlDepartment);
+
+        moKeyDepartment.setPreferredSize(new java.awt.Dimension(325, 23));
+        jPanel6.add(moKeyDepartment);
+
+        jPanel2.add(jPanel6);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlDepartment;
+    private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlName;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDepartment;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
-
+        
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
+        
+        moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), false);
+        moKeyDepartment.setKeySettings(miClient, SGuiUtils.getLabelName(jlDepartment), false);
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
+        moFields.addField(moKeyEmployee);
+        moFields.addField(moKeyDepartment);
 
         moFields.setFormButton(jbSave);
     }
@@ -119,7 +158,8 @@ public class SFormDepartment extends SBeanForm {
 
     @Override
     public void reloadCatalogues() {
-
+        miClient.getSession().populateCatalogue(moKeyEmployee, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyDepartment, SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
     }
 
     @Override
@@ -143,6 +183,9 @@ public class SFormDepartment extends SBeanForm {
 
         moTextName.setValue(moRegistry.getName());
         moTextCode.setValue(moRegistry.getCode());
+        
+        moKeyEmployee.setValue(new int[] { moRegistry.getFkTitularEmployeeId_n() });
+        moKeyDepartment.setValue(new int[] { moRegistry.getFkSuperiorDepartmentId_n()});
 
         setFormEditable(true);
 
@@ -157,6 +200,9 @@ public class SFormDepartment extends SBeanForm {
 
         registry.setName(moTextName.getValue());
         registry.setCode(moTextCode.getValue());
+        
+        registry.setFkTitularEmployeeId_n(moKeyEmployee.getValue().length == 0 ? 0 : moKeyEmployee.getValue()[0]);
+        registry.setFkSuperiorDepartmentId_n(moKeyDepartment.getValue().length == 0 ? 0 : moKeyDepartment.getValue()[0]);
 
         return registry;
     }
