@@ -747,7 +747,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     }
     
     private void populateEmployee() {
-        miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, 0, 
+        miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, 
                 new SGuiParams(jtbEmployeeActive.isSelected() ? SGuiConsts.PARAM_REGS_ACT : SGuiConsts.PARAM_REGS_ALL));
     }
 

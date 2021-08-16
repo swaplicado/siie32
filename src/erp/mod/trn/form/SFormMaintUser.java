@@ -19,6 +19,7 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
@@ -266,7 +267,8 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
     public void reloadCatalogues() {
         switch (mnFormSubtype) {
             case SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE:
-                miClient.getSession().populateCatalogue(moKeyMaintUser, SModConsts.HRSU_EMP, SModConsts.TRN_MAINT_USER, null);
+                miClient.getSession().populateCatalogue(moKeyMaintUser, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, 
+                        new SGuiParams(SGuiConsts.PARAM_REGS_ALL));
                 break;
             case SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR:
             case SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV:

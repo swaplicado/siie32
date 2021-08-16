@@ -19,17 +19,15 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SDbDepartment extends SDbRegistryUser {
 
     protected int mnPkDepartmentId;
     protected String msCode;
     protected String msName;
-    
-    protected int mnFkTitularEmployeeId_n;
     protected int mnFkSuperiorDepartmentId_n;
-    
+    protected int mnFkTitularEmployeeId_n;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -48,8 +46,8 @@ public class SDbDepartment extends SDbRegistryUser {
     public void setName(String s) { msName = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
-    public void setFkTitularEmployeeId_n(int n) { mnFkTitularEmployeeId_n = n; }
     public void setFkSuperiorDepartmentId_n(int n) { mnFkSuperiorDepartmentId_n = n; }
+    public void setFkTitularEmployeeId_n(int n) { mnFkTitularEmployeeId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -60,8 +58,8 @@ public class SDbDepartment extends SDbRegistryUser {
     public String getName() { return msName; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
-    public int getFkTitularEmployeeId_n() { return mnFkTitularEmployeeId_n; }
     public int getFkSuperiorDepartmentId_n() { return mnFkSuperiorDepartmentId_n; }
+    public int getFkTitularEmployeeId_n() { return mnFkTitularEmployeeId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -86,8 +84,8 @@ public class SDbDepartment extends SDbRegistryUser {
         msName = "";
         mbDeleted = false;
         mbSystem = false;
-        mnFkTitularEmployeeId_n = 0;
         mnFkSuperiorDepartmentId_n = 0;
+        mnFkTitularEmployeeId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -141,8 +139,8 @@ public class SDbDepartment extends SDbRegistryUser {
             msName = resultSet.getString("name");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
-            mnFkTitularEmployeeId_n = resultSet.getInt("fk_emp_head_n");
             mnFkSuperiorDepartmentId_n = resultSet.getInt("fk_dep_sup_n");
+            mnFkTitularEmployeeId_n = resultSet.getInt("fk_emp_head_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -172,8 +170,8 @@ public class SDbDepartment extends SDbRegistryUser {
                     "'" + msName + "', " +
                     (mbDeleted ? 1 : 0) + ", " +
                     (mbSystem ? 1 : 0) + ", " +
-                    (mnFkTitularEmployeeId_n > 0 ? mnFkTitularEmployeeId_n : null) + ", " +
-                    (mnFkSuperiorDepartmentId_n > 0 ? mnFkSuperiorDepartmentId_n : null) + ", " +
+                    (mnFkSuperiorDepartmentId_n == 0 ? "NULL" : mnFkSuperiorDepartmentId_n) + ", " +
+                    (mnFkTitularEmployeeId_n == 0 ? "NULL" : mnFkTitularEmployeeId_n) + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
@@ -195,9 +193,9 @@ public class SDbDepartment extends SDbRegistryUser {
                     "name = '" + msName + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
+                    "fk_dep_sup_n = " + (mnFkSuperiorDepartmentId_n == 0 ? "NULL" : mnFkSuperiorDepartmentId_n) + ", " +
+                    "fk_emp_head_n = " + (mnFkTitularEmployeeId_n == 0 ? "NULL" : mnFkTitularEmployeeId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                    "fk_emp_head_n = " + (mnFkTitularEmployeeId_n > 0 ? mnFkTitularEmployeeId_n : null) + ", " +
-                    "fk_dep_sup_n = " + (mnFkSuperiorDepartmentId_n > 0 ? mnFkSuperiorDepartmentId_n : null) + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
                     "ts_usr_upd = " + "NOW()" + " " +
@@ -267,8 +265,8 @@ public class SDbDepartment extends SDbRegistryUser {
         registry.setName(this.getName());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
-        registry.setFkTitularEmployeeId_n(this.getFkTitularEmployeeId_n());
         registry.setFkSuperiorDepartmentId_n(this.getFkSuperiorDepartmentId_n());
+        registry.setFkTitularEmployeeId_n(this.getFkTitularEmployeeId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
