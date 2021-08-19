@@ -9,6 +9,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.data.SDataSqlUtilities;
@@ -43,6 +44,8 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     private javax.swing.JButton mjbAudit;
     private javax.swing.JButton mjbAuditRevoke;
     private javax.swing.JButton jbGetXml;
+    private javax.swing.JButton jbShowDirectCfd;
+    private javax.swing.JButton jbShowIndirectCfd;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.view.SPanelFilterRecordType moPanelFilterRecordType;
@@ -77,18 +80,28 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         
         mjbAudit = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE));
         mjbAudit.setPreferredSize(new Dimension(23, 23));
-        mjbAudit.setToolTipText("Marcar como auditado");
+        mjbAudit.setToolTipText("Marcar como auditada");
         mjbAudit.addActionListener(this);
         
         mjbAuditRevoke = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE_NO));
         mjbAuditRevoke.setPreferredSize(new Dimension(23, 23));
-        mjbAuditRevoke.setToolTipText("Desmarcar como auditado");
+        mjbAuditRevoke.setToolTipText("Desmarcar como auditada");
         mjbAuditRevoke.addActionListener(this);
         
         jbGetXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
         jbGetXml.setPreferredSize(new Dimension(23, 23));
-        jbGetXml.setToolTipText("Obtener CFDI del comprobante");
+        jbGetXml.setToolTipText("Obtener los CFDI directos");
         jbGetXml.addActionListener(this);
+        
+        jbShowDirectCfd = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_DIRECT));
+        jbShowDirectCfd.setPreferredSize(new Dimension(23, 23));
+        jbShowDirectCfd.setToolTipText("Mostrar los CFDI directos");
+        jbShowDirectCfd.addActionListener(this);
+        
+        jbShowIndirectCfd = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_INDIRECT));
+        jbShowIndirectCfd.setPreferredSize(new Dimension(23, 23));
+        jbShowIndirectCfd.setToolTipText("Mostrar los CFDI indirectos");
+        jbShowIndirectCfd.addActionListener(this);
         
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
@@ -110,9 +123,11 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         addTaskBarUpperComponent(mjbAuditRevoke);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbGetXml);
+        addTaskBarUpperComponent(jbShowDirectCfd);
+        addTaskBarUpperComponent(jbShowIndirectCfd);
 
         STableField[] aoKeyFields = new STableField[5];
-        STableColumn[] aoTableColumns = new STableColumn[27];
+        STableColumn[] aoTableColumns = new STableColumn[28];
 
         col = 0;
         aoKeyFields[col++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_year");
@@ -128,9 +143,9 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_per", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bkc.code", "Centro contable", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cob.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Número póliza", STableConstants.WIDTH_RECORD_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "r.dt", "Fecha póliza", STableConstants.WIDTH_DATE);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "r.concept", "Concepto", 200);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "r.concept", "Concepto póliza", 200);
         aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Cargos $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[col++].setSumApplying(true);
         aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Abonos $", STableConstants.WIDTH_VALUE_2X);
@@ -138,10 +153,11 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Saldo $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[col++].setSumApplying(true);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ent", "Cuenta efectivo", 100);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_year", "Cierre", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_audit", "Auditoría", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "cfd", "CFDI", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ent", "Cuenta dinero", 150);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_year", "Póliza cierre", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_audit", "Póliza auditoría", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "direct_cfd", "CFDI directos", STableConstants.WIDTH_NUM_INTEGER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "indirect_cfd", "CFDI indirectos", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_audit", "Auditada", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
@@ -363,6 +379,28 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             }
         }
     }
+    
+    private void actionShowDirectCfd() {
+        if (jbShowDirectCfd.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SModuleUtilities.showCfdi(miClient, moTablePane.getSelectedTableRow().getPrimaryKey(), null, SDataConstants.FINX_REC_CFD_DIRECT);
+            }
+        }
+    }
+    
+    private void actionShowIndirectCfd() {
+        if (jbShowDirectCfd.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SModuleUtilities.showCfdi(miClient, moTablePane.getSelectedTableRow().getPrimaryKey(), null, SDataConstants.FINX_REC_CFD_INDIRECT);
+            }
+        }
+    }
 
     @Override
     public void createSqlQuery() {
@@ -402,11 +440,12 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_num, " +
                 "SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, SUM(re.debit) - SUM(re.credit) AS f_balance, " +
                 "((SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_fin_rec_year_n AND r.id_per = c.fid_fin_rec_per_n AND r.id_bkc = c.fid_fin_rec_bkc_n AND r.id_tp_rec = c.fid_fin_rec_tp_rec_n AND r.id_num = c.fid_fin_rec_num_n) + " +
-                "(SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_rec_year_n AND r.id_per = c.fid_rec_per_n AND r.id_bkc = c.fid_rec_bkc_n AND r.id_tp_rec = c.fid_rec_tp_rec_n AND r.id_num = c.fid_rec_num_n) + " +
-                "(SELECT COUNT(DISTINCT re1.fid_dps_year_n, re1.fid_dps_doc_n) FROM fin_rec_ety AS re1, trn_cfd AS c WHERE NOT re1.b_del AND r.id_year = re1.id_year AND r.id_per = re1.id_per AND r.id_bkc = re1.id_bkc AND r.id_tp_rec = re1.id_tp_rec AND r.id_num = re1.id_num AND " +
+                "(SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_rec_year_n AND r.id_per = c.fid_rec_per_n AND r.id_bkc = c.fid_rec_bkc_n AND r.id_tp_rec = c.fid_rec_tp_rec_n AND r.id_num = c.fid_rec_num_n) " +
+                ") AS direct_cfd, " +
+                "((SELECT COUNT(DISTINCT re1.fid_dps_year_n, re1.fid_dps_doc_n) FROM fin_rec_ety AS re1, trn_cfd AS c WHERE NOT re1.b_del AND r.id_year = re1.id_year AND r.id_per = re1.id_per AND r.id_bkc = re1.id_bkc AND r.id_tp_rec = re1.id_tp_rec AND r.id_num = re1.id_num AND " +
                 " re1.fid_dps_year_n = c.fid_dps_year_n AND re1.fid_dps_doc_n = c.fid_dps_doc_n) + " +
                 "(SELECT COUNT(DISTINCT re1.fid_cfd_n) FROM fin_rec_ety AS re1, trn_cfd AS c WHERE NOT re1.b_del AND r.id_year = re1.id_year AND r.id_per = re1.id_per AND r.id_bkc = re1.id_bkc AND r.id_tp_rec = re1.id_tp_rec AND r.id_num = re1.id_num " +
-                "AND re1.fid_cfd_n = c.id_cfd )) AS cfd " +
+                "AND re1.fid_cfd_n = c.id_cfd )) AS indirect_cfd " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_bkc AS bkc ON " +
                 "r.id_bkc = bkc.id_bkc " +
@@ -459,6 +498,12 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             }
             else if (button == jbGetXml) {
                 actionGetXml();
+            }
+            else if (button == jbShowDirectCfd) {
+                actionShowDirectCfd();
+            }
+            else if (button == jbShowIndirectCfd) {
+                actionShowIndirectCfd();
             }
         }
     }

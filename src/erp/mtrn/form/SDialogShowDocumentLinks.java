@@ -45,7 +45,8 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
     private erp.lib.table.STableColumnForm[] maoTableColumnsDpsEntry = null;
     private erp.mtrn.form.SPanelDps moPanelDps;
 
-    /** Creates new form SDialogDpsActionViewLinks */
+    /** Creates new form SDialogDpsActionViewLinks
+     * @param client */
     public SDialogShowDocumentLinks(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;

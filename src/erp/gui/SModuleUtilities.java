@@ -10,16 +10,20 @@ import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.table.STableRow;
+import erp.mfin.data.SDataRecord;
+import erp.mfin.data.SDataRecordEntry;
+import erp.mfin.form.SDialogShowRecordCfd;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogShowDocumentLinks;
 import erp.mtrn.form.SDialogShowDocumentNotes;
+import java.awt.Cursor;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín
  */
 public abstract class SModuleUtilities {
     
@@ -128,6 +132,37 @@ public abstract class SModuleUtilities {
         }
         else {
             showDocumentLinks(client, gridRow.getRowPrimaryKey());
+        }
+    }
+    
+    public static void showCfdi(final SClientInterface client, final Object pKey, final SDataRecordEntry ety, final int typeCfd) {
+        SDialogShowRecordCfd dialog; 
+        int cfds;
+        String msg = "La póliza no tiene CFDI ";
+        
+        if (pKey == null) {
+            client.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+        }
+        else {
+            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            SDataRecord rec = (SDataRecord) SDataUtilities.readRegistry(client, SDataConstants.FIN_REC, 
+                    pKey, SLibConstants.EXEC_MODE_VERBOSE);
+            client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            
+            dialog = new SDialogShowRecordCfd(client, typeCfd);
+            dialog.formReset();
+            dialog.setValue(SDataConstants.FIN_REC, rec);
+            if (ety != null) {
+                dialog.setValue(SDataConstants.FIN_REC_ETY, ety);
+                msg = "La partida no tiene CFDI ";
+            }
+            cfds = dialog.readCfd();
+            if (cfds == 0) {
+                client.showMsgBoxInformation(msg + (typeCfd == SDataConstants.FINX_REC_CFD_DIRECT ? " directos " : " indirectos ") + ".");
+            }
+            else {
+                dialog.setFormVisible(true);
+            }
         }
     }
 }

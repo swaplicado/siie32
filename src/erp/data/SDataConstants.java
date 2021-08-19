@@ -373,6 +373,8 @@ public abstract class SDataConstants {
     public static final int FINX_REC_RO = 206519;
     public static final int FINX_REC_DPS = 206520;
     public static final int FINX_REC_W_XML = 206521;
+    public static final int FINX_REC_CFD_DIRECT = 206522;
+    public static final int FINX_REC_CFD_INDIRECT = 206523;
     
     public static final int TRNS_CT_DPS = 207001;
     public static final int TRNS_CL_DPS = 207002;
@@ -449,6 +451,7 @@ public abstract class SDataConstants {
     public static final int TRN_USR_CFG = 207077;           // XXX Review if is still needed
     public static final int TRN_USR_CFG_IFAM = 207078;      // XXX Review if is still needed
     public static final int TRN_USR_CFG_BA = 207079;        // XXX Review if is still needed
+    public static final int TRN_USR_DPS_DNS = 2023071;
     public static final int TRN_LOT = 207080;
     public static final int TRN_STK_CFG = 207081;
     public static final int TRN_STK_CFG_ITEM = 207082;
@@ -955,6 +958,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_USR_CFG, "trn_usr_cfg");
         TablesMap.put(TRN_USR_CFG_IFAM, "trn_usr_cfg_ifam");
         TablesMap.put(TRN_USR_CFG_BA, "trn_usr_cfg_ba");
+        TablesMap.put(TRN_USR_DPS_DNS, "trn_usr_dps_dns");
         TablesMap.put(TRN_LOT, "trn_lot");
         TablesMap.put(TRN_STK_CFG, "trn_stk_cfg");
         TablesMap.put(TRN_STK_CFG_ITEM, "trn_stk_cfg_item");

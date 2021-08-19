@@ -118,7 +118,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlDate.setText("Fecha de la póliza: *");
+        jlDate.setText("Fecha póliza: *");
         jlDate.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jlDate);
 
@@ -155,7 +155,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCompanyBranch.setText("Sucursal de la empresa:");
+        jlCompanyBranch.setText("Sucursal empresa:");
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel12.add(jlCompanyBranch);
 
@@ -170,7 +170,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlPkRecordTypeId.setForeground(java.awt.Color.blue);
-        jlPkRecordTypeId.setText("Tipo de póliza: *");
+        jlPkRecordTypeId.setText("Tipo póliza: *");
         jlPkRecordTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel1.add(jlPkRecordTypeId);
 
@@ -187,7 +187,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlPkNumberId.setText("Número de póliza:");
+        jlPkNumberId.setText("Número póliza:");
         jlPkNumberId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlPkNumberId);
 
@@ -216,7 +216,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkAccountCashId_n.setForeground(java.awt.Color.blue);
-        jlFkAccountCashId_n.setText("Cuenta de efectivo: *");
+        jlFkAccountCashId_n.setText("Cuenta dinero: *");
         jlFkAccountCashId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel15.add(jlFkAccountCashId_n);
 
@@ -268,8 +268,8 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-400)/2, 600, 400);
+        setSize(new java.awt.Dimension(600, 400));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

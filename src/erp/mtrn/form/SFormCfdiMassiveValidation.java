@@ -61,15 +61,20 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
     
     private erp.lib.table.STablePane moResultPane;
     private final int mnModuleType;
-
+    private final int mnModuleSubType;
+    
+    private boolean mbErrShowed;
 
     /** Creates new form SFormCfdiMassiveValidation
      * @param client
-     * @param moduleType */
-    public SFormCfdiMassiveValidation(erp.client.SClientInterface client, int moduleType) {
+     * @param moduleType modulo de donde se llama la forma
+     * @param moduleSubType tipo de facturas que se van a mostrar
+     */
+    public SFormCfdiMassiveValidation(erp.client.SClientInterface client, int moduleType, int moduleSubType) {
         super(client.getFrame(), true);
         miClient = client;
         mnModuleType = moduleType;
+        mnModuleSubType = moduleSubType;
         initComponents();
         initComponentsExtra();
     }
@@ -84,9 +89,8 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
     private void initComponents() {
 
         bgCancelationType = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jbCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
@@ -99,19 +103,22 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         jPanel9 = new javax.swing.JPanel();
         jlCfdType = new javax.swing.JLabel();
         jcbCfdType = new javax.swing.JComboBox();
-        jPanel5 = new javax.swing.JPanel();
-        jrbVoucherCancellableWithoutAcceptance = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel4 = new javax.swing.JPanel();
-        jrbVoucherCancellableWithAcceptance = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel7 = new javax.swing.JPanel();
-        jrbAllVouchers = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel8 = new javax.swing.JPanel();
         jlBizPartnerId = new javax.swing.JLabel();
         jcbBizPartnerId = new javax.swing.JComboBox();
         jbBizPartnerId = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jbCheckButton = new javax.swing.JButton();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jrbAllVouchers = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel14 = new javax.swing.JPanel();
+        jrbVoucherCancellableWithoutAcceptance = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel15 = new javax.swing.JPanel();
+        jrbVoucherCancellableWithAcceptance = new sa.lib.gui.bean.SBeanFieldRadio();
         jpResultPane = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jbCheckButton = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Validación masiva de estatus de CFDI");
@@ -122,19 +129,12 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(692, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbCancel.setText("Cerrar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
         jPanel2.setLayout(new java.awt.BorderLayout());
 
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Comprobantes a validar:"));
-        jPanel3.setLayout(new java.awt.GridLayout(7, 1, 0, 2));
+        jPanel3.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -184,36 +184,9 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
 
         jPanel3.add(jPanel9);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgCancelationType.add(jrbVoucherCancellableWithoutAcceptance);
-        jrbVoucherCancellableWithoutAcceptance.setText("Comprobantes cancelables sin aceptación");
-        jrbVoucherCancellableWithoutAcceptance.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel5.add(jrbVoucherCancellableWithoutAcceptance);
-
-        jPanel3.add(jPanel5);
-
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgCancelationType.add(jrbVoucherCancellableWithAcceptance);
-        jrbVoucherCancellableWithAcceptance.setText("Comprobantes cancelables con aceptación");
-        jrbVoucherCancellableWithAcceptance.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel4.add(jrbVoucherCancellableWithAcceptance);
-
-        jPanel3.add(jPanel4);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgCancelationType.add(jrbAllVouchers);
-        jrbAllVouchers.setLabel("Todos los comprobantes");
-        jrbAllVouchers.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel7.add(jrbAllVouchers);
-
-        jPanel3.add(jPanel7);
-
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartnerId.setText("Proveedor:");
+        jlBizPartnerId.setText("Receptor:");
         jlBizPartnerId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlBizPartnerId);
 
@@ -230,19 +203,66 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         jLabel1.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel8.add(jLabel1);
 
-        jbCheckButton.setText("Validar");
-        jbCheckButton.setPreferredSize(new java.awt.Dimension(80, 23));
-        jPanel8.add(jbCheckButton);
-
         jPanel3.add(jPanel8);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jPanel11.add(jPanel3, java.awt.BorderLayout.NORTH);
+
+        jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Estatus de cancelación:"));
+        jPanel12.setLayout(new java.awt.GridLayout(3, 0));
+
+        jPanel13.setPreferredSize(new java.awt.Dimension(310, 23));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        bgCancelationType.add(jrbAllVouchers);
+        jrbAllVouchers.setLabel("Todos los comprobantes");
+        jrbAllVouchers.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel13.add(jrbAllVouchers);
+
+        jPanel12.add(jPanel13);
+
+        jPanel14.setPreferredSize(new java.awt.Dimension(310, 23));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        bgCancelationType.add(jrbVoucherCancellableWithoutAcceptance);
+        jrbVoucherCancellableWithoutAcceptance.setText("Solo comprobantes cancelables sin aceptación");
+        jrbVoucherCancellableWithoutAcceptance.setPreferredSize(new java.awt.Dimension(315, 23));
+        jPanel14.add(jrbVoucherCancellableWithoutAcceptance);
+
+        jPanel12.add(jPanel14);
+
+        jPanel15.setPreferredSize(new java.awt.Dimension(310, 23));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        bgCancelationType.add(jrbVoucherCancellableWithAcceptance);
+        jrbVoucherCancellableWithAcceptance.setText("Solo comprobantes cancelables con aceptación");
+        jrbVoucherCancellableWithAcceptance.setPreferredSize(new java.awt.Dimension(315, 23));
+        jPanel15.add(jrbVoucherCancellableWithAcceptance);
+
+        jPanel12.add(jPanel15);
+
+        jPanel11.add(jPanel12, java.awt.BorderLayout.CENTER);
+
+        jPanel2.add(jPanel11, java.awt.BorderLayout.NORTH);
 
         jpResultPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Resultados de la validación:"));
         jpResultPane.setLayout(new java.awt.BorderLayout());
         jPanel2.add(jpResultPane, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jPanel1.setPreferredSize(new java.awt.Dimension(692, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbCheckButton.setText("Validar");
+        jbCheckButton.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel1.add(jbCheckButton);
+
+        jbCancel.setText("Cerrar");
+        jbCancel.setToolTipText("[Escape]");
+        jbCancel.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel1.add(jbCancel);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(803, 485));
         setLocationRelativeTo(null);
@@ -264,7 +284,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo de doc.", 40);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio", 65);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
-        if (mnModuleType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+        if (mnModuleSubType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
             tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Emisor", 200);
             tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC emisor", 100);
         }
@@ -307,12 +327,15 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         
         jcbCfdType.addItemListener(this);
         
-        if (mnModuleType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+        if (mnModuleType == SDataConstants.MOD_PUR || mnModuleType == SDataConstants.MOD_SAL) {
             jcbCfdType.setEnabled(false);
             jcbCfdType.setSelectedIndex(1);
         }
+        else if (mnModuleType == SDataConstants.MOD_HRS) {
+            jcbCfdType.setEnabled(false); 
+            jcbCfdType.setSelectedIndex(3);
+        }
 
-       
         AbstractAction action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionCancel(); }
@@ -327,8 +350,6 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
             jftDateStart.requestFocus();
         }
     }
-
-    
 
     private void actionCancel() {
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
@@ -365,8 +386,10 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         if (miClient.showMsgBoxConfirm("Esta operación puede tardar varios minutos.\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
             SFormValidation validation = formValidate();
             if (validation.getIsError()) {
-                miClient.showMsgBoxWarning(validation.getMessage());
-                validation.getComponent().requestFocus();
+                if (!mbErrShowed) {
+                    miClient.showMsgBoxWarning(validation.getMessage());
+                    validation.getComponent().requestFocus();
+                }
             }
             else {
                 String fechaInicial = SLibUtils.DbmsDateFormatDate.format(moFieldDateStart.getDate());
@@ -378,12 +401,26 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                 String sqlJoin = "";
                 String sqlColRfc = "";
                 String sqlOrder = "";
+                String sqlTipoDps = "";
                 switch (tipoCfd){
                     case SDataConstantsSys.TRNS_TP_CFD_INV: 
                         sqlFolio = ", d.num_ser AS _serie, d.num AS _folio, d.fid_cl_dps AS _tipo";
                         sqlJoin = "INNER JOIN trn_dps AS d ON c.fid_dps_year_n = d.id_year AND c.fid_dps_doc_n = d.id_doc";
                         sqlColRfc = "c.xml_rfc_emi"; 
                         sqlOrder = "ORDER BY b1.bp, b2.bp, c.id_cfd, c.ts ";
+                        switch (mnModuleSubType) {
+                            case SDataConstantsSys.TRNS_CT_DPS_PUR:
+                                sqlTipoDps = "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + 
+                                        " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + 
+                                        " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2];
+                                break;
+                            case SDataConstantsSys.TRNS_CT_DPS_SAL:
+                                sqlTipoDps = " AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + 
+                                        " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + 
+                                        " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2];
+                                break;
+                            default:
+                        }
                         break;
                     case SDataConstantsSys.TRNS_TP_CFD_PAY_REC: 
                         sqlFolio = ", c.ser AS _serie, c.num AS _folio";
@@ -402,7 +439,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                 String sqlWhere = "c.ts BETWEEN '" + fechaInicial + "' AND '" + fechaFinal + "'";
 
                 if (jrbVoucherCancellableWithoutAcceptance.isSelected()) {
-                    sqlWhere = "(" + sqlWhere +" AND IF (c.xml_tc = 0.0, c.xml_tot <= " + mnCant + " , (c.xml_tot * c.xml_tc) <= " + mnCant + "))"
+                    sqlWhere = "(" + sqlWhere +" AND IF (c.xml_tc = 0.0, c.xml_tot <= " + mnCant + " , (c.xml_tot * c.xml_tc) <= " + mnCant + ")) "
                             + "OR c.ts BETWEEN (NOW() - INTERVAL 3 DAY) AND NOW() ";    
                 }
                 else if (jrbVoucherCancellableWithAcceptance.isSelected()) {
@@ -417,25 +454,34 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                 }
                 try {
                     this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                    String sql = "SELECT c.ts, c.xml_rfc_emi, c.xml_rfc_rec, c.uuid, c.xml_tot, b1.bp AS emisor, b2.bp AS receptor, tc.doc_xml AS xml " + sqlFolio + " " +
+                    String sql = "SELECT c.id_cfd, c.ts, c.xml_rfc_emi, c.xml_rfc_rec, c.uuid, c.xml_tot, b1.bp AS emisor, b2.bp AS receptor, tc.doc_xml AS xml " + sqlFolio + " " +
                         "FROM trn_cfd AS c " +
                         "INNER JOIN " + SClientUtils.getComplementaryDdName(miClient) + ".trn_cfd AS tc ON c.id_cfd = tc.id_cfd " +
                         "INNER JOIN erp.bpsu_bp AS b1 ON c.xml_rfc_emi = b1.fiscal_id " +
                         "INNER JOIN erp.bpsu_bp AS b2 ON c.xml_rfc_rec = b2.fiscal_id " +
                         sqlJoin + " " +
-                        "WHERE fid_tp_cfd = " + tipoCfd + " " +
+                        "WHERE fid_tp_cfd = " + tipoCfd + " " + sqlTipoDps + " " +
                         (rfcAsocNegocio.equals("") ? "" : "AND " + sqlColRfc + " = '" + rfcAsocNegocio + "' ") +
                         "AND "+ sqlWhere + " " +
+                        //"AND tc.doc_xml <> '' " + 
+                        "GROUP BY c.id_cfd, c.ts " +
                         sqlOrder + " ";
                     
                     Connection connection;
                     connection = miClient.getSession().getStatement().getConnection();
 
                     try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+                        int total = 0;
+                        int cancelados = 0;
+                        int vigentes = 0;
+                        int no_encontrados = 0;
+                        int sin_xml = 0;
+                        
                         moResultPane.createTable();
                         moResultPane.clearTableRows();
                         boolean results = false;
                         while (resultSet.next()) {
+                            total++;
                             results = true;
                             String tipoDoc = "";
                             if (tipoCfd == SDataConstantsSys.TRNS_TP_CFD_INV) {
@@ -457,14 +503,34 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                             String rfcEmi = resultSet.getString("c.xml_rfc_emi");
                             String rfcRec = resultSet.getString("c.xml_rfc_rec");
                             String uuid = resultSet.getString("c.uuid");
+                            String xml = resultSet.getString("xml");
                             
-                            cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(resultSet.getString("xml"));
-                            float ver = comprobante.getVersion();
-                            if (tipoCfd == SDataConstantsSys.TRNS_TP_CFD_INV) {
-                                addResultPaneRow(tipoDoc, folio, fecha, emisor, rfcEmi, uuid, new SCfdUtilsHandler(miClient).getCfdiSatStatus(ver, rfcEmi, rfcRec, uuid, resultSet.getDouble("c.xml_tot")).getArrayStatus());
+                            if (xml.isEmpty()) {
+                                sin_xml++;
                             }
                             else {
-                                addResultPaneRow(tipoDoc, folio, fecha, receptor, rfcRec, uuid, new SCfdUtilsHandler(miClient).getCfdiSatStatus(ver, rfcEmi, rfcRec, uuid, resultSet.getDouble("c.xml_tot")).getArrayStatus());
+                                cfd.ver33.DElementComprobante comprobante = null;
+                                try {
+                                    comprobante = DCfdUtils.getCfdi33(xml);
+                                }
+                                catch (Exception e) {}
+                                if (comprobante != null) {
+                                    float ver = comprobante.getVersion();
+                                    String[] status = new SCfdUtilsHandler(miClient).getCfdiSatStatus(ver, rfcEmi, rfcRec, uuid, resultSet.getDouble("c.xml_tot")).getArrayStatus();
+
+                                    switch (status[0].toLowerCase()){
+                                        case "vigente": vigentes++; break;
+                                        case "cancelado": cancelados++; break;
+                                        case "no encontrado": no_encontrados++; break;
+                                    }
+
+                                    if (tipoCfd == SDataConstantsSys.TRNS_TP_CFD_INV) {
+                                        addResultPaneRow(tipoDoc, folio, fecha, emisor, rfcEmi, uuid, status);
+                                    }
+                                    else {
+                                        addResultPaneRow(tipoDoc, folio, fecha, receptor, rfcRec, uuid, status);
+                                    }
+                                }
                             }
                         }
                         
@@ -473,6 +539,11 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                         
                         if (!results) {
                             miClient.showMsgBoxInformation("No se encontraron CFDI a validar para los parámetros proporcionados.");
+                        }
+                        else {
+                            miClient.showMsgBoxInformation("Se validaron un total de " + total + " CFDs, de los cuales resultaron:\n" 
+                                    + (vigentes == 0 ? "" : vigentes + " vigentes\n") + (cancelados == 0 ? "" : cancelados + " cancelados\n") + (no_encontrados == 0 ? "" : no_encontrados + " no encontrados\n")
+                                    + (sin_xml == 0 ? "" : sin_xml + " sin XML"));
                         }
                     }
                     this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -496,12 +567,14 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbBizPartnerId;
@@ -542,23 +615,36 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         moResultPane.clearTableRows();
         moFieldDateStart.setFieldValue(SLibTimeUtils.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateFinal.setFieldValue(SLibTimeUtils.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        SFormUtilities.populateComboBox(miClient, jcbCfdType, SDataConstants.TRNS_TP_CFD);
+        jrbAllVouchers.setSelected(true);
     }
 
     @Override
     public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient, jcbCfdType, SDataConstants.TRNS_TP_CFD);
-        SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_SUP);
-        jrbVoucherCancellableWithoutAcceptance.setSelected(true);
+        if (((int[]) moFieldCfdType.getKey())[0] == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+            SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_EMP);
+            jlBizPartnerId.setText("Empleado:");
+        }
+        else if (mnModuleSubType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+            SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_SUP);
+            jlBizPartnerId.setText("Emisor:");
+        }
+        else if (mnModuleSubType == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+            SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_CUS);
+            jlBizPartnerId.setText("Receptor:");
+        }
     }
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
 
+        mbErrShowed = false;
         for (SFormField mvField : mvFields) {
             if (!((erp.lib.form.SFormField) mvField).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvField).getComponent());
+                mbErrShowed = true;
                 break;
             }
         }
@@ -567,13 +653,6 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
             if (moFieldDateFinal.getDate().compareTo(moFieldDateStart.getDate()) < 0) {
                 validation.setMessage("La fecha final debe ser mayor o igual a la fecha inicial.");
                 validation.setComponent(jftDateEnd);
-            }
-        }
-        
-        if (!validation.getIsError()) {
-            if (jcbCfdType.getSelectedIndex() < 1) {
-                validation.setMessage("Debe seleccionar un tipo de CFD.");
-                validation.setComponent(jcbCfdType);
             }
         }
         
@@ -631,15 +710,17 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         switch (tipoCfd) {
             case SDataConstantsSys.TRNS_TP_CFD_PAY_REC: 
             case SDataConstantsSys.TRNS_TP_CFD_INV: 
+                jrbAllVouchers.setEnabled(true);
                 jrbVoucherCancellableWithoutAcceptance.setEnabled(true);
                 jrbVoucherCancellableWithAcceptance.setEnabled(true);
-                jrbAllVouchers.setEnabled(true);
+                formRefreshCatalogues();
                 break;    
             case SDataConstantsSys.TRNS_TP_CFD_PAYROLL: 
+                jrbAllVouchers.setEnabled(false);
                 jrbVoucherCancellableWithoutAcceptance.setEnabled(true);
                 jrbVoucherCancellableWithoutAcceptance.setSelected(true); 
                 jrbVoucherCancellableWithAcceptance.setEnabled(false);
-                jrbAllVouchers.setEnabled(false);
+                formRefreshCatalogues();
                 break;
             default:
         }

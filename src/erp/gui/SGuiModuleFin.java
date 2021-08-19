@@ -111,6 +111,7 @@ import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mtrn.data.SDataCtr;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
+import erp.mtrn.form.SFormCfdiMassiveValidation;
 import erp.mtrn.form.SFormCtr;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -222,7 +223,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinMassDownloadCfdi;
     private javax.swing.JMenuItem jmiFinMassInvoices;
     private javax.swing.JMenuItem jmiFinImportPayments;
-
+    private javax.swing.JMenu jmFinCfdiMassiveValidation;
+    private javax.swing.JMenuItem jmiFinCfdiMassiveValidationPur;
+    private javax.swing.JMenuItem jmiFinCfdiMassiveValidationSal;
+    
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepTrialBal;
     private javax.swing.JMenuItem jmiRepTrialBalStandard;
@@ -569,6 +573,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinMassDownloadCfdi = new JMenuItem("Descarga masiva de CFDI...");
         jmiFinMassInvoices = new JMenuItem("Envío masivo de facturas...");
         jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
+        jmFinCfdiMassiveValidation = new JMenu("Validación masiva de estatus de CFDI");
+        jmiFinCfdiMassiveValidationPur = new JMenuItem("Validación masiva de estatus de CFDI recibidos...");
+        jmiFinCfdiMassiveValidationSal = new JMenuItem("Validación masiva de estatus de CFDI emitidos...");
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.addSeparator();
@@ -593,6 +600,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinMassDownloadCfdi);
         jmFin.add(jmiFinMassInvoices);
+        jmFin.addSeparator();
+        jmFin.add(jmFinCfdiMassiveValidation);
+        jmFinCfdiMassiveValidation.add(jmiFinCfdiMassiveValidationPur);
+        jmFinCfdiMassiveValidation.add(jmiFinCfdiMassiveValidationSal);
+        
         /* XXX Not released yet! (2018-05-03, Sergio Flores)
         jmFin.addSeparator();
         jmFin.add(jmiFinImportPayments);
@@ -883,6 +895,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinMassDownloadCfdi.addActionListener(this);
         jmiFinMassInvoices.addActionListener(this);
         jmiFinImportPayments.addActionListener(this);
+        jmiFinCfdiMassiveValidationPur.addActionListener(this);
+        jmiFinCfdiMassiveValidationSal.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
         jmiCfgAbpEntityWarehouse.addActionListener(this);
@@ -1087,6 +1101,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
         jmiFinMassInvoices.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
+        jmFinCfdiMassiveValidation.setEnabled(hasRightMoveAccCash);
+        jmiFinCfdiMassiveValidationPur.setEnabled(hasRightMoveAccCash);
+        jmiFinCfdiMassiveValidationPur.setEnabled(hasRightMoveAccCash);
 
         jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);
         jmRepTrialBal.setEnabled(hasRightRep);
@@ -2076,6 +2093,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinImportPayments) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);
+            }
+            else if (item == jmiFinCfdiMassiveValidationPur) {
+                new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_FIN, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
+            }
+            else if (item == jmiFinCfdiMassiveValidationSal) {
+                new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_FIN, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
             else if (item == jmiRepTrialBalStandard) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_ACC, false).setVisible(true);

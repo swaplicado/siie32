@@ -9,6 +9,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -181,6 +182,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbEntryViewSum = new javax.swing.JButton();
         jsEntry4 = new javax.swing.JSeparator();
         jbGetRowXml = new javax.swing.JButton();
+        jbShowDirectCfd = new javax.swing.JButton();
+        jbShowIndirectCfd = new javax.swing.JButton();
         jsEntry3 = new javax.swing.JSeparator();
         jtbEntryDeletedFilter = new javax.swing.JToggleButton();
         jpCommands12 = new javax.swing.JPanel();
@@ -259,7 +262,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlDate.setText("Fecha de la póliza: *");
+        jlDate.setText("Fecha póliza: *");
         jlDate.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jlDate);
 
@@ -291,7 +294,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCompanyBranch.setText("Sucursal de la empresa:");
+        jlCompanyBranch.setText("Sucursal empresa:");
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel14.add(jlCompanyBranch);
 
@@ -305,7 +308,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlPkNumberId.setText("Número de póliza:");
+        jlPkNumberId.setText("Número póliza:");
         jlPkNumberId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlPkNumberId);
 
@@ -367,7 +370,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkAccountCashId_n.setText("Cuenta de dinero:");
+        jlFkAccountCashId_n.setText("Cuenta dinero:");
         jlFkAccountCashId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlFkAccountCashId_n);
 
@@ -563,6 +566,16 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbGetRowXml.setToolTipText("Obtener CFDI del renglón");
         jbGetRowXml.setPreferredSize(new java.awt.Dimension(23, 23));
         jpCommands11.add(jbGetRowXml);
+
+        jbShowDirectCfd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_xml_dir.gif"))); // NOI18N
+        jbShowDirectCfd.setToolTipText("Ver CFDI directos de la partida");
+        jbShowDirectCfd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCommands11.add(jbShowDirectCfd);
+
+        jbShowIndirectCfd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_xml_ind.gif"))); // NOI18N
+        jbShowIndirectCfd.setToolTipText("Ver CFDI indirectos de la partida");
+        jbShowIndirectCfd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCommands11.add(jbShowIndirectCfd);
 
         jsEntry3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jsEntry3.setPreferredSize(new java.awt.Dimension(3, 23));
@@ -910,7 +923,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moPaneGridEntries.setDoubleClickAction(this, "publicActionEntryEdit");
         jpEntries.add(moPaneGridEntries, BorderLayout.CENTER);
 
-        aoTableColumns = new STableColumnForm[34];
+        aoTableColumns = new STableColumnForm[35];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
@@ -935,7 +948,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem auxiliar", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Docto. (factura)", STableConstants.WIDTH_DOC_NUM);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "CFDI", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "CFDI directos", STableConstants.WIDTH_NUM_INTEGER);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "CFDI indirectos", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Ejercicio contable", STableConstants.WIDTH_YEAR_PERIOD);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cheque", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
@@ -979,6 +993,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbGetXml.addActionListener(this);
         jbRecordToRecordEntry.addActionListener(this);
         jbGetRowXml.addActionListener(this); 
+        jbShowDirectCfd.addActionListener(this);
+        jbShowIndirectCfd.addActionListener(this);
         jtbEntryDeletedFilter.addActionListener(this);
         
         jbMoneyIn.addActionListener(this);
@@ -1552,6 +1568,30 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             }
         }
     }
+    
+    private void actionShowDirectCfd() {
+        if (jbShowDirectCfd.isEnabled()) {
+            if (moPaneGridEntries.getSelectedTableRow() == null || moPaneGridEntries.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SDataRecordEntry entry = (SDataRecordEntry) moPaneGridEntries.getSelectedTableRow().getData();
+                SModuleUtilities.showCfdi(miClient, entry.getPrimaryKey(), entry, SDataConstants.FINX_REC_CFD_DIRECT);
+            }
+        }
+    }
+    
+    private void actionShowIndirectCfd() {
+        if (jbShowIndirectCfd.isEnabled()) {
+            if (moPaneGridEntries.getSelectedTableRow() == null || moPaneGridEntries.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SDataRecordEntry entry = (SDataRecordEntry) moPaneGridEntries.getSelectedTableRow().getData();
+                SModuleUtilities.showCfdi(miClient, entry.getPrimaryKey(), entry, SDataConstants.FINX_REC_CFD_INDIRECT);
+            }
+        }
+    }
 
     private void actionPerformedMoneyInOut(final SDataAccountCash cash_n, final boolean in) {
         updateRecord();
@@ -1963,6 +2003,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbMoneyOutTransfer;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRecordToRecordEntry;
+    private javax.swing.JButton jbShowDirectCfd;
+    private javax.swing.JButton jbShowIndirectCfd;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkAccountCashId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbGuiConceptPolicy;
     private javax.swing.JCheckBox jckIsAdjustmentAudit;
@@ -2540,6 +2582,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             }
             else if (button == jbGetRowXml) {
                 actionPerformedGetRowXml();
+            }
+            else if (button == jbShowDirectCfd) {
+                actionShowDirectCfd();
+            }
+            else if (button == jbShowIndirectCfd) {
+                actionShowIndirectCfd();
             }
             else if (button == jbRecordToRecordEntry) {
                 actionPerformedRecordToRecordEntry();

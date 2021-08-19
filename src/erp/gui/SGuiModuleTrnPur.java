@@ -1532,7 +1532,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRNX_DOC_REMISSION, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if(item == jmiCfdiMassiveValidation){
-                new SFormCfdiMassiveValidation(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
+                new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_PUR, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
             }
             else if (item == jmiOrdersFunctionalArea) {
                  miClient.getSession().showView(SModConsts.TRNX_ORD_LIM_MAX, SModConsts.CFGU_FUNC, new SGuiParams(SModSysConsts.TRNS_CT_DPS_PUR));

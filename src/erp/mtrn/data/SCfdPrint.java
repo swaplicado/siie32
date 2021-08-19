@@ -62,7 +62,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Alfredo Pérez, Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public class SCfdPrint {
 
@@ -834,9 +834,50 @@ public class SCfdPrint {
                     paramsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
                     paramsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
                 }
+                else if (element.getName().compareTo("cce11:ComercioExterior") == 0) {
+                    cfd.ver3.cce11.DElementComercioExterior cce = (cfd.ver3.cce11.DElementComercioExterior) element;
+                    paramsMap.put("bCceComplemento", true);
+                    paramsMap.put("sCceComplemento", cce.getElementForXml());
+                    paramsMap.put("sCceVersion", cce.getAttVersion().getString());
+                    paramsMap.put("sCceTipoOperacion", cce.getAttTipoOperacion().getString());
+                    paramsMap.put("sCceClavePedimento", cce.getAttClaveDePedimento().getString());
+                    paramsMap.put("sCceCertificadoOrigen", cce.getAttCertificadoOrigen().getInteger());
+                    paramsMap.put("sCceOrigenMercancia", cce.getEltEmisor().getEltDomicilio().getAttPais().getString());
+                    paramsMap.put("sCceIncoterm", cce.getAttIncoterm().getString());
+                    if (cce.getEltDestinatario() != null) {
+                        cfd.ver3.cce11.DElementTipoDomicilioInt dom = cce.getEltDestinatario().getEltDomicilio();
+                        paramsMap.put("bCceDestinatario", true);
+                        paramsMap.put("sCceDestNoRegistro", cce.getEltDestinatario().getAttNumRegIdTrib().getString().isEmpty() ? "-" : cce.getEltDestinatario().getAttNumRegIdTrib().getString());
+                        paramsMap.put("sCceDestNombre", cce.getEltDestinatario().getAttNombre().getString().isEmpty() ? "-" : cce.getEltDestinatario().getAttNombre().getString());
+                        paramsMap.put("sCceDestCalle", dom.getAttCalle().getString().isEmpty() ? "-" : dom.getAttCalle().getString());
+                        paramsMap.put("sCceDestNoExterior", dom.getAttNoExterior().getString().isEmpty() ? "-" : dom.getAttNoExterior().getString());
+                        paramsMap.put("sCceDestNoInterior", dom.getAttNoInterior().getString().isEmpty() ? "-" : dom.getAttNoInterior().getString());
+                        paramsMap.put("sCceDestColonia", dom.getAttColonia().getString().isEmpty() ? "-" : dom.getAttColonia().getString());
+                        paramsMap.put("sCceDestLocalidad", dom.getAttLocalidad().getString().isEmpty() ? "-" : dom.getAttLocalidad().getString());
+                        paramsMap.put("sCceDestReferencia", dom.getAttReferencia().getString().isEmpty() ? "-" : dom.getAttReferencia().getString());
+                        paramsMap.put("sCceDestMunicipio", dom.getAttMunicipio().getString().isEmpty() ? "-" : dom.getAttMunicipio().getString());
+                        paramsMap.put("sCceDestEstado", dom.getAttEstado().getString().isEmpty() ? "-" : dom.getAttEstado().getString());
+                        paramsMap.put("sCceDestPais", dom.getAttPais().getString().isEmpty() ? "-" : dom.getAttPais().getString());
+                        paramsMap.put("sCceDestCP", dom.getAttCodigoPostal().getString().isEmpty() ? "-" : dom.getAttCodigoPostal().getString());
+                    }
+                    if (cce.getEltReceptor() != null) {
+                        cfd.ver3.cce11.DElementTipoDomicilioInt dom = cce.getEltReceptor().getEltDomicilio();
+                        paramsMap.put("bCceReceptor", true);
+                        paramsMap.put("sCceRecCalle", dom.getAttCalle().getString().isEmpty() ? "-" : dom.getAttCalle().getString());
+                        paramsMap.put("sCceRecNoExterior", dom.getAttNoExterior().getString().isEmpty() ? "-" : dom.getAttNoExterior().getString());
+                        paramsMap.put("sCceRecNoInterior", dom.getAttNoInterior().getString().isEmpty() ? "-" : dom.getAttNoInterior().getString());
+                        paramsMap.put("sCceRecColonia", dom.getAttColonia().getString().isEmpty() ? "-" : dom.getAttColonia().getString());
+                        paramsMap.put("sCceRecLocalidad", dom.getAttLocalidad().getString().isEmpty() ? "-" : dom.getAttLocalidad().getString());
+                        paramsMap.put("sCceRecReferencia", dom.getAttReferencia().getString().isEmpty() ? "-" : dom.getAttReferencia().getString());
+                        paramsMap.put("sCceRecMunicipio", dom.getAttMunicipio().getString().isEmpty() ? "-" : dom.getAttMunicipio().getString());
+                        paramsMap.put("sCceRecEstado", dom.getAttEstado().getString().isEmpty() ? "-" : dom.getAttEstado().getString());
+                        paramsMap.put("sCceRecPais", dom.getAttPais().getString().isEmpty() ? "-" : dom.getAttPais().getString());
+                        paramsMap.put("sCceRecCP", dom.getAttCodigoPostal().getString().isEmpty() ? "-" : dom.getAttCodigoPostal().getString());
+                    }
+                }
             }
         }
-
+        
         // QR Code:
 
         /* IMPORTANT (sflores, 2014-01-15):

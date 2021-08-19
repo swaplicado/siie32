@@ -24,7 +24,7 @@ public final class SDataRecordEntryRow extends erp.lib.table.STableRow {
      * @return HashSet.
      */
     public HashSet<SDataCfd> getCfds() {
-        return ((SDataRecordEntry) moData).getDbmsDataCfds();
+        return ((SDataRecordEntry) moData).getDbmsDataCfd();
     }
     
     /**
@@ -65,6 +65,7 @@ public final class SDataRecordEntryRow extends erp.lib.table.STableRow {
         mvValues.add(entry.getDbmsItemAux());
         mvValues.add(entry.getDbmsDps());
         mvValues.add(entry.getDbmsXmlFilesNumber());
+        mvValues.add(entry.getDbmsIndirectXmlFilesNumber());
         mvValues.add(entry.getFkYearId_n());
         mvValues.add(entry.getAuxCheckNumber() == 0 ? "" : "" + entry.getAuxCheckNumber());
         mvValues.add(entry.getIsDeleted());

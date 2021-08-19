@@ -5195,6 +5195,18 @@ public abstract class SCfdUtils implements Serializable {
         // CFD de manera directa:
         
         String sql = "SELECT id_cfd FROM trn_cfd "
+                + "WHERE fid_fin_rec_year_n = " + cfdKey[0] + " " 
+                + "AND fid_fin_rec_per_n = " + cfdKey[1] + " " 
+                + "AND fid_fin_rec_bkc_n = " + cfdKey[2] + " " 
+                + "AND fid_fin_rec_tp_rec_n = '" + cfdKey[3] + "' " 
+                + "AND fid_fin_rec_num_n = " + cfdKey[4] + ";" ;
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
+            }
+        }
+        
+        sql = "SELECT id_cfd FROM trn_cfd "
                 + "WHERE fid_rec_year_n = " + cfdKey[0] + " " 
                 + "AND fid_rec_per_n = " + cfdKey[1] + " " 
                 + "AND fid_rec_bkc_n = " + cfdKey[2] + " " 
@@ -5206,6 +5218,7 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         
+        /* XXX WARNING (2021-08-11 Isabel Servín): Se comenta este siguiente bloque de código porque: no es necesario descargar los CFDI indirectos
         // CFD de documentos de clientes y proveedores:
 
         String aux = "SELECT DISTINCT c.id_cfd FROM fin_rec_ety AS re1, trn_cfd AS c "
@@ -5232,7 +5245,7 @@ public abstract class SCfdUtils implements Serializable {
                 cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
             }
         }
-        
+        */
         return cfds;
     }
 

@@ -96,6 +96,8 @@ public abstract class SLibConstants {
     public static final int ICON_DOC_DELIVERY = 1112;
     public static final int ICON_DOC_IMPORT_CFD = 1113;
     public static final int ICON_DOC_IMPORT_CFD_ORD = 1114;
+    public static final int ICON_DOC_XML_DIRECT = 1115;
+    public static final int ICON_DOC_XML_INDIRECT = 1116;
     public static final int ICON_FILTER_BP = 1201;
     public static final int ICON_FILTER_BPB = 1202;
     public static final int ICON_FILTER_DOC = 1203;
@@ -297,7 +299,7 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_INF_BP_TRIAL = "El asociado de negocios está en jurídico.";
     public static final java.lang.String MSG_INF_NOT_AUTHORN_ORD = "El pedido no está autorizado.";
     public static final java.lang.String MSG_INF_NOT_AUTHORN_DOC = "El documento no está autorizado.";
-
+    
     public static final java.lang.String MSG_CNF_REG_DELETE = "¿Está seguro que desea eliminar el registro?";
     public static final java.lang.String MSG_CNF_REG_ANNUL = "¿Está seguro que desea anular el registro?";
     public static final java.lang.String MSG_CNF_DOC_CLOSE = "¿Está seguro que desea cerrar el documento?";

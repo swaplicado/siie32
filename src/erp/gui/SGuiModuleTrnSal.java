@@ -1903,7 +1903,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_DPS_ACK, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.PROC);
             }
             else if(item == jmiCfdiMassiveValidation){
-                new SFormCfdiMassiveValidation(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
+                new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_SAL, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);

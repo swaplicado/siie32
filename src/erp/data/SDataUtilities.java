@@ -717,6 +717,9 @@ public abstract class SDataUtilities {
             case SDataConstants.FIN_REC:
                 registry = new SDataRecord();
                 break;
+            case SDataConstants.FIN_REC_ETY:
+                registry = new SDataRecordEntry();
+                break;
 
             case SDataConstants.TRNU_TP_DPS:
                 registry = new SDataDpsType();

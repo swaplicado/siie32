@@ -2750,8 +2750,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         itemStateFkItemId_n();
         itemStateIsCheckApplying();
 
-        if (moRecordEntry.getDbmsDataCfds().size() > 0) {
-            for (SDataCfd cfd : moRecordEntry.getDbmsDataCfds()) {
+        if (moRecordEntry.getDbmsDataCfd().size() > 0) {
+            for (SDataCfd cfd : moRecordEntry.getDbmsDataCfd()) {
                 maCfdRecordRows.add(new SDataCfdRecordRow(maCfdRecordRows.size() + 1, cfd.getPkCfdId(), cfd.getDocXmlName(), ""));
             }
             updateFilesXmlInfo();
@@ -2935,7 +2935,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         
         // obtain XML to delete:
         
-        for (SDataCfd cfdAux : moRecordEntry.getDbmsDataCfds()) {
+        for (SDataCfd cfdAux : moRecordEntry.getDbmsDataCfd()) {
             if (maCfdRecordRows.isEmpty()) {
                 moRecordEntry.getAuxDataCfdToDel().add(cfdAux);
             }
@@ -2960,7 +2960,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         for (SDataCfdRecordRow row : maCfdRecordRows) {
             SDataCfd cfd = null;
             
-            for (SDataCfd cfdAux : moRecordEntry.getDbmsDataCfds()) {
+            for (SDataCfd cfdAux : moRecordEntry.getDbmsDataCfd()) {
                 if (SLibUtilities.compareKeys(new int[] { row.getCfdId() }, new int[] { cfdAux.getPkCfdId() })) {
                     cfd = cfdAux;
                     break;
@@ -3014,9 +3014,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             }
         }
         
-        moRecordEntry.getDbmsDataCfds().clear();
+        moRecordEntry.getDbmsDataCfd().clear();
         if (cfds.size() > 0) {
-            moRecordEntry.getDbmsDataCfds().addAll(cfds);
+            moRecordEntry.getDbmsDataCfd().addAll(cfds);
         }
         
         moRecordEntry.setDbmsXmlFilesNumber(Integer.parseInt(jtfXmlFilesNumber.getText()));

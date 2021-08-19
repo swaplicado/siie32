@@ -832,15 +832,19 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             // Ingresar a la BD complementaria:
             
-            index = 1;
-            preparedStatement = connection.prepareStatement(sqlComp);
-            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXml));
-            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXmlName));
-            preparedStatement.setString(index++, msAcknowledgmentCancellationXml);
             if (!bIsUpd) {
-                preparedStatement.setNull(index++, java.sql.Types.BLOB); // cannot updated a object blob (2014-09-01, jbarajas)
+                sqlComp = "INSERT INTO " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
+                            "(id_cfd, doc_xml, doc_xml_name, ack_can_xml, ack_can_pdf_n) " + 
+                            "VALUES (" + mnPkCfdId + ", '" + SLibUtils.textToSql(msDocXml) + "', '" + SLibUtils.textToSql(msDocXmlName) + "', " +
+                            "'" + msAcknowledgmentCancellationXml + "', NULL)";
             }
-            preparedStatement.execute();
+            else {
+                sqlComp = "UPDATE " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
+                        "SET doc_xml = '" + SLibUtils.textToSql(msDocXml) + "', doc_xml_name = '" + SLibUtils.textToSql(msDocXmlName) + "', " +
+                        "ack_can_xml = '" + msAcknowledgmentCancellationXml + "' " + 
+                        "WHERE id_cfd = " + mnPkCfdId + " ";
+            }
+            connection.createStatement().execute(sqlComp);
             
             /* XXX 2018-09-11, Sergio Flores: By now, BaseX exportation of XML is disabled, until this schema is properly evaluated and validated.
             try {

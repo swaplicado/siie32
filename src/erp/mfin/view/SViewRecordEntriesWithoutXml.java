@@ -53,7 +53,7 @@ public class SViewRecordEntriesWithoutXml extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_per", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_bkc_code", "Centro contable", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Número póliza", STableConstants.WIDTH_RECORD_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fecha póliza", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "re.sort_pos", "Renglón", 35);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "id_acc", "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);

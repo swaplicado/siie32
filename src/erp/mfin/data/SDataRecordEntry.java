@@ -135,7 +135,9 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected java.lang.String msDbmsUserDelete;
     protected erp.mfin.data.SDataCheck moDbmsCheck;
     protected int mnDbmsXmlFilesNumber;
+    protected int mnDbmsIndirectXmlFilesNumber;
     protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
+    protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataIndirectCfd;
     protected HashSet<erp.mtrn.data.SDataCfd> maAuxDataCfdToDel;
             
     protected int mnAuxCheckNumber;
@@ -322,11 +324,13 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setDbmsTax(java.lang.String s) { msDbmsTax = s; }
     public void setDbmsDps(java.lang.String s) { msDbmsDps = s; }
     public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
+    public void setDbmsIndirectXmlFilesNumber(int i) { mnDbmsIndirectXmlFilesNumber = i; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
     public void setDbmsCheck(erp.mfin.data.SDataCheck o) { moDbmsCheck = o; }
     public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
+    public void setDbmsDataIndirectCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataIndirectCfd = a; }
     public void setAuxDataCfdToDel(HashSet<erp.mtrn.data.SDataCfd> a ) { maAuxDataCfdToDel = a; }
 
     public java.lang.String getDbmsAccount() { return msDbmsAccount; }
@@ -349,11 +353,13 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsTax() { return msDbmsTax; }
     public java.lang.String getDbmsDps() { return msDbmsDps; }
     public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
+    public int getDbmsIndirectXmlFilesNumber() { return mnDbmsIndirectXmlFilesNumber; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
     public erp.mfin.data.SDataCheck getDbmsCheck() { return moDbmsCheck; }
-    public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
+    public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfd() { return maDbmsDataCfd; }
+    public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataIndirectCfd() { return maDbmsDataIndirectCfd; }
     public HashSet<erp.mtrn.data.SDataCfd> getAuxDataCfdToDel() { return maAuxDataCfdToDel; }
 
     public void setAuxCheckNumber(int n) { mnAuxCheckNumber = n; }
@@ -514,8 +520,10 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         msDbmsTax = "";
         msDbmsDps = "";
         mnDbmsXmlFilesNumber = 0;
+        mnDbmsIndirectXmlFilesNumber = 0;
         moDbmsCheck = null;
         maDbmsDataCfd = new HashSet<>();
+        maDbmsDataIndirectCfd = new HashSet<>();
         maAuxDataCfdToDel = new HashSet<>();
 
         mnAuxCheckNumber = 0;
@@ -789,21 +797,22 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 sql = "SELECT id_cfd FROM trn_cfd WHERE fid_rec_year_n = " + key[0] + " AND fid_rec_per_n = " + key[1] + " AND " +
                     "fid_rec_bkc_n = " + key[2] + " AND fid_rec_tp_rec_n = '" + key[3] + "' AND " +
                     "fid_rec_num_n = " + key[4] + " AND fid_rec_ety_n = " + key[5] + " ";
-                readXml(statement, sql);
+                readXml(statement, sql, SDataConstants.FINX_REC_CFD_DIRECT);
                 
                 // CFD de documentos de clientes y proveedores:
                 
                 sql = "SELECT id_cfd FROM trn_cfd WHERE fid_dps_year_n = " + mnFkDpsYearId_n + " AND fid_dps_doc_n = " + mnFkDpsDocId_n + " ";
-                readXml(statement, sql);
+                readXml(statement, sql, SDataConstants.FINX_REC_CFD_INDIRECT);
                 
                 // CFD de recepción de pagos:
                 
                 if (mnFkCfdId_n != 0) {
                     sql = "SELECT " + mnFkCfdId_n + " AS id_cfd;";
-                    readXml(statement, sql);
+                    readXml(statement, sql, SDataConstants.FINX_REC_CFD_INDIRECT);
                 }
                 
                 mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
+                mnDbmsIndirectXmlFilesNumber = maDbmsDataIndirectCfd.size();
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -821,7 +830,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         return mnLastDbActionResult;
     }
     
-    private void readXml(Statement statement, String sql) throws Exception {
+    private void readXml(Statement statement, String sql, int typeCfd) throws Exception {
         SDataCfd cfd;
         Statement statementAux = statement.getConnection().createStatement();
         try (ResultSet resultSet = statement.executeQuery(sql)) {
@@ -832,7 +841,10 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 }
                 
                 if (!cfd.getDocXmlName().isEmpty()) {
-                    maDbmsDataCfd.add(cfd);
+                    switch (typeCfd) {
+                        case SDataConstants.FINX_REC_CFD_DIRECT: maDbmsDataCfd.add(cfd); break;
+                        case SDataConstants.FINX_REC_CFD_INDIRECT: maDbmsDataIndirectCfd.add(cfd); break;
+                    }
                 }
             }
         }
