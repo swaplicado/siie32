@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 187.1/ 2021-08-19
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Refactorización general de la forma de validación masiva de CFDI.
+2) Se agregó la validación masiva de CFDI en el modulo de contabildad y de recursos humanos.
+3) Se agregó el "Complemento comercio exterior" en la impresión de CFDI de ventas cuando el XML lo contiene.
+4) Separación de los CFDI directos e indirectos en la vista de pólizas contables.
+5) Adición de la forma SDialoShowRecordCfd que muestra los CFDI directos e indirectos de las pólizas contables. 
+6) Se cambio la forma de guardar los XML de los CFDI de la BD complementaria, pasando de PreparedStatement a
+    createStatement, con el fin de escapar a los apostrofos. 
+
+================================================================================
 SIIE 3.2 187.0/ 2021-08-16
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

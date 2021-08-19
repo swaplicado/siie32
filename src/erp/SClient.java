@@ -107,7 +107,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 187.0"; // fecha release: 2021-08-16
+    public static final String APP_RELEASE = "3.2 187.1"; // fecha release: 2021-08-19
     public static final String APP_COPYRIGHT = "2007-2021";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -193,6 +193,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconDocXml;
     private ImageIcon moIconDocXmlCancel;
     private ImageIcon moIconDocXmlSign;
+    private ImageIcon moIconDocXmlDirect;
+    private ImageIcon moIconDocXmlIndirect;
     private ImageIcon moIconDocDelivery;
     private ImageIcon moIconFilterBp;
     private ImageIcon moIconFilterBpb;
@@ -727,6 +729,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconDocXml = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"));
         moIconDocXmlCancel = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml_ack_can.gif"));
         moIconDocXmlSign = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml_sign.gif"));
+        moIconDocXmlDirect = new ImageIcon(getClass().getResource("/erp/img/icon_std_xml_dir.gif"));
+        moIconDocXmlIndirect = new ImageIcon(getClass().getResource("/erp/img/icon_std_xml_ind.gif"));
         moIconDocDelivery = new ImageIcon(getClass().getResource("/erp/img/icon_std_delivery.gif"));
         moIconFilterBp = new ImageIcon(getClass().getResource("/erp/img/icon_std_filter_bp.gif"));
         moIconFilterBpb = new ImageIcon(getClass().getResource("/erp/img/icon_std_filter_bpb.gif"));
@@ -2075,6 +2079,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_DOC_XML_SIGN:
                 imageIcon = moIconDocXmlSign;
+                break;
+            case SLibConstants.ICON_DOC_XML_DIRECT:
+                imageIcon = moIconDocXmlDirect;
+                break;
+            case SLibConstants.ICON_DOC_XML_INDIRECT:
+                imageIcon = moIconDocXmlIndirect;
                 break;
             case SLibConstants.ICON_DOC_DELIVERY:
                 imageIcon = moIconDocDelivery;
