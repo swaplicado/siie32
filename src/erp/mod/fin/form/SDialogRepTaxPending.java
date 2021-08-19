@@ -189,7 +189,7 @@ public class SDialogRepTaxPending extends SBeanDialogReport implements ActionLis
         tfFunctionalAreas.setEditable(false);
         
         updateOptions();
-        
+        jbEditFunctionalArea.setEnabled(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         msFunctionalAreaIds = "";
         moFunctionalAreaPicker = new SFormOptionPickerFunctionalArea((SClientInterface) miClient);
         this.setTextToField(moFunctionalAreaPicker.getSelectedPrimaryKey() == null ? null : ((int[]) moFunctionalAreaPicker.getSelectedPrimaryKey()));
@@ -242,6 +242,16 @@ public class SDialogRepTaxPending extends SBeanDialogReport implements ActionLis
         String orderByBizPartner = "b.bp, b.id_bp";
         String orderByDoc = "d.num_ser, d.num, d.id_year, d.id_doc, d.dt, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, x.f_dps_bal, d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, x.f_dps_bal_cur, c.id_cur, c.cur_key";
         
+        String areasFilter = "";
+        if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            if (msFunctionalAreaIds.isEmpty()) {
+                areasFilter = "";
+            }
+            else {
+                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreaIds + " ) ";
+            }
+        }
+        
         moParamsMap = miClient.createReportParams();
         moParamsMap.put("sTitle", getTitle().toUpperCase());
         moParamsMap.put("nYear", SLibTimeUtils.digestYear(moDateDate.getValue())[0]);
@@ -284,7 +294,7 @@ public class SDialogRepTaxPending extends SBeanDialogReport implements ActionLis
         }
         
         moParamsMap.put("sFuncText", tfFunctionalAreas.getText());
-        moParamsMap.put("sSqlFunAreas", "AND d.fid_func IN ( " + msFunctionalAreaIds + " ) ");
+        moParamsMap.put("sSqlFunAreas", areasFilter);
     }
 
     @Override

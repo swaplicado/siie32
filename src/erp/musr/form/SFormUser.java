@@ -92,7 +92,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.table.STablePane moUserCompaniesPane;
     private erp.lib.table.STablePane moUserCompanyBranchesPane;
 
-    /** Creates new form DFormCompany */
+    /**
+     * Creates new form SFormUser
+     * @param client GUI client.
+     */
     public SFormUser(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -1229,7 +1232,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         erp.lib.table.STableColumnForm tableColumnsUserCompanies[];
         erp.lib.table.STableColumnForm tableColumnsUserCompanyBranches[];
 
-        mvEmptyListItems = new Vector<SFormComponentItem>();
+        mvEmptyListItems = new Vector<>();
 
         moUserCompaniesPane = new STablePane(miClient);
         moUserCompaniesPane.setDoubleClickAction(this, "publicActionReturnCompany");

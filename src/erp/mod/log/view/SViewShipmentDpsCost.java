@@ -87,7 +87,7 @@ public class SViewShipmentDpsCost extends SGridPaneView implements ActionListene
         }
         
         filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
-        if (filter != null) {
+        if (filter != null && !((String) filter).isEmpty()) {
             sql += (sql.isEmpty() ? "" : "AND ") + " d.fid_func IN ( " + filter + ") ";
         }
 

@@ -50,7 +50,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
             <Property name="columns" type="int" value="1"/>
-            <Property name="rows" type="int" value="3"/>
+            <Property name="rows" type="int" value="5"/>
             <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
@@ -70,9 +70,6 @@
                   </Properties>
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextCode">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
-                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -93,9 +90,56 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextName">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[300, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel6">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlDepartmentSuperior">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Depto. superior:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyDepartmentSuperior">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[350, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel13">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlEmployeeHead">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Titular depto.:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyEmployeeHead">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[350, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
