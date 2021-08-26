@@ -64,6 +64,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.joda.time.DateTime;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeConsts;
@@ -2162,7 +2163,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 if (units >= ppRow.getAbsences()) {
                     hrsReceiptEarning.getPayrollReceiptEarning().setTimeClockSourced(true);
                     hrsReceiptEarning.getPayrollReceiptEarning().setUnitsAlleged(units - ppRow.getAbsences());
-                    hrsReceiptEarning.getPayrollReceiptEarning().setUnits(units - ppRow.getAbsences());
+                    
+                    double unitsPayed = receipt.getHrsEmployee().createEmployeeDays().computeEarningUnits(units - ppRow.getAbsences(), hrsReceiptEarning.getEarning());
+                    hrsReceiptEarning.getPayrollReceiptEarning().setUnits(unitsPayed);
                 }
             }
         }
@@ -2347,6 +2350,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     }
 
                     dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
+                    DateTime dateTime = new DateTime(moDateDateEnd.getValue());
+                    Date endDatePrevious = dateTime.plusDays(-7).toDate();
+                    Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
+                    dates[0] = dates1[0];
                 }
                 else {
                     dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());

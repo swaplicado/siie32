@@ -95,13 +95,13 @@ public class SPayrollUtils {
             ArrayList<SEarnConfiguration> configs = entry.getValue();
             for (SEarnConfiguration oEarnConfiguration : configs) {
                 if (oEarnConfiguration.getIdBonus() == SPayrollBonusUtils.PANTRY) {
-                    double hasPantry = SPayrollBonusUtils.hasPantry(client, entry.getKey(), tStartDate);
+                    double hasPantry = SPayrollBonusUtils.hasPantry(client, entry.getKey(), tEndDate);
                     oEarnConfiguration.setAmount(oEarnConfiguration.getAmount() * hasPantry);
                     oEarnConfiguration.setHasWon(hasPantry);
                     oEarnConfiguration.setComments(hasPantry > 0d ? "" : "No ganó los bonos requeridos");
                 }
                 if (oEarnConfiguration.getIdBonus() == SPayrollBonusUtils.SUPER_BONUS) {
-                    double hasSuperBonus = SPayrollBonusUtils.hasSuperBonus(client, entry.getKey(), tStartDate);
+                    double hasSuperBonus = SPayrollBonusUtils.hasSuperBonus(client, entry.getKey(), tEndDate);
                     oEarnConfiguration.setHasWon(hasSuperBonus);
                     oEarnConfiguration.setComments(hasSuperBonus > 0d ? "" : "No ganó los bonos requeridos");
                 }
