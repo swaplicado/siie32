@@ -9,6 +9,7 @@ Isabel Danae GARCÍA SERVÍN
 5) Adición de la forma SDialoShowRecordCfd que muestra los CFDI directos e indirectos de las pólizas contables. 
 6) Se cambio la forma de guardar los XML de los CFDI de la BD complementaria, pasando de PreparedStatement a
     createStatement, con el fin de escapar a los apostrofos. 
+7) Implementación del filtro por series en todas las vistas de pedidos.
 
 ================================================================================
 SIIE 3.2 187.0/ 2021-08-16
