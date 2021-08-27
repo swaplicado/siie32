@@ -22,15 +22,18 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -62,6 +65,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
+    private erp.table.STabFilterDnsDps moTabFilterDnsDps;
 
     private boolean mbHasRightAuthor = false;
 
@@ -170,6 +174,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -196,6 +201,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterDocumentNature);
         addTaskBarLowerComponent(moTabFilterFunctionalArea);
+        addTaskBarLowerComponent(moTabFilterDnsDps);
 
         mjbClose.setEnabled(hasRightToClose && !isViewForDocLinked());
         mjbOpen.setEnabled(hasRightToOpen && isViewForDocLinked());
@@ -204,6 +210,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         mjbViewLinks.setEnabled(true);
         mjbViewContractAnalysis.setEnabled(isViewForEstimateCon());
         mjbPrintContractMoves.setEnabled(isViewForEstimateCon());
+        moTabFilterDnsDps.setVisible(mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD);
 
         aoKeyFields = new STableField[2];
         aoTableColumns = new STableColumn[isViewForDocEntries() ? 29 : 17];
@@ -540,6 +547,27 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                 }
             }
         }
+        
+        String sqlSeries = "";
+        boolean dnsRight = false; 
+        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+            }
+            else if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+            }
+            if (!dnsRight) {
+                ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
+                if (!usrDnsDpss.isEmpty()) {
+                    for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
+                        sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
+                        sqlSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
+                    }
+                    sqlSeries += ") ";
+                }
+            }
+        }
 
         sqlDpsType = "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " ";
 
@@ -597,6 +625,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
                 "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
+                (sqlSeries.isEmpty() ? "" : (sqlWhere.isEmpty() ? "WHERE " : "AND ") + sqlSeries) + 
                 "GROUP BY de.id_year, de.id_doc, de.id_ety, " +
                 "d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
                 "d.num_ser, d.num, " +

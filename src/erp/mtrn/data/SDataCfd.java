@@ -676,9 +676,6 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, " +
                         "NOW(), NOW())";
-                sqlComp = "INSERT INTO " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
-                        "(id_cfd, doc_xml, doc_xml_name, ack_can_xml, ack_can_pdf_n) " + 
-                        "VALUES (" + mnPkCfdId + ", ?, ?, ?, ?)";
             }
             else {
                 bIsUpd = true;
@@ -691,9 +688,6 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
                         "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
                         "WHERE id_cfd = " + mnPkCfdId + " "; 
-                sqlComp = "UPDATE " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
-                        "SET doc_xml = ?, doc_xml_name = ?, ack_can_xml = ? " + 
-                        "WHERE id_cfd = " + mnPkCfdId + " ";
             }
             
             parseCfdiAttributes(connection, msDocXml);

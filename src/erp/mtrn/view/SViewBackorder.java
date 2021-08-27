@@ -15,17 +15,20 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
+import erp.mtrn.data.SDataUserDnsDps;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín
  */
 public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -33,6 +36,8 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
     private boolean mbIsByItem;
     private boolean mbIsByItemBp;
     private boolean mbIsByItemBpBra;
+    private boolean mbIsOrdPur;
+    private boolean mbIsOrdSal;
     private javax.swing.JButton mjbViewNotes;
     private javax.swing.JButton mjbViewLinks;
     private erp.lib.table.STabFilterDate moTabFilterDate;
@@ -40,6 +45,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
     private erp.mitm.form.SPanelFilterItemGeneric moPanelFilterItemGeneric;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
+    private erp.table.STabFilterDnsDps moTabFilterDnsDps;
 
     public SViewBackorder(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_BACKORDER, auxType01, auxType02);
@@ -66,6 +72,16 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
             SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA, 
             SDataConstantsSys.TRNX_SAL_BACKORDER_CON_ITEM_BP_BRA, 
             SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP_BRA });
+        mbIsOrdPur = SLibUtils.belongsTo(mnTabTypeAux01, new int[] {
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD,
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM,
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP,
+            SDataConstantsSys.TRNX_PUR_BACKORDER_ORD_ITEM_BP_BRA });
+        mbIsOrdSal = SLibUtils.belongsTo(mnTabTypeAux01, new int[] {
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD,
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM,
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP,
+            SDataConstantsSys.TRNX_SAL_BACKORDER_ORD_ITEM_BP_BRA });
         
         initComponents();
     }
@@ -89,6 +105,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         moPanelFilterItemGeneric = new SPanelFilterItemGeneric(miClient, this);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -105,9 +122,11 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        addTaskBarUpperComponent(moTabFilterDnsDps);
 
         mjbViewNotes.setEnabled(true);
         mjbViewLinks.setEnabled(true);
+        moTabFilterDnsDps.setVisible(mbIsOrdPur || mbIsOrdSal);
 
         STableField[] aoKeyFields = new STableField[2];
 
@@ -271,7 +290,28 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 }
             }
         }
-
+        
+        String sqlSeries = "";
+        boolean dnsRight = false; 
+        if (mbIsOrdPur || mbIsOrdSal) {
+            if (mbIsOrdPur) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+            }
+            else if (mbIsOrdSal) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+            }
+            if (!dnsRight) {
+                ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
+                if (!usrDnsDpss.isEmpty()) {
+                    for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
+                        sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
+                        sqlSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
+                    }
+                    sqlSeries += ") ";
+                }
+            }
+        }
+        
         if (mbIsByDoc) {
             msSql = "SELECT de.id_year, de.id_doc, de.id_ety, i.item_key, i.item, de.qty, de.price_u, de.stot_r, de.mass, de.sort_pos, " +
                 "d.dt, d.dt_doc_delivery_n, d.num_ser, d.num, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, dn.code, " +
@@ -339,6 +379,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " AND d.b_link = 0 " + sqlWhereDate + " " +
                 (sqlCompanyBranch.length() == 0 ? "" : " AND " + sqlCompanyBranch) + " " +
                 (sqlWhere.length() == 0 ? "" : sqlWhere) +
+                (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
                 "HAVING f_qty_pend > 0 " +
                 "ORDER BY d.dt, dt.code, d.num_ser, d.num ";
         }
@@ -382,6 +423,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " AND d.b_link = 0 " + sqlWhereDate + " " +
                 (sqlCompanyBranch.length() == 0 ? "" : " AND " + sqlCompanyBranch) + " " +
                 (sqlWhere.length() == 0 ? "" : sqlWhere) +
+                (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
                 "HAVING f_qty_pend > 0 " +
                 "ORDER BY i.item_key) AS t " +
                 "GROUP BY item_key " +
@@ -429,6 +471,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
                 SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " AND d.b_link = 0 " + sqlWhereDate + " " +
                 (sqlCompanyBranch.length() == 0 ? "" : " AND " + sqlCompanyBranch) + " " +
                 (sqlWhere.length() == 0 ? "" : sqlWhere) +
+                (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
                 "HAVING f_qty_pend > 0 " +
                 "ORDER BY i.item_key, ct.bp_key ) AS t " +
                 "GROUP BY item_key, bp_key" + (!mbIsByItemBpBra ? "" : ", bpb ") + " " +

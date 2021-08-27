@@ -18,21 +18,28 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.table.SFilterConstants;
+import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín
  */
 public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
+    private boolean mbIsOrd;
+    
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
+    private erp.table.STabFilterDnsDps moTabFilterDnsDps;
 
     private javax.swing.JButton jbDeleteLinks;
 
@@ -45,6 +52,11 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
      */
     public SViewDpsLinksQuery(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_LINKS, auxType01, auxType02);
+        
+        mbIsOrd = SLibUtils.belongsTo(mnTabTypeAux02, new int[] {
+            SDataConstantsSys.TRNX_LINK_ORD_SRC,
+            SDataConstantsSys.TRNX_LINK_ORD_DES });
+        
         initComponents();
     }
 
@@ -53,6 +65,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
 
         jbDeleteLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK_NO));
         jbDeleteLinks.setPreferredSize(new Dimension(23, 23));
@@ -68,6 +81,9 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         addTaskBarUpperComponent(jbDeleteLinks);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        if (mbIsOrd) {
+            addTaskBarUpperComponent(moTabFilterDnsDps);
+        }
 
         STableField[] aoKeyFields = new STableField[4];
         STableColumn[] aoTableColumns = new STableColumn[12];
@@ -374,7 +390,28 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
                 }
             }
         }
-
+        
+        String sqlSeries = "";
+        boolean dnsRight = false; 
+        if (mbIsOrd) {
+            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+            }
+            else if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+            }
+            if (!dnsRight) {
+                ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
+                if (!usrDnsDpss.isEmpty()) {
+                    for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
+                        sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
+                        sqlSeries += "dd.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
+                    }
+                    sqlSeries += ") ";
+                }
+            }
+        }
+        
         if (isViewFromSource()) {
             sqlDpsType = "AND ds.fid_ct_dps = " + dpsTypeKey[0] + " AND ds.fid_cl_dps = " + dpsTypeKey[1] + " AND ds.fid_tp_dps = " + dpsTypeKey[2] + " ";
         }
@@ -472,6 +509,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
                 "INNER JOIN erp.trnu_tp_dps AS ddt ON dd.fid_ct_dps = ddt.id_ct_dps AND dd.fid_cl_dps = ddt.id_cl_dps AND dd.fid_tp_dps = ddt.id_tp_dps " +
                 "INNER JOIN erp.bpsu_bpb AS dscob ON ds.fid_cob = dscob.id_bpb " +
                 "INNER JOIN erp.bpsu_bpb AS ddcob ON dd.fid_cob = ddcob.id_bpb " +
+                (sqlSeries.isEmpty() ? "" : "WHERE " + sqlSeries) + 
                 sqlOrderBy;
     }
 

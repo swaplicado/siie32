@@ -148,6 +148,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public java.util.Vector<SDataAccessCompanyBranch> getDbmsAccessCompanyBranches() { return mvDbmsAccessCompanyBranches; }
     public java.util.Vector<SDataAccessCompanyBranchEntity> getDbmsAccessCompanyBranchEntities() { return mvDbmsAccessCompanyBranchEntities; }
     public java.util.Vector<SDataAccessCompanyBranchEntityUniversal> getDbmsAccessCompanyBranchEntitiesUniversal() { return mvDbmsAccessCompanyBranchEntitiesUniversal; }
+    
+    public SDataUserConfigurationTransaction getDbmsConfigurationTransaction() { return moDbmsUserConfigurationTransaction; }
 
     public void setExtraIsPasswordUpdateRequired(boolean b) { mbExtraIsPasswordUpdateRequired = b; }
 
