@@ -103,7 +103,7 @@ public class SPayrollBonusUtils {
     public static double hasPantry(SGuiClient client, int idEmployee, Date referenceDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(referenceDate);
-        calendar.add(Calendar.DAY_OF_MONTH, -28);
+        calendar.add(Calendar.MONTH, -1);
         
         try {
             String sql = "SELECT  " +
