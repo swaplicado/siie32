@@ -5,29 +5,32 @@
 
 package erp.mtrn.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.form.SFormOptionPickerPriceHistory;
 import erp.table.SFilterConstants;
+import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
+import java.util.ArrayList;
+import javax.swing.JButton;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Sergio Flores, Isabel Servín
  */
 public class SViewPriceHistory extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private javax.swing.JButton jbCardex;
     private erp.mtrn.form.SFormOptionPickerPriceHistory moFormOptionPickerPriceHistory;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
+    private erp.table.STabFilterDnsDps moTabFilterDnsDps;
 
     public SViewPriceHistory(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_PRICE_HIST, auxType01, 0);
@@ -54,9 +57,11 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
 
         moFormOptionPickerPriceHistory = new SFormOptionPickerPriceHistory(miClient, SDataConstants.TRNX_PRICE_HIST, mnTabTypeAux01);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
         
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        addTaskBarUpperComponent(moTabFilterDnsDps);
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -150,6 +155,25 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
                 }
             }
         }
+        
+        String sqlSeries = "";
+        boolean dnsRight = false; 
+        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+            dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+        }
+        else if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+            dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+        }
+        if (!dnsRight) {
+            ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
+            if (!usrDnsDpss.isEmpty()) {
+                for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
+                    sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
+                    sqlSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
+                }
+                sqlSeries += ") ";
+            }
+        }
 
         msSql = "SELECT i.id_item, i.item, i.item_key, ig.igen, COALESCE(l.line, '(N/A)') AS line, u.symbol, MAX(d.dt) AS f_last_date, " +
             "(SELECT MAX(ets.price_u) " +
@@ -166,6 +190,8 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
             "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
             "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
             "LEFT OUTER JOIN erp.itmu_line AS l ON i.fid_line_n = l.id_line " +
+            (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere) +
+            (sqlSeries.isEmpty() ? "" : (sqlWhere.isEmpty() ? "WHERE " : "AND ") + sqlSeries) + 
             "GROUP BY i.id_item, i.item, i.item_key, ig.igen, l.line, u.symbol " +
             "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
                     "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item ";

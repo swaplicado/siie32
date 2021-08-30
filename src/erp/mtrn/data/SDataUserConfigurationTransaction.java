@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Isabel Servín
  */
 public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -49,6 +49,7 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
     protected java.lang.String msDbmsUser;
     
     private ArrayList<SDataUserFunctionalArea> maUserFunctionalArea;
+    private ArrayList<SDataUserDnsDps> maUserDnsDps;
 
     public SDataUserConfigurationTransaction() {
         super(SDataConstants.TRN_USR_CFG);
@@ -94,6 +95,7 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
     
     public ArrayList<SDataUserFunctionalArea> getUserFunctionalArea() { return maUserFunctionalArea; }
+    public ArrayList<SDataUserDnsDps> getUserDnsDps() { return maUserDnsDps; }
 
     public String getDbmsUser() { return msDbmsUser; }
 
@@ -131,6 +133,7 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
         mtUserDeleteTs = null;
         
         maUserFunctionalArea = new ArrayList<SDataUserFunctionalArea>();
+        maUserDnsDps = new ArrayList<>();
     }
 
     @Override
@@ -207,6 +210,23 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                     }
                     else {
                         maUserFunctionalArea.add(userFunctionalArea);
+                    }
+                }
+                
+                // Read aswell user document number series
+                
+                sql = "SELECT id_dns " + 
+                        "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_USR_DPS_DNS) + " " + 
+                        "WHERE id_usr = " + mnPkUserId + " ";
+                
+                resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    SDataUserDnsDps userDnsDps = new SDataUserDnsDps();
+                    if (userDnsDps.read(new int[] { mnPkUserId, resultSet.getInt(1) }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    }
+                    else {
+                        maUserDnsDps.add(userDnsDps);
                     }
                 }
                 

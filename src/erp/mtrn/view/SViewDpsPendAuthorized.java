@@ -28,17 +28,20 @@ import erp.mcfg.data.SDataCurrency;
 import erp.mitm.data.SDataUnit;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -46,10 +49,11 @@ import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña, Sergio Flores
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -66,12 +70,23 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
+    private erp.table.STabFilterDnsDps moTabFilterDnsDps;
 
     private boolean mbHasRightAuthor = false;
     private boolean mbHasRightRejectOwn = false;
+    private boolean mbIsOrd;
 
     public SViewDpsPendAuthorized(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_AUTHORIZE_PEND, auxType01);
+        
+        mbIsOrd = SLibUtils.belongsTo(mnTabTypeAux01, new int[] {
+            SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_PEND,
+            SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_AUT,
+            SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_REJ, 
+            SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_PEND, 
+            SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_AUT, 
+            SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_REJ });
+        
         initComponents();
     }
 
@@ -88,11 +103,13 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
             hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).HasRight;
             mbHasRightRejectOwn = !hasRightAuthorize && miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_REJECT_OWN).HasRight;
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).Level;
+            moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
         }
         else if (isOrderSal()) {
             hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_AUTHORN).HasRight;
             mbHasRightRejectOwn = !hasRightAuthorize && miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_REJECT_OWN).HasRight;
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_AUTHORN).Level;
+            moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
         }
         else if (isDocPur()) {
             hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level == SUtilConsts.LEV_MANAGER;
@@ -172,6 +189,9 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        if (isOrderPur() || isOrderSal()) {
+            addTaskBarUpperComponent(moTabFilterDnsDps);
+        }
 
         mjbAuthorize.setEnabled(hasRightAuthorize && (isViewDocsPending() || isViewDocsRejected()));
         mjbReject.setEnabled((hasRightAuthorize || mbHasRightRejectOwn) && (isViewDocsPending() || isViewDocsAuthorized()));
@@ -659,6 +679,27 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
             default:
                 sqlOrderBy += "ORDER BY dt.code, d.num_ser, d.num, d.dt, b.bp, b.id_bp, bb.bpb, bb.id_bpb ";
         }
+        
+        String sqlSeries = "";
+        boolean dnsRight = false; 
+        if (mbIsOrd) {
+            if (isOrderPur()) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+            }
+            else if (isOrderSal()) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+            }
+            if (!dnsRight) {
+                ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
+                if (!usrDnsDpss.isEmpty()) {
+                    for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
+                        sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
+                        sqlSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
+                    }
+                    sqlSeries += ") ";
+                }
+            }
+        }
 
         msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.b_close, d.b_del, d.ts_close, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
@@ -690,6 +731,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                 (sqlBizPartner.isEmpty() ? "" : "AND " + sqlBizPartner) +
                 (sqlDocNature.isEmpty() ? "" : "AND " + sqlDocNature) +
                 (sqlFunctionalArea.isEmpty() ? "" : "AND " + sqlFunctionalArea) +
+                (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
                 sqlOrderBy;
     }
 

@@ -7,6 +7,7 @@ package erp.mtrn.data;
 
 import cfd.DCfdUtils;
 import cfd.DElement;
+import cfd.ver3.cce11.DCce11Catalogs;
 import cfd.ver3.nom12.DElementOtroPago;
 import cfd.ver33.DCfdi33Consts;
 import cfd.ver33.DElementCfdiRelacionado;
@@ -30,6 +31,7 @@ import erp.mcfg.data.SDataCurrency;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
+import erp.mod.SModDataUtils;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
@@ -836,14 +838,15 @@ public class SCfdPrint {
                 }
                 else if (element.getName().compareTo("cce11:ComercioExterior") == 0) {
                     cfd.ver3.cce11.DElementComercioExterior cce = (cfd.ver3.cce11.DElementComercioExterior) element;
+                    String incoterm = cce.getAttIncoterm().getString() + " - " + SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOGS_INC, cce.getAttIncoterm().getString());
                     paramsMap.put("bCceComplemento", true);
                     paramsMap.put("sCceComplemento", cce.getElementForXml());
                     paramsMap.put("sCceVersion", cce.getAttVersion().getString());
                     paramsMap.put("sCceTipoOperacion", cce.getAttTipoOperacion().getString());
                     paramsMap.put("sCceClavePedimento", cce.getAttClaveDePedimento().getString());
-                    paramsMap.put("sCceCertificadoOrigen", cce.getAttCertificadoOrigen().getInteger());
+                    paramsMap.put("sCceCertificadoOrigen", DCce11Catalogs.CertificadoOrigen.get(cce.getAttCertificadoOrigen().getInteger() + ""));
                     paramsMap.put("sCceOrigenMercancia", cce.getEltEmisor().getEltDomicilio().getAttPais().getString());
-                    paramsMap.put("sCceIncoterm", cce.getAttIncoterm().getString());
+                    paramsMap.put("sCceIncoterm", incoterm);
                     if (cce.getEltDestinatario() != null) {
                         cfd.ver3.cce11.DElementTipoDomicilioInt dom = cce.getEltDestinatario().getEltDomicilio();
                         paramsMap.put("bCceDestinatario", true);

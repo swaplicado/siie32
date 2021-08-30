@@ -23,19 +23,22 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -50,6 +53,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
+    private erp.table.STabFilterDnsDps moTabFilterDnsDps;
 
     /**
      * View to send documents.
@@ -105,6 +109,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstantsSys.BPSS_CT_BP_CUS);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -126,12 +131,14 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        addTaskBarUpperComponent(moTabFilterDnsDps);
 
         mjbSendClose.setEnabled(isDpsSendPending());
         mjbViewDps.setEnabled(true);
         mjbViewNotes.setEnabled(true);
         mjbViewLinks.setEnabled(true);
         mjbSend.setEnabled(true);
+        moTabFilterDnsDps.setVisible(mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD);
 
         aoKeyFields = new STableField[2];
         aoTableColumns = new STableColumn[isDpsSendPending() ? 11 : 12];
@@ -235,6 +242,27 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                 }
             }
         }
+        
+        String sqlSeries = "";
+        boolean dnsRight = false; 
+        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+            }
+            else if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+            }
+            if (!dnsRight) {
+                ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
+                if (!usrDnsDpss.isEmpty()) {
+                    for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
+                        sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
+                        sqlSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
+                    }
+                    sqlSeries += ") ";
+                }
+            }
+        }
 
         msSql = "SELECT DISTINCT(id_year), id_doc, dt, dt_doc_delivery_n, b_close, b_del, ts_close, " +
                 "num_ser, num, num_ref, CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num) AS f_num, " +
@@ -274,6 +302,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                     (isCfd() ? "INNER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n AND x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED :
                                "") + " " +
                     "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + (isDpsPurchases() && mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD ? " AND d.b_authorn = 1 " : "") + " " +
+                    (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
                     (isDpsSendPending() ? "HAVING f_count_snd = 0 " : "HAVING f_count_snd > 0 ") +
                     "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb) ";
 
@@ -313,6 +342,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                                "INNER JOIN trn_cfd_snd_log AS s ON s.id_cfd = x.id_cfd AND s.b_snd = 1 " :
                                "INNER JOIN trn_dps_snd_log AS s ON s.id_year = d.id_year AND s.id_doc = d.id_doc AND s.b_snd = 1 ") + " " +
                     "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + (isDpsPurchases() && mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD ? " AND d.b_authorn = 1 " : "") + " " +
+                    (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
                     "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb) ";
         }
 
