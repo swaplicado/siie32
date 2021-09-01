@@ -5400,7 +5400,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return impuestos;
     }
     
-        public static boolean getAreaFunctional(SGuiSession session, int mnPkUserId, int mnIdArea) throws SQLException {
+    public static boolean getAreaFunctional(SGuiSession session, int mnPkUserId, int mnIdArea) throws SQLException {
         ResultSet resultSet = null;
         Statement statement = session.getStatement().getConnection().createStatement();
         boolean Functional = false;
