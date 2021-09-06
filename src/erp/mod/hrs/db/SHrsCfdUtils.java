@@ -232,13 +232,13 @@ public abstract class SHrsCfdUtils {
             // Obtain employee payroll receipt (this is always a one-row query):
 
             sql = "SELECT emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
-                    "tsch.code AS f_emp_reg_tp, pr.day_pad AS f_emp_dias_pag, dep.name AS f_emp_dep, " +
+                    "tsch.code AS f_emp_reg_tp, pr.day_pad AS f_emp_days_pay, dep.name AS f_emp_dep, " +
                     "pr.pay_tax_sub_assd, pr.pay_tax_sub_comp, pr.pay_tax_sub_pend_r, pr.pay_tax_sub_payd, " +
                     (bBankAccountUse ? "emp.bank_acc" : "''") + " AS f_emp_bank_clabe, " +
                     "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE " + nBankDefaultId + " END AS f_emp_bank, " +
-                    "pr.sal, pr.wage, pr.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_ini, p.dt_end AS f_nom_fin, " +
+                    "pr.sal, pr.wage, pr.dt_ben AS f_emp_hire, p.dt_sta AS f_pay_start, p.dt_end AS f_pay_end, " +
                     "pri.dt_pay, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, " +
-                    "TIMESTAMPDIFF(DAY, pr.dt_hire, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
+                    "TIMESTAMPDIFF(DAY, pr.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                     "tcon.code AS f_emp_cont_tp, twkd.code AS f_emp_jorn_tp, tpay.code AS f_emp_pay, pr.sal_ssc AS f_emp_sal_bc, trsk.code AS f_emp_risk, " +
                     "IF(emp.b_uni, '" + DCfdi33Catalogs.TxtSí + "', '" + DCfdi33Catalogs.TxtNo + "') AS f_emp_union, " +
                     "NOW() AS f_emp_date_edit " +
@@ -290,13 +290,13 @@ public abstract class SHrsCfdUtils {
                     hrsFormerReceipt.setTipoRegimen(resultSet.getInt("f_emp_reg_tp"));
                     hrsFormerReceipt.setNumSeguridadSocial(SLibUtilities.textTrim(resultSet.getString("f_emp_nss")));
                     hrsFormerReceipt.setFechaPago(resultSet.getDate("pri.dt_pay"));
-                    hrsFormerReceipt.setFechaInicialPago(resultSet.getDate("f_nom_ini"));
-                    hrsFormerReceipt.setFechaFinalPago(resultSet.getDate("f_nom_fin"));
-                    hrsFormerReceipt.setNumDiasPagados(resultSet.getDouble("f_emp_dias_pag"));
+                    hrsFormerReceipt.setFechaInicialPago(resultSet.getDate("f_pay_start"));
+                    hrsFormerReceipt.setFechaFinalPago(resultSet.getDate("f_pay_end"));
+                    hrsFormerReceipt.setNumDiasPagados(resultSet.getDouble("f_emp_days_pay"));
                     hrsFormerReceipt.setDepartamento(SLibUtilities.textTrim(resultSet.getString("f_emp_dep")));
                     hrsFormerReceipt.setBanco(resultSet.getInt("f_emp_bank"));
                     hrsFormerReceipt.setCuentaBancaria(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
-                    hrsFormerReceipt.setFechaInicioRelLaboral(resultSet.getDate("f_emp_alta"));
+                    hrsFormerReceipt.setFechaInicioRelLaboral(resultSet.getDate("f_emp_hire"));
                     hrsFormerReceipt.setAntiguedad(resultSet.getInt("f_emp_sen"));
                     hrsFormerReceipt.setPuesto(SLibUtilities.textTrim(resultSet.getString("f_emp_pos")));
                     hrsFormerReceipt.setTipoContrato(SLibUtilities.textTrim(resultSet.getString("f_emp_cont_tp")));

@@ -2723,8 +2723,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel116.add(jbCfdiCfdiRelated);
 
         jlCfdiCfdiRelatedHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlCfdiCfdiRelatedHint.setText("(separar varios UUID con coma, sin espacios)");
-        jlCfdiCfdiRelatedHint.setPreferredSize(new java.awt.Dimension(250, 23));
+        jlCfdiCfdiRelatedHint.setText("(separar varios UUID con coma, sin espacios intermedios; máximo hasta 100 UUID)");
+        jlCfdiCfdiRelatedHint.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel116.add(jlCfdiCfdiRelatedHint);
 
         jPanel74.add(jPanel116);
@@ -3016,7 +3016,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdiRelationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiRelationType, jlCfdiCfdiUsage);
         moFieldCfdiRelationType.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiCfdiRelated = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdiCfdiRelated, jlCfdiCfdiRelated);
-        moFieldCfdiCfdiRelated.setLengthMax(1024);
+        moFieldCfdiCfdiRelated.setLengthMax(3700); // (36 + 1) * 100: longitud UUID = 36 + 1 coma, aunque hay espacio de más para una última coma innecesaria
         moFieldCfdiCfdiRelated.setPickerButton(jbCfdiCfdiRelated);
         moFieldCfdiCfdiRelated.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         

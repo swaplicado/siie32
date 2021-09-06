@@ -830,12 +830,12 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 sqlComp = "INSERT INTO " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
                             "(id_cfd, doc_xml, doc_xml_name, ack_can_xml, ack_can_pdf_n) " + 
                             "VALUES (" + mnPkCfdId + ", '" + SLibUtils.textToSql(msDocXml) + "', '" + SLibUtils.textToSql(msDocXmlName) + "', " +
-                            "'" + msAcknowledgmentCancellationXml + "', NULL)";
+                            "'" + SLibUtils.textToSql(msAcknowledgmentCancellationXml) + "', NULL)";
             }
             else {
                 sqlComp = "UPDATE " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
                         "SET doc_xml = '" + SLibUtils.textToSql(msDocXml) + "', doc_xml_name = '" + SLibUtils.textToSql(msDocXmlName) + "', " +
-                        "ack_can_xml = '" + msAcknowledgmentCancellationXml + "' " + 
+                        "ack_can_xml = '" + SLibUtils.textToSql(msAcknowledgmentCancellationXml) + "' " + 
                         "WHERE id_cfd = " + mnPkCfdId + " ";
             }
             connection.createStatement().execute(sqlComp);

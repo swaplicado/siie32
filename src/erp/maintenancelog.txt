@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 189.1/ 2021-09-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al formateo adecuado del texto del acuse de cancelación de CFDI en la setencia SQL de incersión y actualización.
+2) Cambio a fecha prestaciones como fecha de alta en la emisión de CFDI de nómina.
+3) Ampliación al tamaño de UUID de CFDI relacionados agregables en la forma de captura de documentos (hasta 100 UUID).
+
+================================================================================
 SIIE 3.2 189.0/ 2021-08-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -158,7 +158,7 @@ public abstract class SHrsFormerUtils {
             "ne.fecha_alta AS f_emp_alta, " +
             "n.fecha_ini AS f_nom_date_start, " +
             "n.fecha_fin AS f_nom_date_end, " +
-            "DATEDIFF(day, e.fecha_prestaciones, n.fecha_fin) / 7 AS f_emp_sen, " + // 7 = days per week
+            "DATEDIFF(day, e.fecha_prestaciones, n.fecha_fin) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, " + // days per week
             "p.puesto AS f_emp_emp, " +
             "'' AS f_emp_cont_tp, " +
             "'' AS f_emp_jorn_tp, " +

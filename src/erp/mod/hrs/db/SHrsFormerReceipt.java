@@ -59,6 +59,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected int mnBanco;
     protected String msCuentaBancaria;
     protected Date mtFechaInicioRelLaboral;
+    /** Antigüedad en semanas. */
     protected int mnAntiguedad;
     protected String msPuesto;
     protected String msTipoContrato;
@@ -163,6 +164,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public void setBanco(int n) { mnBanco = n; }
     public void setCuentaBancaria(String s) { msCuentaBancaria = s; }
     public void setFechaInicioRelLaboral(Date t) { mtFechaInicioRelLaboral = t; }
+    /** Antigüedad en semanas. */
     public void setAntiguedad(int n) { mnAntiguedad = n; }
     public void setPuesto(String s) { msPuesto = s; }
     public void setTipoContrato(String s) { msTipoContrato = s; }
@@ -211,6 +213,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public int getBanco() { return mnBanco; }
     public String getCuentaBancaria() { return msCuentaBancaria; }
     public Date getFechaInicioRelLaboral() { return mtFechaInicioRelLaboral; }
+    /** Antigüedad en semanas. */
     public int getAntiguedad() { return mnAntiguedad; }
     public String getPuesto() { return msPuesto; }
     public int getRiesgoPuesto() { return mnRiesgoPuesto; }
@@ -966,8 +969,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public DElement getElementComplemento() throws Exception { // CFDI 3.2 & 3.3
         DElement complemento = new cfd.ver33.DElementComplemento();
 
-        //((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiElementNomina11());
-        ((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
+        //((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiElementNomina11()); // vigente hasta 31/03/2017
+        ((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());   // vigente a partir de 01/04/2017
 
         return complemento;
     }
