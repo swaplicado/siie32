@@ -17,7 +17,7 @@ import erp.table.STabFilterFunctionalArea;
 
 /**
  *
- * @author Daniel López, Sergio Flores
+ * @author Daniel López, Sergio Flores, Edwin Carmona
  */
 public class SViewBol extends erp.lib.table.STableTab {
     
@@ -92,17 +92,16 @@ public class SViewBol extends erp.lib.table.STableTab {
     @Override
     public void createSqlQuery() {
         java.lang.String sqlWhere = "";
-        java.lang.String sqlFunctAreas = "";
         erp.lib.table.STableSetting setting = null;
         
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
+                sqlWhere += "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlWhere += "AND " + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }
@@ -122,7 +121,7 @@ public class SViewBol extends erp.lib.table.STableTab {
                 + "AND d.fid_cl_dps = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] : SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]) + " "
                 + "AND d.fid_tp_dps = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] : SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]) + " "
                 + "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
-                + "AND NOT d.b_del AND " + sqlWhere + " " + sqlFunctAreas
+                + "AND NOT d.b_del " + sqlWhere
                 + "ORDER BY f_num";
     }
 }
