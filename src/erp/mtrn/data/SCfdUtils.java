@@ -251,10 +251,10 @@ public abstract class SCfdUtils implements Serializable {
             }
             else if (!isProcessingValidation) {
                 if (SLibTimeUtils.convertToDateOnly(cfd.getTimestamp()).after(client.getSessionXXX().getSystemDate())) {
-                    can = client.showMsgBoxConfirm("La fecha del documento " +
+                    can = client.showMsgBoxConfirm("La fecha del comprobante " +
                             "(" + SLibUtils.DateFormatDate.format(cfd.getTimestamp()) + ") es posterior a la fecha del sistema " +
                             "(" + SLibUtils.DateFormatDate.format(client.getSessionXXX().getSystemDate()) + ").\n" +
-                            "¿Está seguro que desea timbrar el documento?") == JOptionPane.YES_OPTION;
+                            "¿Está seguro que desea timbrar el comprobante?") == JOptionPane.YES_OPTION;
                 }
                 else {
                     int[] today = SLibTimeUtils.digestDate(client.getSessionXXX().getSystemDate());
@@ -262,10 +262,10 @@ public abstract class SCfdUtils implements Serializable {
                     GregorianCalendar limit = new GregorianCalendar(today[0], today[1] - 1, today[2], now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND));   // mix ofsystem's date + current time
                     
                     if (SLibTimeUtilities.getDaysDiff(limit.getTime(), cfd.getTimestamp()) > SCfdConsts.CFDI_STAMP_DELAY_DAYS) {
-                        throw new Exception("La fecha-hora del documento " +
+                        throw new Exception("La fecha-hora del comprobante " +
                                 "(" + SLibUtils.DateFormatDatetime.format(cfd.getTimestamp()) + ") es anterior a la fecha-hora del sistema por más de " + SCfdConsts.CFDI_STAMP_DELAY_DAYS + " días " +
                                 "(" + SLibUtils.DateFormatDatetime.format(limit.getTime()) + ").\n" +
-                                "No se puede timbrar el documento.");
+                                "No se puede timbrar el comprobante.");
                     }
                 }
             }
@@ -734,7 +734,7 @@ public abstract class SCfdUtils implements Serializable {
                 }
                 else {
                     if (cfdiSignature == null || cfdiSignature.getUuid().isEmpty()) {
-                        throw new Exception("¡El documento no ha sido " + (newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "cancelado" : "timbrado") + "!");
+                        throw new Exception("¡El comprobante no ha sido " + (newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "cancelado" : "timbrado") + "!");
                     }
                     else {
                         SCfdPacket packet = new SCfdPacket();
@@ -835,11 +835,11 @@ public abstract class SCfdUtils implements Serializable {
                             warningMessage = verifyCertificateExpiration(client);
                             
                             if (newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                                client.showMsgBoxInformation("El documento ha sido anulado correctamente." + (!isNeedStamps(client, dataCfd, SDbConsts.ACTION_ANNUL, pacId == 0 ? pacId : pac.getPkPacId()) || !consumeStamp ? "" :
+                                client.showMsgBoxInformation("El comprobante ha sido anulado correctamente." + (!isNeedStamps(client, dataCfd, SDbConsts.ACTION_ANNUL, pacId == 0 ? pacId : pac.getPkPacId()) || !consumeStamp ? "" :
                                                 "\nTimbres disponibles: " + getStampsAvailable(client, dataCfd.getFkCfdTypeId(), dataCfd.getTimestamp(), pacId == 0 ? pacId : pac.getPkPacId()) + "." + (warningMessage.isEmpty() ? "" : "\n" + warningMessage)));
                             }
                             else {
-                                client.showMsgBoxInformation("El documento ha sido timbrado correctamente. " + (!isNeedStamps(client, dataCfd, SDbConsts.ACTION_SAVE, pacId == 0 ? pacId : pac.getPkPacId()) ? "" :
+                                client.showMsgBoxInformation("El comprobante ha sido timbrado correctamente. " + (!isNeedStamps(client, dataCfd, SDbConsts.ACTION_SAVE, pacId == 0 ? pacId : pac.getPkPacId()) ? "" :
                                                 "\nTimbres disponibles: " + getStampsAvailable(client, dataCfd.getFkCfdTypeId(), dataCfd.getTimestamp(), pacId == 0 ? pacId : pac.getPkPacId()) + "." + (warningMessage.isEmpty() ? "" : "\n" + warningMessage)));
                             }
                         }
@@ -1037,7 +1037,7 @@ public abstract class SCfdUtils implements Serializable {
                             System.err.println("WsTimbradoResponse Codigo: [" + timbradoResponse.getCodigo() + "]");
                             System.err.println("WsTimbradoResponse Mensaje: [" + timbradoResponse.getMensaje() + "]");
                             System.err.println("Cfdi: [" + sCfdi + "]");
-                            throw new Exception("Error al timbrar el documento:\nCódigo: " + timbradoResponse.getCodigo() + "\nMensaje: " + timbradoResponse.getMensaje());
+                            throw new Exception("Error al timbrar el comprobante:\nCódigo: " + timbradoResponse.getCodigo() + "\nMensaje: " + timbradoResponse.getMensaje());
                         }
 
                         xml = timbradoResponse.getCfdi();
@@ -1097,7 +1097,7 @@ public abstract class SCfdUtils implements Serializable {
                             createSignCancelLog(client, sMessageException, !isValidation ? SCfdConsts.ACTION_CODE_PRC_SIGN : SCfdConsts.ACTION_CODE_VAL_SIGN, SCfdConsts.STEP_CODE_PAC_RECV_ERR, cfd, pac.getPkPacId());
 
                             System.err.println("Cfdi: [" + sCfdi + "]");
-                            throw new Exception("Error al timbrar el documento: " + sMessageException);
+                            throw new Exception("Error al timbrar el comprobante: " + sMessageException);
                         }
 
                         xml = acuseRecepcionCFDI.getXml().getValue();
@@ -1171,7 +1171,7 @@ public abstract class SCfdUtils implements Serializable {
                             System.err.println("WsTimbradoResponse Codigo: [" + timbradoResponse.getCodigo() + "]");
                             System.err.println("WsTimbradoResponse Mensaje: [" + timbradoResponse.getMensaje() + "]");
                             System.err.println("Cfdi: [" + sCfdi + "]");
-                            throw new Exception("Error al timbrar el documento:\nCódigo: " + timbradoResponse.getCodigo() + "\nMensaje: " + timbradoResponse.getMensaje());
+                            throw new Exception("Error al timbrar el comprobante:\nCódigo: " + timbradoResponse.getCodigo() + "\nMensaje: " + timbradoResponse.getMensaje());
                         }
 
                         xml = timbradoResponse.getCfdi();
@@ -1235,7 +1235,7 @@ public abstract class SCfdUtils implements Serializable {
                             createSignCancelLog(client, sMessageException, !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                             System.err.println("Cfdi: [" + sCfdi + "]");
-                            throw new Exception("Error al timbrar el documento: " + sMessageException);
+                            throw new Exception("Error al timbrar el comprobante: " + sMessageException);
                         }
 
                         xml = acuseRecepcionCFDI.getXml().getValue();
@@ -1369,7 +1369,7 @@ public abstract class SCfdUtils implements Serializable {
                                     System.err.println("WsCancelacionResponse Codigo: [" + canceladoResponse.getCodEstatus() + "]");
                                     System.err.println("WsCancelacionResponse Mensaje: [" + canceladoResponse.getMensaje() + "]");
                                     System.err.println("UUID: [" + uuidArray + "]\t");
-                                    throw new Exception("Error al cancelar el documento:\nCódigo: " + canceladoResponse.getCodEstatus() + "\nMensaje: " + canceladoResponse.getMensaje());
+                                    throw new Exception("Error al cancelar el comprobante:\nCódigo: " + canceladoResponse.getCodEstatus() + "\nMensaje: " + canceladoResponse.getMensaje());
                                 }
                                 next = false;
                             }
@@ -1782,7 +1782,7 @@ public abstract class SCfdUtils implements Serializable {
                                     System.err.println("WsCancelacionResponse Codigo: [" + canceladoResponse.getCodEstatus() + "]");
                                     System.err.println("WsCancelacionResponse Mensaje: [" + canceladoResponse.getMensaje() + "]");
                                     System.err.println("UUID: [" + uuidArray + "]\t");
-                                    throw new Exception("Error al cancelar el documento:\nCódigo: " + canceladoResponse.getCodEstatus() + "\nMensaje: " + canceladoResponse.getMensaje());
+                                    throw new Exception("Error al cancelar el comprobante:\nCódigo: " + canceladoResponse.getCodEstatus() + "\nMensaje: " + canceladoResponse.getMensaje());
                                 }
                                 next = false;
                             }
@@ -2654,7 +2654,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static void resetCfdiDeactivateFlags(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             boolean deactivate = true;
@@ -2691,7 +2691,7 @@ public abstract class SCfdUtils implements Serializable {
         boolean signed = false;
         
         if (canCfdiSign(client, cfd, false)) {
-            if (!isSingle || !confirmSending || client.showMsgBoxConfirm("¿Está seguro que desea timbrar el documento?") == JOptionPane.YES_OPTION) {
+            if (!isSingle || !confirmSending || client.showMsgBoxConfirm("¿Está seguro que desea timbrar el comprobante?") == JOptionPane.YES_OPTION) {
                 // Open Sign & Cancel Log entry:
                 
                 LogSignId = 0;
@@ -2852,7 +2852,7 @@ public abstract class SCfdUtils implements Serializable {
      */
     public static void printCfd(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype, int printMode, int numberCopies, boolean isSaveOfCfdBeingProcessed) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             if (canPrint(cfd, isSaveOfCfdBeingProcessed)) {
@@ -2871,10 +2871,10 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsPrintable.isEmpty()) {
-            client.showMsgBoxInformation("No hay documentos para imprimir.");
+            client.showMsgBoxInformation("No hay comprobantes para imprimir.");
         }
         else {
-            if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsPrintable.size() + " documentos?") == JOptionPane.YES_OPTION) {
+            if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsPrintable.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de impresión", SCfdConsts.REQ_PRINT_DOC);
                 dialog.setFormParams(client, cfdsPrintable, null, 0, null, false, cfdSubtype, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialog.setNumberCopies(numberCopies);
@@ -2895,7 +2895,7 @@ public abstract class SCfdUtils implements Serializable {
         SCfdPrint cfdPrint = null;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             if (canObtainAcknowledgmentCancellation(client, cfd)) {
@@ -3032,7 +3032,7 @@ public abstract class SCfdUtils implements Serializable {
                 throw new Exception("Documento timbrado, pero no enviado:\n" + e.getMessage());
             }
             else {
-                throw new Exception("No fue posible timbrar ni enviar el documento:\n" + e.getMessage());
+                throw new Exception("No fue posible timbrar ni enviar el comprobante:\n" + e.getMessage());
             }
         }
         
@@ -3371,7 +3371,7 @@ public abstract class SCfdUtils implements Serializable {
         cfdsVerify = new ArrayList<>();
         
         if (cfds.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para verificar.");
+            client.showMsgBoxInformation("No existen comprobantes para verificar.");
         }
         else {
             for (SDataCfd cfd : cfds) {
@@ -3383,7 +3383,7 @@ public abstract class SCfdUtils implements Serializable {
             }
 
             if (cfdsVerify.isEmpty()) {
-                client.showMsgBoxInformation("No existen documentos para verificar.");
+                client.showMsgBoxInformation("No existen comprobantes para verificar.");
             }
             else {
                 if (existsCfdiEmitInconsist(client, cfdsVerify)) {
@@ -4564,7 +4564,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             if (existsCfdiEmitInconsist(client, cfdsValidate)) {
@@ -4591,10 +4591,10 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para timbrar.");
+            client.showMsgBoxInformation("No existen comprobantes para timbrar.");
         }
         else {
-            if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
+            if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 signed = true;
                 boolean signNeeded = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
                 int stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
@@ -4637,10 +4637,10 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para timbrar y enviar.");
+            client.showMsgBoxInformation("No existen comprobantes para timbrar y enviar.");
         }
         else {
-            if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar y enviar " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
+            if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar y enviar " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 signedSent = true;
                 boolean signNeeded = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
                 int stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
@@ -4682,10 +4682,10 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para anular.");
+            client.showMsgBoxInformation("No existen comprobantes para anular.");
         }
         else {
-            if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
+            if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 cancel = true;
                 stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
                 needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
@@ -4725,10 +4725,10 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para anular.");
+            client.showMsgBoxInformation("No existen comprobantes para anular.");
         }
         else {
-            if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
+            if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 cancel = true;
                 stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
                 needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
@@ -4762,7 +4762,7 @@ public abstract class SCfdUtils implements Serializable {
      */
     public static void printCancelAckForCfd(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             printCfdCancelAck(client, cfd, SDataConstantsPrint.PRINT_MODE_VIEWER, cfdSubtype);
@@ -4826,7 +4826,7 @@ public abstract class SCfdUtils implements Serializable {
     public static void downloadXmlCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\n"
-                    + "No se encontró el archivo XML del documento.");
+                    + "No se encontró el archivo XML del comprobante.");
         }
         else {
             if (canObtainXml(cfd)) {
@@ -4845,7 +4845,7 @@ public abstract class SCfdUtils implements Serializable {
         File origin = new File(SDataPdf.composePdfDirectory(((SDataParamsCompany)client.getSession().getConfigCompany()).getXmlBaseDirectory(), pk[0]) + "/" + name);
         if (!origin.exists()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\n"
-                    + "No se encontró el archivo PDF del documento.");
+                    + "No se encontró el archivo PDF del comprobante.");
         }
         else {
             client.getFileChooser().setSelectedFile(new File(name));
@@ -4889,7 +4889,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static void getAcknowledgmentCancellationCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             if (canObtainAcknowledgmentCancellation(client, cfd)) {
@@ -4918,7 +4918,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos anulados para obtener acuse de cancelación.");
+            client.showMsgBoxInformation("No existen comprobantes anulados para obtener acuse de cancelación.");
         }
         else {
             client.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -4940,7 +4940,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static void sendCfd(final SClientInterface client, final int typeCfd, final SDataCfd cfd, final int cfdSubtype, boolean confirmationMail, boolean catchExceptions, boolean needConfirmSending) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             sendCfd(client, typeCfd, cfd, cfdSubtype, true, confirmationMail, catchExceptions, needConfirmSending);
@@ -4957,10 +4957,10 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para enviar por correo-e.");
+            client.showMsgBoxInformation("No existen comprobantes para enviar por correo-e.");
         }
         else {
-            if (client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
+            if (client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.REQ_SEND_DOC);
                 dialog.setFormParams(client, cfdsAux, null, 0, null, false, cfdSubtype, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialog.setVisible(true);
@@ -4977,7 +4977,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else {
             if (existsCfdiEmitInconsist(client, cfdsValidate)) {
@@ -5098,7 +5098,7 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     /**
-     * Devuelve un cfd a través del tipo de cfd y el primary key del documento.
+     * Devuelve un cfd a través del tipo de cfd y el primary key del comprobante.
      * @param client
      * @param typeCfd
      * @param cfdKey
@@ -5110,7 +5110,7 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     /**
-     * Devuelve un cfd a través del tipo de cfd, el subtipo y el primary key del documento.
+     * Devuelve un cfd a través del tipo de cfd, el subtipo y el primary key del comprobante.
      * @param client
      * @param typeCfd
      * @param cfdSubtype
@@ -5162,7 +5162,7 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     /**
-     * Devuelve una lista de cfds a través del tipo de cfd, el subtipo y el primary key de los documentos.
+     * Devuelve una lista de cfds a través del tipo de cfd, el subtipo y el primary key de los comprobantes.
      * @param client
      * @param typeCfd
      * @param cfdSubtype
@@ -5219,7 +5219,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         
         /* XXX WARNING (2021-08-11 Isabel Servín): Se comenta este siguiente bloque de código porque: no es necesario descargar los CFDI indirectos
-        // CFD de documentos de clientes y proveedores:
+        // CFD de comprobantes de clientes y proveedores:
 
         String aux = "SELECT DISTINCT c.id_cfd FROM fin_rec_ety AS re1, trn_cfd AS c "
                 + "WHERE NOT re1.b_del "

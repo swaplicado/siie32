@@ -10119,7 +10119,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 for (SDataDpsEntry dpsEntry : moDps.getDbmsDpsEntries()) {
                     for (SDataDpsDpsAdjustment dpsAdjustment : dpsEntry.getDbmsDpsAdjustmentsAsAdjustment()) {
                         SDataDps invoice = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, dpsAdjustment.getDbmsDpsKey(), SLibConstants.EXEC_MODE_VERBOSE);
-                        if (invoice.getDbmsDataCfd() != null && !invoice.getDbmsDataCfd().getUuid().isEmpty()) {
+                        if (invoice.getDbmsDataCfd() != null && !invoice.getDbmsDataCfd().getUuid().isEmpty() && !dpsCfd.getCfdiRelacionados().contains(invoice.getDbmsDataCfd().getUuid())) {
                             try {
                                 dpsCfd.addCfdiRelacionado(invoice.getDbmsDataCfd().getUuid());
                             }
@@ -10214,6 +10214,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         if ((moFilePdfJustLoaded != null) || (moFieldCfdiPdfFile.getString().isEmpty() && moDps.getDbmsDataPdf() != null)) {
             SDataPdf pdf;
+            
             if (moDps.getDbmsDataPdf() != null) {
                 pdf =  moDps.getDbmsDataPdf();
             }
@@ -10227,6 +10228,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             else {
                 pdf.setAuxToBeDeleted(true);
             }
+            
             pdf.setAuxXmlBaseDirectory(((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
         }
         

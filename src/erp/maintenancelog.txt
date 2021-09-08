@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 189.3/ 2021-09-08
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la validación de CFDI relacionados en la captura de CFDI de modo que no se repitan los UUID de facturas asociadas a renglones con los UUID capturados manualmente separados entre sí mediante coma.
+2) Cambio al texto de los mensajes al usuario en el procesamiento de CFDI, reemplazando el término 'documento' por 'comprobante'.
+
+================================================================================
 SIIE 3.2 189.2/ 2021-09-07
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
