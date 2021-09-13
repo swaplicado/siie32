@@ -1210,7 +1210,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, formType, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
                                 dps.setAuxIsNeedCfd(true);
                                 dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
-                                SCfdUtils.computeCfd(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
                             }
                             catch (java.lang.Exception e) {
                                 throw new Exception("Ha ocurrido una excepción al generar el CFD: " + e);
@@ -1222,7 +1222,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         // compute associated CFD of current CFD of Payment:
                         /*
                         CFD data registry was already saved, but without XML of CFD.
-                        Now, XML of CFD will be generated and saved client-side by method SCfdUtils.computeCfd().
+                        Now, XML of CFD will be generated and saved client-side by method SCfdUtils.computeCfdInvoice().
                         */
                         try {
                             SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, SDataConstants.TRNX_CFD_PAY_REC, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)

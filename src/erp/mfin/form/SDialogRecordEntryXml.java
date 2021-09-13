@@ -167,7 +167,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 File[] files = miClient.getFileChooser().getSelectedFiles();
                 for (File file : files) {
-                    if (SCfdUtils.validateCfdiReceptor(miClient, file.getAbsolutePath())) {
+                    if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, file.getAbsolutePath())) {
                         maRows.add(new SDataCfdRecordRow(maRows.size() + 1, 0, file.getName(), file.getAbsolutePath()));
                         populateGridRows();
                     }

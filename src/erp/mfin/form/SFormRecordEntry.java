@@ -1879,7 +1879,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 msXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
 
-                if (SCfdUtils.validateCfdiReceptor(miClient, msXmlPath)) {
+                if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, msXmlPath)) {
                     maCfdRecordRows.add(new SDataCfdRecordRow(maCfdRecordRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
                 }
             }

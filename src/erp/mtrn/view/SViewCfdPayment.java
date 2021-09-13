@@ -410,7 +410,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
-                    SCfdUtils.printCancelAckForCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SLibConstants.UNDEFINED);
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SCfdUtils.printCfdCancelAck(miClient, cfd, 0, SDataConstantsPrint.PRINT_MODE_VIEWER);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -426,7 +427,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
-                    SCfdUtils.downloadXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SCfdUtils.downloadXmlCfd(miClient, cfd);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -442,7 +444,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
-                    SCfdUtils.getAcknowledgmentCancellationCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SCfdUtils.getAcknowledgmentCancellationCfd(miClient, cfd);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -528,7 +531,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    boolean needUpdate = SCfdUtils.restoreCfdStamped(miClient, cfd, true, SLibConstants.UNDEFINED);
+                    boolean needUpdate = SCfdUtils.restoreCfdStamped(miClient, cfd, 0, true);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -549,7 +552,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    boolean needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, cfd, true, 0);
+                    boolean needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, cfd, 0, true);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);

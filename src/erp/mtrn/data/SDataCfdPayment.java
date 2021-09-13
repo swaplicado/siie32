@@ -307,6 +307,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     int numberPago = 0;
                     int factoringFeeEntry = 0;
                     int[] paymentEntryDocTypes = new int[] { SCfdPaymentEntryDoc.TYPE_INT, SCfdPaymentEntryDoc.TYPE_FEE, SCfdPaymentEntryDoc.TYPE_FEE_VAT };
+                    HashMap<String, SDataRecord> mapRecords = new HashMap<>(); // key = record PK as String; value = record
 
                     if (comprobante.getEltOpcComplemento() != null) {
                         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
@@ -351,8 +352,13 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                                 + "Póliza contable del pago #" + numberPago + ".");
                                     }
                                     else {
-                                        record = new SDataRecord();
-                                        record.read(new Object[] { resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num") }, statementAux);
+                                        record = mapRecords.get(SDataRecord.getRecordPrimaryKey(resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num")));
+                                        
+                                        if (record == null) {
+                                            record = new SDataRecord();
+                                            record.read(new Object[] { resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num") }, statementAux);
+                                            mapRecords.put(record.getRecordPrimaryKey(), record);
+                                        }
                                         
                                         paymentEntryType = resultSet.getInt("ety_type");
                                         
@@ -528,11 +534,11 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             }
             else {
                 if (!wasRegistryNew) {
-                    // delete last CFDI accounting movements in database:
+                    // delete last CFDI accounting movements IN DATABASE:
                     mnAuxFkUserDeleteId = mnAuxFkUserEditId;
                     deleteAccounting(connection);
 
-                    // delete last CFDI accounting movements in memory:
+                    // delete last CFDI accounting movements IN MEMORY:
                     for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
                         for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
                             if (recordEntry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
@@ -545,7 +551,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 // save records (journal vouchers) of all payment entries:
                 
                 int numberEntry = 0;
-                HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>();
+                HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>(); // key = record PK as String; value = next sorting position
                 Statement statement = connection.createStatement();
                 
                 for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {

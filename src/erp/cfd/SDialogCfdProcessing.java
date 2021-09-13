@@ -55,7 +55,8 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
     protected boolean mbValidateStamp;
     
     protected boolean mbFirstTime;
-    protected int mnCfdSubtype;
+    protected final boolean mbIsCfdiSendingAutomaticHrs;
+    protected int mnPayrollCfdVersion;
     protected int mnNumberCopies;
     protected int mnDpsAnnulmentType;
     
@@ -69,6 +70,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_CFD, subtype, title);
         initComponents();
         initComponentsCustom();
+        mbIsCfdiSendingAutomaticHrs = miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs();
     }
 
     /**
@@ -443,7 +445,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                                 }
 
                                 SHrsCfdUtils.computeSignCfdi(miClient.getSession(), key);
-                                detailMessage += receiptIssue.getPayrollReceiptIssueNumber() + ": Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                                detailMessage += receiptIssue.getPayrollReceiptIssueNumber() + ": Timbrado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
                                 cfdProcessedOk++;
                                 break;
 
@@ -512,7 +514,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                             throw new Exception("Not supported yet!");
 
                         case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                            switch (mnCfdSubtype) {
+                            switch (mnPayrollCfdVersion) {
                                 case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                                     formerPayrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
                                     series = formerPayrollEmp.getNumberSeries();
@@ -539,27 +541,27 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                     try {
                         switch (mnFormSubtype) {
                             case SCfdConsts.REQ_STAMP:
-                                SCfdUtils.signCfdi(miClient, cfd, mnCfdSubtype, false, false);
+                                SCfdUtils.signCfdi(miClient, cfd, mnPayrollCfdVersion, false, false);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado.\n";
                                 break;
 
                             case SCfdConsts.REQ_ANNUL:
-                                SCfdUtils.cancelCfdi(miClient, cfd, mnCfdSubtype, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                SCfdUtils.cancelCfdi(miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado.\n";
                                 break;
 
                             case SCfdConsts.REQ_PRINT_DOC:
-                                SCfdUtils.printCfd(miClient, cfd, mnCfdSubtype, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
+                                SCfdUtils.printCfd(miClient, cfd, mnPayrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                                 break;
 
                             case SCfdConsts.REQ_PRINT_ANNUL_ACK:
-                                SCfdUtils.printCfdCancelAck(miClient, cfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnCfdSubtype);
+                                SCfdUtils.printCfdCancelAck(miClient, cfd, mnPayrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PRINT);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                                 break;
 
                             case SCfdConsts.REQ_SEND_DOC:
-                                SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnCfdSubtype, false, false, true);
+                                SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnPayrollCfdVersion, false, false, true);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Enviado.\n";
                                 break;
 
@@ -568,27 +570,27 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                                 break;
 
                             case SCfdConsts.REQ_STAMP_SEND:
-                                if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                    SCfdUtils.signAndSendCfdi(miClient, cfd, mnCfdSubtype, false, false);
+                                if (mbIsCfdiSendingAutomaticHrs) {
+                                    SCfdUtils.signAndSendCfdi(miClient, cfd, mnPayrollCfdVersion, false, false);
                                 }
                                 else {
-                                    SCfdUtils.signCfdi(miClient, cfd, mnCfdSubtype, false, false);
+                                    SCfdUtils.signCfdi(miClient, cfd, mnPayrollCfdVersion, false, false);
                                 }
-                                detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                                detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
                                 break;
 
                             case SCfdConsts.REQ_ANNUL_SEND:
-                                if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                    SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnCfdSubtype, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                if (mbIsCfdiSendingAutomaticHrs) {
+                                    SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 }
                                 else {
-                                    SCfdUtils.cancelCfdi(miClient, cfd, mnCfdSubtype, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                    SCfdUtils.cancelCfdi(miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 }
-                                detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                                detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
                                 break;
 
                             case SCfdConsts.REQ_VERIFY:
-                                SCfdUtils.validateCfdi(miClient, cfd, mnCfdSubtype, false);
+                                SCfdUtils.validateCfdi(miClient, cfd, mnPayrollCfdVersion, false);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Verificado.\n";
                                 break;
 
@@ -659,10 +661,10 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
      * @param stampsAvailable
      * @param annulmentDate
      * @param validateStamp
-     * @param cfdSubtype Constants defined in SCfdConsts.CFDI_PAYROLL_VER_...
+     * @param payrollCfdVersion Constants defined in SCfdConsts.CFDI_PAYROLL_VER_...
      * @param dpsAnnulmentType 
      */
-    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int cfdSubtype, final int dpsAnnulmentType) {
+    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int payrollCfdVersion, final int dpsAnnulmentType) {
         mbFirstTime = true;
         
         miClient = client;
@@ -671,7 +673,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
         mnStampsAvailable = stampsAvailable;
         mtAnnulmentDate = annulmentDate;
         mbValidateStamp = validateStamp;
-        mnCfdSubtype = cfdSubtype;
+        mnPayrollCfdVersion = payrollCfdVersion;
         mnDpsAnnulmentType = dpsAnnulmentType;
     }
     

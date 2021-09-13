@@ -3310,7 +3310,7 @@ public abstract class SHrsUtils {
         ArrayList<Object> aPercepciones = null;
         ArrayList<Object> aDeducciones = null;
 
-        SDbPayroll payroll = SCfdUtils.retrieveDataSetPayroll(client.getSession(), payrollReceiptKey[0]); // streamline payroll retrieval
+        SDbPayroll payroll = SCfdUtils.retrieveDataSetForPayroll(client.getSession(), payrollReceiptKey[0]); // streamline payroll retrieval
         SDbPayrollReceipt payrollReceipt = payroll.getChildPayrollReceipt(payrollReceiptKey);
 
         SDataBizPartner bizPartnerCompany = new SDataBizPartner();

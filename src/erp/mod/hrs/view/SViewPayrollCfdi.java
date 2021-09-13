@@ -78,6 +78,14 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         initComponetsCustom();
     }
 
+    private boolean isPayrollCfdVersionOld() {
+        return mnGridMode == SCfdConsts.CFDI_PAYROLL_VER_OLD;
+    }
+    
+    private int getPayrollCfdVersion() {
+        return isPayrollCfdVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR;
+    }
+
     private void initComponetsCustom() {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -100,7 +108,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
 
         switch (mnGridSubtype) {
             case SModConsts.VIEW_SC_SUM:
-                jbReemitPayroll.setEnabled(isCfdiPayrollVersionOld());
+                jbReemitPayroll.setEnabled(isPayrollCfdVersionOld());
                 jbSignCfdi.setEnabled(true);
                 jbAnnulCfdi.setEnabled(true);
                 jbGetCfdiXml.setEnabled(false);
@@ -202,10 +210,6 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         }
     }
     
-    private boolean isCfdiPayrollVersionOld() {
-        return mnGridMode == SCfdConsts.CFDI_PAYROLL_VER_OLD;
-    }
-
     private void actionSignCfdi() {
         boolean sign = true;
         boolean needUpdate = false;
@@ -233,14 +237,14 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
                             // Stamp all payroll receipts:
                             
-                            needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                            needUpdate = SCfdUtils.signPayrollCfdis((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey()), getPayrollCfdVersion());
                         }
                         else {
                             // Stamp current payroll receipt:
                             
                             cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                            if (!isCfdiPayrollVersionOld()) {
+                            if (!isPayrollCfdVersionOld()) {
                                 receiptIssue = new SDataPayrollReceiptIssue();
                                 
                                 if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
@@ -262,7 +266,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                             }
                             
                             if (sign) {
-                                needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                                needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, getPayrollCfdVersion());
                             }
                         }
 
@@ -307,9 +311,9 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         receiptIssues = new ArrayList<>();
                         
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
+                            cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey());
                             
-                            if (!isCfdiPayrollVersionOld()) {
+                            if (!isPayrollCfdVersionOld()) {
                                 receiptIssues = SHrsUtils.getPayrollReceiptIssues(miClient.getSession(), gridRow.getRowPrimaryKey());
                             }
                         }
@@ -321,7 +325,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                                 cfds.add(cfd);
                             }
             
-                            if (!isCfdiPayrollVersionOld()) {
+                            if (!isPayrollCfdVersionOld()) {
                                 receiptIssue = new SDataPayrollReceiptIssue();
                                 
                                 if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
@@ -338,7 +342,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         moDialogAnnulCfdi.setVisible(true);
 
                         if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), mnGridSubtype == SModConsts.VIEW_SC_SUM, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulationType());
+                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, getPayrollCfdVersion(), mnGridSubtype == SModConsts.VIEW_SC_SUM, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulationType());
                             needUpdate = payrollAnnul.annulPayroll();
                         }
 
@@ -444,21 +448,21 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                                 String typeDepPayroll = (String) dialogPrintOrderPayroll.getString(SLibConstants.TXT_OK);
                                 int numberCopies = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED);
 
-                                ArrayList<SDataCfd> cfdsAvailable = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey(), typeDepPayroll, orderBy);
-                                ArrayList<SDataCfd> cfdsPrintable = new ArrayList<>();
+                                ArrayList<SDataCfd> availableCfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey(), typeDepPayroll, orderBy);
+                                ArrayList<SDataCfd> printableCfds = new ArrayList<>();
  
-                                for(SDataCfd cfd : cfdsAvailable) {
+                                for(SDataCfd cfd : availableCfds) {
                                     if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                                        cfdsPrintable.add(cfd);
+                                        printableCfds.add(cfd);
                                     }
                                 }
                                 
-                                SCfdUtils.printCfds((SClientInterface) miClient, cfdsPrintable, numberCopies, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                                SCfdUtils.printPayrollCfds((SClientInterface) miClient, printableCfds, getPayrollCfdVersion(), numberCopies);
                             }
                         }
                         else {
                             SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                            SCfdUtils.printCfd((SClientInterface) miClient, cfd, isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
+                            SCfdUtils.printCfd((SClientInterface) miClient, cfd, getPayrollCfdVersion(), SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
                         }
                     }
                     catch (Exception e) {
@@ -470,8 +474,6 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
     }
 
     private void actionPrintCfdiCancelAck() {
-        ArrayList<SDataCfd> cfdAux = null;
-        ArrayList<SDataCfd> cfds = null;
 
         if (jbPrintCfdiCancelAck.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -492,21 +494,20 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            cfdAux = new ArrayList<>();
-                            cfds = new ArrayList<>();
+                            ArrayList<SDataCfd> availableCfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey());
+                            ArrayList<SDataCfd> printableCfds = new ArrayList<>();
 
-                            cfdAux = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
-
-                            for(SDataCfd cfd : cfdAux) {
+                            for(SDataCfd cfd : availableCfds) {
                                 if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                                    cfds.add(cfd);
+                                    printableCfds.add(cfd);
                                 }
                             }
 
-                            SCfdUtils.printCancelAckForCfds((SClientInterface) miClient, cfds, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                            SCfdUtils.printCancelAckForCfds((SClientInterface) miClient, printableCfds, getPayrollCfdVersion());
                         }
                         else {
-                            SCfdUtils.printCancelAckForCfd((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                            SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                            SCfdUtils.printCfdCancelAck((SClientInterface) miClient, cfd, getPayrollCfdVersion(), SDataConstantsPrint.PRINT_MODE_VIEWER);
                         }
                     }
                     catch (Exception e) {
@@ -537,10 +538,10 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "los" : "el") + " CFDI de nómina?") == JOptionPane.YES_OPTION) {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                            SCfdUtils.sendCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey()), getPayrollCfdVersion());
                         }
                         else {
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), true, false, false);
+                            SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), getPayrollCfdVersion(), true, false, false);
                          }
                     }
                     catch (Exception e) {
@@ -573,10 +574,10 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            needUpdate = SCfdUtils.verifyCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                            needUpdate = SCfdUtils.verifyCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey()), getPayrollCfdVersion());
                         }
                         else {
-                            needUpdate = SCfdUtils.validateCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), true);
+                            needUpdate = SCfdUtils.validateCfdi((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT), getPayrollCfdVersion(), true);
                         }
                          
                         if (needUpdate) {
@@ -618,7 +619,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                     try {
                         cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                        if (!isCfdiPayrollVersionOld()) {
+                        if (!isPayrollCfdVersionOld()) {
                             receiptIssue = new SDataPayrollReceiptIssue();
                             
                             if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
@@ -633,7 +634,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         }
                         
                         if (restore) {
-                            needUpdate = SCfdUtils.restoreCfdStamped((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), true, SLibConstants.UNDEFINED);
+                            needUpdate = SCfdUtils.restoreCfdStamped((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), 0, true);
 
                             if (needUpdate) {
                                 miClient.getSession().notifySuscriptors(mnGridType);
@@ -675,7 +676,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                     try {
                         cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                         
-                        if (!isCfdiPayrollVersionOld()) {
+                        if (!isPayrollCfdVersionOld()) {
                             receiptIssue = new SDataPayrollReceiptIssue();
                             
                             if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
@@ -690,7 +691,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         }
                         
                         if (restore) {
-                            needUpdate = SCfdUtils.restoreCfdCancelAck((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), true, SLibConstants.UNDEFINED);
+                            needUpdate = SCfdUtils.restoreCfdCancelAck((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), 0, true);
 
                             if (needUpdate) {
                                 miClient.getSession().notifySuscriptors(mnGridType);
@@ -756,7 +757,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                     break;
                 case SGuiConsts.GUI_DATE_MONTH:
                     date = SLibTimeUtils.digestMonth((SGuiDate) filter);
-                    if (isCfdiPayrollVersionOld()) {
+                    if (isPayrollCfdVersionOld()) {
                         sql += (sql.length() == 0 ? "" : "AND ") + "pay_year = " + date[0] + " AND pay_per = " + date[1] + " ";
                     }
                     else {
@@ -765,7 +766,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                     break;
                 case SGuiConsts.GUI_DATE_YEAR:
                     date = SLibTimeUtils.digestYear((SGuiDate) filter);
-                    if (isCfdiPayrollVersionOld()) {
+                    if (isPayrollCfdVersionOld()) {
                         sql += (sql.length() == 0 ? "" : "AND ") + "pay_year = " + date[0] + " ";
                     }
                     else {
@@ -797,7 +798,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             
             if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
                 msSql += "CONCAT(rcp_num_ser, IF(LENGTH(rcp_num_ser) = 0, '', '-'), erp.lib_fix_int(rcp_num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS rcp_num, "
-                        + "IF(" + (isCfdiPayrollVersionOld() ? "c.fid_st_xml = " : "fk_st_rcp = ") + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS _ico, "
+                        + "IF(" + (isPayrollCfdVersionOld() ? "c.fid_st_xml = " : "fk_st_rcp = ") + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS _ico, "
                         + "IF(c.fid_st_xml IS NULL, " + SGridConsts.ICON_NULL + ", " /* not have CFDI associated */
                         + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " /* CFDI pending sign */
                         + "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
@@ -809,32 +810,32 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             }
             else {
                 msSql += "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + (isPayrollCfdVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
                         + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ")
-                        + "WHERE b_con = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS count_sign, "
+                        + "WHERE b_con = 1 AND " + (isPayrollCfdVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS count_sign, "
                         + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + (isPayrollCfdVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
                         + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp <> "  + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
-                        + "WHERE b_con = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_NEW + ") AS count_to_sign, "
+                        + "WHERE b_con = 1 AND " + (isPayrollCfdVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_NEW + ") AS count_to_sign, "
                         + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + (isPayrollCfdVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
                         + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ")
-                        + "WHERE b_con = 0 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS count_inconsistent, "
+                        + "WHERE b_con = 0 AND " + (isPayrollCfdVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS count_inconsistent, "
                         + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + (isPayrollCfdVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
                         + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
-                        + "WHERE b_prc_ws = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_ws, "
+                        + "WHERE b_prc_ws = 1 AND " + (isPayrollCfdVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_ws, "
                         + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + (isPayrollCfdVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
                         + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
-                        + "WHERE b_prc_sto_xml = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_sto_xml, "
+                        + "WHERE b_prc_sto_xml = 1 AND " + (isPayrollCfdVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_sto_xml, "
                         + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + (isPayrollCfdVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
                         + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
-                        + "WHERE b_prc_sto_pdf = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_sto_pdf ";
+                        + "WHERE b_prc_sto_pdf = 1 AND " + (isPayrollCfdVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_sto_pdf ";
             }
 
-            if (isCfdiPayrollVersionOld()) {
+            if (isPayrollCfdVersionOld()) {
                 msSql += "FROM ( "
                         + "SELECT v.id_pay AS id_pay, v.pay_num, v.pay_year, v.pay_per, "
                         + "v.pay_type AS pay_type, IF(v.b_reg, 'NORMAL', 'ESPECIAL') AS pay_sht_type, '' AS pay_sth_cus_type, v.dt_beg, v.dt_end, '' AS pay_notes, "
@@ -888,12 +889,12 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             }
 
             msSql += (mnGridSubtype == SModConsts.VIEW_SC_DET ? "INNER JOIN " : "LEFT OUTER JOIN ") + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON "
-                    + (isCfdiPayrollVersionOld() ? "t.id_pay = c.fid_pay_pay_n AND t.id_emp = c.fid_pay_emp_n " : "t.id_pay = c.fid_pay_rcp_pay_n AND t.id_emp = c.fid_pay_rcp_emp_n AND t.id_iss = c.fid_pay_rcp_iss_n ")
+                    + (isPayrollCfdVersionOld() ? "t.id_pay = c.fid_pay_pay_n AND t.id_emp = c.fid_pay_emp_n " : "t.id_pay = c.fid_pay_rcp_pay_n AND t.id_emp = c.fid_pay_rcp_emp_n AND t.id_iss = c.fid_pay_rcp_iss_n ")
                     + "AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) " 
                     + "LEFT OUTER JOIN " + complementaryDbName + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS xc ON c.id_cfd = xc.id_cfd ";
 
             if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-                msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON " + (isCfdiPayrollVersionOld() ? "t.fid_bpr_n = b.id_bp " : "t.id_emp = b.id_bp ") + 
+                msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON " + (isPayrollCfdVersionOld() ? "t.fid_bpr_n = b.id_bp " : "t.id_emp = b.id_bp ") + 
                         "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON b.id_bp = e.id_emp ";
             }
 
@@ -931,7 +932,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_balance", "Alcance neto $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "pay_notes", "Notas nómina", 200));
         if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-            if (!isCfdiPayrollVersionOld()) {
+            if (!isPayrollCfdVersionOld()) {
                 gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_iss", "F emisión"));
                 gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_pay", "F pago"));
                 gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_pay_sys", "Método pago"));

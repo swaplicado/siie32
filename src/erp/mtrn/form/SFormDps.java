@@ -7435,7 +7435,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
                     String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
-                    if (SCfdUtils.validateCfdiReceptor(miClient, absolutePath)) {
+                    if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, absolutePath)) {
                         String cfdi = SXmlUtils.readXml(absolutePath);
                         msXmlUuid = "";
                         moComprobante = DCfdUtils.getCfdi33(cfdi);

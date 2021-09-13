@@ -214,6 +214,19 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         return getRecordPeriod() + "-" + mnPkBookkeepingCenterId + "-" + getRecordNumber();
     }
 
+    /**
+     * Composes record primary key in format yyyy-mm-0-tp-000000 (i.e., year-month-BKC-type-number).
+     * @param yearId
+     * @param periodId
+     * @param bookkeepingCenterId
+     * @param recordTypeId
+     * @param numberId
+     * @return 
+     */
+    public static String getRecordPrimaryKey(final int yearId, final int periodId, final int bookkeepingCenterId, final String recordTypeId, final int numberId) {
+        return SLibUtils.DecimalFormatCalendarYear.format(yearId) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(periodId) + "-" + bookkeepingCenterId + "-" + recordTypeId + "-" + SLibUtils.DecimalNumberFormat.format(numberId);
+    }
+
     public int getLastSortingPosition() {
         int lastSortingPosition = 0;
                 

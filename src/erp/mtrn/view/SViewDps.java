@@ -1803,7 +1803,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else {
                 try {
-                    SCfdUtils.downloadXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SCfdUtils.downloadXmlCfd(miClient, cfd);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -1835,7 +1836,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else {
                 try {
-                    SCfdUtils.printCancelAckForCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SLibConstants.UNDEFINED);
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SCfdUtils.printCfdCancelAck(miClient, cfd, 0, SDataConstantsPrint.PRINT_MODE_VIEWER);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -1874,7 +1876,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else {
                 try {
-                    SCfdUtils.getAcknowledgmentCancellationCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SCfdUtils.getAcknowledgmentCancellationCfd(miClient, cfd);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -1935,7 +1938,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 else {
                                     if (miClient.showMsgBoxConfirm("¿Está seguro que desea volver a timbrar el documento '" + dps.getDpsNumber() + "'?") == JOptionPane.YES_OPTION) {
                                         try {
-                                             SCfdUtils.computeCfd(miClient, dps, SDataConstantsSys.TRNS_TP_XML_CFD);
+                                             SCfdUtils.computeCfdInvoice(miClient, dps, SDataConstantsSys.TRNS_TP_XML_CFD);
                                              miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                              miClient.showMsgBoxInformation("El comprobante fiscal ha sido timbrado correctamente.");
                                         }
@@ -2058,7 +2061,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    needUpdate = SCfdUtils.restoreCfdStamped(miClient, dps.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
+                    needUpdate = SCfdUtils.restoreCfdStamped(miClient, dps.getDbmsDataCfd(), 0, true);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -2083,7 +2086,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, dps.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
+                    needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, dps.getDbmsDataCfd(), 0, true);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);

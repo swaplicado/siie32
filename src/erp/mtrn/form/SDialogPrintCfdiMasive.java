@@ -234,11 +234,11 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
         String serieEnd = "";
         String folioIni = "";
         String folioEnd = "";
-        ArrayList<int[]> keysDps = null;
+        ArrayList<int[]> dpsKeys = null;
         SFormValidation validation = formValidate();
         ArrayList<SDataCfd> cfds ;
         
-        keysDps = new ArrayList<>();
+        dpsKeys = new ArrayList<>();
         cfds = null;
         
         if (validation.getIsError()) {
@@ -272,8 +272,8 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
             }
             
             try {
-                keysDps = SDataUtilities.obtainDpsIds(miClient, serieIni, serieEnd, folioIni, folioEnd, moFieldDateStart.getDate(), manKey);
-                cfds = SCfdUtils.getCfds(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SLibConstants.UNDEFINED, keysDps);
+                dpsKeys = SDataUtilities.obtainDpsIds(miClient, serieIni, serieEnd, folioIni, folioEnd, moFieldDateStart.getDate(), manKey);
+                cfds = SCfdUtils.getCfds(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SLibConstants.UNDEFINED, dpsKeys);
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);

@@ -35,7 +35,7 @@ public class SCfdUtilsHandler {
     
     public ArrayList<CfdiRelated> getCfdiRelated(final SDataCfd cfd) throws Exception {
         ArrayList<CfdiRelated> cfdiRelatedList = new ArrayList<>();
-        SDataCfdPacType cfdPacType = SCfdUtils.getPacConfiguration(miClient, cfd.getFkCfdTypeId());
+        SDataCfdPacType cfdPacType = SCfdUtils.getCfdPacType(miClient, cfd.getFkCfdTypeId());
         SDataPac pac = null;
         
         if (cfdPacType != null) {
@@ -214,7 +214,7 @@ public class SCfdUtilsHandler {
         * a traves de FINKOK sólo se podían validar los que fueron emitidos por si mismo, por lo cual la validación era limitada.
         
         CfdiAckQuery cfdiAckQuery = null;
-        SDataCfdPacType cfdPacType = SCfdUtils.getPacConfiguration(miClient, cfdTypeId);
+        SDataCfdPacType cfdPacType = SCfdUtils.getCfdPacType(miClient, cfdTypeId);
         SDataPac pac = null;
         
         if (cfdPacType != null) {
