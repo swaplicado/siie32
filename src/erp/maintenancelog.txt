@@ -1,5 +1,12 @@
 ================================================================================
 SIIE 3.2 189.5/ 2021-09-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión a inclusión de cuenta bancaria en CFDI de nómina, sujeto a configuración del Módulo de Recursos Humanos y al largo de la cuenta (distinto de 18 posiciones).
+2) Refactorización de las utilerías de procesamiento de CFDI y del diálogo de procesamiento masivo de CFDI.
+
+================================================================================
+SIIE 3.2 189.5/ 2021-09-28
 Adrián Alejandro AVILÉS GÓMEZ
 --------------------------------------------------------------------------------
 1) Implementación de cambios menores post emisión de documentos para ajustar notas y datos de logística.
@@ -28,7 +35,7 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 189.1/ 2021-09-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Corrección al formateo adecuado del texto del acuse de cancelación de CFDI en la setencia SQL de incersión y actualización.
+1) Corrección al formateo SQL adecuado del texto del acuse de cancelación de CFDI en la setencia SQL de inserción y actualización.
 2) Cambio a fecha prestaciones como fecha de alta en la emisión de CFDI de nómina.
 3) Ampliación al tamaño de UUID de CFDI relacionados agregables en la forma de captura de documentos (hasta 100 UUID).
 

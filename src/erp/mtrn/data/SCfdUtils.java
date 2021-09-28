@@ -2850,7 +2850,7 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsPrintable.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de impresión", SCfdConsts.REQ_PRINT_DOC);
-                dialog.setFormParams(client, cfdsPrintable, null, 0, null, false, payrollCfdVersion, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                dialog.setFormParams(cfdsPrintable, null, 0, null, false, payrollCfdVersion, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialog.setNumberCopies(numberCopies);
                 dialog.setVisible(true);
             }
@@ -2924,7 +2924,7 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsCancelled.size() + " " + (cfdsCancelled.size() == 1 ? "acuse" : "acuses") + " de cancelación?") == JOptionPane.YES_OPTION) {
                 SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de impresión de acuses de cancelación", SCfdConsts.REQ_PRINT_ANNUL_ACK);
-                dialog.setFormParams(client, cfdsCancelled, null, 0, null, false, cfdSubtype, cfdSubtype);
+                dialog.setFormParams(cfdsCancelled, null, 0, null, false, cfdSubtype, cfdSubtype);
                 dialog.setVisible(true);
             }
         }
@@ -3334,7 +3334,7 @@ public abstract class SCfdUtils implements Serializable {
                 if (areCfdInconsistent(cfdsVerify)) {
                     int stampsAvailable = getStampsAvailable(client, cfdsVerify.get(0).getFkCfdTypeId(), cfdsVerify.get(0).getTimestamp(), 0);
                     SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de verificación", SCfdConsts.REQ_VERIFY);
-                    dialog.setFormParams(client, cfdsVerify, null, stampsAvailable, null, false, payrollCfdVersion, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                    dialog.setFormParams(cfdsVerify, null, stampsAvailable, null, false, payrollCfdVersion, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                     dialog.setVisible(true);
                 }
             }
@@ -4557,7 +4557,7 @@ public abstract class SCfdUtils implements Serializable {
                     if (areCfdInconsistent(cfdsValidate)) {
                         if (signed) {
                             SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de timbrado", SCfdConsts.REQ_STAMP);
-                            dialog.setFormParams(client, cfdsAux, null, stampsAvailable, null, signNeeded, cfdSubtype, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            dialog.setFormParams(cfdsAux, null, stampsAvailable, null, signNeeded, cfdSubtype, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialog.setVisible(true);
                         }
                     }
@@ -4603,7 +4603,7 @@ public abstract class SCfdUtils implements Serializable {
                     if (areCfdInconsistent(cfdsValidate)) {
                         if (signedSent) {
                             SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de timbrado y envío", SCfdConsts.REQ_STAMP_SEND);
-                            dialog.setFormParams(client, cfdsAux, null, stampsAvailable, null, signNeeded, cfdSubtype, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            dialog.setFormParams(cfdsAux, null, stampsAvailable, null, signNeeded, cfdSubtype, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialog.setVisible(true);
                         }
                     }
@@ -4615,18 +4615,15 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static boolean cancelCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int cfdSubtype, final Date cancellationDate, boolean validateStamp, int dpsAnnulmentType) throws Exception {
-        boolean cancel = false;
-        int stampsAvailable = 0;
-        ArrayList<SDataCfd> cfdsAux = null;
-        boolean needSign = false;
-
-        cfdsAux = new ArrayList<SDataCfd>();
-
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
+        
         for(SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                 cfdsAux.add(cfd);
             }
         }
+        
+        boolean cancel = false;
 
         if (cfdsAux.isEmpty()) {
             client.showMsgBoxInformation("No existen comprobantes para anular.");
@@ -4634,8 +4631,9 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 cancel = true;
-                stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
-                needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
+                
+                int stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
+                boolean needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
 
                 if (needSign && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
@@ -4647,7 +4645,7 @@ public abstract class SCfdUtils implements Serializable {
 
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de anulación", SCfdConsts.REQ_ANNUL);
-                        dialog.setFormParams(client, cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, cfdSubtype, dpsAnnulmentType);
+                        dialog.setFormParams(cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, cfdSubtype, dpsAnnulmentType);
                         dialog.setVisible(true);
                     }
                 }
@@ -4658,12 +4656,7 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     public static boolean cancelAndSendCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int cfdSubtype, final Date cancellationDate, boolean validateStamp, int dpsAnnulmentType) throws Exception {
-        boolean cancel = false;
-        int stampsAvailable = 0;
-        ArrayList<SDataCfd> cfdsAux = null;
-        boolean needSign = false;
-
-        cfdsAux = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
@@ -4671,14 +4664,16 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
 
+        boolean cancel = false;
+
         if (cfdsAux.isEmpty()) {
             client.showMsgBoxInformation("No existen comprobantes para anular.");
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea anular " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 cancel = true;
-                stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
-                needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
+                int stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
+                boolean needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
 
                 if (needSign && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
@@ -4690,7 +4685,7 @@ public abstract class SCfdUtils implements Serializable {
 
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de anulación y envío", SCfdConsts.REQ_ANNUL_SEND);
-                        dialog.setFormParams(client, cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, cfdSubtype, dpsAnnulmentType);
+                        dialog.setFormParams(cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, cfdSubtype, dpsAnnulmentType);
                         dialog.setVisible(true);
                     }
                 }
@@ -4907,7 +4902,7 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e " + cfdsAux.size() + " comprobantes?") == JOptionPane.YES_OPTION) {
                 SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.REQ_SEND_DOC);
-                dialog.setFormParams(client, cfdsAux, null, 0, null, false, payrollCfdVersion, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                dialog.setFormParams(cfdsAux, null, 0, null, false, payrollCfdVersion, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialog.setVisible(true);
             }
         }

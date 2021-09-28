@@ -79,20 +79,20 @@ public class SCliMailer {
             
             // connect to company database:
             
-            String companyDbName = "";
+            String companyDatabase = "";
             
             String sql = "SELECT bd "
-                    + "FROM cfgu_co "
+                    + "FROM erp.cfgu_co "
                     + "WHERE id_co = " + args[ARG_IDX_COMPANY_ID] + ";";
             try (ResultSet resultSet = dbErp.getConnection().createStatement().executeQuery(sql)) {
                 if (resultSet.next()) {
-                    companyDbName = resultSet.getString("bd");
+                    companyDatabase = resultSet.getString("bd");
                 }
             }
             
             dbCompany = new SDbDatabase(SDbConsts.DBMS_MYSQL);
             result = dbCompany.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(), 
-                    companyDbName, paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
+                    companyDatabase, paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
 
             if (result != SDbConsts.CONNECTION_OK) {
                 throw new Exception(SDbConsts.ERR_MSG_DB_CONNECTION);

@@ -3507,7 +3507,7 @@ public abstract class SHrsUtils {
         }
         
         SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.REQ_SEND_PAYROLL);
-        dialog.setFormParams((SClientInterface) client, null, null, 0, null, true, 0, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+        dialog.setFormParams(null, null, 0, null, true, 0, SModSysConsts.TRNU_TP_DPS_ANN_NA);
         dialog.setPayrollReceipts(payrollReceipts);
         dialog.setVisible(true);
     }
