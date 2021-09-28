@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 189.5/ 2021-09-28
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Implementación de cambios menores post emisión de documentos para ajustar notas y datos de logística.
+2) Implementación de la consulta y reporte de último movimiento de asociados de negocios (clientes y proveedores).
+
+================================================================================
 SIIE 3.2 189.4/ 2021-09-13
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
