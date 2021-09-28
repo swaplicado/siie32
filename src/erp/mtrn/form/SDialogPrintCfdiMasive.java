@@ -14,7 +14,6 @@ package erp.mtrn.form;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogCfdProcessing;
-import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
@@ -282,7 +281,7 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
             actionClose();
             
             SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) miClient, "Procesamiento de impresión", SCfdConsts.REQ_PRINT_DOC);
-            dialog.setFormParams((SClientInterface) miClient, cfds, null, 0, null, true, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED);
+            dialog.setFormParams(cfds, null, 0, null, true, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED);
             dialog.setVisible(true);
         }
     }

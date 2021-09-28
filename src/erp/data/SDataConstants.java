@@ -489,6 +489,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_PEND_ADJ = 207514;
     public static final int TRNX_DPS_BACKORDER = 207516;
     public static final int TRNX_DPS_BAL_AGING = 207519;
+    public static final int TRNX_DPS_LAST_MOV = 207517;
     public static final int TRNX_DPS_ETY_REF = 207529;
     public static final int TRNX_PRICE_HIST = 207520;
     public static final int TRNX_DPS_COMMS_PEND = 207521;

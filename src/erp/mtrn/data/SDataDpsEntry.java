@@ -186,6 +186,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected boolean mbAuxPreserveQuantity; // preserve customized quantity
 
     protected boolean mbFlagReadLinksAswell; // Read aswell links and adjustments
+    protected boolean mbFlagMinorChangesEdited;
     
     protected int mnXtaPkDpsYearConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
@@ -509,7 +510,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public boolean isAuxPreserveQuantity() { return mbAuxPreserveQuantity; }
 
     public void setFlagReadLinksAswell(boolean b) { mbFlagReadLinksAswell = b; }
+    public void setFlagMinorChangesEdited(boolean b) { mbFlagMinorChangesEdited = b; }
+    
     public boolean getFlagReadLinksAswell() { return mbFlagReadLinksAswell; }
+    public boolean getFlagMinorChangesEdited() { return mbFlagMinorChangesEdited; }
 
     public int[] getKeyDps() { return new int[] { mnPkYearId, mnPkDocId }; }
     public int[] getKeyDpsAdjustmentType() { return new int[] { mnFkDpsAdjustmentTypeId }; }
@@ -686,6 +690,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         manAuxPkDpsEntryPrice = null;
         mbAuxPreserveQuantity = false;
         
+        mbFlagReadLinksAswell = false;
+        mbFlagMinorChangesEdited = false;
+    
         mnXtaPkDpsYearConId = 0;
         mnXtaPkDpsDocConId = 0;
         mnXtaPkDpsDocEtyConId = 0;
@@ -1837,6 +1844,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setAuxPkDpsDocId(mnAuxPkDpsDocId);
         clone.setAuxPkDpsEntryPrice(manAuxPkDpsEntryPrice);
         clone.setAuxPreserveQuantity(mbAuxPreserveQuantity);
+        
+        clone.setFlagReadLinksAswell(mbFlagReadLinksAswell);
+        clone.setFlagMinorChangesEdited(mbFlagMinorChangesEdited);
 
         return clone;
     }

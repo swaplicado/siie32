@@ -34,6 +34,7 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
+    private boolean mbPostEmissionEdition; // an edition after the corresponding document has been emitted is requested
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -355,6 +356,8 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
+        
+        mbPostEmissionEdition = false;
 
         moFieldIsAllDocs.setFieldValue(true);
         moFieldIsPrintable.setFieldValue(true);
@@ -443,7 +446,14 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (type) {
+            case SLibConstants.VALUE_POST_EMIT_EDIT:
+                mbPostEmissionEdition = (Boolean) value;
+                jckIsCfdComplement.setEnabled(!mbPostEmissionEdition);
+                break;
+            default:
+                // do nothing
+        }
     }
 
     @Override

@@ -173,9 +173,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkDvyPendEntry;
     private javax.swing.JMenuItem jmiStkDvySupplied;
     private javax.swing.JMenuItem jmiStkDvySuppliedEntry;
+    private javax.swing.JMenuItem jmiStkDvyOrderSupply;
     private javax.swing.JMenuItem jmiStkDvyDiog;
     private javax.swing.JMenuItem jmiStkDvyStatsConsumption;
-    private javax.swing.JMenuItem jmiStkDvyOrderSupply;
     private javax.swing.JMenu jmStkRet;
     private javax.swing.JMenuItem jmiStkRetPending;
     private javax.swing.JMenuItem jmiStkRetPendingEntry;
@@ -186,9 +186,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiAccPend;
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
-    private javax.swing.JMenu jmRepBackorder;
     private javax.swing.JMenu jmRepQueries;
-    private javax.swing.JMenu jmRepBal;
     private javax.swing.JMenuItem jmiRepTrnGlobal;
     private javax.swing.JMenuItem jmiRepTrnByMonth;
     private javax.swing.JMenuItem jmiRepTrnByItemGeneric;
@@ -200,6 +198,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerType;
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerTypeBizPartner;
     private javax.swing.JMenuItem jmiRepTrnDpsByItemBizPartner;
+    private javax.swing.JMenu jmRepBackorder;
     private javax.swing.JMenuItem jmiRepBackorderContract;
     private javax.swing.JMenuItem jmiRepBackorderContractByItem;
     private javax.swing.JMenuItem jmiRepBackorderContractByItemBizPartner;
@@ -208,14 +207,16 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBackorderOrderByItem;
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartner;
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartnerBra;
+    private javax.swing.JMenu jmRepBal;
     private javax.swing.JMenuItem jmiQryBizPartnerBalance;
     private javax.swing.JMenuItem jmiQryBizPartnerAccountsAging;
+    private javax.swing.JMenuItem jmiQryBizPartnerLastMove;
     private javax.swing.JMenuItem jmiQryCurrencyBalance;
     private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartner;
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
-    private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAdvCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
     private javax.swing.JMenuItem jmiRepAccountStatements;
     private javax.swing.JMenuItem jmiRepBizPartnerAccountingMoves;
     private javax.swing.JMenuItem jmiRepBizPartnerJournal;
@@ -529,7 +530,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de ventas");
         jmRepQueries = new JMenu("Consultas de saldos de clientes");
-        jmRepBal = new JMenu("Saldos de clientes");
         jmiRepTrnGlobal = new JMenuItem("Ventas globales");
         jmiRepTrnByMonth = new JMenuItem("Ventas globales por mes");
         jmiRepTrnByItemGeneric = new JMenuItem("Ventas por ítem genérico");
@@ -550,8 +550,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItem = new JMenuItem("Backorder de pedidos por ítem");
         jmiRepBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-cliente");
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-cliente sucursal");
+        jmRepBal = new JMenu("Saldos de clientes");
         jmiQryBizPartnerBalance = new JMenuItem("Consulta de saldos de clientes");
         jmiQryBizPartnerAccountsAging = new JMenuItem("Consulta de antigüedad de saldos de clientes");
+        jmiQryBizPartnerLastMove = new JMenuItem("Consulta último movimiento de clientes");
         jmiQryCurrencyBalance =  new JMenuItem("Consulta de cuentas por cobrar por moneda");
         jmiQryCurrencyBalanceBizPartner =  new JMenuItem("Consulta de cuentas por cobrar por moneda-cliente");
         jmiRepBizPartnerBalance = new JMenuItem("Saldos clientes...");
@@ -608,6 +610,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartnerBra);
         jmRepQueries.add(jmiQryBizPartnerBalance);
         jmRepQueries.add(jmiQryBizPartnerAccountsAging);
+        jmRepQueries.add(jmiQryBizPartnerLastMove);
         jmRepQueries.addSeparator();
         jmRepQueries.add(jmiQryCurrencyBalance);
         jmRepQueries.add(jmiQryCurrencyBalanceBizPartner);
@@ -777,6 +780,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItemBizPartnerBra.addActionListener(this);
         jmiQryBizPartnerBalance.addActionListener(this);
         jmiQryBizPartnerAccountsAging.addActionListener(this);
+        jmiQryBizPartnerLastMove.addActionListener(this);
         jmiQryCurrencyBalance.addActionListener(this);
         jmiQryCurrencyBalanceBizPartner.addActionListener(this);
         jmiRepBizPartnerBalance.addActionListener(this);
@@ -1205,7 +1209,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 switch (formType) {
                     case SDataConstants.TRN_DPS:
                         // compute associated CFD of current DPS:
-                        if (((SDataDps) moRegistry).getAuxIsNeedCfd()) {
+                        if (moRegistry instanceof SDataDps && ((SDataDps) moRegistry).getAuxIsNeedCfd()) {
                             try {
                                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, formType, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
                                 dps.setAuxIsNeedCfd(true);
@@ -1447,6 +1451,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRNX_DPS_BAL_AGING:
                     oViewClass = erp.mtrn.view.SViewDpsBalanceAging.class;
                     sViewTitle = "Antigüedad saldos clientes";
+                    break;
+                    
+                case SDataConstants.TRNX_DPS_LAST_MOV:
+                    oViewClass = erp.mtrn.view.SViewDpsBalanceAging.class;
+                    sViewTitle = "Último movimiento clientes";
                     break;
                     
                 case SDataConstants.TRNX_DPS_PAY_PEND:
@@ -2048,6 +2057,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiQryBizPartnerAccountsAging) {
                 showView(SDataConstants.TRNX_DPS_BAL_AGING, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            }
+            else if (item == jmiQryBizPartnerLastMove) {
+                showView(SDataConstants.TRNX_DPS_LAST_MOV, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
             else if (item == jmiQryCurrencyBalance) {
                 miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_SAL, new SGuiParams(SDataConstantsSys.UNDEFINED));

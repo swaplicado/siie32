@@ -50,6 +50,7 @@ import erp.mfin.form.SDialogRepBizPartnerAdvances;
 import erp.mfin.form.SDialogRepBizPartnerBalance;
 import erp.mfin.form.SDialogRepBizPartnerBalanceDps;
 import erp.mfin.form.SDialogRepBizPartnerJournal;
+import erp.mfin.form.SDialogRepBizPartnerLastMove;
 import erp.mfin.form.SDialogRepBizPartnerMove;
 import erp.mfin.form.SDialogRepBizPartnerStatement;
 import erp.mfin.form.SDialogRepDpsMonthReport;
@@ -259,6 +260,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartnerCus;
     private javax.swing.JMenuItem jmiQryCurrencyBalanceSup;
     private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartnerSup;
+    private javax.swing.JMenuItem jmiRepBizPartnerLastMovCus;
+    private javax.swing.JMenuItem jmiRepBizPartnerLastMovSup;
     private javax.swing.JMenu jmRepBizPartnerBalAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAgingCus;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAgingSup;
@@ -646,6 +649,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCurrencyBalanceBizPartnerCus =  new JMenuItem("Consulta de cuentas por cobrar por moneda-cliente");
         jmiQryCurrencyBalanceSup =  new JMenuItem("Consulta de cuentas por pagar por moneda");
         jmiQryCurrencyBalanceBizPartnerSup =  new JMenuItem("Consulta de cuentas por pagar por moneda-proveedor");
+        jmiRepBizPartnerLastMovCus =  new JMenuItem("Reporte de último movimiento de clientes");
+        jmiRepBizPartnerLastMovSup =  new JMenuItem("Reporte de último movimiento de proveedores");
         jmRepBizPartnerBalAging = new JMenu("Antigüedad de saldos de asociados de negocios");
         jmiRepBizPartnerBalAgingCus = new JMenuItem("Antigüedad de saldos de clientes...");
         jmiRepBizPartnerBalAgingSup = new JMenuItem("Antigüedad de saldos de proveedores...");
@@ -748,6 +753,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepBizPartnerBal.add(jmiQryCurrencyBalanceBizPartnerCus);
         jmRepBizPartnerBal.add(jmiQryCurrencyBalanceSup);
         jmRepBizPartnerBal.add(jmiQryCurrencyBalanceBizPartnerSup);
+        jmRepBizPartnerBal.addSeparator();
+        jmRepBizPartnerBal.add(jmiRepBizPartnerLastMovCus);
+        jmRepBizPartnerBal.add(jmiRepBizPartnerLastMovSup);
         jmRep.add(jmRepBizPartnerBal);
         jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingCus);
         jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingSup);
@@ -938,6 +946,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCurrencyBalanceBizPartnerCus.addActionListener(this);
         jmiQryCurrencyBalanceSup.addActionListener(this);
         jmiQryCurrencyBalanceBizPartnerSup.addActionListener(this);
+        jmiRepBizPartnerLastMovCus.addActionListener(this);
+        jmiRepBizPartnerLastMovSup.addActionListener(this);
         jmiRepBizPartnerBalAgingCus.addActionListener(this);
         jmiRepBizPartnerBalAgingSup.addActionListener(this);
         jmiRepBizPartnerStatCus.addActionListener(this);
@@ -2177,6 +2187,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiQryCurrencyBalanceBizPartnerSup) {
                 miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SGuiConsts.PARAM_BPR));
+            }
+            else if (item == jmiRepBizPartnerLastMovCus) {
+                new SDialogRepBizPartnerLastMove(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepBizPartnerLastMovSup) {
+                new SDialogRepBizPartnerLastMove(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepBizPartnerBalAgingCus) {
                 new SDialogRepBizPartnerBalanceAging(miClient, SDataRepConstants.REP_ACC_AGI + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_CUS, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);

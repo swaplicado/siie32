@@ -45,8 +45,6 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogCfdProcessing extends SBeanFormDialog {
     
-    protected SClientInterface miClient; // WTF!, it hides member of parent class!
-    
     protected ArrayList<SDataCfd> maCfds;
     protected ArrayList<int[]> maPayrollReceiptKeys;
     protected ArrayList<SDbPayrollReceipt> maPayrollReceipts;
@@ -70,7 +68,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_CFD, subtype, title);
         initComponents();
         initComponentsCustom();
-        mbIsCfdiSendingAutomaticHrs = miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs();
+        mbIsCfdiSendingAutomaticHrs = ((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs();
     }
 
     /**
@@ -371,7 +369,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                 }
 
                 for (SDbPayrollReceipt payrollReceipt : maPayrollReceipts) {
-                    SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
                     String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
                     HashMap<String, Object> map = SHrsUtils.createPayrollReceiptMap((SGuiClient) miClient, payrollReceipt.getPrimaryKey(), SDataConstantsPrint.PRINT_MODE_PDF_FILE);
                     File pdf = SHrsUtils.createPayrollReceipt((SGuiClient) miClient, map);
@@ -381,7 +379,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                     if (pdf != null) {
                         String subject = "Envío de recibo de nómina";
                         String body = "Se adjunta recibo de nómina en formato PDF.";
-                        boolean sent = STrnUtilities.sendMailPdf(miClient, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
+                        boolean sent = STrnUtilities.sendMailPdf((SClientInterface) miClient, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
 
                         if (sent) {
                             cfdProcessedOk++;
@@ -418,7 +416,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
             String series = ((SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { 1 })).getNumberSeries();
 
             moIntCfdToProcess.setValue(maPayrollReceiptKeys.size());
-            jtfWarningMessage.setText(SCfdUtils.verifyCertificateExpiration(miClient));
+            jtfWarningMessage.setText(SCfdUtils.verifyCertificateExpiration((SClientInterface) miClient));
             jtfWarningMessage.setCaretPosition(0);
             
             try {
@@ -488,7 +486,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
             boolean processingPayrollReceipts = !maCfds.isEmpty() && maCfds.get(0).getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
 
             moIntCfdToProcess.setValue(maCfds.size());
-            jtfWarningMessage.setText(SCfdUtils.verifyCertificateExpiration(miClient));
+            jtfWarningMessage.setText(SCfdUtils.verifyCertificateExpiration((SClientInterface) miClient));
             jtfWarningMessage.setCaretPosition(0);
 
             try {
@@ -503,7 +501,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
 
                     switch (cfd.getFkCfdTypeId()) {
                         case SDataConstantsSys.TRNS_TP_CFD_INV:
-                            dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                            dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                             series = dps.getNumberSeries();
                             number = dps.getNumber();
 
@@ -516,7 +514,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                         case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                             switch (mnPayrollCfdVersion) {
                                 case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                                    formerPayrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                                    formerPayrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
                                     series = formerPayrollEmp.getNumberSeries();
                                     number = "" + formerPayrollEmp.getNumber();
                                     break;
@@ -541,27 +539,27 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                     try {
                         switch (mnFormSubtype) {
                             case SCfdConsts.REQ_STAMP:
-                                SCfdUtils.signCfdi(miClient, cfd, mnPayrollCfdVersion, false, false);
+                                SCfdUtils.signCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, false, false);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado.\n";
                                 break;
 
                             case SCfdConsts.REQ_ANNUL:
-                                SCfdUtils.cancelCfdi(miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado.\n";
                                 break;
 
                             case SCfdConsts.REQ_PRINT_DOC:
-                                SCfdUtils.printCfd(miClient, cfd, mnPayrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
+                                SCfdUtils.printCfd((SClientInterface) miClient, cfd, mnPayrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                                 break;
 
                             case SCfdConsts.REQ_PRINT_ANNUL_ACK:
-                                SCfdUtils.printCfdCancelAck(miClient, cfd, mnPayrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PRINT);
+                                SCfdUtils.printCfdCancelAck((SClientInterface) miClient, cfd, mnPayrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PRINT);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                                 break;
 
                             case SCfdConsts.REQ_SEND_DOC:
-                                SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnPayrollCfdVersion, false, false, true);
+                                SCfdUtils.sendCfd((SClientInterface) miClient, cfd.getFkCfdTypeId(), cfd, mnPayrollCfdVersion, false, false, true);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Enviado.\n";
                                 break;
 
@@ -571,26 +569,26 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
 
                             case SCfdConsts.REQ_STAMP_SEND:
                                 if (mbIsCfdiSendingAutomaticHrs) {
-                                    SCfdUtils.signAndSendCfdi(miClient, cfd, mnPayrollCfdVersion, false, false);
+                                    SCfdUtils.signAndSendCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, false, false);
                                 }
                                 else {
-                                    SCfdUtils.signCfdi(miClient, cfd, mnPayrollCfdVersion, false, false);
+                                    SCfdUtils.signCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, false, false);
                                 }
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
                                 break;
 
                             case SCfdConsts.REQ_ANNUL_SEND:
                                 if (mbIsCfdiSendingAutomaticHrs) {
-                                    SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                    SCfdUtils.cancelAndSendCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 }
                                 else {
-                                    SCfdUtils.cancelCfdi(miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                    SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 }
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
                                 break;
 
                             case SCfdConsts.REQ_VERIFY:
-                                SCfdUtils.validateCfdi(miClient, cfd, mnPayrollCfdVersion, false);
+                                SCfdUtils.validateCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, false);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Verificado.\n";
                                 break;
 
@@ -655,7 +653,6 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
     
     /**
      * Set form parameters.
-     * @param client
      * @param cfds
      * @param payrollReceiptKeys
      * @param stampsAvailable
@@ -664,10 +661,9 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
      * @param payrollCfdVersion Constants defined in SCfdConsts.CFDI_PAYROLL_VER_...
      * @param dpsAnnulmentType 
      */
-    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int payrollCfdVersion, final int dpsAnnulmentType) {
+    public void setFormParams(final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int payrollCfdVersion, final int dpsAnnulmentType) {
         mbFirstTime = true;
         
-        miClient = client;
         maCfds = cfds;
         maPayrollReceiptKeys = payrollReceiptKeys;
         mnStampsAvailable = stampsAvailable;

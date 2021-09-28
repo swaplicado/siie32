@@ -2275,7 +2275,7 @@
                             <Component class="javax.swing.JButton" name="jbSalesSupervisor">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="..."/>
-                                <Property name="toolTipText" type="java.lang.String" value="Seleccionar agente de ventas"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Seleccionar supervisor de ventas"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[23, 23]"/>
@@ -2717,6 +2717,17 @@
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="javax.swing.JButton" name="jbEditLogistics">
+                              <Properties>
+                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                  <Image iconType="3" name="/erp/img/icon_std_edit_ro.gif"/>
+                                </Property>
+                                <Property name="toolTipText" type="java.lang.String" value="Modificar datos"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                       </SubComponents>
@@ -2804,10 +2815,29 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbSystemNotes">
+                    <Component class="javax.swing.JButton" name="jbPickSystemNotes">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="..."/>
                         <Property name="toolTipText" type="java.lang.String" value="Seleccionar notas de sistema"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[23, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JSeparator" name="jsNotes02">
+                      <Properties>
+                        <Property name="orientation" type="int" value="1"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[3, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jbEditNotes">
+                      <Properties>
+                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                          <Image iconType="3" name="/erp/img/icon_std_edit_ro.gif"/>
+                        </Property>
+                        <Property name="toolTipText" type="java.lang.String" value="Modificar notas"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>

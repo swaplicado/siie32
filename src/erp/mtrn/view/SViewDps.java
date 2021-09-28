@@ -16,6 +16,7 @@ import erp.data.SDataUtilities;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.data.SDataRegistry;
 import erp.lib.data.SDataSqlUtilities;
 import erp.lib.form.SFormUtilities;
 import erp.lib.table.STabFilterDatePeriod;
@@ -39,6 +40,7 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SDataDpsMinorChanges;
 import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SCfdRenderer;
@@ -785,8 +787,22 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 miClient.getGuiModule(gui).setCurrentUserPrivilegeLevel(mbHasRightEdit ? SUtilConsts.LEV_AUTHOR : SUtilConsts.LEV_READ);
 
                 if (miClient.getGuiModule(gui).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
-                    SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(gui).getRegistry());
+                    SDataRegistry registry = miClient.getGuiModule(gui).getRegistry();
+                    if (registry instanceof SDataDps) {
+                        miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                        SDataUtilities.showDpsRecord(miClient, (SDataDps) registry);
+                    }
+                    else if (registry instanceof SDataDpsMinorChanges) {
+                        SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                        if (oDps.getDbmsDataCfd() != null) {
+                            try {
+                                SCfdUtils.printCfd(miClient, oDps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, false);
+                            }
+                            catch (Exception e) {
+                                SLibUtilities.renderException(this, e);
+                            }
+                        }
+                    }
                 }
             }
         }

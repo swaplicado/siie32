@@ -219,6 +219,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private int mnAuxEntryPriceAction;
     private int mnAuxEntryPriceEditedIndex;
     private SDataDpsEntryPrice moAuxEntryPriceEdited;
+    
+    private boolean mbPostEmissionEdition;
+    private erp.mtrn.form.SFormDpsComEntry moFormComEntry;
 
     /** Creates new form DFormDpsEntry
      * @param client GUI client.
@@ -471,6 +474,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel58 = new javax.swing.JPanel();
         jlVgm = new javax.swing.JLabel();
         jtfVgm = new javax.swing.JTextField();
+        jbEditLogistics = new javax.swing.JButton();
         jpExtraDataUnits = new javax.swing.JPanel();
         jpExtraDataUnitsNorth = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
@@ -529,6 +533,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jSeparator1 = new javax.swing.JSeparator();
         jtbNotesFilter = new javax.swing.JToggleButton();
         jbPickSystemNotes = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JSeparator();
+        jbEditNotes = new javax.swing.JButton();
         jpCfdAddenda = new javax.swing.JPanel();
         jPanel37 = new javax.swing.JPanel();
         jPanel42 = new javax.swing.JPanel();
@@ -1679,6 +1685,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfVgm.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel58.add(jtfVgm);
 
+        jbEditLogistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif"))); // NOI18N
+        jbEditLogistics.setToolTipText("Modificar datos");
+        jbEditLogistics.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel58.add(jbEditLogistics);
+
         jPanel38.add(jPanel58);
 
         jpDataShip.add(jPanel38, java.awt.BorderLayout.NORTH);
@@ -1953,6 +1964,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbPickSystemNotes.setToolTipText("Seleccionar notas de sistema");
         jbPickSystemNotes.setPreferredSize(new java.awt.Dimension(23, 23));
         jpNotesControls.add(jbPickSystemNotes);
+
+        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator3.setPreferredSize(new java.awt.Dimension(3, 23));
+        jpNotesControls.add(jSeparator3);
+
+        jbEditNotes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif"))); // NOI18N
+        jbEditNotes.setToolTipText("Modificar notas");
+        jbEditNotes.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpNotesControls.add(jbEditNotes);
 
         jpNotes.add(jpNotesControls, java.awt.BorderLayout.NORTH);
 
@@ -2599,6 +2619,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDialogPriceUnitaryWizard = new SDialogPriceUnitaryWizard(miClient);
         moDialogItemPriceHistory = new SDialogItemPriceHistory(miClient);
         moFormNotes = new SFormDpsEntryNotes(miClient);
+        moFormComEntry = new SFormDpsComEntry(miClient);
 
         // Miscellaneous:
 
@@ -2629,10 +2650,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkTaxRegionId.addActionListener(this);
         jbFkThirdTaxCausingId_n.addActionListener(this);
         jbEditFkThirdTaxCausingId_n.addActionListener(this);
+        jbEditLogistics.addActionListener(this);
         jbNotesNew.addActionListener(this);
         jbNotesEdit.addActionListener(this);
         jbNotesDelete.addActionListener(this);
         jbPickSystemNotes.addActionListener(this);
+        jbEditNotes.addActionListener(this);
         jtbNotesFilter.addActionListener(this);
         jbPriceNew.addActionListener(this);
         jbPriceSave.addActionListener(this);
@@ -3880,6 +3903,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSurplusPercentage.setEditable(false);
             jtfSurplusPercentage.setFocusable(false);
             
+            enableAccountFields(false);
+            
             jcbFkVehicleTypeId_n.setEnabled(false);
             jtfDriver.setEnabled(false);
             jtfVehicleNumber.setEditable(false);
@@ -3888,13 +3913,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSecuritySeal.setEditable(false);
             jtfTicket.setEditable(false);
             jtfVgm.setEditable(false);
-            
-            enableAccountFields(false);
+            jbEditLogistics.setEnabled(false);
 
             jbNotesNew.setEnabled(false);
             jbNotesEdit.setEnabled(false);
             jbNotesDelete.setEnabled(false);
             jbPickSystemNotes.setEnabled(false);
+            jbEditNotes.setEnabled(false);
 
             jlAddBachocoNúmeroPosición.setEnabled(false);
             jtfAddBachocoNúmeroPosición.setEnabled(false);
@@ -3956,11 +3981,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSecuritySeal.setEditable(true);
             jtfTicket.setEditable(true);
             jtfVgm.setEditable(true);
-
+            jbEditLogistics.setEnabled(false);
+            
             jbNotesNew.setEnabled(true);
             jbNotesEdit.setEnabled(true);
             jbNotesDelete.setEnabled(true);
             jbPickSystemNotes.setEnabled(true);
+            jbEditNotes.setEnabled(false);
             
             jtfComplConceptKey.setEnabled(true);
             jtfComplConcept.setEnabled(true);
@@ -4263,9 +4290,33 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jcbFkThirdTaxCausingId_n.requestFocusInWindow();
     }
 
+    private void actionEditLogistics() {
+        moFormComEntry.formReset();
+        moFormComEntry.setRegistry(moDpsEntry);
+        moFormComEntry.setVisible(true);
+        
+        if (moFormComEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            SDataDpsEntry dpsEntry = (SDataDpsEntry) moFormComEntry.getRegistry();
+            //moFieldFkVehicleTypeId_n.setFieldValue(moDpsComerEntry.getFkVehicleTypeId_n());
+            moFieldDriver.setFieldValue(dpsEntry.getDriver());
+            moFieldPlate.setFieldValue(dpsEntry.getPlate());
+            moFieldTicket.setFieldValue(dpsEntry.getTicket());
+            moFieldContainerTank.setFieldValue(dpsEntry.getContainerTank());
+            moFieldSealQuality.setFieldValue(dpsEntry.getSealQuality());
+            moFieldSealSecurity.setFieldValue(dpsEntry.getSealSecurity());
+            moFieldVgm.setFieldValue(dpsEntry.getVgm());
+            
+            jbEditLogistics.setEnabled(false);
+            jbOk.setEnabled(true);
+            
+            jcbFkVehicleTypeId_n.requestFocusInWindow();
+        }
+    }
+    
     private void actionNotesNew() {
         if (jbNotesNew.isEnabled()) {
             moFormNotes.formReset();
+            moFormNotes.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, mbPostEmissionEdition);
             moFormNotes.setFormVisible(true);
 
             if (moFormNotes.getFormResult() == SLibConstants.FORM_RESULT_OK) {
@@ -4282,6 +4333,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             if (index != -1) {
                 moFormNotes.formReset();
+                moFormNotes.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, mbPostEmissionEdition);
                 moFormNotes.setRegistry((SDataDpsEntryNotes) moPaneGridNotes.getSelectedTableRow().getData());
                 moFormNotes.setFormVisible(true);
 
@@ -4344,7 +4396,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moPaneGridNotes.setTableRowSelection(0);
         }
     }
-
+    
+    private void actionEditNotes(){
+        jbNotesNew.setEnabled(true);
+        jbNotesEdit.setEnabled(true);
+        //jbNotesDelete.setEnabled(true); // by now, notes elimination not supported, because additional validations is needed to preserve CFD data
+        jbPickSystemNotes.setEnabled(true);
+        
+        jbEditNotes.setEnabled(false);
+        jbOk.setEnabled(true);
+        
+        jbNotesNew.requestFocusInWindow();
+    }
+    
     private void actionNotesFilter() {
         if (jtbNotesFilter.isEnabled()) {
             int index = moPaneGridNotes.getTable().getSelectedRow();
@@ -4779,11 +4843,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel94;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbConcept;
     private javax.swing.JButton jbConceptKey;
     private javax.swing.JButton jbEditFkThirdTaxCausingId_n;
+    private javax.swing.JButton jbEditLogistics;
+    private javax.swing.JButton jbEditNotes;
     private javax.swing.JButton jbFkItemId;
     private javax.swing.JButton jbFkItemReferenceId_n;
     private javax.swing.JButton jbFkOriginalUnitId;
@@ -5414,8 +5481,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldDpsContractFuture.setDouble(0d);
         moFieldDpsContractFactor.setDouble(0.10d);
         jckIsPriceConfirm.setSelected(false);
-
+    
         actionPriceClear();
+
+        mbPostEmissionEdition = false;
     }
 
     @Override
@@ -5442,316 +5511,318 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
         
-        if (!validation.getIsError()) {
-            boolean isDataShipDomReq = moItem.getDbmsDataItemGeneric().getIsDataShipDomesticReq();
-            boolean isDataShipIntReq = moItem.getDbmsDataItemGeneric().getIsDataShipInternationalReq();
-            boolean isDataShipQltReq = moItem.getDbmsDataItemGeneric().getIsDataQualityReq();
+        if (!mbPostEmissionEdition) {
+            if (!validation.getIsError()) {
+                boolean isDataShipDomReq = moItem.getDbmsDataItemGeneric().getIsDataShipDomesticReq();
+                boolean isDataShipIntReq = moItem.getDbmsDataItemGeneric().getIsDataShipInternationalReq();
+                boolean isDataShipQltReq = moItem.getDbmsDataItemGeneric().getIsDataQualityReq();
 
-            String msgMissingShipData = "";
-            if (isDataShipDomReq || isDataShipIntReq || isDataShipQltReq) {
-                msgMissingShipData = composeMsgMissingShipData();
-            }
-            
-            if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
-                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_INA + "\n" + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "'."); // validate that item is not inactive
-                validation.setComponent(jcbFkItemId);
-            }
-            else if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES && STrnUtilities.getIogCatForDpsClass(moParamDps.getDpsClassKey()) == SModSysConsts.TRNS_CT_IOG_IN) {
-                validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_RES + "\n" + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "'."); // falidate that item is not restricted on in moves
-                validation.setComponent(jcbFkItemId);
-            }
-            else if (moFieldIsDiscountUnitaryPercentage.getBoolean() && moFieldDiscountUnitaryPercentage.getDouble() == 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckIsDiscountUnitaryPercentage.getText() + "'.");
-                validation.setComponent(jtfDiscountUnitaryPercentage);
-            }
-            else if (moFieldIsDiscountEntryPercentage.getBoolean() && moFieldDiscountEntryPercentage.getDouble() == 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckIsDiscountEntryPercentage.getText() + "'.");
-                validation.setComponent(jtfDiscountEntryPercentage);
-            }
-            else if (mdQuantitySrcOrig > 0 && moFieldOriginalQuantity.getDouble() < mdQuantitySrcOrig) {
-                validation.setMessage("El valor mínimo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " +
-                        miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(mdQuantitySrcOrig) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
-                validation.setComponent(jtfOriginalQuantity);
-            }
-            else if (mdQuantityDesOrig > 0 && moFieldOriginalQuantity.getDouble() > mdQuantityDesOrig) {
-                validation.setMessage("El valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " +
-                        miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(mdQuantityDesOrig) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
-                validation.setComponent(jtfOriginalQuantity);
-            }
-            else if (moFieldOriginalQuantity.getDouble() == 0d) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlOriginalQuantity.getText() + "'.");
-                validation.setComponent(jtfOriginalQuantity);
-            }
-            else if (!moItem.getIsBulk() && moFieldOriginalQuantity.getDouble() != Math.round(moFieldOriginalQuantity.getDouble())) {
-                validation.setMessage("El valor para el campo '" + jlOriginalQuantity.getText() + "' debe ser entero.");
-                validation.setComponent(jtfOriginalQuantity);
-            }
-            else if (SLibUtils.parseDouble(jtfQuantityRo.getText()) == 0d) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQuantity.getText() + "'.");
-                // remember that field jtfQuantityRo is read only!, it cannot gain focus
-            }
-            else if (moFieldOriginalPriceUnitaryCy.getDouble() == 0d &&
-                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlOriginalPriceUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlOriginalPriceUnitaryCy.getText() + "'.");
-                validation.setComponent(jtfOriginalPriceUnitaryCy);
-            }
-            else if (SLibUtilities.parseDouble(jtfTotalCy_rRo.getText()) == 0d &&
-                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlTotal_r.getText() + "'?") != JOptionPane.YES_OPTION) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTotal_r.getText() + "'.");
-                // remember that field jtfTotalCy_rRo is read only!, it cannot gain focus
-            }
-            else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesPriceUnitaryCy.getDouble() == 0d &&
-                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlSalesPriceUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSalesPriceUnitaryCy.getText() + "'.");
-                validation.setComponent(jtfSalesPriceUnitaryCy);
-            }
-            else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesFreightUnitaryCy.getDouble() == 0d &&
-                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlSalesFreightUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSalesFreightUnitaryCy.getText() + "'.");
-                validation.setComponent(jtfSalesFreightUnitaryCy);
-            }
-            else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesFreightUnitaryCy.getDouble() != 0d && !moFieldIsSalesFreightAddPrice.getBoolean() &&
-                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar deseleccionado el campo '" + jckIsSalesFreightAddPrice.getText() + "'?") != JOptionPane.YES_OPTION) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_OPTION_SELECT + "'" + jckIsSalesFreightAddPrice.getText() + "'.");
-                validation.setComponent(jckIsSalesFreightAddPrice);
-            }
-            else if (moFieldIsSalesFreightConfirm.getBoolean() &&
-                    miClient.showMsgBoxConfirm("Favor de confirmar que el valor del campo '" + jlSalesFreightUnitaryCy.getText() + "' es correcto.") != JOptionPane.YES_OPTION) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlSalesFreightUnitaryCy.getText() + "'.");
-                validation.setComponent(jtfSalesFreightUnitaryCy);
-            }
-            else if (moPanelFkCostCenterId_n.isEmptyAccountId()) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
-                validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
-            }
-            else if (moItem.getIsPrepayment() && moParamDps.isDocument() && moFieldOperationsType.getKeyAsIntArray()[0] != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
-                        + "debería ser: '" + SDataConstantsSys.OperationsTypesOpsMap.get(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY) + "'.");
-                validation.setComponent(moFieldOperationsType.getComponent());
-            }
-            else if (moItem.getIsPrepayment() && moParamDps.isAdjustment() && !SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY })) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
-                        + "debería ser: '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY) + "' o '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) + "'.");
-                validation.setComponent(moFieldOperationsType.getComponent());
-            }
-            else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY }) && !moItem.getIsPrepayment()) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
-                validation.setComponent(jcbFkItemId);
-            }
-            else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY }) && moFieldDiscountDocCy.getDouble() == 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDiscountDoc.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
-                validation.setComponent(jtfDiscountDocCy);
-            }
-            else if (jcbFkThirdTaxCausingId_n.getSelectedIndex() > 0 && SLibUtils.belongsTo(moFieldFkThirdTaxCausingId_n.getKeyAsIntArray()[0], new int[] { moParamDps.getFkBizPartnerId_r(), miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() })) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkThirdTaxCausingId_n.getText() + "'."); // third party cannot be the owner of this document nor the company itself
-                validation.setComponent(jcbFkThirdTaxCausingId_n);
-            }
-            else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
-                validation.setComponent(jcbFkVehicleTypeId_n);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldDriver.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDriver.getText() + "'.");
-                validation.setComponent(jtfDriver);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (isDataShipDomReq && jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVehicleNumber.getText() + "'.");
-                validation.setComponent(jtfVehicleNumber);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldContainerTank.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlContainerTank.getText() + "'.");
-                validation.setComponent(jtfContTank);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealQuality.getString(), (isDataShipQltReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQualitySeal.getText() + "'.");
-                validation.setComponent(jtfSealQuality);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealSecurity.getString(), (isDataShipQltReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSecuritySeal.getText() + "'.");
-                validation.setComponent(jtfSecuritySeal);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-             else if (SDataDpsEntry.validateShipmentDataValue(moFieldTicket.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTicket.getText() + "'.");
-                validation.setComponent(jtfTicket);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (SDataDpsEntry.validateShipmentDataValue(moFieldVgm.getString(), (isDataShipIntReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVgm.getText() + "'.");
-                validation.setComponent(jtfVgm);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            } 
-            else if (!msgMissingShipData.isEmpty() && 
-                    miClient.showMsgBoxConfirm("Los siguientes campos tienen un valor provisional (" + STrnConsts.TXT_FIELD_BLANK + "):\n" + msgMissingShipData + ".\n¿Deseas conservarlos?") != JOptionPane.YES_OPTION) {
-                validation.setMessage("Revisar los valores de la sección '" + ((TitledBorder) jpDataShip.getBorder()).getTitle() + "'.");
-                validation.setComponent(jtfDriver);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && !jradAccCashAccount.isSelected() && !jradAccAdvanceBilled.isSelected() && (jradAccAdvanceBilled.isEnabled() || jradAccCashAccount.isEnabled())) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAccOptions.getText() + "'.");
-                validation.setComponent(jradAccCashAccount);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && jradAccCashAccount.isSelected() && jcbFkCashAccountId_n.getSelectedIndex() <= 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkCashAccountId_n.getText() + "'.");
-                validation.setComponent(jcbFkCashAccountId_n);
-                jTabbedPane.setSelectedIndex(TAB_MKT);
-            }
-            else if (moParamDps.isOrder() && moDpsEntry.getContractPriceYear() != SLibConstants.UNDEFINED && moDpsEntry.getContractPriceMonth() != SLibConstants.UNDEFINED && moFieldOriginalQuantity.getDouble() > mdQuantityPrc) {
-                validation.setMessage("De acuerdo con la entrega mensual actual" + (mbIsLastPrc ? ", considerando el excedente permitido en la partida del documento origen" : "") + ":\n" +
-                        "el valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " + SLibUtils.getDecimalFormatQuantity().format(mdQuantityPrc) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
-                validation.setComponent(jtfOriginalQuantity);
-            }
-            else {
-                // Validate unitary price vs unitary month price in monthly order:
-                
-                if (moFieldOriginalPriceUnitaryCy.getDouble() != 0d) {
-                    boolean priceUnitaryDiffers = false;
-                    
-                    for (int i = 0; i < moPaneGridPrices.getGridRows().size(); i++) {
-                        if (!SLibUtils.compareAmount(((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getOriginalPriceUnitaryCy(), moFieldOriginalPriceUnitaryCy.getDouble())) {
-                            priceUnitaryDiffers = true;
-                            break;
-                        }       
-                    }
-
-                    if (priceUnitaryDiffers && 
-                            miClient.showMsgBoxConfirm("El valor del campo " + jlOriginalPriceUnitaryCy.getText() + " de la partida es diferente al de las entregas mensuales.\n¿Deseas continuar?") == JOptionPane.NO_OPTION) {
-                        validation.setMessage("Igualar el valor del campo " + jlOriginalPriceUnitaryCy.getText() + " de la partida al de las entregas mensuales.");
-                    }
+                String msgMissingShipData = "";
+                if (isDataShipDomReq || isDataShipIntReq || isDataShipQltReq) {
+                    msgMissingShipData = composeMsgMissingShipData();
                 }
-            }
-        }
-        
-        if (!validation.getIsError()) {
-            // Validate item's reference:
-            
-            if (moItem.getIsReference() && moFieldReference.getString().isEmpty()) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlReference.getText() + "'.");
-                validation.setComponent(jtfReference);
-            }
-            else {
-                String msgValidation = "";
-                
-                if (!moFieldReference.getString().isEmpty()) {
-                    try {
-                        // Validate that reference does not exist yet:
 
-                        SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
-                    }
-                    catch (Exception e) {
-                        validation.setMessage(msgValidation = e.getMessage());
-                        validation.setComponent(jtfReference);
-                    }
+                if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_INA) {
+                    validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_INA + "\n" + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "'."); // validate that item is not inactive
+                    validation.setComponent(jcbFkItemId);
                 }
-                
-                if (msgValidation.isEmpty()) {
-                    // Validate cost center:
-                    
-                    msgValidation = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate());
+                else if (moItem.getFkItemStatusId() == SModSysConsts.ITMS_ST_ITEM_RES && STrnUtilities.getIogCatForDpsClass(moParamDps.getDpsClassKey()) == SModSysConsts.TRNS_CT_IOG_IN) {
+                    validation.setMessage(SItmConsts.MSG_ERR_ST_ITEM_RES + "\n" + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "'."); // falidate that item is not restricted on in moves
+                    validation.setComponent(jcbFkItemId);
+                }
+                else if (moFieldIsDiscountUnitaryPercentage.getBoolean() && moFieldDiscountUnitaryPercentage.getDouble() == 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckIsDiscountUnitaryPercentage.getText() + "'.");
+                    validation.setComponent(jtfDiscountUnitaryPercentage);
+                }
+                else if (moFieldIsDiscountEntryPercentage.getBoolean() && moFieldDiscountEntryPercentage.getDouble() == 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckIsDiscountEntryPercentage.getText() + "'.");
+                    validation.setComponent(jtfDiscountEntryPercentage);
+                }
+                else if (mdQuantitySrcOrig > 0 && moFieldOriginalQuantity.getDouble() < mdQuantitySrcOrig) {
+                    validation.setMessage("El valor mínimo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " +
+                            miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(mdQuantitySrcOrig) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
+                    validation.setComponent(jtfOriginalQuantity);
+                }
+                else if (mdQuantityDesOrig > 0 && moFieldOriginalQuantity.getDouble() > mdQuantityDesOrig) {
+                    validation.setMessage("El valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " +
+                            miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(mdQuantityDesOrig) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
+                    validation.setComponent(jtfOriginalQuantity);
+                }
+                else if (moFieldOriginalQuantity.getDouble() == 0d) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlOriginalQuantity.getText() + "'.");
+                    validation.setComponent(jtfOriginalQuantity);
+                }
+                else if (!moItem.getIsBulk() && moFieldOriginalQuantity.getDouble() != Math.round(moFieldOriginalQuantity.getDouble())) {
+                    validation.setMessage("El valor para el campo '" + jlOriginalQuantity.getText() + "' debe ser entero.");
+                    validation.setComponent(jtfOriginalQuantity);
+                }
+                else if (SLibUtils.parseDouble(jtfQuantityRo.getText()) == 0d) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQuantity.getText() + "'.");
+                    // remember that field jtfQuantityRo is read only!, it cannot gain focus
+                }
+                else if (moFieldOriginalPriceUnitaryCy.getDouble() == 0d &&
+                        miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlOriginalPriceUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlOriginalPriceUnitaryCy.getText() + "'.");
+                    validation.setComponent(jtfOriginalPriceUnitaryCy);
+                }
+                else if (SLibUtilities.parseDouble(jtfTotalCy_rRo.getText()) == 0d &&
+                        miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlTotal_r.getText() + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTotal_r.getText() + "'.");
+                    // remember that field jtfTotalCy_rRo is read only!, it cannot gain focus
+                }
+                else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesPriceUnitaryCy.getDouble() == 0d &&
+                        miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlSalesPriceUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSalesPriceUnitaryCy.getText() + "'.");
+                    validation.setComponent(jtfSalesPriceUnitaryCy);
+                }
+                else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesFreightUnitaryCy.getDouble() == 0d &&
+                        miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jlSalesFreightUnitaryCy.getText() + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSalesFreightUnitaryCy.getText() + "'.");
+                    validation.setComponent(jtfSalesFreightUnitaryCy);
+                }
+                else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesFreightUnitaryCy.getDouble() != 0d && !moFieldIsSalesFreightAddPrice.getBoolean() &&
+                        miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar deseleccionado el campo '" + jckIsSalesFreightAddPrice.getText() + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_OPTION_SELECT + "'" + jckIsSalesFreightAddPrice.getText() + "'.");
+                    validation.setComponent(jckIsSalesFreightAddPrice);
+                }
+                else if (moFieldIsSalesFreightConfirm.getBoolean() &&
+                        miClient.showMsgBoxConfirm("Favor de confirmar que el valor del campo '" + jlSalesFreightUnitaryCy.getText() + "' es correcto.") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlSalesFreightUnitaryCy.getText() + "'.");
+                    validation.setComponent(jtfSalesFreightUnitaryCy);
+                }
+                else if (moPanelFkCostCenterId_n.isEmptyAccountId()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
+                    validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                }
+                else if (moItem.getIsPrepayment() && moParamDps.isDocument() && moFieldOperationsType.getKeyAsIntArray()[0] != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
+                            + "debería ser: '" + SDataConstantsSys.OperationsTypesOpsMap.get(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY) + "'.");
+                    validation.setComponent(moFieldOperationsType.getComponent());
+                }
+                else if (moItem.getIsPrepayment() && moParamDps.isAdjustment() && !SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY })) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
+                            + "debería ser: '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY) + "' o '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) + "'.");
+                    validation.setComponent(moFieldOperationsType.getComponent());
+                }
+                else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY }) && !moItem.getIsPrepayment()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
+                    validation.setComponent(jcbFkItemId);
+                }
+                else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY }) && moFieldDiscountDocCy.getDouble() == 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDiscountDoc.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
+                    validation.setComponent(jtfDiscountDocCy);
+                }
+                else if (jcbFkThirdTaxCausingId_n.getSelectedIndex() > 0 && SLibUtils.belongsTo(moFieldFkThirdTaxCausingId_n.getKeyAsIntArray()[0], new int[] { moParamDps.getFkBizPartnerId_r(), miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() })) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkThirdTaxCausingId_n.getText() + "'."); // third party cannot be the owner of this document nor the company itself
+                    validation.setComponent(jcbFkThirdTaxCausingId_n);
+                }
+                else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
+                    validation.setComponent(jcbFkVehicleTypeId_n);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (SDataDpsEntry.validateShipmentDataValue(moFieldDriver.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDriver.getText() + "'.");
+                    validation.setComponent(jtfDriver);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (isDataShipDomReq && jcbFkVehicleTypeId_n.getSelectedIndex() > 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVehicleNumber.getText() + "'.");
+                    validation.setComponent(jtfVehicleNumber);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (SDataDpsEntry.validateShipmentDataValue(moFieldContainerTank.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlContainerTank.getText() + "'.");
+                    validation.setComponent(jtfContTank);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealQuality.getString(), (isDataShipQltReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQualitySeal.getText() + "'.");
+                    validation.setComponent(jtfSealQuality);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (SDataDpsEntry.validateShipmentDataValue(moFieldSealSecurity.getString(), (isDataShipQltReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSecuritySeal.getText() + "'.");
+                    validation.setComponent(jtfSecuritySeal);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                 else if (SDataDpsEntry.validateShipmentDataValue(moFieldTicket.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTicket.getText() + "'.");
+                    validation.setComponent(jtfTicket);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (SDataDpsEntry.validateShipmentDataValue(moFieldVgm.getString(), (isDataShipIntReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlVgm.getText() + "'.");
+                    validation.setComponent(jtfVgm);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                } 
+                else if (!msgMissingShipData.isEmpty() && 
+                        miClient.showMsgBoxConfirm("Los siguientes campos tienen un valor provisional (" + STrnConsts.TXT_FIELD_BLANK + "):\n" + msgMissingShipData + ".\n¿Deseas conservarlos?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage("Revisar los valores de la sección '" + ((TitledBorder) jpDataShip.getBorder()).getTitle() + "'.");
+                    validation.setComponent(jtfDriver);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && !jradAccCashAccount.isSelected() && !jradAccAdvanceBilled.isSelected() && (jradAccAdvanceBilled.isEnabled() || jradAccCashAccount.isEnabled())) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAccOptions.getText() + "'.");
+                    validation.setComponent(jradAccCashAccount);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (moItem.getIsPrepayment() && moFieldOriginalQuantity.getDouble() > 0 && jradAccCashAccount.isSelected() && jcbFkCashAccountId_n.getSelectedIndex() <= 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkCashAccountId_n.getText() + "'.");
+                    validation.setComponent(jcbFkCashAccountId_n);
+                    jTabbedPane.setSelectedIndex(TAB_MKT);
+                }
+                else if (moParamDps.isOrder() && moDpsEntry.getContractPriceYear() != SLibConstants.UNDEFINED && moDpsEntry.getContractPriceMonth() != SLibConstants.UNDEFINED && moFieldOriginalQuantity.getDouble() > mdQuantityPrc) {
+                    validation.setMessage("De acuerdo con la entrega mensual actual" + (mbIsLastPrc ? ", considerando el excedente permitido en la partida del documento origen" : "") + ":\n" +
+                            "el valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " + SLibUtils.getDecimalFormatQuantity().format(mdQuantityPrc) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
+                    validation.setComponent(jtfOriginalQuantity);
+                }
+                else {
+                    // Validate unitary price vs unitary month price in monthly order:
 
-                    if (!msgValidation.isEmpty()) {
-                        validation.setMessage(msgValidation);
-                        validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                    if (moFieldOriginalPriceUnitaryCy.getDouble() != 0d) {
+                        boolean priceUnitaryDiffers = false;
+
+                        for (int i = 0; i < moPaneGridPrices.getGridRows().size(); i++) {
+                            if (!SLibUtils.compareAmount(((SDataDpsEntryPrice) moPaneGridPrices.getGridRows().get(i).getData()).getOriginalPriceUnitaryCy(), moFieldOriginalPriceUnitaryCy.getDouble())) {
+                                priceUnitaryDiffers = true;
+                                break;
+                            }       
+                        }
+
+                        if (priceUnitaryDiffers && 
+                                miClient.showMsgBoxConfirm("El valor del campo " + jlOriginalPriceUnitaryCy.getText() + " de la partida es diferente al de las entregas mensuales.\n¿Deseas continuar?") == JOptionPane.NO_OPTION) {
+                            validation.setMessage("Igualar el valor del campo " + jlOriginalPriceUnitaryCy.getText() + " de la partida al de las entregas mensuales.");
+                        }
                     }
                 }
             }
-        }
 
-        if (!validation.getIsError() && moParamDps.isForSales()) {
-            if (moParamBizPartner.getIsCustomer() && moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
-                if (jtfAddBachocoNúmeroPosición.isEnabled() && moFieldAddBachocoNúmeroPosición.getInteger() % 10 != 0) {
-                    validation.setMessage("El valor para el campo '" + jlAddBachocoNúmeroPosición.getText() + "' debe ser múltiplo de 10.");
-                    validation.setComponent(jtfAddBachocoNúmeroPosición);
-                    jTabbedPane.setSelectedIndex(TAB_CFD_ADD); // show CFD Addenda's tab
-                }
-            }
-        }
+            if (!validation.getIsError()) {
+                // Validate item's reference:
 
-        if (!validation.getIsError() && moParamDps.isEstimate()) {
-            if (jckIsDpsReqMonthDelivery.isSelected()) {
-                if (moFieldDpsContractBase.getDouble() < 0d) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractBase.getText() + "'.");
-                    validation.setComponent(jtfDpsContractBase);
+                if (moItem.getIsReference() && moFieldReference.getString().isEmpty()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlReference.getText() + "'.");
+                    validation.setComponent(jtfReference);
                 }
-                else if (moFieldDpsContractFuture.getDouble() < 0d) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractFuture.getText() + "'.");
-                    validation.setComponent(jtfDpsContractFuture);
-                }
-                else if (moPaneGridPrices.getGridRows().size() <= 0) {
-                    validation.setMessage("La partida tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero no se encontró ningúna entrega mensual programada.");
-                    validation.setComponent(jckIsDpsReqMonthDelivery);
-                }
-                else if (!validation.getIsError()) {
-                    double quantity = 0;
-                    
-                    for (STableRow row : moPaneGridPrices.getGridRows()) {
-                        if (!((SDataDpsEntryPrice) row.getData()).getIsDeleted()) {
-                            quantity += ((SDataDpsEntryPrice) row.getData()).getOriginalQuantity();
+                else {
+                    String msgValidation = "";
+
+                    if (!moFieldReference.getString().isEmpty()) {
+                        try {
+                            // Validate that reference does not exist yet:
+
+                            SDataUtilities.validateDpsEtyReference(miClient.getSession(), moParamDps.getDpsClassKey(), moFieldReference.getString(), (int[]) moParamDps.getPrimaryKey());
+                        }
+                        catch (Exception e) {
+                            validation.setMessage(msgValidation = e.getMessage());
+                            validation.setComponent(jtfReference);
                         }
                     }
 
-                    if (quantity != moFieldOriginalQuantity.getDouble()) {
-                        validation.setMessage("La suma de cantidades de '"+ jTabbedPane.getTitleAt(TAB_PRC) + "' (" + miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(quantity) + ") debe coincidir con el valor especificado en el campo '" + jlOriginalQuantity.getText() + "' (" + jtfOriginalQuantity.getText() + ") de la partida.");
-                        validation.setComponent(moPaneGridPrices);
+                    if (msgValidation.isEmpty()) {
+                        // Validate cost center:
+
+                        msgValidation = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate());
+
+                        if (!msgValidation.isEmpty()) {
+                            validation.setMessage(msgValidation);
+                            validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                        }
                     }
                 }
             }
-            else {
-                if (moPaneGridPrices.getGridRows().size() > 0) {
-                    if (miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jckIsDpsReqMonthDelivery.getText() + "'?") == JOptionPane.NO_OPTION) {
-                        validation.setMessage("La partida no tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero se encontraron entregas mensuales programadas.");
+
+            if (!validation.getIsError() && moParamDps.isForSales()) {
+                if (moParamBizPartner.getIsCustomer() && moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
+                    if (jtfAddBachocoNúmeroPosición.isEnabled() && moFieldAddBachocoNúmeroPosición.getInteger() % 10 != 0) {
+                        validation.setMessage("El valor para el campo '" + jlAddBachocoNúmeroPosición.getText() + "' debe ser múltiplo de 10.");
+                        validation.setComponent(jtfAddBachocoNúmeroPosición);
+                        jTabbedPane.setSelectedIndex(TAB_CFD_ADD); // show CFD Addenda's tab
+                    }
+                }
+            }
+
+            if (!validation.getIsError() && moParamDps.isEstimate()) {
+                if (jckIsDpsReqMonthDelivery.isSelected()) {
+                    if (moFieldDpsContractBase.getDouble() < 0d) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractBase.getText() + "'.");
+                        validation.setComponent(jtfDpsContractBase);
+                    }
+                    else if (moFieldDpsContractFuture.getDouble() < 0d) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDpsContractFuture.getText() + "'.");
+                        validation.setComponent(jtfDpsContractFuture);
+                    }
+                    else if (moPaneGridPrices.getGridRows().size() <= 0) {
+                        validation.setMessage("La partida tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero no se encontró ningúna entrega mensual programada.");
                         validation.setComponent(jckIsDpsReqMonthDelivery);
                     }
+                    else if (!validation.getIsError()) {
+                        double quantity = 0;
+
+                        for (STableRow row : moPaneGridPrices.getGridRows()) {
+                            if (!((SDataDpsEntryPrice) row.getData()).getIsDeleted()) {
+                                quantity += ((SDataDpsEntryPrice) row.getData()).getOriginalQuantity();
+                            }
+                        }
+
+                        if (quantity != moFieldOriginalQuantity.getDouble()) {
+                            validation.setMessage("La suma de cantidades de '"+ jTabbedPane.getTitleAt(TAB_PRC) + "' (" + miClient.getSessionXXX().getFormatters().getDecimalsSurfaceFormat().format(quantity) + ") debe coincidir con el valor especificado en el campo '" + jlOriginalQuantity.getText() + "' (" + jtfOriginalQuantity.getText() + ") de la partida.");
+                            validation.setComponent(moPaneGridPrices);
+                        }
+                    }
+                }
+                else {
+                    if (moPaneGridPrices.getGridRows().size() > 0) {
+                        if (miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar sin valor al campo '" + jckIsDpsReqMonthDelivery.getText() + "'?") == JOptionPane.NO_OPTION) {
+                            validation.setMessage("La partida no tiene seleccionada la opción '" + jckIsDpsReqMonthDelivery.getText() + "', pero se encontraron entregas mensuales programadas.");
+                            validation.setComponent(jckIsDpsReqMonthDelivery);
+                        }
+                    }
+                }
+
+                if (validation.getIsError()) {
+                    jTabbedPane.setSelectedIndex(TAB_PRC); // show monthly price's tab
                 }
             }
 
-            if (validation.getIsError()) {
-                jTabbedPane.setSelectedIndex(TAB_PRC); // show monthly price's tab
-            }
-        }
-        
-        if (!validation.getIsError()) {
-            // Check if entry item needs to be added to document from source document:
+            if (!validation.getIsError()) {
+                // Check if entry item needs to be added to document from source document:
 
-            try {
-                if (!mbRightTrnOmitSourceDoc) {
-                    STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moParamDps.getDpsTypeKey(), moItem.getPkItemId(), moDpsEntry.hasDpsLinksAsDestiny());
+                try {
+                    if (!mbRightTrnOmitSourceDoc) {
+                        STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moParamDps.getDpsTypeKey(), moItem.getPkItemId(), moDpsEntry.hasDpsLinksAsDestiny());
+                    }
+                }
+                catch (Exception e) {
+                    validation.setMessage(e.getMessage());
+                    validation.setComponent(jcbFkItemId);
+                    SLibUtilities.printOutException(this, e);
                 }
             }
-            catch (Exception e) {
-                validation.setMessage(e.getMessage());
-                validation.setComponent(jcbFkItemId);
-                SLibUtilities.printOutException(this, e);
-            }
-        }
-        
-        if (!validation.getIsError()) {
-            //validate cfd complement values:
-            int values = 0;
-            
-            if (!moFieldComplConceptKey.getString().isEmpty()) {
-                values++;
-            }
-            if (!moFieldComplConcept.getString().isEmpty()) {
-                values++;
-            }
-            if (!moFieldComplCfdProdServ.getString().isEmpty()) {
-                values++;
-            }
-            if (!moFieldComplCfdUnit.getString().isEmpty()) {
-                values++;
-            }
-            
-            if (values != 0 && values != CFD_COMPL_VALS) {
-                validation.setMessage("Se debe especificar un valor para todos los campos de información complementaria.");
-                validation.setComponent(jtfComplConceptKey);
-                validation.setTabbedPaneIndex(TAB_CFD_COMPL);
+
+            if (!validation.getIsError()) {
+                //validate cfd complement values:
+                int values = 0;
+
+                if (!moFieldComplConceptKey.getString().isEmpty()) {
+                    values++;
+                }
+                if (!moFieldComplConcept.getString().isEmpty()) {
+                    values++;
+                }
+                if (!moFieldComplCfdProdServ.getString().isEmpty()) {
+                    values++;
+                }
+                if (!moFieldComplCfdUnit.getString().isEmpty()) {
+                    values++;
+                }
+
+                if (values != 0 && values != CFD_COMPL_VALS) {
+                    validation.setMessage("Se debe especificar un valor para todos los campos de información complementaria.");
+                    validation.setComponent(jtfComplConceptKey);
+                    validation.setTabbedPaneIndex(TAB_CFD_COMPL);
+                }
             }
         }
         
@@ -6152,8 +6223,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     moFieldFkTaxRegionId.setFieldValue(value);
                 }
                 break;
-
+                
+            case SLibConstants.VALUE_POST_EMIT_EDIT:
+                mbPostEmissionEdition = (Boolean) value;
+                jbEditLogistics.setEnabled(mbPostEmissionEdition);
+                jbEditNotes.setEnabled(mbPostEmissionEdition);
+                break;
+                
             default:
+                // do nothing
         }
         
         mbUpdatingForm = false;
@@ -6216,6 +6294,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbEditFkThirdTaxCausingId_n) {
                 actionEditFkThirdTaxCausingId_n();
             }
+            else if(button == jbEditLogistics){
+                actionEditLogistics();
+            }
             else if (button == jbNotesNew) {
                 actionNotesNew();
             }
@@ -6227,6 +6308,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else if (button == jbPickSystemNotes) {
                 actionPickSystemNotes();
+            }
+            else if(button == jbEditNotes){
+                actionEditNotes();
             }
             else if (button == jbPriceNew) {
                 actionPriceNew();
