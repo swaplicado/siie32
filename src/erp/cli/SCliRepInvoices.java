@@ -86,6 +86,7 @@ public class SCliRepInvoices {
     private ArrayList<String> maRecipientsTo;
     private ArrayList<String> maRecipientsBcc;
     
+    private String msCompanyCode;
     private String msCompanyName;
     private int mnLocalCurrencyId;
     private String msLocalCurrencyCode;
@@ -199,12 +200,13 @@ public class SCliRepInvoices {
             
             // company info
             
-            sql = "SELECT co "
+            sql = "SELECT co_key, co "
                     + "FROM erp.cfgu_co "
                     + "WHERE id_co = " + maArgs[SCliMailer.ARG_IDX_COMPANY_ID] + ";";
             
             try (ResultSet resultSet = miStatement.executeQuery(sql)) {
                 if (resultSet.next()) {
+                    msCompanyCode = resultSet.getString("co_key");
                     msCompanyName = resultSet.getString("co");
                 }
             }
@@ -337,7 +339,7 @@ public class SCliRepInvoices {
     }
     
     private String composeMailSubject() throws Exception {
-        String subject = "[" + SClient.APP_NAME + "] " + msDpsCategoryName + " " + SLibUtils.DateFormatDate.format(mtPeriodStart);
+        String subject = "[" + SClient.APP_NAME + "] " + msCompanyCode + ": " + msDpsCategoryName + " " + SLibUtils.DateFormatDate.format(mtPeriodStart);
         
         if (!mtPeriodStart.equals(mtPeriodEnd)) {
             subject += " - " + SLibUtils.DateFormatDate.format(mtPeriodEnd);

@@ -2193,14 +2193,17 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
             if (!validation.getIsError()) {
                 if (moFieldIsDeleted.getBoolean()) {
-                    SDataRecordEntry entry = null;
+                    int deleted = 0;
 
                     for (STableRow row : moPaneGridEntries.getGridRows()) {
-                        entry = (SDataRecordEntry) row.getData();
+                        SDataRecordEntry entry = (SDataRecordEntry) row.getData();
                         if (entry.getIsSystem() && entry.getUserId() == 0) {
-                            validation.setMessage("No se puede eliminar esta póliza contable puesto que al menos una de sus partidas es de sistema.");
-                            break;
+                            deleted++;
                         }
+                    }
+                    
+                    if (deleted > 0) {
+                        validation.setMessage("No se puede eliminar esta póliza contable porque tiene " + SLibUtils.DecimalFormatInteger.format(deleted) + " " + (deleted == 1 ? "partida" : "partidas") + " de sistema.");
                     }
                 }
 

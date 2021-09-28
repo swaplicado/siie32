@@ -597,7 +597,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                 throw new Exception("La cuenta bancaria del empleado '" + msCuentaBancaria + "' tiene una longitud incorrecta: " + msCuentaBancaria.length() + ".");
             }
 
-            if (msCuentaBancaria.length() == SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {
+            if (msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {
                 receptor.getAttBanco().setString((String) miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { mnBanco }, SDbRegistry.FIELD_CODE));
             }
             receptor.getAttCuentaBancaria().setString(msCuentaBancaria);
