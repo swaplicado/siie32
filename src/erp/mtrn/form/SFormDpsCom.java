@@ -135,7 +135,6 @@ public class SFormDpsCom extends javax.swing.JDialog implements erp.lib.form.SFo
         jlDriver.setText("Chofer del vehículo:");
         jlDriver.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jlDriver);
-        jlDriver.getAccessibleContext().setAccessibleName("Chofer del vehículo:");
 
         jtfDriver.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jtfDriver);
@@ -166,6 +165,11 @@ public class SFormDpsCom extends javax.swing.JDialog implements erp.lib.form.SFo
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jbOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbOkActionPerformed(evt);
+            }
+        });
         jpControls.add(jbOk);
 
         jbCancel.setText("Cancelar");
@@ -185,6 +189,10 @@ public class SFormDpsCom extends javax.swing.JDialog implements erp.lib.form.SFo
     private void jbSalesAgentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSalesAgentActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jbSalesAgentActionPerformed
+
+    private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbOkActionPerformed
 
     private void initComponentsExtra() {
         

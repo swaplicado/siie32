@@ -4297,7 +4297,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         
         if (moFormComEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             SDataDpsEntry dpsEntry = (SDataDpsEntry) moFormComEntry.getRegistry();
-            //moFieldFkVehicleTypeId_n.setFieldValue(moDpsComerEntry.getFkVehicleTypeId_n());
+            moFieldFkVehicleTypeId_n.setFieldValue(dpsEntry.getFkVehicleTypeId_n());
             moFieldDriver.setFieldValue(dpsEntry.getDriver());
             moFieldPlate.setFieldValue(dpsEntry.getPlate());
             moFieldTicket.setFieldValue(dpsEntry.getTicket());

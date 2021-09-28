@@ -157,9 +157,6 @@
                       <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
-                  <AccessibilityProperties>
-                    <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Chofer del veh&#xed;culo:"/>
-                  </AccessibilityProperties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="jtfDriver">
                   <Properties>
@@ -228,6 +225,9 @@
               <Dimension value="[75, 23]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbOkActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jbCancel">
           <Properties>
