@@ -484,16 +484,21 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     int idReceptor = getDbmsDataReceptorId(statement, moDbmsDataCfd.getPkCfdId());
                     
                     if (idReceptor == 0) { 
-                        // CFDI could not be found in accounting, so try to get receptor ID by its fiscal ID:
+                        // CFDI could not be found in accounting, so try to get receptor ID by its fiscal ID (as customer or bank):
+                        String rfc = comprobante.getEltReceptor().getAttRfc().getString();
+                        String idFiscal = comprobante.getEltReceptor().getAttNumRegIdTrib().getString();
+                        
                         sql = "SELECT id_bp "
                                 + "FROM erp.bpsu_bp "
-                                + "WHERE fiscal_id = '" + comprobante.getEltReceptor().getAttRfc().getString() + "' "
-                                + (comprobante.getEltReceptor().getAttNumRegIdTrib().getString().isEmpty() ? "" : "AND fiscal_frg_id = '" + comprobante.getEltReceptor().getAttNumRegIdTrib().getString() + "' ")
-                                + "AND b_cus AND NOT b_del "
+                                + "WHERE fiscal_id = '" + rfc + "' "
+                                + (idFiscal.isEmpty() ? "" : "AND fiscal_frg_id = '" + idFiscal + "' ")
+                                + "AND (b_cus OR b_att_bank) AND NOT b_del "
                                 + "ORDER BY id_bp DESC LIMIT 1 ";
                         resultSet = statement.executeQuery(sql);
                         if (!resultSet.next()) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
+                                    + "Cliente o banco con RFC: '" + rfc + "'"
+                                    + (idFiscal.isEmpty() ? "" : ", ID fiscal: '" + idFiscal + "'") + ".");
                         }
                         else {
                             idReceptor = resultSet.getInt(1);

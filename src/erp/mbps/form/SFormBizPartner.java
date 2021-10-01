@@ -104,8 +104,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldFkRiskTypeId;
     private erp.lib.form.SFormField moFieldGuaranteeAmount;
     private erp.lib.form.SFormField moFieldInsuranceAmount;
-    private erp.lib.form.SFormField moFieldIsInInsurProcess;
-    private erp.lib.form.SFormField moFieldIsInGuarProcess;
+    private erp.lib.form.SFormField moFieldIsGuaranteeInProcess;
+    private erp.lib.form.SFormField moFieldIsInsuranceInProcess;
     private erp.lib.form.SFormField moFieldCreditLimit;
     private erp.lib.form.SFormField moFieldDaysOfCredit;
     private erp.lib.form.SFormField moFieldDaysOfGrace;
@@ -1403,12 +1403,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldFkRiskTypeId.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldGuaranteeAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfGuarantee, jlGuarantee);
         moFieldGuaranteeAmount.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldIsInGuarProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckGuarInProcess);
-        moFieldIsInGuarProcess.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldIsGuaranteeInProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckGuarInProcess);
+        moFieldIsGuaranteeInProcess.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldInsuranceAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInsurance, jlInsurance);
         moFieldInsuranceAmount.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldIsInInsurProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckInsurInProcess);
-        moFieldIsInInsurProcess.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldIsInsuranceInProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckInsurInProcess);
+        moFieldIsInsuranceInProcess.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldCreditLimit = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCreditLimit, jlCreditLimit);
         moFieldCreditLimit.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldDaysOfCredit = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfDaysOfCredit, jlDaysOfCredit);
@@ -1492,9 +1492,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCategory.add(moFieldDaysOfGrace);
         mvFieldsCategory.add(moFieldFkRiskTypeId);
         mvFieldsCategory.add(moFieldGuaranteeAmount);
+        mvFieldsCategory.add(moFieldIsGuaranteeInProcess);
         mvFieldsCategory.add(moFieldInsuranceAmount);
-        mvFieldsCategory.add(moFieldIsInGuarProcess);
-        mvFieldsCategory.add(moFieldIsInInsurProcess);
+        mvFieldsCategory.add(moFieldIsInsuranceInProcess);
         mvFieldsCategory.add(moFieldIsCreditByUser);
         mvFieldsCategory.add(moFieldDiotOperation);
         mvFieldsCategory.add(moFieldFkLanguageId);
@@ -1793,8 +1793,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartnerCategory.setDaysOfGrace(0);
         moBizPartnerCategory.setGuarantee(0);
         moBizPartnerCategory.setInsurance(0);
-        moBizPartnerCategory.setIsGuaranteeInProcess(jckGuarInProcess.isSelected());
-        moBizPartnerCategory.setIsInsuranceInProcess(jckInsurInProcess.isSelected());
+        moBizPartnerCategory.setIsGuaranteeInProcess(moFieldIsGuaranteeInProcess.getBoolean());
+        moBizPartnerCategory.setIsInsuranceInProcess(moFieldIsInsuranceInProcess.getBoolean());
         moBizPartnerCategory.setDateStart(moFieldDateStart.getDate());
         moBizPartnerCategory.setDateEnd_n(moFieldDateEnd.getDate());
         moBizPartnerCategory.setIsCreditByUser(jckIsCreditByUser.isSelected());
@@ -1841,7 +1841,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         int index = moCustomerConfigCobPane.getTable().getSelectedRow();
         SFormCustomerConfigurationCob formCustomerConfigCob = new SFormCustomerConfigurationCob(miClient);
         SDataCustomerBranchConfig dataCustomerConfigCob = null;
-        SDataCustomerBranchConfigRow dataCustomerConfigCobRow = null;
 
         formCustomerConfigCob.formRefreshCatalogues();
         formCustomerConfigCob.formReset();
@@ -1853,7 +1852,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 dataCustomerConfigCob = (SDataCustomerBranchConfig) formCustomerConfigCob.getRegistry();
 
                 moBizPartner.getDbmsBizPartnerBranches().get(index + 1).getDbmsDataCustomerBranchConfig().add(dataCustomerConfigCob);
-                moCustomerConfigCobPane.setTableRow(dataCustomerConfigCobRow = new SDataCustomerBranchConfigRow(dataCustomerConfigCob), index);
+                moCustomerConfigCobPane.setTableRow(new SDataCustomerBranchConfigRow(dataCustomerConfigCob), index);
                 moCustomerConfigCobPane.renderTableRows();
             }
         }
@@ -2437,8 +2436,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
             moFieldGuaranteeAmount.setFieldValue(0d);
             moFieldInsuranceAmount.setFieldValue(0d);
-            moFieldIsInGuarProcess.setFieldValue(false);
-            moFieldIsInInsurProcess.setFieldValue(false);
+            moFieldIsGuaranteeInProcess.setFieldValue(false);
+            moFieldIsInsuranceInProcess.setFieldValue(false);
             moFieldCreditLimit.setFieldValue(0d);
             moFieldDaysOfCredit.setFieldValue(0);
             moFieldDaysOfGrace.setFieldValue(0);
@@ -2465,8 +2464,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
             moFieldGuaranteeAmount.setFieldValue(0d);
             moFieldInsuranceAmount.setFieldValue(0d);
-            moFieldIsInGuarProcess.setFieldValue(false);
-            moFieldIsInInsurProcess.setFieldValue(false);
+            moFieldIsGuaranteeInProcess.setFieldValue(false);
+            moFieldIsInsuranceInProcess.setFieldValue(false);
         }
         else {
             if (!jckIsCreditByUser.isSelected()) {
@@ -2490,8 +2489,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkRiskId_n()});
                 moFieldGuaranteeAmount.setFieldValue(moBizPartnerCategory.getGuarantee());
                 moFieldInsuranceAmount.setFieldValue(moBizPartnerCategory.getInsurance());
-                moFieldIsInGuarProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
-                moFieldIsInInsurProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
+                moFieldIsGuaranteeInProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
+                moFieldIsInsuranceInProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
             }
         }
     }
@@ -3060,8 +3059,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getEffectiveRiskTypeId() });
                 moFieldGuaranteeAmount.setFieldValue(moBizPartnerCategory.getGuarantee());
                 moFieldInsuranceAmount.setFieldValue(moBizPartnerCategory.getInsurance());
-                moFieldIsInGuarProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
-                moFieldIsInInsurProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
+                moFieldIsGuaranteeInProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
+                moFieldIsInsuranceInProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
             }
             
             moFieldDiotOperation.setFieldValue(moBizPartnerCategory.getDiotOperation());
@@ -3250,8 +3249,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moBizPartnerCategory.setDaysOfGrace(moFieldDaysOfGrace.getInteger());
                 moBizPartnerCategory.setGuarantee(moFieldGuaranteeAmount.getDouble());
                 moBizPartnerCategory.setInsurance(moFieldInsuranceAmount.getDouble());
-                moBizPartnerCategory.setIsGuaranteeInProcess(moFieldIsInGuarProcess.getBoolean());
-                moBizPartnerCategory.setIsInsuranceInProcess(moFieldIsInInsurProcess.getBoolean());
+                moBizPartnerCategory.setIsGuaranteeInProcess(moFieldIsGuaranteeInProcess.getBoolean());
+                moBizPartnerCategory.setIsInsuranceInProcess(moFieldIsInsuranceInProcess.getBoolean());
             }
             
             moBizPartnerCategory.setDateStart(moFieldDateStart.getDate());
