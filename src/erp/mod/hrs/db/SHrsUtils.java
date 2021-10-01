@@ -2153,7 +2153,7 @@ public abstract class SHrsUtils {
             while (resultSetHeader.next()) {
                  fiscal_id = resultSetHeader.getString("fiscal_id");
             }
-                if (period < 9 || period < 0) {
+                if (period <= 9 || period < 0) {
                     periodN = "0" + period;
                 }
                 else {
@@ -2332,6 +2332,16 @@ public abstract class SHrsUtils {
                         topBonusTa = 0;
                     }
                     
+                    if(exemptEgorations == null) {
+                        exemptEgorations = "0";
+                    }
+                    if(taxedEgorations == null) {
+                        taxedEgorations = "0";
+                    }
+                    if(taxedBonus == null) {
+                        taxedBonus = "0";
+                    }
+
                     buffer += "0000000536" + separator;
                     buffer += declarantRFC + separator;
                     buffer += nameDeclarant + separator;
