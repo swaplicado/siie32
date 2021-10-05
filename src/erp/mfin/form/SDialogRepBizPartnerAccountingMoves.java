@@ -45,7 +45,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -116,6 +116,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jlBizPartner1 = new javax.swing.JLabel();
         jtfFunctionalArea = new javax.swing.JTextField();
         jbFunctionalArea = new javax.swing.JButton();
+        jPanel12 = new javax.swing.JPanel();
+        jckShowFolioOrders = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
@@ -131,7 +133,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -211,6 +213,14 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
 
         jPanel6.add(jPanel10);
 
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckShowFolioOrders.setText("Mostrar folios de pedidos");
+        jckShowFolioOrders.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel12.add(jckShowFolioOrders);
+
+        jPanel6.add(jPanel12);
+
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
@@ -280,6 +290,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jbClose.addActionListener(this);
         jbFunctionalArea.addActionListener(this);
         jckShowPayDays.addItemListener(this);
+        jckShowFolioOrders.addItemListener(this);
         jtfYear.addFocusListener(this);
         jftDateRef.addFocusListener(this);
 
@@ -358,8 +369,13 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             map.put("sCreditType", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_TP_CRED, new int[] { bizPartnerCategory.getEffectiveCreditTypeId() }));
             map.put("sFuncText", jtfFunctionalArea.getText());
             map.put("sFilterFunctionalArea", areasFilter);
-
-            jasperPrint = SDataUtilities.fillReport(miClient, jckShowPayDays.isSelected() ? SDataConstantsSys.REP_FIN_BPS_ACC_MOV_DAY : SDataConstantsSys.REP_FIN_BPS_ACC_MOV, map);
+            
+            if (jckShowFolioOrders.isSelected()) {
+                jasperPrint = SDataUtilities.fillReport(miClient,SDataConstantsSys.REP_FIN_BPS_ACC_MOV_ORD , map);
+            } else {
+                jasperPrint = SDataUtilities.fillReport(miClient, jckShowPayDays.isSelected() ? SDataConstantsSys.REP_FIN_BPS_ACC_MOV_DAY : SDataConstantsSys.REP_FIN_BPS_ACC_MOV, map);
+            }
+            
             jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setTitle(getTitle());
             jasperViewer.setVisible(true);
@@ -378,6 +394,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         if (jckShowPayDays.isSelected()) {
             jftDateRef.setEnabled(true);
             jbPickDateRef.setEnabled(true);
+            jckShowFolioOrders.setEnabled(false);
+            jckShowFolioOrders.setSelected(false);
             
             date = SLibTimeUtils.digestDate(miClient.getSession().getCurrentDate());
             moFieldDateRef.setFieldValue(SLibTimeUtils.createDate(moFieldYear.getInteger(), date[1], date[2]));
@@ -385,11 +403,23 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         else {
             jftDateRef.setEnabled(false);
             jbPickDateRef.setEnabled(false);
+            jckShowFolioOrders.setEnabled(true);
             
             moFieldDateRef.resetField();
         }
     }
 
+    private void itemStateChangedShowFolioOrders() {        
+        if (jckShowFolioOrders.isSelected()) {
+            jckShowPayDays.setEnabled(false);
+            jckShowPayDays.setSelected(false);
+            jbPickDateRef.setEnabled(false);
+        }
+        else {
+            jckShowPayDays.setEnabled(true);
+        }
+    }
+    
     public void focusLostYear() {
         int[] date = null;
         
@@ -460,6 +490,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -473,6 +504,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     private javax.swing.JButton jbPickDateRef;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox jcbBizPartner;
+    private javax.swing.JCheckBox jckShowFolioOrders;
     private javax.swing.JCheckBox jckShowPayDays;
     private javax.swing.JFormattedTextField jftDateRef;
     private javax.swing.JLabel jlBizPartner;
@@ -484,11 +516,13 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     // End of variables declaration//GEN-END:variables
 
     public void initForm() {
-        mbFirstTime = true;
+       mbFirstTime = true;
         
         moFieldYear.setFieldValue(miClient.getSessionXXX().getWorkingYear());
         jckShowPayDays.setSelected(false);
+        jckShowFolioOrders.setSelected(false);
         itemStateChangedShowPayDays(); // resets reference date
+        itemStateChangedShowFolioOrders(); // resets reference date
 
         if (mnBizPartnerId == SLibConsts.UNDEFINED) {
             moFieldBizPartner.resetField();
@@ -536,6 +570,9 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             
             if (checkBox == jckShowPayDays) {
                 itemStateChangedShowPayDays();
+            }
+            if (checkBox == jckShowFolioOrders) {
+                itemStateChangedShowFolioOrders();
             }
         }
     }

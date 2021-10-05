@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña
  */
 public class SDataDiogEntryRow extends erp.lib.table.STableRow {
 
@@ -23,6 +23,7 @@ public class SDataDiogEntryRow extends erp.lib.table.STableRow {
         mvValues.clear();
         mvValues.add(diogEntry.getDbmsItemKey());
         mvValues.add(diogEntry.getDbmsItem());
+        mvValues.add(diogEntry.getDbmsPartNum());
         mvValues.add(diogEntry.getOriginalQuantity());
         mvValues.add(diogEntry.getDbmsOriginalUnitSymbol());
         mvValues.add(diogEntry.getAuxStockMovesAsString());

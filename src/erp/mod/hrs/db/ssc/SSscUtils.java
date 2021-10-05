@@ -41,7 +41,6 @@ public abstract class SSscUtils {
         excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_PTU);
         excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_SAVINGS);
         excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_TAX_SUB);
-        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_VAC_BONUS);
         excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_OTH);
         
         return excludedEarningTypes;
@@ -131,8 +130,8 @@ public abstract class SSscUtils {
                     + "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = emp.id_emp "
                     + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
                     + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
-                    + "emp.dt_hire < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act AND "
-                    + "emp.dt_sal_ssc < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
+                    + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act AND "
+                    + "emp.dt_sal_ssc <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
     //                + "and pr.id_emp = 3680 " // xxx Para pruebas de empleados
                     + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
 
@@ -204,7 +203,7 @@ public abstract class SSscUtils {
                 int calendarDaysInPeriod = daysCalendarPeriod(year , monthStart);
                 calendarDaysInPeriod = calendarDaysInPeriod + daysCalendarPeriod(year , monthEnd);
             
-                String sql = "SELECT e.id_ear, e.fk_tp_ear, pre.id_pay, pre.id_mov, pre.amt_r, pr.pay_hr_r, emp.wrk_hrs_day "
+                String sql = "SELECT e.id_ear, e.fk_tp_ear, pre.id_pay, pre.id_mov, pre.amt_r, pr.pay_hr_r, emp.wrk_hrs_day, pre.amt_taxa, pre.amt_exem "
                         + "FROM hrs_pay AS p "
                         + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                         + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
@@ -261,32 +260,13 @@ public abstract class SSscUtils {
                                     default:
                                 }
                                 break;
-                            case SModSysConsts.HRSS_TP_EAR_SUN_BONUS:
-                                switch (employee.getFkPaymentTypeId()) {
-                                    case SModSysConsts.HRSS_TP_PAY_WEE:
-                                        if ((resultSet.getDouble("pre.amt_r")) >= foodExemptWeekly) {
-                                            amountTaxed = (resultSet.getDouble("pre.amt_r") - foodExemptWeekly);
-                                            amountExempt = 0;
-                                        }
-                                        else {
-                                            amountTaxed = 0;
-                                            amountExempt = resultSet.getDouble("pre.amt_r");
-                                        }
-                                        break;
-                                        
-                                    case SModSysConsts.HRSS_TP_PAY_FOR:
-                                        if ((resultSet.getDouble("pre.amt_r")) >= foodExemptFortnightly) {
-                                            amountTaxed = resultSet.getDouble("pre.amt_r") - foodExemptFortnightly;
-                                            amountExempt = 0;
-                                        }
-                                        else {
-                                            amountTaxed = 0;
-                                            amountExempt = resultSet.getDouble("pre.amt_r");
-                                        }
-                                        break;
-                                        
-                                    default:
-                                }
+                            case SModSysConsts.HRSS_TP_EAR_SUN_BONUS: // Prima dominical
+                                amountTaxed = resultSet.getDouble("pre.amt_taxa") ;
+                                amountExempt = resultSet.getDouble("pre.amt_exem");
+                                break;
+                            case SModSysConsts.HRSS_TP_EAR_VAC_BONUS: // Prima vacacional
+                                amountTaxed = resultSet.getDouble("pre.amt_taxa") ;
+                                amountExempt = resultSet.getDouble("pre.amt_exem");
                                 break;
                             case SModSysConsts.HRSS_TP_EAR_OVER_TIME: //Tiempo extra
                                 switch (employee.getFkPaymentTypeId()) {
