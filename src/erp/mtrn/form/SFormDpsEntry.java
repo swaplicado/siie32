@@ -76,7 +76,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Claudio Peña, Sergio Flores
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Claudio Peña
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -107,6 +107,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldConceptKey;
     private erp.lib.form.SFormField moFieldConcept;
     private erp.lib.form.SFormField moFieldFkOriginalUnitId;
+    private erp.lib.form.SFormField moFieldPartNum;
     private erp.lib.form.SFormField moFieldIsDiscountUnitaryPercentage;
     private erp.lib.form.SFormField moFieldDiscountUnitaryPercentage;
     private erp.lib.form.SFormField moFieldIsDiscountEntryPercentage;
@@ -267,6 +268,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlFkOriginalUnitId = new javax.swing.JLabel();
         jcbFkOriginalUnitId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkOriginalUnitId = new javax.swing.JButton();
+        jlPartNum = new javax.swing.JLabel();
+        jtPartNum = new javax.swing.JTextField();
         jPanel19 = new javax.swing.JPanel();
         jckIsDiscountUnitaryPercentage = new javax.swing.JCheckBox();
         jtfDiscountUnitaryPercentage = new javax.swing.JTextField();
@@ -701,6 +704,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkOriginalUnitId.setFocusable(false);
         jbFkOriginalUnitId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbFkOriginalUnitId);
+
+        jlPartNum.setText("No. parte:");
+        jlPartNum.setPreferredSize(new java.awt.Dimension(67, 23));
+        jPanel10.add(jlPartNum);
+
+        jtPartNum.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel10.add(jtPartNum);
 
         jPanel4.add(jPanel10);
 
@@ -2284,6 +2294,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldConcept.setLengthMax(CONCEPT_LENGTH_MAX);
         moFieldFkOriginalUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkOriginalUnitId, jlFkOriginalUnitId);
         moFieldFkOriginalUnitId.setPickerButton(jbFkOriginalUnitId);
+        moFieldPartNum = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtPartNum, jlPartNum);
         moFieldIsDiscountUnitaryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountUnitaryPercentage);
         moFieldDiscountUnitaryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDiscountUnitaryPercentage, jckIsDiscountUnitaryPercentage);
         moFieldDiscountUnitaryPercentage.setIsPercent(true);
@@ -3162,7 +3173,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             jtConceptfKey.setToolTipText(null);
             jtfConcept.setToolTipText(null);
-
+            jtPartNum.setToolTipText(null);
+            
             jckIsBulk.setSelected(false);
             jckAuxPreserveQuantity.setSelected(false);
             jckIsSurplusPercentageApplying.setSelected(false);
@@ -3181,6 +3193,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbConceptKey.setEnabled(false);
             jtfConcept.setEditable(false);
             jtfConcept.setFocusable(false);
+            jtPartNum.setEditable(false);
+            jtPartNum.setFocusable(false);
             jbConcept.setEnabled(false);
             jbItemBizPartnerDescription.setEnabled(false);
             jcbFkOriginalUnitId.setEnabled(false);
@@ -3255,6 +3269,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             String conceptKey = "";
             String concept = "";
+            String partNum = "";
             int unitId = 0;
             
             // custom item description fo business-partner:
@@ -3290,6 +3305,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     // default item description from catalog:
                     
                     concept = moItem.getItem().length() <= moFieldConcept.getLengthMax() ? moItem.getItem() : moItem.getItemShort();
+                    partNum = moItem.getPartNumber().length() == 0 ? "S/No.Parte" : moItem.getPartNumber();
                 }
             }
 
@@ -3340,9 +3356,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldFkOriginalUnitId.setFieldValue(new int[] { unitId != 0 ? unitId : moItem.getFkUnitId() });
             moFieldIsInventoriable.setFieldValue(moItem.getIsInventoriable());
             moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
+            moFieldPartNum.setFieldValue(!partNum.isEmpty() ? partNum : "S/No.Parte");
 
             jtConceptfKey.setCaretPosition(0);
             jtfConcept.setCaretPosition(0);
+            jtPartNum.setCaretPosition(0);
 
             if (!moItem.getDbmsDataItemGeneric().getIsItemKeyEditable()) {
                 jtConceptfKey.setToolTipText(jtConceptfKey.getText());
@@ -3834,6 +3852,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfConcept.setEditable(false);
             jtfConcept.setFocusable(false);
             jbConcept.setEnabled(false);
+            jtPartNum.setEditable(false);
+            jtPartNum.setFocusable(false);
             jbItemBizPartnerDescription.setEnabled(false);
             jcbFkOriginalUnitId.setEnabled(false);
             jbFkOriginalUnitId.setEnabled(false);
@@ -4953,6 +4973,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlOriginalDiscountUnitaryCy;
     private javax.swing.JLabel jlOriginalPriceUnitaryCy;
     private javax.swing.JLabel jlOriginalQuantity;
+    private javax.swing.JLabel jlPartNum;
     private javax.swing.JLabel jlPriceOriginalPriceUnitaryCy;
     private javax.swing.JLabel jlPriceOriginalQuantity;
     private javax.swing.JLabel jlPriceUnitary;
@@ -5001,6 +5022,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JRadioButton jradAccAdvanceBilled;
     private javax.swing.JRadioButton jradAccCashAccount;
     private javax.swing.JTextField jtConceptfKey;
+    private javax.swing.JTextField jtPartNum;
     private javax.swing.JToggleButton jtbGridPricesFilter;
     private javax.swing.JToggleButton jtbNotesFilter;
     private javax.swing.JTextField jtfAddAmc71PurchaseOrder;

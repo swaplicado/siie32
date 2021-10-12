@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Sergio Flores, Isabel Servín, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -1609,6 +1609,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_PS_CL_ITEM_TOT = 206052;
     public static final int REP_FIN_BPS_ACC_AGI = 206061;       // business partner accounts aging
     public static final int REP_FIN_BPS_ACC_AGI_CRED = 206062;  // business partner accounts aging with credit information (credit days, credit limit, guarantee & insurance)
+    public static final int REP_FIN_BPS_ACC_MOV_ORD = 206064;
 
     public static final int REP_TRN_DPS_BPS = 207001;
     public static final int REP_TRN_DPS_UNP = 207002;
