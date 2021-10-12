@@ -49,6 +49,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
 import javax.swing.JButton;
+import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 
 /**
@@ -694,9 +695,9 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                     row.getValues().add(departamento_cve);
                     row.getValues().add(f_per);
                     row.getValues().add(f_ded);
-                    row.getValues().add(f_per - f_ded);
+                    row.getValues().add(SLibUtils.roundAmount(f_per - f_ded));
 
-                    if (fid_periodo_pago_tp == 1) {
+                    if (fid_periodo_pago_tp == SModSysConsts.HRSS_TP_PAY_WEE) {
                         // Pay weekly:
 
                         row.setSalary((resultSet.getDouble("salario_b") * 365d) / 12d);
@@ -706,6 +707,8 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
                         row.setSalary(resultSet.getDouble("sueldo"));
                     }
+                    
+                    row.setPayment(SLibUtils.roundAmount(f_per - f_ded));
 
                     dias_laborables = resultSet.getInt("dias_laborables");
                     row.setDaysWorked(resultSet.getInt("dias_laborados"));

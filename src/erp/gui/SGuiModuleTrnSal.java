@@ -1035,7 +1035,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             case SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP:
                 viewTitle = "Ventas x tipo cliente-cliente";
                 break;
-           case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL:
+           case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE:
                 viewTitle = "Ventas docs. x ítem-cliente";
                 break;
             default:
@@ -1489,11 +1489,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             oViewClass = erp.mtrn.view.SViewQueryTotal.class;
                             sViewTitle = getViewTitle(auxType01);
                             break;
-                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL:
-                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL:
+                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL:
+                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE:
                             oViewClass = erp.mtrn.view.SViewQueryDpsByItemBizPartner.class;
 
-                            if (auxType01 == SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL) {
+                            if (auxType01 == SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL) {
                                 sViewTitle = "VTA - ";
                             }
                             else {
@@ -1852,7 +1852,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntry) {
-               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_DOC);
+               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntryRef) {
                 showView(SDataConstants.TRNX_DPS_ETY_REF, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
@@ -1918,7 +1918,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjEntry) {
-                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjDocAnn) {
                 showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
@@ -2026,7 +2026,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP);
             }
             else if (item == jmiRepTrnDpsByItemBizPartner) {
-               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL);
+               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE);
             }
             else if (item == jmiRepBackorderContract) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);

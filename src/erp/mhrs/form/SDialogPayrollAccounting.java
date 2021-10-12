@@ -55,6 +55,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.border.TitledBorder;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridUtils;
@@ -68,6 +69,9 @@ import sa.lib.srv.SSrvConsts;
  * @author Sergio Flores, Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollAccounting extends JDialog implements ActionListener {
+    
+    private static final int JOURNAL_VOUCHER_COLS = 5;
+    private static final int JOURNAL_VOUCHER_COLS_INDEX = 8;
     
     private int mnFormResult;
     private boolean mbFirstTime;
@@ -305,7 +309,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(450, 100));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
-        jlTotalAvailables.setText("n");
+        jlTotalAvailables.setText("Empleados disponibles...");
         jlTotalAvailables.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
@@ -315,7 +319,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jpEmployeesSelected.setPreferredSize(new java.awt.Dimension(475, 100));
         jpEmployeesSelected.setLayout(new java.awt.BorderLayout());
 
-        jlTotalSelected.setText("n");
+        jlTotalSelected.setText("Empleados seleccionados...");
         jlTotalSelected.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesSelected.add(jlTotalSelected, java.awt.BorderLayout.SOUTH);
 
@@ -491,18 +495,21 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     }
 
     private void computeTotals() {
-        int countAvailables = 0;
-        int countSelected = 0;
+        double amountAvailable = 0;
+        double amountSelected = 0;
         
-        for (int i = 0; i < moTablePaneEmpAvailable.getTableGuiRowCount(); i++) {
-            countAvailables++;
-        }
-        for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
-            countSelected++;
+        for (int row = 0; row < moTablePaneEmpAvailable.getTableGuiRowCount(); row++) {
+            amountAvailable = SLibUtils.roundAmount(amountAvailable + ((SRowEmployee) moTablePaneEmpAvailable.getTableRow(row)).getPayment());
         }
         
-        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
-        jlTotalSelected.setText(" " + countSelected + " empleados seleccionados.");
+        for (int row = 0; row < moTablePaneEmpSelected.getTableGuiRowCount(); row++) {
+            amountSelected = SLibUtils.roundAmount(amountSelected + ((SRowEmployee) moTablePaneEmpSelected.getTableRow(row)).getPayment());
+        }
+        
+        jlTotalAvailables.setText("Empleados disponibles: " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpAvailable.getTableGuiRowCount()) + " | "
+                + "Monto disponible: $" + SLibUtils.getDecimalFormatAmount().format(amountAvailable) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+        jlTotalSelected.setText("Empleados seleccionados:  " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpSelected.getTableGuiRowCount()) + " | "
+                + "Monto seleccionado: $" + SLibUtils.getDecimalFormatAmount().format(amountSelected) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
     }
     
     @SuppressWarnings("unchecked")
@@ -607,11 +614,12 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     row.setSalaryType(SLibUtils.textLeft(resultSet.getString("tpsal.name"), 3)); // system's catalog, name can be truncated to length of 3
                     row.setBank(resultSet.getString("_bank"));
                     row.setSalary(resultSet.getDouble("pr.pay_day_r"));
+                    row.setPayment(resultSet.getDouble("pr.pay_r"));
                     row.setDaysWorked(resultSet.getInt("pr.day_wrk"));
                     row.setDaysNotWorked(resultSet.getInt("pr.day_not_wrk_r"));
                     row.setDaysPayed(resultSet.getInt("pr.day_pad"));
                     row.setFkBizPartnerId(resultSet.getInt("emp.id_emp"));
-                    row.setFkPaymentSystemTypeId(0); // not supported yet!
+                    row.setFkPaymentSystemTypeId(0); // attribute is obsolete!
 
                     moTablePaneEmpAvailable.addTableRow(row);
                     
@@ -1404,37 +1412,37 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     }
 
     public boolean actionAdd() {
-        int index = 0;
         boolean error = true;
-        SRowEmployee row = null;
+        int index = moTablePaneEmpAvailable.getTable().getSelectedRow();
 
-        if (moCurrentRecord == null) {
+        if (index == -1) {
+            miClient.showMsgBoxWarning("Seleccionar uno de los " + SGuiUtils.getLabelName(((TitledBorder) jpEmployeesAvailable.getBorder()).getTitle()) + ".");
+            moTablePaneEmpAvailable.getTable().requestFocusInWindow();
+        }
+        else if (moCurrentRecord == null) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlRecord.getText() + "'.");
             jbPickRecord.requestFocus();
         }
         else {
-            index = moTablePaneEmpAvailable.getTable().getSelectedRow();
-            if (index != -1) {
-                row = (SRowEmployee) moTablePaneEmpAvailable.getSelectedTableRow();
-                row.setData(moCurrentRecord.getPrimaryKey());
-                row.getValues().add("" + moCurrentRecord.getPkYearId() + "-" + (moCurrentRecord.getPkPeriodId() >= 10 ? "" : "0") + moCurrentRecord.getPkPeriodId());
-                row.getValues().add(jtfRecordBkc.getText());
-                row.getValues().add(jtfRecordBranch.getText());
-                row.getValues().add(jtfRecordNumber.getText());
-                row.getValues().add(moCurrentRecord.getDate());
-                
-                row.setAccountingPayrollEmployee(createAccountingPayrollEmployee(row.getFkBizPartnerId()));
-                
-                moTablePaneEmpAvailable.removeTableRow(index);
-                moTablePaneEmpAvailable.renderTableRows();
-                moTablePaneEmpAvailable.setTableRowSelection(index < moTablePaneEmpAvailable.getTableGuiRowCount() ? index : moTablePaneEmpAvailable.getTableGuiRowCount() - 1);
+            SRowEmployee row = (SRowEmployee) moTablePaneEmpAvailable.getSelectedTableRow();
+            row.setData(moCurrentRecord.getPrimaryKey());
+            row.getValues().add(SLibUtils.DecimalFormatCalendarYear.format(moCurrentRecord.getPkYearId()) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(moCurrentRecord.getPkPeriodId()));
+            row.getValues().add(jtfRecordBkc.getText());
+            row.getValues().add(jtfRecordBranch.getText());
+            row.getValues().add(jtfRecordNumber.getText());
+            row.getValues().add(moCurrentRecord.getDate());
 
-                moTablePaneEmpSelected.addTableRow(row);
-                moTablePaneEmpSelected.renderTableRows();
-                moTablePaneEmpSelected.setTableRowSelection(moTablePaneEmpSelected.getTableGuiRowCount() - 1);
+            row.setAccountingPayrollEmployee(createAccountingPayrollEmployee(row.getFkBizPartnerId()));
 
-                error = false;
-            }
+            moTablePaneEmpAvailable.removeTableRow(index);
+            moTablePaneEmpAvailable.renderTableRows();
+            moTablePaneEmpAvailable.setTableRowSelection(index < moTablePaneEmpAvailable.getTableGuiRowCount() ? index : moTablePaneEmpAvailable.getTableGuiRowCount() - 1);
+
+            moTablePaneEmpSelected.addTableRow(row);
+            moTablePaneEmpSelected.renderTableRows();
+            moTablePaneEmpSelected.setTableRowSelection(moTablePaneEmpSelected.getTableGuiRowCount() - 1);
+
+            error = false;
         }
         
         computeTotals();
@@ -1445,7 +1453,14 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     public void actionAddAll() {
         int rows = moTablePaneEmpAvailable.getTableModel().getRowCount();
         
-        if (rows > 0) {
+        if (rows == 0) {
+            miClient.showMsgBoxWarning("No hay " + SGuiUtils.getLabelName(((TitledBorder) jpEmployeesAvailable.getBorder()).getTitle()) + ".");
+        }
+        else if (moCurrentRecord == null) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlRecord.getText() + "'.");
+            jbPickRecord.requestFocus();
+        }
+        else {
             String bank = "";
             boolean bankSelected = jcbBankFilter.getSelectedIndex() > 0;
 
@@ -1485,15 +1500,17 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     }
 
     public boolean actionRemove() {
-        int index = 0;
         boolean error = true;
-        SRowEmployee row = null;
-
-        index = moTablePaneEmpSelected.getTable().getSelectedRow();
-        if (index != -1) {
-            row = (SRowEmployee) moTablePaneEmpSelected.getSelectedTableRow();
-            for (int i = 1; i <= 5; i++) { // XXX really bizarre!!!
-                row.getValues().remove(8); // XXX really bizarre!!!
+        int index = moTablePaneEmpSelected.getTable().getSelectedRow();
+        
+        if (index == -1) {
+            miClient.showMsgBoxWarning("Seleccionar uno de los " + SGuiUtils.getLabelName(((TitledBorder) jpEmployeesSelected.getBorder()).getTitle()) + ".");
+            moTablePaneEmpSelected.getTable().requestFocusInWindow();
+        }
+        else {
+            SRowEmployee row = (SRowEmployee) moTablePaneEmpSelected.getSelectedTableRow();
+            for (int i = 1; i <= JOURNAL_VOUCHER_COLS; i++) {
+                row.getValues().remove(JOURNAL_VOUCHER_COLS_INDEX);
             }
 
             moTablePaneEmpSelected.removeTableRow(index);
@@ -1513,10 +1530,17 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     }
 
     public void actionRemoveAll() {
-        while (moTablePaneEmpSelected.getTableGuiRowCount() > 0) {
-            moTablePaneEmpSelected.setTableRowSelection(0);
-            if (!actionRemove()) {
-                break;
+        int rows = moTablePaneEmpSelected.getTableModel().getRowCount();
+        
+        if (rows == 0) {
+            miClient.showMsgBoxWarning("No hay " + SGuiUtils.getLabelName(((TitledBorder) jpEmployeesSelected.getBorder()).getTitle()) + ".");
+        }
+        else {
+            while (moTablePaneEmpSelected.getTableGuiRowCount() > 0) {
+                moTablePaneEmpSelected.setTableRowSelection(0);
+                if (!actionRemove()) {
+                    break;
+                }
             }
         }
     }
@@ -1639,9 +1663,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         moCurrentRecord = null;
         moTablePaneEmpAvailable.createTable();
-        moTablePaneEmpAvailable.clearTableRows();
         moTablePaneEmpSelected.createTable();
-        moTablePaneEmpSelected.clearTableRows();
     }
 
     public int getFormResult() {

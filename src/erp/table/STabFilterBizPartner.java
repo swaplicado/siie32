@@ -62,7 +62,7 @@ public class STabFilterBizPartner extends javax.swing.JPanel {
         jtfBizPartner.setText("NAME");
         jtfBizPartner.setToolTipText("Asociado de negocios");
         jtfBizPartner.setFocusable(false);
-        jtfBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfBizPartner.setPreferredSize(new java.awt.Dimension(200, 23));
         add(jtfBizPartner);
 
         jbBizPartner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_filter_bp.gif"))); // NOI18N

@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 189.7/ 2021-10-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a generación de entradas de bitácora de altas y bajas en casos de sustitución patronal, el ID usuario creación del registro estaba ausente.
+2) Mejora selección de empleados disponibles y seleccionados en diálogo de contabilización de nóminas.
+3) Corrección a vista de documentos a detalle y movimientos de documentos por asociado de negocios e ítem.
+
+================================================================================
 SIIE 3.2 189.6/ 2021-09-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

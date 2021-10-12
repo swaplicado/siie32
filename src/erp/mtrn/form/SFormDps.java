@@ -5145,7 +5145,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //jbDateStartCredit.setEnabled(...);    // status already set by previous call to method itemChangeFkPaymentTypeId()
             //jcbFkLanguageId.setEnabled(...);      // language is not editable
             jcbFkDpsNatureId.setEnabled(jcbFkDpsNatureId.getItemCount() > 2);
-            jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && jcbFkFunctionalAreaId.getItemCount() != 2);
+            jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && (jcbFkFunctionalAreaId.getItemCount() - 1) != 1); // enable when functional areas applying and only one asignated to current user
 
             jcbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             jbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
@@ -8982,7 +8982,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (!isApplingFunctionalAreas()) {
             moFieldFkFunctionalAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NON });
         }
-        else if (jcbFkFunctionalAreaId.getItemCount() == 2) {
+        else if ((jcbFkFunctionalAreaId.getItemCount() - 1) == 1) {
             jcbFkFunctionalAreaId.setSelectedIndex(1);
         }
         moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });

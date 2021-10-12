@@ -1270,8 +1270,10 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_PUR_TOT_BY_AGS_ITEM = 211;
     public static final int TRNX_PUR_TOT_BY_TP_BP = 212;
     public static final int TRNX_PUR_TOT_BY_TP_BP_BP = 213;
-    public static final int TRNX_PUR_DPS_BY_ITEM_BP_ALL = 214;
-    public static final int TRNX_PUR_DPS_BY_ITEM_BP_FIL = 215;
+    /** All document entries purchase at once. What type of document is needed must be provided: invoices or credit notes. */
+    public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ALL = 214;
+    /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
+    public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ONE = 215;
 
     public static final int TRNX_SAL_TOT = 301;
     public static final int TRNX_SAL_TOT_MONTH = 302;
@@ -1286,8 +1288,10 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_SAL_TOT_BY_AGS_ITEM = 311;
     public static final int TRNX_SAL_TOT_BY_TP_BP = 312;
     public static final int TRNX_SAL_TOT_BY_TP_BP_BP = 313;
-    public static final int TRNX_SAL_DPS_BY_ITEM_BP_ALL = 314;
-    public static final int TRNX_SAL_DPS_BY_ITEM_BP_FIL = 315;
+    /** All sales document entries at once. What type of document is needed must be provided: invoices or credit notes. */
+    public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ALL = 314;
+    /** Sales document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
+    public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ONE = 315;
 
     public static final int TRNX_PUR_BACKORDER_CON = 11;
     public static final int TRNX_PUR_BACKORDER_CON_ITEM = 12;
