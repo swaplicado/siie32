@@ -2170,7 +2170,7 @@ public abstract class SHrsUtils {
         return nameAnnexed02;
     
     }
-    
+ 
     /*
     *
     * @param client
@@ -2185,13 +2185,14 @@ public abstract class SHrsUtils {
         String separator = "|";
         String fiscal_id = "";
         String bp = "";
+        String uniqueKeyApsa = "0000000536";
         String periodN = "";
         SimpleDateFormat formatter = new SimpleDateFormat("dd");
         String dateDay = formatter.format(client.getSession().getCurrentDate());
         
         try {
             
-            if (period < 9 || period < 0) {
+            if (period <= 9 || period < 0) {
                 periodN = "0" + period;
             }
             else {
@@ -2205,8 +2206,11 @@ public abstract class SHrsUtils {
                 fiscal_id = resultSetHeader.getString("fiscal_id");
                 bp = resultSetHeader.getString("bp");
             }
-
-            lineAnnexed02 = ("0000000536" + separator + fiscal_id + separator + bp + separator + "I" + separator + dateDay + periodN + year + separator +
+            
+            bp = bp.replaceAll("\\.","");
+            bp = bp.replaceAll(",","");
+            
+            lineAnnexed02 = (uniqueKeyApsa + separator + fiscal_id + separator + bp + separator + "I" + separator + dateDay + periodN + year + separator +
                    (typeLayout == 0 ? "NO" : "CO") + separator + "M" + separator + year + periodN + separator + separator + separator);
         }
         
@@ -2243,6 +2247,7 @@ public abstract class SHrsUtils {
         String taxedEgorations = "";
         String taxedBonus = "";
         String separator = "|";
+        String uniqueKeyApsa = "0000000536";
         int typeEmployee = 0;
         double topBonusUma = (SHrsUtils.getRecentUma(client.getSession(), periodEnd) * 30);
         double topBonusEx = 0;
@@ -2270,36 +2275,45 @@ public abstract class SHrsUtils {
                             + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                             + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                             + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
-                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "INNER JOIN erp.hrsu_emp AS emp ON pre.id_emp = emp.id_emp "
                             + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
                             + "AND p.per_year = " + year + " AND p.per = " + period + " "
                             + "AND e.fk_tp_ear IN (1, 102, 109, 108) "
-                            + "AND pre.id_emp = " + pkUser + ") as totalExc, "
+                            + "AND pre.id_emp = " + pkUser + " AND p.id_pay in (SELECT ety.fid_pay_n FROM FIN_REC_ETY AS ety "
+                            + "INNER JOIN HRS_PAY AS p ON ety.fid_pay_n = p.id_pay "
+                            + "WHERE ety.id_year = " + year + " AND ety.id_per = " + period + " AND ety.fid_pay_n >=0 "
+                            + "GROUP BY ety.fid_pay_n)) as totalExc, "
                             + "(SELECT sum(pre.amt_r) "
                             + "FROM hrs_pay AS p "
                             + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                             + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                             + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
-                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "INNER JOIN erp.hrsu_emp AS emp ON pre.id_emp = emp.id_emp "
                             + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
                             + "AND p.per_year = " + year + " AND p.per = " + period + " "
                             + "AND e.fk_tp_ear NOT IN (1, 102, 109, 108) "
-                            + "AND pre.id_emp =  " + pkUser + ") as totalGrab, "
+                            + "AND pre.id_emp = " + pkUser + " AND p.id_pay in (SELECT ety.fid_pay_n FROM FIN_REC_ETY AS ety "
+                            + "INNER JOIN HRS_PAY AS p ON ety.fid_pay_n = p.id_pay "
+                            + "WHERE ety.id_year = " + year + " AND ety.id_per = " + period + " AND ety.fid_pay_n >=0 "
+                            + "GROUP BY ety.fid_pay_n)) as totalGrab, "
                             + "(SELECT sum(pre.amt_r) "
                             + "FROM hrs_pay AS p "
                             + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                             + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                             + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
-                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "INNER JOIN erp.hrsu_emp AS emp ON pre.id_emp = emp.id_emp "
                             + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
                             + "AND p.per_year = " + year + " AND p.per = " + period + " "
                             + "AND e.fk_tp_ear IN (103) "
-                            + "AND pre.id_emp =  " + pkUser + ") as tBonus "
+                            + "AND pre.id_emp = " + pkUser + " AND p.id_pay in (SELECT ety.fid_pay_n FROM FIN_REC_ETY AS ety "
+                            + "INNER JOIN HRS_PAY AS p ON ety.fid_pay_n = p.id_pay "
+                            + "WHERE ety.id_year = " + year + " AND ety.id_per = " + period + " AND ety.fid_pay_n >=0 "
+                            + "GROUP BY ety.fid_pay_n)) as tBonus "
                             + "FROM hrs_pay AS p "
                             + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                             + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                             + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
-                            + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
+                            + "INNER JOIN erp.hrsu_emp AS emp ON pre.id_emp = emp.id_emp "
                             + "INNER JOIN erp.bpsu_bp as bp "
                             + "INNER JOIN erp.bpsu_bp as bpe "
                             + "INNER JOIN erp.HRSS_TP_REC_SCHE AS sch ON sch.id_tp_rec_sche = emp.fk_tp_rec_sche "
@@ -2341,14 +2355,17 @@ public abstract class SHrsUtils {
                     if(taxedBonus == null) {
                         taxedBonus = "0";
                     }
-
-                    buffer += "0000000536" + separator;
+                    
+                    nameDeclarant = nameDeclarant.replaceAll("\\.","");
+                    nameDeclarant = nameDeclarant.replaceAll(",","");
+                    
+                    buffer += uniqueKeyApsa + separator;
                     buffer += declarantRFC + separator;
                     buffer += nameDeclarant + separator;
                     buffer += nameEmployee + separator;
-                    buffer += totalEgorations + separator;
-                    buffer += (Double.parseDouble(exemptEgorations) + topBonusEx) + separator;
-                    buffer += (Double.parseDouble(taxedEgorations) + topBonusTa) + separator;
+                    buffer += Math.round(Double.parseDouble(totalEgorations)) + separator;
+                    buffer += Math.round((Double.parseDouble(exemptEgorations)) + topBonusEx) + separator;
+                    buffer += Math.round((Double.parseDouble(taxedEgorations)) + topBonusTa) + separator;
                     buffer += (typeEmployee == 1 ? "S" : "A");
                     buffer += "\r\n";
                 }
