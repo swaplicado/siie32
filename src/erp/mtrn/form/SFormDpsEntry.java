@@ -3933,13 +3933,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSecuritySeal.setEditable(false);
             jtfTicket.setEditable(false);
             jtfVgm.setEditable(false);
-            jbEditLogistics.setEnabled(false);
 
             jbNotesNew.setEnabled(false);
             jbNotesEdit.setEnabled(false);
             jbNotesDelete.setEnabled(false);
             jbPickSystemNotes.setEnabled(false);
-            jbEditNotes.setEnabled(false);
 
             jlAddBachocoNúmeroPosición.setEnabled(false);
             jtfAddBachocoNúmeroPosición.setEnabled(false);
@@ -4312,12 +4310,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void actionEditLogistics() {
         moFormComEntry.formReset();
+        moFormComEntry.formRefreshCatalogues();
         moFormComEntry.setRegistry(moDpsEntry);
         moFormComEntry.setVisible(true);
         
         if (moFormComEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             SDataDpsEntry dpsEntry = (SDataDpsEntry) moFormComEntry.getRegistry();
-            //moFieldFkVehicleTypeId_n.setFieldValue(moDpsComerEntry.getFkVehicleTypeId_n());
+            moFieldFkVehicleTypeId_n.setFieldValue(dpsEntry.getFkVehicleTypeId_n());
             moFieldDriver.setFieldValue(dpsEntry.getDriver());
             moFieldPlate.setFieldValue(dpsEntry.getPlate());
             moFieldTicket.setFieldValue(dpsEntry.getTicket());
@@ -4326,7 +4325,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldSealSecurity.setFieldValue(dpsEntry.getSealSecurity());
             moFieldVgm.setFieldValue(dpsEntry.getVgm());
             
-            jbEditLogistics.setEnabled(false);
             jbOk.setEnabled(true);
             
             jcbFkVehicleTypeId_n.requestFocusInWindow();

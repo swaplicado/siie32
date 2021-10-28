@@ -15,6 +15,7 @@ public interface SClientInterface {
 
     public sa.lib.gui.SGuiSession getSession();
     public erp.server.SSessionXXX getSessionXXX();
+    public redis.clients.jedis.Jedis getJedis();
 
     public javax.swing.JFrame getFrame();
     public javax.swing.JTabbedPane getTabbedPane();

@@ -99,7 +99,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jbPickDateCutoff = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jlCoBranch = new javax.swing.JLabel();
-        jcbCoBranch = new javax.swing.JComboBox<>();
+        jcbCoBranch = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickCoBranch = new javax.swing.JButton();
         jPanel101 = new javax.swing.JPanel();
         jlRepType = new javax.swing.JLabel();
@@ -119,19 +119,19 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jrbDocSortNumber = new javax.swing.JRadioButton();
         jPanel102 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<>();
+        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickBizPartner = new javax.swing.JButton();
         jPanel104 = new javax.swing.JPanel();
         jlSalesAgent = new javax.swing.JLabel();
-        jcbSalesAgent = new javax.swing.JComboBox<>();
+        jcbSalesAgent = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickSalesAgent = new javax.swing.JButton();
         jPanel106 = new javax.swing.JPanel();
         jlAnalyst = new javax.swing.JLabel();
-        jcbUserAnalyst = new javax.swing.JComboBox<>();
+        jcbUserAnalyst = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickUserAnalyst = new javax.swing.JButton();
         jPanel98 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
-        jcbCurrency = new javax.swing.JComboBox<>();
+        jcbCurrency = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickCurrency = new javax.swing.JButton();
         jlCurrencyWarning = new javax.swing.JLabel();
         jPanel105 = new javax.swing.JPanel();
@@ -345,8 +345,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jlShowAmounts.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel105.add(jlShowAmounts);
 
-        moBoolShowAmounts.setText("Ver seguro y garantía");
-        moBoolShowAmounts.setPreferredSize(new java.awt.Dimension(150, 23));
+        moBoolShowAmounts.setText("Mostrar garantía y seguro");
+        moBoolShowAmounts.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel105.add(moBoolShowAmounts);
 
         jPanel7.add(jPanel105);

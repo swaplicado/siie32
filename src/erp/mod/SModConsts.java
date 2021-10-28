@@ -413,6 +413,10 @@ public abstract class SModConsts {
     public static final int TRN_CFD_SIGN_LOG = 2023052;
     public static final int TRN_CFD_SIGN_LOG_MSG = 2023053;
     public static final int TRN_CFD_SND_LOG = 2023054;
+    public static final int TRN_CFD_FIN_REC = 2023058;
+    public static final int TRN_PAY = 2023401;
+    public static final int TRN_PAY_PAY = 2023402;
+    public static final int TRN_PAY_PAY_DOC = 2023403;
     public static final int TRN_PAC = 2023055;
     public static final int TRN_TP_CFD_PAC = 2023056;
     public static final int TRN_SIGN = 2023057;
@@ -1069,6 +1073,10 @@ public abstract class SModConsts {
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
         TablesMap.put(TRN_CFD_SIGN_LOG_MSG, "trn_cfd_sign_log_msg");
         TablesMap.put(TRN_CFD_SND_LOG, "trn_cfd_snd_log");
+        TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
+        TablesMap.put(TRN_PAY, "trn_pay");
+        TablesMap.put(TRN_PAY_PAY, "trn_pay_pay");
+        TablesMap.put(TRN_PAY_PAY_DOC, "trn_pay_pay_doc");
         TablesMap.put(TRN_PAC, "trn_pac");
         TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
         TablesMap.put(TRN_SIGN, "trn_sign");

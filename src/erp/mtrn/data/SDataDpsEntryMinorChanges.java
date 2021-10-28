@@ -16,6 +16,7 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
     protected int mnPkEntryId;
     protected java.lang.String msSealQuality;
     protected java.lang.String msSealSecurity;
+    protected int mnFkVehicleTypeId_n;
     protected java.lang.String msDriver;
     protected boolean mbIsEdited;
     protected java.lang.String msPlate;
@@ -36,6 +37,7 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setSealQuality(java.lang.String s) { msSealQuality = s; }
     public void setSealSecurity(java.lang.String s) { msSealSecurity = s; }
+    public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
     public void setDriver(java.lang.String s) { msDriver = s; }
     public void setIsEdited(boolean b) { mbIsEdited = b; }
     public void setPlate(java.lang.String s) { msPlate = s; }
@@ -49,6 +51,7 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
     public int getPkEntryId() { return mnPkEntryId; }
     public java.lang.String getSealQuality() { return msSealQuality; }
     public java.lang.String getSealSecurity() { return msSealSecurity; }
+    public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
     public java.lang.String getDriver() { return msDriver; }
     public boolean getIsEdited() { return mbIsEdited; }
     public java.lang.String getPlate() { return msPlate; }
@@ -80,6 +83,7 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
         mnPkEntryId = 0;
         msSealQuality = "";
         msSealSecurity = "";
+        mnFkVehicleTypeId_n = 0;
         msDriver = "";
         mbIsEdited = false;
         msPlate = "";
@@ -96,6 +100,7 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
         mnPkYearId = entry.getPkYearId();
         mnPkDocId = entry.getPkDocId();
         mnPkEntryId = entry.getPkEntryId();
+        mnFkVehicleTypeId_n = entry.getFkVehicleTypeId_n();
         msDriver = entry.getDriver();
         msPlate = entry.getPlate();
         msTicket = entry.getTicket();
@@ -126,6 +131,7 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         Statement oStatement = null;
         String sSql = "";
+        String veh = "";
         try{
             for (SDataDpsEntryNotes notes : mvDbmsEntryNotes) {
                 if (notes.getIsRegistryNew() || notes.getIsRegistryEdited()) {
@@ -139,9 +145,16 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
                 }
             }
             
+            if(mnFkVehicleTypeId_n != 0){
+                veh = " fid_tp_veh_n = " + mnFkVehicleTypeId_n;
+            }else{
+                veh = " fid_tp_veh_n = NULL";
+            }
+            
             oStatement = connection.createStatement();
             sSql = "UPDATE trn_dps_ety SET" +
-                    " driver = " + '"' + msDriver +'"' + "," +
+                    veh + "," +
+                    " driver = " + '"' + msDriver + '"' + "," +
                     " plate = " + '"' + msPlate + '"' + "," +
                     " ticket = " + '"' + msTicket + '"' + "," +
                     " cont_tank = " + '"' + msContainerTank + '"' + "," +

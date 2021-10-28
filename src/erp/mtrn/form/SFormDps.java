@@ -5528,7 +5528,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             jcbNumberSeries.setEditable(true);
             moFieldNumberSeries = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jcbNumberSeries, jlNumber);
-            moFieldNumberSeries.setLengthMax(15);
+            moFieldNumberSeries.setLengthMax(SDataDps.LEN_SERIES);
             
             mbIsNumberSeriesRequired = false;
             mbIsNumberSeriesAvailable = false;

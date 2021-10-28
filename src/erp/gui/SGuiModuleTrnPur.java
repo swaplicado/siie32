@@ -172,6 +172,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBackorderOrderByItemBizPartnerBra;
     private javax.swing.JMenuItem jmiQryBizPartnerBalance;
     private javax.swing.JMenuItem jmiQryBizPartnerAccountsAging;
+    private javax.swing.JMenuItem jmiQryBizPartnerLastMove;
     private javax.swing.JMenuItem jmiQryCurrencyBalance;
     private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartner;
     private javax.swing.JMenuItem jmiRepBizPartnerBalance;
@@ -462,6 +463,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-proveedor sucursal");
         jmiQryBizPartnerBalance = new JMenuItem("Consulta de saldos de proveedores");
         jmiQryBizPartnerAccountsAging = new JMenuItem("Consulta de antigüedad de saldos de proveedores");
+        jmiQryBizPartnerLastMove = new JMenuItem("Consulta último movimiento de proveedores");
         jmiQryCurrencyBalance =  new JMenuItem("Consulta de cuentas por pagar por moneda");
         jmiQryCurrencyBalanceBizPartner =  new JMenuItem("Consulta de cuentas por pagar por moneda-proveedor");
         jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
@@ -517,6 +519,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepBackorder.add(jmiRepBackorderOrderByItemBizPartnerBra);
         jmRepQueries.add(jmiQryBizPartnerBalance);
         jmRepQueries.add(jmiQryBizPartnerAccountsAging);
+        jmRepQueries.add(jmiQryBizPartnerLastMove);
         jmRepQueries.addSeparator();
         jmRepQueries.add(jmiQryCurrencyBalance);
         jmRepQueries.add(jmiQryCurrencyBalanceBizPartner);
@@ -665,6 +668,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItemBizPartnerBra.addActionListener(this);
         jmiQryBizPartnerBalance.addActionListener(this);
         jmiQryBizPartnerAccountsAging.addActionListener(this);
+        jmiQryBizPartnerLastMove.addActionListener(this);
         jmiQryCurrencyBalance.addActionListener(this);
         jmiQryCurrencyBalanceBizPartner.addActionListener(this);
         jmiRepBizPartnerBalance.addActionListener(this);
@@ -1244,6 +1248,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "Antigüedad saldos proveedores";
                     break;
                     
+                case SDataConstants.TRNX_DPS_LAST_MOV:
+                    oViewClass = erp.mtrn.view.SViewDpsLastMove.class;
+                    sViewTitle = "Último movimiento proveedores";
+                    break;
+                    
                 case SDataConstants.TRNX_DPS_PAY_PEND:
                     oViewClass = erp.mtrn.view.SViewDpsPay.class;
                     sViewTitle = "Cuentas x pagar";
@@ -1653,6 +1662,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiQryBizPartnerAccountsAging) {
                 showView(SDataConstants.TRNX_DPS_BAL_AGING, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
+            else if (item == jmiQryBizPartnerLastMove) {
+                showView(SDataConstants.TRNX_DPS_LAST_MOV, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if (item == jmiQryCurrencyBalance) {
                 miClient.getSession().showView(SModConsts.TRNX_BP_BAL_CUR, SDataConstantsSys.TRNS_CT_DPS_PUR, new SGuiParams(SDataConstantsSys.UNDEFINED));

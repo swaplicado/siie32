@@ -152,6 +152,7 @@ public abstract class SGuiModule {
         SServerResponse response = null;
         SDataRegistry registry = null;
         SSrvLock lock = null;
+//        SRedisLock rlock = null;
         SClientDaemonTimeout daemonTimeout = null;
         SLibMethod method = null;
 
@@ -163,6 +164,7 @@ public abstract class SGuiModule {
                 // Attempt to gain data lock:
 
                 lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout());
+//                rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout() / 1000);
             }
 
             // Read data registry:
@@ -175,6 +177,7 @@ public abstract class SGuiModule {
             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
+                    //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                 }
                 throw new Exception(response.getMessage());
             }
@@ -183,6 +186,7 @@ public abstract class SGuiModule {
                 if (result != SLibConstants.DB_ACTION_READ_OK) {
                     if (lock != null) {
                         SSrvUtils.releaseLock(miClient.getSession(), lock);
+                        //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                     }
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
                 }
@@ -218,6 +222,7 @@ public abstract class SGuiModule {
         if (result != SLibConstants.FORM_RESULT_OK) {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
+                //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
             }
         }
         else {
@@ -251,9 +256,11 @@ public abstract class SGuiModule {
             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
+                    //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                 }
                 for (SSrvLock il : mvIndependentLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), il);
+                    //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                 }
 
                 throw new Exception(response.getMessage());
@@ -264,9 +271,11 @@ public abstract class SGuiModule {
                 if (result != SLibConstants.DB_ACTION_SAVE_OK) {
                     if (lock != null) {
                         SSrvUtils.releaseLock(miClient.getSession(), lock);
+                        //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                     }
                     for (SSrvLock il : mvIndependentLocks) {
                         SSrvUtils.releaseLock(miClient.getSession(), il);
+                        //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                     }
 
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
@@ -278,9 +287,11 @@ public abstract class SGuiModule {
 
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
+                    //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                 }
                 for (SSrvLock il : mvIndependentLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), il);
+                    //SRedisLockUtils.releaseLock(miClient.getJedis(), rlock.getLockKey().getLockKey());
                 }
 
                 if (result == SLibConstants.DB_ACTION_SAVE_OK && miForm instanceof SFormExtendedInterface) {

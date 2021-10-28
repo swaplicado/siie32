@@ -34,7 +34,7 @@ public class SServiceDataLocks implements Serializable {
     public SServiceDataLocks(SServer server) {
         moServer = server;
         mlCurrentLockId = 0;
-        mvLocks = new Vector<SSrvLock>();
+        mvLocks = new Vector<>();
     }
 
     /*

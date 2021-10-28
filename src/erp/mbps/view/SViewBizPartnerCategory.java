@@ -13,6 +13,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mbps.data.SDataBizPartnerCategory;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 
@@ -51,7 +52,7 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[16];
+        STableColumn[] aoTableColumns = new STableColumn[17];
 
         moTabFilterDeleted = new STabFilterDeleted(this);
 
@@ -79,6 +80,7 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "bct.garnt", "Monto garantía $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererNumberDouble());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bct.b_garnt_prc", "En trámite (garantía)", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_garnt_tp", "Tipo garantía", 100);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "bct.insur", "Monto seguro $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererNumberDouble());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bct.b_insur_prc", "En trámite (seguro)", STableConstants.WIDTH_BOOLEAN);
@@ -115,7 +117,12 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
                 "IF(bct.b_cred_usr, bct.days_grace, btp.days_grace) AS f_days_grace, " +
                 "IF(bct.b_cred_usr, tcct.tp_cred, tctp.tp_cred) AS f_tp_cred, " +
                 "IF(bct.b_cred_usr, trct.name, trtp.name) AS f_tp_risk, " +
-                "bct.garnt, bct.insur, bct.b_garnt_prc, bct.b_insur_prc, " +
+                "bct.garnt, bct.garnt_tp, bct.insur, bct.b_garnt_prc, bct.b_insur_prc, " +
+                "CASE " +
+                "WHEN bct.garnt_tp = '" + SDataBizPartnerCategory.GARNT_TP_PAY + "' THEN '" + SDataBizPartnerCategory.GuaranteeTypes.get(SDataBizPartnerCategory.GARNT_TP_PAY) + "' " +
+                "WHEN bct.garnt_tp = '" + SDataBizPartnerCategory.GARNT_TP_PROP + "' THEN '" + SDataBizPartnerCategory.GuaranteeTypes.get(SDataBizPartnerCategory.GARNT_TP_PROP) + "' " +
+                "WHEN bct.garnt_tp = '" + SDataBizPartnerCategory.GARNT_TP_PAY_PROP + "' THEN '" + SDataBizPartnerCategory.GuaranteeTypes.get(SDataBizPartnerCategory.GARNT_TP_PAY_PROP) + "' " +
+                "ELSE '?' END AS _garnt_tp, " +
                 "btp.id_ct_bp, btp.id_tp_bp, btp.tp_bp, " +
                 "ta.id_tp_cfd_add, ta.tp_cfd_add " +
                 "FROM erp.bpsu_bp AS b " +

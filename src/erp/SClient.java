@@ -78,6 +78,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
+import redis.clients.jedis.Jedis;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -107,7 +108,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 189.7"; // fecha release: 2021-10-12
+    public static final String APP_RELEASE = "3.2 191.0"; // fecha release: 2021-10-28
     public static final String APP_COPYRIGHT = "2007-2021";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -126,6 +127,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private SLoginSession moLoginSession;
     private SServerRemote moServer;
     private SSessionXXX moSessionXXX;
+    private Jedis moJedis;
     private SXmlConfig moXmlConfig;
     private SCfgProcessor moCfgProcessor;
     private erp.lib.gui.SGuiDatePicker moGuiDatePicker;
@@ -1157,6 +1159,13 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moSession.setSessionCustom(sessionCustom); // client database must be set already
     }
 
+    private void createRedisSession(final int companyId, final int userId, final String userName) throws Exception {
+        /*
+        moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
+        SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
+        */
+    } 
+
     private void logout() {
         Cursor cursor = getCursor();
 
@@ -1264,6 +1273,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                             mbLoggedIn = true;
                             moSessionXXX = response.getSession();
                             moSessionXXX.getFormatters().redefineTableCellRenderers();
+                            createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
+                                    response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
                             prepareGui();
                             createSession();
                             actionFileSession(true);
@@ -1605,6 +1616,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     @Override
     public SSessionXXX getSessionXXX() {
         return moSessionXXX;
+    }
+
+    public Jedis getJedis() {
+        return moJedis;
     }
 
     @Override

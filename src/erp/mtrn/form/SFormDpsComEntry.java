@@ -2,8 +2,11 @@ package erp.mtrn.form;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mod.SModConsts;
 import java.awt.event.ItemEvent;
 import java.util.Vector;
 import erp.mtrn.data.SDataDpsEntry;
@@ -17,6 +20,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     private boolean mbFirstTime;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
+    private erp.lib.form.SFormField moFieldFkVehicleTypeId_n;
     private erp.lib.form.SFormField moFieldDriver;
     private erp.lib.form.SFormField moFieldPlate;
     private erp.lib.form.SFormField moFieldContainer;
@@ -44,27 +48,45 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jpControls = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel19 = new javax.swing.JPanel();
+        jlFkVehicleTypeId_n = new javax.swing.JLabel();
+        jPanel20 = new javax.swing.JPanel();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel8 = new javax.swing.JPanel();
+        jlDriver = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jtfDriver = new javax.swing.JTextField();
+        jPanel10 = new javax.swing.JPanel();
+        jlPlate = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jtfPlate = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
+        jlContainerTank = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jtfContTank = new javax.swing.JTextField();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jlQualitySeal = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jtfSealQuality = new javax.swing.JTextField();
+        jPanel13 = new javax.swing.JPanel();
+        jlSecuritySeal = new javax.swing.JLabel();
+        jPanel14 = new javax.swing.JPanel();
+        jtfSecuritySeal = new javax.swing.JTextField();
+        jPanel15 = new javax.swing.JPanel();
+        jlTicket = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
+        jtfTicket = new javax.swing.JTextField();
+        jPanel17 = new javax.swing.JPanel();
+        jlVgm = new javax.swing.JLabel();
+        jPanel18 = new javax.swing.JPanel();
+        jtfVgm = new javax.swing.JTextField();
+        jpControls1 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
-        jpControls1 = new javax.swing.JPanel();
-        jbOk1 = new javax.swing.JButton();
-        jbCancel1 = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
-        jlDriver = new javax.swing.JLabel();
-        jtfDriver = new javax.swing.JTextField();
-        jlPlate = new javax.swing.JLabel();
-        jtfPlate = new javax.swing.JTextField();
-        jlContainerTank = new javax.swing.JLabel();
-        jtfContTank = new javax.swing.JTextField();
-        jlQualitySeal = new javax.swing.JLabel();
-        jtfSealQuality = new javax.swing.JTextField();
-        jlSecuritySeal = new javax.swing.JLabel();
-        jtfSecuritySeal = new javax.swing.JTextField();
-        jlTicket = new javax.swing.JLabel();
-        jtfTicket = new javax.swing.JTextField();
-        jlVgm = new javax.swing.JLabel();
-        jtfVgm = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Datos Comerciallización");
@@ -75,149 +97,164 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
             }
         });
 
-        jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
-        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jPanel9.setLayout(new java.awt.BorderLayout());
 
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpControls.add(jbOk);
+        jPanel1.setLayout(new java.awt.GridLayout(1, 2));
 
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jpControls.add(jbCancel);
+        jPanel2.setLayout(new java.awt.GridLayout(8, 1));
 
-        getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkVehicleTypeId_n.setText("Tipo vehículo:");
+        jlFkVehicleTypeId_n.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel19.add(jlFkVehicleTypeId_n);
+
+        jPanel2.add(jPanel19);
+
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jcbFkVehicleTypeId_n.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel20.add(jcbFkVehicleTypeId_n);
+
+        jPanel2.add(jPanel20);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDriver.setText("Chofer:");
+        jlDriver.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(jlDriver);
+
+        jPanel2.add(jPanel8);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfDriver.setText("DRIVER");
+        jtfDriver.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel4.add(jtfDriver);
+
+        jPanel2.add(jPanel4);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPlate.setText("Placas vehículo:");
+        jlPlate.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel10.add(jlPlate);
+
+        jPanel2.add(jPanel10);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfPlate.setText("VEHICLE NUMBER");
+        jtfPlate.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel5.add(jtfPlate);
+
+        jPanel2.add(jPanel5);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlContainerTank.setText("Remolque, tanq./cont.:");
+        jlContainerTank.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel11.add(jlContainerTank);
+
+        jPanel2.add(jPanel11);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfContTank.setText("TRAILER CONTAINER TANK");
+        jtfContTank.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel6.add(jtfContTank);
+
+        jPanel2.add(jPanel6);
+
+        jPanel1.add(jPanel2);
+
+        jPanel3.setLayout(new java.awt.GridLayout(8, 1));
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlQualitySeal.setText("Sello(s) de calidad:");
+        jlQualitySeal.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel12.add(jlQualitySeal);
+
+        jPanel3.add(jPanel12);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfSealQuality.setText("SEAL QUALITY");
+        jtfSealQuality.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel7.add(jtfSealQuality);
+
+        jPanel3.add(jPanel7);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSecuritySeal.setText("Sello(s) de seguridad:");
+        jlSecuritySeal.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel13.add(jlSecuritySeal);
+
+        jPanel3.add(jPanel13);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfSecuritySeal.setText("SEAL SECURITY");
+        jtfSecuritySeal.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel14.add(jtfSecuritySeal);
+
+        jPanel3.add(jPanel14);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTicket.setText("Boleto(s) báscula:");
+        jlTicket.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel15.add(jlTicket);
+
+        jPanel3.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfTicket.setText("TICKET");
+        jtfTicket.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel16.add(jtfTicket);
+
+        jPanel3.add(jPanel16);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlVgm.setText("VGM:");
+        jlVgm.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel17.add(jlVgm);
+
+        jPanel3.add(jPanel17);
+
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfVgm.setText("VGM");
+        jtfVgm.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel18.add(jtfVgm);
+
+        jPanel3.add(jPanel18);
+
+        jPanel1.add(jPanel3);
+
+        jPanel9.add(jPanel1, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jPanel9, java.awt.BorderLayout.CENTER);
 
         jpControls1.setPreferredSize(new java.awt.Dimension(392, 33));
         jpControls1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jbOk1.setText("Aceptar");
-        jbOk1.setToolTipText("[Ctrl + Enter]");
-        jbOk1.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpControls1.add(jbOk1);
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls1.add(jbOk);
 
-        jbCancel1.setText("Cancelar");
-        jbCancel1.setToolTipText("[Escape]");
-        jpControls1.add(jbCancel1);
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jpControls1.add(jbCancel);
 
         getContentPane().add(jpControls1, java.awt.BorderLayout.PAGE_END);
 
-        jlDriver.setText("Chofer:");
-        jlDriver.setPreferredSize(new java.awt.Dimension(295, 23));
-
-        jtfDriver.setText("DRIVER");
-        jtfDriver.setPreferredSize(new java.awt.Dimension(300, 30));
-
-        jlPlate.setText("Placas vehículo:");
-        jlPlate.setPreferredSize(new java.awt.Dimension(295, 23));
-
-        jtfPlate.setText("VEHICLE NUMBER");
-        jtfPlate.setPreferredSize(new java.awt.Dimension(300, 30));
-
-        jlContainerTank.setText("Remolque, tanq./cont.:");
-        jlContainerTank.setPreferredSize(new java.awt.Dimension(295, 23));
-
-        jtfContTank.setText("TRAILER CONTAINER TANK");
-        jtfContTank.setPreferredSize(new java.awt.Dimension(300, 30));
-
-        jlQualitySeal.setText("Sello(s) de calidad:");
-        jlQualitySeal.setPreferredSize(new java.awt.Dimension(295, 23));
-
-        jtfSealQuality.setText("SEAL QUALITY");
-        jtfSealQuality.setPreferredSize(new java.awt.Dimension(300, 30));
-
-        jlSecuritySeal.setText("Sello(s) de seguridad:");
-        jlSecuritySeal.setPreferredSize(new java.awt.Dimension(295, 23));
-
-        jtfSecuritySeal.setText("SEAL SECURITY");
-        jtfSecuritySeal.setPreferredSize(new java.awt.Dimension(300, 30));
-
-        jlTicket.setText("Boleto(s) báscula:");
-        jlTicket.setPreferredSize(new java.awt.Dimension(295, 23));
-
-        jtfTicket.setText("TICKET");
-        jtfTicket.setPreferredSize(new java.awt.Dimension(300, 30));
-
-        jlVgm.setText("VGM:");
-        jlVgm.setPreferredSize(new java.awt.Dimension(295, 23));
-
-        jtfVgm.setText("VGM");
-        jtfVgm.setPreferredSize(new java.awt.Dimension(300, 30));
-
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jlVgm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtfVgm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel9Layout.createSequentialGroup()
-                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jlDriver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jtfDriver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jlContainerTank, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jlSecuritySeal, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jtfContTank, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jtfSecuritySeal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel9Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(jtfPlate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel9Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jlQualitySeal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jtfSealQuality, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jtfTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel9Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(jlTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel9Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(jlPlate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap())
-        );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jlDriver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlPlate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(3, 3, 3)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtfDriver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtfPlate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jlContainerTank, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlQualitySeal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtfContTank, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtfSealQuality, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jlSecuritySeal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jtfTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtfSecuritySeal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jlVgm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfVgm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(133, 133, 133))
-        );
-
-        getContentPane().add(jPanel9, java.awt.BorderLayout.CENTER);
-
-        setSize(new java.awt.Dimension(692, 336));
+        setSize(new java.awt.Dimension(656, 414));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -226,6 +263,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
+        
+        moFieldFkVehicleTypeId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkVehicleTypeId_n, jlFkVehicleTypeId_n);
         
         moFieldDriver = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfDriver, jlDriver);
         moFieldDriver.setLengthMax(50);
@@ -249,6 +288,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         moFieldVgm.setLengthMax(15);
 
         mvFields = new Vector<>();
+        mvFields.add(moFieldFkVehicleTypeId_n);
         mvFields.add(moFieldDriver);
         mvFields.add(moFieldPlate);
         mvFields.add(moFieldTicket);
@@ -257,8 +297,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldSecuritySeal);
         mvFields.add(moFieldVgm);
 
-        jbOk1.addActionListener(this);
-        jbCancel1.addActionListener(this);
+        jbOk.addActionListener(this);
+        jbCancel.addActionListener(this);
         
     }
 
@@ -279,19 +319,37 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbCancel1;
     private javax.swing.JButton jbOk;
-    private javax.swing.JButton jbOk1;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkVehicleTypeId_n;
     private javax.swing.JLabel jlContainerTank;
     private javax.swing.JLabel jlDriver;
+    private javax.swing.JLabel jlFkVehicleTypeId_n;
     private javax.swing.JLabel jlPlate;
     private javax.swing.JLabel jlQualitySeal;
     private javax.swing.JLabel jlSecuritySeal;
     private javax.swing.JLabel jlTicket;
     private javax.swing.JLabel jlVgm;
-    private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpControls1;
     private javax.swing.JTextField jtfContTank;
     private javax.swing.JTextField jtfDriver;
@@ -339,6 +397,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         moDpsEntry = (SDataDpsEntry) registry;
 
+        moFieldFkVehicleTypeId_n.setFieldValue(new int[] { moDpsEntry.getFkVehicleTypeId_n() });
         moFieldDriver.setFieldValue(moDpsEntry.getDriver());
         moFieldPlate.setFieldValue(moDpsEntry.getPlate());
         moFieldTicket.setFieldValue(moDpsEntry.getTicket());
@@ -359,6 +418,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
             moDpsEntry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
+        moDpsEntry.setFkVehicleTypeId_n(moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0]);
         moDpsEntry.setDriver(moFieldDriver.getString());
         moDpsEntry.setPlate(moFieldPlate.getString());
         moDpsEntry.setTicket(moFieldTicket.getString());
@@ -377,10 +437,10 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         if (e.getSource() instanceof javax.swing.JButton) {
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
-            if (button == jbOk1) {
+            if (button == jbOk) {
                 actionOk();
             }
-            else if (button == jbCancel1) {
+            else if (button == jbCancel) {
                 actionCancel();
             }
         }
@@ -394,7 +454,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void formRefreshCatalogues() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SFormUtilities.populateComboBox(miClient, jcbFkVehicleTypeId_n, SModConsts.LOGU_TP_VEH);
     }
 
     @Override

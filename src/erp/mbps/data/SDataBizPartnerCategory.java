@@ -10,6 +10,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
 import sa.lib.SLibConsts;
 
 /**
@@ -17,6 +18,17 @@ import sa.lib.SLibConsts;
  * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    public static final String GARNT_TP_PAY = "P";
+    public static final String GARNT_TP_PROP = "I";
+    public static final String GARNT_TP_PAY_PROP = "PI";
+    public static final HashMap<String, String> GuaranteeTypes = new HashMap<>();
+    
+    static {
+        GuaranteeTypes.put(GARNT_TP_PAY, "Pagaré");
+        GuaranteeTypes.put(GARNT_TP_PROP, "Inmueble");
+        GuaranteeTypes.put(GARNT_TP_PAY_PROP, "Pagaré + Inmueble");
+    }
 
     protected int mnPkBizPartnerId;
     protected int mnPkBizPartnerCategoryId;
@@ -26,6 +38,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected int mnDaysOfCredit;
     protected int mnDaysOfGrace;
     protected double mdGuarantee;
+    protected java.lang.String msGuaranteeType;
     protected double mdInsurance;
     protected java.util.Date mtDateStart;
     protected java.util.Date mtDateEnd_n;
@@ -85,6 +98,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setDaysOfCredit(int n) { mnDaysOfCredit = n; }
     public void setDaysOfGrace(int n) { mnDaysOfGrace = n; }
     public void setGuarantee(double d) { mdGuarantee = d; }
+    public void setGuaranteeType(java.lang.String s) { msGuaranteeType = s; }
     public void setInsurance(double d) { mdInsurance = d; }
     public void setDateStart(java.util.Date t) { mtDateStart = t; }
     public void setDateEnd_n(java.util.Date t) { mtDateEnd_n = t; }
@@ -121,6 +135,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public int getDaysOfCredit() { return mnDaysOfCredit; }
     public int getDaysOfGrace() { return mnDaysOfGrace; }
     public double getGuarantee() { return mdGuarantee; }
+    public java.lang.String getGuaranteeType() { return msGuaranteeType; }
     public double getInsurance() { return mdInsurance; }
     public java.util.Date getDateStart() { return mtDateStart; }
     public java.util.Date getDateEnd_n() { return mtDateEnd_n; }
@@ -202,6 +217,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         mnDaysOfCredit = 0;
         mnDaysOfGrace = 0;
         mdGuarantee = 0;
+        msGuaranteeType = "";
         mdInsurance = 0;
         mtDateStart = null;
         mtDateEnd_n = null;
@@ -284,6 +300,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mnDaysOfCredit = resultSet.getInt("bp_ct.days_cred");
                 mnDaysOfGrace = resultSet.getInt("bp_ct.days_grace");
                 mdGuarantee = resultSet.getDouble("bp_ct.garnt");
+                msGuaranteeType = resultSet.getString("garnt_tp");
                 mdInsurance = resultSet.getDouble("bp_ct.insur");
                 mtDateStart = resultSet.getDate("bp_ct.dt_start");
                 mtDateEnd_n = resultSet.getDate("bp_ct.dt_end_n");
@@ -371,7 +388,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkBizPartnerCategoryId);
             callableStatement.setString(nParam++, msKey);
@@ -380,6 +397,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setInt(nParam++, mnDaysOfCredit);
             callableStatement.setInt(nParam++, mnDaysOfGrace);
             callableStatement.setDouble(nParam++, mdGuarantee);
+            callableStatement.setString(nParam++, msGuaranteeType);
             callableStatement.setDouble(nParam++, mdInsurance);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDateStart.getTime()));
             if (mtDateEnd_n != null) callableStatement.setDate(nParam++, new java.sql.Date(mtDateEnd_n.getTime())); else callableStatement.setNull(nParam++, java.sql.Types.DATE);

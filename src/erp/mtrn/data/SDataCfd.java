@@ -39,7 +39,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Claudio Peña, Isabel Servín, Sergio Flores
  */
 public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -114,6 +114,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkPayrollReceiptPayrollId_n;
     protected int mnFkPayrollReceiptEmployeeId_n;
     protected int mnFkPayrollReceiptIssueId_n;
+    protected int mnFkReceiptPaymentId_n;
     protected int mnFkUserProcessingId;
     protected int mnFkUserDeliveryId;
     protected java.util.Date mtUserProcessingTs;
@@ -250,6 +251,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkPayrollReceiptPayrollId_n(int n) { mnFkPayrollReceiptPayrollId_n = n; }
     public void setFkPayrollReceiptEmployeeId_n(int n) { mnFkPayrollReceiptEmployeeId_n = n; }
     public void setFkPayrollReceiptIssueId_n(int n) { mnFkPayrollReceiptIssueId_n = n; }
+    public void setFkReceiptPaymentId_n(int n) { mnFkReceiptPaymentId_n = n; }
     public void setFkUserProcessingId(int n) { mnFkUserProcessingId = n; }
     public void setFkUserDeliveryId(int n) { mnFkUserDeliveryId = n; }
     public void setUserProcessingTs(java.util.Date t) { mtUserProcessingTs = t; }
@@ -314,6 +316,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkPayrollReceiptPayrollId_n() { return mnFkPayrollReceiptPayrollId_n; }
     public int getFkPayrollReceiptEmployeeId_n() { return mnFkPayrollReceiptEmployeeId_n; }
     public int getFkPayrollReceiptIssueId_n() { return mnFkPayrollReceiptIssueId_n; }
+    public int getFkReceiptPaymentId_n() { return mnFkReceiptPaymentId_n; }
     public int getFkUserProcessingId() { return mnFkUserProcessingId; }
     public int getFkUserDeliveryId() { return mnFkUserDeliveryId; }
     public java.util.Date getUserProcessingTs() { return mtUserProcessingTs; }
@@ -491,6 +494,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkPayrollReceiptPayrollId_n = 0;
         mnFkPayrollReceiptEmployeeId_n = 0;
         mnFkPayrollReceiptIssueId_n = 0;
+        mnFkReceiptPaymentId_n = 0;
         mnFkUserProcessingId = 0;
         mnFkUserDeliveryId = 0;
         mtUserProcessingTs = null;
@@ -577,6 +581,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkPayrollReceiptPayrollId_n = resultSet.getInt("fid_pay_rcp_pay_n");
                 mnFkPayrollReceiptEmployeeId_n = resultSet.getInt("fid_pay_rcp_emp_n");
                 mnFkPayrollReceiptIssueId_n = resultSet.getInt("fid_pay_rcp_iss_n");
+                mnFkReceiptPaymentId_n = resultSet.getInt("fid_rcp_pay_n");
                 mnFkUserProcessingId = resultSet.getInt("fid_usr_prc");
                 mnFkUserDeliveryId = resultSet.getInt("fid_usr_dvy");
                 mtUserProcessingTs = resultSet.getTimestamp("ts_prc");
@@ -623,7 +628,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int save(java.sql.Connection connection) {
         int index = 1;
         final int LENGTH_CURRENCY = 15;
-        boolean bIsUpd = false;
+        boolean isUpddate = false;
         String sql = "";
         String sqlComp;
         ResultSet resultSet = null;
@@ -662,31 +667,60 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msDocXmlUuid = SBaseXUtils.generateUniqueXmlId(connection);
                 */
          
-                sql = "INSERT INTO trn_cfd (id_cfd, ser, num, " +
-                        "ts, cert_num, str_signed, signature, doc_xml_uuid, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
-                        "xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
-                        "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_fact_bank_n, fid_dps_year_n, fid_dps_doc_n, " +
+                sql = "INSERT INTO trn_cfd (id_cfd, " +
+                        "ser, num, " +
+                        "ts, cert_num, str_signed, signature, doc_xml_uuid, xml_rfc_emi, xml_rfc_rec, " +
+                        "xml_tot, xml_mon, xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_dvy, msg_dvy, " +
+                        "b_prc_ws, b_prc_sto_xml, b_prc_sto_pdf, " +
+                        "b_con, " +
+                        "fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, " +
+                        "fid_cob_n, fid_fact_bank_n, " +
+                        "fid_dps_year_n, fid_dps_doc_n, " +
                         "fid_fin_rec_year_n, fid_fin_rec_per_n, fid_fin_rec_bkc_n, fid_fin_rec_tp_rec_n, fid_fin_rec_num_n, " + 
-                        "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
-                        "fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
-                        "VALUES (" + mnPkCfdId + ", ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, " +
-                        "NOW(), NOW())";
+                        "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, " +
+                        "fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, fid_pay_rcp_iss_n, " +
+                        "fid_rcp_pay_n, " +
+                        "fid_usr_prc, " +
+                        "fid_usr_dvy, " +
+                        "ts_prc, " +
+                        "ts_dvy) " +
+                        "VALUES (" + mnPkCfdId + ", " + // 1
+                        "?, ?, " + // 3
+                        "?, ?, ?, ?, ?, ?, ?, " + // 10
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, " + // 19
+                        "?, ?, ?, " + // 22
+                        "?, " + // 23
+                        "?, ?, ?, ?, ?, " + // 28
+                        "?, ?, " + // 30
+                        "?, ?, " + // 32
+                        "?, ?, ?, ?, ?, " + // 37
+                        "?, ?, ?, ?, ?, ?, " + // 43
+                        "?, ?, ?, ?, ?, ?, " + // 49
+                        "?, " + // 50
+                        "?, " + // 51
+                        "?, " + // 52
+                        "NOW(), " + // 53
+                        "NOW())"; // 54
             }
             else {
-                bIsUpd = true;
+                isUpddate = true;
                 
-                sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_uuid = ?, " +
-                        "xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
-                        "uuid = ?, qrc_n = ?, can_st = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
-                        "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, fid_fact_bank_n = ?, " +
-                        "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_fin_rec_year_n = ?, fid_fin_rec_per_n = ?, fid_fin_rec_bkc_n = ?, fid_fin_rec_tp_rec_n = ?, fid_fin_rec_num_n = ?, " + 
+                sql = "UPDATE trn_cfd SET ser = ?, num = ?, " +
+                        "ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_uuid = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, " +
+                        "xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, uuid = ?, qrc_n = ?, can_st = ?, ack_dvy = ?, msg_dvy = ?, " +
+                        //"b_prc_ws = ?, b_prc_sto_xml = ?, b_prc_sto_pdf = ?, " + // managed separately
+                        "b_con = ?, " +
+                        "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, " +
+                        "fid_cob_n = ?, fid_fact_bank_n = ?, " +
+                        "fid_dps_year_n = ?, fid_dps_doc_n = ?, " +
+                        "fid_fin_rec_year_n = ?, fid_fin_rec_per_n = ?, fid_fin_rec_bkc_n = ?, fid_fin_rec_tp_rec_n = ?, fid_fin_rec_num_n = ?, " + 
                         "fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
-                        "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
+                        "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, " +
+                        "fid_rcp_pay_n = ?, " +
+                        //fid_usr_prc = ?, // managed separately
+                        "fid_usr_dvy = ?, " +
+                        //ts_prc = NOW(), // managed separately
+                        "ts_dvy = NOW() " +
                         "WHERE id_cfd = " + mnPkCfdId + " "; 
             }
             
@@ -726,7 +760,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msAcknowledgmentDelivery);
             preparedStatement.setString(index++, msMessageDelivery);
             
-            if (!bIsUpd) {
+            if (!isUpddate) {
                 preparedStatement.setBoolean(index++, mbIsProcessingWebService);
                 preparedStatement.setBoolean(index++, mbIsProcessingStorageXml);
                 preparedStatement.setBoolean(index++, mbIsProcessingStoragePdf);
@@ -739,21 +773,21 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setInt(index++, mnFkXmlDeliveryTypeId);
             preparedStatement.setInt(index++, mnFkXmlDeliveryStatusId);
             
-            if (mnFkCompanyBranchId_n == SLibConsts.UNDEFINED) {
+            if (mnFkCompanyBranchId_n == 0) {
                 preparedStatement.setNull(index++, java.sql.Types.INTEGER);
             }
             else {
                 preparedStatement.setInt(index++, mnFkCompanyBranchId_n);
             }
             
-            if (mnFkFactoringBankId_n == SLibConsts.UNDEFINED) {
+            if (mnFkFactoringBankId_n == 0) {
                 preparedStatement.setNull(index++, java.sql.Types.INTEGER);
             }
             else {
                 preparedStatement.setInt(index++, mnFkFactoringBankId_n);
             }
             
-            if (mnFkDpsYearId_n == SLibConsts.UNDEFINED) {
+            if (mnFkDpsYearId_n == 0) {
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 preparedStatement.setNull(index++, java.sql.Types.INTEGER);
             }
@@ -762,7 +796,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 preparedStatement.setInt(index++, mnFkDpsDocId_n);
             }
             
-            if (mnFkFinRecordYearId_n == SLibConsts.UNDEFINED) {
+            if (mnFkFinRecordYearId_n == 0) {
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
@@ -777,7 +811,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 preparedStatement.setInt(index++, mnFkFinRecordNumberId_n);
             }
             
-            if (mnFkRecordYearId_n == SLibConsts.UNDEFINED) {
+            if (mnFkRecordYearId_n == 0) {
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
@@ -794,7 +828,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 preparedStatement.setInt(index++, mnFkRecordEntryId_n);
             }
             
-            if (mnFkPayrollPayrollId_n == SLibConsts.UNDEFINED) {
+            if (mnFkPayrollPayrollId_n == 0) {
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
                 preparedStatement.setNull(index++, java.sql.Types.INTEGER);
@@ -805,9 +839,9 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 preparedStatement.setInt(index++, mnFkPayrollBizPartnerId_n);
             }
             
-            if (mnFkPayrollReceiptPayrollId_n == SLibConsts.UNDEFINED) {
-                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
-                preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
+            if (mnFkPayrollReceiptPayrollId_n == 0) {
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
             }
             else {
@@ -816,7 +850,14 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 preparedStatement.setInt(index++, mnFkPayrollReceiptIssueId_n);
             }
             
-            if (!bIsUpd) {
+            if (mnFkReceiptPaymentId_n == 0) {
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkReceiptPaymentId_n);
+            }
+            
+            if (!isUpddate) {
                 preparedStatement.setInt(index++, mnFkUserProcessingId);
             }
             
@@ -826,7 +867,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             // Ingresar a la BD complementaria:
             
-            if (!bIsUpd) {
+            if (!isUpddate) {
                 sqlComp = "INSERT INTO " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
                             "(id_cfd, doc_xml, doc_xml_name, ack_can_xml, ack_can_pdf_n) " + 
                             "VALUES (" + mnPkCfdId + ", '" + SLibUtils.textToSql(msDocXml) + "', '" + SLibUtils.textToSql(msDocXmlName) + "', " +
@@ -959,53 +1000,53 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
      * @throws Exception 
      */
     public void saveField(java.sql.Connection connection, final int field, final Object value) throws Exception {
-        String sSql = "";
+        String sql = "";
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         
-        sSql = "UPDATE trn_cfd SET ";
+        sql = "UPDATE trn_cfd SET ";
 
         switch (field) {
             case FIELD_PRC_WS:
-                sSql += "b_prc_ws = " + value + " ";
+                sql += "b_prc_ws = " + value + " ";
                 break;
             case FIELD_PRC_STO_XML:
-                sSql += "b_prc_sto_xml = " + value + " ";
+                sql += "b_prc_sto_xml = " + value + " ";
                 break;
             case FIELD_PRC_STO_PDF:
-                sSql += "b_prc_sto_pdf = " + value + " ";
+                sql += "b_prc_sto_pdf = " + value + " ";
                 break;
             case FIELD_PRC_CON:
-                sSql += "b_con = " + value + " ";
+                sql += "b_con = " + value + " ";
                 break;
             case FIELD_PRC_USR:
-                sSql += "fid_usr_prc = " + value + ", ts_prc = NOW() ";
+                sql += "fid_usr_prc = " + value + ", ts_prc = NOW() ";
                 break;
             case FIELD_DVY_ACK:
-                sSql += "ack_dvy = '" + value + "' ";
+                sql += "ack_dvy = '" + value + "' ";
                 break;
             case FIELD_DVY_MSG:
-                sSql += "msg_dvy = '" + value + "' ";
+                sql += "msg_dvy = '" + value + "' ";
                 break;
             case FIELD_DVY_TP:
-                sSql += "fid_tp_xml_dvy = " + value + " ";
+                sql += "fid_tp_xml_dvy = " + value + " ";
                 break;
             case FIELD_DVY_ST:
-                sSql += "fid_st_xml_dvy = " + value + " ";
+                sql += "fid_st_xml_dvy = " + value + " ";
                 break;
             case FIELD_DVY_USR:
-                sSql += "fid_usr_dvy = " + value + ", ts_dvy = NOW() ";
+                sql += "fid_usr_dvy = " + value + ", ts_dvy = NOW() ";
                 break;
             case FIELD_CAN_ST:
-                sSql += "can_st = '" + value + "' ";
+                sql += "can_st = '" + value + "' ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        sSql += "WHERE id_cfd = " + mnPkCfdId + ";";
+        sql += "WHERE id_cfd = " + mnPkCfdId + ";";
         
-        connection.createStatement().execute(sSql);
+        connection.createStatement().execute(sql);
         
         mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
     }

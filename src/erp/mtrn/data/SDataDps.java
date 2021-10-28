@@ -105,8 +105,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_CLO_COMMS = 4;
     public static final int FIELD_CLO_COMMS_USR = 5;
     public static final int FIELD_USR = 6;
-    public static final int LEN_SERIES = 15; // maximum length of number series
-    public static final int LEN_NUMBER = 15; // maximum length of number
+    public static final int LEN_SERIES = 25; // maximum length of number series
+    public static final int LEN_NUMBER = 32; // maximum length of number
     public static final String TXT_PREPAY_INV = "facturación anticipos";
     public static final String TXT_OPS_TYPE = "tipo de operación";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
