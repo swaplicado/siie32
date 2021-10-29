@@ -1532,6 +1532,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "VTA - bitácora envíos CFDI";
                     break;
                     
+                case SDataConstants.TRN_PAY:
+                    oViewClass = erp.mtrn.view.SViewReceiptPayment.class;
+                    sViewTitle = "Registros CFDI pagos";
+                    break;
+                    
                 case SDataConstants.TRNX_CFD_PAY_REC:
                     oViewClass = erp.mtrn.view.SViewCfdPayment.class;
                     switch(auxType01) {

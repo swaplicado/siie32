@@ -53,6 +53,7 @@ import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
 import erp.mod.usr.db.SDbUserGui;
+import erp.redis.SRedisConnectionUtils;
 import erp.server.SLoginRequest;
 import erp.server.SLoginResponse;
 import erp.server.SServerRemote;
@@ -768,6 +769,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             System.exit(-1);    // there is no way of connecting to an ERP Server
         }
 
+	TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone("GMT-06:00"));
+        SLibUtils.restoreDateFormats(zone);
+        TimeZone.setDefault(zone);
+        
         moLogin = new SLogin(this);
 
         msCompany = "";
@@ -1160,11 +1165,16 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     }
 
     private void createRedisSession(final int companyId, final int userId, final String userName) throws Exception {
-        /*
-        moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
-        SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
-        */
-    } 
+        try {
+            moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
+            SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
+            SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
+        } catch (Exception e) {
+            showMsgBoxWarning("No se encontró servidor de acceso exclusivo a registros\n"
+                                        + "favor de comunicarlo al administrador");
+            moJedis = null;
+        }
+    }
 
     private void logout() {
         Cursor cursor = getCursor();
@@ -1198,6 +1208,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 }
             }
 
+            if (moJedis != null) {
+               moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
+               moJedis.disconnect();
+               moJedis = null;
+            }
+            
             moServer = null;
             moSessionXXX = null;
             moSession = null;
@@ -1617,9 +1633,15 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SSessionXXX getSessionXXX() {
         return moSessionXXX;
     }
-
+    
+    @Override
     public Jedis getJedis() {
         return moJedis;
+    }
+
+    @Override
+    public void setJedis(Jedis jedis) {
+        moJedis = jedis;
     }
 
     @Override

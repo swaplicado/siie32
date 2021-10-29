@@ -38,6 +38,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     protected java.lang.String msConfirmationNum;
     protected java.lang.String msCfdiRelationCode;
     protected java.lang.String msCfdiRelatedUuid;
+    protected double mdPaymentLoc_r;
     protected boolean mbIsDeleted;
     protected int mnFkReceiptStatusId;
     protected int mnFkCompanyBranchId;
@@ -78,6 +79,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public void setConfirmationNum(java.lang.String s) { msConfirmationNum = s; }
     public void setCfdiRelationCode(java.lang.String s) { msCfdiRelationCode = s; }
     public void setCfdiRelatedUuid(java.lang.String s) { msCfdiRelatedUuid = s; }
+    public void setPaymentLoc_r(double d) { mdPaymentLoc_r = d; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkReceiptStatusId(int n) { mnFkReceiptStatusId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
@@ -98,6 +100,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public java.lang.String getConfirmationNum() { return msConfirmationNum; }
     public java.lang.String getCfdiRelationCode() { return msCfdiRelationCode; }
     public java.lang.String getCfdiRelatedUuid() { return msCfdiRelatedUuid; }
+    public double getPaymentLoc_r() { return mdPaymentLoc_r; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkReceiptStatusId() { return mnFkReceiptStatusId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
@@ -125,8 +128,18 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     
     public ArrayList<SDataReceiptPaymentPay> getDbmsReceiptPaymentPays() { return maDbmsReceiptPaymentPays; }
     
-    /** Map of financial records (journal vouchers) to optimize its retrieval from database reading each of them only once. */
+    /** Map of financial records (journal vouchers) to optimize its retrieval from database reading each of them only once.
+     * @return Map of financial records.
+     */
     public HashMap<String, SDataRecord> getXtaRecordsMap() { return moXtaRecordsMap; }
+    
+    public void computePaymentLoc() {
+        mdPaymentLoc_r = 0;
+        
+        for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
+            mdPaymentLoc_r = SLibUtils.roundAmount(mdPaymentLoc_r + pay.getPaymentLoc());
+        }
+    }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -150,6 +163,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         msConfirmationNum = "";
         msCfdiRelationCode = "";
         msCfdiRelatedUuid = "";
+        mdPaymentLoc_r = 0;
         mbIsDeleted = false;
         mnFkReceiptStatusId = 0;
         mnFkCompanyBranchId = 0;
@@ -193,6 +207,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                     msConfirmationNum = resultSet.getString("conf_num");
                     msCfdiRelationCode = resultSet.getString("cfdi_relation_code");
                     msCfdiRelatedUuid = resultSet.getString("cfdi_related_uuid");
+                    mdPaymentLoc_r = resultSet.getDouble("pay_loc_r");
                     mbIsDeleted = resultSet.getBoolean("b_del");
                     mnFkReceiptStatusId = resultSet.getInt("fid_st_rcp");
                     mnFkCompanyBranchId = resultSet.getInt("fid_cob");
@@ -228,6 +243,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                         }
                     }
                     
+                    computePaymentLoc();
+                    
                     // finish reading registry:
                     
                     mbIsRegistryNew = false;
@@ -254,6 +271,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         try {
             try (Statement statement = connection.createStatement()) {
                 String sql = "";
+                
+                computePaymentLoc();
                 
                 if (mnPkReceiptId == 0) {
                     sql = "SELECT COALESCE(MAX(id_rcp), 0) + 1 "
@@ -283,6 +302,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "'" + msConfirmationNum + "', " +
                             "'" + msCfdiRelationCode + "', " +
                             "'" + msCfdiRelatedUuid + "', " +
+                            mdPaymentLoc_r + ", " +
                             mbIsDeleted + ", " +
                             mnFkReceiptStatusId + ", " +
                             mnFkCompanyBranchId + ", " +
@@ -310,6 +330,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "conf_num = '" + msConfirmationNum + "', " +
                             "cfdi_relation_code = '" + msCfdiRelationCode + "', " +
                             "cfdi_related_uuid = '" + msCfdiRelatedUuid + "', " +
+                            "pay_loc_r=" + mdPaymentLoc_r + ", " +
                             "b_del = " + (mbIsDeleted ? 1 : 0) + ", " +
                             "fid_st_rcp = " + mnFkReceiptStatusId + ", " +
                             "fid_cob = " + mnFkCompanyBranchId + ", " +
@@ -384,6 +405,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         clone.setConfirmationNum(msConfirmationNum);
         clone.setCfdiRelationCode(msCfdiRelationCode);
         clone.setCfdiRelatedUuid(msCfdiRelatedUuid);
+        clone.setPaymentLoc_r(mdPaymentLoc_r);
         clone.setIsDeleted(mbIsDeleted);
         clone.setFkReceiptStatusId(mnFkReceiptStatusId);
         clone.setFkCompanyBranchId(mnFkCompanyBranchId);

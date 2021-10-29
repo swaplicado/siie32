@@ -14,11 +14,15 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.Vector;
 import javax.swing.JOptionPane;
 import redis.clients.jedis.Jedis;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
+import sa.lib.srv.redis.SRedisLock;
+import sa.lib.srv.redis.SRedisLockKey;
 
 /**
  *
@@ -27,7 +31,7 @@ import sa.lib.db.SDbConsts;
 public abstract class SRedisLockUtils {
 
     private static final String[] TsEditFieldNames = new String[] { "ts_edit", "ts_upd" };
-    
+
     public static final String LOCK_COUNT = "LockIdCount"; // contador de id de los locks
 
     private static final SimpleDateFormat DateFormatDatetime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -54,7 +58,7 @@ public abstract class SRedisLockUtils {
 
             String sql = "SHOW COLUMNS FROM " + tableName + " WHERE `Key` = 'PRI';";
             ResultSet resultSet = statement.executeQuery(sql);
-            HashMap<String, String> primaryKeyNamesMap = new HashMap<>();
+            LinkedHashMap<String, String> primaryKeyNamesMap = new LinkedHashMap<>();
 
             while (resultSet.next()) {
                 primaryKeyNamesMap.put(resultSet.getString("Field"), resultSet.getString("Type"));
@@ -62,15 +66,22 @@ public abstract class SRedisLockUtils {
 
             int index = 0;
 
-            for (HashMap.Entry<String, String> entry : primaryKeyNamesMap.entrySet()) {
-                if (entry.getValue().contains("char")) {
-                    stringPk += (((String[]) registryPk)[index++]) + "/" + "";
-                }
-                else if (entry.getValue().contains("date")) {
-                    stringPk += SLibUtils.DbmsDateFormatDate.format(((Date[]) registryPk)[index++]) + "/" + "";
-                }
-                else {
+            if (registryPk instanceof int[]) {
+                for (HashMap.Entry<String, String> entry : primaryKeyNamesMap.entrySet()) {
                     stringPk += (((int[]) registryPk)[index++]) + "/" + "";
+                }
+            }
+            else if (registryPk instanceof Object[]) {
+                for (HashMap.Entry<String, String> entry : primaryKeyNamesMap.entrySet()) {
+                    if (entry.getValue().contains("char")) {
+                        stringPk += ((Object[]) registryPk)[index++] + "/" + "";
+                    }
+                    else if (entry.getValue().contains("date")) {
+                        stringPk += SLibUtils.DbmsDateFormatDate.format(((Object[]) registryPk)[index++]) + "/" + "";
+                    }
+                    else {
+                        stringPk += (((Object[]) registryPk)[index++]) + "/" + "";
+                    }
                 }
             }
         }
@@ -84,9 +95,9 @@ public abstract class SRedisLockUtils {
      * @return Regresa la llave del candado en un string en la forma:
      * "Lock+lockId+companyId+registryType+stringId+jedisClientId+userId"
      */
-    private static SLockKey setLock(final Jedis jedis, final int companyId, final int registryType, final String registryPk, final int userId, final long timeout) {
+    private static SRedisLockKey setLock(final Jedis jedis, final int companyId, final int registryType, final String registryPk, final int userId, final long timeout) {
         long lockId = jedis.incr(LOCK_COUNT); // incrementa conteo de ID de candado en 1
-        SLockKey lockKey = new SLockKey(lockId, companyId, registryType, registryPk, jedis.clientId(), userId);
+        SRedisLockKey lockKey = new SRedisLockKey(lockId, companyId, registryType, registryPk, jedis.clientId(), userId);
 
         jedis.setex(lockKey.getLockKey(), timeout, DateFormatDatetime.format(new Date()) + " : " + timeout); // crea clave Redis con tiempo de expiración en segundos a manera de candado
 
@@ -96,11 +107,18 @@ public abstract class SRedisLockUtils {
     /**
      * Método para eliminar un candado de Redis.
      *
-     * @param jedis Cliente Jedis.
-     * @param lockKey Cadena de la llave del candado.
+     * @param client
+     * @param redisLock
      */
-    public static void releaseLock(final Jedis jedis, final String lockKey) {
-        jedis.del(lockKey);
+    public static void releaseLock(erp.client.SClientInterface client, SRedisLock redisLock) {
+        if (SRedisConnectionUtils.getConnectionStatus(client)) {
+            Jedis jedis = client.getJedis();
+            jedis.del(redisLock.getLockKey().getLockKey());
+        }
+        else if (!redisLock.getLockKey().isDummy()) {
+            client.showMsgBoxWarning("No se eliminó el candado de acceso exclusivo al registro.\n"
+                    + "Comunicarlo al administrador");
+        }
     }
 
     /**
@@ -138,16 +156,38 @@ public abstract class SRedisLockUtils {
      * <code>null</code>.
      * @throws java.lang.Exception
      */
-    public static SLockKey getLockKeyFromRedis(final Jedis jedis, final int companyId, final int registryType, final String registryPk) throws Exception {
+    public static SRedisLockKey getLockKeyFromRedis(final Jedis jedis, final int companyId, final int registryType, final String registryPk) throws Exception {
         String lockKey = "";
-        String lockKeyForSearch = SLockKey.composeLockKeyForSearch(companyId, registryType, registryPk);
+        String lockKeyForSearch = SRedisLockKey.composeLockKeyForSearch(companyId, registryType, registryPk);
         Set<String> keys = jedis.keys(lockKeyForSearch);
 
         if (!keys.isEmpty()) {
             lockKey = keys.toArray()[0].toString(); // si hay coincidencias, siempre será una sola
         }
 
-        return lockKey.isEmpty() ? null : new SLockKey(lockKey);
+        return lockKey.isEmpty() ? null : new SRedisLockKey(lockKey);
+    }
+
+    /**
+     * Metodo para crear un SRedisLock Dummy, este metodo solo se debe usar si
+     * el servidor redis no esta en funcionamiento
+     *
+     * @param client
+     * @param registryType
+     * @param registryPk
+     * @param timeout
+     * @return
+     * @throws SQLException
+     */
+    private static SRedisLock gainLockDummy(erp.client.SClientInterface client, int registryType, Object registryPk, long timeout) throws SQLException {
+        int companyId = client.getSessionXXX().getCompany().getPkCompanyId();
+        int userId = client.getSessionXXX().getUser().getPkUserId();
+
+        String registryPkFlatten = setStringPk(client, registryType, registryPk);
+        SRedisLockKey rLockKey = new SRedisLockKey(0, companyId, registryType, registryPkFlatten, 0, userId);
+        SRedisLock rLock = new SRedisLock(registryPk, timeout, rLockKey);
+
+        return rLock;
     }
 
     /**
@@ -162,33 +202,37 @@ public abstract class SRedisLockUtils {
      * @throws java.sql.SQLException
      */
     public static SRedisLock gainLock(SClientInterface client, int registryType, Object registryPk, long timeout) throws Exception, SQLException {
-        Jedis jedis = client.getJedis();
         int companyId = client.getSessionXXX().getCompany().getPkCompanyId();
         int userId = client.getSessionXXX().getUser().getPkUserId();
         String registryPkFlatten = setStringPk(client, registryType, registryPk);
-        SLockKey lockKey = getLockKeyFromRedis(jedis, companyId, registryType, registryPkFlatten);
         SRedisLock redisLock = null;
 
-        if (lockKey != null) {
-            // el candado de acceso exclusivo ya existe
-            if (lockKey.getUserId() != userId && lockKey.getCompanyId() != companyId) {
-                // el candado de acceso exclusivo pertenece a otro usuario y/o empresa
-                throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
-            }
-            else {
-                // el candado de acceso exclusivo pertenece al mismo usuario y empresa
-                if (client.showMsgBoxConfirm("El registro esta siendo utilizado por usted mismo,\n"
-                        + "¿Desea obtener nuevamente el acceso exclusivo al mismo?") != JOptionPane.YES_OPTION) {
-                    throw new Exception("El registro esta siendo utilizado por usted mismo.");
+        if (SRedisConnectionUtils.getConnectionStatus(client)) {
+            Jedis jedis = client.getJedis();
+            SRedisLockKey lockKey = getLockKeyFromRedis(jedis, companyId, registryType, registryPkFlatten);
+            if (lockKey != null) {
+                // el candado de acceso exclusivo ya existe
+                if (lockKey.getUserId() != userId && lockKey.getCompanyId() != companyId) {
+                    // el candado de acceso exclusivo pertenece a otro usuario y/o empresa
+                    throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
                 }
                 else {
-                    releaseLock(jedis, lockKey.getLockKey());
+                    // el candado de acceso exclusivo pertenece al mismo usuario y empresa
+                    if (client.showMsgBoxConfirm("El registro esta siendo utilizado por usted mismo,\n"
+                            + "¿Desea obtener nuevamente el acceso exclusivo al mismo?") != JOptionPane.YES_OPTION) {
+                        throw new Exception("El registro esta siendo utilizado por usted mismo.");
+                    }
+                    else {
+                        jedis.del(lockKey.getLockKey());
+                    }
                 }
             }
+            lockKey = setLock(jedis, companyId, registryType, registryPkFlatten, userId, timeout);     //crea nuevo candado
+            redisLock = new SRedisLock(registryPk, timeout, lockKey);
         }
-
-        lockKey = setLock(jedis, companyId, registryType, registryPkFlatten, userId, timeout);     //crea nuevo candado
-        redisLock = new SRedisLock(registryPk, timeout, lockKey);
+        else {
+            redisLock = gainLockDummy(client, registryType, registryPk, timeout);
+        }
 
         return redisLock;
     }
@@ -209,7 +253,7 @@ public abstract class SRedisLockUtils {
 
             String sql = "SHOW COLUMNS FROM " + tableName + " WHERE `Key` = 'PRI';";     //consulta los nombres de todas las pk del registro
             ResultSet resultSet = statement.executeQuery(sql);
-            HashMap<String, String> primaryKeyNamesMap = new HashMap<>();
+            LinkedHashMap<String, String> primaryKeyNamesMap = new LinkedHashMap<>();
 
             while (resultSet.next()) {
                 primaryKeyNamesMap.put(resultSet.getString("Field"), resultSet.getString("Type"));   //guarda las pk el hash
@@ -228,7 +272,7 @@ public abstract class SRedisLockUtils {
                 }
                 resultSet.close();
             }
-            
+
             int index = 0;
             sql = "SELECT " + lastUpdateTsFieldName + " FROM " + tableName + " WHERE ";   //consulta la fecha de modificacion del registro
 
@@ -253,7 +297,7 @@ public abstract class SRedisLockUtils {
                     throw new Exception("El tipo de dato del PK del registro es desconocido: " + registryPk.getClass().getName() + ".");
                 }
             }
-            
+
             resultSet = statement.executeQuery(sql);
 
             if (resultSet.next()) {
@@ -263,47 +307,63 @@ public abstract class SRedisLockUtils {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
         }
-        
+
         return lastUpdateTs;
     }
 
     /**
-     * Verificar si el candado de acceso exclusivo aún existe mediante su clave Redis,
-     * si no, verifica que no exista un candado para el registro, 
-     * si non existe un candado, consulta la fecha de modificacion de registro para recuperar el candado
+     * Verificar si el candado de acceso exclusivo aún existe mediante su clave
+     * Redis, si no, verifica que no exista un candado para el registro, si non
+     * existe un candado, consulta la fecha de modificacion de registro para
+     * recuperar el candado
+     *
      * @param client Cliente GUI.
      * @param redisLock
-     * @return 
-     * @throws java.lang.Exception 
+     * @return
+     * @throws java.lang.Exception
      */
-    public static boolean verifyLockStatus(SClientInterface client, SRedisLock redisLock) throws Exception {
-        boolean lockStatus = false;
-        Jedis jedis = client.getJedis();
+    public static SRedisLock verifyLockStatus(erp.client.SClientInterface client, SRedisLock rlock) throws Exception {
+        Date lastTs = getLastUpdateTs(client, rlock.getLockKey().getRegistryType(), rlock.getRegistryPk());
 
-        if (jedis.exists(redisLock.getLockKey().getLockKey())) {
-            lockStatus = true; // el candado aún existe
+        if (!lastTs.after(rlock.getLockTimestamp())) {
+            if (SRedisConnectionUtils.getConnectionStatus(client)) {
+                Jedis jedis = client.getJedis();
+                if (!jedis.exists(rlock.getLockKey().getLockKey())) {
+                    Set<String> redisKeysSet = jedis.keys(rlock.getLockKey().getLockKeyForSearch());
+                    if (redisKeysSet.isEmpty()) {
+
+                        Object registryPk = rlock.getRegistryPk();
+                        long timeout = rlock.getTimeout();
+                        SRedisLockKey rLockKey = setLock(jedis, rlock.getLockKey().getCompanyId(), rlock.getLockKey().getRegistryType(),
+                                rlock.getLockKey().getLockKey(), rlock.getLockKey().getUserId(), rlock.getTimeout());
+                        rlock = new SRedisLock(registryPk, timeout, rLockKey);
+
+                    }
+                    else {
+                        SRedisLockKey lockKey = new SRedisLockKey((String) (redisKeysSet.toArray())[0]);
+                        throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
+                    }
+                }
+            }
         }
         else {
-            Set<String> redisKeysSet = jedis.keys(redisLock.getLockKey().getLockKeyForSearch());
-            
-            if (!redisKeysSet.isEmpty()) {
-                // el candado de acceso exclusivo pertenece a otro usuario y/o empresa
-                SLockKey lockKey = new SLockKey((String) (redisKeysSet.toArray())[0]);
-                throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
-            }
-            else {
-                /*obtiene la fecha de ultima modificacion del registro*/
-                Date lastUpdateTs = getLastUpdateTs(client, redisLock.getLockKey().getRegistryType(), redisLock.getRegistryPk());
-
-                if (lastUpdateTs.after(redisLock.getLockTimestamp())) {
-                    throw new Exception("El registro fue modificado el " + SLibUtils.DateFormatDatetime.format(lastUpdateTs) + " después de perderse el acceso exclusivo.");
-                }
-                else {
-                    lockStatus = true; // el candado ya no existe, pero el registro no ha sido modificado
-                }
-            }
+            throw new Exception("El registro ha sido modificado");
         }
-        
-        return lockStatus;
+        return rlock;
+    }
+
+    /**
+     * Metodo que regresa un vector de todos los candados en Redis
+     *
+     * @param jedis
+     * @return
+     */
+    public static Vector<String> getLocksList(Jedis jedis) {
+        Vector<String> vectorKeys = new Vector<>();
+        Set<String> keys = jedis.keys(SRedisLockKey.LOCK + "+*");
+        for (int i = 0; i < keys.size(); i++) {
+            vectorKeys.add(keys.toArray()[i].toString());
+        }
+        return vectorKeys;
     }
 }
