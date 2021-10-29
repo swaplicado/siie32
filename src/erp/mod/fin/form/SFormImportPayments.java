@@ -20,6 +20,7 @@ import erp.mod.fin.db.SDbBankLayoutDeposits;
 import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
 import erp.mod.fin.db.SFinConsts;
 import erp.mod.fin.util.SImportPayments;
+import erp.redis.SRedisLockUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -51,6 +52,7 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -89,6 +91,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     
     private HashMap<Integer, Object> moParamsMap;
     private ArrayList<SSrvLock> maLocks;
+    private ArrayList<SRedisLock> maRedisLocks;
     
 
     /**
@@ -665,6 +668,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         mvDeposits = new Vector<>();
         
         maLocks = new ArrayList<>();
+        maRedisLocks = new ArrayList<>();
         
         renderOption = ST_REGISTRY_NEW;
     }
@@ -765,6 +769,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     private void getRecordLocks() throws Exception {
         boolean exists = false;
         SSrvLock lock = null;
+        SRedisLock rlock = null;
         SAnalystDepositRow anaRow = null;
         ArrayList<Object> recordKeys = new ArrayList<>();
         
@@ -781,7 +786,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 }
                 if (!exists) {
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
+                    rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
                     maLocks.add(lock);
+                    maRedisLocks.add(rlock);
                     recordKeys.add(anaRow.getRecord().getPrimaryKey());
                 }
             }
@@ -1248,6 +1255,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         if (!maLocks.isEmpty()) {
             registry.getLocks().addAll(maLocks);
         }
+        if (!maRedisLocks.isEmpty()) {
+            registry.getRedisLocks().addAll(maRedisLocks);
+        }
         
         return registry;
     }
@@ -1277,6 +1287,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                 try {
                     for (SSrvLock lock : maLocks) {
                         SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
+                    }
+                    for (SRedisLock rlock : maRedisLocks) {
+                        SRedisLockUtils.verifyLockStatus((SClientInterface) miClient, rlock);
                     }
                 }
                 catch (Exception e) {
@@ -1319,6 +1332,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
             try {
                 for (SSrvLock lock : maLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
+                }
+                for (SRedisLock rlock : maRedisLocks) {
+                    SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
                 }
             }
             catch (Exception e) {

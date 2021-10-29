@@ -14,6 +14,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.fin.db.SFinDpsExchangeRateDiff;
 import erp.mod.fin.db.SFinConsts;
+import erp.redis.SRedisLockUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -29,6 +30,7 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -330,6 +332,7 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
     public void actionSave() {
         String msg;
         SSrvLock lock = null;
+        SRedisLock rlock = null;
         SFinDpsExchangeRateDiff dpsExchangeRateDiff;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
@@ -341,6 +344,7 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
                 try {
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
+                    rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout() / 1000);
                     dpsExchangeRateDiff = new SFinDpsExchangeRateDiff(miClient);
                     dpsExchangeRateDiff.setRecYear(SLibTimeUtils.digestYear(moDateDate.getValue())[0]);
                     dpsExchangeRateDiff.setEndOfMonth(moDateDate.getValue());
@@ -358,7 +362,10 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
                 finally {
                     try {
                         if (lock != null) {
-                            SSrvUtils.releaseLock(miClient.getSession(), lock);
+                            SSrvUtils.releaseLock(miClient.getSession(), lock);                            
+                        }
+                        if (rlock != null) {
+                            SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
                         }
                     }
                     catch (Exception e) {

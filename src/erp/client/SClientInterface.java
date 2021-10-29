@@ -5,7 +5,10 @@
 
 package erp.client;
 
+import erp.SParamsApp;
+import erp.redis.SRedisConnection;
 import java.util.HashMap;
+import redis.clients.jedis.Jedis;
 
 /**
  *
@@ -15,6 +18,9 @@ public interface SClientInterface {
 
     public sa.lib.gui.SGuiSession getSession();
     public erp.server.SSessionXXX getSessionXXX();
+    public Jedis getJedis();
+    public void setJedis(Jedis j);
+    public SParamsApp getParamsApp();
 
     public javax.swing.JFrame getFrame();
     public javax.swing.JTabbedPane getTabbedPane();

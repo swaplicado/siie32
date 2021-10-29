@@ -127,6 +127,9 @@ public abstract class SDataConstants {
     public static final int USRU_ROL_USR = 202014;
     public static final int USRU_ROL_CO = 202015;
     public static final int USRU_USR = 202018;
+    public static final int USRU_USR_REDIS_LOCKS = 20219;
+    public static final int USRU_USR_UPDATED = 202020;
+    public static final int USRU_USR_REDIS = 202021;
 
     public static final int USRX_RIGHT = 202501;
     public static final int USRX_RIGHT_PRV = 202502;

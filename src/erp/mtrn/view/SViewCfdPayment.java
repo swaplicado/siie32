@@ -27,6 +27,7 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
+import erp.redis.SRedisLockUtils;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  * User view for management of database registries of CFDI of Payments.
@@ -323,6 +325,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                         boolean isCopy = false;
                         boolean mbIsFormReadOnly = false;
                         ArrayList<SSrvLock> locks = new ArrayList<>();
+                        ArrayList<SRedisLock> rlocks = new ArrayList<>();
 
                         try {
                             // Attempt to gain all data locks:
@@ -331,7 +334,9 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                                 if (journalVoucherKeys.get(x) != null) {
                                     if (!mbIsFormReadOnly && !isCopy) {
                                         SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(x), 7200000);
+                                        SRedisLock rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC , journalVoucherKeys.get(x), 7200);
                                         locks.add(lock);
+                                        rlocks.add(rlock);
                                     }
                                 }
                             }
@@ -339,6 +344,9 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                         catch (Exception e) {
                             for(Object lock : locks) {
                                 SSrvUtils.releaseLock(miClient.getSession(), (SSrvLock) lock);
+                            }
+                            for(Object rlock : rlocks) {
+                                SRedisLockUtils.releaseLock(miClient, ((SRedisLock) rlock));
                             }
                             SLibUtils.showException(this, e);
                         }

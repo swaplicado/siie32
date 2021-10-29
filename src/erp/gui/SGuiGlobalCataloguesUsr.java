@@ -15,6 +15,7 @@ import erp.mtrn.data.SDataUserConfigurationTransaction;
 import erp.mtrn.form.SFormUserConfigurationTransaction;
 import erp.musr.data.*;
 import erp.musr.form.*;
+import erp.redis.form.SFormRedisSessions;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -26,6 +27,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
 
     private javax.swing.JMenu jmMenuUser;
     private javax.swing.JMenuItem jmiUser;
+    private javax.swing.JMenuItem jmiRedisLocks;
+    private javax.swing.JMenuItem jmiRedisSessions;
+    private javax.swing.JMenuItem jmiUpdatedUser;
     private javax.swing.JMenuItem jmiAccessCompany;
     private javax.swing.JMenuItem jmiAccessCompanyBranch;
     private javax.swing.JMenuItem jmiAccessCompanyBranchEntity;
@@ -36,8 +40,12 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiUserFunctionalArea;
 
     private erp.musr.form.SFormUser moFormUser;
+    private erp.musr.form.SFormUpdatedUser moFormUpdatedUser;
     private erp.musr.form.SFormUserRight moFormUserRolePrivilege;
     private erp.mtrn.form.SFormUserConfigurationTransaction moFormUserConfigurationTransaction;
+    
+    private erp.musr.form.SFormLockUser moFormLock;
+    private erp.redis.form.SFormRedisSessions moFormRedisSessions;
 
     private erp.form.SFormOptionPicker moPickerUsers;
 
@@ -51,6 +59,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
 
         jmMenuUser = new JMenu("Usuarios");
         jmiUser = new JMenuItem("Usuarios");
+        jmiRedisLocks = new JMenuItem("Locks en Redis");
+        jmiRedisSessions = new JMenuItem("Sesiones en Redis");
+        jmiUpdatedUser = new JMenuItem("Get Updated Users");
         jmiAccessCompany = new JMenuItem("Acceso a empresas");
         jmiAccessCompanyBranch = new JMenuItem("Acceso a sucursales de empresas");
         jmiAccessCompanyBranchEntity = new JMenuItem("Acceso a entidades de sucursales");
@@ -61,6 +72,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserFunctionalArea = new JMenuItem("Usuarios vs. áreas funcionales");
 
         jmMenuUser.add(jmiUser);
+        jmMenuUser.add(jmiRedisLocks);
+        jmMenuUser.add(jmiRedisSessions);
+        jmMenuUser.add(jmiUpdatedUser);
         jmMenuUser.addSeparator();
         jmMenuUser.add(jmiAccessCompany);
         jmMenuUser.add(jmiAccessCompanyBranch);
@@ -74,6 +88,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmMenuUser.add(jmiUserFunctionalArea);
 
         jmiUser.addActionListener(this);
+        jmiRedisLocks.addActionListener(this);
+        jmiRedisSessions.addActionListener(this);
+        jmiUpdatedUser.addActionListener(this);
         jmiAccessCompany.addActionListener(this);
         jmiAccessCompanyBranch.addActionListener(this);
         jmiAccessCompanyBranchEntity.addActionListener(this);
@@ -84,6 +101,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserFunctionalArea.addActionListener(this);
 
         moFormUser = null;
+        moFormLock = null;
+        moFormRedisSessions = null;
+        moFormUpdatedUser = null;
         moFormUserRolePrivilege = null;
         moFormUserConfigurationTransaction = null;
 
@@ -91,6 +111,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
 
         jmMenuUser.setEnabled(hasRightUser);
         jmiUser.setEnabled(hasRightUser);
+        jmiRedisLocks.setEnabled(hasRightUser);
+        jmiRedisSessions.setEnabled(hasRightUser);
+        jmiUpdatedUser.setEnabled(hasRightUser);
         jmiAccessCompany.setEnabled(hasRightUser);
         jmiAccessCompanyBranch.setEnabled(hasRightUser);
         jmiAccessCompanyBranchEntity.setEnabled(hasRightUser);
@@ -119,6 +142,18 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
                         moRegistry = new SDataUser();
                     }
                     miForm = moFormUser;
+                    break;
+                case SDataConstants.USRU_USR_REDIS_LOCKS:
+                    moFormLock = new SFormLockUser(miClient);
+                    miForm = moFormLock;
+                    break;
+                case SDataConstants.USRU_USR_REDIS:
+                    moFormRedisSessions = new SFormRedisSessions(miClient);
+                    miForm = moFormRedisSessions;
+                    break;
+                case SDataConstants.USRU_USR_UPDATED:
+                    moFormUpdatedUser = new SFormUpdatedUser(miClient);
+                    miForm = moFormUpdatedUser;
                     break;
                 case SDataConstants.USRX_RIGHT:
                     if (moFormUserRolePrivilege == null) {
@@ -297,6 +332,15 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
 
             if (item == jmiUser) {
                 showView(SDataConstants.USRU_USR);
+            }
+            else if (item == jmiRedisLocks) {
+                showForm(SDataConstants.USRU_USR_REDIS_LOCKS, null);
+            }
+            else if (item == jmiRedisSessions) {
+                showForm(SDataConstants.USRU_USR_REDIS, null);
+            }
+            else if (item == jmiUpdatedUser) {
+                showForm(SDataConstants.USRU_USR_UPDATED, null);
             }
             else if (item == jmiAccessCompany) {
                 showView(SDataConstants.USRU_ACCESS_CO);

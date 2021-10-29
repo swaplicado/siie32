@@ -36,6 +36,7 @@ import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
 import erp.mtrn.data.SCfdUtilsHandler;
+import erp.redis.SRedisLockUtils;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -79,6 +80,7 @@ import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
 
 /**
@@ -142,6 +144,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SDataBizPartnerBranchBankAccount> maBizPartnerBranchBankAccounts;
     private HashMap<String, ArrayList<SGuiItem>> moAgreementReferencesMap;
     private ArrayList<SSrvLock> maLocks;
+    private ArrayList<SRedisLock> maRedisLocks;
     
     private boolean mbShowConfirmCloseDialog;
     
@@ -1947,6 +1950,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         SDataRecord record = null;
         SLayoutBankRecord bankRecord = null;
         SSrvLock lock = null;
+        SRedisLock rlock = null;
         
         if (layoutBankRecordKey == null) {
             for (SLayoutBankRecord bankRecordRow : maLayoutBankRecords) {
@@ -1965,7 +1969,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (!found) {
                 record = (SDataRecord) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
+                rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout() / 1000);
                 maLocks.add(lock);
+                maRedisLocks.add(rlock);
 
                 bankRecord = new SLayoutBankRecord(layoutBankRecordKey);
                 bankRecord.getLayoutBankPayments().add(layoutBankPayment);
@@ -2617,6 +2623,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         maLayoutBankRecords = new ArrayList<>();
         maLocks = new ArrayList<>();
+        maRedisLocks = new ArrayList<>();
 
         switch (mnFormSubtype) {
             case SModSysConsts.FINX_LAY_BANK_ACC:
@@ -2765,6 +2772,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         if (!maLocks.isEmpty()) {
             registry.getLocks().addAll(maLocks);
         }
+        if (!maRedisLocks.isEmpty()) {
+            registry.getRedisLocks().addAll(maRedisLocks);
+        }
 
         return registry;
     }
@@ -2821,6 +2831,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     for (SSrvLock lock : maLocks) {
                         SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
                     }
+                    for (SRedisLock rlock : maRedisLocks) {
+                        SRedisLockUtils.verifyLockStatus((SClientInterface) miClient, rlock);
+                    }
                 }
                 catch (Exception e) {
                     validation.setMessage("No fue posible validar el acceso exclusivo al registro de una de las pólizas seleccionadas." + e);
@@ -2848,6 +2861,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         try {
             for (SSrvLock lock : maLocks) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            for (SRedisLock rlock : maRedisLocks) {
+                SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
             }
         }
         catch (Exception e) {

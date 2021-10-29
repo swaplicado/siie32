@@ -36,6 +36,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDsm;
 import erp.mtrn.data.SDataDsmEntry;
 import erp.mtrn.data.STrnUtilities;
+import erp.redis.SRedisLockUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,6 +65,7 @@ import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
 
 /**
@@ -1546,6 +1548,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public boolean updateLayoutStatus(SGuiClient client, int newLayoutStatus) throws Exception {
         boolean done = false;
         SSrvLock lock = null;
+        SRedisLock rlock = null;
         
         try {
             mnLayoutStatus = newLayoutStatus;
@@ -1553,6 +1556,8 @@ public class SDbBankLayout extends SDbRegistryUser {
             lock = SSrvUtils.gainLock(client.getSession(), 
                     ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId(), 
                     SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
+            
+            rlock = SRedisLockUtils.gainLock((SClientInterface) client, SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout() / 1000);
             
             if (lock != null && lock.getLockStatus() == SSrvConsts.LOCK_GAINED) {
                 String sql = "UPDATE " + getSqlTable() + " SET "
@@ -1569,6 +1574,9 @@ public class SDbBankLayout extends SDbRegistryUser {
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
+            }
+            if (rlock != null) {
+                SRedisLockUtils.releaseLock(((SClientInterface) client), rlock);
             }
         }
         

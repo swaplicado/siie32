@@ -9,6 +9,7 @@ import erp.lib.SLibConstants;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
+import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -17,6 +18,7 @@ import java.util.Date;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -86,12 +88,13 @@ public class SHrsPayrollAnnul {
         SServerRequest request = null;
         SServerResponse response = null;
         SSrvLock lock = null;
-
+        SRedisLock rlock = null;
+        
         try {
             // Attempt to gain data lock:
 
             lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-
+            rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 60);
             // Read data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
@@ -155,11 +158,17 @@ public class SHrsPayrollAnnul {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
+            if (rlock != null) {
+                SRedisLockUtils.releaseLock(miClient, rlock);
+            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            if (rlock != null) {
+                SRedisLockUtils.releaseLock(miClient, rlock);
             }
             if (msgError.length() > 0) {
                 throw new Exception(msgError);

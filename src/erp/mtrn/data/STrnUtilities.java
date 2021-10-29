@@ -37,6 +37,7 @@ import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
+import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -69,6 +70,7 @@ import sa.lib.mail.SMailSender;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -1475,6 +1477,7 @@ public abstract class STrnUtilities {
     public static boolean confirmSend(final SClientInterface client, final String title, final SDataCfd cfd, final SDataDps dps, final int idBizPartner, final int idBizPartnerBranch) throws RemoteException, Exception {
         boolean send = false;
         SSrvLock lock = null;
+        SRedisLock rlock = null;
         SServerRequest request = null;
         SServerResponse response = null;
         SDialogCfdSend dlgCfdSend = null;
@@ -1486,7 +1489,7 @@ public abstract class STrnUtilities {
         if (dlgCfdSend.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             if ((boolean) dlgCfdSend.getValue(SDialogCfdSend.VAL_IS_EMAIL_EDITED)) {
                 lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
-                
+                rlock = SRedisLockUtils.gainLock(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout() / 1000);
                 if (idBizPartnerBranch == SLibConsts.UNDEFINED) {
                     bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
                 }
@@ -1499,6 +1502,7 @@ public abstract class STrnUtilities {
                 response = client.getSessionXXX().request(request);
 
                 SSrvUtils.releaseLock(client.getSession(), lock);
+                SRedisLockUtils.releaseLock(client, rlock);
                 
                 if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));

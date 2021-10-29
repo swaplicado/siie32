@@ -277,6 +277,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
     protected sa.lib.srv.SSrvLock moAuxUserLock;
+    protected sa.lib.srv.redis.SRedisLock moAuxUserRedisLock;
     
     protected double mdTempCfdIvaPorcentaje;
 
@@ -1968,6 +1969,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
+    public void setAuxUserRedisLock(sa.lib.srv.redis.SRedisLock o) { moAuxUserRedisLock = o; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
@@ -1994,6 +1996,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
+    public sa.lib.srv.redis.SRedisLock getAuxUserRedisLock() { return moAuxUserRedisLock; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }

@@ -150,11 +150,11 @@ public class SDataDpsMinorChanges extends erp.lib.data.SDataRegistry{
                         entry.setPkYearId(mnPkYearId);
                         entry.setPkDocId(mnPkDocId);
                         
-                        if(entry.getIsEdited()){
+                        //if(entry.getIsEdited()){
                             if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                             }
-                        }
+                        //}
                     }
                 }
                 

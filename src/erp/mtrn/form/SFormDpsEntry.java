@@ -3913,13 +3913,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSecuritySeal.setEditable(false);
             jtfTicket.setEditable(false);
             jtfVgm.setEditable(false);
-            jbEditLogistics.setEnabled(false);
 
             jbNotesNew.setEnabled(false);
             jbNotesEdit.setEnabled(false);
             jbNotesDelete.setEnabled(false);
             jbPickSystemNotes.setEnabled(false);
-            jbEditNotes.setEnabled(false);
 
             jlAddBachocoNúmeroPosición.setEnabled(false);
             jtfAddBachocoNúmeroPosición.setEnabled(false);
@@ -3981,13 +3979,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSecuritySeal.setEditable(true);
             jtfTicket.setEditable(true);
             jtfVgm.setEditable(true);
-            jbEditLogistics.setEnabled(false);
             
             jbNotesNew.setEnabled(true);
             jbNotesEdit.setEnabled(true);
             jbNotesDelete.setEnabled(true);
             jbPickSystemNotes.setEnabled(true);
-            jbEditNotes.setEnabled(false);
             
             jtfComplConceptKey.setEnabled(true);
             jtfComplConcept.setEnabled(true);
@@ -4292,12 +4288,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void actionEditLogistics() {
         moFormComEntry.formReset();
+        moFormComEntry.formRefreshCatalogues();
         moFormComEntry.setRegistry(moDpsEntry);
         moFormComEntry.setVisible(true);
         
         if (moFormComEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             SDataDpsEntry dpsEntry = (SDataDpsEntry) moFormComEntry.getRegistry();
-            moFieldFkVehicleTypeId_n.setFieldValue(dpsEntry.getFkVehicleTypeId_n());
+            moFieldFkVehicleTypeId_n.setFieldValue(new int[] { dpsEntry.getFkVehicleTypeId_n() });
             moFieldDriver.setFieldValue(dpsEntry.getDriver());
             moFieldPlate.setFieldValue(dpsEntry.getPlate());
             moFieldTicket.setFieldValue(dpsEntry.getTicket());
@@ -4306,10 +4303,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldSealSecurity.setFieldValue(dpsEntry.getSealSecurity());
             moFieldVgm.setFieldValue(dpsEntry.getVgm());
             
-            jbEditLogistics.setEnabled(false);
             jbOk.setEnabled(true);
-            
-            jcbFkVehicleTypeId_n.requestFocusInWindow();
         }
     }
     
@@ -5855,7 +5849,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mbResetingForm = true;
 
         moDpsEntry = (SDataDpsEntry) registry;
-
+        
         moFieldFkItemId.setFieldValue(new int[] { moDpsEntry.getFkItemId() });
         itemChangedFkItemId(false);
 
@@ -6113,7 +6107,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             complement.setCfdUnit(moFieldComplCfdUnit.getString());
             moDpsEntry.setDbmsComplement(complement);
         }
-        
+
         return moDpsEntry;
     }
 

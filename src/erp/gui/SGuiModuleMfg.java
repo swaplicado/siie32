@@ -20,6 +20,7 @@ import erp.mmfg.form.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import redis.clients.jedis.Jedis;
 
 /**
  *

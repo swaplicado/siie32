@@ -31,6 +31,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryEdit;
 import erp.mtrn.data.SRowDpsEdit;
+import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -45,6 +46,7 @@ import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  * Modificar el ítem y el centro de costo de un documento y de todos los documentos asociados a este, sin necesidad de editar cada documento de forma manual.
@@ -251,6 +253,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         }
         if(mbDocuentsLockedError) {
             releaseDpsUserLock();
+            releaseDpsUserRedisLock();
             setVisible(false);
         }
     }
@@ -408,9 +411,14 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         if (dps != moDps) {
             if (dps != null) { 
             SSrvLock lock = gainDpsUserLock(dps);
+            SRedisLock rlock = gainDpsUserRedisLock(dps);
 
                 if (lock != null) {
                     dps.setAuxUserLock(lock);
+                    error = false;
+                }
+                if (rlock != null) {
+                    dps.setAuxUserRedisLock(rlock);
                     error = false;
                 }
             }
@@ -418,6 +426,21 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         else error = false;
 
         return error;
+    }
+    
+    private sa.lib.srv.redis.SRedisLock gainDpsUserRedisLock(SDataDps dps) {
+        SRedisLock rlock;
+
+        try {
+            rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.TRN_DPS, dps.getPrimaryKey(), dps.getRegistryTimeout() / 1000);
+        }
+        catch (Exception e) {
+            rlock = null;
+            miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + 
+                    SLibUtils.DateFormatDateYearMonth.format(dps.getDateDoc()) + " " + dps.getNumberSeries() + dps.getNumber() + "'.\n" + e);
+        }
+
+        return rlock;
     }
     
     private sa.lib.srv.SSrvLock gainDpsUserLock(SDataDps dps) {
@@ -435,6 +458,21 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         return lock;
     }
     
+    private void releaseDpsUserRedisLock() {
+        moDocuments.stream().forEach((document) -> {
+            sa.lib.srv.redis.SRedisLock rlock = document.getAuxUserRedisLock();
+            if (rlock != null) {
+                try {
+                    SRedisLockUtils.releaseLock(miClient, rlock);
+                    document.setAuxUserRedisLock(null);
+                }
+                catch (Exception e) {
+                    miClient.showMsgBoxWarning("No fue posible liberar el acceso exclusivo del registro '" + 
+                            SLibUtils.DateFormatDateYearMonth.format(document.getDateDoc()) + " " + document.getNumberSeries() + document.getNumber() + "'.\n" + e);
+                }
+            }
+        });
+    }
     private void releaseDpsUserLock() {
         moDocuments.stream().forEach((document) -> {
             sa.lib.srv.SSrvLock lock = document.getAuxUserLock();
@@ -617,6 +655,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
     private void actionCancel() {
         releaseDpsUserLock();
+        releaseDpsUserRedisLock();
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }

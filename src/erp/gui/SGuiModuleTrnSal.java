@@ -74,6 +74,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import redis.clients.jedis.Jedis;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -1454,7 +1455,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     break;
                     
                 case SDataConstants.TRNX_DPS_LAST_MOV:
-                    oViewClass = erp.mtrn.view.SViewDpsBalanceAging.class;
+                    oViewClass = erp.mtrn.view.SViewDpsLastMove.class;
                     sViewTitle = "Último movimiento clientes";
                     break;
                     

@@ -14,6 +14,7 @@ import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.SModConsts;
 import erp.mod.fin.db.SFinConsts;
 import erp.mod.fin.db.SValuationBalances;
+import erp.redis.SRedisLockUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -35,6 +36,7 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -449,6 +451,8 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
     public void actionSave() {
         String msg;
         SSrvLock lock = null;
+        SRedisLock rlock = null;
+        
         SValuationBalances sbe;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
@@ -461,6 +465,7 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
                 try {
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
+                    rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout() / 1000);
                     
                     sbe = new SValuationBalances(miClient);
                     sbe.setRecYear(moCalYear.getValue());
@@ -483,6 +488,9 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
                     try {
                         if (lock != null) {
                             SSrvUtils.releaseLock(miClient.getSession(), lock);
+                        }
+                        if (rlock != null) {
+                            SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
                         }
                     }
                     catch (Exception e) {

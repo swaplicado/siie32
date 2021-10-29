@@ -4,7 +4,9 @@ import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mod.SModConsts;
 import java.awt.event.ItemEvent;
 import java.util.Vector;
 import erp.mtrn.data.SDataDpsEntry;
@@ -452,7 +454,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void formRefreshCatalogues() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SFormUtilities.populateComboBox(miClient, jcbFkVehicleTypeId_n, SModConsts.LOGU_TP_VEH);
     }
 
     @Override
