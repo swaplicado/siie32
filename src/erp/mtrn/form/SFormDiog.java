@@ -911,10 +911,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfEntryValue.addFocusListener(this);
 
         i = 0;
-        tableColumnsEntry = new STableColumnForm[15];
+        tableColumnsEntry = new STableColumnForm[14];
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
-        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 100);
         mnColQty = i;
         tableColumnsEntry[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY_2X);
         tableColumnsEntry[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
@@ -1616,7 +1615,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setPkYearId(SLibConstants.UNDEFINED);
                             iogEntry.setPkDocId(SLibConstants.UNDEFINED);
                             iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
-                            iogEntry.setDbmsPartNum(moEntryItem.getPartNumber());
                             iogEntry.setQuantity(stockSupplyRow.getQuantityAboutToSupply());
                             iogEntry.setValueUnitary(dpsEntry.getPriceUnitaryReal_r());
                             iogEntry.setValue(SLibUtilities.round(iogEntry.getValueUnitary() * iogEntry.getQuantity(), decsQty));

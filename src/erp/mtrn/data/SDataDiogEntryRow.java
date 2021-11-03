@@ -23,7 +23,7 @@ public class SDataDiogEntryRow extends erp.lib.table.STableRow {
         mvValues.clear();
         mvValues.add(diogEntry.getDbmsItemKey());
         mvValues.add(diogEntry.getDbmsItem());
-        mvValues.add(diogEntry.getDbmsPartNum());
+//        mvValues.add(diogEntry.getDbmsPartNum());
         mvValues.add(diogEntry.getOriginalQuantity());
         mvValues.add(diogEntry.getDbmsOriginalUnitSymbol());
         mvValues.add(diogEntry.getAuxStockMovesAsString());
