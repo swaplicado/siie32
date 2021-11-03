@@ -318,7 +318,7 @@ public abstract class SRedisLockUtils {
      * recuperar el candado
      *
      * @param client Cliente GUI.
-     * @param redisLock
+     * @param rlock
      * @return
      * @throws java.lang.Exception
      */

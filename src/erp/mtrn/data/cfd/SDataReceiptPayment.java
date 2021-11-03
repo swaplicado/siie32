@@ -479,6 +479,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         msConfirmationNum = cfdPayment.getAuxCfdConfirmacion();
         msCfdiRelationCode = cfdPayment.getAuxCfdCfdiRelacionadosTipoRelacion();
         msCfdiRelatedUuid = cfdPayment.getAuxCfdCfdiRelacionadoUuid();
+        //mdPaymentLoc_r = ...; // computed in computePaymentLoc()
         mbIsDeleted = false;
         mnFkReceiptStatusId = SLibUtilities.belongsTo(cfd.getFkXmlStatusId(), new int[] { SDataConstantsSys.TRNS_ST_DPS_NEW, SDataConstantsSys.TRNS_ST_DPS_EMITED }) ? SDataConstantsSys.TRNS_ST_DPS_EMITED : cfd.getFkXmlStatusId();
         mnFkCompanyBranchId = cfd.getFkCompanyBranchId_n();
@@ -500,5 +501,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
             pay.harvestCfdPaymentEntry(paymentEntry);
             maDbmsReceiptPaymentPays.add(pay);
         }
+        
+        computePaymentLoc();
     }
 }

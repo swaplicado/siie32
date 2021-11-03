@@ -53,7 +53,6 @@ import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
 import erp.mod.usr.db.SDbUserGui;
-import erp.redis.SRedisConnectionUtils;
 import erp.server.SLoginRequest;
 import erp.server.SLoginResponse;
 import erp.server.SServerRemote;
@@ -109,7 +108,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 191.0"; // fecha release: 2021-10-28
+    public static final String APP_RELEASE = "3.2 191.1"; // fecha release: 2021-11-03
     public static final String APP_COPYRIGHT = "2007-2021";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -1165,15 +1164,16 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     }
 
     private void createRedisSession(final int companyId, final int userId, final String userName) throws Exception {
-        try {
-            moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
-            SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
-            SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
-        } catch (Exception e) {
-            showMsgBoxWarning("No se encontró servidor de acceso exclusivo a registros\n"
-                                        + "favor de comunicarlo al administrador");
-            moJedis = null;
-        }
+//        try {
+//            moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
+//            SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
+//            SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
+//        }
+//        catch (Exception e) {
+//            showMsgBoxWarning("No se encontró servidor de acceso exclusivo a los registros registros.\n"
+//                    + "Favor de comunicarlo al administrador del sistema.");
+//            moJedis = null;
+//        }
     }
 
     private void logout() {
@@ -1208,11 +1208,11 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 }
             }
 
-            if (moJedis != null) {
-               moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
-               moJedis.disconnect();
-               moJedis = null;
-            }
+//            if (moJedis != null) {
+//               moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
+//               moJedis.disconnect();
+//               moJedis = null;
+//            }
             
             moServer = null;
             moSessionXXX = null;
@@ -1488,7 +1488,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     }
 
     private void actionFilePassword() {
-        Vector<Object> params = new Vector<Object>();
+        Vector<Object> params = new Vector<>();
         SUserPassword userPassword = new SUserPassword(this);
 
         while (true) {

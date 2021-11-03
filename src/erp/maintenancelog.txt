@@ -1,5 +1,11 @@
 ================================================================================
-SIIE 3.2 191.0/ 2021-10-28
+SIIE 3.2 191.1/ 2021-11-03
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a captura de movimientos de almacén por número de parte.
+
+================================================================================
+SIIE 3.2 191.0/ 2021-11-01
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Habilitación de filtro de movimientos exclusivamente timbrados en generación de archivo CSV para informativa de sueldos y salarios.

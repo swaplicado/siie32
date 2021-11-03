@@ -56,6 +56,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_DVY_USR = 25;
 
     public static final int FIELD_CAN_ST = 31;
+    
+    public static final int FIELD_FK_RCP_PAY = 41;
 
     private final static int DATA_TYPE_TEXT = 1;
     private final static int DATA_TYPE_NUMBER = 2;
@@ -1039,6 +1041,9 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 break;
             case FIELD_CAN_ST:
                 sql += "can_st = '" + value + "' ";
+                break;
+            case FIELD_FK_RCP_PAY:
+                sql += "fid_rcp_pay_n = " + value + " ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

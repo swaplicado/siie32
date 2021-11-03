@@ -75,6 +75,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     
     // auxiliar members:
     protected boolean mbAuxIsProcessingValidation;
+    protected boolean mbAuxIsProcessingStorageOnly; // for temporary use, only to create the storage of all former receipts of payments
     
     /**
      * Creates database registry of CFDI of Payments.
@@ -158,8 +159,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public int getFkUserDeleteId() { return mnAuxFkUserDeleteId; }
     
     public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
+    public void setAuxIsProcessingStorageOnly(boolean b) { mbAuxIsProcessingStorageOnly = b; }
     
     public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
+    public boolean getAuxIsProcessingStorageOnly() { return mbAuxIsProcessingStorageOnly; }
     
     public void copyCfdMembers(final SDataCfdPayment sourceCfdPayment) {
         this.msAuxCfdConfirmacion = sourceCfdPayment.msAuxCfdConfirmacion;
@@ -531,6 +534,75 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         }
     }
     
+    /**
+     * Save payment movements into financial records (journal vouchers).
+     * @param connection
+     * @param isRegistryNew
+     * @throws Exception 
+     */
+    private void saveFinRecords(final Connection connection, final boolean isRegistryNew) throws Exception {
+        if (!isRegistryNew) {
+            // delete last CFDI accounting movements IN DATABASE:
+            mnAuxFkUserDeleteId = mnAuxFkUserEditId;
+            deleteAccounting(connection);
+
+            // delete last CFDI accounting movements IN MEMORY:
+            for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
+                for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
+                    if (recordEntry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
+                        recordEntry.setIsDeleted(true);
+                    }
+                }
+            }
+        }
+
+        int numberEntry = 0;
+        HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>(); // key = financial record PK as String; value = next sorting position
+        Statement statement = connection.createStatement();
+
+        for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
+            // define next sorting position for current financial record (journal voucher):
+
+            int nextSortingPosition;
+
+            if (mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
+                nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
+            }
+            else {
+                nextSortingPosition = paymentEntry.DataRecord.getLastSortingPosition() + 1;
+            }
+
+            // save new financial record (journal voucher) entries:
+
+            for (SDataRecordEntry entry : paymentEntry.AuxDbmsRecordEntries) {
+                if (entry.getIsRegistryNew()) {
+                    entry.setSortingPosition(nextSortingPosition++);
+                    entry.setFkCfdId_n(moDbmsDataCfd.getPkCfdId());
+                    if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+            }
+
+            // preserve next sorting position for current financial record (journal voucher):
+
+            mapRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
+
+            // leave user trace into financial record (journal voucher) that it was modified:
+
+            paymentEntry.DataRecord.setFkUserEditId(paymentEntry.AuxUserId);
+            if (paymentEntry.DataRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+            }
+
+            String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", " + paymentEntry.EntryType + ", "
+                    + paymentEntry.DataRecord.getPkYearId() + ", " + paymentEntry.DataRecord.getPkPeriodId() + ", " + paymentEntry.DataRecord.getPkBookkeepingCenterId() + ", "
+                    + "'" + paymentEntry.DataRecord.getPkRecordTypeId() + "', " + paymentEntry.DataRecord.getPkNumberId() + ", "
+                    + (paymentEntry.AccountDestKey == null ? "NULL, NULL" : "" + paymentEntry.AccountDestKey[0] + ", " + paymentEntry.AccountDestKey[1]) + ");";
+            statement.execute(sql);
+        }
+    }
+    
     /*
      * Implementation of methods of class SDataRegistry
      */
@@ -569,6 +641,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         mnAuxFkUserDeleteId = 0;
         
         mbAuxIsProcessingValidation = false;
+        mbAuxIsProcessingStorageOnly = false;
     }
 
     @Override
@@ -585,16 +658,14 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             
             // construct payment receipt in memory:
             
-            readPaymentFromFinRecords(statement);
-            
-//            if (moDbmsDataCfd.getFkReceiptPaymentId_n() != 0) {
-//                // since SIIE 3.2.191 payments receipts are stored in DBMS:
-//                readPaymentFromReceiptPayment(statement);
-//            }
-//            else {
-//                // up to SIIE 3.2.191 payments receipts where stored in financial records (journal vouchers):
-//                readPaymentFromFinRecords(statement);
-//            }
+            if (moDbmsDataCfd.getFkReceiptPaymentId_n() != 0) {
+                // since SIIE 3.2.191 payments receipts are stored in DBMS:
+                readPaymentFromReceiptPayment(statement);
+            }
+            else {
+                // up to SIIE 3.2.191 payments receipts where stored in financial records (journal vouchers):
+                readPaymentFromFinRecords(statement);
+            }
             
             // finish reading registry:
 
@@ -620,10 +691,17 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         try {
             boolean isRegistryNew = moDbmsDataCfd.getPkCfdId() == 0;
             
+            if (mbAuxIsProcessingStorageOnly) {
+                if (isRegistryNew) {
+                    msDbmsError = "El CFD de recepción de pago no ha sido guardado aún.";
+                    throw new Exception();
+                }
+            }
+            
             // save payment receipt:
             
             if (isRegistryNew) {
-//                moDbmsReceiptPayment = new SDataReceiptPayment();
+                moDbmsReceiptPayment = new SDataReceiptPayment();
             }
             
             if (moDbmsReceiptPayment != null) {
@@ -638,75 +716,34 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             
             // save CFD:
             
-            if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + "\nTipo de registro: CFDI.");
-            }
-            
-            if (isRegistryNew) {
-                moDbmsReceiptPayment.saveField(connection, SDataReceiptPayment.FIELD_NUM, moDbmsDataCfd.getNumber(), 0);
-            }
-
-            // save records (journal vouchers) of all payment entries:
-            
-            if (!isRegistryNew) {
-                // delete last CFDI accounting movements IN DATABASE:
-                mnAuxFkUserDeleteId = mnAuxFkUserEditId;
-                deleteAccounting(connection);
+            if (mbAuxIsProcessingStorageOnly) {
+                // update only FK of receipt of payment into CFD:
                 
-                // delete last CFDI accounting movements IN MEMORY:
-                for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
-                    for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
-                        if (recordEntry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
-                            recordEntry.setIsDeleted(true);
-                        }
-                    }
+                if (moDbmsReceiptPayment == null) {
+                    msDbmsError = "El registro de recepción de pago no existe.";
+                    throw new Exception();
                 }
+                else if (moDbmsReceiptPayment.getPkReceiptId() == 0) {
+                    msDbmsError = "El registro de recepción de pago no ha sido guardado aún.";
+                    throw new Exception();
+                }
+                
+                moDbmsDataCfd.saveField(connection, SDataCfd.FIELD_FK_RCP_PAY, moDbmsReceiptPayment.getPkReceiptId());
             }
+            else {
+                // save CFD:
 
-            int numberEntry = 0;
-            HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>(); // key = financial record PK as String; value = next sorting position
-            Statement statement = connection.createStatement();
-
-            for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
-                // define next sorting position for current financial record (journal voucher):
-
-                int nextSortingPosition;
-
-                if (mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
-                    nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
-                }
-                else {
-                    nextSortingPosition = paymentEntry.DataRecord.getLastSortingPosition() + 1;
+                if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + "\nTipo de registro: CFDI.");
                 }
 
-                // save new financial record (journal voucher) entries:
-
-                for (SDataRecordEntry entry : paymentEntry.AuxDbmsRecordEntries) {
-                    if (entry.getIsRegistryNew()) {
-                        entry.setSortingPosition(nextSortingPosition++);
-                        entry.setFkCfdId_n(moDbmsDataCfd.getPkCfdId());
-                        if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                        }
-                    }
+                if (isRegistryNew && moDbmsReceiptPayment != null) {
+                    moDbmsReceiptPayment.saveField(connection, SDataReceiptPayment.FIELD_NUM, moDbmsDataCfd.getNumber(), 0);
                 }
 
-                // preserve next sorting position for current financial record (journal voucher):
+                // save records (journal vouchers) of all payment entries:
 
-                mapRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
-
-                // leave user trace into financial record (journal voucher) that it was modified:
-
-                paymentEntry.DataRecord.setFkUserEditId(paymentEntry.AuxUserId);
-                if (paymentEntry.DataRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                }
-
-                String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", " + paymentEntry.EntryType + ", "
-                        + paymentEntry.DataRecord.getPkYearId() + ", " + paymentEntry.DataRecord.getPkPeriodId() + ", " + paymentEntry.DataRecord.getPkBookkeepingCenterId() + ", "
-                        + "'" + paymentEntry.DataRecord.getPkRecordTypeId() + "', " + paymentEntry.DataRecord.getPkNumberId() + ", "
-                        + (paymentEntry.AccountDestKey == null ? "NULL, NULL" : "" + paymentEntry.AccountDestKey[0] + ", " + paymentEntry.AccountDestKey[1]) + ");";
-                statement.execute(sql);
+                saveFinRecords(connection, isRegistryNew);
             }
 
             mbIsRegistryNew = false;

@@ -172,19 +172,19 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
         aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_ico_xml", "CFD", STableConstants.WIDTH_ICON);
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.uuid", "UUID CFDI", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Deudor", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC Deudor", 100);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "p.pay_loc_r", "Total loc $", 100);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.uuid", "UUID CFDI", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.bp", "Banco factoraje", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.fiscal_id", "RFC banco factoraje", 100);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "p.pay_loc_r", "Total loc. $", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "p.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "user_new.usr", "Usr. creación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_usr_new", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "p.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "user_edit.usr", "Usr. modificación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_usr_edit", "Usr. modificación", STableConstants.WIDTH_USER);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "p.ts_edit", "Modificación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "user_del.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "o.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_usr_del", "Usr. eliminación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "p.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
         
         for (col = 0; col < aoTableColumns.length; col++) {
             moTablePane.addTableColumn(aoTableColumns[col]);
@@ -619,7 +619,6 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                 "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = p.fid_bp " +
                 "INNER JOIN trn_cfd AS c ON c.fid_rcp_pay_n = p.id_rcp " +
                 "INNER JOIN " + complementaryDbName + ".trn_cfd AS xc ON c.id_cfd = xc.id_cfd " +
-                "INNER JOIN erp.bpsu_bpb AS cob ON c.fid_cob_n = cob.id_bpb " +
                 "INNER JOIN erp.usru_usr AS usr_new ON p.fid_usr_new = usr_new.id_usr " +
                 "INNER JOIN erp.usru_usr AS usr_edit ON p.fid_usr_edit = usr_edit.id_usr " +
                 "INNER JOIN erp.usru_usr AS usr_del ON p.fid_usr_del = usr_del.id_usr " +

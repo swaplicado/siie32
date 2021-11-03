@@ -1136,6 +1136,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     miForm = moFormDpsDeliveryAck;
                     break;
+                case SDataConstants.TRN_PAY:
                 case SDataConstants.TRNX_CFD_PAY_REC:
                     if(moFormCfdPayment == null) {
                         moFormCfdPayment = new SFormCfdPayment(miClient);
@@ -1222,6 +1223,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         }
                         break;
 
+                    case SDataConstants.TRN_PAY:
                     case SDataConstants.TRNX_CFD_PAY_REC:
                         // compute associated CFD of current CFD of Payment:
                         /*
@@ -1647,8 +1649,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
                     break;
 
+                case SDataConstants.TRN_PAY:
                 case SDataConstants.TRNX_CFD_PAY_REC:
-                    moRegistry = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, registryType, pk, SLibConstants.EXEC_MODE_VERBOSE);
+                    moRegistry = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, SDataConstants.TRNX_CFD_PAY_REC, pk, SLibConstants.EXEC_MODE_VERBOSE);
 
                     if (moRegistry == null) {
                         annul = false;

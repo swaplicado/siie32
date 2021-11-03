@@ -602,7 +602,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinCfdPayment);
         jmFin.add(jmiFinCfdPaymentExtended);
-        jmFin.add(jmiFinReceiptPayment);
+//        jmFin.add(jmiFinReceiptPayment);
         jmFin.addSeparator();
         jmFin.add(jmiFinMassDownloadCfdi);
         jmFin.add(jmiFinMassInvoices);
