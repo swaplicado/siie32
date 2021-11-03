@@ -658,14 +658,16 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             
             // construct payment receipt in memory:
             
-            if (moDbmsDataCfd.getFkReceiptPaymentId_n() != 0) {
-                // since SIIE 3.2.191 payments receipts are stored in DBMS:
-                readPaymentFromReceiptPayment(statement);
-            }
-            else {
-                // up to SIIE 3.2.191 payments receipts where stored in financial records (journal vouchers):
-                readPaymentFromFinRecords(statement);
-            }
+//            if (moDbmsDataCfd.getFkReceiptPaymentId_n() != 0) {
+//                // since SIIE 3.2.191 payments receipts are stored in DBMS:
+//                readPaymentFromReceiptPayment(statement);
+//            }
+//            else {
+//                // up to SIIE 3.2.191 payments receipts where stored in financial records (journal vouchers):
+//                readPaymentFromFinRecords(statement);
+//            }
+            
+            readPaymentFromFinRecords(statement);
             
             // finish reading registry:
 
@@ -701,7 +703,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             // save payment receipt:
             
             if (isRegistryNew) {
-                moDbmsReceiptPayment = new SDataReceiptPayment();
+//                moDbmsReceiptPayment = new SDataReceiptPayment();
             }
             
             if (moDbmsReceiptPayment != null) {
