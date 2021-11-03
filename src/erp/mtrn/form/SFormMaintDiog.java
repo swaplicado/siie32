@@ -1235,7 +1235,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
 
                     iogEntry.setDbmsItem(moEntryItem.getItem());
                     iogEntry.setDbmsItemKey(moEntryItem.getKey());
-                    iogEntry.setDbmsPartNum(moEntryItem.getPartNumber());
+//                    iogEntry.setDbmsPartNum(moEntryItem.getPartNumber());
                     iogEntry.setDbmsUnit(moEntryItem.getDbmsDataUnit().getUnit());
                     iogEntry.setDbmsUnitSymbol(moEntryItem.getDbmsDataUnit().getSymbol());
                     iogEntry.setDbmsOriginalUnit(moEntryItem.getDbmsDataUnit().getUnit());
