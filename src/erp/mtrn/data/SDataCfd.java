@@ -583,7 +583,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkPayrollReceiptPayrollId_n = resultSet.getInt("fid_pay_rcp_pay_n");
                 mnFkPayrollReceiptEmployeeId_n = resultSet.getInt("fid_pay_rcp_emp_n");
                 mnFkPayrollReceiptIssueId_n = resultSet.getInt("fid_pay_rcp_iss_n");
-                mnFkReceiptPaymentId_n = resultSet.getInt("fid_rcp_pay_n");
+//                mnFkReceiptPaymentId_n = resultSet.getInt("fid_rcp_pay_n");
                 mnFkUserProcessingId = resultSet.getInt("fid_usr_prc");
                 mnFkUserDeliveryId = resultSet.getInt("fid_usr_dvy");
                 mtUserProcessingTs = resultSet.getTimestamp("ts_prc");
@@ -698,7 +698,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "?, ?, ?, ?, ?, " + // 37
                         "?, ?, ?, ?, ?, ?, " + // 43
                         "?, ?, ?, ?, ?, ?, " + // 49
-                        "?, " + // 50
+//                        "?, " + // 50
                         "?, " + // 51
                         "?, " + // 52
                         "NOW(), " + // 53
@@ -718,7 +718,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "fid_fin_rec_year_n = ?, fid_fin_rec_per_n = ?, fid_fin_rec_bkc_n = ?, fid_fin_rec_tp_rec_n = ?, fid_fin_rec_num_n = ?, " + 
                         "fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
                         "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, " +
-                        "fid_rcp_pay_n = ?, " +
+//                        "fid_rcp_pay_n = ?, " +
                         //fid_usr_prc = ?, // managed separately
                         "fid_usr_dvy = ?, " +
                         //ts_prc = NOW(), // managed separately
@@ -853,10 +853,10 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
             
             if (mnFkReceiptPaymentId_n == 0) {
-                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+//                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
             }
             else {
-                preparedStatement.setInt(index++, mnFkReceiptPaymentId_n);
+//                preparedStatement.setInt(index++, mnFkReceiptPaymentId_n);
             }
             
             if (!isUpddate) {

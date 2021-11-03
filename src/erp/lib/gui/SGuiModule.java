@@ -12,7 +12,6 @@ import erp.lib.form.SFormExtendedInterface;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
-import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -157,7 +156,7 @@ public abstract class SGuiModule {
         SServerResponse response = null;
         SDataRegistry registry = null;
         SSrvLock lock = null;
-        SRedisLock redisLock = null;
+//        SRedisLock redisLock = null;
         SClientDaemonTimeout daemonTimeout = null;
         SLibMethod method = null;
 
@@ -183,9 +182,9 @@ public abstract class SGuiModule {
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-                if (redisLock != null) {
-                    SRedisLockUtils.releaseLock(miClient, redisLock);
-                }
+//                if (redisLock != null) {
+//                    SRedisLockUtils.releaseLock(miClient, redisLock);
+//                }
                 throw new Exception(response.getMessage());
             }
             else {
@@ -194,9 +193,9 @@ public abstract class SGuiModule {
                     if (lock != null) {
                         SSrvUtils.releaseLock(miClient.getSession(), lock);
                     }
-                    if (redisLock != null) {
-                        SRedisLockUtils.releaseLock(miClient, redisLock);
-                    }
+//                    if (redisLock != null) {
+//                        SRedisLockUtils.releaseLock(miClient, redisLock);
+//                    }
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
                 }
                 else {
@@ -232,9 +231,9 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
         }
         else {
             registry = miForm.getRegistry();
@@ -244,10 +243,10 @@ public abstract class SGuiModule {
                 lock = SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
             }
 
-            if (redisLock != null) {
-                // Verify that user still has data lock:
-                redisLock = SRedisLockUtils.verifyLockStatus(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                // Verify that user still has data lock:
+//                redisLock = SRedisLockUtils.verifyLockStatus(miClient, redisLock);
+//            }
             
             // Verify that independent locks are still valid:
 
@@ -256,7 +255,7 @@ public abstract class SGuiModule {
                     mvIndependentLocks.add((SSrvLock) complement);
                 }
                 else if (complement instanceof SRedisLock) {
-                    mvIndependentRedisLocks.add((SRedisLock) complement);
+//                    mvIndependentRedisLocks.add((SRedisLock) complement);
                 }
             }
 
@@ -266,8 +265,8 @@ public abstract class SGuiModule {
             }
 
             for (int i = 0; i < mvIndependentRedisLocks.size(); i++) {
-                SRedisLock irl = SRedisLockUtils.verifyLockStatus(miClient, mvIndependentRedisLocks.get(i));
-                mvIndependentRedisLocks.set(i, irl);
+//                SRedisLock irl = SRedisLockUtils.verifyLockStatus(miClient, mvIndependentRedisLocks.get(i));
+//                mvIndependentRedisLocks.set(i, irl);
             }
             
             // Save data registry:
@@ -280,14 +279,14 @@ public abstract class SGuiModule {
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-                if (redisLock != null) {
-                    SRedisLockUtils.releaseLock(miClient, redisLock);
-                }
+//                if (redisLock != null) {
+//                    SRedisLockUtils.releaseLock(miClient, redisLock);
+//                }
                 for (SSrvLock il : mvIndependentLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), il);
                 }
                 for (SRedisLock irl : mvIndependentRedisLocks) {
-                    SRedisLockUtils.releaseLock(miClient, irl);
+//                    SRedisLockUtils.releaseLock(miClient, irl);
                 }
 
                 throw new Exception(response.getMessage());
@@ -299,14 +298,14 @@ public abstract class SGuiModule {
                     if (lock != null) {
                         SSrvUtils.releaseLock(miClient.getSession(), lock);
                     }
-                    if (redisLock != null) {
-                        SRedisLockUtils.releaseLock(miClient, redisLock);
-                    }
+//                    if (redisLock != null) {
+//                        SRedisLockUtils.releaseLock(miClient, redisLock);
+//                    }
                     for (SSrvLock il : mvIndependentLocks) {
                         SSrvUtils.releaseLock(miClient.getSession(), il);
                     }
                     for (SRedisLock irl : mvIndependentRedisLocks) {
-                         SRedisLockUtils.releaseLock(miClient, irl);
+//                         SRedisLockUtils.releaseLock(miClient, irl);
                     }
 
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
@@ -319,14 +318,14 @@ public abstract class SGuiModule {
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-                if (redisLock != null) {
-                    SRedisLockUtils.releaseLock(miClient, redisLock);
-                }
+//                if (redisLock != null) {
+//                    SRedisLockUtils.releaseLock(miClient, redisLock);
+//                }
                 for (SSrvLock il : mvIndependentLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), il);
                 }
                 for (SRedisLock irl : mvIndependentRedisLocks) {
-                    SRedisLockUtils.releaseLock(miClient, irl);
+//                    SRedisLockUtils.releaseLock(miClient, irl);
                 }
 
                 if (result == SLibConstants.DB_ACTION_SAVE_OK && miForm instanceof SFormExtendedInterface) {
@@ -347,7 +346,7 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SSrvLock lock = null;
-        SRedisLock redisLock = null;
+//        SRedisLock redisLock = null;
 
         try {
             // Attempt to gain data lock:
@@ -418,18 +417,18 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             if (msgError.length() > 0) {
                 throw new Exception(msgError);
             }
@@ -444,7 +443,7 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SSrvLock lock = null;
-        SRedisLock redisLock = null;
+//        SRedisLock redisLock = null;
 
         try {
             // Attempt to gain data lock:
@@ -520,18 +519,18 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             if (msgError.length() > 0) {
                 throw new Exception(msgError);
             }
@@ -546,7 +545,7 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SSrvLock lock = null;
-        SRedisLock redisLock = null;
+//        SRedisLock redisLock = null;
         SDataRegistry registry = null;
 
         try {
@@ -581,18 +580,18 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             if (msgError.length() > 0) {
                 throw new Exception(msgError);
             }
@@ -626,7 +625,7 @@ public abstract class SGuiModule {
             if (miClient.getTabbedPane().getComponentAt(i) instanceof STableTabInterface) {
                 vector = ((STableTabInterface) miClient.getTabbedPane().getComponentAt(i)).getSuscriptors();
                 for (j = 0; j < vector.size(); j++) {
-                    if (suscriptor == vector.get(j).intValue()) {
+                    if (suscriptor == vector.get(j)) {
                         ((STableTabInterface) miClient.getTabbedPane().getComponentAt(i)).actionRefresh(STableConstants.REFRESH_MODE_RELOAD);
                     }
                 }
