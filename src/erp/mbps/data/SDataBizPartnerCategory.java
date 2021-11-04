@@ -300,7 +300,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 mnDaysOfCredit = resultSet.getInt("bp_ct.days_cred");
                 mnDaysOfGrace = resultSet.getInt("bp_ct.days_grace");
                 mdGuarantee = resultSet.getDouble("bp_ct.garnt");
-                msGuaranteeType = resultSet.getString("garnt_tp");
+                msGuaranteeType = resultSet.getString("bp_ct.garnt_tp");
                 mdInsurance = resultSet.getDouble("bp_ct.insur");
                 mtDateStart = resultSet.getDate("bp_ct.dt_start");
                 mtDateEnd_n = resultSet.getDate("bp_ct.dt_end_n");
