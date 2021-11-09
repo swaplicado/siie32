@@ -369,7 +369,9 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                 for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
                     pay.setPkReceiptId(mnPkReceiptId);
                     pay.setPkPaymentId(0);
-                    pay.save(connection);
+                    if (pay.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nTipo de registro: Pago.");
+                    }
                 }
                 
                 // finish saving registry:

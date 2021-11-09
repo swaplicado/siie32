@@ -2162,10 +2162,10 @@ public abstract class SCfdUtils implements Serializable {
      * @param dpsAnnulmentType
      * @throws Exception 
      */
-    private static void  processAnnul(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, final int dpsAnnulmentType) throws Exception {
-        int result = SLibConstants.UNDEFINED;
-        String error = "";
+    private static void processAnnul(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, final int dpsAnnulmentType) throws Exception {
+        Object key = null;
         SDataDps dps = null;
+        SDataCfdPayment cfdPayment = null;
         SDataPayrollReceiptIssue receiptIssue = null;
         SSrvLock lock = null;
         SServerRequest request = null;
@@ -2174,30 +2174,34 @@ public abstract class SCfdUtils implements Serializable {
         try {
             switch (cfd.getFkCfdTypeId()) {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
-                    // Annul DPS:
+                    // annul invoice or credit note:
+                    
+                    key = new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() };
+                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_SILENT);
 
-                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-
-                    // Attempt to gain data lock:
-
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-
-                    if (dps != null) {
+                    if (dps == null) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
+                    }
+                    else {
+                        // lock registry:
+                        
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, key, 1000 * 60); // 1 min. timeout
+                        
+                        // check if registry can be annuled:
+                        
                         request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
                         request.setPacket(dps);
                         response = client.getSessionXXX().request(request);
 
                         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                            error = response.getMessage();
+                            throw new Exception(response.getMessage());
                         }
                         else {
-                            result = response.getResultType();
-
-                            if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                            if (response.getResultType() != SLibConstants.DB_CAN_ANNUL_YES) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
                             }
                             else {
-                                // Annul registry:
+                                // annul registry:
 
                                 dps.setIsRegistryRequestAnnul(true);
                                 dps.setFkDpsAnnulationTypeId(dpsAnnulmentType);
@@ -2208,89 +2212,121 @@ public abstract class SCfdUtils implements Serializable {
                                 response = client.getSessionXXX().request(request);
 
                                 if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                    error = response.getMessage();
+                                    throw new Exception(response.getMessage());
                                 }
                                 else {
-                                    result = response.getResultType();
-
-                                    if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
-                                        error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                    if (response.getResultType() != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
                                     }
                                 }
                             }
                         }
-                    }
-                    else {
-                        error = SLibConstants.MSG_ERR_DB_REG_READ;
                     }
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
-                    // no action needed
+                    // annul receipt of payment:
+
+                    key = new int[] { cfd.getPkCfdId() };
+                    cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, key, SLibConstants.EXEC_MODE_SILENT);
+                    
+                    if (cfdPayment == null) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
+                    }
+                    else {
+                        // lock registry:
+
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, key, 1000 * 60); // 1 min. timeout
+
+                        // check if registry can be annuled:
+                        
+                        request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                        request.setPacket(cfdPayment);
+                        response = client.getSessionXXX().request(request);
+
+                        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                            throw new Exception(response.getMessage());
+                        }
+                        else {
+                            if (response.getResultType() != SLibConstants.DB_CAN_ANNUL_YES) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                            }
+                            else {
+                                // annul registry:
+
+                                cfdPayment.setIsRegistryRequestAnnul(true);
+                                cfdPayment.setFkUserEditId(client.getSession().getUser().getPkUserId());
+                                cfdPayment.setFkUserDeleteId(client.getSession().getUser().getPkUserId()); // to preserve user when deleting accounting
+
+                                request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
+                                request.setPacket(cfdPayment);
+                                response = client.getSessionXXX().request(request);
+
+                                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                    throw new Exception(response.getMessage());
+                                }
+                                else {
+                                    if (response.getResultType() != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                                    }
+                                }
+                            }
+                        }
+                    }
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                    // Annul Payroll CFDI:
-
+                    // annul payroll receipt:
+                    
                     if (payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
+                        key = new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() };
                         receiptIssue = new SDataPayrollReceiptIssue();
-
-                        if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        if (receiptIssue.read(key, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
                         }
 
-                        // Attempt to gain data lock:
+                        // lock registry:
+                        
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, key, 1000 * 60); // 1 min. timeout
 
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+                        // check if registry can be annuled:
+                        
+                        request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                        request.setPacket(receiptIssue);
+                        response = client.getSessionXXX().request(request);
 
-                        if (receiptIssue != null) {
-                            request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
-                            request.setPacket(receiptIssue);
-                            response = client.getSessionXXX().request(request);
-
-                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                error = response.getMessage();
-                            }
-                            else {
-                                result = response.getResultType();
-
-                                if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                    error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
-                                }
-                                else {
-                                    // Annul registry:
-
-                                    receiptIssue.setIsRegistryRequestAnnul(true);
-                                    receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
-
-                                    request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
-                                    request.setPacket(receiptIssue);
-                                    response = client.getSessionXXX().request(request);
-
-                                    if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                        error = response.getMessage();
-                                    }
-                                    else {
-                                        result = response.getResultType();
-
-                                        if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
-                                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
-                                        }
-                                    }
-                                }
-                            }
+                        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                            throw new Exception(response.getMessage());
                         }
                         else {
-                            error = SLibConstants.MSG_ERR_DB_REG_READ;
+                            if (response.getResultType() != SLibConstants.DB_CAN_ANNUL_YES) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                            }
+                            else {
+                                // annul registry:
+
+                                receiptIssue.setIsRegistryRequestAnnul(true);
+                                receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
+
+                                request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
+                                request.setPacket(receiptIssue);
+                                response = client.getSessionXXX().request(request);
+
+                                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                    throw new Exception(response.getMessage());
+                                }
+                                else {
+                                    if (response.getResultType() != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                                    }
+                                }
+                            }
                         }
                     }
                     break;
                     
                 default:
-            }
-            
-            if (!error.isEmpty()) {
-                throw new Exception(error);
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
         }
         catch (Exception e) {

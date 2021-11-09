@@ -356,7 +356,9 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                     payDoc.setPkReceiptId(mnPkReceiptId);
                     payDoc.setPkPaymentId(mnPkPaymentId);
                     payDoc.setPkDocumentId(0);
-                    payDoc.save(connection);
+                    if (payDoc.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nTipo de registro: Documento relacionado.");
+                    }
                 }
                 
                 // finish saving registry:

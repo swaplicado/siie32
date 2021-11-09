@@ -232,7 +232,7 @@
                     <Component class="javax.swing.JLabel" name="jlConcept1">
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="0"/>
-                        <Property name="text" type="java.lang.String" value="  Archivos XML:"/>
+                        <Property name="text" type="java.lang.String" value="Archivos XML CFD:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[100, 23]"/>
                         </Property>
@@ -243,30 +243,30 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" value="100"/>
-                        <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero de archivos XML"/>
+                        <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero de archivos XML de CFD"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[35, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbFileXmlAdd">
+                    <Component class="javax.swing.JButton" name="jbAddXml">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_doc_add.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Agregar archivos XML"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Agregar archivos XML de CFD"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbRecordToRecordEntry">
+                    <Component class="javax.swing.JButton" name="jbRecordToRecordEntryXml">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_dps_link.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Transferir CFD a una partida"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Mover CFD a una partida"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -277,7 +277,7 @@
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_doc_xml.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Descargar archivos XML"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Obtener CFD"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
@@ -718,34 +718,34 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JButton" name="jbGetRowXml">
+                        <Component class="javax.swing.JButton" name="jbEntryGetXml">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/icon_std_doc_xml.gif"/>
                             </Property>
-                            <Property name="toolTipText" type="java.lang.String" value="Obtener CFDI del rengl&#xf3;n"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Obtener CFD de la partida"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JButton" name="jbShowDirectCfd">
+                        <Component class="javax.swing.JButton" name="jbEntryShowDirectCfd">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/icon_std_xml_dir.gif"/>
                             </Property>
-                            <Property name="toolTipText" type="java.lang.String" value="Ver CFDI directos de la partida"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Ver CFD directos de la partida"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JButton" name="jbShowIndirectCfd">
+                        <Component class="javax.swing.JButton" name="jbEntryShowIndirectCfd">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/icon_std_xml_ind.gif"/>
                             </Property>
-                            <Property name="toolTipText" type="java.lang.String" value="Ver CFDI indirectos de la partida"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Ver CFD indirectos de la partida"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>
                             </Property>

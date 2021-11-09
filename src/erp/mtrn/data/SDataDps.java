@@ -1999,7 +1999,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
     public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
-	public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }																		
+    public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }																		
     
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
@@ -2913,7 +2913,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // 4.3 Business partner's asset or liability:
                         
-                        //Determinación de los distintos impuestos en el documento
+                        // determinación de los distintos impuestos en el documento:
                         boolean taxEmpty = false;
                         ArrayList<int[]> taxes = new ArrayList();
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
@@ -2987,8 +2987,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
-                                // Determina si ya existe el impuesto en la lista, si no existe se agrega otro monto con el impuesto faltante,
-                                // si existe, se agrega el monto al impuesto existente
+                                // determina si ya existe el impuesto en la lista, si no existe se agrega otro monto con el impuesto faltante, si existe, se agrega el monto al impuesto existente:
                                 int[] taxPk = new int[]{ 0, 0, 0};
                                 for (SDataDpsEntryTax dbmsEntryTax : entry.getDbmsEntryTaxes()) {
                                     if (dbmsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
@@ -3006,7 +3005,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 
-                                // considera el caso de cuando no hay impuestos en la partida
+                                // considera el caso de cuando no hay impuestos en la partida:
                                 if (entry.getDbmsEntryTaxes().isEmpty()) {
                                     taxPk[2] = 1;
                                 }
@@ -3496,8 +3495,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                             anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
                                                             isAdjustment() ? entry.getKeyAuxDps() : null, null);
 
-                                                    oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
-                                                    oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
+                                                    oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED); // se quita el vínculo al documento porque no se trata propiamente de un ajuste al mismo, sino una especie de pago vía nota de crédito
+                                                    oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED); // se quita el vínculo al documento porque no se trata propiamente de un ajuste al mismo, sino una especie de pago vía nota de crédito
 
                                                     if (isDebitForOperations()) {
                                                         oRecordEntry.setDebit(aAmountEntries.get(i).Amount);

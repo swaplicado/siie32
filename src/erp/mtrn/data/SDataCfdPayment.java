@@ -75,7 +75,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     
     // auxiliar members:
     protected boolean mbAuxIsProcessingValidation;
-    protected boolean mbAuxIsProcessingStorageOnly; // for temporary use, only to create the storage of all former receipts of payments
+    protected boolean mbAuxIsProcessingStorageOnly; // for temporary use only, to create the storage of all former receipts of payments prior to SIIE 3.2 191
     
     /**
      * Creates database registry of CFDI of Payments.
@@ -658,6 +658,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             
             // construct payment receipt in memory:
             
+            readPaymentFromFinRecords(statement);
+            
 //            if (moDbmsDataCfd.getFkReceiptPaymentId_n() != 0) {
 //                // since SIIE 3.2.191 payments receipts are stored in DBMS:
 //                readPaymentFromReceiptPayment(statement);
@@ -666,8 +668,6 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 //                // up to SIIE 3.2.191 payments receipts where stored in financial records (journal vouchers):
 //                readPaymentFromFinRecords(statement);
 //            }
-            
-            readPaymentFromFinRecords(statement);
             
             // finish reading registry:
 
@@ -695,15 +695,18 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             
             if (mbAuxIsProcessingStorageOnly) {
                 if (isRegistryNew) {
-                    msDbmsError = "El CFD de recepción de pago no ha sido guardado aún.";
+                    msDbmsError = "El CFDI de recepción de pago no ha sido guardado aún.";
                     throw new Exception();
                 }
             }
             
             // save payment receipt:
             
-            if (isRegistryNew) {
+            if (isRegistryNew || mbAuxIsProcessingStorageOnly) {
 //                moDbmsReceiptPayment = new SDataReceiptPayment();
+            }
+            else if (mbAuxIsProcessingStorageOnly) {
+                moDbmsReceiptPayment = new SDataReceiptPayment();
             }
             
             if (moDbmsReceiptPayment != null) {
@@ -794,7 +797,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testAnnulment(connection, "No se puede anular el documento: ")) {
+            if (testAnnulment(connection, "No se puede anular el comprobante: ")) {
                 if (moDbmsDataCfd.annul(connection) != SLibConstants.DB_ACTION_ANNUL_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL);
                 }
