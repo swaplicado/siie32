@@ -521,6 +521,7 @@ public abstract class SModConsts {
     public static final int LOGS_TP_MOT = 2041004;
     public static final int LOGS_TP_CAR = 2041005;
     public static final int LOGS_TP_DOC_SHIP = 2041006;
+    public static final int LOGS_TP_BOL_PERSON = 2041008;
     public static final int LOGS_INC = 2041007;
 
     public static final int LOGU_TP_VEH = 2042001;
@@ -528,12 +529,22 @@ public abstract class SModConsts {
     public static final int LOGU_SPOT_COB = 2042003;
     public static final int LOGU_SPOT_COB_ENT = 2042004;
 
+    public static final int LOG_INSURER = 2043011;
     public static final int LOG_VEH = 2043001;
+    public static final int LOG_TRAILER = 2043012;
+    public static final int LOG_BOL_PERSON = 2043013;
+    public static final int LOG_DRIVER_VEH = 2043014;
+    public static final int LOG_DIST_LOCATION = 2043015;
     public static final int LOG_RATE = 2043002;
     public static final int LOG_SHIP = 2043003;
     public static final int LOG_SHIP_NTS = 2043004;
     public static final int LOG_SHIP_DEST = 2043005;
     public static final int LOG_SHIP_DEST_ETY = 2043006;
+    public static final int LOG_BOL = 2043016;
+    public static final int LOG_BOL_TRANSP_MODE = 2043017;
+    public static final int LOG_BOL_LOCATION = 2043018;
+    public static final int LOG_BOL_MERCH = 2043019;
+    public static final int LOG_BOL_MERCH_QTY = 2043020;
 
     public static final int LOGX_TP_VEH = 2044001;
     public static final int LOGX_RATE = 2044002;
@@ -547,6 +558,8 @@ public abstract class SModConsts {
     public static final int LOGX_SHIP_DEST_ETY_DPS = 2044010;
     public static final int LOGX_SHIP_DEST_ETY_DIOG = 2044011;
     public static final int LOGX_TP_MOT_SHIP = 2044012;
+    public static final int LOGX_LOCATION_TP = 2044013;
+    public static final int LOGX_BOL = 2044014;
 
     public static final int LOGR_SHIP = 2045001;
 
@@ -1144,6 +1157,7 @@ public abstract class SModConsts {
         TablesMap.put(LOGS_TP_MOT, "erp.logs_tp_mot");
         TablesMap.put(LOGS_TP_CAR, "erp.logs_tp_car");
         TablesMap.put(LOGS_TP_DOC_SHIP, "erp.logs_tp_doc_ship");
+        TablesMap.put(LOGS_TP_BOL_PERSON, "erp.logs_tp_bol_person");
         TablesMap.put(LOGS_INC, "erp.logs_inc");
 
         TablesMap.put(LOGU_TP_VEH, "erp.logu_tp_veh");
@@ -1151,12 +1165,22 @@ public abstract class SModConsts {
         TablesMap.put(LOGU_SPOT_COB, "erp.logu_spot_cob");
         TablesMap.put(LOGU_SPOT_COB_ENT, "erp.logu_spot_cob_ent");
 
+        TablesMap.put(LOG_INSURER, "log_insurer");
         TablesMap.put(LOG_VEH, "log_veh");
+        TablesMap.put(LOG_TRAILER, "log_trailer");
+        TablesMap.put(LOG_BOL_PERSON, "log_bol_person");
+        TablesMap.put(LOG_DRIVER_VEH, "log_driver_veh");
+        TablesMap.put(LOG_DIST_LOCATION, "log_dist_location");
         TablesMap.put(LOG_RATE, "log_rate");
         TablesMap.put(LOG_SHIP, "log_ship");
         TablesMap.put(LOG_SHIP_NTS, "log_ship_nts");
         TablesMap.put(LOG_SHIP_DEST, "log_ship_dest");
         TablesMap.put(LOG_SHIP_DEST_ETY, "log_ship_dest_ety");
+        TablesMap.put(LOG_BOL, "log_bol");
+        TablesMap.put(LOG_BOL_TRANSP_MODE, "log_bol_transp_mode");
+        TablesMap.put(LOG_BOL_LOCATION, "log_bol_location");
+        TablesMap.put(LOG_BOL_MERCH, "log_bol_merch");
+        TablesMap.put(LOG_BOL_MERCH_QTY, "log_bol_merch_qty");
 
         TablesMap.put(LOGX_TP_MOT_SHIP, "erp.logs_tp_mot");
 

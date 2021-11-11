@@ -1,0 +1,320 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package erp.mod.log.db;
+
+import erp.mloc.data.SDataCountry;
+import erp.mod.SModConsts;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
+import sa.gui.util.SUtilConsts;
+import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbRegistry;
+import sa.lib.db.SDbRegistryUser;
+import sa.lib.gui.SGuiSession;
+
+/**
+ *
+ * @author Isabel Servín
+ */
+public class SDbBolPerson extends SDbRegistryUser {
+
+    protected int mnPkBolPersonId;
+    protected String msName;
+    protected String msFiscalId;
+    protected String msFiscalForeginId;
+    protected String msLicense;
+    protected String msTelephone;
+    protected String msStreet;
+    protected String msStreetNumberExt;
+    protected String msStreetNumberInt;
+    protected String msNeighborhood;
+    protected String msReference;
+    protected String msLocality;
+    protected String msState;
+    protected String msZipCode;
+    //protected boolean mbDeleted;
+    protected int mnFkBolPersonTypeId;
+    protected int mnFkCountryId_n;
+    /*
+    protected int mnFkUserInsertId;
+    protected int mnFkUserUpdateId;
+    protected Date mtTsUserInsert;
+    protected Date mtTsUserUpdate;
+    */
+    
+    protected erp.mloc.data.SDataCountry moXtaCountry;
+    
+    public SDbBolPerson() {
+        super(SModConsts.LOG_BOL_PERSON);
+    }
+    
+    public void setPkBolPersonId(int n) { mnPkBolPersonId = n; }
+    public void setName(String s) { msName = s; }
+    public void setFiscalId(String s) { msFiscalId = s; }
+    public void setFiscalForeginId(String s) { msFiscalForeginId = s; }
+    public void setLicense(String s) { msLicense = s; }
+    public void setTelephone(String s) { msTelephone = s; }
+    public void setStreet(String s) { msStreet = s; }
+    public void setStreetNumberExt(String s) { msStreetNumberExt = s; }
+    public void setStreetNumberInt(String s) { msStreetNumberInt = s; }
+    public void setNeighborhood(String s) { msNeighborhood = s; }
+    public void setReference(String s) { msReference = s; }
+    public void setLocality(String s) { msLocality = s; }
+    public void setState(String s) { msState = s; }
+    public void setZipCode(String s) { msZipCode = s; }
+    public void setDeleted(boolean b) { mbDeleted = b; }
+    public void setFkBolPersonTypeId(int n) { mnFkBolPersonTypeId = n; }
+    public void setFkCountryId_n(int n) { mnFkCountryId_n = n; }
+    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
+    public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
+    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
+    public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
+
+    public int getPkBolPersonId() { return mnPkBolPersonId; }
+    public String getName() { return msName; }
+    public String getFiscalId() { return msFiscalId; }
+    public String getFiscalForeginId() { return msFiscalForeginId; }
+    public String getLicense() { return msLicense; }
+    public String getTelephone() { return msTelephone; }
+    public String getStreet() { return msStreet; }
+    public String getStreetNumberExt() { return msStreetNumberExt; }
+    public String getStreetNumberInt() { return msStreetNumberInt; }
+    public String getNeighborhood() { return msNeighborhood; }
+    public String getReference() { return msReference; }
+    public String getLocality() { return msLocality; }
+    public String getState() { return msState; }
+    public String getZipCode() { return msZipCode; }
+    public boolean isDeleted() { return mbDeleted; }
+    public int getFkBolPersonTypeId() { return mnFkBolPersonTypeId; }
+    public int getFkCountryId_n() { return mnFkCountryId_n; }
+    public int getFkUserInsertId() { return mnFkUserInsertId; }
+    public int getFkUserUpdateId() { return mnFkUserUpdateId; }
+    public Date getTsUserInsert() { return mtTsUserInsert; }
+    public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public void setXtaCountry(SDataCountry o) { moXtaCountry = o; }
+    
+    public SDataCountry getXtaCountry() { return moXtaCountry; }
+
+    @Override
+    public void setPrimaryKey(int[] pk) {
+        mnPkBolPersonId = pk[0];
+    }
+
+    @Override
+    public int[] getPrimaryKey() {
+        return new int[] { mnPkBolPersonId };
+    }
+
+    @Override
+    public void initRegistry() {
+        initBaseRegistry();
+        
+        mnPkBolPersonId = 0;
+        msName = "";
+        msFiscalId = "";
+        msFiscalForeginId = "";
+        msLicense = "";
+        msTelephone = "";
+        msStreet = "";
+        msStreetNumberExt = "";
+        msStreetNumberInt = "";
+        msNeighborhood = "";
+        msReference = "";
+        msLocality = "";
+        msState = "";
+        msZipCode = "";
+        mbDeleted = false;
+        mnFkBolPersonTypeId = 0;
+        mnFkCountryId_n = 0;
+        mnFkUserInsertId = 0;
+        mnFkUserUpdateId = 0;
+        mtTsUserInsert = null;
+        mtTsUserUpdate = null;
+        
+        moXtaCountry = null;
+    }
+
+    @Override
+    public String getSqlTable() {
+        return SModConsts.TablesMap.get(mnRegistryType);
+    }
+
+    @Override
+    public String getSqlWhere() {
+        return "WHERE id_bol_person = " + mnPkBolPersonId + " ";
+    }
+
+    @Override
+    public String getSqlWhere(int[] pk) {
+        return "WHERE id_bol_person = " + pk[0] + " ";
+    }
+
+    @Override
+    public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
+        ResultSet resultSet;
+        
+        mnPkBolPersonId = 0;
+        
+        msSql = "SELECT COALESCE(MAX(id_bol_person), 0) + 1 FROM " + getSqlTable() + " ";
+        resultSet = session.getStatement().executeQuery(msSql);
+        if (resultSet.next()) {
+            mnPkBolPersonId = resultSet.getInt(1);
+        }
+    }
+
+    @Override
+    public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
+        ResultSet resultSet;
+        
+        initRegistry();
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.READ_ERROR;
+        
+        msSql = "SELECT * FROM " + getSqlTable() + " WHERE id_bol_person = " + pk[0];
+        resultSet = session.getStatement().executeQuery(msSql);
+        if (!resultSet.next()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+        }
+        else {
+            mnPkBolPersonId = resultSet.getInt("id_bol_person");
+            msName = resultSet.getString("name");
+            msFiscalId = resultSet.getString("fiscal_id");
+            msFiscalForeginId = resultSet.getString("fiscal_frg_id");
+            msLicense = resultSet.getString("driver_lic");
+            msTelephone = resultSet.getString("telephone");
+            msStreet = resultSet.getString("street");
+            msStreetNumberExt = resultSet.getString("street_num_ext");
+            msStreetNumberInt = resultSet.getString("street_num_int");
+            msNeighborhood = resultSet.getString("neighborhood");
+            msReference = resultSet.getString("reference");
+            msLocality = resultSet.getString("locality");
+            msState = resultSet.getString("state");
+            msZipCode = resultSet.getString("zip_code");
+            mbDeleted = resultSet.getBoolean("b_del");
+            mnFkBolPersonTypeId = resultSet.getInt("fk_tp_bol_person");
+            mnFkCountryId_n = resultSet.getInt("fk_cty_n");
+            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
+            mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
+            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+
+            mbRegistryNew = false;
+        }
+        
+        // Read Country:
+        
+        if (mnFkCountryId_n != 0) {
+            moXtaCountry = new SDataCountry();
+            moXtaCountry.read(new int[] { mnFkCountryId_n }, session.getStatement());
+        }
+        
+        mnQueryResultId = SDbConsts.READ_OK;
+    }
+
+    @Override
+    public void save(SGuiSession session) throws SQLException, Exception {
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        if (mbRegistryNew) {
+            verifyRegistryNew(session);
+        }
+        
+        if (mbRegistryNew) {
+            computePrimaryKey(session);
+            mbDeleted = false;
+            mnFkUserInsertId = session.getUser().getPkUserId();
+            mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
+            
+            msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
+                mnPkBolPersonId + ", " + 
+                "'" + msName + "', " + 
+                "'" + msFiscalId + "', " + 
+                "'" + msFiscalForeginId + "', " + 
+                "'" + msLicense + "', " + 
+                "'" + msTelephone + "', " + 
+                "'" + msStreet + "', " + 
+                "'" + msStreetNumberExt + "', " + 
+                "'" + msStreetNumberInt + "', " + 
+                "'" + msNeighborhood + "', " + 
+                "'" + msReference + "', " + 
+                "'" + msLocality + "', " + 
+                "'" + msState + "', " + 
+                "'" + msZipCode + "', " + 
+                (mbDeleted ? 1 : 0) + ", " + 
+                mnFkBolPersonTypeId + ", " + 
+                (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") + 
+                mnFkUserInsertId + ", " + 
+                mnFkUserUpdateId + ", " + 
+                "NOW()" + ", " + 
+                "NOW()" + " " + 
+                ")";
+        }
+        else {
+            mnFkUserUpdateId = session.getUser().getPkUserId();
+            
+            msSql = "UPDATE " + getSqlTable() + " SET " + 
+                //"id_bol_person = " + mnPkBolPersonId + ", " +
+                "name = '" + msName + "', " +
+                "fiscal_id = '" + msFiscalId + "', " +
+                "fiscal_frg_id = '" + msFiscalForeginId + "', " +
+                "driver_lic = '" + msLicense + "', " +
+                "telephone = '" + msTelephone + "', " +
+                "street = '" + msStreet + "', " +
+                "street_num_ext = '" + msStreetNumberExt + "', " +
+                "street_num_int = '" + msStreetNumberInt + "', " +
+                "neighborhood = '" + msNeighborhood + "', " +
+                "reference = '" + msReference + "', " +
+                "locality = '" + msLocality + "', " +
+                "state = '" + msState + "', " +
+                "zip_code = '" + msZipCode + "', " +
+                "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                "fk_tp_bol_person = " + mnFkBolPersonTypeId + ", " +
+                "fk_cty_n = " + (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") +
+                //"fk_usr_ins = " + mnFkUserInsertId + ", " +
+                "fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                //"ts_usr_ins = " + "NOW()" + ", " +
+                "ts_usr_upd = " + "NOW()" + " " +
+                getSqlWhere();
+        }
+        session.getStatement().execute(msSql);
+        
+        mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+
+    @Override
+    public SDbRegistry clone() throws CloneNotSupportedException {
+        SDbBolPerson registry = new SDbBolPerson();
+        
+        registry.setPkBolPersonId(this.getPkBolPersonId());
+        registry.setName(this.getName());
+        registry.setFiscalId(this.getFiscalId());
+        registry.setFiscalForeginId(this.getFiscalForeginId());
+        registry.setLicense(this.getLicense());
+        registry.setTelephone(this.getTelephone());
+        registry.setStreet(this.getStreet());
+        registry.setStreetNumberExt(this.getStreetNumberExt());
+        registry.setStreetNumberInt(this.getStreetNumberInt());
+        registry.setNeighborhood(this.getNeighborhood());
+        registry.setReference(this.getReference());
+        registry.setLocality(this.getLocality());
+        registry.setState(this.getState());
+        registry.setZipCode(this.getZipCode());
+        registry.setDeleted(this.isDeleted());
+        registry.setFkBolPersonTypeId(this.getFkBolPersonTypeId());
+        registry.setFkCountryId_n(this.getFkCountryId_n());
+        registry.setFkUserInsertId(this.getFkUserInsertId());
+        registry.setFkUserUpdateId(this.getFkUserUpdateId());
+        registry.setTsUserInsert(this.getTsUserInsert());
+        registry.setTsUserUpdate(this.getTsUserUpdate());
+
+        return registry;
+    }
+    
+}
