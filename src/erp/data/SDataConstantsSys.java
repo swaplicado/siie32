@@ -91,6 +91,10 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
+    public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    
+    public static final int USD_XRT_POLICY_BANXICO = 1;
+    public static final int USD_XRT_POLICY_INFORMAL = 2;
     
     public static final int CFGX_IVM_FIFO = 1;
     

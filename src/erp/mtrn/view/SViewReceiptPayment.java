@@ -42,7 +42,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  * User view for management of database registries of CFDI of Payments.
- * @author Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores
  */
 public class SViewReceiptPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -65,7 +65,6 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
      * Creates user view for management of database registries of CFDI of Payments.
      * @param client GUI client interface.
      * @param tabTitle View tab title.
-     * @param auxType01
      */
     public SViewReceiptPayment(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.TRN_PAY);
@@ -308,71 +307,73 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
             }
             else {
                 if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_ANNUL) == JOptionPane.YES_OPTION) {
+                    boolean annul = true;
+                    SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                    ArrayList<Object[]> journalVoucherKeys = SDataCfd.getDependentJournalVoucherKeys(miClient.getSession().getStatement(), cfd.getPkCfdId());
+                    ArrayList<SSrvLock> locks = new ArrayList<>();
+                    
                     try {
-                        boolean annul = true;
-                        SGuiParams params = new SGuiParams();
-                        SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                        ArrayList<Object[]> journalVoucherKeys = SDataCfd.getDependentJournalVoucherKeys(miClient.getSession().getStatement(), cfd.getPkCfdId());
-                        boolean isCopy = false;
-                        boolean mbIsFormReadOnly = false;
-                        ArrayList<SSrvLock> locks = new ArrayList<>();
-
                         try {
-                            // Attempt to gain all data locks:
-                            for (int x = 0; x < journalVoucherKeys.size(); x++) {
-                                journalVoucherKeys.get(0);
-                                if (journalVoucherKeys.get(x) != null) {
-                                    if (!mbIsFormReadOnly && !isCopy) {
-                                        SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(x), 7200000);
-                                        locks.add(lock);
-                                    }
+                            // gain locks for all journal vouchers:
+                            
+                            for (int index = 0; index < journalVoucherKeys.size(); index++) {
+                                if (journalVoucherKeys.get(index) != null) {
+                                    SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60 * 1000); // 10 min.
+                                    locks.add(lock);
                                 }
                             }
                         }
                         catch (Exception e) {
-                            for(Object lock : locks) {
-                                SSrvUtils.releaseLock(miClient.getSession(), (SSrvLock) lock);
-                            }
+                            annul = false;
                             SLibUtils.showException(this, e);
                         }
+                        
+                        if (annul) {
+                            SGuiParams params = new SGuiParams();
+                            
+                            if (cfd.isCfdi()) {
+                                annul = false;
 
-                        if (cfd.isCfdi()) {
-                            annul = false;
+                                if (cfd.isStamped()) {
+                                    moDialogAnnulCfdi.formReset();
+                                    moDialogAnnulCfdi.formRefreshCatalogues();
+                                    moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
+                                    moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, SDataConstantsSys.TRNS_TP_CFD_PAY_REC);
+                                    moDialogAnnulCfdi.setVisible(true);
 
-                            if (cfd.isStamped()) {
-                                moDialogAnnulCfdi.formReset();
-                                moDialogAnnulCfdi.formRefreshCatalogues();
-                                moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
-                                moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, SDataConstantsSys.TRNS_TP_CFD_PAY_REC);
-                                moDialogAnnulCfdi.setVisible(true);
-
-                                if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                        annul = true;
+                                        params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
+                                        // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (true/false):
+                                        params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat());
+                                        // cause of annulation:
+                                        params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType());
+                                    }
+                                }
+                                else {
                                     annul = true;
-                                    params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
-                                    // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (true/false):
-                                    params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat());
+                                    params.getParamsMap().put(SGuiConsts.PARAM_DATE, miClient.getSession().getCurrentDate());
+                                    // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (false):
+                                    params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
                                     // cause of annulation:
-                                    params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType());
+                                    params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                                 }
                             }
-                            else {
-                                annul = true;
-                                params.getParamsMap().put(SGuiConsts.PARAM_DATE, miClient.getSession().getCurrentDate());
-                                // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (false):
-                                params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
-                                // cause of annulation:
-                                params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA);
-                            }
-                        }
 
-                        if (annul) {
-                            if (miClient.getGuiModule(SDataConstants.MOD_SAL).annulRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey(), params) == SLibConstants.DB_ACTION_ANNUL_OK) {
-                                miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                            if (annul) {
+                                if (miClient.getGuiModule(SDataConstants.MOD_SAL).annulRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey(), params) == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                    miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                                }
                             }
                         }
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
+                    }
+                    finally {
+                        for (SSrvLock lock : locks) {
+                            SSrvUtils.releaseLock(miClient.getSession(), lock);
+                        }
                     }
                 }
             }

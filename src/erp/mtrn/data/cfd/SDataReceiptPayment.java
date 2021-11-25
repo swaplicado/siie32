@@ -307,7 +307,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             mnFkReceiptStatusId + ", " +
                             mnFkCompanyBranchId + ", " +
                             mnFkBizPartnerId + ", " +
-                            (mnFkFactoringBankId_n != 0 ? mnFkFactoringBankId_n : "NULL") + ", " +
+                            (mnFkFactoringBankId_n == 0 ? "NULL" : mnFkFactoringBankId_n) + ", " +
                             mnFkUserNewId + ", " +
                             mnFkUserEditId + ", " +
                             mnFkUserDeleteId + ", " +
@@ -335,7 +335,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "fid_st_rcp = " + mnFkReceiptStatusId + ", " +
                             "fid_cob = " + mnFkCompanyBranchId + ", " +
                             "fid_bp = " + mnFkBizPartnerId + ", " +
-                            "fid_fact_bank_n = " + mnFkFactoringBankId_n + ", " +
+                            "fid_fact_bank_n = " + (mnFkFactoringBankId_n == 0 ? "NULL" : mnFkFactoringBankId_n) + ", " +
                             "fid_usr_new = " + mnFkUserNewId + ", " +
                             "fid_usr_edit = " + mnFkUserEditId + ", " +
                             "fid_usr_del = " + mnFkUserDeleteId + ", " +

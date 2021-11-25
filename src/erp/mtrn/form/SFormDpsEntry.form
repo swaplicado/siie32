@@ -3456,13 +3456,6 @@
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="jpCfdComplement">
-              <Properties>
-                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="Informaci&#xf3;n alterna para Concepto CFD:"/>
-                  </Border>
-                </Property>
-              </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="CFD: XML">
@@ -3473,7 +3466,14 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
               <SubComponents>
-                <Container class="javax.swing.JPanel" name="jPanel81">
+                <Container class="javax.swing.JPanel" name="jpCompl">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Informaci&#xf3;n alterna del Concepto CFD:"/>
+                      </Border>
+                    </Property>
+                  </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                       <BorderConstraints direction="North"/>
@@ -3498,7 +3498,7 @@
                             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                               <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                             </Property>
-                            <Property name="text" type="java.lang.String" value="IMPORTANTE: Los datos que proporciones a continuaci&#xf3;n ser&#xe1;n incorporados en la emisi&#xf3;n del CFDI en lugar de los datos propios de esta partida."/>
+                            <Property name="text" type="java.lang.String" value="IMPORTANTE: Los datos que proporciones a continuaci&#xf3;n ser&#xe1;n incorporados al Concepto del CFD en lugar de los datos propios de esta partida."/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[950, 23]"/>
                             </Property>
@@ -3515,9 +3515,9 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlComplConceptKey">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Clave:"/>
+                            <Property name="text" type="java.lang.String" value="No. identificaci&#xf3;n concepto:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[150, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -3539,9 +3539,9 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlComplConcept">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Concepto:"/>
+                            <Property name="text" type="java.lang.String" value="Descripci&#xf3;n concepto:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[150, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -3563,9 +3563,9 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlComplCfdProdServ">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="ClaveProdServ:"/>
+                            <Property name="text" type="java.lang.String" value="Clave ProdServ SAT:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[150, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -3598,9 +3598,9 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlComplCfdUnit">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="ClaveUnidad:"/>
+                            <Property name="text" type="java.lang.String" value="Clave Unidad SAT:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[150, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -3619,6 +3619,53 @@
                             <Property name="text" type="java.lang.String" value="p. ej., XUN"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel89">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Otros datos:"/>
+                      </Border>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="Center"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel90">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="North"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JLabel" name="jlComplPredial">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="N&#xfa;mero cuenta predial:"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[150, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JTextField" name="jtfComplPredial">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[400, 23]"/>
                             </Property>
                           </Properties>
                         </Component>

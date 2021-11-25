@@ -2798,7 +2798,7 @@ public abstract class SCfdUtils implements Serializable {
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                         cfdPrint.printCfdi32(cfd, printMode, dps);
                         break;
-                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33://
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                         cfdPrint.printCfdi33(cfd, printMode, dps);
                         break;
                     default:

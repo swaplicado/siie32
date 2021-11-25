@@ -120,7 +120,7 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
             }
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal asociado", 150);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.id_add_code", "Código domicilio", 50);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.bpb_add_code", "Código domicilio", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp.tp_add", "Tipo domicilio", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.bpb_add", "Id. domicilio", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.street", "Calle", 150);
@@ -238,7 +238,7 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
             sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_emp = TRUE ";
         }
 
-        msSql = "SELECT ad.id_bpb, ad.id_add, ad.id_add_code, ad.bpb_add, ad.street, ad.street_num_ext, ad.street_num_int, ad.neighborhood, " +
+        msSql = "SELECT ad.id_bpb, ad.id_add, ad.bpb_add, ad.bpb_add_code, ad.street, ad.street_num_ext, ad.street_num_int, ad.neighborhood, " +
                 "ad.zip_code, ad.po_box, ad.b_def, bp.b_del, bpb.b_del, ad.b_del, ad.ts_new, ad.ts_edit, ad.ts_del, " +
                 "bpb.bpb, bp.bp, " + (mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP ? "" :"ct.bp_key, ct.b_del, ") +
                 "tp.tp_add, ad.locality, ad.county, ad.state, COALESCE(cty.cty_abbr, '" + miClient.getSession().getSessionCustom().getLocalCountryCode() + "') AS f_cty_abbr, un.usr, ue.usr, ud.usr " +

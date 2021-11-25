@@ -498,15 +498,6 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
                 validation.setComponent(jtfZipCode);
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jtfZipCode.getToolTipText() + "' debe tener una longitud de 5 dígitos.");
             }
-            else {
-                try {
-                    Integer.parseInt(jtfAddressCodeRo.getText());
-                }
-                catch (Exception e) {
-                    validation.setComponent(jtfAddressCodeRo);
-                    validation.setMessage("El código de la dirección debe ser númerico.");
-                }
-            }
         }
 
         return validation;
@@ -575,7 +566,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         }
 
         moBizPartnerBranchAddress.setAddress(mbParamIsInMainWindow ? SModSysConsts.TXT_OFFICIAL : moFieldAddress.getString());
-        moBizPartnerBranchAddress.setAddressCode(SLibUtils.DecimalNumberFormat.format(jtfAddressCodeRo.getText()));
+        moBizPartnerBranchAddress.setAddressCode(SLibUtils.DecimalNumberFormat.format(SLibUtils.parseInt(jtfAddressCodeRo.getText())));
         moBizPartnerBranchAddress.setStreet(moFieldStreet.getString());
         moBizPartnerBranchAddress.setStreetNumberExt(moFieldStreetNumberExt.getString());
         moBizPartnerBranchAddress.setStreetNumberInt(moFieldStreetNumberInt.getString());

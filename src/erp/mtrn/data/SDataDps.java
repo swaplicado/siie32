@@ -5654,10 +5654,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_INV);
                 
-                if (dpsEntry.getDbmsComplement() == null) {
+                if (dpsEntry.getDbmsComplement() == null || dpsEntry.getDbmsComplement().getConcept().isEmpty()) {
                     //use original data of current document entry:
                     
                     String descripcion = dpsEntry.getConcept();
+                    
                     for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
                         if (dpsEntryNotes.getIsCfd()) {
                             descripcion += " - " + dpsEntryNotes.getNotes();
@@ -5678,6 +5679,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     concepto.setClaveUnidad(dpsEntry.getDbmsComplement().getCfdUnit());
                     concepto.setUnidad("");
                     concepto.setDescripcion(dpsEntry.getDbmsComplement().getConcept());
+                }
+                
+                if (dpsEntry.getDbmsComplement() != null && dpsEntry.getDbmsComplement().getPredial().isEmpty()) {
+                    concepto.setPredial(dpsEntry.getDbmsComplement().getPredial());
                 }
                 
                 double price;

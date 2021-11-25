@@ -180,6 +180,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldComplConcept;
     private erp.lib.form.SFormField moFieldComplCfdProdServ;
     private erp.lib.form.SFormField moFieldComplCfdUnit;
+    private erp.lib.form.SFormField moFieldComplPredial;
     
     private int mnAuxCurrentUnitTypeId;
     private int mnAuxCurrentUnitAlternativeTypeId;
@@ -583,7 +584,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jftfAddAmc71PurchaseOrderDate = new javax.swing.JFormattedTextField();
         jlAddAmc71PurchaseOrderDateHint = new javax.swing.JLabel();
         jpCfdComplement = new javax.swing.JPanel();
-        jPanel81 = new javax.swing.JPanel();
+        jpCompl = new javax.swing.JPanel();
         jPanel86 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jPanel82 = new javax.swing.JPanel();
@@ -600,6 +601,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlComplCfdUnit = new javax.swing.JLabel();
         jtfComplCfdUnit = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
+        jPanel89 = new javax.swing.JPanel();
+        jPanel90 = new javax.swing.JPanel();
+        jlComplPredial = new javax.swing.JLabel();
+        jtfComplPredial = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -2177,46 +2182,46 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jTabbedPane.addTab("CFD: addenda", jpCfdAddenda);
 
-        jpCfdComplement.setBorder(javax.swing.BorderFactory.createTitledBorder("Información alterna para Concepto CFD:"));
         jpCfdComplement.setLayout(new java.awt.BorderLayout());
 
-        jPanel81.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
+        jpCompl.setBorder(javax.swing.BorderFactory.createTitledBorder("Información alterna del Concepto CFD:"));
+        jpCompl.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
 
         jPanel86.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jLabel4.setForeground(java.awt.Color.blue);
-        jLabel4.setText("IMPORTANTE: Los datos que proporciones a continuación serán incorporados en la emisión del CFDI en lugar de los datos propios de esta partida.");
+        jLabel4.setText("IMPORTANTE: Los datos que proporciones a continuación serán incorporados al Concepto del CFD en lugar de los datos propios de esta partida.");
         jLabel4.setPreferredSize(new java.awt.Dimension(950, 23));
         jPanel86.add(jLabel4);
 
-        jPanel81.add(jPanel86);
+        jpCompl.add(jPanel86);
 
         jPanel82.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlComplConceptKey.setText("Clave:");
-        jlComplConceptKey.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlComplConceptKey.setText("No. identificación concepto:");
+        jlComplConceptKey.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel82.add(jlComplConceptKey);
 
         jtfComplConceptKey.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel82.add(jtfComplConceptKey);
 
-        jPanel81.add(jPanel82);
+        jpCompl.add(jPanel82);
 
         jPanel83.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlComplConcept.setText("Concepto:");
-        jlComplConcept.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlComplConcept.setText("Descripción concepto:");
+        jlComplConcept.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel83.add(jlComplConcept);
 
         jtfComplConcept.setPreferredSize(new java.awt.Dimension(750, 23));
         jPanel83.add(jtfComplConcept);
 
-        jPanel81.add(jPanel83);
+        jpCompl.add(jPanel83);
 
         jPanel84.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlComplCfdProdServ.setText("ClaveProdServ:");
-        jlComplCfdProdServ.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlComplCfdProdServ.setText("Clave ProdServ SAT:");
+        jlComplCfdProdServ.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel84.add(jlComplCfdProdServ);
 
         jtfComplCfdProdServ.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -2227,12 +2232,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jLabel6.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel84.add(jLabel6);
 
-        jPanel81.add(jPanel84);
+        jpCompl.add(jPanel84);
 
         jPanel85.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlComplCfdUnit.setText("ClaveUnidad:");
-        jlComplCfdUnit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlComplCfdUnit.setText("Clave Unidad SAT:");
+        jlComplCfdUnit.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel85.add(jlComplCfdUnit);
 
         jtfComplCfdUnit.setPreferredSize(new java.awt.Dimension(50, 23));
@@ -2243,9 +2248,25 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jLabel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel85.add(jLabel8);
 
-        jPanel81.add(jPanel85);
+        jpCompl.add(jPanel85);
 
-        jpCfdComplement.add(jPanel81, java.awt.BorderLayout.NORTH);
+        jpCfdComplement.add(jpCompl, java.awt.BorderLayout.NORTH);
+
+        jPanel89.setBorder(javax.swing.BorderFactory.createTitledBorder("Otros datos:"));
+        jPanel89.setLayout(new java.awt.BorderLayout());
+
+        jPanel90.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlComplPredial.setText("Número cuenta predial:");
+        jlComplPredial.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel90.add(jlComplPredial);
+
+        jtfComplPredial.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel90.add(jtfComplPredial);
+
+        jPanel89.add(jPanel90, java.awt.BorderLayout.NORTH);
+
+        jpCfdComplement.add(jPanel89, java.awt.BorderLayout.CENTER);
 
         jTabbedPane.addTab("CFD: XML", jpCfdComplement);
 
@@ -2445,6 +2466,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldComplCfdUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplCfdUnit, jlComplCfdUnit);
         moFieldComplCfdUnit.setLengthMax(3);
         moFieldComplCfdUnit.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
+        moFieldComplPredial = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplPredial, jlComplPredial);
+        moFieldComplPredial.setLengthMax(150);
+        moFieldComplPredial.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
 
         mvFields.add(moFieldFkItemId);
         mvFields.add(moFieldConceptKey);
@@ -2527,6 +2551,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldComplConcept);
         mvFields.add(moFieldComplCfdProdServ);
         mvFields.add(moFieldComplCfdUnit);
+        mvFields.add(moFieldComplPredial);
 
         // Taxes pane:
 
@@ -3966,6 +3991,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfComplConcept.setEnabled(false);
             jtfComplCfdProdServ.setEnabled(false);
             jtfComplCfdUnit.setEnabled(false);
+            jtfComplPredial.setEnabled(false);
 
             jbOk.setEnabled(false);
             
@@ -4011,6 +4037,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfComplConcept.setEnabled(true);
             jtfComplCfdProdServ.setEnabled(true);
             jtfComplCfdUnit.setEnabled(true);
+            jtfComplPredial.setEnabled(true);
 
             jbOk.setEnabled(true);
 
@@ -4849,7 +4876,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel79;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel80;
-    private javax.swing.JPanel jPanel81;
     private javax.swing.JPanel jPanel82;
     private javax.swing.JPanel jPanel83;
     private javax.swing.JPanel jPanel84;
@@ -4857,7 +4883,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel86;
     private javax.swing.JPanel jPanel87;
     private javax.swing.JPanel jPanel88;
+    private javax.swing.JPanel jPanel89;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jPanel90;
     private javax.swing.JPanel jPanel94;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -4938,6 +4966,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlComplCfdUnit;
     private javax.swing.JLabel jlComplConcept;
     private javax.swing.JLabel jlComplConceptKey;
+    private javax.swing.JLabel jlComplPredial;
     private javax.swing.JLabel jlConcept;
     private javax.swing.JLabel jlConceptKey;
     private javax.swing.JLabel jlContainerTank;
@@ -5000,6 +5029,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jpCfdAddenda;
     private javax.swing.JPanel jpCfdComplement;
     private javax.swing.JPanel jpCommissions;
+    private javax.swing.JPanel jpCompl;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpCostCenter;
     private javax.swing.JPanel jpDataShip;
@@ -5037,6 +5067,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JTextField jtfComplCfdUnit;
     private javax.swing.JTextField jtfComplConcept;
     private javax.swing.JTextField jtfComplConceptKey;
+    private javax.swing.JTextField jtfComplPredial;
     private javax.swing.JTextField jtfConcept;
     private javax.swing.JTextField jtfContTank;
     private javax.swing.JTextField jtfContractBase;
@@ -5823,23 +5854,23 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             if (!validation.getIsError()) {
                 //validate cfd complement values:
-                int values = 0;
+                int complValues = 0;
 
                 if (!moFieldComplConceptKey.getString().isEmpty()) {
-                    values++;
+                    complValues++;
                 }
                 if (!moFieldComplConcept.getString().isEmpty()) {
-                    values++;
+                    complValues++;
                 }
                 if (!moFieldComplCfdProdServ.getString().isEmpty()) {
-                    values++;
+                    complValues++;
                 }
                 if (!moFieldComplCfdUnit.getString().isEmpty()) {
-                    values++;
+                    complValues++;
                 }
 
-                if (values != 0 && values != CFD_COMPL_VALS) {
-                    validation.setMessage("Se debe especificar un valor para todos los campos de información complementaria.");
+                if (complValues > 0 && complValues != CFD_COMPL_VALS) {
+                    validation.setMessage("Se debe especificar un valor para todos los " + CFD_COMPL_VALS + " campos de la sección '" + ((TitledBorder) jpCompl.getBorder()).getTitle() + "'.");
                     validation.setComponent(jtfComplConceptKey);
                     validation.setTabbedPaneIndex(TAB_CFD_COMPL);
                 }
@@ -5993,6 +6024,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldComplConcept.setFieldValue(moDpsEntry.getDbmsComplement().getConcept());
             moFieldComplCfdProdServ.setFieldValue(moDpsEntry.getDbmsComplement().getCfdProdServ());
             moFieldComplCfdUnit.setFieldValue(moDpsEntry.getDbmsComplement().getCfdUnit());
+            
+            moFieldComplPredial.setFieldValue(moDpsEntry.getDbmsComplement().getPredial());
         }
 
         renderDpsEntryValue();
@@ -6122,15 +6155,23 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setDbmsAddJsonData(composeAddendaJsonData());
         }
         
-        if (moFieldComplConceptKey.getString().isEmpty()) {
+        if (moFieldComplConcept.getString().isEmpty() && moFieldComplPredial.getString().isEmpty()) {
             moDpsEntry.setDbmsComplement(null);
         }
         else {
             SDataDpsEntryComplement complement = new SDataDpsEntryComplement();
-            complement.setConceptKey(moFieldComplConceptKey.getString());
-            complement.setConcept(moFieldComplConcept.getString());
-            complement.setCfdProdServ(moFieldComplCfdProdServ.getString());
-            complement.setCfdUnit(moFieldComplCfdUnit.getString());
+            
+            if (!moFieldComplConcept.getString().isEmpty()) {
+                complement.setConceptKey(moFieldComplConceptKey.getString());
+                complement.setConcept(moFieldComplConcept.getString());
+                complement.setCfdProdServ(moFieldComplCfdProdServ.getString());
+                complement.setCfdUnit(moFieldComplCfdUnit.getString());
+            }
+            
+            if (!moFieldComplPredial.getString().isEmpty()) {
+                complement.setPredial(moFieldComplPredial.getString());
+            }
+            
             moDpsEntry.setDbmsComplement(complement);
         }
         

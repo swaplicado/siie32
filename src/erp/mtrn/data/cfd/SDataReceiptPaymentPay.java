@@ -304,8 +304,8 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                             "'" + msPayeeBankFiscalId + "', " +
                             "'" + msPayeeBankAccount + "', " +
                             mnFkPaymentCurrencyId + ", " +
-                            mnFkBankPayeeCompanyBranchId_n + ", " +
-                            mnFkBankPayeeAccountCashId_n + ", " +
+                            (mnFkBankPayeeCompanyBranchId_n == 0 ? "NULL" : mnFkBankPayeeCompanyBranchId_n) + ", " +
+                            (mnFkBankPayeeAccountCashId_n == 0 ? "NULL" : mnFkBankPayeeAccountCashId_n) + ", " +
                             mnFkFinRecordYearId + ", " +
                             mnFkFinRecordPeriodId + ", " +
                             mnFkFinRecordBookkeepingCenterId + ", " +
@@ -331,8 +331,8 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                             "payee_bank_fiscal_id = '" + msPayeeBankFiscalId + "', " +
                             "payee_bank_acc = '" + msPayeeBankAccount + "', " +
                             "fid_pay_cur = " + mnFkPaymentCurrencyId + ", " +
-                            "fid_bank_payee_cob_n = " + mnFkBankPayeeCompanyBranchId_n + ", " +
-                            "fid_bank_payee_acc_cash_n = " + mnFkBankPayeeAccountCashId_n + ", " +
+                            "fid_bank_payee_cob_n = " + (mnFkBankPayeeCompanyBranchId_n == 0 ? "NULL" : mnFkBankPayeeCompanyBranchId_n) + ", " +
+                            "fid_bank_payee_acc_cash_n = " + (mnFkBankPayeeAccountCashId_n == 0 ? "NULL" : mnFkBankPayeeAccountCashId_n) + ", " +
                             "fid_fin_rec_year = " + mnFkFinRecordYearId + ", " +
                             "fid_fin_rec_per = " + mnFkFinRecordPeriodId + ", " +
                             "fid_fin_rec_bkc = " + mnFkFinRecordBookkeepingCenterId + ", " +
@@ -464,8 +464,8 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         msPayeeBankFiscalId = paymentEntry.AccountDestFiscalId;
         msPayeeBankAccount = paymentEntry.AccountDestNumber;
         mnFkPaymentCurrencyId = paymentEntry.CurrencyId;
-        mnFkBankPayeeCompanyBranchId_n = paymentEntry.AccountDestKey[0];
-        mnFkBankPayeeAccountCashId_n = paymentEntry.AccountDestKey[1];
+        mnFkBankPayeeCompanyBranchId_n = paymentEntry.AccountDestKey == null ? 0 : paymentEntry.AccountDestKey[0];
+        mnFkBankPayeeAccountCashId_n = paymentEntry.AccountDestKey == null ? 0 : paymentEntry.AccountDestKey[1];
         //mnFkFinRecordYearId = ...; // set in setDbmsRecord()
         //mnFkFinRecordPeriodId = ...; // set in setDbmsRecord()
         //mnFkFinRecordBookkeepingCenterId = ...; // set in setDbmsRecord()
