@@ -316,9 +316,9 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "NOW() " +
                             ");";
                     
-                            mtUserNewTs = new Date();
-                            mtUserEditTs = mtUserNewTs;
-                            mtUserDeleteTs = mtUserNewTs;
+                    mtUserNewTs = new Date();
+                    mtUserEditTs = mtUserNewTs;
+                    mtUserDeleteTs = mtUserNewTs;
                 }
                 else {
                     sql = "UPDATE trn_pay SET " +
@@ -340,14 +340,14 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "fid_usr_edit = " + mnFkUserEditId + ", " +
                             "fid_usr_del = " + mnFkUserDeleteId + ", " +
                             //"ts_new = NOW(), " +
-                            "ts_edit = NOW(), " +
-                            (mbIsDeleted ? "ts_del = NOW(), " : "") +
+                            "ts_edit = NOW() " +
+                            (mbIsDeleted ? ", ts_del = NOW() " : "") +
                             "WHERE id_rcp = " + mnPkReceiptId + ";";
                     
-                            mtUserEditTs = mtUserNewTs;
-                            if (mbIsDeleted) {
-                                mtUserDeleteTs = mtUserNewTs;
-                            }
+                    mtUserEditTs = new Date();
+                    if (mbIsDeleted) {
+                        mtUserDeleteTs = mtUserEditTs;
+                    }
                 }
                 
                 statement.execute(sql);

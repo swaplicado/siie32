@@ -1120,8 +1120,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinItemCost.setEnabled(hasRightMoveAccCash);
         jmiFinCfdPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinCfdPaymentExtended.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
-//        jmiFinReceiptPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
-        jmiFinReceiptPayment.setEnabled(false);
+        jmiFinReceiptPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
         jmiFinMassInvoices.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);

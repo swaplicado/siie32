@@ -118,7 +118,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkPayrollReceiptEmployeeId_n;
     protected int mnFkPayrollReceiptIssueId_n;
     protected int mnFkReceiptPaymentId_n;
-    protected int mnFkBillOfLading_n;
+    protected int mnFkBillOfLadingId_n;
     protected int mnFkUserProcessingId;
     protected int mnFkUserDeliveryId;
     protected java.util.Date mtUserProcessingTs;
@@ -256,7 +256,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkPayrollReceiptEmployeeId_n(int n) { mnFkPayrollReceiptEmployeeId_n = n; }
     public void setFkPayrollReceiptIssueId_n(int n) { mnFkPayrollReceiptIssueId_n = n; }
     public void setFkReceiptPaymentId_n(int n) { mnFkReceiptPaymentId_n = n; }
-    public void setFkBillOfLading_n(int n) { mnFkBillOfLading_n = n; }
+    public void setFkBillOfLadingId_n(int n) { mnFkBillOfLadingId_n = n; }
     public void setFkUserProcessingId(int n) { mnFkUserProcessingId = n; }
     public void setFkUserDeliveryId(int n) { mnFkUserDeliveryId = n; }
     public void setUserProcessingTs(java.util.Date t) { mtUserProcessingTs = t; }
@@ -322,7 +322,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkPayrollReceiptEmployeeId_n() { return mnFkPayrollReceiptEmployeeId_n; }
     public int getFkPayrollReceiptIssueId_n() { return mnFkPayrollReceiptIssueId_n; }
     public int getFkReceiptPaymentId_n() { return mnFkReceiptPaymentId_n; }
-    public int getFkBillOfLading_n() { return mnFkBillOfLading_n; }
+    public int getFkBillOfLadingId_n() { return mnFkBillOfLadingId_n; }
     public int getFkUserProcessingId() { return mnFkUserProcessingId; }
     public int getFkUserDeliveryId() { return mnFkUserDeliveryId; }
     public java.util.Date getUserProcessingTs() { return mtUserProcessingTs; }
@@ -501,7 +501,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkPayrollReceiptEmployeeId_n = 0;
         mnFkPayrollReceiptIssueId_n = 0;
         mnFkReceiptPaymentId_n = 0;
-        mnFkBillOfLading_n = 0;
+        mnFkBillOfLadingId_n = 0;
         mnFkUserProcessingId = 0;
         mnFkUserDeliveryId = 0;
         mtUserProcessingTs = null;
@@ -589,7 +589,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkPayrollReceiptEmployeeId_n = resultSet.getInt("fid_pay_rcp_emp_n");
                 mnFkPayrollReceiptIssueId_n = resultSet.getInt("fid_pay_rcp_iss_n");
                 mnFkReceiptPaymentId_n = resultSet.getInt("fid_rcp_pay_n");
-                mnFkBillOfLading_n = resultSet.getInt("fid_bol_n");
+                mnFkBillOfLadingId_n = resultSet.getInt("fid_bol_n");
                 mnFkUserProcessingId = resultSet.getInt("fid_usr_prc");
                 mnFkUserDeliveryId = resultSet.getInt("fid_usr_dvy");
                 mtUserProcessingTs = resultSet.getTimestamp("ts_prc");
@@ -868,11 +868,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 preparedStatement.setInt(index++, mnFkReceiptPaymentId_n);
             }
             
-            if (mnFkBillOfLading_n == 0) {
+            if (mnFkBillOfLadingId_n == 0) {
                 preparedStatement.setNull(index++, java.sql.Types.INTEGER);
             }
             else {
-                preparedStatement.setInt(index++, mnFkBillOfLading_n);
+                preparedStatement.setInt(index++, mnFkBillOfLadingId_n);
             }
             
             if (!isUpddate) {

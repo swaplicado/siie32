@@ -337,8 +337,9 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                             "fid_fin_rec_per = " + mnFkFinRecordPeriodId + ", " +
                             "fid_fin_rec_bkc = " + mnFkFinRecordBookkeepingCenterId + ", " +
                             "fid_fin_rec_tp_rec = '" + msFkFinRecordRecordTypeId + "', " +
-                            "fid_fin_rec_num = " + mnFkFinRecordNumberId + ", " +
-                            "WHERE id_rcp = " + mnPkReceiptId + " AND id_pay = " + mnPkPaymentId + ";";
+                            "fid_fin_rec_num = " + mnFkFinRecordNumberId + " " +
+                            "WHERE id_rcp = " + mnPkReceiptId + " AND " +
+                            "id_pay = " + mnPkPaymentId + ";";
                 }
                 
                 statement.execute(sql);

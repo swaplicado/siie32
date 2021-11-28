@@ -15,6 +15,9 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  * Generación de registros CFDI de recepción de pagos a partir de los CFDI de recepción de pagos existentes que no los tengan.
+ * Para correr la utilería en la CLI, en la carpeta base de SIIE 3.2, invocarla así:
+ * java -classpath dist/siie32.jar erp.cfd.utils.SUtilReceiptPaymentGen
+ * Puede correrse la utilería con el parámetro <code>help</code> para obtener información de las opciones que ofrece.
  * @author Sergio Flores
  */
 public class SUtilReceiptPaymentGen {

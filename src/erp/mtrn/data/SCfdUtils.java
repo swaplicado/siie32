@@ -276,10 +276,10 @@ public abstract class SCfdUtils implements Serializable {
 
     private static boolean canObtainCfdXml(final SDataCfd cfd) throws Exception {
         if (cfd.isOwnCfd() && !cfd.isCfd() && !cfd.isCfdi()) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante fiscal desconocido.");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante desconocido.");
         }
         else if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_NEW) {
-            throw new Exception("El comprobante fiscal no está emitido.");
+            throw new Exception("El comprobante no está emitido.");
         }
         else if (cfd.isCfdi()) {
             if (!cfd.isStamped()) {
@@ -298,7 +298,7 @@ public abstract class SCfdUtils implements Serializable {
 
     private static boolean canObtainCfdCancelAck(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (!cfd.isCfd() && !cfd.isCfdi()) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante fiscal desconocido.");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante desconocido.");
         }
         else {
             if (cfd.isCfd()) {
@@ -784,6 +784,8 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setPayrollReceiptPayrollId(dataCfd.getFkPayrollReceiptPayrollId_n());
                         packet.setPayrollReceiptEmployeeId(dataCfd.getFkPayrollReceiptEmployeeId_n());
                         packet.setPayrollReceiptIssueId(dataCfd.getFkPayrollReceiptIssueId_n());
+                        packet.setReceiptPaymentId(dataCfd.getFkReceiptPaymentId_n());
+                        packet.setBillOfLadingId(dataCfd.getFkBillOfLadingId_n());
 
                         if (dataCfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                             switch (dataCfd.getFkCfdTypeId()) {
@@ -2986,7 +2988,6 @@ public abstract class SCfdUtils implements Serializable {
             // Sign CFDI:
             
             if (canCfdiSign(client, cfd, false)) {
-
                 switch (cfd.getFkCfdTypeId()) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
                         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
@@ -3292,6 +3293,10 @@ public abstract class SCfdUtils implements Serializable {
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
+        
+        if (cfdPayment.getDbmsReceiptPayment() != null) {
+            packet.setReceiptPaymentId(cfdPayment.getDbmsReceiptPayment().getPkReceiptId());
+        }
 
         packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY_REC);
         packet.setFkXmlTypeId(xmlType);
@@ -3383,16 +3388,16 @@ public abstract class SCfdUtils implements Serializable {
         boolean valid = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante fiscal.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante fiscal solicitado no es un CFDI.");
+            throw new Exception("El comprobante solicitado no es un CFDI.");
         }
         else {
             SDataPac pac = getPacForValidation(client, cfd);
 
             if (pac == null) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo fue posible determinar un PAC para la verificación del CFDI.");
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo fue posible determinar cuál es el PAC para la verificación del CFDI.");
             }
 
             if (!(cfd.getIsProcessingWebService() || cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf())) {
@@ -3471,10 +3476,10 @@ public abstract class SCfdUtils implements Serializable {
         boolean isRestore = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante fiscal.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante fiscal solicitado no es un CFDI.");
+            throw new Exception("El comprobante solicitado no es un CFDI.");
         }
         else if (cfd.isStamped()) {
             throw new Exception("No es necesario restaurar el CFDI.");
@@ -3525,10 +3530,10 @@ public abstract class SCfdUtils implements Serializable {
         boolean isRestore = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante fiscal.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante fiscal solicitado no es un CFDI.");
+            throw new Exception("El comprobante solicitado no es un CFDI.");
         }
         else {
             if (isRequestByUser) {

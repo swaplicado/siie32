@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 193.1*/ 2021-11-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Liberación en versión beta de la captura de CFDI de recepción de pagos con su nuevo almacenamiento independiente.
+2) Estandarización de algoritmos y mensajes de usuario del procesamiento de CFDI para sus distintos tipos.
+
+================================================================================
 SIIE 3.2 193.0*/ 2021-11-24
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

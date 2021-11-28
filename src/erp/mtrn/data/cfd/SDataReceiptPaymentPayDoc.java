@@ -242,8 +242,10 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
                             "pay_loc = " + mdPaymentLoc + ", " +
                             "fid_doc_year = " + mnFkDocYearId + ", " +
                             "fid_doc_doc = " + mnFkDocDocId + ", " +
-                            "fid_doc_cur = " + mnFkDocCurrencyId + ", " +
-                            "WHERE id_rcp = " + mnPkReceiptId + " AND id_pay = " + mnPkPaymentId + " AND id_doc = " + mnPkDocumentId + ";";
+                            "fid_doc_cur = " + mnFkDocCurrencyId + " " +
+                            "WHERE id_rcp = " + mnPkReceiptId + " AND " +
+                            "id_pay = " + mnPkPaymentId + " AND " +
+                            "id_doc = " + mnPkDocumentId + ";";
                 }
                 
                 statement.execute(sql);

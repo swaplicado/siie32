@@ -72,6 +72,11 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         super(client, tabTitle, SDataConstants.TRNX_CFD_PAY_REC, auxType01);
         mnAuxType = auxType01;
         initComponents();
+        miClient.showMsgBoxInformation("ACLARACIÓN:\n"
+                + "Esta vista está próxima a ser obsoleta.\n"
+                + "Favor de confirmar con soporte técnico SIIE si ya debe dejar de usarse.\n"
+                + "Tel. 443 204-1032 ext. 105\n"
+                + "Mail: claudio.pena@swaplicado.com.mx");
     }
 
     private void initComponents() {
@@ -499,7 +504,12 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).getDetailedStatus());
+                    if (!cfd.isStamped()) {
+                        miClient.showMsgBoxInformation("El comprobante " + cfd.getCfdNumber() + " no está timbrado.");
+                    }
+                    else {
+                        miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).getDetailedStatus());
+                    }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

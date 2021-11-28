@@ -2031,7 +2031,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro CFD del documento '" + dps.getDpsNumber() + "'.");
                 }
                 else {
-                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(dps.getDbmsDataCfd()).getDetailedStatus());
+                    if (!dps.getDbmsDataCfd().isStamped()) {
+                        miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' no está timbrado.");
+                    }
+                    else {
+                        miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(dps.getDbmsDataCfd()).getDetailedStatus());
+                    }
                 }
             }
         }

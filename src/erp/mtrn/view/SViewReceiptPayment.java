@@ -69,6 +69,11 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
     public SViewReceiptPayment(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.TRN_PAY);
         initComponents();
+        miClient.showMsgBoxInformation("ACLARACIÓN:\n"
+                + "Esta vista está en versión beta.\n"
+                + "Favor de confirmar con soporte técnico SIIE si ya es posible usarla.\n"
+                + "Tel. 443 204-1032 ext. 105\n"
+                + "Mail: claudio.pena@swaplicado.com.mx");
     }
 
     private void initComponents() {
@@ -193,6 +198,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         setIsSummaryApplying(true);
 
         mvSuscriptors.add(mnTabType);
+        mvSuscriptors.add(SDataConstants.TRNX_CFD_PAY_REC);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
         mvSuscriptors.add(SDataConstants.USRU_USR);
@@ -491,7 +497,12 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).getDetailedStatus());
+                    if (!cfd.isStamped()) {
+                        miClient.showMsgBoxInformation("El comprobante " + cfd.getCfdNumber() + " no está timbrado.");
+                    }
+                    else {
+                        miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).getDetailedStatus());
+                    }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

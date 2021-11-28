@@ -54,6 +54,8 @@ public final class SCfdPacket implements java.io.Serializable {
     private int mnPayrollReceiptPayrollId;      // used in creation of SDataCfd
     private int mnPayrollReceiptEmployeeId;     // used in creation of SDataCfd
     private int mnPayrollReceiptIssueId;        // used in creation of SDataCfd
+    private int mnReceiptPaymentId;
+    private int mnBillOfLadingId;
     
     private SDataDps moAuxDataDps;
     private SDataCfdPayment moAuxDataCfdPayment;
@@ -104,6 +106,8 @@ public final class SCfdPacket implements java.io.Serializable {
         mnPayrollReceiptPayrollId = 0;
         mnPayrollReceiptEmployeeId = 0;
         mnPayrollReceiptIssueId = 0;
+        mnReceiptPaymentId = 0;
+        mnBillOfLadingId = 0;
         
         moAuxDataDps = null;
         moAuxDataCfdPayment = null;
@@ -155,6 +159,8 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setPayrollReceiptPayrollId(int n) { mnPayrollReceiptPayrollId = n; }
     public void setPayrollReceiptEmployeeId(int n) { mnPayrollReceiptEmployeeId = n; }
     public void setPayrollReceiptIssueId(int n) { mnPayrollReceiptIssueId = n; }
+    public void setReceiptPaymentId(int n) { mnReceiptPaymentId = n; }
+    public void setBillOfLadingId(int n) { mnBillOfLadingId = n; }
     
     public void setAuxDataDps(SDataDps o) { moAuxDataDps = o; }
     public void setAuxDataCfdPayment(SDataCfdPayment o) { moAuxDataCfdPayment = o; }
@@ -205,6 +211,8 @@ public final class SCfdPacket implements java.io.Serializable {
     public int getPayrollReceiptPayrollId() { return mnPayrollReceiptPayrollId; }
     public int getPayrollReceiptEmployeeId() { return mnPayrollReceiptEmployeeId; }
     public int getPayrollReceiptIssueId() { return mnPayrollReceiptIssueId; }
+    public int getReceiptPaymentId() { return mnReceiptPaymentId; }
+    public int getBillOfLadingId() { return mnBillOfLadingId; }
     
     public SDataDps getAuxDataDps() { return moAuxDataDps; }
     public SDataCfdPayment getAuxDataCfdPayment() { return moAuxDataCfdPayment; }
@@ -293,6 +301,8 @@ public final class SCfdPacket implements java.io.Serializable {
         cfd.setFkPayrollReceiptPayrollId_n(mnPayrollReceiptPayrollId);
         cfd.setFkPayrollReceiptEmployeeId_n(mnPayrollReceiptEmployeeId);
         cfd.setFkPayrollReceiptIssueId_n(mnPayrollReceiptIssueId);
+        cfd.setFkReceiptPaymentId_n(mnReceiptPaymentId);
+        cfd.setFkBillOfLadingId_n(mnBillOfLadingId);
         cfd.setFkUserProcessingId(mnFkUserDeliveryId);
         cfd.setFkUserDeliveryId(mnFkUserDeliveryId);
 
