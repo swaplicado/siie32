@@ -26,6 +26,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
      
     private erp.client.SClientInterface miClient;
     private Jedis jedis;
+    private erp.redis.form.SFormRedisSessionLocks locksSessions;
     
     /**
      * Creates new form SFormRedisSessions
@@ -231,6 +232,11 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jPanel7.add(jLabel7);
 
         jtSeeUserId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtSeeUserId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtSeeUserIdActionPerformed(evt);
+            }
+        });
         jPanel7.add(jtSeeUserId);
 
         jbSeeUserId.setText("ver");
@@ -558,6 +564,10 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         // TODO add your handling code here:
     }//GEN-LAST:event_jbCloseSessionActionPerformed
 
+    private void jtSeeUserIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtSeeUserIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtSeeUserIdActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -655,9 +665,12 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         
         jbCloseSession.addActionListener(this);
         jbEraseLock.addActionListener(this);
-        jbSeeUserId.addActionListener(this);
         jbClose.addActionListener(this);
         jbReload.addActionListener(this);
+        
+        jbSeeUserId.addActionListener(this);
+        
+        locksSessions = new SFormRedisSessionLocks(miClient);
         
         setTables();
     }
@@ -818,6 +831,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
     }
     
     private void seeLocksuser(int userId){
+        locksSessions.setId(userId);
+        locksSessions.setFormVisible(true);
         
     }
     
@@ -900,7 +915,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
             }else if (button == jbReload) {
                 refreshTable();
             }else if (button == jbSeeUserId) {
-                //seeLocksuser();
+                seeLocksuser(Integer.parseInt(jtSeeUserId.getText()));
             }
         }
     }

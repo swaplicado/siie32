@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 import java.util.Vector;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import redis.clients.jedis.Jedis;
 

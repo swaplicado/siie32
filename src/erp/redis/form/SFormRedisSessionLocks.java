@@ -12,6 +12,7 @@ import erp.redis.SRedisLockUtils;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import redis.clients.jedis.Jedis;
 
@@ -28,18 +29,40 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
     /**
      * Creates new form SFormRedisSessionLocks
      */
-    public SFormRedisSessionLocks(erp.client.SClientInterface client, int Id) {
-        super(client.getFrame());
-        initComponents();
+    public SFormRedisSessionLocks(erp.client.SClientInterface client) {
+        super(client.getFrame(), true);
         miClient = client;
         jedis = client.getJedis();
-        userId = Id;
+        initComponents();
+        initComponentsExtra();
+    }
+    
+    private void initComponentsExtra(){
+        
+        jtType.setEditable(false);
+        jtLockId.setEditable(false);
+        jtLockCompanyId.setEditable(false);
+        jtRegistryType.setEditable(false);
+        jtPK.setEditable(false);
+        jtLockSessionId.setEditable(false);
+        jtLockUserId.setEditable(false);
+        jtTimestamp.setEditable(false);
+        
+        jbEraseLock.addActionListener(this);
+        jbClose.addActionListener(this);
+        jbReload.addActionListener(this);
+        setTables();
+    }
+    
+    public void setId(int id){
+        userId = id;
+        setTables();
     }
 
     private void setTables(){
         DefaultTableModel modeloTableLocksSession = new DefaultTableModel();
         
-        jTLocksSession.setModel(modeloTableLocksSession);
+        jTLocks.setModel(modeloTableLocksSession);
         
         modeloTableLocksSession.addColumn("Type");
         modeloTableLocksSession.addColumn("id");
@@ -50,13 +73,13 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         modeloTableLocksSession.addColumn("userId");
         
         int[] anchosAllLocks = {70, 70, 100, 100, 70, 70, 70};
-        for (int i = 0; i < jTLocksSession.getColumnCount(); i++) {
-            jTLocksSession.getColumnModel().getColumn(i).setPreferredWidth(anchosAllLocks[i]);
-            jTLocksSession.getColumnModel().getClass();
-            jTLocksSession.setDefaultEditor(Object.class, null);
+        for (int i = 0; i < jTLocks.getColumnCount(); i++) {
+            jTLocks.getColumnModel().getColumn(i).setPreferredWidth(anchosAllLocks[i]);
+            jTLocks.getColumnModel().getClass();
+            jTLocks.setDefaultEditor(Object.class, null);
         }
         
-        Vector keys = SRedisLockUtils.getLockListFromUser(jedis, userId);
+        Vector keys = SRedisLockUtils.getLocksListFromUser(jedis, userId);
                 
         for(int i=0; i<keys.size(); i++){
             String stringKey = keys.get(i).toString();
@@ -78,9 +101,40 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         jPanel3 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTLocksSession = new javax.swing.JTable();
+        jTLocks = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jtType = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jtLockId = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jtLockCompanyId = new javax.swing.JTextField();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jtRegistryType = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jtPK = new javax.swing.JTextField();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jtLockSessionId = new javax.swing.JTextField();
+        jPanel13 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        jtLockUserId = new javax.swing.JTextField();
+        jPanel14 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jtTimestamp = new javax.swing.JTextField();
+        jPanel15 = new javax.swing.JPanel();
+        jbEraseLock = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        jPanel24 = new javax.swing.JPanel();
+        jbReload = new javax.swing.JButton();
+        jPanel16 = new javax.swing.JPanel();
+        jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -91,7 +145,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
 
         jScrollPane1.setPreferredSize(new java.awt.Dimension(500, 421));
 
-        jTLocksSession.setModel(new javax.swing.table.DefaultTableModel(
+        jTLocks.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -102,7 +156,12 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTLocksSession);
+        jTLocks.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTLocksMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jTLocks);
 
         jPanel5.add(jScrollPane1);
 
@@ -110,35 +169,171 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.WEST);
 
-        jPanel4.setPreferredSize(new java.awt.Dimension(300, 421));
+        jPanel4.setPreferredSize(new java.awt.Dimension(280, 421));
+        jPanel4.setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 421, Short.MAX_VALUE)
-        );
+        jPanel6.setLayout(new java.awt.GridLayout(9, 1));
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setText("Tipo");
+        jLabel1.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel7.add(jLabel1);
+
+        jtType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtTypeActionPerformed(evt);
+            }
+        });
+        jPanel7.add(jtType);
+
+        jPanel6.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel2.setText("Id");
+        jLabel2.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel8.add(jLabel2);
+
+        jtLockId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtLockId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtLockIdActionPerformed(evt);
+            }
+        });
+        jPanel8.add(jtLockId);
+
+        jPanel6.add(jPanel8);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel3.setText("Compañia Id");
+        jLabel3.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel9.add(jLabel3);
+
+        jtLockCompanyId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtLockCompanyId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtLockCompanyIdActionPerformed(evt);
+            }
+        });
+        jPanel9.add(jtLockCompanyId);
+
+        jPanel6.add(jPanel9);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel4.setText("Registtro");
+        jLabel4.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel10.add(jLabel4);
+
+        jtRegistryType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtRegistryType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtRegistryTypeActionPerformed(evt);
+            }
+        });
+        jPanel10.add(jtRegistryType);
+
+        jPanel6.add(jPanel10);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel5.setText("PK");
+        jLabel5.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel11.add(jLabel5);
+
+        jtPK.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtPK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtPKActionPerformed(evt);
+            }
+        });
+        jPanel11.add(jtPK);
+
+        jPanel6.add(jPanel11);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel6.setText("Sesion Id");
+        jLabel6.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel12.add(jLabel6);
+
+        jtLockSessionId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtLockSessionId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtLockSessionIdActionPerformed(evt);
+            }
+        });
+        jPanel12.add(jtLockSessionId);
+
+        jPanel6.add(jPanel12);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel7.setText("Usuario Id");
+        jLabel7.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel13.add(jLabel7);
+
+        jtLockUserId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtLockUserId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtLockUserIdActionPerformed(evt);
+            }
+        });
+        jPanel13.add(jtLockUserId);
+
+        jPanel6.add(jPanel13);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel8.setText("Ts");
+        jLabel8.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel14.add(jLabel8);
+
+        jtTimestamp.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtTimestamp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtTimestampActionPerformed(evt);
+            }
+        });
+        jPanel14.add(jtTimestamp);
+
+        jPanel6.add(jPanel14);
+
+        jbEraseLock.setText("Eliminar");
+        jPanel15.add(jbEraseLock);
+
+        jPanel6.add(jPanel15);
+
+        jPanel4.add(jPanel6, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jPanel2.setPreferredSize(new java.awt.Dimension(400, 40));
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 40, Short.MAX_VALUE)
-        );
+        jPanel24.setMinimumSize(new java.awt.Dimension(50, 10));
+        jPanel24.setPreferredSize(new java.awt.Dimension(100, 10));
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jbReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_reload.gif"))); // NOI18N
+        jbReload.setToolTipText("Modificar datos");
+        jbReload.setPreferredSize(new java.awt.Dimension(30, 30));
+        jPanel24.add(jbReload);
+
+        jPanel2.add(jPanel24, java.awt.BorderLayout.WEST);
+
+        jPanel16.setPreferredSize(new java.awt.Dimension(200, 42));
+
+        jbClose.setText("Cerrar"); // NOI18N
+        jbClose.setToolTipText("[Escape]");
+        jPanel16.add(jbClose);
+
+        jPanel2.add(jPanel16, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
@@ -146,16 +341,140 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jtTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtTypeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtTypeActionPerformed
+
+    private void jtLockIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtLockIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtLockIdActionPerformed
+
+    private void jtLockCompanyIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtLockCompanyIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtLockCompanyIdActionPerformed
+
+    private void jtRegistryTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtRegistryTypeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtRegistryTypeActionPerformed
+
+    private void jtPKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtPKActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtPKActionPerformed
+
+    private void jtLockSessionIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtLockSessionIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtLockSessionIdActionPerformed
+
+    private void jtLockUserIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtLockUserIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtLockUserIdActionPerformed
+
+    private void jtTimestampActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtTimestampActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtTimestampActionPerformed
+
+    private void jTLocksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTLocksMouseClicked
+        int Fila = jTLocks.getSelectedRow();
+        String type = jTLocks.getValueAt(Fila, 0).toString();
+        String id = jTLocks.getValueAt(Fila, 1).toString();
+        String companyId = jTLocks.getValueAt(Fila, 2).toString();
+        String RegistryType = jTLocks.getValueAt(Fila, 3).toString();
+        String PK = jTLocks.getValueAt(Fila, 4).toString();
+        String sessionId = jTLocks.getValueAt(Fila, 5).toString();
+        String userId = jTLocks.getValueAt(Fila, 6).toString();
+        String Ts = jedis.get(type + "+" + id + "+" + companyId + "+" + RegistryType + "+" + PK + "+" + sessionId + "+" + userId);
+
+        jtType.setText(type);
+        jtLockId.setText(id);
+        jtLockCompanyId.setText(companyId);
+        jtRegistryType.setText(RegistryType);
+        jtPK.setText(PK);
+        jtLockSessionId.setText(sessionId);
+        jtLockUserId.setText(userId);
+        jtTimestamp.setText(Ts);
+    }//GEN-LAST:event_jTLocksMouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTLocksSession;
+    private javax.swing.JTable jTLocks;
+    private javax.swing.JButton jbClose;
+    private javax.swing.JButton jbEraseLock;
+    private javax.swing.JButton jbReload;
+    private javax.swing.JTextField jtLockCompanyId;
+    private javax.swing.JTextField jtLockId;
+    private javax.swing.JTextField jtLockSessionId;
+    private javax.swing.JTextField jtLockUserId;
+    private javax.swing.JTextField jtPK;
+    private javax.swing.JTextField jtRegistryType;
+    private javax.swing.JTextField jtTimestamp;
+    private javax.swing.JTextField jtType;
     // End of variables declaration//GEN-END:variables
 
+    private void actionEraseLock(){
+        String keyLock = jtType.getText() + "+" +
+                        jtLockId.getText() + "+" +
+                        jtLockCompanyId.getText() + "+" +
+                        jtRegistryType.getText() + "+" +
+                        jtPK.getText() + "+" +
+                        jtLockSessionId.getText() + "+" +
+                        jtLockUserId.getText();
+        
+        if(jtType.getText().equals("Lock") && !jtLockId.getText().equals("") && !jtLockCompanyId.getText().equals("") && 
+                !jtRegistryType.getText().equals("") && !jtPK.getText().equals("") && !jtLockSessionId.getText().equals("") && 
+                !jtLockUserId.getText().equals("")){
+            int option = JOptionPane.showConfirmDialog(this, "Seguro que desea eliminar el candado:\n" + keyLock);
+            if(option == 0){
+                if(jedis.del(keyLock) == 1){
+                    refreshTable();
+                }else{
+                    JOptionPane.showMessageDialog(this, "No se encontro el candado a borrar");
+                    refreshTable();
+                }
+            }
+        }else{
+            JOptionPane.showMessageDialog(this, "No se selecciono ningun candado");
+        }
+            
+    }
+    
+    private void refreshTable(){
+        setTables();
+        
+        jtType.setText("");
+        jtLockId.setText("");
+        jtLockCompanyId.setText("");
+        jtRegistryType.setText("");
+        jtPK.setText("");
+        jtLockSessionId.setText("");
+        jtLockUserId.setText("");
+        jtTimestamp.setText("");
+    }
+    
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -183,7 +502,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
 
     @Override
     public void setFormVisible(boolean visible) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        setVisible(visible);
     }
 
     @Override
@@ -223,6 +542,16 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (e.getSource() instanceof javax.swing.JButton) {
+            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
+
+            if (button == jbEraseLock) {
+                actionEraseLock();
+            }else if (button == jbClose) {
+                setVisible(false);
+            }else if (button == jbReload) {
+                refreshTable();
+            }
+        }
     }
 }
