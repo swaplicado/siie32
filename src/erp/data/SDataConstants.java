@@ -352,6 +352,7 @@ public abstract class SDataConstants {
     public static final int FINS_FISCAL_BANK = 206073;
     public static final int FINS_FISCAL_PAY_MET = 206074;
     public static final int FIN_LAY_BANK = 206075;
+    public static final int FINU_BANK_NB_DAY = 206076;
 
     public static final int FINX_REC_CASH = 206101;
     public static final int FINX_MOVES_ACC = 206501;
@@ -460,27 +461,27 @@ public abstract class SDataConstants {
     public static final int TRN_STK_CFG_ITEM = 207082;
     public static final int TRN_STK_CFG_DNS = 207083;
     public static final int TRN_STK = 207084;
-    public static final int TRN_STK_PERIOD = 207085;
     public static final int TRN_STK_SEG = 207101;
     public static final int TRN_STK_SEG_WHS = 207102;
     public static final int TRN_STK_SEG_WHS_ETY = 207103;
+    public static final int TRN_PDF = 207094;
+    public static final int TRN_CFD = 207095;
+    public static final int TRN_CFD_SIGN_LOG = 207100;
+    public static final int TRN_CFD_SND_LOG = 207096;
+    public static final int TRN_CFD_FIN_REC = 207104;
+    public static final int TRN_PAY = 207401;
+    public static final int TRN_PAY_PAY = 207402;
+    public static final int TRN_PAY_PAY_DOC = 207403;
+    public static final int TRN_PAC = 207097;
+    public static final int TRN_TP_CFD_PAC = 207098;
     public static final int TRN_SIGN = 207085;
+    public static final int TRN_MMS_LOG = 207099;
+    public static final int TRN_DVY = 207111;
+    public static final int TRN_DVY_ETY = 207112;
     public static final int TRN_DNC_DPS = 207086;
     public static final int TRN_DNC_DPS_DNS = 207087;
     public static final int TRN_DNC_DIOG = 207088;
     public static final int TRN_DNC_DIOG_DNS = 207089;
-    public static final int TRN_PDF = 207094;           // out of place!
-    public static final int TRN_CFD = 207095;           // out of place! (sflores, 2014-01-28)
-    public static final int TRN_CFD_SND_LOG = 207096;   // out of place! (sflores, 2014-05-12)
-    public static final int TRN_PAC = 207097;           // out of place! (sflores, 2014-02-17)
-    public static final int TRN_TP_CFD_PAC = 207098;    // out of place! (sflores, 2014-02-17)
-    public static final int TRN_MMS_LOG = 207099;       // out of place! (sflores, 2014-01-28)
-    public static final int TRN_CFD_SIGN_LOG = 207100;  // out of place! (sflores, 2014-09-01)
-    public static final int TRN_DNC_DPS_SUA = 207101;
-    public static final int TRN_DNC_DPS_IDSE = 207102;
-    public static final int TRN_CFD_FIN_REC = 207104;
-    public static final int TRN_DVY = 207111;
-    public static final int TRN_DVY_ETY = 207112;
 
     public static final int TRNX_DPS_RO = 207505;
     public static final int TRNX_DPS_QRY = 207506;
@@ -527,6 +528,9 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DPS_AUTHORIZE_PEND = 207561;
     public static final int TRNX_DPS_AUTHORIZED = 207562;
+    
+    public static final int TRNX_CON_AUTHORIZE_PEND = 207563;
+    public static final int TRNX_CON_AUTHORIZED = 207564;
 
     public static final int TRNX_DPS_AUDIT_PEND = 207571;
     public static final int TRNX_DPS_AUDITED = 207572;
@@ -917,6 +921,7 @@ public abstract class SDataConstants {
         TablesMap.put(FIN_CC_ITEM, "fin_cc_item");
         TablesMap.put(FIN_COB_BKC, "fin_cob_bkc");
         TablesMap.put(FIN_LAY_BANK, "fin_lay_bank");
+        TablesMap.put(FINU_BANK_NB_DAY, "erp.finu_bank_nb_day");
         TablesMap.put(FIN_BKC, "fin_bkc");
 
         TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");
@@ -968,10 +973,17 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_STK_CFG_ITEM, "trn_stk_cfg_item");
         TablesMap.put(TRN_STK_CFG_DNS, "trn_stk_cfg_dns");
         TablesMap.put(TRN_STK, "trn_stk");
+        TablesMap.put(TRN_STK_SEG, "trn_stk_seg");
+        TablesMap.put(TRN_STK_SEG_WHS, "trn_stk_seg_whs");
+        TablesMap.put(TRN_STK_SEG_WHS_ETY, "trn_stk_seg_whs_ety");
+        TablesMap.put(TRN_PDF, "trn_pdf");
         TablesMap.put(TRN_CFD, "trn_cfd");
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
         TablesMap.put(TRN_CFD_SND_LOG, "trn_cfd_snd_log");
         TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
+        TablesMap.put(TRN_PAY, "trn_pay");
+        TablesMap.put(TRN_PAY_PAY, "trn_pay_pay");
+        TablesMap.put(TRN_PAY_PAY_DOC, "trn_pay_pay_doc");
         TablesMap.put(TRN_PAC, "trn_pac");
         TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
         TablesMap.put(TRN_SIGN, "trn_sign");

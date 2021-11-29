@@ -30,6 +30,7 @@ import erp.mfin.data.SDataCheckWallet;
 import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.data.SDataExchangeRate;
+import erp.mfin.data.SDataBankNbDay;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataTaxBasic;
 import erp.mfin.data.SDataTaxGroup;
@@ -76,6 +77,7 @@ import erp.mfin.form.SFormAccountItem;
 import erp.mfin.form.SFormAccountMajor;
 import erp.mfin.form.SFormAccountTax;
 import erp.mfin.form.SFormAdministrativeConceptType;
+import erp.mfin.form.SFormBankNbDay;
 import erp.mfin.form.SFormCardIssuer;
 import erp.mfin.form.SFormCheckAnnuled;
 import erp.mfin.form.SFormCheckFormat;
@@ -117,7 +119,6 @@ import erp.mtrn.form.SFormCtr;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import redis.clients.jedis.Jedis;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
@@ -207,6 +208,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmFin;
     private javax.swing.JMenuItem jmiFinExchangeRate;
+    private javax.swing.JMenuItem jmiFinBankNbDay;
     private javax.swing.JMenuItem jmiFinValuationBalances;
     private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
     
@@ -222,6 +224,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinItemCost;
     private javax.swing.JMenuItem jmiFinCfdPayment;
     private javax.swing.JMenuItem jmiFinCfdPaymentExtended;
+    private javax.swing.JMenuItem jmiFinReceiptPayment;
     private javax.swing.JMenuItem jmiFinMassDownloadCfdi;
     private javax.swing.JMenuItem jmiFinMassInvoices;
     private javax.swing.JMenuItem jmiFinImportPayments;
@@ -324,6 +327,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mfin.form.SFormCostCenter moFormCostCenter;
     private erp.mfin.form.SFormCostCenterMajor moFormCostCenterMajor;
     private erp.mfin.form.SFormExchangeRate moFormExchangeRate;
+    private erp.mfin.form.SFormBankNbDay moFormBankNbDay;
     private erp.mfin.form.SFormYear moFormYear;
     private erp.mfin.form.SFormCardIssuer moFormCardIssuer;
     private erp.mfin.form.SFormTaxRegion moFormTaxRegion;
@@ -560,6 +564,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin = new JMenu("Finanzas");
 
         jmiFinExchangeRate = new JMenuItem("Tipos de cambio");
+        jmiFinBankNbDay = new JMenuItem("Días Bancarios inhábiles");
         jmiFinValuationBalances = new JMenuItem("Revaluación de saldos en moneda extranjera");
         jmiFinDpsExchangeRateDiff = new JMenuItem("Diferencias cambiarias de cuentas liquidadas en moneda extranjera");
         jmiFinCashCheck = new JMenuItem("Cheques");
@@ -574,6 +579,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinItemCost = new JMenuItem("Costos de ítems");
         jmiFinCfdPayment = new JMenuItem("CFDI recepción de pagos");
         jmiFinCfdPaymentExtended = new JMenuItem("CFDI recepción de pagos extendida");
+        jmiFinReceiptPayment = new JMenuItem("Registros CFDI recepción de pagos");
         jmiFinMassDownloadCfdi = new JMenuItem("Descarga masiva de CFDI...");
         jmiFinMassInvoices = new JMenuItem("Envío masivo de facturas...");
         jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
@@ -582,6 +588,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdiMassiveValidationSal = new JMenuItem("Validación masiva de estatus de CFDI emitidos...");
 
         jmFin.add(jmiFinExchangeRate);
+        jmFin.add(jmiFinBankNbDay);
         jmFin.addSeparator();
         jmFin.add(jmiFinValuationBalances);
         jmFin.add(jmiFinDpsExchangeRateDiff);
@@ -601,6 +608,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinCfdPayment);
         jmFin.add(jmiFinCfdPaymentExtended);
+        jmFin.add(jmiFinReceiptPayment);
         jmFin.addSeparator();
         jmFin.add(jmiFinMassDownloadCfdi);
         jmFin.add(jmiFinMassInvoices);
@@ -888,6 +896,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerSup.addActionListener(this);
 
         jmiFinExchangeRate.addActionListener(this);
+        jmiFinBankNbDay.addActionListener(this);
         jmiFinValuationBalances.addActionListener(this);
         jmiFinDpsExchangeRateDiff.addActionListener(this);
         jmiFinCashCheck.addActionListener(this);
@@ -901,6 +910,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinItemCost.addActionListener(this);
         jmiFinCfdPayment.addActionListener(this);
         jmiFinCfdPaymentExtended.addActionListener(this);
+        jmiFinReceiptPayment.addActionListener(this);
         jmiFinMassDownloadCfdi.addActionListener(this);
         jmiFinMassInvoices.addActionListener(this);
         jmiFinImportPayments.addActionListener(this);
@@ -1098,6 +1108,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmFin.setEnabled(hasRightExcRate || hasRightMoveAccCash || hasRightCounterRcpt || hasRightCfdPayment);
         jmiFinExchangeRate.setEnabled(hasRightExcRate);
+        jmiFinBankNbDay.setEnabled(hasRightExcRate);
         jmiFinCashCheck.setEnabled(hasRightMoveAccCash);
         jmiFinCashCounterReceipt.setEnabled(hasRightCounterRcpt);
         jmiFinLayoutBank.setEnabled(hasRightMoveAccCash);
@@ -1109,6 +1120,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinItemCost.setEnabled(hasRightMoveAccCash);
         jmiFinCfdPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinCfdPaymentExtended.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
+        jmiFinReceiptPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
         jmiFinMassInvoices.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
@@ -1483,6 +1495,15 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     }
                     miForm = moFormExchangeRate;
                     break;
+                case SDataConstants.FINU_BANK_NB_DAY:
+                    if (moFormBankNbDay == null) {
+                        moFormBankNbDay = new SFormBankNbDay(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataBankNbDay();
+                    }
+                    miForm = moFormBankNbDay;
+                    break;
                 case SDataConstants.FIN_CC_ITEM:
                     if (moFormItemConfig == null) {
                         moFormItemConfig = new SFormCostCenterItem(miClient);
@@ -1725,6 +1746,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 case SDataConstants.FIN_EXC_RATE:
                     oViewClass = erp.mfin.view.SViewExchangeRate.class;
                     sViewTitle = "Tipos cambio";
+                    break;
+                case SDataConstants.FINU_BANK_NB_DAY:
+                    oViewClass = erp.mfin.view.SViewBankNbDay.class;
+                    sViewTitle = "Días bancarios inhábiles";
                     break;
                 case SDataConstants.FIN_CHECK:
                     oViewClass = erp.mfin.view.SViewCheck.class;
@@ -2057,6 +2082,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiFinExchangeRate) {
                 showView(SDataConstants.FIN_EXC_RATE);
             }
+            else if (item == jmiFinBankNbDay) {
+                showView(SDataConstants.FINU_BANK_NB_DAY);
+            }
             else if (item == jmiFinValuationBalances) {
                 new SDialogValuationBalances(miClient.getSession().getClient(), "Revaluación de saldos en moneda extranjera").setVisible(true);
             }
@@ -2095,6 +2123,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinCfdPaymentExtended) {
                 miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC, SDataConstants.TRNX_CFD_PAY_REC_EXT);
+            }
+            else if (item == jmiFinReceiptPayment) {
+                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRN_PAY);
             }
             else if (item == jmiFinMassDownloadCfdi) {
                 new SDialogMassDownloadCfdi((SGuiClient) miClient).setVisible(true);
