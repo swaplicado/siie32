@@ -17,6 +17,7 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
@@ -45,6 +46,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private erp.mtrn.data.SDataDps moDps;
     private java.util.Vector<SFormField> mvFields;
 
+    private erp.lib.form.SFormField moFieldDocType;
     private erp.lib.form.SFormField moFieldSearchBizPartnerId;
     private erp.lib.form.SFormField moFieldSearchDpsNumber;
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDps;
@@ -54,6 +56,8 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private boolean mbIsBizPartnerRequired;
     private int[] manCurrentBizPartnerKey;
     private String msCurrentDpsNumber;
+    private SFormComponentItem COT = new SFormComponentItem(1, "COT");
+    private SFormComponentItem CON = new SFormComponentItem(2, "CON");
 
     /** Creates new form SPanelDpsFinder
      * @param client ERP Client interface.
@@ -99,6 +103,8 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jPanel1 = new javax.swing.JPanel();
         jlSearchDpsClass = new javax.swing.JLabel();
         jtfSearchDpsClass = new javax.swing.JTextField();
+        jlDocType = new javax.swing.JLabel();
+        jcbDocType = new javax.swing.JComboBox();
         jPanel3 = new javax.swing.JPanel();
         jlSearchBizPartnerId = new javax.swing.JLabel();
         jcbSearchBizPartnerId = new javax.swing.JComboBox();
@@ -128,6 +134,13 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jtfSearchDpsClass.setFocusable(false);
         jtfSearchDpsClass.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel1.add(jtfSearchDpsClass);
+
+        jlDocType.setText("Tipo de documento:");
+        jPanel1.add(jlDocType);
+
+        jcbDocType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbDocType.setPreferredSize(new java.awt.Dimension(150, 26));
+        jPanel1.add(jcbDocType);
 
         jpDpsFinder.add(jPanel1);
 
@@ -201,7 +214,8 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
-
+        
+        moFieldDocType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbDocType, jlDocType);
         moFieldSearchBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbSearchBizPartnerId, jlSearchBizPartnerId);
         moFieldSearchBizPartnerId.setPickerButton(jbSearchBizPartnerId);
         moFieldSearchDpsNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSearchDpsNumber, jlSearchDpsNumber);
@@ -209,6 +223,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         moFieldSearchDpsNumber.setPickerButton(jbPickDps);
 
         mvFields = new Vector<>();
+        mvFields.add(moFieldDocType);
         mvFields.add(moFieldSearchBizPartnerId);
         mvFields.add(moFieldSearchDpsNumber);
 
@@ -218,6 +233,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         remove(jlPanelDps);
         add(moPanelDps, BorderLayout.CENTER);
 
+        jcbDocType.addActionListener(this);
         jbSearchBizPartnerId.addActionListener(this);
         jbPickDps.addActionListener(this);
         jbClearDps.addActionListener(this);
@@ -237,6 +253,14 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
         try {
             if (!moFieldSearchDpsNumber.getString().isEmpty()) {
+                if (manParamDpsClassKey.length > 1) {
+                    if(manParamDpsClassKey[1] == 1){
+                        SFormComponentItem params = (SFormComponentItem) jcbDocType.getSelectedItem();
+                        int[] docType = {manParamDpsClassKey[0],manParamDpsClassKey[1],(Integer)params.getPrimaryKey()};
+                        manParamDpsClassKey = docType;
+                    }
+                }
+                
                 asNumberDps = SLibUtilities.textExplode(moFieldSearchDpsNumber.getString(), "-");
 
                 if (asNumberDps.length > 1) {
@@ -442,8 +466,10 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private javax.swing.JButton jbClearDps;
     private javax.swing.JButton jbPickDps;
     private javax.swing.JButton jbSearchBizPartnerId;
+    private javax.swing.JComboBox jcbDocType;
     private javax.swing.JComboBox jcbSearchBizPartnerId;
     private javax.swing.JCheckBox jckConvertToLocalCurrency;
+    private javax.swing.JLabel jlDocType;
     private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlPanelDps;
     private javax.swing.JLabel jlSearchBizPartnerId;
@@ -477,6 +503,8 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         }
 
         jtfSearchDpsClass.setText("");
+        jcbDocType.removeAllItems();
+        jcbDocType.setEnabled(false);
     }
 
     public erp.lib.form.SFormValidation validatePanel() {
@@ -512,7 +540,14 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
     public void setDpsClassKey(int[] key) {
         manParamDpsClassKey = key;
-
+        if (manParamDpsClassKey.length > 1) {
+            if (manParamDpsClassKey[1] == 1) {
+                jcbDocType.setEnabled(true);
+                jcbDocType.addItem(COT);
+                jcbDocType.addItem(CON);
+            }
+        }
+        
         jtfSearchDpsClass.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_CL_DPS, manParamDpsClassKey));
         jtfSearchDpsClass.setCaretPosition(0);
 

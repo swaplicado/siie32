@@ -113,6 +113,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiContractsLinked;
     private javax.swing.JMenuItem jmiContractsLinkedEntry;
     private javax.swing.JMenuItem jmiContractsLinks;
+    private javax.swing.JMenuItem jmiContractsAutPending;
+    private javax.swing.JMenuItem jmiContractsAutAutorized;
+    private javax.swing.JMenuItem jmiContractsAutRejected;
     private javax.swing.JMenuItem jmiContractsLinkPendEntryPrice;
     private javax.swing.JMenuItem jmiContractsLinkedEntryPrice;
     private javax.swing.JMenuItem jmiContractsSendMail;
@@ -344,6 +347,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinked = new JMenuItem("Contratos procesados");
         jmiContractsLinkedEntry = new JMenuItem("Contratos procesados a detalle");
         jmiContractsLinks = new JMenuItem("Vínculos de contratos como origen");
+        jmiContractsAutPending = new JMenuItem("Contratos por autorizar");
+        jmiContractsAutAutorized = new JMenuItem("Contratos autorizados");
+        jmiContractsAutRejected = new JMenuItem("Contratos rechazados");
         jmiContractsLinkPendEntryPrice = new JMenuItem("Entregas mensuales de contratos por procesar");
         jmiContractsLinkedEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
         jmiContractsSendMail = new JMenuItem("Envío de contratos por correo-e");
@@ -356,6 +362,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCon.add(jmiContractsLinkedEntry);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinks);
+        jmCon.addSeparator();
+        jmCon.add(jmiContractsAutPending);
+        jmCon.add(jmiContractsAutAutorized);
+        jmCon.add(jmiContractsAutRejected);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinkPendEntryPrice);
         jmCon.add(jmiContractsLinkedEntryPrice);
@@ -696,6 +706,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinkPendEntry.addActionListener(this);
         jmiContractsLinkedEntry.addActionListener(this);
         jmiContractsLinks.addActionListener(this);
+        jmiContractsAutPending.addActionListener(this);
+        jmiContractsAutAutorized.addActionListener(this);
+        jmiContractsAutRejected.addActionListener(this);
         jmiContractsLinkPendEntryPrice.addActionListener(this);
         jmiContractsLinkedEntryPrice.addActionListener(this);
         jmiContractsSendMail.addActionListener(this);
@@ -1006,6 +1019,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             case SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_REJ:
                 viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " rechazad@s";
                 break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " x autorizar";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " autorizad@s";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " rechazad@s";
+                break;
             case SDataConstantsSys.TRNX_SAL_TOT:
                 viewTitle = "Ventas globales";
                 break;
@@ -1036,7 +1058,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             case SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP:
                 viewTitle = "Ventas x tipo cliente-cliente";
                 break;
-           case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL:
+           case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE:
                 viewTitle = "Ventas docs. x ítem-cliente";
                 break;
             default:
@@ -1490,11 +1512,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             oViewClass = erp.mtrn.view.SViewQueryTotal.class;
                             sViewTitle = getViewTitle(auxType01);
                             break;
-                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL:
-                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL:
+                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL:
+                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE:
                             oViewClass = erp.mtrn.view.SViewQueryDpsByItemBizPartner.class;
 
-                            if (auxType01 == SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL) {
+                            if (auxType01 == SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL) {
                                 sViewTitle = "VTA - ";
                             }
                             else {
@@ -1531,6 +1553,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRN_CFD_SND_LOG:
                     oViewClass = erp.mtrn.view.SViewCfdSendingLog.class;
                     sViewTitle = "VTA - bitácora envíos CFDI";
+                    break;
+                    
+                case SDataConstants.TRN_PAY:
+                    oViewClass = erp.mtrn.view.SViewReceiptPayment.class;
+                    sViewTitle = "Registros CFDI pagos";
                     break;
                     
                 case SDataConstants.TRNX_CFD_PAY_REC:
@@ -1810,6 +1837,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiContractsLinks) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_LINK_EST_CON_SRC);
             }
+            else if (item == jmiContractsAutPending) {
+                showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND);
+            }
+            else if (item == jmiContractsAutAutorized) {
+                showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT);
+            }
+            else if (item == jmiContractsAutRejected) {
+                showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ);
+            }
             else if (item == jmiContractsLinkPendEntryPrice) {
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_SAL_N, new SGuiParams(SModConsts.VIEW_ST_PEND));
             }
@@ -1853,7 +1889,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntry) {
-               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_DOC);
+               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiDpsEntryRef) {
                 showView(SDataConstants.TRNX_DPS_ETY_REF, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
@@ -1919,7 +1955,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjEntry) {
-                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAdjDocAnn) {
                 showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
@@ -2027,7 +2063,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP);
             }
             else if (item == jmiRepTrnDpsByItemBizPartner) {
-               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL);
+               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE);
             }
             else if (item == jmiRepBackorderContract) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);

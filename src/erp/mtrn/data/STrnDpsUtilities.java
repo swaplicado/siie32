@@ -94,6 +94,20 @@ public abstract class STrnDpsUtilities {
                 }
             }
         }
+        else if (dps.isDpsTypeContract()) {
+            if (dps.isDpsTypeContractPur()) {
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesConAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
+                }
+            }
+            else {
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesConAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
+                }
+            }
+        }
         return authorized;
     }
 }
