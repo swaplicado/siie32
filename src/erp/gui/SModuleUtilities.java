@@ -154,11 +154,11 @@ public abstract class SModuleUtilities {
             dialog.setValue(SDataConstants.FIN_REC, rec);
             if (ety != null) {
                 dialog.setValue(SDataConstants.FIN_REC_ETY, ety);
-                msg = "La partida no tiene CFDI ";
+                msg = "La partida de la póliza no tiene CFDI ";
             }
             cfds = dialog.readCfd();
             if (cfds == 0) {
-                client.showMsgBoxInformation(msg + (typeCfd == SDataConstants.FINX_REC_CFD_DIRECT ? " directos " : " indirectos ") + ".");
+                client.showMsgBoxInformation(msg + (typeCfd == SDataConstants.FINX_REC_CFD_DIRECT ? "directos" : "indirectos") + ".");
             }
             else {
                 dialog.setFormVisible(true);

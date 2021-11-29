@@ -12,11 +12,16 @@ import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SRowBenefitCardex;
 import erp.mod.hrs.db.SRowBenefitDetailCardex;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
+import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.gui.util.SUtilConsts;
@@ -33,13 +38,14 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelectionListener {
+public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListener, ItemListener, ListSelectionListener {
     
     private SDbEmployee moEmployee;
     private Date mtDateCutoff;
@@ -77,11 +83,14 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         jlEmployeeName = new javax.swing.JLabel();
         moTextEmployeeName = new sa.lib.gui.bean.SBeanFieldText();
         moTextEmployeeNumber = new sa.lib.gui.bean.SBeanFieldText();
-        jlDailyPayment = new javax.swing.JLabel();
-        moDecDailyPayment = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jLabel1 = new javax.swing.JLabel();
+        moKeyCompany = new sa.lib.gui.bean.SBeanFieldKey();
+        jbCompany = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jlBenefitType = new javax.swing.JLabel();
         moTextBenefitType = new sa.lib.gui.bean.SBeanFieldText();
+        jlDailyPayment = new javax.swing.JLabel();
+        moDecDailyPayment = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel10 = new javax.swing.JPanel();
         jlDateCutoff = new javax.swing.JLabel();
         moTextDateCutoff = new sa.lib.gui.bean.SBeanFieldText();
@@ -124,13 +133,17 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         moTextEmployeeNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(moTextEmployeeNumber);
 
-        jlDailyPayment.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlDailyPayment.setText("Pago diario:");
-        jlDailyPayment.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlDailyPayment);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Empresa:");
+        jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel7.add(jLabel1);
 
-        moDecDailyPayment.setEditable(false);
-        jPanel7.add(moDecDailyPayment);
+        moKeyCompany.setPreferredSize(new java.awt.Dimension(285, 23));
+        jPanel7.add(moKeyCompany);
+
+        jbCompany.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbCompany.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbCompany);
 
         jPanel4.add(jPanel7);
 
@@ -144,6 +157,14 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         moTextBenefitType.setText("TEXT");
         moTextBenefitType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel2.add(moTextBenefitType);
+
+        jlDailyPayment.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDailyPayment.setText("Pago diario:");
+        jlDailyPayment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jlDailyPayment);
+
+        moDecDailyPayment.setEditable(false);
+        jPanel2.add(moDecDailyPayment);
 
         jPanel4.add(jPanel2);
 
@@ -223,12 +244,14 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JButton jbCompany;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlDailyPayment;
     private javax.swing.JLabel jlDateBenefits;
@@ -245,6 +268,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
     private sa.lib.gui.bean.SBeanFieldDecimal moDecSeniorityProp;
     private sa.lib.gui.bean.SBeanFieldInteger moIntSeniorityDays;
     private sa.lib.gui.bean.SBeanFieldInteger moIntSeniorityYears;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCompany;
     private sa.lib.gui.bean.SBeanFieldText moTextBenefitType;
     private sa.lib.gui.bean.SBeanFieldText moTextDateBenefits;
     private sa.lib.gui.bean.SBeanFieldText moTextDateCutoff;
@@ -342,18 +366,33 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         };
 
         jpBenefitDetail.add(moGridBenefitDetail, BorderLayout.CENTER);
+        
+        reloadCatalogues();
+        moKeyCompany.setValue(new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
+        moKeyCompany.setEnabled(false);
     }
     
     private double getSeniorityProp() {
         return (mnSeniorityDays <= SHrsConsts.YEAR_DAYS ? mnSeniorityDays : SHrsConsts.YEAR_DAYS) / (double) SHrsConsts.YEAR_DAYS;
     }
     
+    private String getDbmsSchema() {
+        String database = "";
+        
+        if (moKeyCompany.getSelectedIndex() > 0) {
+            database = ((String) moKeyCompany.getSelectedItem().getComplement()) + ".";
+        }
+        
+        return database;
+    }
+    
     private int getVacationDays(final Statement statement, final int anniversary) throws Exception {
         int days = 0;
+        String dbmsSchema = getDbmsSchema();
         
         String sql = "SELECT benr.id_ben, benr.id_row, benr.mon, benr.ben_day, benr.ben_bon_per "
-                + "FROM hrs_ben AS ben "
-                + "INNER JOIN hrs_ben_row AS benr ON benr.id_ben = ben.id_ben "
+                + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS ben "
+                + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS benr ON benr.id_ben = ben.id_ben "
                 + "WHERE ben.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
                 + "benr.mon >= (" + SHrsConsts.YEAR_MONTHS + " * " + anniversary + ") AND "
                 + "ben.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
@@ -379,6 +418,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                 // proceed adding 1 to show current anniversary, eventhough elapsed partially:
                 
                 int yearBenefits = SLibTimeUtils.digestYear(moEmployee.getDateBenefits())[0];
+                String dbmsSchema = getDbmsSchema();
                 
                 for (int anniversary = mnSeniorityYears + 1; anniversary >= 1; anniversary--) {
                     String sql;
@@ -392,8 +432,8 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     row.setProportional(anniversary == mnSeniorityYears + 1 ? getSeniorityProp() : 1.0);
                     
                     sql = "SELECT benr.id_ben, benr.id_row, benr.mon, benr.ben_day, benr.ben_bon_per "
-                            + "FROM hrs_ben AS ben "
-                            + "INNER JOIN hrs_ben_row AS benr ON benr.id_ben = ben.id_ben "
+                            + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS ben "
+                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS benr ON benr.id_ben = ben.id_ben "
                             + "WHERE ben.id_ben = " + mnBenefitsTableId + " AND ben.fk_tp_ben = " + mnFormSubtype + " AND "
                             + "benr.mon >= (" + SHrsConsts.YEAR_MONTHS + " * " + anniversary + ") AND "
                             + "ben.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
@@ -415,7 +455,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     
                     if (mnFormSubtype == SModSysConsts.HRSS_TP_BEN_VAC) {
                         sql = "SELECT SUM(eff_day) AS _days_sched "
-                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                                + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
                                 + "WHERE id_emp = " + moEmployee.getPkEmployeeId() + " AND "
                                 + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                 + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
@@ -433,9 +473,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     double payedAmount = 0;
                     
                     sql = "SELECT SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _amount "
-                            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                            + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                             + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND pre.fk_tp_ben = " + mnFormSubtype + " AND "
                             + "pre.ben_year = " + benefitYear + " AND pre.ben_ann = " + anniversary + " AND "
                             + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
@@ -447,9 +487,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     }
                     
                     sql = "SELECT SUM(prd.unt_all) AS _days, SUM(prd.amt_r) AS _amount "
-                            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                            + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                             + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND prd.fk_tp_ben = " + mnFormSubtype + " AND "
                             + "prd.ben_year = " + benefitYear + " AND prd.ben_ann = " + anniversary + " AND "
                             + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
@@ -540,7 +580,24 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         }
     }
     
+    private void actionPerformedCompany() {
+        jbCompany.setEnabled(false);
+        moKeyCompany.setEnabled(true);
+        moKeyCompany.requestFocusInWindow();
+    }
+    
+    private void itemStateChangedCompany() {
+        if (moKeyCompany.getSelectedIndex() <= 0) {
+            moGridBenefitSummary.clearGridRows();
+        }
+        else {
+            showBenefitCardex();
+        }
+    }
+    
     public void setFormParams(final int employeeId, final int seniorityYears, final int seniorityDays, final int benefitsTableId, final Date dateCutoff) {
+        removeAllListeners();
+        
         SDbConfig config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         
         moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
@@ -562,21 +619,24 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         moDecSeniorityProp.setValue(getSeniorityProp());
         
         showBenefitCardex();
+        addAllListeners();
     }
     
     @Override
     public void addAllListeners() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        jbCompany.addActionListener(this);
+        moKeyCompany.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        jbCompany.removeActionListener(this);
+        moKeyCompany.removeItemListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        miClient.getSession().populateCatalogue(moKeyCompany, SModConsts.CFGU_CO, SModConsts.MOD_HRS, null);
     }
 
     @Override
@@ -602,6 +662,26 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
     @Override
     public Object getValue(final int type) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            if (button == jbCompany) {
+                actionPerformedCompany();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+            if (field == moKeyCompany) {
+                itemStateChangedCompany();
+            }
+        }
     }
 
     @Override

@@ -26,7 +26,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author  Juan Barajas
+ * @author Juan Barajas
  */
 public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -183,7 +183,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDate, jlPkDateId);
         moFieldDate.setPickerButton(jbPkDateId);
@@ -306,7 +306,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
 
     @Override
     public void formRefreshCatalogues() {
-        //SFormUtilities.populateComboBox(miClient, jcbPkPacId, SDataConstants.TRN_PAC);
+        SFormUtilities.populateComboBox(miClient, jcbPkPacId, SDataConstants.TRN_PAC);
     }
 
     @Override

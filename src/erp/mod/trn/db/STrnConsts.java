@@ -22,8 +22,4 @@ public abstract class STrnConsts {
     public static final String TXT_FIELD_BLANK = "-";
     public static final String TXT_TRN_DOM = "NACIONAL";
     public static final String TXT_TRN_INT = "INTERNACIONAL";
-    
-    public static final String TRN_TXT_REL_PARTS = "CON PARTES RELACIONADAS";
-    public static final String TRN_TXT_WITHOUT_REL_PARTS = "SIN PARTES RELACIONADAS";
-    
 }

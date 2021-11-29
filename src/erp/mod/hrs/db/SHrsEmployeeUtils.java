@@ -221,9 +221,11 @@ public abstract class SHrsEmployeeUtils {
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             boolean insert = false;
+            
             if (resultSet.next()) {
                 insert = resultSet.getInt(1) == 0;
             }
+            
             if (insert) {
                 sql = "INSERT INTO " + table + " VALUES ("
                         + employeeId + ", "

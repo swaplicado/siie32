@@ -34,6 +34,7 @@ public class SCfdDataConcepto {
     protected double mdImporte;
     protected double mdDescuento;
     protected ArrayList<SCfdDataImpuesto> maImpuestosXml;
+    protected String msPredial;
     
     /**
      * Creates a CFD Concepto XML node.
@@ -53,6 +54,7 @@ public class SCfdDataConcepto {
         mdImporte = 0;
         mdDescuento = 0;
         maImpuestosXml = new ArrayList<>();
+        msPredial = "";
     }
     
     /*
@@ -111,6 +113,7 @@ public class SCfdDataConcepto {
     public void setValorUnitario(double d) { mdValorUnitario = d; }
     public void setImporte(double d) { mdImporte = d; }
     public void setDescuento(double d) { mdDescuento = d; }
+    public void setPredial(String s) { msPredial = s; }
     
     public boolean hasIntCommerceComplement() { return mbHasIntCommerceComplement; }
     public int getCfdType() { return mnCfdType; }
@@ -123,6 +126,7 @@ public class SCfdDataConcepto {
     public double getValorUnitario() { return mdValorUnitario; }
     public double getImporte() { return mdImporte; }
     public double getDescuento() { return mdDescuento; }
+    public String getPredial() { return msPredial; }
     
     public ArrayList<SCfdDataImpuesto> getCfdDataImpuestos() { return maImpuestosXml; }
     
@@ -264,6 +268,14 @@ public class SCfdDataConcepto {
         
         if (!impuestosRetenciones.getEltImpuestoRetenciones().isEmpty()) {
             concepto.getEltOpcConceptoImpuestos().setEltOpcImpuestosRetenciones(impuestosRetenciones);
+        }
+        
+        // Predial account:
+        
+        if (!msPredial.isEmpty()) {
+            cfd.ver33.DElementConceptoCuentaPredial cuentaPredial = new cfd.ver33.DElementConceptoCuentaPredial();
+            cuentaPredial.getAttNumero().setString(msPredial);
+            concepto.setEltOpcConceptoCuentaPredial(cuentaPredial);
         }
         
         return concepto;

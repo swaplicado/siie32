@@ -494,6 +494,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
                 case SModSysConsts.HRSS_TP_LOAN_LOAN_COM:
                 case SModSysConsts.HRSS_TP_LOAN_LOAN_UNI:
                 case SModSysConsts.HRSS_TP_LOAN_LOAN_3RD:
+                case SModSysConsts.HRSS_TP_LOAN_LOAN_GLASS:
                     jlPaymentAmountHelp.setText("(por nómina)");
                     
                     moDecCapital.setEditable(true);
@@ -506,6 +507,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
                     break;
                     
                 default:
+                    miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
         }
     }

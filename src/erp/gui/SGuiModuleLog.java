@@ -41,8 +41,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiShipmentDeliveryPendingDetail;
     private javax.swing.JMenuItem jmiShipmentBill;
     private javax.swing.JMenuItem jmiShipmentBillPending;
-    private javax.swing.JMenuItem jmiShipmentDpsSales;
     private javax.swing.JMenuItem jmiShipmentDpsSalesPending;
+    private javax.swing.JMenuItem jmiShipmentDpsSales;
+    private javax.swing.JMenuItem jmiShipmentBol;
 
     private javax.swing.JMenu jmShipmentSales;
     private javax.swing.JMenuItem jmiShipmentDps;
@@ -125,6 +126,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentBill = new JMenuItem("Embarques facturados");
         jmiShipmentDpsSalesPending = new JMenuItem("Embarques vs. facturas ventas por facturar");
         jmiShipmentDpsSales = new JMenuItem("Embarques vs. facturas ventas facturadas");
+        jmiShipmentBol = new JMenuItem("Traslados");
 
         jmCatalogue = new JMenu("Catálogos");
         jmiCatalogueSpot = new JMenuItem("Lugares");
@@ -162,6 +164,8 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmShipment.add(jmiShipmentDpsSalesPending);
         jmShipment.addSeparator();
         jmShipment.add(jmiShipmentDpsSales);
+        jmShipment.addSeparator();
+        jmShipment.add(jmiShipmentBol);
 
         jmShipmentSales.add(jmiShipmentDpsPending);
         jmShipmentSales.add(jmiShipmentDpsPendingDetail);
@@ -218,6 +222,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentBill.addActionListener(this);
         jmiShipmentDpsSalesPending.addActionListener(this);
         jmiShipmentDpsSales.addActionListener(this);
+        jmiShipmentBol.addActionListener(this);
 
         jmiCatalogueSpot.addActionListener(this);
         jmiCatalogueSpotCompanyBranch.addActionListener(this);
@@ -449,7 +454,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiShipmentDpsSales) {
                 miClient.getSession().showView(SModConsts.LOGX_SHIP_DPS_SAL, SModConsts.VIEW_ST_DONE, new SGuiParams(SModConsts.VIEW_SC_SUM));
             }
-            
+            else if (item == jmiShipmentBol) {
+                miClient.getSession().showView(SModConsts.LOG_BOL, SLibConstants.UNDEFINED, null);
+            }
             else if (item == jmiRepRate) {
                 new SDialogRepRate(miClient.getSession().getClient(), "Listado de tarifas").setVisible(true);
             }

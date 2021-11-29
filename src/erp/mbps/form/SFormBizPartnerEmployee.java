@@ -1928,8 +1928,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             category.setPaymentAccount("");
             category.setNumberExporter("");
             category.setIsCreditByUser(true);
-            category.setIsGuaranteeInProcess(true);
-            category.setIsInsuranceInProcess(true);
+            category.setIsGuaranteeInProcess(false);
+            category.setIsInsuranceInProcess(false);
             category.setIsDeleted(false);
             category.setFkBizPartnerCategoryId(categoryId);
             category.setFkBizPartnerTypeId(SModSysConsts.BPSU_TP_BP_DEF);

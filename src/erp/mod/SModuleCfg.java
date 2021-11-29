@@ -77,9 +77,54 @@ public class SModuleCfg extends SGuiModule {
     @Override
     public SGuiCatalogueSettings getCatalogueSettings(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
+        String where = "";
         SGuiCatalogueSettings settings = null;
 
         switch (type) {
+            case SModConsts.CFGU_CO:
+                /* Use of other parameters:
+                 * subtype = Filter: Module ID. Can be 'SLibConsts.UNDEFINED' meaning that all companies are requested.
+                 */
+                switch (subtype) {
+                    case SModConsts.MOD_CFG:
+                        where = "AND b_mod_cfg ";
+                        break;
+                    case SModConsts.MOD_FIN:
+                        where = "AND b_mod_fin ";
+                        break;
+                    case SModConsts.MOD_PUR:
+                        where = "AND b_mod_pur ";
+                        break;
+                    case SModConsts.MOD_SAL:
+                        where = "AND b_mod_sal ";
+                        break;
+                    case SModConsts.MOD_INV:
+                        where = "AND b_mod_inv ";
+                        break;
+                    case SModConsts.MOD_MKT:
+                        where = "AND b_mod_mkt ";
+                        break;
+                    case SModConsts.MOD_LOG:
+                        where = "AND b_mod_log ";
+                        break;
+                    case SModConsts.MOD_MFG:
+                        where = "AND b_mod_mfg ";
+                        break;
+                    case SModConsts.MOD_HRS:
+                        where = "AND b_mod_hrs ";
+                        break;
+                    case SModConsts.MOD_QLT:
+                        where = "AND b_mod_qlt ";
+                        break;
+                    default:
+                        // do nothing
+                }
+                settings = new SGuiCatalogueSettings("Empresa", 1, 0, SLibConsts.DATA_TYPE_TEXT);
+                sql = "SELECT id_co AS " + SDbConsts.FIELD_ID + "1, co AS " + SDbConsts.FIELD_ITEM + ", bd AS " + SDbConsts.FIELD_COMP + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " " +
+                        "WHERE NOT b_del " + where +
+                        "ORDER BY co, id_co ";
+                break;
             case SModConsts.CFGU_COB_ENT:
                 /* Use of other parameters:
                  * subtype = Filter: Entity category ID. Can be 'SLibConsts.UNDEFINED' meaning that all categories are requested.
@@ -88,29 +133,36 @@ public class SModuleCfg extends SGuiModule {
                 sql = "SELECT id_cob AS " + SDbConsts.FIELD_ID + "1, id_ent AS " + SDbConsts.FIELD_ID + "2, ent AS " + SDbConsts.FIELD_ITEM + ", " +
                         "id_cob AS " + SDbConsts.FIELD_FK + "1 " +
                         "FROM " + SModConsts.TablesMap.get(type) + " " +
-                        "WHERE b_del = 0 " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_ct_ent = " + subtype) + " " +
+                        "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_ct_ent = " + subtype) + " " +
                         "ORDER BY id_cob, id_ent, ent ";
                 break;
             case SModConsts.CFGU_CUR:
                 settings = new SGuiCatalogueSettings("Moneda", 1, 1, SLibConsts.DATA_TYPE_TEXT);
                 sql = "SELECT id_cur AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, cur AS " + SDbConsts.FIELD_ITEM + ", cur_key AS " + SDbConsts.FIELD_COMP + " " +
                         "FROM erp.cfgu_cur " +
-                        "WHERE b_del = 0 " +
+                        "WHERE NOT b_del " +
                         "ORDER BY cur, id_cur ";
                 break;
             case SModConsts.CFGS_TP_MMS:
                 settings = new SGuiCatalogueSettings("Configuración", 1, 1, SLibConsts.DATA_TYPE_TEXT);
                 sql = "SELECT id_tp_mms AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
                         "FROM erp.cfgs_tp_mms " +
-                        "WHERE b_del = 0 " +
+                        "WHERE NOT b_del " +
                         "ORDER BY name, id_tp_mms ";
                 break;
             case SModConsts.CFGU_FUNC:
                 settings = new SGuiCatalogueSettings("Área funcional", 1, 1, SLibConsts.DATA_TYPE_TEXT);
                 sql = "SELECT id_func AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
                         "FROM " + SModConsts.TablesMap.get(type) + " " +
-                        "WHERE b_del = 0 " +
+                        "WHERE NOT b_del " +
                         "ORDER BY name, id_func ";
+                break;
+            case SModConsts.LOCU_CTY:
+                settings = new SGuiCatalogueSettings("País", 1);
+                sql = "SELECT id_cty AS " + SDbConsts.FIELD_ID + "1, cty AS " + SDbConsts.FIELD_ITEM + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " " +
+                        "WHERE NOT b_del " + 
+                        "ORDER BY cty, id_cty ";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

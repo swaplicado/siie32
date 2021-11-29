@@ -135,7 +135,7 @@ public class SFormLoanTypeAdjustment extends SBeanForm {
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyLoanType, SModConsts.HRSS_TP_LOAN, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyLoanType, SModConsts.HRSS_TP_LOAN, SModConsts.HRS_LOAN, null);
     }
 
     @Override

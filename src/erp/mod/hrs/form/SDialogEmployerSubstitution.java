@@ -11,9 +11,13 @@ import erp.mod.bps.db.SDbBizPartner;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SHrsEmployeeHireLog;
 import erp.mod.hrs.db.SHrsEmployeeUtils;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -30,10 +34,10 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogEmployerSubstitution extends SBeanFormDialog {
+public class SDialogEmployerSubstitution extends SBeanFormDialog implements FocusListener {
     
-    private static final String ERR_EMP_ACTTIVE = "¡El empleado debe estar inactivo para ser exportado a otra(s) empresa(s)!";
-    private static final String WAR_NO_ROLLBACK = "¡Esta operación no puede ser revertida!";
+    private static final String ERR_EMP_ACTTIVE = "¡El empleado debe estar inactivo para ser exportado a otra empresa!";
+    private static final String WAR_NO_ROLLBACK = "¡Esta operación no se puede revertir!";
 
     protected SDbEmployee moEmployee;
 
@@ -67,6 +71,9 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         jlDate = new javax.swing.JLabel();
         moDateDate = new sa.lib.gui.bean.SBeanFieldDate();
         jlDateHint = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jlDateLong = new javax.swing.JLabel();
+        jtfDateLong = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jlWarning = new javax.swing.JLabel();
         jtfWarning = new javax.swing.JTextField();
@@ -74,7 +81,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del movimiento:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -108,11 +115,24 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         jPanel11.add(moDateDate);
 
         jlDateHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlDateHint.setText("(con el patrón o los patrones sustitutos)");
+        jlDateHint.setText("(fecha de alta con el patrón sustituto)");
         jlDateHint.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel11.add(jlDateHint);
 
         jPanel2.add(jPanel11);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateLong.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlDateLong);
+
+        jtfDateLong.setEditable(false);
+        jtfDateLong.setText("01 de noviembre de 2001");
+        jtfDateLong.setFocusable(false);
+        jtfDateLong.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jtfDateLong);
+
+        jPanel2.add(jPanel5);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -121,6 +141,8 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         jPanel4.add(jlWarning);
 
         jtfWarning.setEditable(false);
+        jtfWarning.setForeground(java.awt.Color.red);
+        jtfWarning.setText("¡Advertencia!");
         jtfWarning.setFocusable(false);
         jtfWarning.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel4.add(jtfWarning);
@@ -139,11 +161,14 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDateHint;
+    private javax.swing.JLabel jlDateLong;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlNewEmployer;
     private javax.swing.JLabel jlWarning;
+    private javax.swing.JTextField jtfDateLong;
     private javax.swing.JTextField jtfEmployee;
     private javax.swing.JTextField jtfWarning;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
@@ -163,6 +188,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
 
         moFields.setFormButton(jbSave);
 
+        jtfWarning.setText("");
         jbSave.setText("Aceptar");
     }
     
@@ -184,6 +210,16 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
             SLibUtils.printException(this, e);
         }
     }
+    
+    private void renderDateLong() {
+        Date date = moDateDate.getValue();
+        jtfDateLong.setText(date == null ? "" : SLibUtils.DateFormatDateLong.format(date));
+        jtfDateLong.setCaretPosition(0);
+    }
+    
+    private void focusLostDate() {
+        renderDateLong();
+    }
 
     @Override
     public void initForm() {
@@ -197,11 +233,13 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         
         moKeyNewEmployer.resetField();
         moDateDate.setValue(miClient.getSession().getCurrentDate());
+        renderDateLong();
         
         addAllListeners();
     }
     
     @Override
+    @SuppressWarnings("unchecked")
     public void reloadCatalogues() {
         try {
             // get list of ID's of companies to wich the employee is already a member:
@@ -241,8 +279,13 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
             if (moEmployee.isActive()) {
                 validation.setMessage(ERR_EMP_ACTTIVE);
             }
-            else if (miClient.showMsgBoxConfirm("¿Está seguro que desea cambiar a '" + jtfEmployee.getText() + "' a '" + moKeyNewEmployer.getSelectedItem().getItem() + "'?\n"
-                    + "Fecha de alta: " + SLibUtils.DateFormatDate.format(moDateDate.getValue()) + ".\n"
+            else if (miClient.showMsgBoxConfirm("¿Está seguro que desea realizar la siguiente sustitución patronal:\n"
+                    + "empleado:\n"
+                    + jtfEmployee.getText() + "\n"
+                    + "patrón sustituto:\n"
+                    + moKeyNewEmployer.getSelectedItem().getItem() + "\n"
+                    + "fecha de alta:\n"
+                    + SLibUtils.DateFormatDate.format(moDateDate.getValue()) + " (" + SLibUtils.DateFormatDateLong.format(moDateDate.getValue()) + ")?\n"
                     + WAR_NO_ROLLBACK) != JOptionPane.YES_OPTION) {
                 validation.setMessage("Favor de revisar los datos de la sustitución patronal.");
             }
@@ -253,12 +296,12 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
 
     @Override
     public void addAllListeners() {
-        
+        moDateDate.getComponent().addFocusListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        
+        moDateDate.getComponent().removeFocusListener(this);
     }
 
     @Override
@@ -283,6 +326,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
                 renderEmployee((int[]) value);
                 break;
             default:
+                // do nothing
         }
     }
 
@@ -298,7 +342,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         try {
             switch (type) {
                 case SModConsts.HRSU_EMP:
-                    // new employer connection:
+                    // new employer DB connection:
                     Connection connection = SClientUtils.createConnection((String) moKeyNewEmployer.getSelectedItem().getComplement()); // convenience variable
                     
                     /*
@@ -321,10 +365,10 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
                     //hrsEmployeeHireLog.setFkUserUpdateId(...);
                     
                     hrsEmployeeHireLog.setIsAuxFirstHiring(false); // employee has been hired at least once!
-                    hrsEmployeeHireLog.setIsAuxForceFirstHiring(true); // to emulate a first-higing movement
+                    hrsEmployeeHireLog.setIsAuxForceFirstHiring(true); // emulate a first-higing movement
                     hrsEmployeeHireLog.setIsAuxModification(false);
                     hrsEmployeeHireLog.setIsAuxCorrection(false);
-                    hrsEmployeeHireLog.setAuxFormerEmployerConnection(miClient.getSession().getStatement().getConnection()); // former employer connection (in current user session)
+                    hrsEmployeeHireLog.setAuxFormerEmployerConnection(miClient.getSession().getStatement().getConnection()); // former employer DB connection (current DB connection in user session)
                     
                     moEmployee.setActive(true); // re-active this inactive employee
                     moEmployee.setDateLastHire(moDateDate.getValue());
@@ -346,5 +390,20 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         }
 
         return value;
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof JFormattedTextField) {
+            JFormattedTextField field = (JFormattedTextField) e.getSource();
+            if (field == moDateDate.getComponent()) {
+                focusLostDate();
+            }
+        }
     }
 }

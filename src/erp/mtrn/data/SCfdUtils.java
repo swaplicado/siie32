@@ -61,7 +61,6 @@ import erp.mod.hrs.db.SHrsFormerReceipt;
 import erp.mod.hrs.db.SHrsFormerReceiptConcept;
 import erp.mtrn.form.SDialogRestoreCfdi;
 import erp.print.SDataConstantsPrint;
-import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -115,7 +114,6 @@ import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlUtils;
 import views.core.soap.services.apps.CancelaCFDResult; 
 import views.core.soap.services.apps.FolioArray; 
@@ -278,10 +276,10 @@ public abstract class SCfdUtils implements Serializable {
 
     private static boolean canObtainCfdXml(final SDataCfd cfd) throws Exception {
         if (cfd.isOwnCfd() && !cfd.isCfd() && !cfd.isCfdi()) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante fiscal desconocido.");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante desconocido.");
         }
         else if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_NEW) {
-            throw new Exception("El comprobante fiscal no está emitido.");
+            throw new Exception("El comprobante no está emitido.");
         }
         else if (cfd.isCfdi()) {
             if (!cfd.isStamped()) {
@@ -300,7 +298,7 @@ public abstract class SCfdUtils implements Serializable {
 
     private static boolean canObtainCfdCancelAck(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (!cfd.isCfd() && !cfd.isCfdi()) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante fiscal desconocido.");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante desconocido.");
         }
         else {
             if (cfd.isCfd()) {
@@ -665,7 +663,6 @@ public abstract class SCfdUtils implements Serializable {
         SDataCfdPayment dataCfdPayment = null;
         SDataPayrollReceiptIssue dataPayrollReceiptIssue = null;
         SSrvLock lock = null;
-        SRedisLock rlock = null;
         SCfdiSignature cfdiSignature = null;
         String xmlStamping = "";
         String xmlAckCancellation = "";
@@ -678,20 +675,17 @@ public abstract class SCfdUtils implements Serializable {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
                     registryKey = new int[] { dataCfd.getFkDpsYearId_n(), dataCfd.getFkDpsDocId_n() };
                     lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60); // 1 minute timeout
-                    rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                     registryKey = new int[] { dataCfd.getPkCfdId() };
                     lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60); // 1 minute timeout
-                    rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                     if (payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
                         registryKey = new int[] { dataCfd.getFkPayrollReceiptPayrollId_n(), dataCfd.getFkPayrollReceiptEmployeeId_n(), dataCfd.getFkPayrollReceiptIssueId_n() };
                         lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60); // 1 minute timeout
-                        rlock = SRedisLockUtils.gainLock(client, SModConsts.HRS_PAY_RCP_ISS, registryKey, 60);
                     }
                     break;
                 default:
@@ -790,6 +784,8 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setPayrollReceiptPayrollId(dataCfd.getFkPayrollReceiptPayrollId_n());
                         packet.setPayrollReceiptEmployeeId(dataCfd.getFkPayrollReceiptEmployeeId_n());
                         packet.setPayrollReceiptIssueId(dataCfd.getFkPayrollReceiptIssueId_n());
+                        packet.setReceiptPaymentId(dataCfd.getFkReceiptPaymentId_n());
+                        packet.setBillOfLadingId(dataCfd.getFkBillOfLadingId_n());
 
                         if (dataCfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                             switch (dataCfd.getFkCfdTypeId()) {
@@ -868,17 +864,11 @@ public abstract class SCfdUtils implements Serializable {
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
-            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
-            }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
             }
             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -2174,44 +2164,46 @@ public abstract class SCfdUtils implements Serializable {
      * @param dpsAnnulmentType
      * @throws Exception 
      */
-    private static void  processAnnul(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, final int dpsAnnulmentType) throws Exception {
-        int result = SLibConstants.UNDEFINED;
-        String error = "";
+    private static void processAnnul(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, final int dpsAnnulmentType) throws Exception {
+        Object key = null;
         SDataDps dps = null;
+        SDataCfdPayment cfdPayment = null;
         SDataPayrollReceiptIssue receiptIssue = null;
         SSrvLock lock = null;
-        SRedisLock rlock = null;
         SServerRequest request = null;
         SServerResponse response = null;
 
         try {
             switch (cfd.getFkCfdTypeId()) {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
-                    // Annul DPS:
-
-                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-
-                    // Attempt to gain data lock:
-
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-                    rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, dps.getPrimaryKey(), 60);
+                    // annul invoice or credit note:
                     
-                    if (dps != null) {
+                    key = new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() };
+                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_SILENT);
+
+                    if (dps == null) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
+                    }
+                    else {
+                        // lock registry:
+                        
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, key, 1000 * 60); // 1 min. timeout
+                        
+                        // check if registry can be annuled:
+                        
                         request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
                         request.setPacket(dps);
                         response = client.getSessionXXX().request(request);
 
                         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                            error = response.getMessage();
+                            throw new Exception(response.getMessage());
                         }
                         else {
-                            result = response.getResultType();
-
-                            if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                            if (response.getResultType() != SLibConstants.DB_CAN_ANNUL_YES) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
                             }
                             else {
-                                // Annul registry:
+                                // annul registry:
 
                                 dps.setIsRegistryRequestAnnul(true);
                                 dps.setFkDpsAnnulationTypeId(dpsAnnulmentType);
@@ -2222,107 +2214,132 @@ public abstract class SCfdUtils implements Serializable {
                                 response = client.getSessionXXX().request(request);
 
                                 if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                    error = response.getMessage();
+                                    throw new Exception(response.getMessage());
                                 }
                                 else {
-                                    result = response.getResultType();
-
-                                    if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
-                                        error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                    if (response.getResultType() != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
                                     }
                                 }
                             }
                         }
-                    }
-                    else {
-                        error = SLibConstants.MSG_ERR_DB_REG_READ;
                     }
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
-                    // no action needed
+                    // annul receipt of payment:
+
+                    key = new int[] { cfd.getPkCfdId() };
+                    cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, key, SLibConstants.EXEC_MODE_SILENT);
+                    
+                    if (cfdPayment == null) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
+                    }
+                    else {
+                        // lock registry:
+
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, key, 1000 * 60); // 1 min. timeout
+
+                        // check if registry can be annuled:
+                        
+                        request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                        request.setPacket(cfdPayment);
+                        response = client.getSessionXXX().request(request);
+
+                        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                            throw new Exception(response.getMessage());
+                        }
+                        else {
+                            if (response.getResultType() != SLibConstants.DB_CAN_ANNUL_YES) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                            }
+                            else {
+                                // annul registry:
+
+                                cfdPayment.setIsRegistryRequestAnnul(true);
+                                cfdPayment.setFkUserEditId(client.getSession().getUser().getPkUserId());
+                                cfdPayment.setFkUserDeleteId(client.getSession().getUser().getPkUserId()); // to preserve user when deleting accounting
+
+                                request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
+                                request.setPacket(cfdPayment);
+                                response = client.getSessionXXX().request(request);
+
+                                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                    throw new Exception(response.getMessage());
+                                }
+                                else {
+                                    if (response.getResultType() != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                                    }
+                                }
+                            }
+                        }
+                    }
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                    // Annul Payroll CFDI:
-
+                    // annul payroll receipt:
+                    
                     if (payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
+                        key = new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() };
                         receiptIssue = new SDataPayrollReceiptIssue();
-
-                        if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        if (receiptIssue.read(key, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
                         }
 
-                        // Attempt to gain data lock:
-
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-                        rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 60);
+                        // lock registry:
                         
-                        if (receiptIssue != null) {
-                            request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
-                            request.setPacket(receiptIssue);
-                            response = client.getSessionXXX().request(request);
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, key, 1000 * 60); // 1 min. timeout
 
-                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                error = response.getMessage();
-                            }
-                            else {
-                                result = response.getResultType();
+                        // check if registry can be annuled:
+                        
+                        request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                        request.setPacket(receiptIssue);
+                        response = client.getSessionXXX().request(request);
 
-                                if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                    error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
-                                }
-                                else {
-                                    // Annul registry:
-
-                                    receiptIssue.setIsRegistryRequestAnnul(true);
-                                    receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
-
-                                    request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
-                                    request.setPacket(receiptIssue);
-                                    response = client.getSessionXXX().request(request);
-
-                                    if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                        error = response.getMessage();
-                                    }
-                                    else {
-                                        result = response.getResultType();
-
-                                        if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
-                                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
-                                        }
-                                    }
-                                }
-                            }
+                        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                            throw new Exception(response.getMessage());
                         }
                         else {
-                            error = SLibConstants.MSG_ERR_DB_REG_READ;
+                            if (response.getResultType() != SLibConstants.DB_CAN_ANNUL_YES) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                            }
+                            else {
+                                // annul registry:
+
+                                receiptIssue.setIsRegistryRequestAnnul(true);
+                                receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
+
+                                request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
+                                request.setPacket(receiptIssue);
+                                response = client.getSessionXXX().request(request);
+
+                                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                    throw new Exception(response.getMessage());
+                                }
+                                else {
+                                    if (response.getResultType() != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
+                                    }
+                                }
+                            }
                         }
                     }
                     break;
                     
                 default:
-            }
-            
-            if (!error.isEmpty()) {
-                throw new Exception(error);
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
         }
         catch (Exception e) {
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
-            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
-            }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
             }
         }
     }
@@ -2783,7 +2800,7 @@ public abstract class SCfdUtils implements Serializable {
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                         cfdPrint.printCfdi32(cfd, printMode, dps);
                         break;
-                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33://
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                         cfdPrint.printCfdi33(cfd, printMode, dps);
                         break;
                     default:
@@ -2971,7 +2988,6 @@ public abstract class SCfdUtils implements Serializable {
             // Sign CFDI:
             
             if (canCfdiSign(client, cfd, false)) {
-
                 switch (cfd.getFkCfdTypeId()) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
                         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
@@ -3277,6 +3293,10 @@ public abstract class SCfdUtils implements Serializable {
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
+        
+        if (cfdPayment.getDbmsReceiptPayment() != null) {
+            packet.setReceiptPaymentId(cfdPayment.getDbmsReceiptPayment().getPkReceiptId());
+        }
 
         packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAY_REC);
         packet.setFkXmlTypeId(xmlType);
@@ -3368,16 +3388,16 @@ public abstract class SCfdUtils implements Serializable {
         boolean valid = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante fiscal.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante fiscal solicitado no es un CFDI.");
+            throw new Exception("El comprobante solicitado no es un CFDI.");
         }
         else {
             SDataPac pac = getPacForValidation(client, cfd);
 
             if (pac == null) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo fue posible determinar un PAC para la verificación del CFDI.");
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo fue posible determinar cuál es el PAC para la verificación del CFDI.");
             }
 
             if (!(cfd.getIsProcessingWebService() || cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf())) {
@@ -3456,10 +3476,10 @@ public abstract class SCfdUtils implements Serializable {
         boolean isRestore = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante fiscal.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante fiscal solicitado no es un CFDI.");
+            throw new Exception("El comprobante solicitado no es un CFDI.");
         }
         else if (cfd.isStamped()) {
             throw new Exception("No es necesario restaurar el CFDI.");
@@ -3510,10 +3530,10 @@ public abstract class SCfdUtils implements Serializable {
         boolean isRestore = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante fiscal.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante fiscal solicitado no es un CFDI.");
+            throw new Exception("El comprobante solicitado no es un CFDI.");
         }
         else {
             if (isRequestByUser) {

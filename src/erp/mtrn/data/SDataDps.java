@@ -105,8 +105,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_CLO_COMMS = 4;
     public static final int FIELD_CLO_COMMS_USR = 5;
     public static final int FIELD_USR = 6;
-    public static final int LEN_SERIES = 15; // maximum length of number series
-    public static final int LEN_NUMBER = 15; // maximum length of number
+    public static final int LEN_SERIES = 25; // maximum length of number series
+    public static final int LEN_NUMBER = 32; // maximum length of number
     public static final String TXT_PREPAY_INV = "facturación anticipos";
     public static final String TXT_OPS_TYPE = "tipo de operación";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
@@ -2002,7 +2002,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
     public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
-	public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }																		
+    public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }																		
     
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
@@ -2916,7 +2916,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // 4.3 Business partner's asset or liability:
                         
-                        //Determinación de los distintos impuestos en el documento
+                        // determinación de los distintos impuestos en el documento:
                         boolean taxEmpty = false;
                         ArrayList<int[]> taxes = new ArrayList();
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
@@ -2990,8 +2990,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
-                                // Determina si ya existe el impuesto en la lista, si no existe se agrega otro monto con el impuesto faltante,
-                                // si existe, se agrega el monto al impuesto existente
+                                // determina si ya existe el impuesto en la lista, si no existe se agrega otro monto con el impuesto faltante, si existe, se agrega el monto al impuesto existente:
                                 int[] taxPk = new int[]{ 0, 0, 0};
                                 for (SDataDpsEntryTax dbmsEntryTax : entry.getDbmsEntryTaxes()) {
                                     if (dbmsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
@@ -3009,7 +3008,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 
-                                // considera el caso de cuando no hay impuestos en la partida
+                                // considera el caso de cuando no hay impuestos en la partida:
                                 if (entry.getDbmsEntryTaxes().isEmpty()) {
                                     taxPk[2] = 1;
                                 }
@@ -3499,8 +3498,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                             anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
                                                             isAdjustment() ? entry.getKeyAuxDps() : null, null);
 
-                                                    oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
-                                                    oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
+                                                    oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED); // se quita el vínculo al documento porque no se trata propiamente de un ajuste al mismo, sino una especie de pago vía nota de crédito
+                                                    oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED); // se quita el vínculo al documento porque no se trata propiamente de un ajuste al mismo, sino una especie de pago vía nota de crédito
 
                                                     if (isDebitForOperations()) {
                                                         oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
@@ -5658,10 +5657,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_INV);
                 
-                if (dpsEntry.getDbmsComplement() == null) {
+                if (dpsEntry.getDbmsComplement() == null || dpsEntry.getDbmsComplement().getConcept().isEmpty()) {
                     //use original data of current document entry:
                     
                     String descripcion = dpsEntry.getConcept();
+                    
                     for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
                         if (dpsEntryNotes.getIsCfd()) {
                             descripcion += " - " + dpsEntryNotes.getNotes();
@@ -5682,6 +5682,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     concepto.setClaveUnidad(dpsEntry.getDbmsComplement().getCfdUnit());
                     concepto.setUnidad("");
                     concepto.setDescripcion(dpsEntry.getDbmsComplement().getConcept());
+                }
+                
+                if (dpsEntry.getDbmsComplement() != null && dpsEntry.getDbmsComplement().getPredial().isEmpty()) {
+                    concepto.setPredial(dpsEntry.getDbmsComplement().getPredial());
                 }
                 
                 double price;

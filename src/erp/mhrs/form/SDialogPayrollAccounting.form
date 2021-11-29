@@ -348,7 +348,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlTotalAvailables">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="n"/>
+                    <Property name="text" type="java.lang.String" value="Empleados disponibles..."/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 20]"/>
                     </Property>
@@ -382,7 +382,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlTotalSelected">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="n"/>
+                    <Property name="text" type="java.lang.String" value="Empleados seleccionados..."/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 20]"/>
                     </Property>

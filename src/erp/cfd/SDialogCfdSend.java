@@ -102,7 +102,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
 
         mtfCfdNumber.setEditable(false);
         mtfCfdNumber.setFocusable(false);
-        mtfCfdNumber.setPreferredSize(new java.awt.Dimension(100, 23));
+        mtfCfdNumber.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel2.add(mtfCfdNumber);
 
         jPanel7.add(jPanel2);
@@ -117,19 +117,19 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
 
         mtfBizPartner.setEditable(false);
         mtfBizPartner.setFocusable(false);
-        mtfBizPartner.setPreferredSize(new java.awt.Dimension(350, 23));
+        mtfBizPartner.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel4.add(mtfBizPartner);
 
         jPanel7.add(jPanel4);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmail.setText("Cuenta correo-e*");
+        jlEmail.setText("Cuentas correo-e:*");
         jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlEmail);
 
         moTextEmail.setMaxLength(255);
-        moTextEmail.setPreferredSize(new java.awt.Dimension(275, 23));
+        moTextEmail.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel5.add(moTextEmail);
 
         jbEmailEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
@@ -154,9 +154,9 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         jlDummy1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlDummy1);
 
-        jlDummy2.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
-        jlDummy2.setText("Cambios a la cuenta de correo-e se guardan en el asociado de negocios.");
-        jlDummy2.setPreferredSize(new java.awt.Dimension(350, 23));
+        jlDummy2.setForeground(java.awt.Color.red);
+        jlDummy2.setText("¡Los cambios a las cuentas de correo-e se guardan en el asociado de negocios!");
+        jlDummy2.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel8.add(jlDummy2);
 
         jPanel7.add(jPanel8);
@@ -196,7 +196,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
      */
     
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 480, 300);
+        SGuiUtils.setWindowBounds(this, 640, 400);
 
         jbSave.setText("Aceptar");
         moTextEmail.setTextSettings(SGuiUtils.getLabelName(jlEmail), 255);
@@ -213,10 +213,10 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         mtfBizPartner.setCaretPosition(0);
         
         if (mnBizPartnerBranch == SLibConsts.UNDEFINED) {
-            moTextEmail.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+            moTextEmail.setValue(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
         else {
-            moTextEmail.setText(moBizPartner.getDbmsBizPartnerBranch(new int[] { mnBizPartnerBranch }).getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+            moTextEmail.setValue(moBizPartner.getDbmsBizPartnerBranch(new int[] { mnBizPartnerBranch }).getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
         
         enableEmailFields(moTextEmail.getText().isEmpty());

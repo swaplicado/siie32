@@ -208,7 +208,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsDpsAdjustmentsAsDps = new Vector<>();
         mvDbmsDpsAdjustmentsAsAdjustment = new Vector<>();
 
-        mbFlagReadLinksAswell = true;
+        mbFlagReadLinksAswell = true; // must be independent of a reset!
 
         reset();
     }
@@ -690,7 +690,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         manAuxPkDpsEntryPrice = null;
         mbAuxPreserveQuantity = false;
         
-        mbFlagReadLinksAswell = false;
+        //mbFlagReadLinksAswell = false; // must be independent of a reset!
         mbFlagMinorChangesEdited = false;
     
         mnXtaPkDpsYearConId = 0;

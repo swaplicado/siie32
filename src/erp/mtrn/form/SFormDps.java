@@ -35,6 +35,7 @@ import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
+import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBranch;
@@ -124,7 +125,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Claudio Peña, Isabel Servín
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Isabel Servín, Claudio Peña
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
     
@@ -511,6 +512,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryWizard = new javax.swing.JButton();
         jsEntry03 = new javax.swing.JSeparator();
         jbEntryViewLinks = new javax.swing.JButton();
+        jbExportCsv = new javax.swing.JButton();
         jpEntriesControlsEast = new javax.swing.JPanel();
         jlAdjustmentSubtypeId = new javax.swing.JLabel();
         jcbAdjustmentSubtypeId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -1624,6 +1626,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryViewLinks.setToolTipText("Ver vínculos de la partida [Ctrl + L]");
         jbEntryViewLinks.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryViewLinks);
+
+        jbExportCsv.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_file_csv.gif"))); // NOI18N
+        jbExportCsv.setToolTipText("Exportar CSV [Ctrl + E]");
+        jbExportCsv.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbExportCsv);
 
         jpEntriesControls.add(jpEntriesControlsWest, java.awt.BorderLayout.WEST);
 
@@ -3273,6 +3280,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryImportFromDps.addActionListener(this);
         jbEntryWizard.addActionListener(this);
         jbEntryViewLinks.addActionListener(this);
+        jbExportCsv.addActionListener(this);
         jbTaxRegionId.addActionListener(this);
         jbNotesNew.addActionListener(this);
         jbNotesEdit.addActionListener(this);
@@ -3353,7 +3361,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
         SFormUtilities.putActionMap(moPanelRecord, actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
     }
-
+    
+    public void actionExportCsv() {
+        if (jbExportCsv.isEnabled()) {
+            STableUtilities.actionExportCsv(miClient, moPaneGridEntries, getTitle());
+        }
+    }
+    
     private void windowActivated() {
         boolean goAhead = true;
         
@@ -3393,7 +3407,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 mbFormSettingsOk = false;
                                 actionCancel();
                             }
-                        }
+                        } 
 
                         if (moBizPartner == null) {
                             pickBizPartner(); // choose business partner
@@ -5185,7 +5199,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //jbDateStartCredit.setEnabled(...);    // status already set by previous call to method itemChangeFkPaymentTypeId()
             //jcbFkLanguageId.setEnabled(...);      // language is not editable
             jcbFkDpsNatureId.setEnabled(jcbFkDpsNatureId.getItemCount() > 2);
-            jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && jcbFkFunctionalAreaId.getItemCount() != 2);
+            jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && (jcbFkFunctionalAreaId.getItemCount() - 1) != 1); // enable when functional areas applying and only one asignated to current user
 
             jcbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             jbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
@@ -5554,7 +5568,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             jcbNumberSeries.setEditable(true);
             moFieldNumberSeries = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jcbNumberSeries, jlNumber);
-            moFieldNumberSeries.setLengthMax(15);
+            moFieldNumberSeries.setLengthMax(SDataDps.LEN_SERIES);
             
             mbIsNumberSeriesRequired = false;
             mbIsNumberSeriesAvailable = false;
@@ -8598,6 +8612,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbEntryViewLinks;
     private javax.swing.JButton jbEntryWizard;
     private javax.swing.JButton jbExchangeRate;
+    private javax.swing.JButton jbExportCsv;
     private javax.swing.JButton jbFkCarrierId_n;
     private javax.swing.JButton jbFkCurrencyId;
     private javax.swing.JButton jbFkIncotermId;
@@ -9024,7 +9039,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (!isApplingFunctionalAreas()) {
             moFieldFkFunctionalAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NON });
         }
-        else if (jcbFkFunctionalAreaId.getItemCount() == 2) {
+        else if ((jcbFkFunctionalAreaId.getItemCount() - 1) == 1) {
             jcbFkFunctionalAreaId.setSelectedIndex(1);
         }
         moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });
@@ -9478,14 +9493,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
 
                             if (applicationsCy > prepaymentsCy) {
-                                validation.setMessage("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
-                                        + "no puede ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
-                                validation.setComponent(moPaneGridEntries);
-                                jTabbedPane.setSelectedIndex(TAB_ETY);
+                                if (miClient.showMsgBoxConfirm("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
+                                        + "no debería ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + "." +
+                                        SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                    validation.setMessage("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
+                                            + "NO debería ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
+                                    validation.setComponent(moPaneGridEntries);
+                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                                }
                             }
                             else if (mbIsDpsInvoice && operationsAvailable && prepaymentsCy > 0 && applicationsCy == 0) {
-                                if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos facturados a su favor por $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ",\n"
-                                        + "¿está seguro que NO desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
+                                if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos facturados a su favor por $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ","
+                                        + "\n¿está seguro que NO desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
                                         validation.setMessage("Se deberían aplicar anticipos facturados en este documento.");
                                         validation.setComponent(moPaneGridEntries);
                                         jTabbedPane.setSelectedIndex(TAB_ETY);
@@ -10485,6 +10504,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbEntryViewLinks) {
                     actionEntryViewLinks();
+                }
+                else if (button == jbExportCsv) {
+                    actionExportCsv();
                 }
                 else if (button == jbTaxRegionId) {
                     actionTaxRegionId();

@@ -483,9 +483,9 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolShowAmounts">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Ver seguro y garant&#xed;a"/>
+                    <Property name="text" type="java.lang.String" value="Mostrar garant&#xed;a y seguro"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[200, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

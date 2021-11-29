@@ -91,6 +91,10 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
+    public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    
+    public static final int USD_XRT_POLICY_BANXICO = 1;
+    public static final int USD_XRT_POLICY_INFORMAL = 2;
     
     public static final int CFGX_IVM_FIFO = 1;
     
@@ -1114,6 +1118,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_XML_CFDI_33 = 4;
 
     public static final int TRNS_TP_CFD_INV = 1;        // invoice
+    public static final int TRNS_TP_CFD_BOL = 2;        // bill of lading
     public static final int TRNS_TP_CFD_PAY_REC = 6;    // payment receipt
     public static final int TRNS_TP_CFD_PAYROLL = 11;   // payroll
 
@@ -1135,6 +1140,11 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason (Int. Commerce)
     public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type (Int. Commerce)
     public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys (Int. Commerce)
+    public static final int TRNS_CFD_CAT_BOL_TRA = 31;          // BOL: transportation code
+    public static final int TRNS_CFD_CAT_BOL_PER_TP = 32;       // BOL: SCT permisson type
+    public static final int TRNS_CFD_CAT_BOL_MOTOR_CFG = 33;    // BOL: motortransport configuration
+    public static final int TRNS_CFD_CAT_BOL_TRAILER_STP = 34;  // BOL: trailer subtype
+    public static final int TRNS_CFD_CAT_BOL_TRANSP_PART = 35;  // BOL: transport part
     
     public static final String TRNS_CFD_CAT_PAY_WAY_99 = "99";  // Por definir
     
@@ -1270,8 +1280,10 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_PUR_TOT_BY_AGS_ITEM = 211;
     public static final int TRNX_PUR_TOT_BY_TP_BP = 212;
     public static final int TRNX_PUR_TOT_BY_TP_BP_BP = 213;
-    public static final int TRNX_PUR_DPS_BY_ITEM_BP_ALL = 214;
-    public static final int TRNX_PUR_DPS_BY_ITEM_BP_FIL = 215;
+    /** All document entries purchase at once. What type of document is needed must be provided: invoices or credit notes. */
+    public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ALL = 214;
+    /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
+    public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ONE = 215;
 
     public static final int TRNX_SAL_TOT = 301;
     public static final int TRNX_SAL_TOT_MONTH = 302;
@@ -1286,8 +1298,10 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_SAL_TOT_BY_AGS_ITEM = 311;
     public static final int TRNX_SAL_TOT_BY_TP_BP = 312;
     public static final int TRNX_SAL_TOT_BY_TP_BP_BP = 313;
-    public static final int TRNX_SAL_DPS_BY_ITEM_BP_ALL = 314;
-    public static final int TRNX_SAL_DPS_BY_ITEM_BP_FIL = 315;
+    /** All sales document entries at once. What type of document is needed must be provided: invoices or credit notes. */
+    public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ALL = 314;
+    /** Sales document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
+    public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ONE = 315;
 
     public static final int TRNX_PUR_BACKORDER_CON = 11;
     public static final int TRNX_PUR_BACKORDER_CON_ITEM = 12;
@@ -1605,6 +1619,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_PS_CL_ITEM_TOT = 206052;
     public static final int REP_FIN_BPS_ACC_AGI = 206061;       // business partner accounts aging
     public static final int REP_FIN_BPS_ACC_AGI_CRED = 206062;  // business partner accounts aging with credit information (credit days, credit limit, guarantee & insurance)
+    public static final int REP_FIN_BPS_ACC_MOV_ORD = 206064;
 
     public static final int REP_TRN_DPS_BPS = 207001;
     public static final int REP_TRN_DPS_UNP = 207002;

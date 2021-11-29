@@ -29,6 +29,8 @@ import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.cfd.SCfdPaymentEntry;
 import erp.mtrn.data.cfd.SCfdPaymentEntryDoc;
+import erp.mtrn.data.cfd.SDataReceiptPayment;
+import erp.mtrn.data.cfd.SDataReceiptPaymentPay;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -53,6 +55,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     protected SDataBizPartner moAuxDbmsDataEmisor;
     protected SDataBizPartnerBranch moAuxDbmsDataEmisorSucursal;
     
+    // actual database registry of receipt of payment:
+    protected SDataReceiptPayment moDbmsReceiptPayment;
+    
     // members that belong to XML of CFDI:
     protected String msAuxCfdConfirmacion;
     protected String msAuxCfdEmisorRegimenFiscal;
@@ -70,6 +75,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     
     // auxiliar members:
     protected boolean mbAuxIsProcessingValidation;
+    protected boolean mbAuxIsProcessingStorageOnly; // for temporary use only, to create the storage of all former receipts of payments prior to SIIE 3.2 191
     
     /**
      * Creates database registry of CFDI of Payments.
@@ -123,6 +129,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public SDataBizPartner getAuxDbmsDataEmisor() { return moAuxDbmsDataEmisor; }
     public SDataBizPartnerBranch getAuxDbmsDataEmisorSucursal() { return moAuxDbmsDataEmisorSucursal; }
     
+    public void setDbmsReceiptPayment(SDataReceiptPayment o) { moDbmsReceiptPayment = o; }
+    
+    public SDataReceiptPayment getDbmsReceiptPayment() { return moDbmsReceiptPayment; }
+    
     public void setAuxCfdConfirmacion(String s) { msAuxCfdConfirmacion = s; }
     public void setAuxCfdEmisorRegimenFiscal(String s) { msAuxCfdEmisorRegimenFiscal = s; }
     public void setAuxCfdDbmsDataReceptor(SDataBizPartner o) { moAuxCfdDbmsDataReceptor = o; }
@@ -149,8 +159,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public int getFkUserDeleteId() { return mnAuxFkUserDeleteId; }
     
     public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
+    public void setAuxIsProcessingStorageOnly(boolean b) { mbAuxIsProcessingStorageOnly = b; }
     
     public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
+    public boolean getAuxIsProcessingStorageOnly() { return mbAuxIsProcessingStorageOnly; }
     
     public void copyCfdMembers(final SDataCfdPayment sourceCfdPayment) {
         this.msAuxCfdConfirmacion = sourceCfdPayment.msAuxCfdConfirmacion;
@@ -160,6 +172,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         this.msAuxCfdCfdiRelacionadosTipoRelacion = sourceCfdPayment.msAuxCfdCfdiRelacionadosTipoRelacion;
         this.msAuxCfdCfdiRelacionadoUuid = sourceCfdPayment.msAuxCfdCfdiRelacionadoUuid;
         this.moAuxCfdDbmsDataCfdCfdiRelacionado = sourceCfdPayment.moAuxCfdDbmsDataCfdCfdiRelacionado;
+        this.maAuxCfdPaymentEntries.clear();
         this.maAuxCfdPaymentEntries.addAll(sourceCfdPayment.maAuxCfdPaymentEntries);
     }
     
@@ -188,17 +201,459 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     public static int getDbmsDataReceptorId(final Statement statement, final int idCfdi) throws Exception {
         int idReceptor = 0;
+        String sql;
+        ResultSet resultSet;
         
-        String sql = "SELECT DISTINCT re.fid_bp_nr "
+        // attemt to find out to whom this registry was issued:
+        sql = "SELECT DISTINCT re.fid_bp_nr "
                 + "FROM fin_rec AS r "
                 + "INNER JOIN fin_rec_ety re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
                 + "WHERE NOT r.b_del AND NOT re.b_del AND re.fid_cfd_n = " + idCfdi + ";";
-        ResultSet resultSet = statement.executeQuery(sql);
+        resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             idReceptor = resultSet.getInt(1);
         }
+        else {
+            // second attemt to find out to whom this registry was issued:
+            sql = sql.replace("AND NOT re.b_del ", "AND re.b_del ");
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                idReceptor = resultSet.getInt(1);
+            }
+        }
+        
+        resultSet.close();
         
         return idReceptor;
+    }
+    
+    /**
+     * Read payment from data registry SDataReceiptPayment.
+     * It is assumed that member moDbmsDataCfd has been already read and properly setup.
+     * @param statement DBMS statement.
+     * @throws Exception 
+     */
+    private void readPaymentFromReceiptPayment(final Statement statement) throws Exception {
+        moDbmsReceiptPayment = new SDataReceiptPayment();
+        moDbmsReceiptPayment.read(new int[] { moDbmsDataCfd.getFkReceiptPaymentId_n() }, statement);
+
+        // read 'Emisor' branch and business partner data objects:
+
+        moAuxDbmsDataEmisorSucursal = new SDataBizPartnerBranch();
+        moAuxDbmsDataEmisorSucursal.read(new int[] { moDbmsReceiptPayment.getFkCompanyBranchId() }, statement);
+
+        moAuxDbmsDataEmisor = new SDataBizPartner();
+        moAuxDbmsDataEmisor.read(new int[] { moAuxDbmsDataEmisorSucursal.getFkBizPartnerId() }, statement);
+
+        mnAuxFkUserNewId = moDbmsReceiptPayment.getFkUserNewId();
+        mnAuxFkUserEditId = moDbmsReceiptPayment.getFkUserEditId();
+        mnAuxFkUserDeleteId = moDbmsReceiptPayment.getFkUserDeleteId();
+
+        // parse CFDI to extract auxiliar data:
+
+        msAuxCfdConfirmacion = moDbmsReceiptPayment.getConfirmationNum();
+        msAuxCfdEmisorRegimenFiscal = moDbmsReceiptPayment.getTaxRegimeCode();
+
+        msAuxCfdCfdiRelacionadosTipoRelacion = moDbmsReceiptPayment.getCfdiRelationCode();
+        msAuxCfdCfdiRelacionadoUuid = moDbmsReceiptPayment.getCfdiRelatedUuid();
+        if (!msAuxCfdCfdiRelacionadoUuid.isEmpty()) {
+            int id = STrnUtilities.getCfdIdByUuid(statement, msAuxCfdCfdiRelacionadoUuid);
+            if (id != 0) {
+                moAuxCfdDbmsDataCfdCfdiRelacionado = new SDataCfd();
+                if (moAuxCfdDbmsDataCfdCfdiRelacionado.read(new int[] { id }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n"
+                            + "CFDI relacionado (ID = " + id + ")");
+                }
+            }
+        }
+
+        if (moDbmsReceiptPayment.getFkFactoringBankId_n() != 0) {
+            moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
+            moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsReceiptPayment.getFkFactoringBankId_n() }, statement);
+        }
+        
+        for (SDataReceiptPaymentPay pay : moDbmsReceiptPayment.getDbmsReceiptPaymentPays()) {
+            SCfdPaymentEntry paymentEntry = pay.createCfdPaymentEntry(this, statement); // convenience variable
+            maAuxCfdPaymentEntries.add(paymentEntry);
+        }
+
+        moAuxCfdDbmsDataReceptor = new SDataBizPartner();
+        moAuxCfdDbmsDataReceptor.read(new int[] { moDbmsReceiptPayment.getFkBizPartnerId() }, statement);
+    }
+    
+    /**
+     * Read payment from financial records (journal vouchers).
+     * It is assumed that member moDbmsDataCfd has been already read and properly setup.
+     * @param statement DBMS statement.
+     * @throws Exception 
+     */
+    private void readPaymentFromFinRecords(final Statement statement) throws Exception {
+        Statement statementAux = statement.getConnection().createStatement();
+
+        // read 'Emisor' branch and business partner data objects:
+
+        moAuxDbmsDataEmisorSucursal = new SDataBizPartnerBranch();
+        moAuxDbmsDataEmisorSucursal.read(new int[] { moDbmsDataCfd.getFkCompanyBranchId_n() }, statementAux);
+
+        moAuxDbmsDataEmisor = new SDataBizPartner();
+        moAuxDbmsDataEmisor.read(new int[] { moAuxDbmsDataEmisorSucursal.getFkBizPartnerId() }, statementAux);
+
+        String sql;
+        ResultSet resultSet;
+        
+        int idReceptor = 0;
+        cfd.ver33.DElementComprobante comprobante = null;
+        
+        if (!moDbmsDataCfd.getDocXml().isEmpty()) {
+            comprobante = DCfdUtils.getCfdi33(moDbmsDataCfd.getDocXml());
+            
+            if (moDbmsDataCfd.getFkXmlStatusId() < SModSysConsts.TRNS_ST_DPS_ANNULED) {
+                // get creation-modification-deletion user from financial record (journal voucher) entries:
+
+                // find out who have edited this registry:
+                sql = "SELECT DISTINCT fid_usr_new, fid_usr_edit, fid_usr_del "
+                        + "FROM fin_rec_ety "
+                        + "WHERE fid_cfd_n = " + moDbmsDataCfd.getPkCfdId() + " AND NOT b_del "
+                        + "LIMIT 1;";
+                resultSet = statement.executeQuery(sql);
+                if (!resultSet.next()) {
+                    // a second attempt to find out who have edited this registry:
+                    sql = sql.replace("AND NOT b_del ", "AND b_del ");
+                    resultSet = statement.executeQuery(sql);
+                    if (!resultSet.next()) {
+                        throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n"
+                                + "Partidas de pólizas contables relacionadas con el comprobante.");
+                    }
+                    else {
+                        mnAuxFkUserNewId = resultSet.getInt("fid_usr_new");
+                        mnAuxFkUserEditId = resultSet.getInt("fid_usr_edit");
+                        mnAuxFkUserDeleteId = resultSet.getInt("fid_usr_del");
+                    }
+                }
+                else {
+                    mnAuxFkUserNewId = resultSet.getInt("fid_usr_new");
+                    mnAuxFkUserEditId = resultSet.getInt("fid_usr_edit");
+                    mnAuxFkUserDeleteId = resultSet.getInt("fid_usr_del");
+                }
+
+                // parse CFDI to extract auxiliar data:
+
+                msAuxCfdConfirmacion = comprobante.getAttConfirmacion().getString();
+                msAuxCfdEmisorRegimenFiscal = comprobante.getEltEmisor().getAttRegimenFiscal().getString();
+
+                if (comprobante.getEltOpcCfdiRelacionados() != null) {
+                    msAuxCfdCfdiRelacionadosTipoRelacion = comprobante.getEltOpcCfdiRelacionados().getAttTipoRelacion().getString();
+                    msAuxCfdCfdiRelacionadoUuid = comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString();
+                    int id = STrnUtilities.getCfdIdByUuid(statement, msAuxCfdCfdiRelacionadoUuid);
+                    if (id != 0) {
+                        moAuxCfdDbmsDataCfdCfdiRelacionado = new SDataCfd();
+                        if (moAuxCfdDbmsDataCfdCfdiRelacionado.read(new int[] { id }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n"
+                                    + "CFDI relacionado (ID = " + id + ")");
+                        }
+                    }
+                }
+
+                if (moDbmsDataCfd.getFkFactoringBankId_n() != 0) {
+                    moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
+                    moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsDataCfd.getFkFactoringBankId_n() }, statementAux);
+                }
+
+                // extract complement:
+
+                int numberPago = 0;
+                int factoringFeeEntry = 0;
+                int[] paymentEntryDocTypes = new int[] { SCfdPaymentEntryDoc.TYPE_INT, SCfdPaymentEntryDoc.TYPE_FEE, SCfdPaymentEntryDoc.TYPE_FEE_VAT };
+                HashMap<String, SDataRecord> mapRecords = new HashMap<>(); // key = financial record PK as String; value = financial record
+
+                if (comprobante.getEltOpcComplemento() != null) {
+                    for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+                        if (element instanceof DElementPagos) {
+                            // get XML payments:
+
+                            DElementPagos pagos = (DElementPagos) element;
+
+                            for (DElementPagosPago pago : pagos.getEltPagos()) {
+                                numberPago++;
+
+                                // read current payment's currency ID:
+
+                                int currencyId;
+
+                                sql = "SELECT id_cur "
+                                        + "FROM erp.cfgu_cur "
+                                        + "WHERE cur_key = '" + pago.getAttMonedaP().getString() + "' AND NOT b_del "
+                                        + "ORDER BY id_cur "
+                                        + "LIMIT 1;";
+                                resultSet = statement.executeQuery(sql);
+                                if (!resultSet.next()) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
+                                            + "Moneda " + pago.getAttMonedaP().getString() + " del pago #" + numberPago + ".");
+                                }
+                                else {
+                                    currencyId = resultSet.getInt(1);
+                                }
+
+                                // read current payment's financial record (journal voucher)
+
+                                SDataRecord record;
+                                int paymentEntryType = 0;
+                                int[] accountCashDestKey = null;
+
+                                sql = "SELECT ety_type, fid_rec_year, fid_rec_per, fid_rec_bkc, fid_rec_tp_rec, fid_rec_num, fid_acc_cash_cob_n, fid_acc_cash_acc_cash_n "
+                                        + "FROM trn_cfd_fin_rec "
+                                        + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + " AND id_ety = " + numberPago + ";";
+                                resultSet = statement.executeQuery(sql);
+                                if (!resultSet.next()) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
+                                            + "Póliza contable del pago #" + numberPago + ".");
+                                }
+                                else {
+                                    record = mapRecords.get(SDataRecord.getRecordPrimaryKey(resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num")));
+
+                                    if (record == null) {
+                                        record = new SDataRecord();
+                                        if (mbAuxIsProcessingStorageOnly) {
+                                            record.setAuxReadHeaderOnly(true); // to reduce dramatically reading time when entries and extra stuff are useless
+                                        }
+                                        record.read(new Object[] { resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num") }, statementAux);
+                                        mapRecords.put(record.getRecordPrimaryKey(), record);
+                                    }
+
+                                    paymentEntryType = resultSet.getInt("ety_type");
+
+                                    if (paymentEntryType == SCfdPaymentEntry.TYPE_FACTORING_FEE) {
+                                        factoringFeeEntry++; // to guess (WTF!) type of document payment entry
+                                    }
+
+                                    if (resultSet.getInt("fid_acc_cash_cob_n") != 0 && resultSet.getInt("fid_acc_cash_acc_cash_n") != 0) {
+                                        accountCashDestKey = new int[] { resultSet.getInt("fid_acc_cash_cob_n"), resultSet.getInt("fid_acc_cash_acc_cash_n") };
+                                    }
+                                }
+
+                                // add XML payment:
+
+                                SCfdPaymentEntry paymentEntry = new SCfdPaymentEntry(
+                                        this,
+                                        numberPago,
+                                        paymentEntryType,
+                                        pago.getAttFechaPago().getDatetime(),
+                                        pago.getAttFormaDePagoP().getString(),
+                                        currencyId,
+                                        pago.getAttMonedaP().getString(),
+                                        pago.getAttMonto().getDouble(),
+                                        currencyId == SModSysConsts.CFGU_CUR_MXN ? 1.0 : pago.getAttTipoCambioP().getDouble(),
+                                        record);
+
+                                paymentEntry.Operation = pago.getAttNumOperacion().getString();
+                                paymentEntry.AccountSrcFiscalId = pago.getAttRfcEmisorCtaOrd().getString();
+                                paymentEntry.AccountSrcNumber = pago.getAttCtaOrdenante().getString();
+                                paymentEntry.AccountSrcEntity = pago.getAttNomBancoOrdExt().getString();
+                                paymentEntry.AccountDestFiscalId = pago.getAttRfcEmisorCtaBen().getString();
+                                paymentEntry.AccountDestNumber = pago.getAttCtaBeneficiario().getString();
+                                paymentEntry.AccountDestKey = accountCashDestKey;
+
+                                if (moAuxCfdDbmsDataReceptorFactoring != null) {
+                                    paymentEntry.AuxFactoringBankId = moAuxCfdDbmsDataReceptorFactoring.getPkBizPartnerId();
+                                    paymentEntry.AuxFactoringBankFiscalId = moAuxCfdDbmsDataReceptorFactoring.getFiscalId();
+                                }
+
+                                // get XML related documents of XML payments:
+
+                                int numberDoctoRelacionado = 0;
+
+                                for (DElementDoctoRelacionado doctoRelacionado : pago.getEltDoctoRelacionados()) {
+                                    numberDoctoRelacionado++;
+
+                                    // read DPS:
+
+                                    /*
+                                    WARNING: 2018-05-29, Sergio Flores:
+                                    This is a vulnerable data retrieval because there is not a strong, reliable, unequivocal reference to 'Documento Relacionado' data object!
+                                    The document retrieval is done by its document number (there is no way of doing it other way, by now), instead of its primary key.
+                                    */
+
+                                    SDataDps dps;
+
+                                    sql = "SELECT d.id_year, d.id_doc "
+                                            + "FROM trn_dps AS d "
+                                            + "INNER JOIN trn_cfd AS c ON d.id_year = c.fid_dps_year_n AND d.id_doc = c.fid_dps_doc_n "
+                                            + "WHERE d.num_ser = '" + doctoRelacionado.getAttSerie().getString() + "' AND "
+                                            + "d.num = '" + doctoRelacionado.getAttFolio().getString() + "' AND "
+                                            + "c.uuid = '" + doctoRelacionado.getAttIdDocumento().getString() + "' AND "
+                                            + "NOT d.b_del;";
+                                    resultSet = statement.executeQuery(sql);
+                                    if (!resultSet.next()) {
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
+                                                + "Comprobante " + STrnUtils.formatDocNumber(doctoRelacionado.getAttSerie().getString(), doctoRelacionado.getAttFolio().getString()) + ", "
+                                                + doctoRelacionado.getAttIdDocumento().getString() + ", del documento #" + numberDoctoRelacionado + ", del pago #" + numberPago + ".");
+                                    }
+                                    else {
+                                        dps = new SDataDps();
+                                        dps.read(new int[] { resultSet.getInt(1), resultSet.getInt(2) }, statementAux);
+                                    }
+
+                                    // add XML related document of XML payment:
+
+                                    int paymentEntryDocType;
+
+                                    switch (paymentEntryType) {
+                                        case SCfdPaymentEntry.TYPE_STANDARD:
+                                        case SCfdPaymentEntry.TYPE_FACTORING_PAY:
+                                            paymentEntryDocType = SCfdPaymentEntryDoc.TYPE_PAY;
+                                            break;
+
+                                        case SCfdPaymentEntry.TYPE_FACTORING_FEE:
+                                            /*
+                                            WARNING: 2018-05-29, Sergio Flores:
+                                            By now there is no way to identify if specific payment is for interests, fees or VAT of fees.
+                                            It is assumed that the type that is more frecuent is interests, then fees, then VAT of fees.
+                                            */
+                                            int index = factoringFeeEntry - 1;  // XXX improve this, precision of data recovered is error prone!
+                                            paymentEntryDocType = index < paymentEntryDocTypes.length ? paymentEntryDocTypes[index] : SCfdPaymentEntryDoc.TYPE_INT;
+                                            break;
+
+                                        default:
+                                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\nEl tipo de pago " + paymentEntryType + " es inválido.");
+                                    }
+
+                                    SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
+                                            paymentEntry,
+                                            dps,
+                                            numberDoctoRelacionado,
+                                            paymentEntryDocType,
+                                            doctoRelacionado.getAttNumParcialidad().getInteger(),
+                                            doctoRelacionado.getAttImpSaldoAnt().getDouble(),
+                                            doctoRelacionado.getAttImpPagado().getDouble(),
+                                            currencyId == dps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble());
+
+                                    paymentEntryDoc.prepareTableRow();
+                                    paymentEntry.PaymentEntryDocs.add(paymentEntryDoc);
+                                }
+
+                                paymentEntry.computeTotalPayments();
+                                paymentEntry.prepareTableRow();
+                                maAuxCfdPaymentEntries.add(paymentEntry);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                // read 'Receptor' business partner data object:
+
+                idReceptor = getDbmsDataReceptorId(statement, moDbmsDataCfd.getPkCfdId());
+            }
+        }
+        
+        if (idReceptor == 0 && comprobante != null) {
+            // CFDI could not be found in accounting or it has been canceled, so try to get receptor ID by its fiscal ID (as customer or bank):
+            String rfc = comprobante.getEltReceptor().getAttRfc().getString();
+            String idFiscal = comprobante.getEltReceptor().getAttNumRegIdTrib().getString();
+            
+            if (rfc.equals(DCfdConsts.RFC_GEN_NAC) || rfc.equals(DCfdConsts.RFC_GEN_INT)) {
+                // there is no way of knowing what is the exact business partner:
+                idReceptor = moAuxDbmsDataEmisor.getPkBizPartnerId();
+            }
+            else {
+                // lookup business partner by fiscal ID:
+                sql = "SELECT id_bp "
+                        + "FROM erp.bpsu_bp "
+                        + "WHERE fiscal_id = '" + rfc + "' "
+                        + (idFiscal.isEmpty() ? "" : "AND fiscal_frg_id = '" + idFiscal + "' ")
+                        + "AND (b_cus OR b_att_bank) AND NOT b_del "
+                        + "ORDER BY id_bp DESC LIMIT 1;";
+                resultSet = statement.executeQuery(sql);
+                if (!resultSet.next()) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
+                            + "Cliente o banco con RFC: '" + rfc + "'"
+                            + (idFiscal.isEmpty() ? "" : ", ID fiscal: '" + idFiscal + "'") + ".");
+                }
+                else {
+                    idReceptor = resultSet.getInt(1);
+                }
+            }
+        }
+        
+        if (idReceptor == 0) {
+            // force a receiver:
+            idReceptor = moAuxDbmsDataEmisor.getPkBizPartnerId();
+            SLibUtilities.printOutException(this, new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n"
+                    + "Partidas de pólizas contables relacionadas con el comprobante."));
+        }
+
+        moAuxCfdDbmsDataReceptor = new SDataBizPartner();
+        moAuxCfdDbmsDataReceptor.read(new int[] { idReceptor }, statementAux);
+    }
+    
+    /**
+     * Save payment movements into financial records (journal vouchers).
+     * @param connection
+     * @param isRegistryNew
+     * @throws Exception 
+     */
+    private void saveFinRecords(final Connection connection, final boolean isRegistryNew) throws Exception {
+        if (!isRegistryNew) {
+            // delete last CFDI accounting movements IN DATABASE:
+            mnAuxFkUserDeleteId = mnAuxFkUserEditId;
+            deleteAccounting(connection);
+
+            // delete last CFDI accounting movements IN MEMORY:
+            for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
+                for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
+                    if (recordEntry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
+                        recordEntry.setIsDeleted(true);
+                    }
+                }
+            }
+        }
+
+        int numberEntry = 0;
+        HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>(); // key = financial record PK as String; value = next sorting position
+        Statement statement = connection.createStatement();
+
+        for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
+            // define next sorting position for current financial record (journal voucher):
+
+            int nextSortingPosition;
+
+            if (mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
+                nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
+            }
+            else {
+                nextSortingPosition = paymentEntry.DataRecord.getLastSortingPosition() + 1;
+            }
+
+            // save new financial record (journal voucher) entries:
+
+            for (SDataRecordEntry entry : paymentEntry.AuxDbmsRecordEntries) {
+                if (entry.getIsRegistryNew()) {
+                    entry.setSortingPosition(nextSortingPosition++);
+                    entry.setFkCfdId_n(moDbmsDataCfd.getPkCfdId());
+                    if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+            }
+
+            // preserve next sorting position for current financial record (journal voucher):
+
+            mapRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
+
+            // leave user trace into financial record (journal voucher) that it was modified:
+
+            paymentEntry.DataRecord.setFkUserEditId(paymentEntry.AuxUserId);
+            if (paymentEntry.DataRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+            }
+
+            String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", " + paymentEntry.EntryType + ", "
+                    + paymentEntry.DataRecord.getPkYearId() + ", " + paymentEntry.DataRecord.getPkPeriodId() + ", " + paymentEntry.DataRecord.getPkBookkeepingCenterId() + ", "
+                    + "'" + paymentEntry.DataRecord.getPkRecordTypeId() + "', " + paymentEntry.DataRecord.getPkNumberId() + ", "
+                    + (paymentEntry.AccountDestKey == null ? "NULL, NULL" : "" + paymentEntry.AccountDestKey[0] + ", " + paymentEntry.AccountDestKey[1]) + ");";
+            statement.execute(sql);
+        }
     }
     
     /*
@@ -223,6 +678,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         moAuxDbmsDataEmisor = null;
         moAuxDbmsDataEmisorSucursal = null;
         
+        moDbmsReceiptPayment = null;
+        
         msAuxCfdConfirmacion = "";
         msAuxCfdEmisorRegimenFiscal = "";
         moAuxCfdDbmsDataReceptor = null;
@@ -237,6 +694,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         mnAuxFkUserDeleteId = 0;
         
         mbAuxIsProcessingValidation = false;
+        //mbAuxIsProcessingStorageOnly = false; prevent from reseting this flag
     }
 
     @Override
@@ -250,263 +708,22 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             if (moDbmsDataCfd.read(pk, statement) != SLibConstants.DB_ACTION_READ_OK) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
-            else {
-                Statement statementAux = statement.getConnection().createStatement();
-                
-                // read 'Emisor' branch and business partner data objects:
-                
-                moAuxDbmsDataEmisorSucursal = new SDataBizPartnerBranch();
-                moAuxDbmsDataEmisorSucursal.read(new int[] { moDbmsDataCfd.getFkCompanyBranchId_n() }, statementAux);
-                
-                moAuxDbmsDataEmisor = new SDataBizPartner();
-                moAuxDbmsDataEmisor.read(new int[] { moAuxDbmsDataEmisorSucursal.getFkBizPartnerId() }, statementAux);
-                
-                String sql;
-                ResultSet resultSet;
-                
-                // get creation-modification-deletion user from record (journal voucher) entries:
-                
-                sql = "SELECT fid_usr_new, fid_usr_edit, fid_usr_del "
-                        + "FROM fin_rec_ety "
-                        + "WHERE fid_cfd_n = " + moDbmsDataCfd.getPkCfdId() + " AND NOT b_del "
-                        + "LIMIT 1;";
-                resultSet = statement.executeQuery(sql);
-                if (resultSet.next()) {
-                    mnAuxFkUserNewId = resultSet.getInt("fid_usr_new");
-                    mnAuxFkUserEditId = resultSet.getInt("fid_usr_edit");
-                    mnAuxFkUserDeleteId = resultSet.getInt("fid_usr_del");
-                }
-                
-                // parse CFDI to extract auxiliar data:
-                
-                if (!moDbmsDataCfd.getDocXml().isEmpty()) {
-                    cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(moDbmsDataCfd.getDocXml());
-
-                    msAuxCfdConfirmacion = comprobante.getAttConfirmacion().getString();
-                    msAuxCfdEmisorRegimenFiscal = comprobante.getEltEmisor().getAttRegimenFiscal().getString();
-
-                    if (comprobante.getEltOpcCfdiRelacionados() != null) {
-                        msAuxCfdCfdiRelacionadosTipoRelacion = comprobante.getEltOpcCfdiRelacionados().getAttTipoRelacion().getString();
-                        msAuxCfdCfdiRelacionadoUuid = comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString();
-                        int id = STrnUtilities.getCfdIdByUuid(statement, msAuxCfdCfdiRelacionadoUuid);
-                        if (id != SLibConstants.UNDEFINED) {
-                            moAuxCfdDbmsDataCfdCfdiRelacionado = new SDataCfd();
-                            if (moAuxCfdDbmsDataCfdCfdiRelacionado.read(new int[] { id }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
-                            }
-                        }
-                    }
-
-                    if (moDbmsDataCfd.getFkFactoringBankId_n() != 0) {
-                        moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
-                        moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsDataCfd.getFkFactoringBankId_n() }, statementAux);
-                    }
-                    
-                    // extract complement:
-
-                    int numberPago = 0;
-                    int factoringFeeEntry = 0;
-                    int[] paymentEntryDocTypes = new int[] { SCfdPaymentEntryDoc.TYPE_INT, SCfdPaymentEntryDoc.TYPE_FEE, SCfdPaymentEntryDoc.TYPE_FEE_VAT };
-                    HashMap<String, SDataRecord> mapRecords = new HashMap<>(); // key = record PK as String; value = record
-
-                    if (comprobante.getEltOpcComplemento() != null) {
-                        for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-                            if (element instanceof DElementPagos) {
-                                // get XML payments:
-
-                                DElementPagos pagos = (DElementPagos) element;
-
-                                for (DElementPagosPago pago : pagos.getEltPagos()) {
-                                    numberPago++;
-
-                                    // read current payment's currency ID:
-
-                                    int currencyId;
-
-                                    sql = "SELECT id_cur "
-                                            + "FROM erp.cfgu_cur "
-                                            + "WHERE cur_key = '" + pago.getAttMonedaP().getString() + "' AND NOT b_del "
-                                            + "ORDER BY id_cur "
-                                            + "LIMIT 1;";
-                                    resultSet = statement.executeQuery(sql);
-                                    if (!resultSet.next()) {
-                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
-                                                + "Moneda " + pago.getAttMonedaP().getString() + " del pago #" + numberPago + ".");
-                                    }
-                                    else {
-                                        currencyId = resultSet.getInt(1);
-                                    }
-
-                                    // read current payment's record (journal voucher)
-
-                                    SDataRecord record;
-                                    int paymentEntryType = 0;
-                                    int[] accountCashDestKey = null;
-
-                                    sql = "SELECT ety_type, fid_rec_year, fid_rec_per, fid_rec_bkc, fid_rec_tp_rec, fid_rec_num, fid_acc_cash_cob_n, fid_acc_cash_acc_cash_n "
-                                            + "FROM trn_cfd_fin_rec "
-                                            + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + " AND id_ety = " + numberPago + ";";
-                                    resultSet = statement.executeQuery(sql);
-                                    if (!resultSet.next()) {
-                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
-                                                + "Póliza contable del pago #" + numberPago + ".");
-                                    }
-                                    else {
-                                        record = mapRecords.get(SDataRecord.getRecordPrimaryKey(resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num")));
-                                        
-                                        if (record == null) {
-                                            record = new SDataRecord();
-                                            record.read(new Object[] { resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num") }, statementAux);
-                                            mapRecords.put(record.getRecordPrimaryKey(), record);
-                                        }
-                                        
-                                        paymentEntryType = resultSet.getInt("ety_type");
-                                        
-                                        if (paymentEntryType == SCfdPaymentEntry.TYPE_FACTORING_FEE) {
-                                            factoringFeeEntry++; // to guess (WTF!) type of document payment entry
-                                        }
-                                        
-                                        if (resultSet.getInt("fid_acc_cash_cob_n") != 0 && resultSet.getInt("fid_acc_cash_acc_cash_n") != 0) {
-                                            accountCashDestKey = new int[] { resultSet.getInt("fid_acc_cash_cob_n"), resultSet.getInt("fid_acc_cash_acc_cash_n") };
-                                        }
-                                    }
-
-                                    // add XML payment:
-
-                                    SCfdPaymentEntry paymentEntry = new SCfdPaymentEntry(
-                                            numberPago, 
-                                            paymentEntryType, 
-                                            pago.getAttFechaPago().getDatetime(), 
-                                            pago.getAttFormaDePagoP().getString(), 
-                                            currencyId, 
-                                            pago.getAttMonedaP().getString(), 
-                                            pago.getAttMonto().getDouble(), 
-                                            currencyId == SModSysConsts.CFGU_CUR_MXN ? 1.0 : pago.getAttTipoCambioP().getDouble(), 
-                                            record, 
-                                            this);
-
-                                    paymentEntry.Operation = pago.getAttNumOperacion().getString();
-                                    paymentEntry.AccountSrcFiscalId = pago.getAttRfcEmisorCtaOrd().getString();
-                                    paymentEntry.AccountSrcNumber = pago.getAttCtaOrdenante().getString();
-                                    paymentEntry.AccountSrcEntity = pago.getAttNomBancoOrdExt().getString();
-                                    paymentEntry.AccountDestFiscalId = pago.getAttRfcEmisorCtaBen().getString();
-                                    paymentEntry.AccountDestNumber = pago.getAttCtaBeneficiario().getString();
-                                    paymentEntry.AccountDestKey = accountCashDestKey;
-                                    
-                                    if (moAuxCfdDbmsDataReceptorFactoring != null) {
-                                        paymentEntry.AuxFactoringBankId = moAuxCfdDbmsDataReceptorFactoring.getPkBizPartnerId();
-                                        paymentEntry.AuxFactoringBankFiscalId = moAuxCfdDbmsDataReceptorFactoring.getFiscalId();
-                                    }
-
-                                    // get XML related documents of XML payments:
-
-                                    int numberDoctoRelacionado = 0;
-
-                                    for (DElementDoctoRelacionado doctoRelacionado : pago.getEltDoctoRelacionados()) {
-                                        numberDoctoRelacionado++;
-
-                                        // read DPS:
-                                        
-                                        /*
-                                        WARNING: 2018-05-29, Sergio Flores:
-                                        This is a vulnerable data retrieval because there is not a strong, reliable, unequivocal reference to 'Documento Relacionado' data object!
-                                        The document retrieval is done by its document number (there is no way of doing it other way, by now), instead of its primary key.
-                                        */
-                                        
-                                        SDataDps dps;
-
-                                        sql = "SELECT d.id_year, d.id_doc "
-                                                + "FROM trn_dps AS d "
-                                                + "INNER JOIN trn_cfd AS c ON d.id_year = c.fid_dps_year_n AND d.id_doc = c.fid_dps_doc_n "
-                                                + "WHERE d.num_ser = '" + doctoRelacionado.getAttSerie().getString() + "' AND "
-                                                + "d.num = '" + doctoRelacionado.getAttFolio().getString() + "' AND "
-                                                + "c.uuid = '" + doctoRelacionado.getAttIdDocumento().getString() + "' AND "
-                                                + "NOT d.b_del;";
-                                        resultSet = statement.executeQuery(sql);
-                                        if (!resultSet.next()) {
-                                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
-                                                    + "Comprobante " + STrnUtils.formatDocNumber(doctoRelacionado.getAttSerie().getString(), doctoRelacionado.getAttFolio().getString()) + ", "
-                                                    + doctoRelacionado.getAttIdDocumento().getString() + ", del documento #" + numberDoctoRelacionado + ", del pago #" + numberPago + ".");
-                                        }
-                                        else {
-                                            dps = new SDataDps();
-                                            dps.read(new int[] { resultSet.getInt(1), resultSet.getInt(2) }, statementAux);
-                                        }
-
-                                        // add XML related document of XML payment:
-                                        
-                                        int paymentEntryDocType;
-                                        
-                                        switch (paymentEntryType) {
-                                            case SCfdPaymentEntry.TYPE_STANDARD:
-                                            case SCfdPaymentEntry.TYPE_FACTORING_PAY:
-                                                paymentEntryDocType = SCfdPaymentEntryDoc.TYPE_PAY;
-                                                break;
-                                                
-                                            case SCfdPaymentEntry.TYPE_FACTORING_FEE:
-                                                /*
-                                                WARNING: 2018-05-29, Sergio Flores:
-                                                By now there is no way to identify if specific payment is for interests, fees or VAT of fees.
-                                                It is assumed that the type that is more frecuent is interests, then fees, then VAT of fees.
-                                                */
-                                                int index = factoringFeeEntry - 1;  // XXX improve this, precision of data recovered is error prone!
-                                                paymentEntryDocType = index < paymentEntryDocTypes.length ? paymentEntryDocTypes[index] : SCfdPaymentEntryDoc.TYPE_INT;
-                                                break;
-                                                
-                                            default:
-                                                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\nEl tipo de pago " + paymentEntryType + " es inválido.");
-                                        }
-
-                                        SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
-                                                paymentEntry, 
-                                                dps, 
-                                                numberDoctoRelacionado, 
-                                                paymentEntryDocType, 
-                                                doctoRelacionado.getAttNumParcialidad().getInteger(), 
-                                                doctoRelacionado.getAttImpSaldoAnt().getDouble(), 
-                                                doctoRelacionado.getAttImpPagado().getDouble(), 
-                                                currencyId == dps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble());
-
-                                        paymentEntryDoc.prepareTableRow();
-                                        paymentEntry.PaymentEntryDocs.add(paymentEntryDoc);
-                                    }
-
-                                    paymentEntry.computeTotalPayments();
-                                    paymentEntry.prepareTableRow();
-                                    maAuxCfdPaymentEntries.add(paymentEntry);
-                                }
-                            }
-                        }
-                    }
-
-                    // read 'Receptor' business partner data object:
-                    
-                    int idReceptor = getDbmsDataReceptorId(statement, moDbmsDataCfd.getPkCfdId());
-                    
-                    if (idReceptor == 0) { 
-                        // CFDI could not be found in accounting, so try to get receptor ID by its fiscal ID:
-                        sql = "SELECT id_bp "
-                                + "FROM erp.bpsu_bp "
-                                + "WHERE fiscal_id = '" + comprobante.getEltReceptor().getAttRfc().getString() + "' "
-                                + (comprobante.getEltReceptor().getAttNumRegIdTrib().getString().isEmpty() ? "" : "AND fiscal_frg_id = '" + comprobante.getEltReceptor().getAttNumRegIdTrib().getString() + "' ")
-                                + "AND b_cus AND NOT b_del "
-                                + "ORDER BY id_bp DESC LIMIT 1 ";
-                        resultSet = statement.executeQuery(sql);
-                        if (!resultSet.next()) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                        }
-                        else {
-                            idReceptor = resultSet.getInt(1);
-                        }
-                    }
-
-                    moAuxCfdDbmsDataReceptor = new SDataBizPartner();
-                    moAuxCfdDbmsDataReceptor.read(new int[] { idReceptor }, statementAux);
-                }
-
-                mbIsRegistryNew = false;
-                mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
+            
+            // construct payment receipt in memory:
+            
+            if (moDbmsDataCfd.getFkReceiptPaymentId_n() != 0) {
+                // since SIIE 3.2.191 payments receipts are stored in DBMS:
+                readPaymentFromReceiptPayment(statement);
             }
+            else {
+                // up to SIIE 3.2.191 payments receipts where stored in financial records (journal vouchers):
+                readPaymentFromFinRecords(statement);
+            }
+            
+            // finish reading registry:
+
+            mbIsRegistryNew = false;
+            mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
@@ -525,80 +742,68 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         
         try {
+            boolean isRegistryNew = moDbmsDataCfd.getPkCfdId() == 0;
+            
+            if (mbAuxIsProcessingStorageOnly) {
+                if (isRegistryNew) {
+                    msDbmsError = "El CFDI de recepción de pagos es nuevo, no puede ser regenerado.";
+                    throw new Exception();
+                }
+                else {
+                    moDbmsReceiptPayment = new SDataReceiptPayment();
+                }
+            }
+            
+            // save payment receipt:
+            
+            if (isRegistryNew) {
+                moDbmsReceiptPayment = new SDataReceiptPayment();
+            }
+            
+            if (moDbmsReceiptPayment != null) {
+                moDbmsReceiptPayment.harvestCfdPayment(this);
+
+                if (moDbmsReceiptPayment.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + "\nTipo de registro: Comprobante de recepción de pagos.");
+                }
+
+                moDbmsDataCfd.setFkReceiptPaymentId_n(moDbmsReceiptPayment.getPkReceiptId()); // link payment receipt to CFD
+            }
+            
             // save CFD:
             
-            boolean wasRegistryNew = moDbmsDataCfd.getPkCfdId() == 0;
-            
-            if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
+            if (mbAuxIsProcessingStorageOnly) {
+                // update only FK of receipt of payment into CFD:
+                
+                if (moDbmsReceiptPayment == null) {
+                    msDbmsError = "El registro de recepción de pago no existe.";
+                    throw new Exception();
+                }
+                else if (moDbmsReceiptPayment.getPkReceiptId() == 0) {
+                    msDbmsError = "El registro de recepción de pago no ha sido guardado aún.";
+                    throw new Exception();
+                }
+                
+                moDbmsDataCfd.saveField(connection, SDataCfd.FIELD_FK_RCP_PAY, moDbmsReceiptPayment.getPkReceiptId());
             }
             else {
-                if (!wasRegistryNew) {
-                    // delete last CFDI accounting movements IN DATABASE:
-                    mnAuxFkUserDeleteId = mnAuxFkUserEditId;
-                    deleteAccounting(connection);
+                // save CFD:
 
-                    // delete last CFDI accounting movements IN MEMORY:
-                    for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
-                        for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
-                            if (recordEntry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
-                                recordEntry.setIsDeleted(true);
-                            }
-                        }
-                    }
+                if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + "\nTipo de registro: CFDI.");
+                }
+
+                if (isRegistryNew && moDbmsReceiptPayment != null) {
+                    moDbmsReceiptPayment.saveField(connection, SDataReceiptPayment.FIELD_NUM, moDbmsDataCfd.getNumber(), 0);
                 }
 
                 // save records (journal vouchers) of all payment entries:
-                
-                int numberEntry = 0;
-                HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>(); // key = record PK as String; value = next sorting position
-                Statement statement = connection.createStatement();
-                
-                for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
-                    // define next sorting position for current record (journal voucher):
-                    
-                    int nextSortingPosition;
-                    
-                    if (mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
-                        nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
-                    }
-                    else {
-                        nextSortingPosition = paymentEntry.DataRecord.getLastSortingPosition() + 1;
-                    }
-                    
-                    // save new record (journal voucher) entries:
-                    
-                    for (SDataRecordEntry entry : paymentEntry.AuxDbmsRecordEntries) {
-                        if (entry.getIsRegistryNew()) {
-                            entry.setSortingPosition(nextSortingPosition++);
-                            entry.setFkCfdId_n(moDbmsDataCfd.getPkCfdId());
-                            if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                            }
-                        }
-                    }
-                    
-                    // preserve next sorting position for current record (journal voucher):
-                    
-                    mapRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
-                    
-                    // leave user trace into record (journal voucher) that it was modified:
-                    
-                    paymentEntry.DataRecord.setFkUserEditId(paymentEntry.AuxUserId);
-                    if (paymentEntry.DataRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                    }
-                    
-                    String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", " + paymentEntry.Type + ", "
-                            + paymentEntry.DataRecord.getPkYearId() + ", " + paymentEntry.DataRecord.getPkPeriodId() + ", " + paymentEntry.DataRecord.getPkBookkeepingCenterId() + ", "
-                            + "'" + paymentEntry.DataRecord.getPkRecordTypeId() + "', " + paymentEntry.DataRecord.getPkNumberId() + ", "
-                            + (paymentEntry.AccountDestKey == null ? "NULL, NULL" : "" + paymentEntry.AccountDestKey[0] + ", " + paymentEntry.AccountDestKey[1]) + ");";
-                    statement.execute(sql);
-                }
 
-                mbIsRegistryNew = false;
-                mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+                saveFinRecords(connection, isRegistryNew);
             }
+
+            mbIsRegistryNew = false;
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
@@ -643,13 +848,17 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testAnnulment(connection, "No se puede anular el documento: ")) {
+            if (testAnnulment(connection, "No se puede anular el comprobante: ")) {
                 if (moDbmsDataCfd.annul(connection) != SLibConstants.DB_ACTION_ANNUL_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL);
                 }
                 else {
                     deleteAccounting(connection);
 
+                    if (moDbmsReceiptPayment != null) {
+                        moDbmsReceiptPayment.saveField(connection, SDataReceiptPayment.FIELD_ST_RCP, moDbmsDataCfd.getFkXmlStatusId(), mnAuxFkUserEditId);
+                    }
+                    
                     mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;
                 }
             }
@@ -854,7 +1063,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         
         for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
             DElementPagosPago pago = new DElementPagosPago();
-            pago.getAttFechaPago().setDatetime(paymentEntry.Date);
+            pago.getAttFechaPago().setDatetime(paymentEntry.PaymentDate);
             pago.getAttFormaDePagoP().setString(paymentEntry.PaymentWay);
             pago.getAttMonedaP().setString(paymentEntry.CurrencyKey);
             if (paymentEntry.CurrencyId != SModSysConsts.CFGU_CUR_MXN) {

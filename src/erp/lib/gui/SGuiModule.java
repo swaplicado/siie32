@@ -12,7 +12,6 @@ import erp.lib.form.SFormExtendedInterface;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
-import erp.redis.SRedisConnectionUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -24,7 +23,6 @@ import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
-import erp.redis.SRedisLockUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
@@ -58,6 +56,7 @@ public abstract class SGuiModule {
     public SGuiModule(erp.client.SClientInterface client, int type) {
         miClient = client;
         mnModuleType = type;
+
         mvIndependentLocks = new Vector<>();
         mvIndependentRedisLocks = new Vector<>();
         mvOptionPickers = new Vector<>();
@@ -157,7 +156,7 @@ public abstract class SGuiModule {
         SServerResponse response = null;
         SDataRegistry registry = null;
         SSrvLock lock = null;
-        SRedisLock rlock = null;
+//        SRedisLock redisLock = null;
         SClientDaemonTimeout daemonTimeout = null;
         SLibMethod method = null;
 
@@ -167,10 +166,11 @@ public abstract class SGuiModule {
         if (pk != null) {
             if (!mbIsFormReadOnly && !isCopy) {
                 // Attempt to gain data lock:
-                rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout()/1000);
-                //lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout());
+
+                lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout());
+//                redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout()/1000);
             }
-            
+
             // Read data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
@@ -182,9 +182,9 @@ public abstract class SGuiModule {
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-                if (rlock != null) {
-                    SRedisLockUtils.releaseLock(miClient, rlock);
-                }
+//                if (redisLock != null) {
+//                    SRedisLockUtils.releaseLock(miClient, redisLock);
+//                }
                 throw new Exception(response.getMessage());
             }
             else {
@@ -193,9 +193,9 @@ public abstract class SGuiModule {
                     if (lock != null) {
                         SSrvUtils.releaseLock(miClient.getSession(), lock);
                     }
-                    if (rlock != null) {
-                        SRedisLockUtils.releaseLock(miClient, rlock);
-                    }
+//                    if (redisLock != null) {
+//                        SRedisLockUtils.releaseLock(miClient, redisLock);
+//                    }
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
                 }
                 else {
@@ -231,42 +231,44 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(miClient, rlock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
         }
         else {
             registry = miForm.getRegistry();
 
             if (lock != null) {
                 // Verify that user still has data lock:
-
                 lock = SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                rlock = SRedisLockUtils.verifyLockStatus(miClient, rlock);
-            }
 
+//            if (redisLock != null) {
+//                // Verify that user still has data lock:
+//                redisLock = SRedisLockUtils.verifyLockStatus(miClient, redisLock);
+//            }
+            
             // Verify that independent locks are still valid:
 
             for (Object complement : registry.getRegistryComplements()) {
                 if (complement instanceof SSrvLock) {
                     mvIndependentLocks.add((SSrvLock) complement);
                 }
-                if (complement instanceof SRedisLock) {
-                    mvIndependentRedisLocks.add((SRedisLock) complement);
+                else if (complement instanceof SRedisLock) {
+//                    mvIndependentRedisLocks.add((SRedisLock) complement);
                 }
             }
 
-            /*for (int i = 0; i < mvIndependentLocks.size(); i++) {
-                SSrvLock sl = SSrvUtils.verifyLockStatus(miClient.getSession(), mvIndependentLocks.get(i));
-                mvIndependentLocks.set(i, sl);
-            }*/
-            for (int i = 0; i < mvIndependentRedisLocks.size(); i++) {
-                SRedisLock rl = SRedisLockUtils.verifyLockStatus(miClient, mvIndependentRedisLocks.get(i));
-                mvIndependentRedisLocks.set(i, rl);
+            for (int i = 0; i < mvIndependentLocks.size(); i++) {
+                SSrvLock il = SSrvUtils.verifyLockStatus(miClient.getSession(), mvIndependentLocks.get(i));
+                mvIndependentLocks.set(i, il);
             }
 
+            for (int i = 0; i < mvIndependentRedisLocks.size(); i++) {
+//                SRedisLock irl = SRedisLockUtils.verifyLockStatus(miClient, mvIndependentRedisLocks.get(i));
+//                mvIndependentRedisLocks.set(i, irl);
+            }
+            
             // Save data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
@@ -275,16 +277,16 @@ public abstract class SGuiModule {
 
             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
                 if (lock != null) {
-                    //SSrvUtils.releaseLock(miClient.getSession(), lock);
+                    SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-                if (rlock != null) {
-                    SRedisLockUtils.releaseLock(miClient, rlock);
-                }
+//                if (redisLock != null) {
+//                    SRedisLockUtils.releaseLock(miClient, redisLock);
+//                }
                 for (SSrvLock il : mvIndependentLocks) {
-                    //SSrvUtils.releaseLock(miClient.getSession(), il);
+                    SSrvUtils.releaseLock(miClient.getSession(), il);
                 }
-                for (SRedisLock ir : mvIndependentRedisLocks) {
-                    SRedisLockUtils.releaseLock(miClient, ir);
+                for (SRedisLock irl : mvIndependentRedisLocks) {
+//                    SRedisLockUtils.releaseLock(miClient, irl);
                 }
 
                 throw new Exception(response.getMessage());
@@ -294,16 +296,16 @@ public abstract class SGuiModule {
 
                 if (result != SLibConstants.DB_ACTION_SAVE_OK) {
                     if (lock != null) {
-                        //SSrvUtils.releaseLock(miClient.getSession(), lock);
+                        SSrvUtils.releaseLock(miClient.getSession(), lock);
                     }
-                    if (rlock != null) {
-                        SRedisLockUtils.releaseLock(miClient, rlock);
-                    }
+//                    if (redisLock != null) {
+//                        SRedisLockUtils.releaseLock(miClient, redisLock);
+//                    }
                     for (SSrvLock il : mvIndependentLocks) {
-                        //SSrvUtils.releaseLock(miClient.getSession(), il);
+                        SSrvUtils.releaseLock(miClient.getSession(), il);
                     }
-                    for (SRedisLock ir : mvIndependentRedisLocks) {
-                        SRedisLockUtils.releaseLock(miClient, ir);
+                    for (SRedisLock irl : mvIndependentRedisLocks) {
+//                         SRedisLockUtils.releaseLock(miClient, irl);
                     }
 
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
@@ -314,17 +316,16 @@ public abstract class SGuiModule {
                 }
 
                 if (lock != null) {
-                    //SSrvUtils.releaseLock(miClient.getSession(), lock);
+                    SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-                if (rlock != null) {
-                    SRedisLockUtils.releaseLock(miClient, rlock);
-                }
-                
+//                if (redisLock != null) {
+//                    SRedisLockUtils.releaseLock(miClient, redisLock);
+//                }
                 for (SSrvLock il : mvIndependentLocks) {
-                    //SSrvUtils.releaseLock(miClient.getSession(), il);
+                    SSrvUtils.releaseLock(miClient.getSession(), il);
                 }
-                for (SRedisLock ir : mvIndependentRedisLocks) {
-                    SRedisLockUtils.releaseLock(miClient.getJedis(), ir.getLockKey().getLockKey());
+                for (SRedisLock irl : mvIndependentRedisLocks) {
+//                    SRedisLockUtils.releaseLock(miClient, irl);
                 }
 
                 if (result == SLibConstants.DB_ACTION_SAVE_OK && miForm instanceof SFormExtendedInterface) {
@@ -345,13 +346,14 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SSrvLock lock = null;
-        SRedisLock rlock = null;
-        
+//        SRedisLock redisLock = null;
+
         try {
             // Attempt to gain data lock:
-            
-            rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60);
-            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, 1000 * 60);     // 1 minute timeout
+
+            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, 1000 * 60); // 1 minute timeout
+//            redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60); // 1 minute timeout
+
             // Read data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
@@ -415,18 +417,18 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(miClient, rlock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(miClient, rlock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             if (msgError.length() > 0) {
                 throw new Exception(msgError);
             }
@@ -441,12 +443,14 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SSrvLock lock = null;
-        SRedisLock rlock = null;
+//        SRedisLock redisLock = null;
 
         try {
             // Attempt to gain data lock:
-            rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60);
-            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, 1000 * 60);     // 1 minute timeout
+
+            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, 1000 * 60); // 1 minute timeout
+//            redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60); // 1 minute timeout
+
             // Read data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
@@ -515,18 +519,18 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(miClient, rlock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(miClient, rlock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             if (msgError.length() > 0) {
                 throw new Exception(msgError);
             }
@@ -541,15 +545,15 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SSrvLock lock = null;
-        SRedisLock rlock = null;
+//        SRedisLock redisLock = null;
         SDataRegistry registry = null;
 
         try {
             // Attempt to gain data lock:
 
             if (!poRegistry.getIsRegistryNew()) {
-                rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), poRegistry.getPrimaryKey(), 60);
                 lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), poRegistry.getRegistryType(), poRegistry.getPrimaryKey(), 1000 * 60); // 1 minute timeout
+//                redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), poRegistry.getPrimaryKey(), 60); // 1 minute timeout
             }
 
             // Read data registry:
@@ -576,18 +580,18 @@ public abstract class SGuiModule {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(miClient, rlock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             throw e;
         }
         finally {
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(miClient, rlock);
-            }
+//            if (redisLock != null) {
+//                SRedisLockUtils.releaseLock(miClient, redisLock);
+//            }
             if (msgError.length() > 0) {
                 throw new Exception(msgError);
             }
@@ -621,7 +625,7 @@ public abstract class SGuiModule {
             if (miClient.getTabbedPane().getComponentAt(i) instanceof STableTabInterface) {
                 vector = ((STableTabInterface) miClient.getTabbedPane().getComponentAt(i)).getSuscriptors();
                 for (j = 0; j < vector.size(); j++) {
-                    if (suscriptor == vector.get(j).intValue()) {
+                    if (suscriptor == vector.get(j)) {
                         ((STableTabInterface) miClient.getTabbedPane().getComponentAt(i)).actionRefresh(STableConstants.REFRESH_MODE_RELOAD);
                     }
                 }
