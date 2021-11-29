@@ -490,7 +490,7 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
                             SSrvUtils.releaseLock(miClient.getSession(), lock);
                         }
                         if (rlock != null) {
-                            SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
+                            SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                         }
                     }
                     catch (Exception e) {

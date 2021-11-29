@@ -55,6 +55,7 @@ import erp.mod.SModuleUsr;
 import erp.mod.usr.db.SDbUserGui;
 import erp.redis.SRedisConnection;
 import erp.redis.SRedisConnectionUtils;
+import erp.redis.SRedisLockManager;
 import erp.server.SLoginRequest;
 import erp.server.SLoginResponse;
 import erp.server.SServerRemote;
@@ -110,7 +111,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 189.5"; // fecha release: 2021-09-28
+    public static final String APP_RELEASE = "3.2 191.0"; // fecha release: 2021-10-28
     public static final String APP_COPYRIGHT = "2007-2021";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -123,6 +124,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public static final String ERR_PARAMS_APP_READING = "No fue posible leer los parámetros de configuración del sistema.";
 
     //private SRedisConection moRedis;
+    private SRedisLockManager moRedisLockManager;
     private Jedis moJedis;
     private boolean mbFirstActivation;
     private boolean mbLoggedIn;
@@ -233,9 +235,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SClient() {
         initComponents();
         initComponentsCustom();
-        TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone("GMT-05:00"));
-        SLibUtils.restoreDateFormats(zone);
-        TimeZone.setDefault(zone);
     }
 
     /** This method is called from within the constructor to
@@ -774,7 +773,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             System.exit(-1);    // there is no way of connecting to an ERP Server
         }
 
-        //moRedis = new SRedisConection();
+	TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone("GMT-06:00"));
+        SLibUtils.restoreDateFormats(zone);
+        TimeZone.setDefault(zone);
         
         moLogin = new SLogin(this);
 
@@ -1167,6 +1168,18 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moSession.setSessionCustom(sessionCustom); // client database must be set already
     }
 
+    private void createRedisSession(final int companyId, final int userId, final String userName) throws Exception {
+        try {
+            moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
+            SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
+            SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
+        } catch (Exception e) {
+            showMsgBoxWarning("No se encontró servidor de acceso exclusivo a registros\n"
+                                        + "favor de comunicarlo al administrador");
+            moJedis = null;
+        }
+    }
+
     private void logout() {
         Cursor cursor = getCursor();
 
@@ -1234,18 +1247,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             setCursor(cursor);
         }
     }
-
-    private void createRedisSession(final int companyId, final int userId, final String userName) throws Exception {
-        try {
-            moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
-            SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
-            SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
-        } catch (Exception e) {
-            showMsgBoxWarning("No se encontró servidor de acceso exclusivo a registros\n"
-                                        + "favor de comunicarlo al administrador");
-            moJedis = null;
-        }
-    }
     
     private void login() {
         boolean lookup = false;
@@ -1292,10 +1293,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                             mbLoggedIn = true;
                             moSessionXXX = response.getSession();
                             moSessionXXX.getFormatters().redefineTableCellRenderers();
+                            createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
+                                    response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
                             prepareGui();
                             createSession();
-                            createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
-                                               response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
                             actionFileSession(true);
                             break;
                         default:
@@ -1620,16 +1621,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
     }
     
-    @Override
-    public Jedis getJedis(){
-        return moJedis;
-    }
-    
-    @Override
-    public void setJedis(Jedis jedis) {
-        moJedis = jedis;
-    }
-    
     public SXmlConfig getXmlConfig() {
         return moXmlConfig;
     }
@@ -1645,6 +1636,16 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     @Override
     public SSessionXXX getSessionXXX() {
         return moSessionXXX;
+    }
+    
+    @Override
+    public Jedis getJedis() {
+        return moJedis;
+    }
+
+    @Override
+    public void setJedis(Jedis jedis) {
+        moJedis = jedis;
     }
 
     @Override
@@ -1990,7 +1991,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SGuiSession getSession() {
         return moSession;
     }
-
+    
     @Override
     public sa.lib.gui.SGuiDatePicker getDatePicker() {
         return moDatePicker;
@@ -2324,6 +2325,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         return APP_PROVIDER;
     }
 
+    @Override
+    public Object getLockManager() {
+        moRedisLockManager = new SRedisLockManager();
+        return moRedisLockManager;
+    }
+    
     @Override
     public void computeSessionSettings() {
         throw new UnsupportedOperationException("Not supported yet.");

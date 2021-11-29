@@ -1576,7 +1576,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 SSrvUtils.releaseLock(client.getSession(), lock);
             }
             if (rlock != null) {
-                SRedisLockUtils.releaseLock(((SClientInterface) client), rlock);
+                SRedisLockUtils.releaseLock((SClientInterface) (client), rlock);
             }
         }
         

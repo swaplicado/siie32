@@ -1785,8 +1785,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jrbPayFactoringPay.setSelected(true);
         }
         else {
-            moFieldPayDate.setFieldValue(moPaymentEntry.Date);
-            moFieldPayTime.setFieldValue(moPaymentEntry.Date);
+            moFieldPayDate.setFieldValue(moPaymentEntry.PaymentDate);
+            moFieldPayTime.setFieldValue(moPaymentEntry.PaymentDate);
             moFieldPayPaymentWay.setFieldValue(moPaymentEntry.PaymentWay);
             itemStateChangedPayPaymentWay();
             moFieldPayCurrency.setFieldValue(new int[] { moPaymentEntry.CurrencyId });
@@ -1808,7 +1808,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             
             jckPayFactoring.setSelected(moPaymentEntry.isFactoring());
             itemStateChangedPayFactoring();
-            jrbPayFactoringPay.setSelected(moPaymentEntry.Type == SCfdPaymentEntry.TYPE_FACTORING_PAY);
+            jrbPayFactoringPay.setSelected(moPaymentEntry.EntryType == SCfdPaymentEntry.TYPE_FACTORING_PAY);
         }
     }
 
@@ -2503,7 +2503,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 moPaneGridPayments.getTable().requestFocusInWindow();
             }
             else if (!paymentEntry.PaymentEntryDocs.isEmpty()) {
-                miClient.showMsgBoxWarning("El pago #" + paymentEntry.Number + " no debe tener documentos relacionados para poderlo modificar.");
+                miClient.showMsgBoxWarning("El pago #" + paymentEntry.EntryNumber + " no debe tener documentos relacionados para poderlo modificar.");
                 moPaneGridPaymentDocs.getTable().requestFocusInWindow();
             }
             else {
@@ -2536,7 +2536,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 int number = 0;
                 for (STableRow row : moPaneGridPayments.getGridRows()) {
                     SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
-                    paymentEntry.Number = ++number;
+                    paymentEntry.EntryNumber = ++number;
                     paymentEntry.prepareTableRow();
                 }
                 
@@ -2648,6 +2648,20 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         miClient.showMsgBoxWarning("El RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + factoringBank.getFiscalId() + ") debe ser de longitud " + DCfdConsts.LEN_RFC_ORG + ".");
                         jcbPayFactoringBank.requestFocusInWindow();
                     }
+                    else {
+                        // factoring bank must be the same as other payments:
+                        for (STableRow row : moPaneGridPayments.getGridRows()) {
+                            SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
+                            if (paymentEntry.isFactoring() && paymentEntry != moPaymentEntry) {
+                                if (paymentEntry.AuxFactoringBankId != factoringBank.getPkBizPartnerId()) {
+                                    valid = false;
+                                    miClient.showMsgBoxWarning("El " + jcbPayFactoringBank.getToolTipText() + " (" + factoringBank.getBizPartner() + ") debe ser el mismo que el de los demás pagos del comprobante.");
+                                    jcbPayFactoringBank.requestFocusInWindow();
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -2681,6 +2695,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 // adding payment...
                 
                 moPaymentEntry = new SCfdPaymentEntry(
+                        moDataCfdPayment,
                         moPaneGridPayments.getTable().getRowCount() + 1, 
                         paymentEntryType, 
                         gcDate.getTime(), 
@@ -2689,15 +2704,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         ((SFormComponentItem) jcbPayCurrency.getSelectedItem()).getComplement().toString(), 
                         moFieldPayAmount.getDouble(), 
                         moFieldPayExchangeRate.getDouble(), 
-                        moDataPayRecord, 
-                        moDataCfdPayment);
+                        moDataPayRecord);
             }
             else {
                 // modifying payment...
                 
-                //moPaymentEntry.Number
-                moPaymentEntry.Type = paymentEntryType;
-                moPaymentEntry.Date = gcDate.getTime();
+                //moPaymentEntry.EntryDocNumber
+                moPaymentEntry.EntryType = paymentEntryType;
+                moPaymentEntry.PaymentDate = gcDate.getTime();
                 moPaymentEntry.PaymentWay = paymentWayCode;
                 moPaymentEntry.CurrencyId = paymentCurrencyId;
                 moPaymentEntry.CurrencyKey = ((SFormComponentItem) jcbPayCurrency.getSelectedItem()).getComplement().toString();
@@ -2819,7 +2833,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             
             for (SCfdPaymentEntryDoc paymentEntryDoc : paymentEntry.PaymentEntryDocs) {
                 if (SLibUtils.compareKeys(paymentEntryDoc.DataDps.getPrimaryKey(), pickerDps.getSelectedPrimaryKey())) {
-                    if (miClient.showMsgBoxConfirm("El documento relacionado " + paymentEntryDoc.DataDps.getDpsNumber() + " ya está agregado en el pago #" + paymentEntry.Number + ".\n"
+                    if (miClient.showMsgBoxConfirm("El documento relacionado " + paymentEntryDoc.DataDps.getDpsNumber() + " ya está agregado en el pago #" + paymentEntry.EntryNumber + ".\n"
                             + "¿Está seguro que desea agregarlo otra vez?") != JOptionPane.YES_OPTION) {
                         isValid = false;
                         jbDocDpsRelatedPickPend.requestFocusInWindow();
@@ -2890,7 +2904,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         if (jbDocPaymentEntryDocAdd.isEnabled()) {
             SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
             
-            if (adding && paymentEntry.Type == SCfdPaymentEntry.TYPE_FACTORING_FEE) {
+            if (adding && paymentEntry.EntryType == SCfdPaymentEntry.TYPE_FACTORING_FEE) {
                 if (moDialogCfdPaymentFactoringFees == null) {
                     moDialogCfdPaymentFactoringFees = new SDialogCfdPaymentFactoringFees(miClient, this);
                 }
@@ -2995,7 +3009,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 int number = 0;
                 for (STableRow row : moPaneGridPaymentDocs.getGridRows()) {
                     SCfdPaymentEntryDoc doc = (SCfdPaymentEntryDoc) row;
-                    doc.Number = ++number;
+                    doc.EntryDocNumber = ++number;
                     doc.prepareTableRow();
                 }
 
@@ -3088,8 +3102,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             else {
                 // modifying document...
-                //moPaymentEntryDoc.Number
-                //moPaymentEntryDoc.Type
+                //moPaymentEntryDoc.EntryDocNumber
+                //moPaymentEntryDoc.EntryDocType
                 moPaymentEntryDoc.DataDps = moDataDocDpsRelated;
                 moPaymentEntryDoc.Installment = moFieldDocInstallment.getInteger();
                 moPaymentEntryDoc.DocBalancePrev = moFieldDocBalancePrev.getDouble();
@@ -3664,15 +3678,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 validation.setComponent(jftVouDate.isEditable() ? jftVouDate : jbVouResume);
             }
             else if (moPaneGridPayments.getTable().getRowCount() == 0 && miClient.showMsgBoxConfirm(
-                    "El comprobante no tiene pagos a documentos relacionados.\n"
+                    "El comprobante no tiene pagos.\n"
                     + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                validation.setMessage("El comprobante debe tener pagos a documentos relacionados.");
+                validation.setMessage("El comprobante debe tener pagos.");
                 validation.setComponent(moPaneGridPayments.getTable());
             }
             else {
                 int index = 0;
                 int factoringPayments = 0;
-                HashSet<String> factoringBankFiscalIds = new HashSet<>();
+                HashSet<String> factoringBankFiscalIdsSet = new HashSet<>();
                 
                 for (STableRow row : moPaneGridPayments.getGridRows()) {
                     SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
@@ -3683,19 +3697,19 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         
                         // even though fiscal ID is not mandatory, is need to issue payment receipt of factoring:
                         if (paymentEntry.AuxFactoringBankFiscalId.isEmpty()) {
-                            validation.setMessage("En el pago #" + paymentEntry.Number + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " está vacio.");
+                            validation.setMessage("En el pago #" + paymentEntry.EntryNumber + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " está vacio.");
                             validation.setComponent(jcbPayFactoringBank);
                             moPaneGridPayments.setTableRowSelection(index);
                             break;
                         }
                         else if (paymentEntry.AuxFactoringBankFiscalId.length() != DCfdConsts.LEN_RFC_ORG) {
-                            validation.setMessage("En el pago #" + paymentEntry.Number + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + paymentEntry.AuxFactoringBankFiscalId + ") debe ser de longitud " + DCfdConsts.LEN_RFC_ORG + ".");
+                            validation.setMessage("En el pago #" + paymentEntry.EntryNumber + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + paymentEntry.AuxFactoringBankFiscalId + ") debe ser de longitud " + DCfdConsts.LEN_RFC_ORG + ".");
                             validation.setComponent(jcbPayFactoringBank);
                             moPaneGridPayments.setTableRowSelection(index);
                             break;
                         }
                         
-                        factoringBankFiscalIds.add(paymentEntry.AuxFactoringBankFiscalId);
+                        factoringBankFiscalIdsSet.add(paymentEntry.AuxFactoringBankFiscalId);
                     }
                     
                     /*
@@ -3705,23 +3719,23 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                     3. payment is totally applied
                     */
                     
-                    if (!SDataUtilities.isPeriodOpen(miClient, paymentEntry.Date)) {
+                    if (!SDataUtilities.isPeriodOpen(miClient, paymentEntry.PaymentDate)) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\n"
-                                + "El pago #" + paymentEntry.Number + " tiene fecha " + SLibUtils.DateFormatDate.format(paymentEntry.Date) + ".");
+                                + "El pago #" + paymentEntry.EntryNumber + " tiene fecha " + SLibUtils.DateFormatDate.format(paymentEntry.PaymentDate) + ".");
                         validation.setComponent(moPaneGridPayments.getTable());
                         moPaneGridPayments.setTableRowSelection(index);
                         break;
                     }
                     else if (!SDataUtilities.isPeriodOpen(miClient, paymentEntry.DataRecord.getDate())) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\n"
-                                + "En el pago #" + paymentEntry.Number + " la póliza contable '" + paymentEntry.DataRecord.getRecordPrimaryKey() + "' "
+                                + "En el pago #" + paymentEntry.EntryNumber + " la póliza contable '" + paymentEntry.DataRecord.getRecordPrimaryKey() + "' "
                                 + "tiene fecha " + SLibUtils.DateFormatDate.format(paymentEntry.DataRecord.getDate()) + ".");
                         validation.setComponent(moPaneGridPayments.getTable());
                         moPaneGridPayments.setTableRowSelection(index);
                         break;
                     }
                     else if (paymentEntry.PaymentEntryDocs.isEmpty()) {
-                        validation.setMessage("El pago #" + paymentEntry.Number + " no tiene documentos relacionados.");
+                        validation.setMessage("El pago #" + paymentEntry.EntryNumber + " no tiene documentos relacionados.");
                         validation.setComponent(moPaneGridPayments.getTable());
                         moPaneGridPayments.setTableRowSelection(index);
                         break;
@@ -3742,11 +3756,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                 Note that due to the validations in each individual payment, this case should not happen never!
                                 */
 
-                                message = "En el pago #" + paymentEntry.Number + " "
-                                        + "el total de pagos a documentos relacionados en la moneda del pago (" + currency + "), $"
+                                message = "En el pago #" + paymentEntry.EntryNumber + " "
+                                        + "la suma total de pagos a documentos relacionados en la moneda del PAGO (" + currency + "), $"
                                         + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + ",\n"
-                                        + "es MAYOR que el monto del pago mismo $"
-                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + " "
+                                        + "es MAYOR que el monto del pago mismo, $"
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + ", "
                                         + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".";
 
                                 validation.setMessage(message);
@@ -3759,11 +3773,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                 The sum of aplication of individual payments to documents CAN be less than the amount of payment, only if approved.
                                 */
 
-                                confirm = "En el pago #" + paymentEntry.Number + " "
-                                        + "el total de pagos a documentos relacionados en la moneda del pago (" + currency + "), $"
+                                confirm = "En el pago #" + paymentEntry.EntryNumber + " "
+                                        + "la suma total de pagos a documentos relacionados en la moneda del PAGO (" + currency + "), $"
                                         + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + ",\n"
-                                        + "es MENOR que el monto del pago mismo en la moneda del pago $"
-                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + " "
+                                        + "es MENOR que el monto del pago mismo, $"
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + ", "
                                         + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".\n"
                                         + "¡ADVERTENCIA: Será necesario cuadrar manualmente la contabilización de este pago!\n"
                                         + SLibConstants.MSG_CNF_MSG_CONT;
@@ -3772,7 +3786,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                     paymentEntry.AuxAllowTotalPaymentsLessThanAmount = true;
                                 }
                                 else {
-                                    message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.Number + " en la moneda del pago (" + currency + ").";
+                                    message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.EntryNumber + " en la moneda del PAGO (" + currency + ").";
 
                                     validation.setMessage(message);
                                     validation.setComponent(moPaneGridPayments.getTable());
@@ -3783,7 +3797,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         }
                         
                         if (!validation.getIsError()) {
-                            boolean isPaymentCompletelyLocal = miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { paymentEntry.CurrencyId });
+                            boolean isPaymentLocal = miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { paymentEntry.CurrencyId });
+                            boolean isPaymentCompletelyLocal = isPaymentLocal;
 
                             if (isPaymentCompletelyLocal) {
                                 for (SCfdPaymentEntryDoc doc : paymentEntry.PaymentEntryDocs) {
@@ -3806,23 +3821,23 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                         if payment IS NOT completely local, then the sum of aplication of individual payments to documents CAN be greater than the amount of payment, only if approved:
                                         */
 
-                                        confirm = "En el pago #" + paymentEntry.Number + " "
-                                                + "el total de pagos a documentos relacionados en la moneda local (" + currency + "), $"
+                                        confirm = "En el pago #" + paymentEntry.EntryNumber + " "
+                                                + "la suma total de pagos a documentos relacionados en la moneda LOCAL (" + currency + "), $"
                                                 + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + ",\n"
-                                                + "es MAYOR que el monto del pago mismo en la moneda local $"
-                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + " "
+                                                + "es MAYOR que el monto del pago mismo, $"
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + ", "
                                                 + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
                                                 + "!ADVERTENCIA: "
                                                 + (paymentEntry.isAmountTotallyApplied() ?
-                                                    "Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" :
-                                                    "Será necesario cuadrar manualmente la contabilización de este pago!\n")
+                                                    "Se agregará un ajuste contable para compensar esta diferencia cambiaria!" :
+                                                    "Será necesario cuadrar manualmente la contabilización de este pago!") + "\n"
                                                 + SLibConstants.MSG_CNF_MSG_CONT;
 
                                         if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
                                             paymentEntry.AuxAllowTotalPaymentsLocalGreaterThanAmountLocal = true;
                                         }
                                         else {
-                                            message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.Number + " en la moneda local (" + currency + ").";
+                                            message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.EntryNumber + " en la moneda LOCAL (" + currency + ").";
 
                                             validation.setMessage(message);
                                             validation.setComponent(moPaneGridPayments.getTable());
@@ -3830,28 +3845,28 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                             break;
                                         }
                                     }
-                                    else if (paymentEntry.AuxTotalPaymentsLocal < paymentEntry.AmountLocal) {
+                                    else if (paymentEntry.AuxTotalPaymentsLocal < paymentEntry.AmountLocal && (!isPaymentLocal || (isPaymentLocal && !paymentEntry.AuxAllowTotalPaymentsLessThanAmount))) {
                                         /*
                                         The sum of aplication of individual payments to documents CAN be less than the amount of payment, only if approved.
                                         */
 
-                                        confirm = "En el pago #" + paymentEntry.Number + " "
-                                                + "el total de pagos a documentos relacionados en la moneda local (" + currency + "), $"
+                                        confirm = "En el pago #" + paymentEntry.EntryNumber + " "
+                                                + "la suma total de pagos a documentos relacionados en la moneda LOCAL (" + currency + "), $"
                                                 + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + ",\n"
-                                                + "es MENOR que el monto del pago mismo en la moneda local $"
-                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + " "
+                                                + "es MENOR que el monto del pago mismo, $"
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + ", "
                                                 + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
                                                 + "!ADVERTENCIA: "
                                                 + (paymentEntry.isAmountTotallyApplied() ?
-                                                    "Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" :
-                                                    "Será necesario cuadrar manualmente la contabilización de este pago!\n")
+                                                    "Se agregará un ajuste contable para compensar esta diferencia cambiaria!" :
+                                                    "Será necesario cuadrar manualmente la contabilización de este pago!") + "\n"
                                                 + SLibConstants.MSG_CNF_MSG_CONT;
 
                                         if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
                                             paymentEntry.AuxAllowTotalPaymentsLocalLessThanAmountLocal = true;
                                         }
                                         else {
-                                            message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.Number + " en la moneda local (" + currency + ").";
+                                            message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.EntryNumber + " en la moneda LOCAL (" + currency + ").";
 
                                             validation.setMessage(message);
                                             validation.setComponent(moPaneGridPayments.getTable());
@@ -3864,15 +3879,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         }
                     }
                     
-                    // warn user about manual accounting required for payments without associated bank account:
+                    // warn user about manual accounting required for payments without associated bank account (all payments of this kind come without it):
                     
                     if (paymentEntry.AccountDestKey == null) {
                         SCfdXmlCatalogs xmlCatalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
-                        String message = "La forma de pago del pago #" + paymentEntry.Number + ", '" + xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, paymentEntry.PaymentWay) + "', no requiere de cuenta bancaria.\n"
+                        String message = "La forma de pago del pago #" + paymentEntry.EntryNumber + ", '" + xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, paymentEntry.PaymentWay) + "', no requiere de cuenta bancaria.\n"
                                 + "¡ADVERTENCIA: Será necesario cuadrar manualmente la contabilización de este pago!\n"
                                 + SLibConstants.MSG_CNF_MSG_CONT;
                         if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {
-                            validation.setMessage("En el pago #" + paymentEntry.Number + " " + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF.toLowerCase() + "'" + jlPayPaymentWay.getText() + "'");
+                            validation.setMessage("En el pago #" + paymentEntry.EntryNumber + " " + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF.toLowerCase() + "'" + jlPayPaymentWay.getText() + "'");
                             validation.setComponent(moPaneGridPayments.getTable());
                             moPaneGridPayments.setTableRowSelection(index);
                             break;
@@ -3889,7 +3904,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                             validation.setComponent(moPaneGridPayments.getTable());
                             moPaneGridPayments.setTableRowSelection(index);
                         }
-                        else if (factoringBankFiscalIds.size() > 1) {
+                        else if (factoringBankFiscalIdsSet.size() > 1) {
                             validation.setMessage("Todos los pagos del comprobante por ser con factoraje deben ser con la misma entidad (banco o institución financiera).");
                             validation.setComponent(moPaneGridPayments.getTable());
                             moPaneGridPayments.setTableRowSelection(0); // if conditions is true, there is at least one payment

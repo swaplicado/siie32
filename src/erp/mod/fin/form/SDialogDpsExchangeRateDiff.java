@@ -365,7 +365,7 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
                             SSrvUtils.releaseLock(miClient.getSession(), lock);                            
                         }
                         if (rlock != null) {
-                            SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
+                            SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                         }
                     }
                     catch (Exception e) {

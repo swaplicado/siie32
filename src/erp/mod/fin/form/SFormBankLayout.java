@@ -1968,8 +1968,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
             if (!found) {
                 record = (SDataRecord) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
                 rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout() / 1000);
+                lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
                 maLocks.add(lock);
                 maRedisLocks.add(rlock);
 
@@ -2863,7 +2863,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
             for (SRedisLock rlock : maRedisLocks) {
-                SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
+                SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
             }
         }
         catch (Exception e) {

@@ -1334,7 +1334,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
                 for (SRedisLock rlock : maRedisLocks) {
-                    SRedisLockUtils.releaseLock(((SClientInterface) miClient), rlock);
+                    SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                 }
             }
             catch (Exception e) {
