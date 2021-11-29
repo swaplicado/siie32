@@ -36,9 +36,6 @@ public abstract class SRedisLockUtils{
 
     private static final SimpleDateFormat DateFormatDatetime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-    public static void prueba(){
-        System.out.println("prueba de un gainlock");
-    }
     /**
      * Método para pasar el objeto PK a un string.
      *
@@ -51,6 +48,17 @@ public abstract class SRedisLockUtils{
      */
     public static String setFlattenPk(final SClientInterface client, final int registryType, final Object registryPk) throws SQLException {
         String flattenPk = "";
+
+        try (Statement statement = client.getSession().getDatabase().getConnection().createStatement()) {
+            String tableName = SDataConstants.TablesMap.get(registryType);
+
+            if (tableName == null || tableName.isEmpty()) {
+                tableName = SModConsts.TablesMap.get(registryType);
+            }
+
+            String sql = "SHOW COLUMNS FROM " + tableName + " WHERE `Key` = 'PRI';";
+            ResultSet resultSet = statement.executeQuery(sql);
+            LinkedHashMap<String, String> primaryKeyNamesMap = new LinkedHashMap<>();
 
         if (registryPk instanceof int[]) {
             for (int index = 0; index<((int[])registryPk).length; index++) {
@@ -163,14 +171,13 @@ public abstract class SRedisLockUtils{
     private static SRedisLock gainLockDummy(erp.client.SClientInterface client, int registryType, Object registryPk, long timeout) throws SQLException {
         int companyId = client.getSessionXXX().getCompany().getPkCompanyId();
         int userId = client.getSessionXXX().getUser().getPkUserId();
-
         String registryPkFlatten = setFlattenPk(client, registryType, registryPk);
         SRedisLockKey rLockKey = new SRedisLockKey(0, companyId, registryType, registryPkFlatten, 0, userId);
         SRedisLock rLock = new SRedisLock(registryPk, timeout, rLockKey);
 
         return rLock;
     }
-    
+
     /**
      * Crear el candado Redis de acceso exclusivo al registro.
      *
@@ -193,7 +200,7 @@ public abstract class SRedisLockUtils{
             SRedisLockKey lockKey = getLockKeyFromRedis(jedis, companyId, registryType, registryPkFlatten);
             if (lockKey != null) {
                 // el candado de acceso exclusivo ya existe
-                if (lockKey.getUserId() != userId || lockKey.getCompanyId() != companyId) {
+                if (lockKey.getUserId() != userId && lockKey.getCompanyId() != companyId) {
                     // el candado de acceso exclusivo pertenece a otro usuario y/o empresa
                     throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
                 }
@@ -231,7 +238,7 @@ public abstract class SRedisLockUtils{
             if (tableName == null || tableName.isEmpty()) {
                 tableName = SModConsts.TablesMap.get(registryType);
             }
-            
+
             if(tableName != null){
                 String sql = "SHOW COLUMNS FROM " + tableName + " WHERE `Key` = 'PRI';";     //consulta los nombres de todas las pk del registro
                 ResultSet resultSet = statement.executeQuery(sql);

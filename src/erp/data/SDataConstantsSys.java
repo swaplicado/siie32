@@ -92,6 +92,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    public static final int USD_XRT_POLICY_BANXICO = 1;
+    public static final int USD_XRT_POLICY_INFORMAL = 2;
     
     public static final int CFGX_IVM_FIFO = 1;
     
@@ -1118,6 +1120,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_XML_CFDI_33 = 4;
 
     public static final int TRNS_TP_CFD_INV = 1;        // invoice
+    public static final int TRNS_TP_CFD_BOL = 2;        // bill of lading
     public static final int TRNS_TP_CFD_PAY_REC = 6;    // payment receipt
     public static final int TRNS_TP_CFD_PAYROLL = 11;   // payroll
 
@@ -1139,6 +1142,11 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason (Int. Commerce)
     public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type (Int. Commerce)
     public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys (Int. Commerce)
+    public static final int TRNS_CFD_CAT_BOL_TRA = 31;          // BOL: transportation code
+    public static final int TRNS_CFD_CAT_BOL_PER_TP = 32;       // BOL: SCT permisson type
+    public static final int TRNS_CFD_CAT_BOL_MOTOR_CFG = 33;    // BOL: motortransport configuration
+    public static final int TRNS_CFD_CAT_BOL_TRAILER_STP = 34;  // BOL: trailer subtype
+    public static final int TRNS_CFD_CAT_BOL_TRANSP_PART = 35;  // BOL: transport part
     
     public static final String TRNS_CFD_CAT_PAY_WAY_99 = "99";  // Por definir
     

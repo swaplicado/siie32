@@ -22,5 +22,4 @@ public abstract class SFilterConstants {
     public static final int SETTING_FILTER_FUNC_AREA = 1009;
     public static final int SETTING_FILTER_CURRENCY = 1010;
     public static final int SETTING_FILTER_REL_PARTY = 1011;
-    
 }

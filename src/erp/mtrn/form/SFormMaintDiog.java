@@ -643,10 +643,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jtfEntryValue.addFocusListener(this);
 
         int i = 0;
-        STableColumnForm tableColumnsEntry[] = new STableColumnForm[15];
+        STableColumnForm tableColumnsEntry[] = new STableColumnForm[14];
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
-        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 250);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Área mantenimiento", 150);
         tableColumnsEntry[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY);
         tableColumnsEntry[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
@@ -1235,7 +1234,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
 
                     iogEntry.setDbmsItem(moEntryItem.getItem());
                     iogEntry.setDbmsItemKey(moEntryItem.getKey());
-                    iogEntry.setDbmsPartNum(moEntryItem.getPartNumber());
+//                    iogEntry.setDbmsPartNum(moEntryItem.getPartNumber());
                     iogEntry.setDbmsUnit(moEntryItem.getDbmsDataUnit().getUnit());
                     iogEntry.setDbmsUnitSymbol(moEntryItem.getDbmsDataUnit().getSymbol());
                     iogEntry.setDbmsOriginalUnit(moEntryItem.getDbmsDataUnit().getUnit());

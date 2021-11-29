@@ -17,6 +17,7 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     protected java.lang.String msSalaryType;
     protected java.lang.String msBank;
     protected double mdSalary;
+    protected double mdPayment;
     protected int mnDaysWorked;
     protected int mnDaysNotWorked;
     protected int mnDaysPayed;
@@ -36,6 +37,7 @@ public class SRowEmployee extends erp.lib.table.STableRow {
         msSalaryType = "";
         msBank = "";
         mdSalary = 0;
+        mdPayment = 0;
         mnDaysWorked = 0;
         mnDaysNotWorked = 0;
         mnDaysPayed = 0;
@@ -53,6 +55,7 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     public void setSalaryType(java.lang.String s) { msSalaryType = s; }
     public void setBank(java.lang.String s) { msBank = s; }
     public void setSalary(double d) { mdSalary = d; }
+    public void setPayment(double d) { mdPayment = d; }
     public void setDaysWorked(int n) { mnDaysWorked = n; }
     public void setDaysNotWorked(int n) { mnDaysNotWorked = n; }
     public void setDaysPayed(int n) { mnDaysPayed = n; }
@@ -65,6 +68,7 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     public java.lang.String getSalaryType() { return msSalaryType; }
     public java.lang.String getBank() { return msBank; }
     public double getSalary() { return mdSalary; }
+    public double getPayment() { return mdPayment; }
     public int getDaysWorked() { return mnDaysWorked; }
     public int getDaysNotWorked() { return mnDaysNotWorked; }
     public int getDaysPayed() { return mnDaysPayed; }

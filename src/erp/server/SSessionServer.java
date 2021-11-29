@@ -738,7 +738,6 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 case SServerConstants.REQ_COMP_ITEMS_COMBO_BOX:
                     oResponse.setPacket(SDataReadComponentItems.getComponentItemsForComboBox(poRequest.getRegistryType(), getStatement(), moServer.getParamsErp(), poRequest.getPrimaryKey()));
                     break;
-
                 case SServerConstants.REQ_COMP_ITEMS_LIST:
                     oResponse.setPacket(SDataReadComponentItems.getComponentItemsForList(poRequest.getRegistryType(), getStatement(), moServer.getParamsErp(), poRequest.getPrimaryKey()));
                     break;

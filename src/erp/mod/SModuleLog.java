@@ -6,14 +6,21 @@
 package erp.mod;
 
 import erp.client.SClientInterface;
+import erp.mod.log.db.SDbBillOfLading;
+import erp.mod.log.db.SDbBolLocation;
+import erp.mod.log.db.SDbBolMerchandise;
+import erp.mod.log.db.SDbBolMerchandiseQuantity;
+import erp.mod.log.db.SDbBolPerson;
 import erp.mod.log.db.SDbRate;
 import erp.mod.log.db.SDbShipment;
 import erp.mod.log.db.SDbShipmentDestiny;
 import erp.mod.log.db.SDbSpot;
 import erp.mod.log.db.SDbSpotCompanyBranch;
 import erp.mod.log.db.SDbSpotCompanyBranchEntity;
+import erp.mod.log.db.SDbTrailer;
 import erp.mod.log.db.SDbVehicle;
 import erp.mod.log.db.SDbVehicleType;
+import erp.mod.log.form.SFormBillOfLading;
 import erp.mod.log.form.SFormRate;
 import erp.mod.log.form.SFormShipment;
 import erp.mod.log.form.SFormShipmentDelivery;
@@ -22,6 +29,7 @@ import erp.mod.log.form.SFormSpotCompanyBranch;
 import erp.mod.log.form.SFormSpotCompanyBranchEntity;
 import erp.mod.log.form.SFormVehicle;
 import erp.mod.log.form.SFormVehicleType;
+import erp.mod.log.view.SViewBillOfLading;
 import erp.mod.log.view.SViewRate;
 import erp.mod.log.view.SViewShipment;
 import erp.mod.log.view.SViewShipmentAuthorn;
@@ -64,6 +72,7 @@ public class SModuleLog extends SGuiModule {
     private SFormRate moFormRate;
     private SFormVehicle moFormVehicle;
     private SFormShipment moFormShipment;
+    private SFormBillOfLading moFormBillOfLading;
     private SFormShipmentDelivery moFormShipmentDelivery;
 
     private SClientInterface miClient_xxx;
@@ -112,8 +121,26 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOG_VEH:
                 registry = new SDbVehicle();
                 break;
+            case SModConsts.LOG_TRAILER:
+                registry = new SDbTrailer();
+                break;
+            case SModConsts.LOG_BOL_PERSON:
+                registry = new SDbBolPerson();
+                break;
             case SModConsts.LOG_SHIP:
                 registry = new SDbShipment();
+                break;
+            case SModConsts.LOG_BOL:
+                registry = new SDbBillOfLading();
+                break;
+            case SModConsts.LOG_BOL_LOCATION:
+                registry = new SDbBolLocation((SDbBillOfLading) params.getParamsMap().get(SModConsts.LOG_BOL));
+                break;
+            case SModConsts.LOG_BOL_MERCH:
+                registry = new SDbBolMerchandise();
+                break;
+            case SModConsts.LOG_BOL_MERCH_QTY:
+                registry = new SDbBolMerchandiseQuantity();
                 break;
             case SModConsts.LOG_SHIP_DEST:
             case SModConsts.LOGX_SHIP_DLY:
@@ -228,6 +255,35 @@ public class SModuleLog extends SGuiModule {
                         + "WHERE b_del = 0 "
                         + "ORDER BY name ";
                 break;
+            case SModConsts.LOG_INSURER:
+                settings = new SGuiCatalogueSettings("Aseguradora", 1);
+                sql = "SELECT id_insurer AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY name ";
+                break;
+            case SModConsts.LOG_TRAILER:
+                settings = new SGuiCatalogueSettings("Remolque", 1);
+                sql = "SELECT id_trailer AS " + SDbConsts.FIELD_ID + "1, name AS "  + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY name ";
+                break;
+            case SModConsts.LOG_BOL_PERSON:
+                String title = "";
+                switch (subtype) {
+                    case SModSysConsts.LOGS_TP_BOL_PERSON_DRI: title = "Chofer"; break;
+                    case SModSysConsts.LOGS_TP_BOL_PERSON_OWN: title = "Propietario"; break;
+                    case SModSysConsts.LOGS_TP_BOL_PERSON_LES: title = "Arrendatario"; break;
+                    case SModSysConsts.LOGS_TP_BOL_PERSON_NOT: title = "Notificado"; break;
+                }
+                settings = new SGuiCatalogueSettings(title, 1, 1);
+                sql = "SELECT id_bol_person AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", fk_tp_bol_person AS " + SDbConsts.FIELD_FK + "1 "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE fk_tp_bol_person = " + subtype + " "
+                        + "AND b_del = 0 "
+                        + "ORDER BY name ";
+                break;
             case SModConsts.LOGX_TP_VEH:
                 /* Use of other parameters:
                  * params.getKey(): If is different of null will contain:
@@ -338,6 +394,10 @@ public class SModuleLog extends SGuiModule {
 
                 view = new SViewShipment(miClient, type, subtype, "Embarques " + title, params);
 
+                break;
+                
+            case SModConsts.LOG_BOL:
+                view = new SViewBillOfLading(miClient, "Traslados");
                 break;
 
             case SModConsts.LOGX_SHIP_AUTH:
@@ -525,6 +585,10 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOG_SHIP:
                 if (moFormShipment == null) moFormShipment = new SFormShipment(miClient, miClient_xxx, "Embarque");
                 form = moFormShipment;
+                break;
+            case SModConsts.LOG_BOL:
+                if (moFormBillOfLading == null) moFormBillOfLading = new SFormBillOfLading(miClient, "Traslados");
+                form = moFormBillOfLading;
                 break;
             case SModConsts.LOGX_SHIP_DLY:
                 if (moFormShipmentDelivery == null) moFormShipmentDelivery = new SFormShipmentDelivery(miClient, "Asignación fecha de entrega real");

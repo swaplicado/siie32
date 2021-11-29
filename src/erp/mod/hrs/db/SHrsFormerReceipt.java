@@ -240,7 +240,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public String getRegimenFiscal() { return msRegimenFiscal; }
     //public String getCfdiRelacionadosTipoRelacion() { return msCfdiRelacionadosTipoRelacion; } // implemented within interface SCfdXmlCfdi33
     //public ArrayList<String> getCfdiRelacionados() { return maCfdiRelacionados; } // implemented within interface SCfdXmlCfdi33
-
+    
     public int getAuxEmpleadoId() { return mnAuxEmpleadoId; }
     public double getAuxSueldoMensual() { return mdAuxSueldoMensual; }
     

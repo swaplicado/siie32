@@ -24,6 +24,7 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
     protected java.lang.String msConcept;
     protected java.lang.String msCfdProdServ;
     protected java.lang.String msCfdUnit;
+    protected java.lang.String msPredial;
     
     /**
      * Overrides java.lang.Object.clone() function.
@@ -41,6 +42,7 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
     public void setConcept(java.lang.String s) { msConcept = s; }
     public void setCfdProdServ(java.lang.String s) { msCfdProdServ = s; }
     public void setCfdUnit(java.lang.String s) { msCfdUnit = s; }
+    public void setPredial(java.lang.String s) { msPredial = s; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
@@ -49,6 +51,7 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
     public java.lang.String getConcept() { return msConcept; }
     public java.lang.String getCfdProdServ() { return msCfdProdServ; }
     public java.lang.String getCfdUnit() { return msCfdUnit; }
+    public java.lang.String getPredial() { return msPredial; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -73,6 +76,7 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
         msConcept = "";
         msCfdProdServ = "";
         msCfdUnit = "";
+        msPredial = "";
     }
 
     @Override
@@ -103,6 +107,7 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
                 msConcept = resultSet.getString("concept");
                 msCfdProdServ = resultSet.getString("cfd_prod_serv");
                 msCfdUnit = resultSet.getString("cfd_unit");
+                msPredial = resultSet.getString("predial");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -149,7 +154,8 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
                         + "'" + msConceptKey + "', "
                         + "'" + msConcept + "', "
                         + "'" + msCfdProdServ + "', "
-                        + "'" + msCfdUnit + "');";
+                        + "'" + msCfdUnit + "', "
+                        + "'" + msPredial + "');";
             }
             else {
                 sql = "UPDATE trn_dps_ety_compl SET "
@@ -157,6 +163,7 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
                         + "concept = '" + msConcept + "', "
                         + "cfd_prod_serv = '" + msCfdProdServ + "', "
                         + "cfd_unit = '" + msCfdUnit + "', "
+                        + "predial = '" + msPredial + "' "
                         + "WHERE "
                         + "id_year = " + mnPkYearId + " AND "
                         + "id_doc = " + mnPkDocId + " AND "
@@ -197,6 +204,7 @@ public class SDataDpsEntryComplement extends erp.lib.data.SDataRegistry implemen
         clone.setConcept(msConcept);
         clone.setCfdProdServ(msCfdProdServ);
         clone.setCfdUnit(msCfdUnit);
+        clone.setPredial(msPredial);
 
         return clone;
     }

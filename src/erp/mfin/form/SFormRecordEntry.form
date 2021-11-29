@@ -550,7 +550,7 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlFileXml">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Archivo XML:"/>
+                            <Property name="text" type="java.lang.String" value="Archivo XML CFD:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -592,9 +592,9 @@
                             <Property name="editable" type="boolean" value="false"/>
                             <Property name="horizontalAlignment" type="int" value="11"/>
                             <Property name="text" type="java.lang.String" value="100"/>
-                            <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero de archivos XML"/>
+                            <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero de archivos XML de CFD"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[25, 23]"/>
+                              <Dimension value="[35, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -603,7 +603,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/icon_std_doc_add.gif"/>
                             </Property>
-                            <Property name="toolTipText" type="java.lang.String" value="Agregar archivos XML"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Agregar archivos XML de CFD"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>
@@ -615,7 +615,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/icon_std_doc_xml.gif"/>
                             </Property>
-                            <Property name="toolTipText" type="java.lang.String" value="Descargar archivos XML"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Obtener CFD"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>

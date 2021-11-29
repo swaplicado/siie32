@@ -323,6 +323,7 @@ public abstract class SDataConstants {
     public static final int FIN_YEAR = 206043;
     public static final int FIN_YEAR_PER = 206044;
     public static final int FIN_EXC_RATE = 206045;
+    public static final int FINU_BANK_NB_DAY = 206076;
     public static final int FIN_ACC = 206046;
     public static final int FIN_CC = 206047;
     public static final int FIN_ACC_CASH = 206048;
@@ -896,6 +897,7 @@ public abstract class SDataConstants {
         TablesMap.put(FIN_YEAR, "fin_year");
         TablesMap.put(FIN_YEAR_PER, "fin_year_per");
         TablesMap.put(FIN_EXC_RATE, "fin_exc_rate");
+        TablesMap.put(FINU_BANK_NB_DAY, "erp.finu_bank_nb_day");
         TablesMap.put(FIN_ACC, "fin_acc");
         TablesMap.put(FIN_CC, "fin_cc");
         TablesMap.put(FIN_ACC_CASH, "fin_acc_cash");

@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
@@ -68,10 +69,11 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     protected java.lang.String msDbmsCompanyBranchCode;
     protected erp.mfin.data.SDataAccountCash moDbmsDataAccountCash;
     protected java.util.Vector<erp.mfin.data.SDataRecordEntry> mvDbmsRecordEntries;
-    
     protected int mnDbmsXmlFilesNumber;
     protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
+    
     protected HashSet<erp.mtrn.data.SDataCfd> maAuxDataCfdToDel;
+    protected boolean mbAuxReadHeaderOnly; // it reduces dramatically reading time when entries and extra stuff are useless
 
     public SDataRecord() {
         super(SDataConstants.FIN_REC);
@@ -180,7 +182,9 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     public void setDbmsCompanyBranchCode(java.lang.String s) { msDbmsCompanyBranchCode = s; }
     public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
     public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
+    
     public void setAuxDataCfdToDel(HashSet<erp.mtrn.data.SDataCfd> a ) { maAuxDataCfdToDel = a; }
+    public boolean getAuxReadHeaderOnly() { return mbAuxReadHeaderOnly; }
     
     public java.lang.String getDbmsBookkeepingCenterCode() { return msDbmsBookkeepingCenterCode; }
     public java.lang.String getDbmsCompanyBranchCode() { return msDbmsCompanyBranchCode; }
@@ -188,7 +192,9 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     public java.util.Vector<SDataRecordEntry> getDbmsRecordEntries() { return mvDbmsRecordEntries; }
     public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
     public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
+    
     public HashSet<erp.mtrn.data.SDataCfd> getAuxDataCfdToDel() { return maAuxDataCfdToDel; }
+    public void setAuxReadHeaderOnly(boolean b) { mbAuxReadHeaderOnly = b; }
 
     /**
      * Composes record period in format yyyy-mm (i.e., year-month).
@@ -315,7 +321,9 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         mvDbmsRecordEntries.clear();
         mnDbmsXmlFilesNumber = 0;
         maDbmsDataCfd = new HashSet<>();
+        
         maAuxDataCfdToDel = new HashSet<>();
+        //mbAuxReadHeaderOnly = false; // prevent from reseting this flag
     }
 
     @Override
@@ -380,34 +388,36 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
+                
+                if (!mbAuxReadHeaderOnly) {
+                    statementAux = statement.getConnection().createStatement();
 
-                statementAux = statement.getConnection().createStatement();
+                    // Read aswell record entries:
 
-                // Read aswell record entries:
-
-                sql = "SELECT id_ety FROM fin_rec_ety " +
-                        "WHERE id_year = " + (Integer) key[0] + " AND id_per = " + (Integer) key[1] + " AND " +
-                        "id_bkc = " + (Integer) key[2] + " AND id_tp_rec = '" + (String) key[3] + "' AND id_num = " + (Integer) key[4] + " " +
-                        "ORDER BY sort_pos, id_ety ";
-                resultSet = statement.executeQuery(sql);
-                while (resultSet.next()) {
-                    SDataRecordEntry entry = new SDataRecordEntry();
-                    if (entry.read(new Object[] { mnPkYearId, mnPkPeriodId, mnPkBookkeepingCenterId, msPkRecordTypeId, mnPkNumberId, resultSet.getInt("id_ety") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    sql = "SELECT id_ety FROM fin_rec_ety " +
+                            "WHERE id_year = " + (Integer) key[0] + " AND id_per = " + (Integer) key[1] + " AND " +
+                            "id_bkc = " + (Integer) key[2] + " AND id_tp_rec = '" + (String) key[3] + "' AND id_num = " + (Integer) key[4] + " " +
+                            "ORDER BY sort_pos, id_ety ";
+                    resultSet = statement.executeQuery(sql);
+                    while (resultSet.next()) {
+                        SDataRecordEntry entry = new SDataRecordEntry();
+                        if (entry.read(new Object[] { mnPkYearId, mnPkPeriodId, mnPkBookkeepingCenterId, msPkRecordTypeId, mnPkNumberId, resultSet.getInt("id_ety") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                        else {
+                            mvDbmsRecordEntries.add(entry);
+                        }
                     }
-                    else {
-                        mvDbmsRecordEntries.add(entry);
-                    }
+
+                    // CFD
+
+                    sql = "SELECT id_cfd FROM trn_cfd WHERE fid_fin_rec_year_n = " + key[0] + " AND fid_fin_rec_per_n = " + key[1] + " AND "
+                            + "fid_fin_rec_bkc_n = " + key[2] + " AND fid_fin_rec_tp_rec_n = '" + key[3] + "' AND "
+                            + "fid_fin_rec_num_n = " + key[4] + ";";
+                    readCfds(statement, sql);
+
+                    mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
                 }
-                
-                // CFD
-                
-                sql = "SELECT id_cfd FROM trn_cfd WHERE fid_fin_rec_year_n = " + key[0] + " AND fid_fin_rec_per_n = " + key[1] + " AND "
-                        + "fid_fin_rec_bkc_n = " + key[2] + " AND fid_fin_rec_tp_rec_n = '" + key[3] + "' AND "
-                        + "fid_fin_rec_num_n = " + key[4] + ";";
-                readXml(statement, sql);
-                
-                mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
  
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -425,12 +435,11 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         return mnLastDbActionResult;
     }
     
-    private void readXml(Statement statement, String sql) throws Exception {
-        SDataCfd cfd;
-        Statement statementAux = statement.getConnection().createStatement();
-        try (ResultSet resultSet = statement.executeQuery(sql)) {
+    private void readCfds(Statement statement, String sql) throws Exception {
+        try (Statement statementAux = statement.getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
-                cfd = new SDataCfd();
+                SDataCfd cfd = new SDataCfd();
                 if (cfd.read(new int[] { resultSet.getInt("id_cfd") }, statementAux)!= SLibConstants.DB_ACTION_READ_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
@@ -455,6 +464,10 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
+            if (mbAuxReadHeaderOnly) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NON_UPDATABLE);
+            }
+            
             sanitizeData();
             
             callableStatement = connection.prepareCall(
@@ -574,6 +587,10 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     }
     
     public void saveField(java.sql.Connection connection, final int field, final Object value) throws Exception {
+        if (mbAuxReadHeaderOnly) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NON_UPDATABLE);
+        }
+
         Statement statement = null;    
         String msSql = "UPDATE " + "fin_rec " + "SET ";
         
@@ -605,6 +622,10 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         ResultSet resultSet = null;
 
         try {
+            if (mbAuxReadHeaderOnly) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NON_UPDATABLE);
+            }
+            
             if (mbIsSystem) {
                 can = SLibConstants.DB_CAN_DELETE_NO;
                 msDbmsError = SLibConstants.MSG_ERR_REG_SYSTEM;

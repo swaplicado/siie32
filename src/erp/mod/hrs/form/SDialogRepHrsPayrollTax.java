@@ -312,7 +312,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         String sDepartamentsName = "";
         String sSqlWhere = "";
         String sSqlInnerIssue = "";
-        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SLibConsts.UNDEFINED);
+        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SPanelHrsFilterPayrollStatus.STATUS);
         
         moParamsMap = miClient.createReportParams();
         config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
@@ -331,13 +331,11 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
             sSqlWhere = " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";            
         }
         
-        if (payrollStatus != SPanelHrsFilterPayrollStatus.STATUS_UNDEF) {
-            if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
-                    sSqlWhere +=  " AND p.b_clo = 1 ";                
-            }
-            else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
-                    sSqlWhere +=  " AND p.b_clo = 0 ";
-            }
+        if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
+                sSqlWhere += " AND p.b_clo = 1 ";                
+        }
+        else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
+                sSqlWhere += " AND p.b_clo = 0 ";
         }
         
         if (moRadFilterTypeDatePay.isSelected()) {

@@ -799,6 +799,11 @@ public abstract class SModSysConsts {
     public static final int LOGS_INC_DES = 23;
     public static final int LOGS_INC_DEQ = 24;
     public static final int LOGS_INC_LAB = 101;
+    
+    public static final int LOGS_TP_BOL_PERSON_DRI = 1; // Driver
+    public static final int LOGS_TP_BOL_PERSON_OWN = 2; // Owner
+    public static final int LOGS_TP_BOL_PERSON_LES = 3; // Lessee
+    public static final int LOGS_TP_BOL_PERSON_NOT = 4; // Notified
 
     public static final int FIELD_MONTH_JANUARY = 1;
     public static final int FIELD_MONTH_FEBRUARY = 2;
@@ -933,6 +938,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_LOAN_COM = 2;  // Company loans
     public static final int HRSS_TP_LOAN_LOAN_UNI = 3;  // Union loans
     public static final int HRSS_TP_LOAN_LOAN_3RD = 4;  // Third parties loans
+    public static final int HRSS_TP_LOAN_LOAN_GLASS = 6; // Glasses loans
     public static final int HRSS_TP_LOAN_HOME = 11;     // Home credit
     public static final int HRSS_TP_LOAN_CONS = 12;     // Consumer credit
 

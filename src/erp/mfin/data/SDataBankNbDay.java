@@ -91,7 +91,6 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
-
     }
 
     @Override
@@ -187,5 +186,4 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
     public Date getLastDbUpdate() {
         return mtUserEditTs;
     }
-    
 }

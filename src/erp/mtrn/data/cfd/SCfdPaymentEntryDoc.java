@@ -18,25 +18,24 @@ import sa.lib.SLibUtils;
  */
 public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
-    public static final int TYPE_PAY = 1;
-    public static final int TYPE_INT = 2;
-    public static final int TYPE_FEE = 3;
-    public static final int TYPE_FEE_VAT = 4;
+    public static final int TYPE_PAY = 1;       // payment
+    public static final int TYPE_INT = 2;       // interest
+    public static final int TYPE_FEE = 3;       // factoring fee
+    public static final int TYPE_FEE_VAT = 4;   // factoring fee VAT
     
-    public static final HashMap<Integer, String> Types = new HashMap<>();
+    private static final HashMap<Integer, String> EntryDocTypes = new HashMap<>();
     
     static {
-        Types.put(TYPE_PAY, "Pago");
-        Types.put(TYPE_INT, "Intereses");
-        Types.put(TYPE_FEE, "Comisiones");
-        Types.put(TYPE_FEE_VAT, "IVA comisiones");
+        EntryDocTypes.put(TYPE_PAY, "Pago");
+        EntryDocTypes.put(TYPE_INT, "Intereses");
+        EntryDocTypes.put(TYPE_FEE, "Comisiones");
+        EntryDocTypes.put(TYPE_FEE_VAT, "IVA comisiones");
     }
     
     public SCfdPaymentEntry ParentPaymentEntry;
     public SDataDps DataDps;
-    
-    public int Number;
-    public int Type;
+    public int EntryDocNumber;
+    public int EntryDocType;
     public int Installment;
     public double DocBalancePrev;   // in original currency of document
     public double DocPayment;       // in original currency of document
@@ -52,12 +51,11 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
     public int AuxGridIndex;
     
-    public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SDataDps dataDps, int number, int type, int installment, double balancePrev, double payment, double exchangeRate) {
+    public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SDataDps dataDps, int entryNumber, int entryType, int installment, double balancePrev, double payment, double exchangeRate) {
         ParentPaymentEntry = parentPaymentEntry;
         DataDps = dataDps;
-        
-        Number = number;
-        Type = type;
+        EntryDocNumber = entryNumber;
+        EntryDocType = entryType;
         Installment = installment;
         DocBalancePrev = balancePrev;
         DocPayment = payment;
@@ -80,7 +78,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
      * Gets description of current type.
      */
     public String getTypeDescription() {
-        return Types.get(Type);
+        return EntryDocTypes.get(EntryDocType);
     }
 
     /**
@@ -95,6 +93,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
      */
     public void computePaymentAmounts() {
         computeBalancePend();
+        
         if (ExchangeRate == 0) {
             // compute payment in terms of currency of payment:
             PayBalancePrev = 0;
@@ -140,7 +139,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     @Override
     public void prepareTableRow() {
         mvValues.clear();
-        mvValues.add(Number);
+        mvValues.add(EntryDocNumber);
         mvValues.add(DataDps.getDpsNumber());
         mvValues.add(DataDps.getDbmsDataCfd().getUuid());
         mvValues.add(Installment);
@@ -151,6 +150,6 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         mvValues.add(ExchangeRate);
         mvValues.add(PayPayment);
         mvValues.add(ParentPaymentEntry.CurrencyKey);
-        mvValues.add(Types.get(Type));
+        mvValues.add(EntryDocTypes.get(EntryDocType));
     }
 }

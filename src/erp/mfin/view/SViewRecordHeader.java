@@ -112,6 +112,7 @@ public class SViewRecordHeader extends erp.lib.table.STableTab implements java.a
         mvSuscriptors.add(SDataConstants.TRNX_DPS_SUPPLIED);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_PAYED);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_PAY_PEND);
+        mvSuscriptors.add(SDataConstants.TRN_PAY);
         mvSuscriptors.add(SDataConstants.TRNX_CFD_PAY_REC);
         mvSuscriptors.add(SDataConstants.USRU_USR);
 

@@ -283,7 +283,7 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
     }
 
     @Override
-    public int getFormStatus() {
+    public int getFormStatus() 
         return mnFormStatus;
     }
 

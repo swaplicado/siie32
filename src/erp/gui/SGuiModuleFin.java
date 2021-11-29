@@ -23,6 +23,7 @@ import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataAccountItem;
 import erp.mfin.data.SDataAccountTax;
 import erp.mfin.data.SDataAdministrativeConceptType;
+import erp.mfin.data.SDataBankNbDay;
 import erp.mfin.data.SDataCardIssuer;
 import erp.mfin.data.SDataCheck;
 import erp.mfin.data.SDataCheckPrintingFormat;
@@ -211,7 +212,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinBankNbDay;
     private javax.swing.JMenuItem jmiFinValuationBalances;
     private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
-    
+    private javax.swing.JMenuItem jmiFinBankNbDay;
+
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;
     private javax.swing.JSeparator jsFinCash;
@@ -564,7 +566,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin = new JMenu("Finanzas");
 
         jmiFinExchangeRate = new JMenuItem("Tipos de cambio");
-        jmiFinBankNbDay = new JMenuItem("Días Bancarios inhábiles");
+        jmiFinBankNbDay = new JMenuItem("Días inhábiles bancarios");
         jmiFinValuationBalances = new JMenuItem("Revaluación de saldos en moneda extranjera");
         jmiFinDpsExchangeRateDiff = new JMenuItem("Diferencias cambiarias de cuentas liquidadas en moneda extranjera");
         jmiFinCashCheck = new JMenuItem("Cheques");
@@ -1749,7 +1751,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.FINU_BANK_NB_DAY:
                     oViewClass = erp.mfin.view.SViewBankNbDay.class;
-                    sViewTitle = "Días bancarios inhábiles";
+                    sViewTitle = "Días inhábiles bancarios";
                     break;
                 case SDataConstants.FIN_CHECK:
                     oViewClass = erp.mfin.view.SViewCheck.class;

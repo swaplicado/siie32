@@ -723,6 +723,11 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         return mtUserEditTs;
     }
     
+    @Override
+    public String toString() {
+        return msName + " (" + msCode + ")";
+    }
+    
     public String getXtaItemWidthStatus() {
         String item = getItem();
         

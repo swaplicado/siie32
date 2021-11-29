@@ -18,7 +18,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín
  */
 public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -29,6 +29,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     protected int mnPkBizPartnerBranchId;
     protected int mnPkAddressId;
     protected java.lang.String msAddress;
+    protected java.lang.String msAddressCode;
     protected java.lang.String msStreet;
     protected java.lang.String msStreetNumberExt;
     protected java.lang.String msStreetNumberInt;
@@ -67,6 +68,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public void setPkBizPartnerBranchId(int n) { mnPkBizPartnerBranchId = n; }
     public void setPkAddressId(int n) { mnPkAddressId = n; }
     public void setAddress(java.lang.String s) { msAddress = s; }
+    public void setAddressCode(java.lang.String s) { msAddressCode = s; }
     public void setStreet(java.lang.String s) { msStreet = s; }
     public void setStreetNumberExt(java.lang.String s) { msStreetNumberExt = s; }
     public void setStreetNumberInt(java.lang.String s) { msStreetNumberInt = s; }
@@ -92,6 +94,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public int getPkBizPartnerBranchId() { return mnPkBizPartnerBranchId; }
     public int getPkAddressId() { return mnPkAddressId; }
     public java.lang.String getAddress() { return msAddress; }
+    public java.lang.String getAddressCode() { return msAddressCode; }
     public java.lang.String getStreet() { return msStreet; }
     public java.lang.String getStreetNumberExt() { return msStreetNumberExt; }
     public java.lang.String getStreetNumberInt() { return msStreetNumberInt; }
@@ -144,6 +147,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
         mnPkBizPartnerBranchId = 0;
         mnPkAddressId = 0;
         msAddress = "";
+        msAddressCode = "";
         msStreet = "";
         msStreetNumberExt = "";
         msStreetNumberInt = "";
@@ -203,6 +207,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 mnPkBizPartnerBranchId = resultSet.getInt("a.id_bpb");
                 mnPkAddressId = resultSet.getInt("a.id_add");
                 msAddress = resultSet.getString("a.bpb_add");
+                msAddressCode = resultSet.getString("a.bpb_add_code");
                 msStreet = resultSet.getString("a.street");
                 msStreetNumberExt = resultSet.getString("a.street_num_ext");
                 msStreetNumberInt = resultSet.getString("a.street_num_int");
@@ -285,10 +290,11 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                     "{ CALL erp.bpsu_bpb_add_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerBranchId);
             callableStatement.setInt(nParam++, mnPkAddressId);
             callableStatement.setString(nParam++, msAddress);
+            callableStatement.setString(nParam++, msAddressCode);
             callableStatement.setString(nParam++, msStreet);
             callableStatement.setString(nParam++, msStreetNumberExt);
             callableStatement.setString(nParam++, msStreetNumberInt);

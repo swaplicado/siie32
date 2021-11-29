@@ -48,17 +48,18 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public static final int TYPE_FACTORING_PAY = 11;    // factoring payment
     public static final int TYPE_FACTORING_FEE = 12;    // factoring fees
     
-    public static final HashMap<Integer, String> Types = new HashMap<>();
+    private static final HashMap<Integer, String> EntryTypes = new HashMap<>();
     
     static {
-        Types.put(TYPE_STANDARD, "Estándar");
-        Types.put(TYPE_FACTORING_PAY, "Factoraje: pago");
-        Types.put(TYPE_FACTORING_FEE, "Factoraje: intereses y comisiones");
+        EntryTypes.put(TYPE_STANDARD, "Estándar");
+        EntryTypes.put(TYPE_FACTORING_PAY, "Factoraje: pago");
+        EntryTypes.put(TYPE_FACTORING_FEE, "Factoraje: intereses y comisiones");
     }
     
-    public int Number;
-    public int Type;    // payment type
-    public Date Date;
+    public SDataCfdPayment DataParentPayment;
+    public int EntryNumber;
+    public int EntryType;    // payment type
+    public Date PaymentDate;
     public String PaymentWay;
     public int CurrencyId;
     public String CurrencyKey;
@@ -73,7 +74,6 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public String AccountDestNumber;
     public int[] AccountDestKey;    // can be null when destiny cash account (e.g., receipt bank) is not needed
     public SDataRecord DataRecord;
-    public SDataCfdPayment DataParentPayment;
     public ArrayList<SCfdPaymentEntryDoc> PaymentEntryDocs;
     
     public int AuxGridIndex;
@@ -91,10 +91,11 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public boolean AuxAllowTotalPaymentsLocalGreaterThanAmountLocal;
     public ArrayList<SDataRecordEntry> AuxDbmsRecordEntries;
     
-    public SCfdPaymentEntry(int number, int type, Date date, String paymentWay, int currencyId, String currencyKey, double amount, double exchangeRate, SDataRecord dataRecord, SDataCfdPayment parentPayment) {
-        Number = number;
-        Type = type;
-        Date = date;
+    public SCfdPaymentEntry(SDataCfdPayment parentPayment, int entryNumber, int entryType, Date paymentDate, String paymentWay, int currencyId, String currencyKey, double amount, double exchangeRate, SDataRecord dataRecord) {
+        DataParentPayment = parentPayment;
+        EntryNumber = entryNumber;
+        EntryType = entryType;
+        PaymentDate = paymentDate;
         PaymentWay = paymentWay;
         CurrencyId = currencyId;
         CurrencyKey = currencyKey;
@@ -109,7 +110,6 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         AccountDestNumber = "";
         AccountDestKey = null;
         DataRecord = dataRecord;
-        DataParentPayment = parentPayment;
         PaymentEntryDocs = new ArrayList<>();
         
         AuxGridIndex = -1;
@@ -117,6 +117,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         AuxFactoringBankId = 0;
         AuxFactoringBankFiscalId = "";
         AuxConceptDocsCustom = "";
+        AuxConceptDocs = "";
         AuxDbmsRecordEntries = new ArrayList<>();
         
         resetAllowances();
@@ -192,7 +193,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
      * @return 
      */
     public boolean isFactoring() {
-        return SLibUtils.belongsTo(Type, new int[] { TYPE_FACTORING_PAY, TYPE_FACTORING_FEE });
+        return SLibUtils.belongsTo(EntryType, new int[] { TYPE_FACTORING_PAY, TYPE_FACTORING_FEE });
     }
     
     /**
@@ -200,7 +201,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
      * @return 
      */
     public String getTypeDescription() {
-        return Types.get(Type);
+        return EntryTypes.get(EntryType);
     }
     
     /**
@@ -488,7 +489,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         2.1. Payment type may require a bank and a bank is available or
         2.2. Payment type is factoring fee, thus, income or expenses are already processed.
         */
-        return isAmountTotallyApplied() && ((SLibUtils.belongsTo(Type, new int[] { TYPE_STANDARD, TYPE_FACTORING_PAY }) && AccountDestKey != null) || Type == TYPE_FACTORING_FEE);
+        return isAmountTotallyApplied() && ((SLibUtils.belongsTo(EntryType, new int[] { TYPE_STANDARD, TYPE_FACTORING_PAY }) && AccountDestKey != null) || EntryType == TYPE_FACTORING_FEE);
     }
 
     /**
@@ -699,14 +700,14 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 AuxDbmsRecordEntries.add(recordEntry);
             }
             
-            if (Type == TYPE_FACTORING_FEE) {
+            if (EntryType == TYPE_FACTORING_FEE) {
                 // accounting counterpart for factoring fees:
                 
                 // add as well bokkeeping registry for cash account:
                 SDataRecordEntry recordEntry = null;
                 SDataParamsCompany paramsCompany = (SDataParamsCompany) session.getConfigCompany();
                 
-                switch (paymentEntryDoc.Type) {
+                switch (paymentEntryDoc.EntryDocType) {
                     case SCfdPaymentEntryDoc.TYPE_PAY:
                         throw new Exception("Opción inválida para intereses y comisiones de factoraje.");
                         
@@ -725,9 +726,8 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                         break;
                         
                     case SCfdPaymentEntryDoc.TYPE_FEE_VAT:
-                        String accountId = SFinAccountUtilities.obtainTaxAccountId(
-                                new int[] { paramsCompany.getFkCfdPaymentBankFeeTaxBasicId_n(), paramsCompany.getFkCfdPaymentBankFeeTaxId_n() }, 
-                                SDataConstantsSys.TRNS_CT_DPS_PUR, Date, SDataConstantsSys.FINX_ACC_PAY, session.getStatement()); // VAT in favor, so it is treat as VAT from purchases
+                        String accountId = SFinAccountUtilities.obtainTaxAccountId(new int[] { paramsCompany.getFkCfdPaymentBankFeeTaxBasicId_n(), paramsCompany.getFkCfdPaymentBankFeeTaxId_n() }, 
+                                SDataConstantsSys.TRNS_CT_DPS_PUR, PaymentDate, SDataConstantsSys.FINX_ACC_PAY, session.getStatement()); // VAT in favor, so it is treat as VAT from purchases
                         
                         recordEntry = createRecordEntryFactoringFee(session, 
                                 accountId, "", 
@@ -758,7 +758,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             globalConcept = composeConcept(getConceptDocs(), bizPartnerName, accountCashDest, Amount, ExchangeRate);
         }
         
-        switch (Type) {
+        switch (EntryType) {
             case TYPE_STANDARD:
             case TYPE_FACTORING_PAY:
                 // a real payment done:
@@ -808,7 +808,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
 
                 if (isPayCurrencyLocal && areAllDocsCurrencyLocal) {
                     // differences not allowed for local currency:
-                    throw new Exception("No debe haber diferencias en moneda local en la contabilización del pago #" + Number + "\n:"
+                    throw new Exception("No debe haber diferencias en moneda local en la contabilización del pago #" + EntryNumber + "\n:"
                             + "el total de cargos $" + SLibUtils.getDecimalFormatAmount().format(totDebit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " "
                             + "es distinto al total de abonos $" + SLibUtils.getDecimalFormatAmount().format(totCredit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " "
                             + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(totDebit - totCredit) + " " + session.getSessionCustom().getLocalCurrencyCode() + "."); // show difference without rounding
@@ -850,8 +850,8 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     @Override
     public void prepareTableRow() {
         mvValues.clear();
-        mvValues.add(Number);
-        mvValues.add(Date);
+        mvValues.add(EntryNumber);
+        mvValues.add(PaymentDate);
         mvValues.add(PaymentWay);
         mvValues.add(Amount);
         mvValues.add(CurrencyKey);
@@ -863,7 +863,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         mvValues.add(AccountSrcEntity);
         mvValues.add(AccountDestFiscalId);
         mvValues.add(AccountDestNumber);
-        mvValues.add(Types.get(Type));
+        mvValues.add(EntryTypes.get(EntryType));
         mvValues.add(AuxFactoringBankFiscalId);
         mvValues.add(AuxConceptDocsCustom);
     }

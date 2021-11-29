@@ -23,11 +23,12 @@ import erp.mod.SModSysConsts;
 import java.awt.event.ItemEvent;
 import java.util.Vector;
 import javax.swing.JComboBox;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, Daniel López, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín
  */
 public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -78,6 +79,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jlAddress = new javax.swing.JLabel();
         jtfAddress = new javax.swing.JTextField();
         jckIsDefault = new javax.swing.JCheckBox();
+        jtfAddressCodeRo = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         jlCountry = new javax.swing.JLabel();
         jcbFkCountryId_n = new javax.swing.JComboBox();
@@ -110,7 +112,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlAddress.setText("Id. domicilio: *");
+        jlAddress.setText("Domicilio: *");
         jlAddress.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel1.add(jlAddress);
 
@@ -120,8 +122,14 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
 
         jckIsDefault.setText("Domicilio por default");
         jckIsDefault.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jckIsDefault.setPreferredSize(new java.awt.Dimension(133, 23));
+        jckIsDefault.setPreferredSize(new java.awt.Dimension(128, 23));
         jPanel1.add(jckIsDefault);
+
+        jtfAddressCodeRo.setEditable(false);
+        jtfAddressCodeRo.setToolTipText("Código domicilio");
+        jtfAddressCodeRo.setFocusable(false);
+        jtfAddressCodeRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel1.add(jtfAddressCodeRo);
 
         add(jPanel1);
 
@@ -390,6 +398,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
     private javax.swing.JLabel jlStreet;
     private javax.swing.JLabel jlZipCode;
     private javax.swing.JTextField jtfAddress;
+    private javax.swing.JTextField jtfAddressCodeRo;
     private javax.swing.JTextField jtfCounty;
     private javax.swing.JTextField jtfLocality;
     private javax.swing.JTextField jtfNeighborhood;
@@ -524,6 +533,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         }
 
         moFieldAddress.setFieldValue(moBizPartnerBranchAddress.getAddress());
+        jtfAddressCodeRo.setText(moBizPartnerBranchAddress.getAddressCode());
         moFieldIsDefault.setFieldValue(moBizPartnerBranchAddress.getIsDefault());
         moFieldFkCountryId.setFieldValue(new int[] { miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartnerBranchAddress.getFkCountryId_n() }) ? SLibConstants.UNDEFINED : moBizPartnerBranchAddress.getFkCountryId_n() });
         setCountryEnabled(moBizPartnerBranchAddress.getFkCountryId_n() != SLibConstants.UNDEFINED && !miClient.getSession().getSessionCustom().isLocalCountry(new int[] { moBizPartnerBranchAddress.getFkCountryId_n() }));
@@ -556,6 +566,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         }
 
         moBizPartnerBranchAddress.setAddress(mbParamIsInMainWindow ? SModSysConsts.TXT_OFFICIAL : moFieldAddress.getString());
+        moBizPartnerBranchAddress.setAddressCode(SLibUtils.DecimalNumberFormat.format(SLibUtils.parseInt(jtfAddressCodeRo.getText())));
         moBizPartnerBranchAddress.setStreet(moFieldStreet.getString());
         moBizPartnerBranchAddress.setStreetNumberExt(moFieldStreetNumberExt.getString());
         moBizPartnerBranchAddress.setStreetNumberInt(moFieldStreetNumberInt.getString());

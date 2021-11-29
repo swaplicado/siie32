@@ -788,7 +788,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         String sSqlInnerIssue = "";
         String sDepartamentsId = "";
         String sDepartamentsName = "";
-        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SLibConsts.UNDEFINED);
+        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SPanelHrsFilterPayrollStatus.STATUS);
 
         bizPartnerCompany = new SDataBizPartner();
         bizPartnerCompany.read(new int[] { ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId() }, miClient.getSession().getStatement());
@@ -802,13 +802,11 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         sSqlWhere += moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " +  moKeyPaymentType.getValue()[0] : "";
         sSqlWhere += sDepartamentsId.isEmpty() ? "" : " AND dep.id_dep IN(" + sDepartamentsId + ") ";
         
-        if (payrollStatus != SPanelHrsFilterPayrollStatus.STATUS_UNDEF) {
-            if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
-                sSqlWhere +=  " AND p.b_clo = 1 ";                
-            }
-            else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
-                sSqlWhere +=  " AND p.b_clo = 0 ";
-            }
+        if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
+            sSqlWhere += " AND p.b_clo = 1 ";                
+        }
+        else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
+            sSqlWhere += " AND p.b_clo = 0 ";
         }
         
         if (moRadFilterTypeDatePay.isSelected()) {

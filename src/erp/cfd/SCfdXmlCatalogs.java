@@ -21,12 +21,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiSession;
+import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.xml.SXmlUtils;
 
 /**
  * Class from management of catalogs from SAT.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SCfdXmlCatalogs {
     
@@ -81,7 +83,7 @@ public class SCfdXmlCatalogs {
      * @param date Date to check validity of catalog entries.
      * @return Vector of component items.
      */
-    public Vector<SFormComponentItem> getComponentItems(final int catalog, final Date date) {
+    private Vector<SFormComponentItem> getComponentItems(final int catalog, final Date date) {
         Vector<SFormComponentItem> items = new Vector<>();
         items.add(new SFormComponentItem(new int[] {}, "(Seleccionar opción)"));
         
@@ -90,6 +92,25 @@ public class SCfdXmlCatalogs {
             for (SCfdXmlCatalogEntry entry : entries) {
                 if (entry.getValidityStart().compareTo(date) <= 0 && (entry.getValidityEnd() == null || entry.getValidityEnd().compareTo(date) >= 0)) {
                     items.add(new SFormComponentItem(entry.getCode(), entry.getCode() + " - " + entry.getName()));
+                }
+            }
+        }
+        
+        return items;
+    }
+    
+    private ArrayList<SGuiItem> getGuiItems(final int catalog, final Date date) {
+        ArrayList<SGuiItem> items = new ArrayList<>();
+        items.add(new SGuiItem("(Seleccionar opción)"));
+        
+        ArrayList<SCfdXmlCatalogEntry> entries = mhmCatalogs.get(catalog);
+        if (entries != null) {
+            for (SCfdXmlCatalogEntry entry : entries) {
+                if (entry.getValidityStart().compareTo(date) <= 0 && (entry.getValidityEnd() == null || entry.getValidityEnd().compareTo(date) >= 0)) {
+                    SGuiItem item = new SGuiItem(entry.getCode() + " - " + entry.getName());
+                    item.setCode(entry.getCode()); 
+                    item.setCodeVisible(false);
+                    items.add(item);
                 }
             }
         }
@@ -109,6 +130,15 @@ public class SCfdXmlCatalogs {
         comboBox.removeAllItems();
         for (SFormComponentItem item : items) {
             comboBox.addItem(item);
+        }
+    }
+    
+    public void populateComboBox(final SBeanFieldKey fieldKey, final int catalog, final Date date) {
+        ArrayList<SGuiItem> items = getGuiItems(catalog, date);
+        
+        fieldKey.removeAllItems();
+        for (SGuiItem item : items) {
+            fieldKey.addItem(item);
         }
     }
     

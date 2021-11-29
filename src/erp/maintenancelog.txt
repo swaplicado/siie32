@@ -1,4 +1,75 @@
 ================================================================================
+SIIE 3.2 193.1*/ 2021-11-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Liberación en versión beta de la captura de CFDI de recepción de pagos con su nuevo almacenamiento independiente.
+2) Estandarización de algoritmos y mensajes de usuario del procesamiento de CFDI para sus distintos tipos.
+
+================================================================================
+SIIE 3.2 193.0*/ 2021-11-24
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de captura e impresión número de cuenta predial en renglones de facturas y notas de crédito.
+
+================================================================================
+SIIE 3.2 191.5/ 2021-11-17
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de tipo de crédito "lentes".
+
+================================================================================
+SIIE 3.2 191.4/ 2021-11-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Puesta en marcha del guardado de CFDI de recepción de pagos en sus nuevas tablas.
+
+================================================================================
+SIIE 3.2 191.3/ 2021-11-09
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a captura de movimientos de almacén por número de parte.
+
+================================================================================
+SIIE 3.2 191.2/ 2021-11-09
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de preparación para almacenamiento de CFDI de recepción de pagos.
+
+================================================================================
+SIIE 3.2 191.1/ 2021-11-03
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a captura de movimientos de almacén por número de parte.
+
+================================================================================
+SIIE 3.2 191.0/ 2021-11-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de filtro de movimientos exclusivamente timbrados en generación de archivo CSV para informativa de sueldos y salarios.
+2) Implementación de consulta de último movimiento de clientes y proveedores.
+3) Adición de campo tipo de garantía a la categoría de clientes y proveedores, y despliegue en reporte de antigüedad de saldos 30, 60, 90 con datos de garantía y seguro.
+4) Ampliación del tamaño de la serie y folio de documentos.
+5) Cambio a la validación de discrepancia de serie y/o folio de documentos vs. el XML del CFDI, para mostrar solamente una advertencia con opción de confirmación para continuar.
+6) Habilitación de selección de empresa para consulta del cárdex de vacaciones de empleados, y poder consultar el historial de incidencias relacionadas en empresas en las que anteriormente el empleado estuvo dado de alta.
+7) Refactorización al filtro de estatus de nóminas para reportes.
+8) Inicio de implementación del guardado de CFDI de recepción de pagos en sus nuevas tablas.
+9) Inicio de implementación del control de acceso exclusivo a registros con Redis.
+
+================================================================================
+SIIE 3.2 189.7/ 2021-10-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a generación de entradas de bitácora de altas y bajas en casos de sustitución patronal, el ID usuario creación del registro estaba ausente.
+2) Mejora selección de empleados disponibles y seleccionados en diálogo de contabilización de nóminas.
+3) Corrección a vista de documentos a detalle y movimientos de documentos por asociado de negocios e ítem.
+
+================================================================================
+SIIE 3.2 189.6/ 2021-09-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejora a lectura de receptor de CFDI de recepción de pagos por RFC cuando es el banco de factoraje.
+
+================================================================================
 SIIE 3.2 189.5/ 2021-09-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

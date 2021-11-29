@@ -123,7 +123,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     
     public static final String ERR_PARAMS_APP_READING = "No fue posible leer los parámetros de configuración del sistema.";
 
-    //private SRedisConection moRedis;
     private SRedisLockManager moRedisLockManager;
     private Jedis moJedis;
     private boolean mbFirstActivation;
@@ -133,6 +132,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private SLoginSession moLoginSession;
     private SServerRemote moServer;
     private SSessionXXX moSessionXXX;
+    private Jedis moJedis;
     private SXmlConfig moXmlConfig;
     private SCfgProcessor moCfgProcessor;
     private erp.lib.gui.SGuiDatePicker moGuiDatePicker;
@@ -1184,7 +1184,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         Cursor cursor = getCursor();
 
         try {
-
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             actionFileCloseViews();
 
@@ -1212,11 +1211,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                     SLibUtils.showException(this, e);
                 }
             }
-            
-            if (moJedis != null) {
-                moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
-                moJedis.disconnect();
-            }
+
+//            if (moJedis != null) {
+//               moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
+//               moJedis.disconnect();
+//               moJedis = null;
+//            }
             
             moServer = null;
             moSessionXXX = null;
@@ -1247,7 +1247,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             setCursor(cursor);
         }
     }
-    
+
+
     private void login() {
         boolean lookup = false;
         Cursor cursor = getCursor();
@@ -1260,9 +1261,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
             moServer = (SServerRemote) Naming.lookup("rmi://" + moParamsApp.getErpHost() + ":" + moParamsApp.getErpRmiRegistryPort() + "/" + moParamsApp.getErpInstance());
             lookup = true;
-            
+
             moLogin.setCompanies(readCompanies());
-            
+
             while (!mbLoggedIn) {
                 moLogin.reset();
                 moLogin.setVisible(true);
@@ -1492,7 +1493,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     }
 
     private void actionFilePassword() {
-        Vector<Object> params = new Vector<Object>();
+        Vector<Object> params = new Vector<>();
         SUserPassword userPassword = new SUserPassword(this);
 
         while (true) {
@@ -2360,6 +2361,4 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public int showMsgBoxConfirm(String msg) {
         return JOptionPane.showConfirmDialog(this, msg, SGuiConsts.MSG_BOX_CONFIRM, JOptionPane.YES_NO_OPTION);
     }
-
-    
 }

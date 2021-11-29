@@ -20,6 +20,9 @@ import javax.swing.JToggleButton;
  */
 public class STabFilterRelatedParts extends javax.swing.JPanel implements java.awt.event.ActionListener {
 
+    private static final String TXT_REL_PTY_WITH = "CON PARTES REL.";
+    private static final String TXT_REL_PTY_WITH_OUT = "SIN PARTES REL.";
+    
     private erp.client.SClientInterface miClient;
     private erp.lib.table.STableTab moTab;
     private erp.lib.table.STableSetting moSetting;
@@ -50,23 +53,20 @@ public class STabFilterRelatedParts extends javax.swing.JPanel implements java.a
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
         jtfFilterCurrency.setEditable(false);
-        jtfFilterCurrency.setText("RELATED PARTS");
-        jtfFilterCurrency.setToolTipText("Moneda");
-        jtfFilterCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfFilterCurrency.setText("TEXT");
+        jtfFilterCurrency.setToolTipText("Partes relacionadas");
+        jtfFilterCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
         add(jtfFilterCurrency);
 
-        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif"))); // NOI18N
+        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_off.gif"))); // NOI18N
+        jtbRelatedParty.setToolTipText("Cambiar partes relacionadas");
         jtbRelatedParty.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbRelatedParty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif"))); // NOI18N
         add(jtbRelatedParty);
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsExtra() {
         moSetting = new STableSetting(SFilterConstants.SETTING_FILTER_REL_PARTY, STrnConsts.TRN_BPS_WITH_REL_PARTY);
-        
-        jtbRelatedParty.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_off.gif")));
-        jtbRelatedParty.setToolTipText("Filtrar partes relacionadas");
-        jtbRelatedParty.setPreferredSize(new java.awt.Dimension(23, 23));
-        jtbRelatedParty.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_rel_pty_on.gif")));
         
         jtbRelatedParty.addActionListener(this);
         
@@ -84,7 +84,7 @@ public class STabFilterRelatedParts extends javax.swing.JPanel implements java.a
     }
 
     private void renderText() {
-        jtfFilterCurrency.setText(mnDataType == STrnConsts.TRN_BPS_WITH_REL_PARTY ? STrnConsts.TRN_TXT_REL_PARTS : STrnConsts.TRN_TXT_WITHOUT_REL_PARTS);
+        jtfFilterCurrency.setText(mnDataType == STrnConsts.TRN_BPS_WITH_REL_PARTY ? TXT_REL_PTY_WITH : TXT_REL_PTY_WITH_OUT);
         jtfFilterCurrency.setCaretPosition(0);
     }
 

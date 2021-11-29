@@ -67,7 +67,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Claudio Peña
  */
 public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 

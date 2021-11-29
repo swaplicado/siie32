@@ -1159,6 +1159,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     miForm = moFormDpsDeliveryAck;
                     break;
+                case SDataConstants.TRN_PAY:
                 case SDataConstants.TRNX_CFD_PAY_REC:
                     if(moFormCfdPayment == null) {
                         moFormCfdPayment = new SFormCfdPayment(miClient);
@@ -1245,6 +1246,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         }
                         break;
 
+                    case SDataConstants.TRN_PAY:
                     case SDataConstants.TRNX_CFD_PAY_REC:
                         // compute associated CFD of current CFD of Payment:
                         /*
@@ -1610,7 +1612,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     public int annulRegistry(int registryType, java.lang.Object pk, sa.lib.gui.SGuiParams params) {
         int result = SLibConstants.UNDEFINED;
         boolean annul = true;
-        String error = "";
         SServerRequest request = null;
         SServerResponse response = null;
 
@@ -1634,13 +1635,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                     response = miClient.getSessionXXX().request(request);
 
                                     if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                        error = response.getMessage();
+                                        throw new Exception(response.getMessage());
                                     }
                                     else {
                                         result = response.getResultType();
 
                                         if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage());
+                                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
                                         }
                                         else {
                                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
@@ -1655,6 +1656,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                                         (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
                                                         (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                             }
+                                            
                                             result = SLibConstants.DB_ACTION_ANNUL_OK;
                                             annul = false;
                                         }
@@ -1663,21 +1665,18 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             }
                         }
                     }
-
-                    if (!error.isEmpty()) {
-                        throw new Exception(error);
-                    }
-
                     break;
 
+                case SDataConstants.TRN_PAY:
                 case SDataConstants.TRNX_CFD_PAY_REC:
-                    moRegistry = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, registryType, pk, SLibConstants.EXEC_MODE_VERBOSE);
+                    moRegistry = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, SDataConstants.TRNX_CFD_PAY_REC, pk, SLibConstants.EXEC_MODE_VERBOSE);
 
                     if (moRegistry == null) {
                         annul = false;
                     }
                     else {
                         SDataCfd cfd = ((SDataCfdPayment) moRegistry).getDbmsDataCfd();
+                        
                         if (cfd != null) {
                             if (cfd.isCfdi() && cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                                 // Check if registry can be annuled:
@@ -1687,13 +1686,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 response = miClient.getSessionXXX().request(request);
 
                                 if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                    error = response.getMessage();
+                                    throw new Exception(response.getMessage());
                                 }
                                 else {
                                     result = response.getResultType();
 
                                     if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                        error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage());
+                                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage()));
                                     }
                                     else {
                                         if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
@@ -1708,6 +1707,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                                     (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
                                                     (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                         }
+                                        
                                         result = SLibConstants.DB_ACTION_ANNUL_OK;
                                         annul = false;
                                     }
@@ -1715,11 +1715,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             }
                         }
                     }
-
-                    if (!error.isEmpty()) {
-                        throw new Exception(error);
-                    }
-
                     break;
 
                 default:

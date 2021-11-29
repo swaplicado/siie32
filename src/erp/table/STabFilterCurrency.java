@@ -19,6 +19,9 @@ import javax.swing.JToggleButton;
  */
 public class STabFilterCurrency extends javax.swing.JPanel implements java.awt.event.ActionListener {
 
+    private static final String TXT_CUR_SYS = "MONEDA LOCAL";
+    private static final String TXT_CUR_DPS = "MONEDA DOCTO.";
+
     private erp.client.SClientInterface miClient;
     private erp.lib.table.STableTab moTab;
     private erp.lib.table.STableSetting moSetting;
@@ -27,9 +30,6 @@ public class STabFilterCurrency extends javax.swing.JPanel implements java.awt.e
     
     public static final int TP_SYSTEM_CURRENCY = 1;
     
-    private static final String TXT_CUR_SYS = "MONEDA LOCAL";
-    private static final String TXT_CUR_DPS = "MONEDA DOCUMENTO";
-
     /** Creates new form STabFilterCurrency */
     public STabFilterCurrency(erp.client.SClientInterface client, erp.lib.table.STableTab tableTab) {
         miClient = client;
@@ -54,23 +54,20 @@ public class STabFilterCurrency extends javax.swing.JPanel implements java.awt.e
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
         jtfFilterCurrency.setEditable(false);
-        jtfFilterCurrency.setText("CURRENCY");
-        jtfFilterCurrency.setToolTipText("Moneda");
-        jtfFilterCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfFilterCurrency.setText("TEXT");
+        jtfFilterCurrency.setToolTipText("Tipo moneda");
+        jtfFilterCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
         add(jtfFilterCurrency);
 
-        jtbFilterCurrency.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_money_on.gif"))); // NOI18N
+        jtbFilterCurrency.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_money_off.gif"))); // NOI18N
+        jtbFilterCurrency.setToolTipText("Cambiar tipo moneda");
         jtbFilterCurrency.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbFilterCurrency.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_money_on.gif"))); // NOI18N
         add(jtbFilterCurrency);
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsExtra() {
         moSetting = new STableSetting(SFilterConstants.SETTING_FILTER_CURRENCY, STabFilterCurrency.TP_SYSTEM_CURRENCY);
-        
-        jtbFilterCurrency.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_money_off.gif")));
-        jtbFilterCurrency.setToolTipText("Cambiar moneda");
-        jtbFilterCurrency.setPreferredSize(new java.awt.Dimension(23, 23));
-        jtbFilterCurrency.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_money_on.gif")));
         
         jtbFilterCurrency.addActionListener(this);
         

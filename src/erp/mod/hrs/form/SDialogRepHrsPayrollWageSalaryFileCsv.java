@@ -5,6 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
@@ -72,6 +73,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moRadFilterTypePeriod = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadFilterTypeDate = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadFilterTypeDatePay = new sa.lib.gui.bean.SBeanFieldRadio();
+        moBoolCfdiStampedOnly = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel35 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
         moIntPeriodYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
@@ -114,13 +116,17 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
         moRadGroupFilterType.add(moRadFilterTypeDate);
         moRadFilterTypeDate.setText("Por rango de fechas");
-        moRadFilterTypeDate.setPreferredSize(new java.awt.Dimension(150, 23));
+        moRadFilterTypeDate.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel3.add(moRadFilterTypeDate);
 
         moRadGroupFilterType.add(moRadFilterTypeDatePay);
         moRadFilterTypeDatePay.setText("Por fecha pago nómina");
         moRadFilterTypeDatePay.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel3.add(moRadFilterTypeDatePay);
+
+        moBoolCfdiStampedOnly.setText("Sólo movimientos de CFDI vigentes y emitidos en el mismo período");
+        moBoolCfdiStampedOnly.setPreferredSize(new java.awt.Dimension(365, 23));
+        jPanel3.add(moBoolCfdiStampedOnly);
 
         jPanel2.add(jPanel3);
 
@@ -248,6 +254,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpFilterStatusPay;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolCfdiStampedOnly;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private javax.swing.ButtonGroup moGroupOrderByDepartament;
@@ -279,6 +286,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
         moRadFilterTypeDatePay.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDatePay.getText()), false);
+        moBoolCfdiStampedOnly.setBooleanSettings(SGuiUtils.getLabelName(moBoolCfdiStampedOnly.getText()), false);
         moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
         moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
         moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
@@ -289,7 +297,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moFields.addField(moRadFilterTypePeriod);
         moFields.addField(moRadFilterTypeDate);
         moFields.addField(moRadFilterTypeDatePay);
-        
+        moFields.addField(moBoolCfdiStampedOnly);
         moFields.addField(moIntPeriodYear);
         moFields.addField(moIntPeriodStart);
         moFields.addField(moIntPeriodEnd);
@@ -325,14 +333,19 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
     private void actionEnableFields() {
         if (moRadFilterTypePeriod.isSelected()) {
+            moBoolCfdiStampedOnly.setEnabled(true);
+            
             moIntPeriodYear.setEnabled(true);
             moIntPeriodStart.setEnabled(true);    
             moIntPeriodEnd.setEnabled(true);
             moDateDateStart.setEnabled(false);
             moDateDateEnd.setEnabled(false);
+            
             moPanelHrsFilterPayrollStatus.setSelectedAll();
         }
         else if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
+            moBoolCfdiStampedOnly.setEnabled(false);
+            
             moIntPeriodYear.setEnabled(false);
             moIntPeriodStart.setEnabled(false);    
             moIntPeriodEnd.setEnabled(false);
@@ -346,6 +359,8 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 moPanelHrsFilterPayrollStatus.setSelectedAll();
             }
         }
+        
+        moBoolCfdiStampedOnly.setSelected(false);
     }
     
     private String getOrderBy() {
@@ -373,7 +388,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
         String sql = "SELECT * "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
-                + "WHERE b_del = 0 "
+                + "WHERE NOT b_del "
                 + "ORDER BY CONCAT(code, ' - ', name), id_ear ";
 
         Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
@@ -396,30 +411,40 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
      */
     private double[] getDeductions(final int employeeId, final String sqlStatusPay) throws Exception {
         double deductions[] = null;
+        
+        String sqlInnerJoinCfd = "";
 
-        String sql = "SELECT "
-                + "SUM(IF(d.b_who = 1, prd.amt_r, 0.0)) AS f_ded_who, "
-                + "SUM(IF(prd.fk_tp_ded = " + SModSysConsts.HRSS_TP_DED_TAX + ", prd.amt_r, 0.0)) AS f_ded_tax, "
-                + "SUM(prd.amt_r) AS f_ded_all "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                + (!moRadFilterTypeDatePay.isSelected() ?  "" : "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
-                + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
-                + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
-                + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
-                + "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded "
-                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 " + sqlStatusPay
-                + (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "");
+        if (moBoolCfdiStampedOnly.getValue()) {
+            sqlInnerJoinCfd = "INNER JOIN trn_cfd AS cfd ON cfd.fid_pay_rcp_pay_n = pr.id_pay AND cfd.fid_pay_rcp_emp_n = pr.id_emp AND " +
+                    "YEAR(cfd.ts) = " + moIntPeriodYear.getValue() + " AND " +
+                    "MONTH(cfd.ts) BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " AND " +
+                    "cfd.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " ";
+        }
+
+        String sql = "SELECT " +
+                "SUM(IF(d.b_who = 1, prd.amt_r, 0.0)) AS f_ded_who, " +
+                "SUM(IF(prd.fk_tp_ded = " + SModSysConsts.HRSS_TP_DED_TAX + ", prd.amt_r, 0.0)) AS f_ded_tax, " +
+                "SUM(prd.amt_r) AS f_ded_all " +
+                "FROM hrs_pay AS p " +
+                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                (!moRadFilterTypeDatePay.isSelected() ? "" : "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp AND " +
+                "rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND " +
+                "rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
+                sqlInnerJoinCfd +
+                "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 " + sqlStatusPay +
+                (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " ";
                 
                 if (moRadFilterTypePeriod.isSelected()) {
-                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " "
+                    sql += "AND p.per_year = " + moIntPeriodYear.getValue() + " "
                             + "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
                 }
                 else if (moRadFilterTypeDate.isSelected()) {
-                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
+                    sql += "AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
                 }
                 
-                sql += " AND prd.id_emp = " + employeeId + " ";
+                sql += "AND prd.id_emp = " + employeeId + " ";
 
         try (Statement statement = miClient.getSession().getDatabase().getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
@@ -437,7 +462,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     
     private void computeReport() {
         Cursor cursor = getCursor();
-        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SLibConsts.UNDEFINED);
+        int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SPanelHrsFilterPayrollStatus.STATUS);
 
         try {
             miClient.getFileChooser().setSelectedFile(new File(getTitle() + " " + ((SClientInterface) miClient).getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + ".csv"));
@@ -485,37 +510,45 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
                 bw.write(SLibUtilities.textToAscii(buffer));
                 
-                String sql = "SELECT DISTINCT pre.id_emp, e.num, b.bp, d.code, d.name " +
+                String sqlInnerJoinCfd = "";
+
+                if (moBoolCfdiStampedOnly.getValue()) {
+                    sqlInnerJoinCfd = "INNER JOIN trn_cfd AS cfd ON cfd.fid_pay_rcp_pay_n = pr.id_pay AND cfd.fid_pay_rcp_emp_n = pr.id_emp AND " +
+                            "YEAR(cfd.ts) = " + moIntPeriodYear.getValue() + " AND " +
+                            "MONTH(cfd.ts) BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " AND " +
+                            "cfd.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " ";
+                }
+                
+                String sqlStatusPay = "";
+                
+                if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
+                    sqlStatusPay = " AND p.b_clo = 1 ";                
+                }
+                else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
+                    sqlStatusPay = " AND p.b_clo = 0 ";
+                }
+
+                String sql = "SELECT " +
+                        "DISTINCT pre.id_emp, e.num, b.bp, d.code, d.name " +
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                         "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                        (!moRadFilterTypeDatePay.isSelected() ?  "" :
-                        "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp AND " +
-                        "rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND  '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND " +
+                        (!moRadFilterTypeDatePay.isSelected() ? "" : "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp AND " +
+                        "rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND " +
                         "rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
+                        sqlInnerJoinCfd +
                         "INNER JOIN erp.hrsu_emp AS e ON e.id_emp = pre.id_emp " +
                         "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = pre.id_emp " +
                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = e.fk_dep " +
-                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " +
+                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " + sqlStatusPay +
                         (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " ";
                         
                 if (moRadFilterTypePeriod.isSelected()) {
-                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
+                    sql += "AND p.per_year = " + moIntPeriodYear.getValue() + " " +
                             "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " " + getOrderBy();
                 }
                 else if (moRadFilterTypeDate.isSelected()) {
-                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' " + getOrderBy();
-                }
-
-                String sqlStatusPay = "";
-                
-                if (payrollStatus != SPanelHrsFilterPayrollStatus.STATUS_UNDEF) {
-                    if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
-                        sql += sqlStatusPay = " AND p.b_clo = 1 ";                
-                    }
-                    else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
-                        sql += sqlStatusPay = " AND p.b_clo = 0 ";
-                    }
+                    sql += "AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' " + getOrderBy();
                 }
 
                 try (Statement stEmployee = miClient.getSession().getStatement().getConnection().createStatement()) {
@@ -537,20 +570,21 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                             sql = "SELECT SUM(pre.amt_taxa) AS f_taxable, SUM(pre.amt_exem) AS f_exempt " +
                                     "FROM hrs_pay AS p " +
                                     "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                    (!moRadFilterTypeDatePay.isSelected() ?  "" : " INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
-                                    + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
-                                    + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
+                                    (!moRadFilterTypeDatePay.isSelected() ? "" : "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp AND " +
+                                    "rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND " +
+                                    "rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
+                                    sqlInnerJoinCfd +
                                     "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
                                     "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " + sqlStatusPay +
-                                    (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " AND pre.id_emp = " + employeeId + " " +
-                                    "AND pre.fk_ear = " + earning.getPkEarningId();
+                                    (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " AND " +
+                                    "pre.id_emp = " + employeeId + " AND pre.fk_ear = " + earning.getPkEarningId() + " ";
 
                                     if (moRadFilterTypePeriod.isSelected()) {
-                                        sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
+                                        sql += "AND p.per_year = " + moIntPeriodYear.getValue() + " " +
                                                 "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
                                     }
                                     else if (moRadFilterTypeDate.isSelected()) {
-                                        sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
+                                        sql += "AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
                                     }
 
                             try (ResultSet resulSet = miClient.getSession().getStatement().executeQuery(sql)) {

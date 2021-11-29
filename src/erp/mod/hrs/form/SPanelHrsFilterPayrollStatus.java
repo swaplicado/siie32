@@ -17,7 +17,8 @@ import sa.lib.gui.bean.SBeanPanel;
  */
 public class SPanelHrsFilterPayrollStatus extends SBeanPanel {
 
-    public static final int STATUS_UNDEF = 1;
+    public static final int STATUS = 0; // to invoke getValue() method
+    public static final int STATUS_ALL = 1;
     public static final int STATUS_CLOSE = 2;
     public static final int STATUS_OPEN = 3;
     
@@ -143,14 +144,21 @@ public class SPanelHrsFilterPayrollStatus extends SBeanPanel {
     public Object getValue(int type) {
         Object value = null;
         
-        if (moRadUndef.getValue()) {
-            value = STATUS_UNDEF;
-        }
-        else if (moRadClose.getValue()) {
-            value = STATUS_CLOSE;
-        }
-        else if (moRadOpen.getValue()) {
-            value = STATUS_OPEN;
+        switch (type) {
+            case STATUS:
+                if (moRadUndef.getValue()) {
+                    value = STATUS_ALL;
+                }
+                else if (moRadClose.getValue()) {
+                    value = STATUS_CLOSE;
+                }
+                else if (moRadOpen.getValue()) {
+                    value = STATUS_OPEN;
+                }
+                break;
+                
+            default:
+                // do nothing
         }
         
         return value;

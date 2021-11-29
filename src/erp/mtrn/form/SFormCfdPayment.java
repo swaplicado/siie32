@@ -1009,13 +1009,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocDpsRelatedVersionRo.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel14.add(jtfDocDpsRelatedVersionRo);
 
-        jbDocDpsRelatedPickPend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbDocDpsRelatedPickPend.setText("...");
         jbDocDpsRelatedPickPend.setToolTipText("Seleccionar doc. relacionado con saldo");
         jbDocDpsRelatedPickPend.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel14.add(jbDocDpsRelatedPickPend);
 
-        jbDocDpsRelatedPickAll.setText("...");
-        jbDocDpsRelatedPickAll.setToolTipText("Seleccionar doc. relacionado");
+        jbDocDpsRelatedPickAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbDocDpsRelatedPickAll.setToolTipText("Seleccionar doc. relacionado (cualquiera)");
         jbDocDpsRelatedPickAll.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel14.add(jbDocDpsRelatedPickAll);
 
@@ -1756,6 +1756,31 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             moFieldPayAccountDest.setKey(account.getPrimaryKey());    // will throw an item-state-changed event
         }        
     }
+    
+    private void validateDpsRelated() throws Exception {
+        if (moDataDocDpsRelated == null) {
+            throw new Exception("El documento relacionado no existe.");
+        }
+        else {
+            String msg = "El documento relacionado " + moDataDocDpsRelated.getDpsNumber() + " ";
+            
+            if (moDataDocDpsRelated.getDbmsDataCfd() == null) {
+                throw new Exception(msg + "carece de CFDI.");
+            }
+            else if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                throw new Exception(msg + "debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + ".");
+            }
+            else if (!moDataDocDpsRelated.getDbmsDataCfd().isStamped()) {
+                throw new Exception(msg + "no está timbrado.");
+            }
+            else if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                throw new Exception(msg + "está cancelado.");
+            }
+            else if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                throw new Exception(msg + "no está emitido.");
+            }
+        }
+    }
 
     private void renderPayPaymentEntry() {
         if (moPaymentEntry == null) {
@@ -1911,9 +1936,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jbDocPaymentCompute.setEnabled(false);
         }
         else {
-            if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-                throw new Exception("El documento relacionado debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + ".");
-            }
+            validateDpsRelated();
             
             jtfDocDpsRelatedNumberRo.setText(moDataDocDpsRelated.getDpsNumber());
             jtfDocDpsRelatedUuid.setText(moDataDocDpsRelated.getDbmsDataCfd().getUuid());
@@ -2845,41 +2868,41 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             
             if (isValid) {
-                // read doc:
-
-                double[] balance = new double[] { 0, 0 };
-                
-                moDataDocDpsRelated = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, pickerDps.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-
                 try {
+                    // read doc:
+
+                    double[] balance = new double[] { 0, 0 };
+
+                    moDataDocDpsRelated = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, pickerDps.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+
                     renderDocDpsRelated();
                     balance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moDataDocDpsRelated.getPrimaryKey(), year);
                     if (docPayments != 0) {
                         balance[1] = SLibUtils.roundAmount(balance[1] + docPayments);
                     }
+
+                    // set default doc values:
+                    int installment = STrnUtilities.countDpsPayments(miClient.getSession().getStatement(), (int[]) moDataDocDpsRelated.getPrimaryKey(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId()) + installments;
+                    moFieldDocInstallment.setFieldValue(installment + 1);
+
+                    if (paymentEntry.CurrencyId == moDataDocDpsRelated.getFkCurrencyId()) {
+                        moFieldDocExchangeRate.setFieldValue(1d);
+                    }
+                    else {
+                        moFieldDocExchangeRate.setFieldValue(0d);
+                    }
+
+                    moFieldDocBalancePrev.setFieldValue(balance[1]);
+
+                    double remainder = SLibUtils.roundAmount(getPaymentRemainder(paymentEntry) * moFieldDocExchangeRate.getDouble());
+                    moFieldDocPayment.setFieldValue(balance[1] <= remainder ? balance[1] : remainder);
+                    computeDocBalancePend();
+
+                    jtfDocInstallment.requestFocusInWindow();
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
                 }
-
-                // set default doc values:
-                int installment = STrnUtilities.countDpsPayments(miClient.getSession().getStatement(), (int[]) moDataDocDpsRelated.getPrimaryKey(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId()) + installments;
-                moFieldDocInstallment.setFieldValue(installment + 1);
-
-                if (paymentEntry.CurrencyId == moDataDocDpsRelated.getFkCurrencyId()) {
-                    moFieldDocExchangeRate.setFieldValue(1d);
-                }
-                else {
-                    moFieldDocExchangeRate.setFieldValue(0d);
-                }
-
-                moFieldDocBalancePrev.setFieldValue(balance[1]);
-
-                double remainder = SLibUtils.roundAmount(getPaymentRemainder(paymentEntry) * moFieldDocExchangeRate.getDouble());
-                moFieldDocPayment.setFieldValue(balance[1] <= remainder ? balance[1] : remainder);
-                computeDocBalancePend();
-
-                jtfDocInstallment.requestFocusInWindow();
             }
         }
     }
@@ -4103,6 +4126,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         //cfdPacket.setPayrollReceiptPayrollId(...);
         //cfdPacket.setPayrollReceiptEmployeeId(...);
         //cfdPacket.setPayrollReceiptIssueId(...);
+        
+        if (moDataCfdPayment.getDbmsReceiptPayment() != null) {
+            cfdPacket.setReceiptPaymentId(moDataCfdPayment.getDbmsReceiptPayment().getPkReceiptId());
+        }
+        
+        //cfdPacket.setBillOfLadingId(...);
         
         try {
             moDataCfdPayment.setDbmsDataCfd(cfdPacket.createDataCfd());

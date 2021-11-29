@@ -486,7 +486,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFileXml.setText("Archivo XML:");
+        jlFileXml.setText("Archivo XML CFD:");
         jlFileXml.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlFileXml);
 
@@ -510,18 +510,18 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jtfXmlFilesNumber.setEditable(false);
         jtfXmlFilesNumber.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfXmlFilesNumber.setText("100");
-        jtfXmlFilesNumber.setToolTipText("Número de archivos XML");
-        jtfXmlFilesNumber.setPreferredSize(new java.awt.Dimension(25, 23));
+        jtfXmlFilesNumber.setToolTipText("Número de archivos XML de CFD");
+        jtfXmlFilesNumber.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel11.add(jtfXmlFilesNumber);
 
         jbFileXmlAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add.gif"))); // NOI18N
-        jbFileXmlAdd.setToolTipText("Agregar archivos XML");
+        jbFileXmlAdd.setToolTipText("Agregar archivos XML de CFD");
         jbFileXmlAdd.setFocusable(false);
         jbFileXmlAdd.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbFileXmlAdd);
 
         jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
-        jbGetXml.setToolTipText("Descargar archivos XML");
+        jbGetXml.setToolTipText("Obtener CFD");
         jbGetXml.setFocusable(false);
         jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbGetXml);
