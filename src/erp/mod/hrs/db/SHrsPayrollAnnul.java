@@ -16,7 +16,7 @@ import erp.server.SServerResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
@@ -87,13 +87,13 @@ public class SHrsPayrollAnnul {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-        SSrvLock lock = null;
+//        SSrvLock lock = null;
         SRedisLock rlock = null;
         
         try {
             // Attempt to gain data lock:
 
-            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+//            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
             rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 60);
             // Read data registry:
 
@@ -155,18 +155,18 @@ public class SHrsPayrollAnnul {
             }
         }
         catch (Exception e) {
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
-            }
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(miClient.getSession(), lock);
+//            }
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }
             throw e;
         }
         finally {
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
-            }
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(miClient.getSession(), lock);
+//            }
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }

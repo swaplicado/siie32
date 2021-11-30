@@ -46,6 +46,8 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
     private boolean mbIsDpsDoc = false;
     private boolean mbIsDpsAdj = false;
 
+    private int mnRegistryType;
+    
     /**
      * Query view of all documents at once.
      * @param client
@@ -217,6 +219,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
                     moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS, new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1] });
                     moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS_ETY, moTablePane.getSelectedTableRow().getPrimaryKey());
                     moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.FIN_ACC, new String[] { account, costCenter }); 
+                    moDialogUpdateDpsAccountCostCenter.setRegistryType(mnRegistryType);
                     moDialogUpdateDpsAccountCostCenter.setFormVisible(true);
 
                     if (moDialogUpdateDpsAccountCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
@@ -273,9 +276,11 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         
         if (mbIsDpsDoc) {
             dpsTypeKeys = new int[][] { isViewForPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV };
+            mnRegistryType = SDataConstantsSys.TRNX_TP_DPS_DOC;
         }
         else if (mbIsDpsAdj) {
             dpsTypeKeys = new int[][] { isViewForPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN : SDataConstantsSys.TRNU_TP_DPS_SAL_CN };
+            mnRegistryType = SDataConstantsSys.TRNX_TP_DPS_ADJ;
         }
         else {
             switch (mnTabTypeAux01) {

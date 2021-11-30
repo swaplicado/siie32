@@ -212,7 +212,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinBankNbDay;
     private javax.swing.JMenuItem jmiFinValuationBalances;
     private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
-    private javax.swing.JMenuItem jmiFinBankNbDay;
 
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;

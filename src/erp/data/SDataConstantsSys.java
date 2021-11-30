@@ -97,8 +97,6 @@ public abstract class SDataConstantsSys {
     
     public static final int CFGX_IVM_FIFO = 1;
     
-    public static final int USD_XRT_POLICY_BANXICO = 1;
-    public static final int USD_XRT_POLICY_INFORMAL = 2;
     
     /* XXX 2019-08-16 Sergio Flores: Not used yet.
     public static final int USRS_TP_LEV_NO_PERMISSION = 0;

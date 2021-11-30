@@ -63,7 +63,7 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
@@ -1547,19 +1547,20 @@ public class SDbBankLayout extends SDbRegistryUser {
      */
     public boolean updateLayoutStatus(SGuiClient client, int newLayoutStatus) throws Exception {
         boolean done = false;
-        SSrvLock lock = null;
+//        SSrvLock lock = null;
         SRedisLock rlock = null;
         
         try {
             mnLayoutStatus = newLayoutStatus;
             
-            lock = SSrvUtils.gainLock(client.getSession(), 
-                    ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId(), 
-                    SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
+//            lock = SSrvUtils.gainLock(client.getSession(), 
+//                    ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId(), 
+//                    SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
             
             rlock = SRedisLockUtils.gainLock((SClientInterface) client, SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout() / 1000);
             
-            if (lock != null && lock.getLockStatus() == SSrvConsts.LOCK_GAINED) {
+//            if (lock != null && lock.getLockStatus() == SSrvConsts.LOCK_GAINED) {
+            if (rlock != null) {
                 String sql = "UPDATE " + getSqlTable() + " SET "
                         + "lay_st = " + mnLayoutStatus + "" + 
                         (mnLayoutStatus == SDbBankLayout.STATUS_APPROVED ? ", auth_req = " + ++mnAuthorizationRequests : "") + " " + // if needed, increment count of requests
@@ -1572,9 +1573,9 @@ public class SDbBankLayout extends SDbRegistryUser {
             SLibUtils.showException(this, e);
         }
         finally {
-            if (lock != null) {
-                SSrvUtils.releaseLock(client.getSession(), lock);
-            }
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(client.getSession(), lock);
+//            }
             if (rlock != null) {
                 SRedisLockUtils.releaseLock((SClientInterface) (client), rlock);
             }

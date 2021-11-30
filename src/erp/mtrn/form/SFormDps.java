@@ -118,8 +118,8 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
+//import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlUtils;
 
@@ -296,7 +296,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private File moFilePdfJustLoaded;
     private erp.mtrn.data.cfd.SAddendaAmc71Manager moAddendaAmc71Manager;
     private java.lang.Object moRecordUserKey;
-    private sa.lib.srv.SSrvLock moRecordUserLock;
+//    private sa.lib.srv.SSrvLock moRecordUserLock;
     private sa.lib.srv.redis.SRedisLock moRecordUserRedisLock;
     private erp.mfin.data.SDataRecord moRecordUser;
     private erp.form.SFormOptionPickerBizPartner moPickerBizPartner;
@@ -3377,7 +3377,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             mbFirstTime = false;
 
             if (!moDps.getIsRegistryNew()) {
-                if (!moDps.getIsRecordAutomatic() && moRecordUserLock == null && moRecordUserRedisLock == null) {
+                if (!moDps.getIsRecordAutomatic() && moRecordUserRedisLock == null) {
                     miClient.showMsgBoxWarning("La póliza contable manual no debe estar siendo utilizada por otro usuario.");
                     actionCancel();     // if lock for manual record could not be gained, exit form
                 }
@@ -4493,19 +4493,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return ((Double) out.get(0)).doubleValue();
     }
 
-    private sa.lib.srv.SSrvLock gainRecordUserLock(java.lang.Object pk, long timeout) {
-        SSrvLock lock = null;
-
-        try {
-            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, pk, timeout);
-        }
-        catch (Exception e) {
-            lock = null;
-            miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.\n" + e);
-        }
-
-        return lock;
-    }
+//    private sa.lib.srv.SSrvLock gainRecordUserLock(java.lang.Object pk, long timeout) {
+//        SSrvLock lock = null;
+//
+//        try {
+//            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, pk, timeout);
+//        }
+//        catch (Exception e) {
+//            lock = null;
+//            miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.\n" + e);
+//        }
+//
+//        return lock;
+//    }
     
     private sa.lib.srv.redis.SRedisLock gainRecordUserRedisLock(java.lang.Object pk, long timeout) throws Exception {
         SRedisLock rlock = null;
@@ -4534,25 +4534,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void releaseRecordUserLock() {
-        if (moRecordUserLock != null) {
-            try {
-                SSrvUtils.releaseLock(miClient.getSession(), moRecordUserLock);
-                moRecordUserLock = null;
-            }
-            catch (Exception e) {
-                miClient.showMsgBoxWarning("No fue posible liberar el acceso exclusivo del registro '" + jckRecordUser.getText() + "'.\n" + e);
-            }
-        }
-    }
+//    private void releaseRecordUserLock() {
+//        if (moRecordUserLock != null) {
+//            try {
+//                SSrvUtils.releaseLock(miClient.getSession(), moRecordUserLock);
+//                moRecordUserLock = null;
+//            }
+//            catch (Exception e) {
+//                miClient.showMsgBoxWarning("No fue posible liberar el acceso exclusivo del registro '" + jckRecordUser.getText() + "'.\n" + e);
+//            }
+//        }
+//    }
 
     private boolean readRecordUser(Object pk) throws Exception {
         boolean error = true;
         SDataRecord record = null;
-        SSrvLock lock = null;
+//        SSrvLock lock = null;
         SRedisLock rlock = null;
 
-        releaseRecordUserLock();
+//        releaseRecordUserLock();
         releaseRecordUserRedisLock();
         moRecordUser = null;
 
@@ -4561,11 +4561,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //lock = gainRecordUserLock(pk, record.getRegistryTimeout());
             rlock = gainRecordUserRedisLock(pk, record.getRegistryTimeout());
 
-            if (lock != null) {
-                moRecordUser = record;
-                moRecordUserLock = lock;
-                error = false;
-            }
+//            if (lock != null) {
+//                moRecordUser = record;
+//                moRecordUserLock = lock;
+//                error = false;
+//            }
             if (rlock != null) {
                 moRecordUser = record;
                 moRecordUserRedisLock = rlock;
@@ -8287,7 +8287,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void actionCancel() {
         if (jbCancel.isEnabled()) {
             if (!mbFormSettingsOk || mbParamIsReadOnly || mnFormStatus == SLibConstants.FORM_STATUS_READ_ONLY || miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_FORM_CLOSE) == JOptionPane.YES_OPTION) {
-                releaseRecordUserLock();
+//                releaseRecordUserLock();
                 releaseRecordUserRedisLock();
                 mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
                 setVisible(false);
@@ -8980,7 +8980,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moBizPartnerCategory = null;
         moRecordUserKey = null;
         moRecordUser = null;
-        moRecordUserLock = null;
+//        moRecordUserLock = null;
         moRecordUserRedisLock = null;
         mnSalesAgentId_n = 0;
         mnSalesAgentBizPartnerId_n = 0;
@@ -9591,7 +9591,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     validation.setMessage("No fue posible leer el registro '" + jckRecordUser.getText() + "'.");
                                     validation.setComponent(jbRecordManualSelect);
                                 }
-                                else if (moRecordUserLock == null && moRecordUserRedisLock == null) {
+                                else if (moRecordUserRedisLock == null) {
                                     validation.setMessage("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.");
                                     validation.setComponent(jbRecordManualSelect);
                                 }
@@ -10233,13 +10233,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             moDps.getRegistryComplements().clear();
             if (!jckRecordUser.isSelected()) {
-                releaseRecordUserLock();    // if lock was gained, release it
+//                releaseRecordUserLock();    // if lock was gained, release it
                 releaseRecordUserRedisLock();
                 moDps.setDbmsRecordKey(null);
             }
             else {
                 moDps.setDbmsRecordKey(moRecordUserKey);
-                moDps.getRegistryComplements().add(moRecordUserLock);
+//                moDps.getRegistryComplements().add(moRecordUserLock);
                 moDps.getRegistryComplements().add(moRecordUserRedisLock);
             }
 

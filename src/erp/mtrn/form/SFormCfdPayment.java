@@ -70,7 +70,7 @@ import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
-import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
@@ -113,7 +113,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private java.lang.String msXmlRelationType;
     private java.awt.Color moBackgroundDefaultColor;
-    private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;  // key: record's primary key as string; value: corresponding gained lock
+//    private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;  // key: record's primary key as string; value: corresponding gained lock
     private java.util.HashMap<java.lang.String, sa.lib.srv.redis.SRedisLock> moRecordRedisLocksMap;  
     private erp.mfin.form.SDialogRecordPicker moDialogPayRecordPicker;
     private erp.mtrn.form.SDialogPickerDps moDialogRecDpsRelatedPicker;
@@ -1592,15 +1592,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void gainRecordLock(final erp.mfin.data.SDataRecord record) throws Exception {
         // check if lock of desired record already exists:
         
-        SSrvLock lock = moRecordLocksMap.get(record.getRecordPrimaryKey()); // record's primary key as string used as map's key
+//        SSrvLock lock = moRecordLocksMap.get(record.getRecordPrimaryKey()); // record's primary key as string used as map's key
         SRedisLock rlock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
         
-        if (lock == null) {
-            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, record.getPrimaryKey(), record.getRegistryTimeout());
-            if (lock != null) {
-                moRecordLocksMap.put(record.getRecordPrimaryKey(), lock);
-            }
-        }
+//        if (lock == null) {
+//            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, record.getPrimaryKey(), record.getRegistryTimeout());
+//            if (lock != null) {
+//                moRecordLocksMap.put(record.getRecordPrimaryKey(), lock);
+//            }
+//        }
         if (rlock == null) {
             rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, record.getPrimaryKey(), record.getRegistryTimeout() / 1000);
             if (rlock != null) {
@@ -1630,13 +1630,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         if (count == 1) {
             // lock used only once, proceed to release it:
             
-            SSrvLock lock = moRecordLocksMap.get(record.getRecordPrimaryKey());
+//            SSrvLock lock = moRecordLocksMap.get(record.getRecordPrimaryKey());
             SRedisLock rlock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
             
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
-                moRecordLocksMap.remove(record.getRecordPrimaryKey());
-            }
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(miClient.getSession(), lock);
+//                moRecordLocksMap.remove(record.getRecordPrimaryKey());
+//            }
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
                 moRecordRedisLocksMap.remove(record.getRecordPrimaryKey());
@@ -1650,17 +1650,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
      */
     private void releaseAllRecordLocks() throws Exception {
         String exception = "";
-        ArrayList<SSrvLock> locks = new ArrayList<>(moRecordLocksMap.values());
+//        ArrayList<SSrvLock> locks = new ArrayList<>(moRecordLocksMap.values());
         ArrayList<SRedisLock> rlocks = new ArrayList<>(moRecordRedisLocksMap.values());
         
-        for (int index = 0; index < locks.size(); index++) {
-            try {
-                SSrvUtils.releaseLock(miClient.getSession(), locks.get(index));
-            }
-            catch (Exception e) {
-                exception += (exception.isEmpty() ? "" : "\n") + e;
-            }
-        }
+//        for (int index = 0; index < locks.size(); index++) {
+//            try {
+//                SSrvUtils.releaseLock(miClient.getSession(), locks.get(index));
+//            }
+//            catch (Exception e) {
+//                exception += (exception.isEmpty() ? "" : "\n") + e;
+//            }
+//        }
         for (int index = 0; index < rlocks.size(); index++) {
             try {
                 SRedisLockUtils.releaseLock(miClient, rlocks.get(index));
@@ -1670,7 +1670,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
         
-        moRecordLocksMap.clear();
+//        moRecordLocksMap.clear();
         moRecordRedisLocksMap.clear();
         
         if (!exception.isEmpty()) {
@@ -3638,7 +3638,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         msXmlRelationType = "";
         moBackgroundDefaultColor = jtfAccConceptDocsRo.getBackground();
-        moRecordLocksMap = new HashMap<>();
+//        moRecordLocksMap = new HashMap<>();
         moRecordRedisLocksMap = new HashMap<>();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -4183,9 +4183,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         // send as well locks of journal vouchers:
         moDataCfdPayment.getRegistryComplements().clear();
-        for (SSrvLock lock : moRecordLocksMap.values()) {
-            moDataCfdPayment.getRegistryComplements().add(lock);
-        }
+//        for (SSrvLock lock : moRecordLocksMap.values()) {
+//            moDataCfdPayment.getRegistryComplements().add(lock);
+//        }
         for (SRedisLock rlock : moRecordRedisLocksMap.values()) {
             moDataCfdPayment.getRegistryComplements().add(rlock);
         }

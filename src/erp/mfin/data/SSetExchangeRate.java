@@ -45,7 +45,7 @@ public class SSetExchangeRate {
      * @throws SQLException 
      */
     public static int getExchangeRatePolicy(Connection connection) throws SQLException{
-        int exchangeRatePolicy =2;
+        int exchangeRatePolicy = 2;
         
         Statement statement = connection.createStatement();
         String sql = "SELECT param_value FROM cfg_param WHERE id_param = " + ID_PARAM_XRT_POLICY;
@@ -71,7 +71,7 @@ public class SSetExchangeRate {
         String day = String.valueOf(date.getDate());
         
         Statement statement = connection.createStatement();
-        String sql = "SELECT nb_day FROM finu_bank_nb_day WHERE nb_day >= " + "'" + year + month + day + "'" + " AND b_del != 1";
+        String sql = "SELECT nb_day FROM finu_bank_nb_day WHERE nb_day >= " + "'" + year + month + day + "'" + " AND NOT b_del";
         ResultSet resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
             bankNbDays.add(resultSet.getString(1));
@@ -94,7 +94,8 @@ public class SSetExchangeRate {
             String bankNbDay = day.toString();
             if (!formatter.format(nextDay).equals(bankNbDay) && nextDay.getDay() != 6 && nextDay.getDay() != 0) {
                 isbankBussDay = true;
-            } else {
+            } 
+            else {
                 isbankBussDay = false;
                 break;
             }
@@ -111,7 +112,8 @@ public class SSetExchangeRate {
             String bankNbDay = day.toString();
             if (!formatter.format(date).equals(bankNbDay) && date.getDay() != 6 && date.getDay() != 0) {
                 bankBussDay = true;
-            } else {
+            } 
+            else {
                 bankBussDay = false;
                 break;
             }
@@ -142,12 +144,12 @@ public class SSetExchangeRate {
     /**
      * Pone en un ArrayList todas las fechas en las cuales se utilizara el tipo de cambio obtenido 
      * de banxico, dependiendo de la poltica de tipo de cambio obtenida.
-     * @param option
+     * @param usd_xrt_policy
      * @param calendar
      * @return
      * @throws Exception 
      */
-    public static ArrayList setExchangeRateDays(int option, ArrayList calendar) throws Exception {
+    public static ArrayList setExchangeRateDays(int usd_xrt_policy, ArrayList calendar) throws Exception {
         Date date = new Date();
         ArrayList exchangeRateDays = new ArrayList();
         boolean bankBussDay = false;
@@ -156,26 +158,30 @@ public class SSetExchangeRate {
         while(!bankBussDay){
             if(isNextDayBankBussDay(date, calendar)){
                 
-                if(option == SDataConstantsSys.USD_XRT_POLICY_INFORMAL){
+                if(usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_INFORMAL){
                     date.setDate(date.getDate() + 1);
                     canSetDay = true;
-                }else if (option == SDataConstantsSys.USD_XRT_POLICY_BANXICO) {
+                }
+                else if (usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_BANXICO) {
                     date.setDate(date.getDate() + 1);
                     canSetDay = false;
-                    option = SDataConstantsSys.USD_XRT_POLICY_INFORMAL;
-                } else {
+                    usd_xrt_policy = SDataConstantsSys.USD_XRT_POLICY_INFORMAL;
+                } 
+                else {
                     throw new Exception("La politica de tipo de cambio no es reconocida");
                 }
                 
                 if(canSetDay){
                     if(exchangeRateDays.isEmpty()){
                         exchangeRateDays.add((date.getYear() + 1900) + "-" + (date.getMonth() + 1) + "-" + date.getDate());
-                    }else{
+                    }
+                    else{
                         bankBussDay = true;
                     }
                 }
                 
-            }else{
+            }
+            else{
                 date.setDate(date.getDate()+ 1);
                 if(!exchangeRateDays.isEmpty()){
                     exchangeRateDays.add((date.getYear() + 1900) + "-" + (date.getMonth() + 1) + "-" + date.getDate());
@@ -185,10 +191,10 @@ public class SSetExchangeRate {
         return exchangeRateDays;
     }
     
-    public static boolean isSetExchangeRate(Connection con, String day) throws SQLException{
+    public static boolean isSetExchangeRate(Connection connection, String day) throws SQLException{
         String sql = "SELECT exc_rate FROM fin_exc_rate WHERE id_dt = " + '"' + day + '"';
         boolean isSetExchangeRate = false;
-        try (ResultSet resultSet = con.createStatement().executeQuery(sql)) {
+        try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
             if(resultSet.next()){
                 isSetExchangeRate = true;
             }
@@ -198,13 +204,13 @@ public class SSetExchangeRate {
     
     /**
      * Guarda en la base de datos el tipo de cambio y la fechas en las que se usará;
-     * @param con
+     * @param connection
      * @param valueExchangeRate
      * @param exchangeRateDays
      * @throws ParseException
      * @throws Exception 
      */
-    public static void saveExchangeRate(Connection con, Double valueExchangeRate, ArrayList exchangeRateDays) throws ParseException, Exception {
+    public static void saveExchangeRate(Connection connection, Double valueExchangeRate, ArrayList exchangeRateDays) throws ParseException, Exception {
         SDataExchangeRate exchangeRate = new SDataExchangeRate();
         int lastActionResult = 0;
         
@@ -219,9 +225,9 @@ public class SSetExchangeRate {
         exchangeRate.setUserDeleteTs(new Date());
         for (Object exchangeRateDay : exchangeRateDays) {
             Date newdate = formatter.parse(exchangeRateDay.toString());
-            if(!isSetExchangeRate(con,(newdate.getYear() + 1900) + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate())){
+            if(!isSetExchangeRate(connection,(newdate.getYear() + 1900) + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate())){
                 exchangeRate.setPkDateId(newdate);
-                lastActionResult = exchangeRate.save(con);
+                lastActionResult = exchangeRate.save(connection);
                 System.out.println("Saved value: " + valueExchangeRate + " at " + newdate);
             }
         }
@@ -239,11 +245,9 @@ public class SSetExchangeRate {
                 throw new Exception(erp.SClient.ERR_PARAMS_APP_READING);
             }
             
-            // create database connections:
-            
             int result = 0;
             
-            // connect to ERP database:
+            //conect to erp database
             
             dbErp = new SDbDatabase(SDbConsts.DBMS_MYSQL);
             result = dbErp.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(), 

@@ -78,7 +78,7 @@ import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
-import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
@@ -143,7 +143,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SGuiItem> maBeneficiaryAccountGuiItems;
     private ArrayList<SDataBizPartnerBranchBankAccount> maBizPartnerBranchBankAccounts;
     private HashMap<String, ArrayList<SGuiItem>> moAgreementReferencesMap;
-    private ArrayList<SSrvLock> maLocks;
+//    private ArrayList<SSrvLock> maLocks;
     private ArrayList<SRedisLock> maRedisLocks;
     
     private boolean mbShowConfirmCloseDialog;
@@ -1949,7 +1949,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         boolean found = false;
         SDataRecord record = null;
         SLayoutBankRecord bankRecord = null;
-        SSrvLock lock = null;
+//        SSrvLock lock = null;
         SRedisLock rlock = null;
         
         if (layoutBankRecordKey == null) {
@@ -1969,8 +1969,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (!found) {
                 record = (SDataRecord) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout() / 1000);
-                lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
-                maLocks.add(lock);
+//                lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
+//                maLocks.add(lock);
                 maRedisLocks.add(rlock);
 
                 bankRecord = new SLayoutBankRecord(layoutBankRecordKey);
@@ -2622,7 +2622,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jckShowOnlyBenefsWithAccounts.setSelected(isModeForTransfers());
 
         maLayoutBankRecords = new ArrayList<>();
-        maLocks = new ArrayList<>();
+//        maLocks = new ArrayList<>();
         maRedisLocks = new ArrayList<>();
 
         switch (mnFormSubtype) {
@@ -2769,9 +2769,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         registry.setExchangeRate(1d);
         registry.setXtaBankPaymentTypeId(mnBankPaymentTypeId);
 
-        if (!maLocks.isEmpty()) {
-            registry.getLocks().addAll(maLocks);
-        }
+//        if (!maLocks.isEmpty()) {
+//            registry.getLocks().addAll(maLocks);
+//        }
         if (!maRedisLocks.isEmpty()) {
             registry.getRedisLocks().addAll(maRedisLocks);
         }
@@ -2828,9 +2828,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             
             if (validation.isValid()) {
                 try {
-                    for (SSrvLock lock : maLocks) {
-                        SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
-                    }
+//                    for (SSrvLock lock : maLocks) {
+//                        SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
+//                    }
                     for (SRedisLock rlock : maRedisLocks) {
                         SRedisLockUtils.verifyLockStatus((SClientInterface) miClient, rlock);
                     }
@@ -2859,9 +2859,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     
     private void close() {
         try {
-            for (SSrvLock lock : maLocks) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
-            }
+//            for SSrvLock(SSrvLock lock : maLocks) {
+//                SSrvUtils.releaseLock(miClient.getSession(), lock);
+//            }
             for (SRedisLock rlock : maRedisLocks) {
                 SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
             }

@@ -61,6 +61,7 @@ import erp.mod.hrs.db.SHrsFormerReceipt;
 import erp.mod.hrs.db.SHrsFormerReceiptConcept;
 import erp.mtrn.form.SDialogRestoreCfdi;
 import erp.print.SDataConstantsPrint;
+import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -112,8 +113,9 @@ import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlUtils;
 import views.core.soap.services.apps.CancelaCFDResult; 
 import views.core.soap.services.apps.FolioArray; 
@@ -662,7 +664,8 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dataDps = null;
         SDataCfdPayment dataCfdPayment = null;
         SDataPayrollReceiptIssue dataPayrollReceiptIssue = null;
-        SSrvLock lock = null;
+//        SSrvLock lock = null;
+        SRedisLock rlock = null;
         SCfdiSignature cfdiSignature = null;
         String xmlStamping = "";
         String xmlAckCancellation = "";
@@ -674,18 +677,21 @@ public abstract class SCfdUtils implements Serializable {
             switch (dataCfd.getFkCfdTypeId()) {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
                     registryKey = new int[] { dataCfd.getFkDpsYearId_n(), dataCfd.getFkDpsDocId_n() };
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60); // 1 minute timeout
+//                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60); // 1 minute timeout
+                    rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                     registryKey = new int[] { dataCfd.getPkCfdId() };
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60); // 1 minute timeout
+//                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60); // 1 minute timeout
+                    rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                     if (payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
                         registryKey = new int[] { dataCfd.getFkPayrollReceiptPayrollId_n(), dataCfd.getFkPayrollReceiptEmployeeId_n(), dataCfd.getFkPayrollReceiptIssueId_n() };
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60); // 1 minute timeout
+//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60); // 1 minute timeout
+                        rlock = SRedisLockUtils.gainLock(client, SModConsts.HRS_PAY_RCP_ISS, registryKey, 60);
                     }
                     break;
                 default:
@@ -861,14 +867,20 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         catch (Exception e) {
-            if (lock != null) {
-                SSrvUtils.releaseLock(client.getSession(), lock);
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(client.getSession(), lock);
+//            }
+            if (rlock != null) {
+                SRedisLockUtils.releaseLock(client, rlock);
             }
             throw e;
         }
         finally {
-            if (lock != null) {
-                SSrvUtils.releaseLock(client.getSession(), lock);
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(client.getSession(), lock);
+//            }
+            if (rlock != null) {
+                SRedisLockUtils.releaseLock(client, rlock);
             }
             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -2169,7 +2181,8 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dps = null;
         SDataCfdPayment cfdPayment = null;
         SDataPayrollReceiptIssue receiptIssue = null;
-        SSrvLock lock = null;
+//        SSrvLock lock = null;
+        SRedisLock rlock = null;
         SServerRequest request = null;
         SServerResponse response = null;
 
@@ -2187,8 +2200,8 @@ public abstract class SCfdUtils implements Serializable {
                     else {
                         // lock registry:
                         
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, key, 1000 * 60); // 1 min. timeout
-                        
+//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, key, 1000 * 60); // 1 min. timeout
+                        rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, key, 60);
                         // check if registry can be annuled:
                         
                         request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
@@ -2238,8 +2251,8 @@ public abstract class SCfdUtils implements Serializable {
                     else {
                         // lock registry:
 
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, key, 1000 * 60); // 1 min. timeout
-
+//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, key, 1000 * 60); // 1 min. timeout
+                        rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRNX_CFD_PAY_REC, key, 60);
                         // check if registry can be annuled:
                         
                         request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
@@ -2289,7 +2302,8 @@ public abstract class SCfdUtils implements Serializable {
 
                         // lock registry:
                         
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, key, 1000 * 60); // 1 min. timeout
+//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, key, 1000 * 60); // 1 min. timeout
+                        rlock = SRedisLockUtils.gainLock(client, SModConsts.HRS_PAY_RCP_ISS, key, 60); // 1 min. timeout
 
                         // check if registry can be annuled:
                         
@@ -2332,14 +2346,20 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         catch (Exception e) {
-            if (lock != null) {
-                SSrvUtils.releaseLock(client.getSession(), lock);
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(client.getSession(), lock);
+//            }
+            if (rlock != null) {
+                SRedisLockUtils.releaseLock(client, rlock);
             }
             throw e;
         }
         finally {
-            if (lock != null) {
-                SSrvUtils.releaseLock(client.getSession(), lock);
+//            if (lock != null) {
+//                SSrvUtils.releaseLock(client.getSession(), lock);
+//            }
+            if (rlock != null) {
+                SRedisLockUtils.releaseLock(client, rlock);
             }
         }
     }

@@ -132,7 +132,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private SLoginSession moLoginSession;
     private SServerRemote moServer;
     private SSessionXXX moSessionXXX;
-    private Jedis moJedis;
     private SXmlConfig moXmlConfig;
     private SCfgProcessor moCfgProcessor;
     private erp.lib.gui.SGuiDatePicker moGuiDatePicker;
@@ -1212,11 +1211,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 }
             }
 
-//            if (moJedis != null) {
-//               moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
-//               moJedis.disconnect();
-//               moJedis = null;
-//            }
+            if (moJedis != null) {
+                moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
+                moJedis.disconnect();
+            }
             
             moServer = null;
             moSessionXXX = null;

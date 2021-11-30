@@ -60,7 +60,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvRequest;
 import sa.lib.srv.SSrvResponse;
 
@@ -684,43 +684,43 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
     @Override
     public SSrvResponse request(SSrvRequest request) throws RemoteException {
-        SSrvLock lock = null;
+//        SSrvLock lock = null;
         SSrvResponse response = new SSrvResponse(SSrvConsts.RESP_TYPE_OK);
 
-        try {
-            switch (request.getRequestType()) {
-                case SSrvConsts.REQ_LOCK_GAIN:
-                    lock = (SSrvLock) request.getPacket();
-                    response.setPacket(moServer.getServiceDataLocks().gainLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout()));
-                    break;
-
-                case SSrvConsts.REQ_LOCK_RECOVER:
-                    lock = (SSrvLock) request.getPacket();
-                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout(), lock.getTimestamp()));
-                    break;
-
-                case SSrvConsts.REQ_LOCK_STATUS:
-                    lock = (SSrvLock) request.getPacket();
-                    response.setPacket(moServer.getServiceDataLocks().getLockStatus(lock.getLockId()));
-                    if ((Integer) response.getPacket() == 0){
-                        response.setPacket( SSrvConsts.LOCK_ST_EXPIRED );
-                    }
-                    break;
-
-                case SSrvConsts.REQ_LOCK_RELEASE:
-                    lock = (SSrvLock) request.getPacket();
-                    moServer.getServiceDataLocks().releaseLock(lock.getLockId());
-                    break;
-
-                default:
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-            }
-        }
-        catch (Exception e) {
-            response.setResponseType(SSrvConsts.RESP_TYPE_ERROR);
-            response.setMessage(e.toString());
-            moServer.renderMessageLn(msSessionServer + e);
-        }
+//        try {
+//            switch (request.getRequestType()) {
+//                case SSrvConsts.REQ_LOCK_GAIN:
+//                    lock = (SSrvLock) request.getPacket();
+//                    response.setPacket(moServer.getServiceDataLocks().gainLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout()));
+//                    break;
+//
+//                case SSrvConsts.REQ_LOCK_RECOVER:
+//                    lock = (SSrvLock) request.getPacket();
+//                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout(), lock.getTimestamp()));
+//                    break;
+//
+//                case SSrvConsts.REQ_LOCK_STATUS:
+//                    lock = (SSrvLock) request.getPacket();
+//                    response.setPacket(moServer.getServiceDataLocks().getLockStatus(lock.getLockId()));
+//                    if ((Integer) response.getPacket() == 0){
+//                        response.setPacket( SSrvConsts.LOCK_ST_EXPIRED );
+//                    }
+//                    break;
+//
+//                case SSrvConsts.REQ_LOCK_RELEASE:
+//                    lock = (SSrvLock) request.getPacket();
+//                    moServer.getServiceDataLocks().releaseLock(lock.getLockId());
+//                    break;
+//
+//                default:
+//                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+//            }
+//        }
+//        catch (Exception e) {
+//            response.setResponseType(SSrvConsts.RESP_TYPE_ERROR);
+//            response.setMessage(e.toString());
+//            moServer.renderMessageLn(msSessionServer + e);
+//        }
 
         return response;
     }
