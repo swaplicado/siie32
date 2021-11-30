@@ -53,7 +53,6 @@ import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
 import erp.mod.usr.db.SDbUserGui;
-import erp.redis.SRedisConnection;
 import erp.redis.SRedisConnectionUtils;
 import erp.redis.SRedisLockManager;
 import erp.server.SLoginRequest;

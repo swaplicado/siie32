@@ -64,13 +64,13 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         
         jTLocks.setModel(modeloTableLocksSession);
         
-        modeloTableLocksSession.addColumn("Type");
-        modeloTableLocksSession.addColumn("id");
-        modeloTableLocksSession.addColumn("companyId");
-        modeloTableLocksSession.addColumn("RegistryType");
-        modeloTableLocksSession.addColumn("pk");
-        modeloTableLocksSession.addColumn("sessionId");
-        modeloTableLocksSession.addColumn("userId");
+        modeloTableLocksSession.addColumn("Tipo");
+        modeloTableLocksSession.addColumn("Id de candado");
+        modeloTableLocksSession.addColumn("Id de empresa");
+        modeloTableLocksSession.addColumn("Tipo de registro");
+        modeloTableLocksSession.addColumn("PK");
+        modeloTableLocksSession.addColumn("Id de sesión");
+        modeloTableLocksSession.addColumn("Id de usuario");
         
         int[] anchosAllLocks = {70, 70, 100, 100, 70, 70, 70};
         for (int i = 0; i < jTLocks.getColumnCount(); i++) {
@@ -137,6 +137,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Control de candados por usuario de Redis");
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 

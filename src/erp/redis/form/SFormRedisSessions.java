@@ -124,6 +124,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jbReload = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Control de sesiones y candados de Redis");
 
         jPanel1.setPreferredSize(new java.awt.Dimension(800, 610));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -145,7 +146,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jLabel1.setText("Tipo");
         jLabel1.setMaximumSize(new java.awt.Dimension(60, 14));
         jLabel1.setMinimumSize(new java.awt.Dimension(60, 14));
-        jLabel1.setPreferredSize(new java.awt.Dimension(90, 23));
+        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jLabel1);
 
         jtType.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -160,8 +161,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel2.setText("sesión id");
-        jLabel2.setPreferredSize(new java.awt.Dimension(90, 23));
+        jLabel2.setText("Id de sesión");
+        jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jLabel2);
 
         jtSessionId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -171,8 +172,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel3.setText("compañia id");
-        jLabel3.setPreferredSize(new java.awt.Dimension(90, 23));
+        jLabel3.setText("Id de empresa");
+        jLabel3.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jLabel3);
 
         jtCompanyId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -182,8 +183,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel4.setText("usuario id");
-        jLabel4.setPreferredSize(new java.awt.Dimension(90, 23));
+        jLabel4.setText("Id de usuario");
+        jLabel4.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel30.add(jLabel4);
 
         jtUserId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -198,8 +199,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel5.setText("nombre usuario");
-        jLabel5.setPreferredSize(new java.awt.Dimension(90, 23));
+        jLabel5.setText("Nombre de usuario");
+        jLabel5.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel31.add(jLabel5);
 
         jtUserName.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -226,8 +227,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel7.setText("ver por id");
-        jLabel7.setPreferredSize(new java.awt.Dimension(90, 23));
+        jLabel7.setText("Ver por Id de usuario");
+        jLabel7.setPreferredSize(new java.awt.Dimension(100, 23));
         jLabel7.setRequestFocusEnabled(false);
         jPanel7.add(jLabel7);
 
@@ -310,7 +311,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jLabel8.setText("Tipo");
         jLabel8.setMaximumSize(new java.awt.Dimension(60, 14));
         jLabel8.setMinimumSize(new java.awt.Dimension(60, 14));
-        jLabel8.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel34.add(jLabel8);
 
         jtType1.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -325,8 +326,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel9.setText("Id");
-        jLabel9.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel9.setText("Id de candado");
+        jLabel9.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jLabel9);
 
         jtLockId.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -336,8 +337,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel10.setText("compañia Id");
-        jLabel10.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel10.setText("Id de empresa");
+        jLabel10.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jLabel10);
 
         jtLockCompanyId.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -347,8 +348,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel11.setText("Registro");
-        jLabel11.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel11.setText("Tipo de registro");
+        jLabel11.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jLabel11);
 
         jtRegistryType.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -364,7 +365,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jLabel12.setText("PK");
-        jLabel12.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel12.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel38.add(jLabel12);
 
         jtPK.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -374,8 +375,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel13.setText("sesion Id");
-        jLabel13.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel13.setText("Id de sesión");
+        jLabel13.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel39.add(jLabel13);
 
         jtLockSessionId.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -385,8 +386,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel14.setText("usuario Id");
-        jLabel14.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel14.setText("Id de usuario");
+        jLabel14.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel40.add(jLabel14);
 
         jtLockUserId.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -396,8 +397,8 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel6.setText("Ts");
-        jLabel6.setPreferredSize(new java.awt.Dimension(80, 23));
+        jLabel6.setText("Fecha de creación");
+        jLabel6.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jLabel6);
 
         jtTimestamp.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -487,7 +488,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jbReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_reload.gif"))); // NOI18N
-        jbReload.setToolTipText("Modificar datos");
+        jbReload.setToolTipText("Refrescar tabla");
         jbReload.setPreferredSize(new java.awt.Dimension(30, 30));
         jPanel24.add(jbReload);
 
@@ -687,11 +688,11 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         
         jTSessions.setModel(modeloTableSessions);
         
-        modeloTableSessions.addColumn("Type");
-        modeloTableSessions.addColumn("session Id");
-        modeloTableSessions.addColumn("company Id");
-        modeloTableSessions.addColumn("User Id");
-        modeloTableSessions.addColumn("User Name");
+        modeloTableSessions.addColumn("Tipo");
+        modeloTableSessions.addColumn("Id de sesión");
+        modeloTableSessions.addColumn("Id de empresa");
+        modeloTableSessions.addColumn("Id de usuario");
+        modeloTableSessions.addColumn("Nombre de usuario");
 
         int[] anchosSessions = {50, 50, 50, 50, 50};
         for (int i = 0; i < jTSessions.getColumnCount(); i++) {
@@ -710,13 +711,13 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         
         jTLocks.setModel(modeloTableAllLocks);
         
-        modeloTableAllLocks.addColumn("Type");
-        modeloTableAllLocks.addColumn("id");
-        modeloTableAllLocks.addColumn("companyId");
-        modeloTableAllLocks.addColumn("RegistryType");
-        modeloTableAllLocks.addColumn("pk");
-        modeloTableAllLocks.addColumn("sessionId");
-        modeloTableAllLocks.addColumn("userId");
+        modeloTableAllLocks.addColumn("Tipo");
+        modeloTableAllLocks.addColumn("Id de candado");
+        modeloTableAllLocks.addColumn("Id de empresa");
+        modeloTableAllLocks.addColumn("Tipo de registro");
+        modeloTableAllLocks.addColumn("PK");
+        modeloTableAllLocks.addColumn("Id de sesión");
+        modeloTableAllLocks.addColumn("Id de usuario");
         
         int[] anchosAllLocks = {70, 70, 100, 100, 70, 70, 70};
         for (int i = 0; i < jTLocks.getColumnCount(); i++) {
