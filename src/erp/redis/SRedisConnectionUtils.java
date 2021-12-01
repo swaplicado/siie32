@@ -30,14 +30,16 @@ public abstract class SRedisConnectionUtils {
      * Establecer conexión a servidor Redis.
      *
      * @param host Nombre del host de Redis.
+     * @param psw
      * @return regresa el cliente de Redis <code>Jedis</code>.
      * @throws Exception
      */
-    public static Jedis connect(final String host) throws Exception {
+    public static Jedis connect(final String host, final String psw) throws Exception {
         Jedis jedis = null;
 
         try {
             jedis = new Jedis(host, REDIS_PORT);
+            jedis.auth(psw);
             jedis.connect();
         }
         catch (Exception e) {
@@ -138,7 +140,7 @@ public abstract class SRedisConnectionUtils {
 
         if (!connection) {
             try {
-                jedis = connect(client.getParamsApp().getErpHost());
+                jedis = connect(client.getParamsApp().getRedisHost(), client.getParamsApp().getRedisPswd());
                 setSessionName(jedis, client.getSessionXXX().getCompany().getPkCompanyId(),
                         client.getSessionXXX().getUser().getPkUserId(), client.getSessionXXX().getUser().getName());
                 setSessionsUsers(jedis, client.getSessionXXX().getCompany().getPkCompanyId(),

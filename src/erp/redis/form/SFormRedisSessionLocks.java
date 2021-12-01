@@ -7,7 +7,6 @@ package erp.redis.form;
 
 import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormValidation;
-import erp.redis.SRedisConnectionUtils;
 import erp.redis.SRedisLockUtils;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
@@ -22,8 +21,7 @@ import redis.clients.jedis.Jedis;
  */
 public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener{
 
-    private erp.client.SClientInterface miClient;
-    private Jedis jedis;
+    private Jedis moJedis;
     private int userId;
     
     /**
@@ -31,8 +29,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
      */
     public SFormRedisSessionLocks(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
-        miClient = client;
-        jedis = client.getJedis();
+        moJedis = client.getJedis();
         initComponents();
         initComponentsExtra();
     }
@@ -79,7 +76,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
             jTLocks.setDefaultEditor(Object.class, null);
         }
         
-        Vector keys = SRedisLockUtils.getLocksListFromUser(jedis, userId);
+        Vector keys = SRedisLockUtils.getLocksListFromUser(moJedis, userId);
                 
         for(int i=0; i<keys.size(); i++){
             String stringKey = keys.get(i).toString();
@@ -383,7 +380,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         String PK = jTLocks.getValueAt(Fila, 4).toString();
         String sessionId = jTLocks.getValueAt(Fila, 5).toString();
         String userId = jTLocks.getValueAt(Fila, 6).toString();
-        String Ts = jedis.get(type + "+" + id + "+" + companyId + "+" + RegistryType + "+" + PK + "+" + sessionId + "+" + userId);
+        String Ts = moJedis.get(type + "+" + id + "+" + companyId + "+" + RegistryType + "+" + PK + "+" + sessionId + "+" + userId);
 
         jtType.setText(type);
         jtLockId.setText(id);
@@ -450,7 +447,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
                 !jtLockUserId.getText().equals("")){
             int option = JOptionPane.showConfirmDialog(this, "Seguro que desea eliminar el candado:\n" + keyLock);
             if(option == 0){
-                if(jedis.del(keyLock) == 1){
+                if(moJedis.del(keyLock) == 1){
                     refreshTable();
                 }else{
                     JOptionPane.showMessageDialog(this, "No se encontro el candado a borrar");

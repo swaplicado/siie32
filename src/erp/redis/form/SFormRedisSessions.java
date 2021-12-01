@@ -25,7 +25,7 @@ import redis.clients.jedis.params.ClientKillParams;
 public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
      
     private erp.client.SClientInterface miClient;
-    private Jedis jedis;
+    private Jedis moJedis;
     private erp.redis.form.SFormRedisSessionLocks locksSessions;
     
     /**
@@ -35,7 +35,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
     public SFormRedisSessions(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        jedis = miClient.getJedis();
+        moJedis = miClient.getJedis();
         initComponents();
         initComponentsExtra();
     }
@@ -56,7 +56,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jPanel13 = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jtType = new javax.swing.JTextField();
+        jtTypeSession = new javax.swing.JTextField();
         jPanel28 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jtSessionId = new javax.swing.JTextField();
@@ -75,7 +75,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jPanel7 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jtSeeUserId = new javax.swing.JTextField();
-        jbSeeUserId = new javax.swing.JButton();
+        jbSeeLocksByUserId = new javax.swing.JButton();
         jPanel26 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
@@ -87,7 +87,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jPanel20 = new javax.swing.JPanel();
         jPanel34 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
-        jtType1 = new javax.swing.JTextField();
+        jtTypeLock = new javax.swing.JTextField();
         jPanel35 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jtLockId = new javax.swing.JTextField();
@@ -149,13 +149,13 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jLabel1);
 
-        jtType.setPreferredSize(new java.awt.Dimension(125, 23));
-        jtType.addActionListener(new java.awt.event.ActionListener() {
+        jtTypeSession.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtTypeSession.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtTypeActionPerformed(evt);
+                jtTypeSessionActionPerformed(evt);
             }
         });
-        jPanel27.add(jtType);
+        jPanel27.add(jtTypeSession);
 
         jPanel13.add(jPanel27);
 
@@ -240,13 +240,13 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         });
         jPanel7.add(jtSeeUserId);
 
-        jbSeeUserId.setText("ver");
-        jbSeeUserId.addActionListener(new java.awt.event.ActionListener() {
+        jbSeeLocksByUserId.setText("ver");
+        jbSeeLocksByUserId.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbSeeUserIdActionPerformed(evt);
+                jbSeeLocksByUserIdActionPerformed(evt);
             }
         });
-        jPanel7.add(jbSeeUserId);
+        jPanel7.add(jbSeeLocksByUserId);
 
         jPanel13.add(jPanel7);
 
@@ -314,13 +314,13 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jLabel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel34.add(jLabel8);
 
-        jtType1.setPreferredSize(new java.awt.Dimension(150, 23));
-        jtType1.addActionListener(new java.awt.event.ActionListener() {
+        jtTypeLock.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtTypeLock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtType1ActionPerformed(evt);
+                jtTypeLockActionPerformed(evt);
             }
         });
-        jPanel34.add(jtType1);
+        jPanel34.add(jtTypeLock);
 
         jPanel20.add(jPanel34);
 
@@ -500,17 +500,17 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jtTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtTypeActionPerformed
+    private void jtTypeSessionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtTypeSessionActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jtTypeActionPerformed
+    }//GEN-LAST:event_jtTypeSessionActionPerformed
 
     private void jtUserIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtUserIdActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jtUserIdActionPerformed
 
-    private void jtType1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtType1ActionPerformed
+    private void jtTypeLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtTypeLockActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jtType1ActionPerformed
+    }//GEN-LAST:event_jtTypeLockActionPerformed
 
     private void jtRegistryTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtRegistryTypeActionPerformed
         // TODO add your handling code here:
@@ -525,9 +525,9 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         String PK = jTLocks.getValueAt(Fila, 4).toString();
         String sessionId = jTLocks.getValueAt(Fila, 5).toString();
         String userId = jTLocks.getValueAt(Fila, 6).toString();
-        String Ts = jedis.get(type + "+" + id + "+" + companyId + "+" + RegistryType + "+" + PK + "+" + sessionId + "+" + userId);
+        String Ts = moJedis.get(type + "+" + id + "+" + companyId + "+" + RegistryType + "+" + PK + "+" + sessionId + "+" + userId);
 
-        jtType1.setText(type);
+        jtTypeLock.setText(type);
         jtLockId.setText(id);
         jtLockCompanyId.setText(companyId);
         jtRegistryType.setText(RegistryType);
@@ -545,7 +545,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         String userId = jTSessions.getValueAt(Fila, 3).toString();
         String userName = jTSessions.getValueAt(Fila, 4).toString();
 
-        jtType.setText(type);
+        jtTypeSession.setText(type);
         jtSessionId.setText(id);
         jtCompanyId.setText(companyId);
         jtUserId.setText(userId);
@@ -557,9 +557,9 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         // TODO add your handling code here:
     }//GEN-LAST:event_jtTimestampActionPerformed
 
-    private void jbSeeUserIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSeeUserIdActionPerformed
+    private void jbSeeLocksByUserIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSeeLocksByUserIdActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jbSeeUserIdActionPerformed
+    }//GEN-LAST:event_jbSeeLocksByUserIdActionPerformed
 
     private void jbCloseSessionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCloseSessionActionPerformed
         // TODO add your handling code here:
@@ -629,7 +629,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
     private javax.swing.JButton jbCloseSession;
     private javax.swing.JButton jbEraseLock;
     private javax.swing.JButton jbReload;
-    private javax.swing.JButton jbSeeUserId;
+    private javax.swing.JButton jbSeeLocksByUserId;
     private javax.swing.JTextField jtCompanyId;
     private javax.swing.JTextField jtLockCompanyId;
     private javax.swing.JTextField jtLockId;
@@ -640,22 +640,22 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
     private javax.swing.JTextField jtSeeUserId;
     private javax.swing.JTextField jtSessionId;
     private javax.swing.JTextField jtTimestamp;
-    private javax.swing.JTextField jtType;
-    private javax.swing.JTextField jtType1;
+    private javax.swing.JTextField jtTypeLock;
+    private javax.swing.JTextField jtTypeSession;
     private javax.swing.JTextField jtUserId;
     private javax.swing.JTextField jtUserName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsExtra(){
         
-        jtType.setEditable(false);
+        jtTypeSession.setEditable(false);
         jtSessionId.setEditable(false);
         jtCompanyId.setEditable(false);
         jtUserId.setEditable(false);
         jtUserName.setEditable(false);
         jtSeeUserId.setEditable(true);
         
-        jtType1.setEditable(false);
+        jtTypeLock.setEditable(false);
         jtLockId.setEditable(false);
         jtLockCompanyId.setEditable(false);
         jtRegistryType.setEditable(false);
@@ -669,7 +669,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
         jbClose.addActionListener(this);
         jbReload.addActionListener(this);
         
-        jbSeeUserId.addActionListener(this);
+        jbSeeLocksByUserId.addActionListener(this);
         
         locksSessions = new SFormRedisSessionLocks(miClient);
         
@@ -701,7 +701,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
             jTSessions.setDefaultEditor(Object.class, null);
         }
         
-        Vector sessionsUsers = SRedisConnectionUtils.getSessionsUsers(jedis);
+        Vector sessionsUsers = SRedisConnectionUtils.getSessionsUsers(moJedis);
         
         for(int i=0; i<sessionsUsers.size(); i++){
             String stringKey = sessionsUsers.get(i).toString();
@@ -726,7 +726,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
             jTLocks.setDefaultEditor(Object.class, null);
         }
         
-        Vector keys = SRedisLockUtils.getLocksList(jedis);
+        Vector keys = SRedisLockUtils.getLocksList(moJedis);
                 
         for(int i=0; i<keys.size(); i++){
             String stringKey = keys.get(i).toString();
@@ -740,7 +740,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
      * Toma los parametros del candado seleccionado para eliminarlo del servidor Redis.
      */
     private void actionEraseLock(){
-        String keyLock = jtType1.getText() + "+" +
+        String keyLock = jtTypeLock.getText() + "+" +
                         jtLockId.getText() + "+" +
                         jtLockCompanyId.getText() + "+" +
                         jtRegistryType.getText() + "+" +
@@ -748,19 +748,21 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
                         jtLockSessionId.getText() + "+" +
                         jtLockUserId.getText();
         
-        if(jtType1.getText().equals("Lock") && !jtLockId.getText().equals("") && !jtLockCompanyId.getText().equals("") && 
+        if(jtTypeLock.getText().equals("Lock") && !jtLockId.getText().equals("") && !jtLockCompanyId.getText().equals("") && 
                 !jtRegistryType.getText().equals("") && !jtPK.getText().equals("") && !jtLockSessionId.getText().equals("") && 
                 !jtLockUserId.getText().equals("")){
             int option = JOptionPane.showConfirmDialog(this, "Seguro que desea eliminar el candado:\n" + keyLock);
             if(option == 0){
-                if(jedis.del(keyLock) == 1){
+                if (moJedis.del(keyLock) == 1) {
                     refreshTable();
-                }else{
+                }
+                else {
                     JOptionPane.showMessageDialog(this, "No se encontro el candado a borrar");
                     refreshTable();
                 }
             }
-        }else{
+        }
+        else {
             JOptionPane.showMessageDialog(this, "No se selecciono ningun candado");
         }
             
@@ -773,35 +775,38 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
      *  a conectarse al servidor Redis.
      */
     private void actionEraseSession() {
-        String keySession = jtType.getText() + "+" +
+        String keySession = jtTypeSession.getText() + "+" +
                         jtSessionId.getText() + "+" +
                         jtCompanyId.getText() + "+" +
                         jtUserId.getText() + "+" +
                         jtUserName.getText();
         
-        if (jtType.getText().equals(SRedisConnectionUtils.SESSION) && !jtSessionId.getText().equals("") && !jtCompanyId.getText().equals("") &&
+        if (jtTypeSession.getText().equals(SRedisConnectionUtils.SESSION) && !jtSessionId.getText().equals("") && !jtCompanyId.getText().equals("") &&
                 !jtUserId.getText().equals("") && !jtUserName.getText().equals("")) {
             
             int option;
-            if (!jedis.clientId().toString().equals(jtSessionId.getText())) {
+            if (!moJedis.clientId().toString().equals(jtSessionId.getText())) {
                 option = JOptionPane.showConfirmDialog(this, "Seguro que desea eliminar la sesión:\n\n" + keySession + "\n");
-            }else{
+            }
+            else {
                 JOptionPane.showMessageDialog(this, "La sesión:\n\n" + keySession
                         + "\n\nEs su sesión de usuario");
                 option = 1;
             }
             if(option == 0){
-                jedis.del(keySession);
-                Long killSession = jedis.clientKill(new ClientKillParams().id(jtSessionId.getText()));
+                moJedis.del(keySession);
+                Long killSession = moJedis.clientKill(new ClientKillParams().id(jtSessionId.getText()));
                 
                 if (killSession == 1) {
                     JOptionPane.showMessageDialog(this, "Se eliminó la sesión\n" + keySession);
-                } else {
+                } 
+                else {
                     JOptionPane.showMessageDialog(this, "ocurrió un error al eliminar la sesión\n" + keySession);
                 }
                 refreshTable();
             }
-        } else {
+        } 
+        else {
             JOptionPane.showMessageDialog(this, "No se selecciono ninguna sesión");
         }
     }
@@ -814,14 +819,14 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
     private void refreshTable(){
         setTables();
         
-        jtType.setText("");
+        jtTypeSession.setText("");
         jtSessionId.setText("");
         jtCompanyId.setText("");
         jtUserId.setText("");
         jtUserName.setText("");
         jtSeeUserId.setText("");
         
-        jtType1.setText("");
+        jtTypeLock.setText("");
         jtLockId.setText("");
         jtLockCompanyId.setText("");
         jtRegistryType.setText("");
@@ -915,7 +920,7 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
                 setVisible(false);
             }else if (button == jbReload) {
                 refreshTable();
-            }else if (button == jbSeeUserId) {
+            }else if (button == jbSeeLocksByUserId) {
                 seeLocksuser(Integer.parseInt(jtSeeUserId.getText()));
             }
         }

@@ -103,6 +103,11 @@ public class SSetExchangeRate {
         return isbankBussDay;
     }
     
+    /**
+     * Revisa si el dia actual es un dia habil bancario.
+     * @param bankNbDays
+     * @return 
+     */
     public static boolean isActualDayBankBussDay(ArrayList bankNbDays) {
         boolean bankBussDay = true;
         
@@ -191,6 +196,13 @@ public class SSetExchangeRate {
         return exchangeRateDays;
     }
     
+    /**
+     * Comprueba si no existe un valor de tipo de cambio en la fecha ingresada
+     * @param connection
+     * @param day
+     * @return
+     * @throws SQLException 
+     */
     public static boolean isSetExchangeRate(Connection connection, String day) throws SQLException{
         String sql = "SELECT exc_rate FROM fin_exc_rate WHERE id_dt = " + '"' + day + '"';
         boolean isSetExchangeRate = false;
@@ -212,7 +224,6 @@ public class SSetExchangeRate {
      */
     public static void saveExchangeRate(Connection connection, Double valueExchangeRate, ArrayList exchangeRateDays) throws ParseException, Exception {
         SDataExchangeRate exchangeRate = new SDataExchangeRate();
-        int lastActionResult = 0;
         
         exchangeRate.setPkCurrencyId(SModSysConsts.CFGU_CUR_USD);
         exchangeRate.setExchangeRate(valueExchangeRate);
@@ -227,7 +238,7 @@ public class SSetExchangeRate {
             Date newdate = formatter.parse(exchangeRateDay.toString());
             if(!isSetExchangeRate(connection,(newdate.getYear() + 1900) + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate())){
                 exchangeRate.setPkDateId(newdate);
-                lastActionResult = exchangeRate.save(connection);
+                exchangeRate.save(connection);
                 System.out.println("Saved value: " + valueExchangeRate + " at " + newdate);
             }
         }
@@ -263,16 +274,14 @@ public class SSetExchangeRate {
                 // total databases:
 
                 ArrayList companiesDb = new ArrayList();
-                int index = 0;
-
+                
                 String sql = "SELECT bd "
                         + "FROM erp.cfgu_co ;";
 
                 try (ResultSet resultSet = dbErp.getConnection().createStatement().executeQuery(sql)) {
                     while(resultSet.next()){
-                        String aux = resultSet.getString("bd");
-                        companiesDb.add(aux);
-                        index++;
+                        String bd = resultSet.getString("bd");
+                        companiesDb.add(bd);
                     }
                 }
 
@@ -284,7 +293,7 @@ public class SSetExchangeRate {
                     dbCompany = new SDbDatabase(SDbConsts.DBMS_MYSQL);
                     result = dbCompany.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(), 
                             companiesDb.get(i).toString(), paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
-
+                    
                     if (result == SDbConsts.CONNECTION_OK) {
                         int exchangeRatePolicy = getExchangeRatePolicy(dbCompany.getConnection());
                         ArrayList exchangeRateDays = setExchangeRateDays(exchangeRatePolicy, bankNbDays);

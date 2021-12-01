@@ -1168,7 +1168,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     private void createRedisSession(final int companyId, final int userId, final String userName) throws Exception {
         try {
-            moJedis = SRedisConnectionUtils.connect(moParamsApp.getErpHost());
+            moJedis = SRedisConnectionUtils.connect(moParamsApp.getRedisHost(), moParamsApp.getRedisPswd());
             SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
             SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
         } catch (Exception e) {
