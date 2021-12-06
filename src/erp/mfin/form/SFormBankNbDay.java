@@ -20,15 +20,13 @@ import javax.swing.JLabel;
 
 /**
  *
- * @author SW
+ * @author Adrián Alejandro Avilés
  */
 public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
-    private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
-    private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldNameDay;
@@ -42,7 +40,6 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
     public SFormBankNbDay(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        mnFormType = SDataConstants.ITMU_TP_VAR;
         
         initComponents();
         initComponentsExtra();
@@ -262,13 +259,6 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
                 break;
             }
         }
-
-        if (!validation.getIsError()) {
-            Object[] oParamsIn = new Object[] { moBankNbDay == null ? 0 : moBankNbDay.getPkBankNonBizDayId(), moFieldDate};
-
-            
-        }
-
         return validation;
     }
 

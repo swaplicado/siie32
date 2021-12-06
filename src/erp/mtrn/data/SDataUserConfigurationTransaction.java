@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Alfonso Flores, Isabel Servín
+ * @author Alfonso Flores, Isabel Servín, Adrián Avilés
  */
 public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 

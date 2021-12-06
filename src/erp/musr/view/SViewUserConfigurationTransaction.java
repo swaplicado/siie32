@@ -18,7 +18,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Adrián Avilés
  */
 public class SViewUserConfigurationTransaction extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 

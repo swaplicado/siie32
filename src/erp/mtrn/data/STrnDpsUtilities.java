@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Uriel Castañeda
+ * @author Uriel Castañeda, Adrián Avilés
  */
 public abstract class STrnDpsUtilities {
  

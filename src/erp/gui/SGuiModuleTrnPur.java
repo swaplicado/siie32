@@ -57,7 +57,6 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import redis.clients.jedis.Jedis;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -65,7 +64,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores, Isabel Servín, Adrián Avilés
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 

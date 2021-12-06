@@ -266,7 +266,14 @@ public abstract class SRedisLockUtils {
                             sql += "'" + ((Object[]) registryPk)[index++] + "' ";
                         } 
                         else if (entry.getValue().contains("date")) {
-                            sql += "'" + SLibUtils.DbmsDateFormatDate.format(((Object[]) registryPk)[index++]) + "' ";
+                            int i = index++;
+                            Object obj = ((Object[]) registryPk)[i];
+                            if (obj instanceof String) {
+                                sql += "'" + obj.toString() + "' ";
+                            }
+                            else {
+                                sql += "'" +  SLibUtils.DbmsDateFormatDate.format(obj) + "' ";
+                            }
                         } 
                         else {
                             sql += (((Object[]) registryPk)[index++]) + " ";

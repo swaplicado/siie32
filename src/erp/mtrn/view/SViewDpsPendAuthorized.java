@@ -53,7 +53,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores, Isabel Servín, Adrián Avilés
  */
 public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 

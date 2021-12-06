@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Adrián Avilés
  */
 public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -204,7 +204,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsExtra() {
-        switch (mnFinderType) {
+        switch (mnFinderType) { 
             case SDataConstants.TRNX_DPS_PAY_PEND:
             case SDataConstants.TRNX_DPS_SHIP_PEND_LINK:
             case SDataConstants.TRNX_DPS_PEND_LINK:

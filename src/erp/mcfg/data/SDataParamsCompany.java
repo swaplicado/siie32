@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiConfigCompany;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Adrián Avilés
  */
 public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements java.io.Serializable, SGuiConfigCompany {
     

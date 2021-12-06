@@ -145,17 +145,18 @@ public class SFormExchangeRate extends javax.swing.JDialog implements erp.lib.fo
 
         jbOk.setText("Aceptar"); // NOI18N
         jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jbOk.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jbOk);
 
         jbCancel.setText("Cancelar"); // NOI18N
         jbCancel.setToolTipText("[Escape]");
+        jbCancel.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jbCancel);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-300)/2, 400, 300);
+        setSize(new java.awt.Dimension(418, 297));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

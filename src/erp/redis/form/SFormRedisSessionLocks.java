@@ -19,11 +19,11 @@ import redis.clients.jedis.Jedis;
  *
  * @author SW
  */
-public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener{
+public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private Jedis moJedis;
     private int userId;
-    
+
     /**
      * Creates new form SFormRedisSessionLocks
      */
@@ -33,9 +33,9 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         initComponents();
         initComponentsExtra();
     }
-    
-    private void initComponentsExtra(){
-        
+
+    private void initComponentsExtra() {
+
         jtType.setEditable(false);
         jtLockId.setEditable(false);
         jtLockCompanyId.setEditable(false);
@@ -44,23 +44,23 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         jtLockSessionId.setEditable(false);
         jtLockUserId.setEditable(false);
         jtTimestamp.setEditable(false);
-        
+
         jbEraseLock.addActionListener(this);
         jbClose.addActionListener(this);
         jbReload.addActionListener(this);
         setTables();
     }
-    
-    public void setId(int id){
+
+    public void setId(int id) {
         userId = id;
         setTables();
     }
 
-    private void setTables(){
+    private void setTables() {
         DefaultTableModel modeloTableLocksSession = new DefaultTableModel();
-        
+
         jTLocks.setModel(modeloTableLocksSession);
-        
+
         modeloTableLocksSession.addColumn("Tipo");
         modeloTableLocksSession.addColumn("Id de candado");
         modeloTableLocksSession.addColumn("Id de empresa");
@@ -68,23 +68,23 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         modeloTableLocksSession.addColumn("PK");
         modeloTableLocksSession.addColumn("Id de sesión");
         modeloTableLocksSession.addColumn("Id de usuario");
-        
+
         int[] anchosAllLocks = {70, 70, 100, 100, 70, 70, 70};
         for (int i = 0; i < jTLocks.getColumnCount(); i++) {
             jTLocks.getColumnModel().getColumn(i).setPreferredWidth(anchosAllLocks[i]);
             jTLocks.getColumnModel().getClass();
             jTLocks.setDefaultEditor(Object.class, null);
         }
-        
+
         Vector keys = SRedisLockUtils.getLocksListFromUser(moJedis, userId);
-                
-        for(int i=0; i<keys.size(); i++){
+
+        for (int i = 0; i < keys.size(); i++) {
             String stringKey = keys.get(i).toString();
             String[] splitKey = stringKey.split("\\+");
             modeloTableLocksSession.addRow(splitKey);
-        } 
+        }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -433,36 +433,38 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
     private javax.swing.JTextField jtType;
     // End of variables declaration//GEN-END:variables
 
-    private void actionEraseLock(){
-        String keyLock = jtType.getText() + "+" +
-                        jtLockId.getText() + "+" +
-                        jtLockCompanyId.getText() + "+" +
-                        jtRegistryType.getText() + "+" +
-                        jtPK.getText() + "+" +
-                        jtLockSessionId.getText() + "+" +
-                        jtLockUserId.getText();
-        
-        if(jtType.getText().equals("Lock") && !jtLockId.getText().equals("") && !jtLockCompanyId.getText().equals("") && 
-                !jtRegistryType.getText().equals("") && !jtPK.getText().equals("") && !jtLockSessionId.getText().equals("") && 
-                !jtLockUserId.getText().equals("")){
+    private void actionEraseLock() {
+        String keyLock = jtType.getText() + "+"
+                + jtLockId.getText() + "+"
+                + jtLockCompanyId.getText() + "+"
+                + jtRegistryType.getText() + "+"
+                + jtPK.getText() + "+"
+                + jtLockSessionId.getText() + "+"
+                + jtLockUserId.getText();
+
+        if (jtType.getText().equals("Lock") && !jtLockId.getText().equals("") && !jtLockCompanyId.getText().equals("")
+                && !jtRegistryType.getText().equals("") && !jtPK.getText().equals("") && !jtLockSessionId.getText().equals("")
+                && !jtLockUserId.getText().equals("")) {
             int option = JOptionPane.showConfirmDialog(this, "Seguro que desea eliminar el candado:\n" + keyLock);
-            if(option == 0){
-                if(moJedis.del(keyLock) == 1){
+            if (option == 0) {
+                if (moJedis.del(keyLock) == 1) {
                     refreshTable();
-                }else{
+                } 
+                else {
                     JOptionPane.showMessageDialog(this, "No se encontro el candado a borrar");
                     refreshTable();
                 }
             }
-        }else{
+        } 
+        else {
             JOptionPane.showMessageDialog(this, "No se selecciono ningun candado");
         }
-            
+
     }
-    
-    private void refreshTable(){
+
+    private void refreshTable() {
         setTables();
-        
+
         jtType.setText("");
         jtLockId.setText("");
         jtLockCompanyId.setText("");
@@ -472,7 +474,7 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
         jtLockUserId.setText("");
         jtTimestamp.setText("");
     }
-    
+
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -545,9 +547,11 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
 
             if (button == jbEraseLock) {
                 actionEraseLock();
-            }else if (button == jbClose) {
+            } 
+            else if (button == jbClose) {
                 setVisible(false);
-            }else if (button == jbReload) {
+            } 
+            else if (button == jbReload) {
                 refreshTable();
             }
         }

@@ -28,7 +28,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Adrián Avilés
  */
 public class SFormUserConfigurationTransaction extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
