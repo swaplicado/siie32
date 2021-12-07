@@ -39,7 +39,7 @@ public abstract class SRedisConnectionUtils {
 
         try {
             jedis = new Jedis(host, REDIS_PORT);
-            jedis.auth(psw);
+            //jedis.auth(psw);
             jedis.connect();
         }
         catch (Exception e) {
@@ -150,8 +150,6 @@ public abstract class SRedisConnectionUtils {
             }
             catch (Exception e) {
                 connection = false;
-                client.showMsgBoxWarning("No está conectado a servidor de acceso exclusivo\n"
-                        + "Favor de comunicarlo al administrador del sistema.");
             }
         }
 
