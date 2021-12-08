@@ -158,7 +158,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.mbps.form.SPanelBizPartnerBranchAddress moPanelBizPartnerBranchAddress;
 
     private int mnPkContactId;
-    private int mnFormTypeExport;
     
     private boolean mbPhotoChange;
     private boolean mbSignatureChange;
@@ -1096,7 +1095,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel61.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlBirthPlace.setText("Lugar nacimiento: *");
+        jlBirthPlace.setText("Lugar nacimiento:");
         jlBirthPlace.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel61.add(jlBirthPlace);
 
@@ -1107,7 +1106,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlUmf.setText("UMF: *");
+        jlUmf.setText("UMF:");
         jlUmf.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel62.add(jlUmf);
         jlUmf.getAccessibleContext().setAccessibleDescription("");
@@ -1983,6 +1982,36 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         return contact;
     }
+    
+    private SFormValidation validateNumber() {
+        SFormValidation validation = new SFormValidation();
+        
+        try {
+            int count = 0;
+            String employees = "";
+            String sql = "SELECT b.bp "
+                    + "FROM erp.hrsu_emp AS e "
+                    + "INNER JOIN erp.bpsu_bp AS b ON e.id_emp = b.id_bp "
+                    + "WHERE e.num = '" + moFieldNumber.getString() + "' "
+                    + (moEmployee == null ? "" : "AND e.id_emp <> " + moEmployee.getPkEmployeeId() + " ")
+                    + "AND NOT e.b_del;";
+            try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                while (resultSet.next()) {
+                    count++;
+                    employees += (employees.isEmpty() ? "" : "; ") + resultSet.getString(1);
+                }
+            }
+            
+            if (count > 0) {
+                validation.setMessage("El número de empleado '" + moFieldNumber.getString() + "' ya esta siendo usado por " + (count == 1 ? "el empleado:\n" : "los empleados:\n") + employees);
+                validation.setComponent(jftNumber); 
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        return validation;
+    }
 
     private void actionOk() {
         SFormValidation validation = formValidate();
@@ -2245,7 +2274,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mbUpdatingForm = false;
     }
     
-    
     private void focusLostDateBenefits() {
         jtfSeniority.setText(SLibTimeUtils.formatAge(moFieldDateBenefits.getDate(), miClient.getSession().getSystemDate()));
     }
@@ -2276,31 +2304,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     
     private void focusLostSonDateBirth5() {
         jtfSonAge5.setText(SLibTimeUtils.formatAge(moFieldSonDateBirth5.getDate(), miClient.getSession().getSystemDate()));
-    }
-    
-    private SFormValidation numEmpValidate(SFormValidation validation) {
-        try {
-            String sql = "SELECT b.bp FROM erp.hrsu_emp AS e " +
-                    "INNER JOIN erp.bpsu_bp AS b ON e.id_emp = b.id_bp " +
-                    "WHERE e.num = " + jftNumber.getText() + " " +
-                    "AND e.id_emp <> " + moEmployee.getPkEmployeeId() + " " +
-                    "AND NOT e.b_del;";
-            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-            int count = 0;
-            String employees = "";
-            while (resultSet.next()) {
-                count++;
-                employees += (employees.isEmpty() ? "" : "; ") + resultSet.getString(1);
-            }
-            if (count > 0) {
-                validation.setMessage("El número de empleado '" + jftNumber.getText() + "' ya esta siendo usado por " + (count == 1 ? "el empleado:\n" : "los empleados:\n") + employees);
-                validation.setComponent(jftNumber); 
-            }
-        }
-        catch (Exception e) {
-            miClient.showMsgBoxWarning(e.getMessage());
-        }
-        return validation;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2562,8 +2565,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moBizPartnerBranch = null;
         moEmployee = null;
 
-        mnFormTypeExport = SLibConstants.UNDEFINED;
-
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
@@ -2665,7 +2666,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         }
         
         if (!validation.getIsError()) {
-            validation = numEmpValidate(validation);
+            validation = validateNumber();
         }
         
         if (!validation.getIsError()) {
@@ -2836,15 +2837,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     int nYearRfc = Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH > SLibTimeUtilities.digestYear(miClient.getSessionXXX().getSystemDate())[0] ? 
                             Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MIN_BIRTH : Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH;
 
-                    Date tDateRfc = SLibTimeUtilities.createDate(nYearRfc, Integer.parseInt(sDateRfc.substring(2, 4)), Integer.parseInt(sDateRfc.substring(4, 6)));
+                    Date dateRfc = SLibTimeUtilities.createDate(nYearRfc, Integer.parseInt(sDateRfc.substring(2, 4)), Integer.parseInt(sDateRfc.substring(4, 6)));
 
-                    if (tDateRfc.compareTo(moFieldDateBirth.getDate()) != 0) {
-                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDateBirth.getText() + "'\n " +
-                                "La fecha de nacimiento (" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDateBirth.getDate()) + ") no corresponde a la " +
-                                "fecha del RFC (" + miClient.getSessionXXX().getFormatters().getDateFormat().format(tDateRfc) + ").");
-                        jTabbedPane.setSelectedIndex(1);
+                    if (!SLibTimeUtils.isSameDate(dateRfc, moFieldDateBirth.getDate())) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDateBirth) + "':\n"
+                                + "la fecha de este campo, " + SLibUtils.DateFormatDate.format(moFieldDateBirth.getDate()) + ", "
+                                + "no coincide con la fecha implícita del campo '" + SGuiUtils.getLabelName(jlFiscalId).toUpperCase() + "', " + SLibUtils.DateFormatDate.format(dateRfc) + ", correspondiente al valor '" + moFieldFiscalId.getString() + "'.");
                         validation.setComponent(jftDateBirth);
-                        validation.setTabbedPaneIndex(0);
+                        validation.setTabbedPaneIndex(1);
                     }
                 }
             }
