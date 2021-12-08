@@ -87,6 +87,12 @@
                         <Property name="enabled" type="boolean" value="false"/>
                       </Properties>
                     </Component>
+                    <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextTaxRegime">
+                      <Properties>
+                        <Property name="toolTipText" type="java.lang.String" value="Regimen fiscal"/>
+                        <Property name="enabled" type="boolean" value="false"/>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="jPanel25">

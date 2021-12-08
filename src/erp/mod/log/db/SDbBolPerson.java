@@ -6,13 +6,13 @@
 package erp.mod.log.db;
 
 import erp.mloc.data.SDataCountry;
+import erp.mloc.data.SDataState;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -26,7 +26,7 @@ public class SDbBolPerson extends SDbRegistryUser {
     protected String msName;
     protected String msFiscalId;
     protected String msFiscalForeginId;
-    protected String msLicense;
+    protected String msDriverLicense;
     protected String msTelephone;
     protected String msStreet;
     protected String msStreetNumberExt;
@@ -39,6 +39,7 @@ public class SDbBolPerson extends SDbRegistryUser {
     //protected boolean mbDeleted;
     protected int mnFkBolPersonTypeId;
     protected int mnFkCountryId_n;
+    protected int mnFkStateId_n;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -47,6 +48,7 @@ public class SDbBolPerson extends SDbRegistryUser {
     */
     
     protected erp.mloc.data.SDataCountry moXtaCountry;
+    protected erp.mloc.data.SDataState moXtaState;
     
     public SDbBolPerson() {
         super(SModConsts.LOG_BOL_PERSON);
@@ -56,7 +58,7 @@ public class SDbBolPerson extends SDbRegistryUser {
     public void setName(String s) { msName = s; }
     public void setFiscalId(String s) { msFiscalId = s; }
     public void setFiscalForeginId(String s) { msFiscalForeginId = s; }
-    public void setLicense(String s) { msLicense = s; }
+    public void setDriverLicense(String s) { msDriverLicense = s; }
     public void setTelephone(String s) { msTelephone = s; }
     public void setStreet(String s) { msStreet = s; }
     public void setStreetNumberExt(String s) { msStreetNumberExt = s; }
@@ -69,6 +71,7 @@ public class SDbBolPerson extends SDbRegistryUser {
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkBolPersonTypeId(int n) { mnFkBolPersonTypeId = n; }
     public void setFkCountryId_n(int n) { mnFkCountryId_n = n; }
+    public void setFkStateId_n(int n) { mnFkStateId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -78,7 +81,7 @@ public class SDbBolPerson extends SDbRegistryUser {
     public String getName() { return msName; }
     public String getFiscalId() { return msFiscalId; }
     public String getFiscalForeginId() { return msFiscalForeginId; }
-    public String getLicense() { return msLicense; }
+    public String getDriverLicense() { return msDriverLicense; }
     public String getTelephone() { return msTelephone; }
     public String getStreet() { return msStreet; }
     public String getStreetNumberExt() { return msStreetNumberExt; }
@@ -91,14 +94,17 @@ public class SDbBolPerson extends SDbRegistryUser {
     public boolean isDeleted() { return mbDeleted; }
     public int getFkBolPersonTypeId() { return mnFkBolPersonTypeId; }
     public int getFkCountryId_n() { return mnFkCountryId_n; }
+    public int getFkStateId_n() { return mnFkStateId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public void setXtaCountry(SDataCountry o) { moXtaCountry = o; }
+    public void setXtaState(SDataState o) { moXtaState = o; }
     
     public SDataCountry getXtaCountry() { return moXtaCountry; }
+    public SDataState getXtaState() { return moXtaState; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -118,7 +124,7 @@ public class SDbBolPerson extends SDbRegistryUser {
         msName = "";
         msFiscalId = "";
         msFiscalForeginId = "";
-        msLicense = "";
+        msDriverLicense = "";
         msTelephone = "";
         msStreet = "";
         msStreetNumberExt = "";
@@ -131,12 +137,14 @@ public class SDbBolPerson extends SDbRegistryUser {
         mbDeleted = false;
         mnFkBolPersonTypeId = 0;
         mnFkCountryId_n = 0;
+        mnFkStateId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
         moXtaCountry = null;
+        moXtaState = null;
     }
 
     @Override
@@ -185,7 +193,7 @@ public class SDbBolPerson extends SDbRegistryUser {
             msName = resultSet.getString("name");
             msFiscalId = resultSet.getString("fiscal_id");
             msFiscalForeginId = resultSet.getString("fiscal_frg_id");
-            msLicense = resultSet.getString("driver_lic");
+            msDriverLicense = resultSet.getString("driver_lic");
             msTelephone = resultSet.getString("telephone");
             msStreet = resultSet.getString("street");
             msStreetNumberExt = resultSet.getString("street_num_ext");
@@ -198,6 +206,7 @@ public class SDbBolPerson extends SDbRegistryUser {
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkBolPersonTypeId = resultSet.getInt("fk_tp_bol_person");
             mnFkCountryId_n = resultSet.getInt("fk_cty_n");
+            mnFkStateId_n = resultSet.getInt("fk_sta_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -211,6 +220,13 @@ public class SDbBolPerson extends SDbRegistryUser {
         if (mnFkCountryId_n != 0) {
             moXtaCountry = new SDataCountry();
             moXtaCountry.read(new int[] { mnFkCountryId_n }, session.getStatement());
+        }
+        
+        // Read state
+        
+        if (mnFkStateId_n != 0) {
+            moXtaState = new SDataState();
+            moXtaState.read(new int[] { mnFkStateId_n }, session.getStatement());
         }
         
         mnQueryResultId = SDbConsts.READ_OK;
@@ -236,7 +252,7 @@ public class SDbBolPerson extends SDbRegistryUser {
                 "'" + msName + "', " + 
                 "'" + msFiscalId + "', " + 
                 "'" + msFiscalForeginId + "', " + 
-                "'" + msLicense + "', " + 
+                "'" + msDriverLicense + "', " + 
                 "'" + msTelephone + "', " + 
                 "'" + msStreet + "', " + 
                 "'" + msStreetNumberExt + "', " + 
@@ -249,6 +265,7 @@ public class SDbBolPerson extends SDbRegistryUser {
                 (mbDeleted ? 1 : 0) + ", " + 
                 mnFkBolPersonTypeId + ", " + 
                 (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") + 
+                (mnFkStateId_n == 0 ? "NULL, " : mnFkStateId_n + ", ") +
                 mnFkUserInsertId + ", " + 
                 mnFkUserUpdateId + ", " + 
                 "NOW()" + ", " + 
@@ -263,7 +280,7 @@ public class SDbBolPerson extends SDbRegistryUser {
                 "name = '" + msName + "', " +
                 "fiscal_id = '" + msFiscalId + "', " +
                 "fiscal_frg_id = '" + msFiscalForeginId + "', " +
-                "driver_lic = '" + msLicense + "', " +
+                "driver_lic = '" + msDriverLicense + "', " +
                 "telephone = '" + msTelephone + "', " +
                 "street = '" + msStreet + "', " +
                 "street_num_ext = '" + msStreetNumberExt + "', " +
@@ -276,6 +293,7 @@ public class SDbBolPerson extends SDbRegistryUser {
                 "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                 "fk_tp_bol_person = " + mnFkBolPersonTypeId + ", " +
                 "fk_cty_n = " + (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") +
+                "fk_sta_n = " + (mnFkStateId_n == 0 ? "NULL, " : mnFkStateId_n + ", ") +
                 //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                 "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                 //"ts_usr_ins = " + "NOW()" + ", " +
@@ -289,14 +307,14 @@ public class SDbBolPerson extends SDbRegistryUser {
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbBolPerson clone() throws CloneNotSupportedException {
         SDbBolPerson registry = new SDbBolPerson();
         
         registry.setPkBolPersonId(this.getPkBolPersonId());
         registry.setName(this.getName());
         registry.setFiscalId(this.getFiscalId());
         registry.setFiscalForeginId(this.getFiscalForeginId());
-        registry.setLicense(this.getLicense());
+        registry.setDriverLicense(this.getDriverLicense());
         registry.setTelephone(this.getTelephone());
         registry.setStreet(this.getStreet());
         registry.setStreetNumberExt(this.getStreetNumberExt());
@@ -309,6 +327,7 @@ public class SDbBolPerson extends SDbRegistryUser {
         registry.setDeleted(this.isDeleted());
         registry.setFkBolPersonTypeId(this.getFkBolPersonTypeId());
         registry.setFkCountryId_n(this.getFkCountryId_n());
+        registry.setFkStateId_n(this.getFkStateId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

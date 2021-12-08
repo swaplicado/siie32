@@ -12,6 +12,7 @@ import erp.lib.SLibUtilities;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mloc.data.SDataCountry;
 import erp.mloc.data.SDataState;
+import erp.mloc.data.SDataZipCode;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import sa.gui.util.SUtilConsts;
@@ -59,6 +60,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     
     protected erp.mloc.data.SDataCountry moDbmsDataCountry;
     protected erp.mloc.data.SDataState moDbmsDataState;
+    protected erp.mloc.data.SDataZipCode moDbmsDataZipCode;
 
     public SDataBizPartnerBranchAddress() {
         super(SDataConstants.BPSU_BPB_ADD);
@@ -128,6 +130,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
     public erp.mloc.data.SDataCountry getDbmsDataCountry() { return moDbmsDataCountry; }
     public erp.mloc.data.SDataState getDbmsDataState() { return moDbmsDataState; }
+    public erp.mloc.data.SDataZipCode getDbmsDataZipCode() { return moDbmsDataZipCode; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -176,6 +179,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
         msDbmsUserDelete = "";
         moDbmsDataCountry = null;
         moDbmsDataState = null;
+        moDbmsDataZipCode = null;
     }
 
     @Override
@@ -260,6 +264,11 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
 
                 if (moDbmsDataCountry.read(new int[] { mnFkCountryId_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                
+                if (!msZipCode.isEmpty() && moDbmsDataState != null) {
+                    moDbmsDataZipCode = new SDataZipCode();
+                    moDbmsDataZipCode.read(new String[] { msZipCode, moDbmsDataState.getStateCode() }, statement);
                 }
                 
                 mbIsRegistryNew = false;

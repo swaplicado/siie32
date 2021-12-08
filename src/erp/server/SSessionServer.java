@@ -27,6 +27,7 @@ import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataEmployee;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
+import erp.mod.log.db.SDbBillOfLading;
 import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SDataCfd;
@@ -578,6 +579,14 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 }
                                 break;
                                 
+                            case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                                SDbBillOfLading bol = packet.getAuxDataBillOfLading();
+                                if (bol != null) { 
+                                    if (bol.canDisable()) {
+                                        bol.setFkUserUpdateId(mnPkUserId);
+                                        //bol.disable();
+                                    }
+                                }
                             default:
                         }
                     }

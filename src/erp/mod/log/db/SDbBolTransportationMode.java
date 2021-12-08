@@ -290,6 +290,14 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
         registry.setFkVehicleOwnerId_n(this.getFkVehicleOwnerId_n());
         registry.setFkVehicleLesseeId_n(this.getFkVehicleLesseeId_n());
         registry.setFkNotifiedId_n(this.getFkNotifiedId_n());
+        
+        registry.setXtaVehicle(this.getXtaVehicle());
+        registry.setXtaTrailer1(this.getXtaTrailer1());
+        registry.setXtaTrailer2(this.getXtaTrailer2());
+        registry.setXtaDriver(this.getXtaDriver());
+        registry.setXtaOwner(this.getXtaOwner());
+        registry.setXtaLessee(this.getXtaLessee());
+        registry.setXtaNotified(this.getXtaNotified());
 
         return registry;
     }

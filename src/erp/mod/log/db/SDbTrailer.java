@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -90,12 +89,12 @@ public class SDbTrailer extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_bol = " + mnPkTrailerId + " ";
+        return "WHERE id_trailer = " + mnPkTrailerId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_bol = " + pk[0] + " ";
+        return "WHERE id_trailer = " + pk[0] + " ";
     }
 
     @Override
@@ -183,10 +182,14 @@ public class SDbTrailer extends SDbRegistryUser {
                 "ts_usr_upd = " + "NOW()" + " " +
                 getSqlWhere();
         }
+        
+        session.getStatement().execute(msSql);
+        mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbTrailer clone() throws CloneNotSupportedException {
         SDbTrailer registry = new SDbTrailer();
         
         registry.setPkTrailerId(this.getPkTrailerId());

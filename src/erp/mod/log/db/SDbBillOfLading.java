@@ -10,11 +10,13 @@ import cfd.DElement;
 import cfd.ver3.ccp20.DElementAutotransporte;
 import cfd.ver3.ccp20.DElementCantidadTransporta;
 import cfd.ver3.ccp20.DElementCartaPorte;
+import cfd.ver3.ccp20.DElementDomicilio;
 import cfd.ver3.ccp20.DElementIdentificacionVehicular;
 import cfd.ver3.ccp20.DElementMercancia;
 import cfd.ver3.ccp20.DElementMercancias;
 import cfd.ver3.ccp20.DElementPartesTransporte;
 import cfd.ver3.ccp20.DElementRemolque;
+import cfd.ver3.ccp20.DElementRemolques;
 import cfd.ver3.ccp20.DElementSeguros;
 import cfd.ver3.ccp20.DElementTiposFigura;
 import cfd.ver3.ccp20.DElementUbicacion;
@@ -26,8 +28,10 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
+import erp.mloc.data.SDataZipCode;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataCfd;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -44,7 +48,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlCfdi33 {
+public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlCfdi33, Serializable {
     
     protected int mnPkBolId;
     protected String msSeries;
@@ -72,25 +76,24 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     protected Date mtTsUserUpdate;
     */
     
+    protected SDbBolTransportationMode moBolTransportationMode;
+    protected ArrayList<SDbBolLocation> maBolLocations;
+    protected ArrayList<SDbBolMerchandise> maBolMerchandises;
+    
     protected SDataCfd moDbmsDataCfd;
     
     protected String msXtaCtyCode;
     protected String msXtaGrossWeightUnitCode;
+    protected String msXtaTaxRegime;
+    protected SDbInsurer moXtaEnvironmentalInsurer;
+    protected SDbInsurer moXtaMerchandiseInsurer;
     
-    protected SDbBolTransportationMode moBolTransportationMode;
-    
-    protected ArrayList<SDbBolLocation> maBolLocations;
-    protected ArrayList<SDbBolMerchandise> maBolMerchandises;
-    
+    protected int mnAuxCfdId;
     protected String msAuxCfdCfdiRelacionadosTipoRelacion;
     protected String msAuxCfdCfdiRelacionadoUuid; // available when CFDI is not stored in SIIE, e.g., third-party
-    
     protected SDataBizPartner moAuxDbmsDataEmisor;
     protected SDataBizPartnerBranch moAuxDbmsDataEmisorSucursal;
     
-    protected SDbInsurer moXtaEnvironmentalInsurer;
-    protected SDbInsurer moXtaMerchandiseInsurer;
-
     public SDbBillOfLading() {
         super(SModConsts.LOG_BOL);
     }
@@ -156,6 +159,10 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         catch (Exception e) {}
     }
     
+    public boolean canDisable() {
+        return true;
+    }
+    
     public void setPkBolId(int n) { mnPkBolId = n; }
     public void setSeries(String s) { msSeries = s; }
     public void setNumber(String s) { msNumber = s; }
@@ -209,20 +216,36 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
 
     public void setBolTransportationMode(SDbBolTransportationMode o) { moBolTransportationMode = o; }
-    
     public void setBolLocations(ArrayList<SDbBolLocation> v) { maBolLocations = v; }
     public void setBolMerchandises(ArrayList<SDbBolMerchandise> v) { maBolMerchandises = v; }
     
-    public void setXtaEnvironmentalInsurer(SDbInsurer o) { moXtaEnvironmentalInsurer = o; } 
-    public void setXtaMerchandiseInsurer(SDbInsurer o) { moXtaMerchandiseInsurer = o; } 
-    
     public SDbBolTransportationMode getBolTransportationMode() { return moBolTransportationMode; }
-    
     public ArrayList<SDbBolLocation> getBolLocations() { return maBolLocations; }
     public ArrayList<SDbBolMerchandise> getBolMerchandises() { return maBolMerchandises; }
     
+    public void setXtaCtyCode(String s) { msXtaCtyCode = s; }
+    public void setXtaGrossWeightUnitCode(String s) { msXtaGrossWeightUnitCode = s; }
+    public void setXtaTaxRegime(String s) { msXtaTaxRegime = s; }
+    public void setXtaEnvironmentalInsurer(SDbInsurer o) { moXtaEnvironmentalInsurer = o; } 
+    public void setXtaMerchandiseInsurer(SDbInsurer o) { moXtaMerchandiseInsurer = o; } 
+    
+    public String getXtaCtyCode() { return msXtaCtyCode; }
+    public String getXtaGrossWeightUnitCode() { return msXtaGrossWeightUnitCode; }
+    public String getXtaTaxRegime() { return msXtaTaxRegime; }
     public SDbInsurer getXtaEnvironmentalInsurer() { return moXtaEnvironmentalInsurer; }
     public SDbInsurer getXtaMerchandiseInsurer() { return moXtaMerchandiseInsurer; }
+    
+    public void setAuxCfdId(int i) { mnAuxCfdId = i; }
+    public void setAuxCfdCfdiRelacionadosTipoRelacion(String s) { msAuxCfdCfdiRelacionadosTipoRelacion = s; }
+    public void setAuxCfdCfdiRelacionadoUuid(String s) { msAuxCfdCfdiRelacionadoUuid = s; }
+    public void setAuxDbmsDataEmisor(SDataBizPartner o) { moAuxDbmsDataEmisor = o; }
+    public void setAuxDbmsDataEmisorSucursal(SDataBizPartnerBranch o) { moAuxDbmsDataEmisorSucursal = o; }
+    
+    public int getAuxCfdId() { return mnAuxCfdId; }
+    public String getAuxCfdCfdiRelacionadosTipoRelacion() { return msAuxCfdCfdiRelacionadosTipoRelacion; }
+    public String getAuxCfdCfdiRelacionadoUuid() { return msAuxCfdCfdiRelacionadoUuid; }
+    public SDataBizPartner getAuxDbmsDataEmisor() { return moAuxDbmsDataEmisor; }
+    public SDataBizPartnerBranch getAuxDbmsDataEmisorSucursal() { return moAuxDbmsDataEmisorSucursal; }
     
     public void computeNumber(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet;
@@ -276,16 +299,18 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         mtTsUserUpdate = null;
         
         moBolTransportationMode = new SDbBolTransportationMode();
-        
         maBolLocations = new ArrayList<>();
         maBolMerchandises = new ArrayList<>();
         
+        moDbmsDataCfd = null;
+        
         msAuxCfdCfdiRelacionadosTipoRelacion = "";
         msAuxCfdCfdiRelacionadoUuid = ""; 
+        mnAuxCfdId = 0;
         
         msXtaCtyCode = "";
         msXtaGrossWeightUnitCode = "";
-        
+        msXtaTaxRegime = "";
         moXtaEnvironmentalInsurer = new SDbInsurer();
         moXtaMerchandiseInsurer = new SDbInsurer();
     }
@@ -327,7 +352,9 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
         
-        msSql = "SELECT * FROM " + getSqlTable() + " WHERE id_bol = " + pk[0];
+        msSql = "SELECT b.*, c.id_cfd FROM " + getSqlTable() + " AS b " +
+                "LEFT OUTER JOIN trn_cfd AS c on b.id_bol = c.fid_bol_n " +
+                "WHERE id_bol = " + pk[0];
         statement = session.getDatabase().getConnection().createStatement();
         resultSet = statement.executeQuery(msSql);
         if (!resultSet.next()) {
@@ -358,6 +385,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+            
+            mnAuxCfdId = resultSet.getInt("id_cfd");
             
             mbRegistryNew = false;
         }
@@ -392,8 +421,19 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Read Insurers
         
-        moXtaEnvironmentalInsurer.read(session, new int[ mnFkEnvironmentalInsurer_n ]);
-        moXtaMerchandiseInsurer.read(session, new int[ mnFkMerchandiseInsurer_n ]);
+        if (mnFkEnvironmentalInsurer_n != 0) {
+            moXtaEnvironmentalInsurer.read(session, new int[] { mnFkEnvironmentalInsurer_n });
+        }
+        if (mnFkMerchandiseInsurer_n != 0) {
+            moXtaMerchandiseInsurer.read(session, new int[] { mnFkMerchandiseInsurer_n });
+        }
+        
+        // Read cfd
+        
+        if (mnAuxCfdId != 0) {
+            moDbmsDataCfd = new SDataCfd();
+            moDbmsDataCfd.read(new int[] { mnAuxCfdId }, statement);
+        }
         
         updateSatCtyCode(session);
         updateGrossWeightUnitCode(session);
@@ -529,9 +569,22 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setBolTransportationMode(this.getBolTransportationMode());
-        
         registry.setBolLocations(this.getBolLocations());
         registry.setBolMerchandises(this.getBolMerchandises());
+        
+        registry.setDbmsDataCfd(this.getDbmsDataCfd());
+        
+        registry.setXtaCtyCode(this.getXtaCtyCode());
+        registry.setXtaGrossWeightUnitCode(this.getXtaGrossWeightUnitCode());
+        registry.setXtaTaxRegime(this.getXtaTaxRegime());
+        registry.setXtaEnvironmentalInsurer(this.getXtaEnvironmentalInsurer());
+        registry.setXtaMerchandiseInsurer(this.getXtaMerchandiseInsurer());
+        
+        registry.setAuxCfdId(this.getAuxCfdId());
+        registry.setAuxCfdCfdiRelacionadosTipoRelacion(this.getAuxCfdCfdiRelacionadosTipoRelacion());
+        registry.setAuxCfdCfdiRelacionadoUuid(this.getAuxCfdCfdiRelacionadoUuid());
+        registry.setAuxDbmsDataEmisor(this.getAuxDbmsDataEmisor());
+        registry.setAuxDbmsDataEmisorSucursal(this.getAuxDbmsDataEmisorSucursal());
 
         return registry;
     }
@@ -613,7 +666,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
 
     @Override
     public String getComprobanteConfirmacion() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return "";
     }
 
     @Override
@@ -645,7 +698,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
 
     @Override
     public String getEmisorRegimenFiscal() {
-        return "";
+        return msXtaTaxRegime;
     }
 
     @Override
@@ -704,7 +757,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             concepto.setDescuento(0);
 
             conceptos.add(concepto);
-            
+            break;
         }
 
         return conceptos;
@@ -722,7 +775,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Encabezado:
         
         DElementCartaPorte ccp = new DElementCartaPorte();
-        ccp.getAttTransInternac().setString(mbInternationalBol ? "Si" : "No");
+        ccp.getAttTransInternac().setString(mbInternationalBol ? DCfdi33Catalogs.TxtSí : DCfdi33Catalogs.TxtNo);
         if (mbInternationalBol) {
             ccp.getAttEntradaSalidaMerc().setString(msInputOutputBol);
             ccp.getAttViaEntradaSalida().setString(msInputOutputWay);
@@ -739,7 +792,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             if (location.getXtaIsOrigin()) {
                 origen = new DElementUbicacion();
                 origen.getAttTipoUbicacion().setString("Origen");
-                origen.getAttIDUbicacion().setString("OR" + location.getXtaBizPartnerBranchAddress().getAddressCode());
+                origen.getAttIDUbicacion().setString(DCfdi33Catalogs.PrefijoClaveOrigen + location.getXtaBizPartnerBranchAddress().getAddressCode());
                 if (location.getXtaBizPartner().getFiscalId().isEmpty()) {
                     origen.getAttNumRegIdTrib().setString(location.getXtaBizPartner().getFiscalId());
                     origen.getAttNombreRemitenteDestinatario().setString(location.getXtaBizPartner().getBizPartner());
@@ -749,11 +802,27 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                     origen.getAttRFCRemitenteDestinatario().setString(location.getXtaBizPartner().getFiscalId());
                 }
                 origen.getAttFechaHoraSalidaLlegada().setDatetime(location.getDateDeparture_n());
+                
+                // Domicilio: 
+                
+                DElementDomicilio domicilio = origen.getEltDomicilio();
+                domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
+                domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
+                domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 
+                if (location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode() != null) {
+                    SDataZipCode zipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode();
+                    if (zipCode.getDbmsCounty() != null) {
+                        domicilio.getAttMunicipio().setString(zipCode.getDbmsCounty().getPkCountyCode());
+                    }
+                    if (zipCode.getDbmsLocality() != null) {
+                        domicilio.getAttLocalidad().setString(zipCode.getDbmsLocality().getPkLocalityCode());
+                    }
+                }
             }
             if (location.getXtaIsDestination()) {
                 destino = new DElementUbicacion();
                 destino.getAttTipoUbicacion().setString("Destino");
-                destino.getAttIDUbicacion().setString("DE" + location.getXtaBizPartnerBranchAddress().getAddressCode());
+                destino.getAttIDUbicacion().setString(DCfdi33Catalogs.PrefijoClaveDestino + location.getXtaBizPartnerBranchAddress().getAddressCode());
                 if (location.getXtaBizPartner().getFiscalId().isEmpty()) {
                     destino.getAttNumRegIdTrib().setString(location.getXtaBizPartner().getFiscalId());
                     destino.getAttNombreRemitenteDestinatario().setString(location.getXtaBizPartner().getBizPartner());
@@ -764,6 +833,22 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 }
                 destino.getAttFechaHoraSalidaLlegada().setDatetime(location.getDateArrival_n());
                 destino.getAttDistanciaRecorrida().setDouble(location.getDistance());
+                
+                // Domicilio: 
+                
+                DElementDomicilio domicilio = destino.getEltDomicilio();
+                domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
+                domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
+                domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 
+                if (location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode() != null) {
+                    SDataZipCode zipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode();
+                    if (zipCode.getDbmsCounty() != null) {
+                        domicilio.getAttMunicipio().setString(zipCode.getDbmsCounty().getPkCountyCode());
+                    }
+                    if (zipCode.getDbmsLocality() != null) {
+                        domicilio.getAttLocalidad().setString(zipCode.getDbmsLocality().getPkLocalityCode());
+                    }
+                }
             }
             if (origen != null) {
                 ubicaciones.add(origen);
@@ -789,24 +874,50 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             mercancia.getAttDescripcion().setString(merch.getXtaItem().getItem());
             mercancia.getAttCantidad().setDouble(merch.getQuantity());
             mercancia.getAttClaveUnidad().setString(merch.getXtaClaveUnidad());
-            mercancia.getAttMaterialPeligroso().setString("No");
-            mercancia.getAttPesoEnKg().setDouble(merch.getWeight());
+            mercancia.getAttPesoEnKg().setDouble(merch.getXtaClaveUnidad().equals("KGM") ? merch.getQuantity() : merch.getWeight());
             mercancia.getAttFraccionArancelaria().setString(merch.getExternalUUID());
             
             // Cantidad transporta:
             
-            ArrayList<DElementCantidadTransporta> transporta = mercancia.getEltCantidadTransporta();
+            ArrayList<SDbBolMerchandiseQuantity> qtyOr = new ArrayList<>();
+            ArrayList<SDbBolMerchandiseQuantity> qtyDe = new ArrayList<>();
             for (SDbBolMerchandiseQuantity qty : merch.getBolMerchandiseQuantity()) {
-                DElementCantidadTransporta transp = new DElementCantidadTransporta();
                 if (qty.getXtaOriginBizPartnerBranchAddress() != null) {
-                    transp.getAttIDOrigen().setString("OR" + qty.getXtaOriginBizPartnerBranchAddress().getAddressCode());
+                    qtyOr.add(qty);
                 }
                 if (qty.getXtaDestinationBizPartnerBranchAddress() != null) {
-                    transp.getAttIDDestino().setString("DE" + qty.getXtaDestinationBizPartnerBranchAddress().getAddressCode());
+                    qtyDe.add(qty);
                 }
-                transp.getAttCantidad().setDouble(qty.getQuantity());
-                
-                transporta.add(transp);
+            }
+            
+            ArrayList<DElementCantidadTransporta> transporta = mercancia.getEltCantidadTransporta();
+            
+            for (SDbBolMerchandiseQuantity or : qtyOr) {
+                if (or.getQuantity() > 0) {
+                    for (SDbBolMerchandiseQuantity de : qtyDe) {
+                        if (de.getQuantity() > 0) {
+                            DElementCantidadTransporta elementTransp = new DElementCantidadTransporta();
+                            elementTransp.getAttIDOrigen().setString(DCfdi33Catalogs.PrefijoClaveOrigen + or.getXtaOriginBizPartnerBranchAddress().getAddressCode());
+                            elementTransp.getAttIDDestino().setString(DCfdi33Catalogs.PrefijoClaveDestino + de.getXtaDestinationBizPartnerBranchAddress().getAddressCode());
+                            if (or.getQuantity() > de.getQuantity()) {
+                                or.setQuantity(or.getQuantity() - de.getQuantity());                                
+                                elementTransp.getAttCantidad().setDouble(de.getQuantity());
+                                de.setQuantity(0);                                
+                            }
+                            else if (or.getQuantity() < de.getQuantity()) {
+                                de.setQuantity(de.getQuantity() - or.getQuantity());
+                                elementTransp.getAttCantidad().setDouble(or.getQuantity());
+                                or.setQuantity(0);
+                            }
+                            else if (or.getQuantity() == de.getQuantity()) {
+                                elementTransp.getAttCantidad().setDouble(or.getQuantity());
+                                or.setQuantity(0);
+                                de.setQuantity(0);
+                            }
+                            transporta.add(elementTransp);
+                        }
+                    }
+                }
             }
             
             // Pedimentos:
@@ -818,7 +929,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Autotransporte:
         
-        DElementAutotransporte autotransporte = encabezadoMercancias.getAutotransporteFederal();
+        DElementAutotransporte autotransporte = encabezadoMercancias.getEltAutotransporte();
         autotransporte.getAttPermSCT().setString(moBolTransportationMode.getXtaVehicle().getPermissonSctType());
         autotransporte.getAttNumPermisoSCT().setString(moBolTransportationMode.getXtaVehicle().getPermissonSctNumber());
         
@@ -842,24 +953,32 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Remolques:
         
-        ArrayList<DElementRemolque> remolques = autotransporte.getEltRemolques().getEltRemolques();
-        if (moBolTransportationMode.getXtaTrailer1() != null) {
+        DElementRemolques elementRemolques = new DElementRemolques();
+        ArrayList<DElementRemolque> remolques = new ArrayList<>();
+        if (moBolTransportationMode.getXtaTrailer1().getPkTrailerId() != 0) {
             DElementRemolque remolque = new DElementRemolque();
             remolque.getAttSubTipoRem().setString(moBolTransportationMode.getXtaTrailer1().getTrailerSubtype());
+            remolque.getAttPlaca().setString(moBolTransportationMode.getXtaTrailer1().getPlate());
             remolques.add(remolque);
         }
-        if (moBolTransportationMode.getXtaTrailer2() != null) {
+        if (moBolTransportationMode.getXtaTrailer2().getPkTrailerId() != 0) {
             DElementRemolque remolque = new DElementRemolque();
             remolque.getAttSubTipoRem().setString(moBolTransportationMode.getXtaTrailer2().getTrailerSubtype());
+            remolque.getAttPlaca().setString(moBolTransportationMode.getXtaTrailer2().getPlate());
             remolques.add(remolque);
         }
+        if (remolques.size() > 0) {
+            elementRemolques.getEltRemolques().addAll(remolques);
+            autotransporte.setEltRemolques(elementRemolques); 
+        }
+        
         
         // Figura transporte:
         
         ArrayList<DElementTiposFigura> figuras = ccp.getEltFiguraTransporte().getEltTiposFigura();
         DElementTiposFigura chofer = new DElementTiposFigura();
-        chofer.getAttTipoFigura().setString("01");
-        chofer.getAttNumLicencia().setString(moBolTransportationMode.getXtaDriver().getLicense()); 
+        chofer.getAttTipoFigura().setString(DCfdi33Catalogs.ClaveChofer);
+        chofer.getAttNumLicencia().setString(moBolTransportationMode.getXtaDriver().getDriverLicense()); 
         if (!moBolTransportationMode.getXtaDriver().getFiscalId().isEmpty()) {
             chofer.getAttRFCFigura().setString(moBolTransportationMode.getXtaDriver().getFiscalId());
         }
@@ -870,9 +989,9 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         }
         figuras.add(chofer);
         
-        if (moBolTransportationMode.getXtaOwner() != null) {
+        if (moBolTransportationMode.getXtaOwner().getPkBolPersonId() != 0) {
             DElementTiposFigura propietario = new DElementTiposFigura();
-            propietario.getAttTipoFigura().setString("02");
+            propietario.getAttTipoFigura().setString(DCfdi33Catalogs.ClavePropietario);
             if (!moBolTransportationMode.getXtaOwner().getFiscalId().isEmpty()) {
                 propietario.getAttRFCFigura().setString(moBolTransportationMode.getXtaOwner().getFiscalId());
             }
@@ -881,16 +1000,16 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 propietario.getAttNombreFigura().setString(moBolTransportationMode.getXtaOwner().getName());
                 propietario.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getXtaOwner().getXtaCountry().getCountryCode());
             }
-            ArrayList<DElementPartesTransporte> partesTransporte = propietario.getEltPartesTransporte();
+            ArrayList<DElementPartesTransporte> partesTransporte = propietario.getEltPartesTransporte(); 
             DElementPartesTransporte parte = new DElementPartesTransporte();
             parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartOwner());
             partesTransporte.add(parte);
             figuras.add(propietario);
         }
         
-        if (moBolTransportationMode.getXtaLessee()!= null) {
+        if (moBolTransportationMode.getXtaLessee().getPkBolPersonId() != 0) {
             DElementTiposFigura arrendador = new DElementTiposFigura();
-            arrendador.getAttTipoFigura().setString("03");
+            arrendador.getAttTipoFigura().setString(DCfdi33Catalogs.ClaveArrendador);
             if (!moBolTransportationMode.getXtaLessee().getFiscalId().isEmpty()) {
                 arrendador.getAttRFCFigura().setString(moBolTransportationMode.getXtaLessee().getFiscalId());
             }
@@ -906,9 +1025,9 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             figuras.add(arrendador);
         }
         
-        if (moBolTransportationMode.getXtaNotified()!= null) {
+        if (moBolTransportationMode.getXtaNotified().getPkBolPersonId() != 0) {
             DElementTiposFigura notificado = new DElementTiposFigura();
-            notificado.getAttTipoFigura().setString("03");
+            notificado.getAttTipoFigura().setString(DCfdi33Catalogs.ClaveNotificado);
             if (!moBolTransportationMode.getXtaNotified().getFiscalId().isEmpty()) {
                 notificado.getAttRFCFigura().setString(moBolTransportationMode.getXtaNotified().getFiscalId());
             }

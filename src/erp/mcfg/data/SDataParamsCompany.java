@@ -65,6 +65,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected boolean mbIsPaymentSunday;
     protected boolean mbIsCfdiProduction;
     protected boolean mbIsCfdiSendingAutomaticSal;
+    protected boolean mbIsCfdiSendingAutomaticBol;
     protected boolean mbIsCfdiSendingAutomaticHrs;
     protected boolean mbIsFunctionalAreas;
     protected boolean mbIsReportsBackground;
@@ -167,6 +168,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setIsPaymentSunday(boolean b) { mbIsPaymentSunday = b; }
     public void setIsCfdiProduction(boolean b) { mbIsCfdiProduction = b; }
     public void setIsCfdiSendingAutomaticSal(boolean b) { mbIsCfdiSendingAutomaticSal = b; }
+    public void setIsCfdiSendingAutomaticBol(boolean b) { mbIsCfdiSendingAutomaticBol = b; }
     public void setIsCfdiSendingAutomaticHrs(boolean b) { mbIsCfdiSendingAutomaticHrs = b; }
     public void setIsFunctionalAreas(boolean b) { mbIsFunctionalAreas = b; }
     public void setIsReportsBackground(boolean b) { mbIsReportsBackground = b; }
@@ -260,6 +262,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public boolean getIsPaymentSunday() { return mbIsPaymentSunday; }
     public boolean getIsCfdiProduction() { return mbIsCfdiProduction; }
     public boolean getIsCfdiSendingAutomaticSal() { return mbIsCfdiSendingAutomaticSal; }
+    public boolean getIsCfdiSendingAutomaticBol() { return mbIsCfdiSendingAutomaticBol; }
     public boolean getIsCfdiSendingAutomaticHrs() { return mbIsCfdiSendingAutomaticHrs; }
     public boolean getIsFunctionalAreas() { return mbIsFunctionalAreas; }
     public boolean getIsReportsBackground() { return mbIsReportsBackground; }
@@ -388,6 +391,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mbIsPaymentSunday = false;
         mbIsCfdiProduction = false;
         mbIsCfdiSendingAutomaticSal = false;
+        mbIsCfdiSendingAutomaticBol = false;
         mbIsCfdiSendingAutomaticHrs = false;
         mbIsFunctionalAreas = false;
         mbIsReportsBackground = false;
@@ -507,6 +511,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mbIsPaymentSunday = resultSet.getBoolean("b_pay_sun");
                 mbIsCfdiProduction = resultSet.getBoolean("b_cfdi_prod");
                 mbIsCfdiSendingAutomaticSal = resultSet.getBoolean("b_cfdi_snd_aut_sal");
+                mbIsCfdiSendingAutomaticBol = resultSet.getBoolean("b_cfdi_snd_aut_bol");
                 mbIsCfdiSendingAutomaticHrs = resultSet.getBoolean("b_cfdi_snd_aut_hrs");
                 mbIsFunctionalAreas = resultSet.getBoolean("b_func");
                 mbIsReportsBackground = resultSet.getBoolean("b_reps_bg");
@@ -634,7 +639,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
             callableStatement.setInt(nParam++, mnDaysOfGraceCustomer);
@@ -674,6 +679,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setBoolean(nParam++, mbIsPaymentSunday);
             callableStatement.setBoolean(nParam++, mbIsCfdiProduction);
             callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticSal);
+            callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticBol);
             callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticHrs);
             callableStatement.setBoolean(nParam++, mbIsFunctionalAreas);
             callableStatement.setBoolean(nParam++, mbIsReportsBackground);

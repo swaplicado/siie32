@@ -14,6 +14,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mod.log.db.SDbBolLocation;
 import erp.mod.log.db.SDbBolMerchandise;
+import erp.mod.log.db.SDbBolMerchandiseQuantity;
 import erp.mod.log.db.SDbBolPerson;
 import erp.mod.log.db.SDbBolTransportationMode;
 import erp.mod.log.db.SDbInsurer;
@@ -24,6 +25,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.JCheckBox;
@@ -56,6 +58,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     
     private SFormBolLocation moFormLocation;
     
+    private boolean mbFormSettingsOk;
+    
     /**
      * Creates new form SFormShipment
      * @param client
@@ -63,7 +67,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
      */
     public SFormBillOfLading(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.LOG_SHIP, SLibConstants.UNDEFINED, title);
-
+        
+        windowActivate();
         initComponents();
         initComponentsCustom();
     }
@@ -85,6 +90,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jPanel21 = new javax.swing.JPanel();
         jlFiscalIdReceptor = new javax.swing.JLabel();
         moTextFiscalIdReceptor = new sa.lib.gui.bean.SBeanFieldText();
+        moTextTaxRegime = new sa.lib.gui.bean.SBeanFieldText();
         jPanel25 = new javax.swing.JPanel();
         moBoolInternationalShip = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel26 = new javax.swing.JPanel();
@@ -239,6 +245,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
         moTextFiscalIdReceptor.setEnabled(false);
         jPanel21.add(moTextFiscalIdReceptor);
+
+        moTextTaxRegime.setToolTipText("Regimen fiscal");
+        moTextTaxRegime.setEnabled(false);
+        jPanel21.add(moTextTaxRegime);
 
         jPanel23.add(jPanel21);
 
@@ -933,6 +943,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private sa.lib.gui.bean.SBeanFieldText moTextPlate;
     private sa.lib.gui.bean.SBeanFieldText moTextPremium;
     private sa.lib.gui.bean.SBeanFieldText moTextSerie;
+    private sa.lib.gui.bean.SBeanFieldText moTextTaxRegime;
     private sa.lib.gui.bean.SBeanFieldText moTextTrailerPlate1;
     private sa.lib.gui.bean.SBeanFieldText moTextTrailerPlate2;
     // End of variables declaration//GEN-END:variables
@@ -941,6 +952,28 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     * Private methods:
     */
 
+    private void windowActivate() {
+        mbFormSettingsOk = true;
+        if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);   // no company branch selected
+            mbFormSettingsOk = false;
+            actionCancel();
+        }
+    }
+    
+    @Override
+    public void actionCancel() {
+        if (jbCancel.isEnabled()) {
+            if (!mbFormSettingsOk) {
+                mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+                setVisible(false);
+            }
+            else {
+                super.actionCancel();
+            }
+        }
+    }
+    
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1050, 720);
         
@@ -957,10 +990,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moDecimalGrossWeight.setDecimalSettings(SGuiUtils.getLabelName(jlGrossWeight.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
         moKeyGrossWeightUnit.setKeySettings(miClient, SGuiUtils.getLabelName(jlGrossWeightUnit.getText()), true);
         moKeyEnvironmentalInsurer.setKeySettings(miClient, SGuiUtils.getLabelName(jlEnvironmentalInsurer.getText()), false);
-        moTextEnvironmentalPolicy.setTextSettings(SGuiUtils.getLabelName(jlEnvironmentalPolicy.getText()), 30);
+        moTextEnvironmentalPolicy.setTextSettings(SGuiUtils.getLabelName(jlEnvironmentalPolicy.getText()), 30, 0);
         moKeyMerchandiseInsurer.setKeySettings(miClient, SGuiUtils.getLabelName(jlMerchandiseInsurer.getText()), false);
-        moTextMerchandisePolicy.setTextSettings(SGuiUtils.getLabelName(jlMerchandisePolicy.getText()), 30);
-        moTextPremium.setTextSettings(SGuiUtils.getLabelName(jlPremium.getText()), 30);
+        moTextMerchandisePolicy.setTextSettings(SGuiUtils.getLabelName(jlMerchandisePolicy.getText()), 30, 0);
+        moTextPremium.setTextSettings(SGuiUtils.getLabelName(jlPremium.getText()), 30, 0);
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), true);
         moKeyCfdiUsage.setKeySettings(miClient, SGuiUtils.getLabelName(jlCfdiUsage.getText()), false);
         moKeyVehicle.setKeySettings(miClient, SGuiUtils.getLabelName(jlVehicle.getText()), true);
@@ -1139,11 +1172,23 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private void updateTotalDistance() {
         double distance = 0;
         for (SGridRow row : moGridLocations.getModel().getGridRows()) {
-            if (((SDbBolLocation) row).getDistance() > distance) {
-                distance = ((SDbBolLocation) row).getDistance();
-            }
+                distance += ((SDbBolLocation) row).getDistance();
         }
         moDecimalTotalDistance.setValue(distance);
+    }
+    
+    private void updateGrossWeight() {
+        ArrayList<Integer> itemKeys = new ArrayList<>();
+        double weight = 0;
+        for (SGridRow row : moGridLocations.getModel().getGridRows()) {
+            for (SDbBolMerchandiseQuantity qty : ((SDbBolLocation) row).getXtaMerchandiseQuantityCharge()) {
+                if (!itemKeys.contains(qty.getXtaMerchandise().getFkItemId())) {
+                    itemKeys.add(qty.getXtaMerchandise().getFkItemId());
+                    weight += qty.getXtaMerchandise().getQuantity();
+                }
+            }
+        }
+        moDecimalTotalDistance.setValue(weight);
     }
     
     private void setVehicleDriver(int vehPk){
@@ -1208,7 +1253,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         if (moKeyDriver.getSelectedIndex() >= 1) {
             SDbBolPerson per = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyDriver.getValue() );
             moTextDriverFiscalId.setText("".equals(per.getFiscalId()) && !"".equals(per.getFiscalForeginId()) ? per.getFiscalForeginId() : per.getFiscalId());
-            moTextDriverLicense.setText(per.getLicense());
+            moTextDriverLicense.setText(per.getDriverLicense());
         }
         else {
             moTextDriverFiscalId.setText("");
@@ -1278,6 +1323,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         SGuiValidation validation = new SGuiValidation();
         int start = 0;
         int end = 0;
+        moRegistry.getBolLocations().clear();
+        for (SGridRow row : moGridLocations.getModel().getGridRows()) {
+            moRegistry.getBolLocations().add((SDbBolLocation) row);
+        }
         for (SDbBolLocation location : moRegistry.getBolLocations()) {
             if (location.getLocationType() == 1) {
                 start++;
@@ -1314,6 +1363,38 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
         
         return validation;
+    }
+    
+     private void saveDistanceLocations(SDbBillOfLading registry) {
+        try {
+            Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+            int[] startAdd = new int[] { 0, 0};
+            int[] endAdd = new int [] { 0, 0};
+            double distance = 0;
+            for (SDbBolLocation loc : registry.getBolLocations()) {
+                if (loc.getLocationType() == 1) { // Inicial
+                    startAdd = new int[] { loc.getFkOriginBizPartnerAddress_n(), loc.getFkOriginAddressAddress_n() }; 
+                }
+                else if (loc.getLocationType() == 3) { // Final
+                    endAdd = new int[] { loc.getFkDestinationBizPartnerAddress_n(), loc.getFkDestinationAddressAddress_n() };
+                    distance = loc.getDistance();
+                }
+            }
+            String sql = "SELECT * FROM log_dist_location "
+                    + "WHERE (id_bpb_add_1 = " + startAdd[0] + " AND id_add_add_1 = " + startAdd[1] + " "
+                    + "AND id_bpb_add_2 = " + endAdd[0] + " AND id_add_add_2 = " + endAdd[1] + ") OR ("
+                    + "id_bpb_add_1 = " + endAdd[0] + " AND id_add_add_1 = " + endAdd[1] + " "
+                    + "AND id_bpb_add_2 = " + startAdd[0] + " AND id_add_add_2 = " + startAdd[1] + ")"; 
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (!resultSet.next()) {
+                sql = "INSERT INTO log_dist_location VALUES ("
+                        + startAdd[0] + ", " + startAdd[1] + ", "
+                        + endAdd[0] + ", " + endAdd[1] + ", "
+                        + distance + ");" ;
+                statement.execute(sql);
+            }
+        }
+        catch(Exception e) {}
     }
 
 
@@ -1427,9 +1508,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
             moBoolInternationalShip.setSelected(moRegistry.isInternationalBol());
-            moTextFiscalIdReceptor.setText(moRegistry.getFiscalIdReceptor());
+            moTextFiscalIdReceptor.setText(((SClientInterface) miClient).getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId());
         }
 
+        moTextTaxRegime.setValue(((SClientInterface)miClient).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
         moKeyCountry.setValue(new int[] { moRegistry.getFkInputOutputCountry() });
         SGuiUtils.locateItemByCode(moKeyInputOutput, moRegistry.getInputOutputBol());
         SGuiUtils.locateItemByCode(moKeyInputOutputWay, moRegistry.getInputOutputWay());
@@ -1480,7 +1562,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             
             moKeyDriver.setValue(new int[] { driver.getPkBolPersonId() });
             moTextDriverFiscalId.setText(driver.getFiscalId().isEmpty() ? driver.getFiscalForeginId() : driver.getFiscalId());
-            moTextDriverLicense.setText(driver.getLicense());
+            moTextDriverLicense.setText(driver.getDriverLicense());
             moKeyOwner.setValue(new int[] { owner.getPkBolPersonId() });
             moTextOwnerFiscalId.setText(owner.getFiscalId().isEmpty() ? owner.getFiscalForeginId() : owner.getFiscalId());
             SGuiUtils.locateItemByCode(moKeyTransportationPartOwner, moRegistry.getBolTransportationMode().getTransportationPartOwner());
@@ -1497,30 +1579,14 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-//        SCfdPacket cfdPacket = new SCfdPacket();
-//        
-//        if (moDataCfdPayment == null) {
-//            moDataCfdPayment = new SDataCfdPayment();
-//            moDataCfdPayment.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-//            cfdPacket.setCfdSeries("");
-//        }
-//        else {
-//            moDataCfdPayment.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-//            
-//            cfdPacket.setCfdId(moDataCfdPayment);
-//        }
-//        
         SDbBillOfLading registry = (SDbBillOfLading) moRegistry.clone();
 
         if (registry.isRegistryNew()) {
         }
         
-        SDbInsurer environmental = new SDbInsurer();
-        environmental.read(miClient.getSession(), moKeyEnvironmentalInsurer.getValue());
-        
-        SDbInsurer merchansise = new SDbInsurer();
-        merchansise.read(miClient.getSession(), moKeyMerchandiseInsurer.getValue());
-        
+        SDbInsurer environmental = (SDbInsurer) miClient.getSession().readRegistry(SModConsts.LOG_INSURER, moKeyEnvironmentalInsurer.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbInsurer merchansise = (SDbInsurer) miClient.getSession().readRegistry(SModConsts.LOG_INSURER, moKeyMerchandiseInsurer.getValue(), SLibConstants.EXEC_MODE_SILENT);
+ 
         registry.setFiscalIdReceptor(moTextFiscalIdReceptor.getValue());
         registry.setSeries(moTextSerie.getText());
         registry.setNumber(moTextNumber.getText());
@@ -1534,16 +1600,17 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         registry.setEnviromentalInsurerPolicy(moTextEnvironmentalPolicy.getValue());
         registry.setMerchandiseInsurerPolicy(moTextMerchandisePolicy.getValue());
         registry.setPremium(moTextPremium.getValue());
-        registry.setFkCompanyBranchId(miClient.getSession().getConfigBranch().getBranchId());
-        registry.setFkInputOutputCountry(moKeyCountry.getValue()[0]);
+        registry.setFkCompanyBranchId(((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId());
+        registry.setFkInputOutputCountry(moKeyCountry.getValue().length == 0 ? 0 : moKeyCountry.getValue()[0]);
         registry.setFkGrossWeightUnit(moKeyGrossWeightUnit.getValue()[0]);
-        registry.setFkEnvironmentalInsurer_n(moKeyEnvironmentalInsurer.getValue()[0]);
-        registry.setFkMerchandiseInsurer_n(moKeyMerchandiseInsurer.getValue()[0]);
-        registry.readBizPartner(miClient.getSession(), miClient.getSession().getConfigBranch().getCompanyId());
+        registry.setFkEnvironmentalInsurer_n(moKeyEnvironmentalInsurer.getValue().length == 0 ? 0 : moKeyEnvironmentalInsurer.getValue()[0]);
+        registry.setFkMerchandiseInsurer_n(moKeyMerchandiseInsurer.getValue().length == 0 ? 0 :moKeyMerchandiseInsurer.getValue()[0]);
+        registry.readBizPartner(miClient.getSession(), miClient.getSession().getConfigCompany().getCompanyId());
         registry.setXtaEnvironmentalInsurer(environmental);
         registry.setXtaMerchandiseInsurer(merchansise);
         registry.updateSatCtyCode(miClient.getSession());
         registry.updateGrossWeightUnitCode(miClient.getSession());
+        registry.setXtaTaxRegime(moTextTaxRegime.getValue()); 
         
         SDbBolTransportationMode transportation = registry.getBolTransportationMode();
         
@@ -1557,21 +1624,13 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         transportation.setFkVehicleLesseeId_n(moKeyLessee.getValue().length == 0 ? 0 : moKeyLessee.getValue()[0]);
         transportation.setFkNotifiedId_n(moKeyNotified.getValue().length == 0 ? 0 : moKeyNotified.getValue()[0]);
         
-        SDbVehicle veh = new SDbVehicle();
-        SDbTrailer tra1 = new SDbTrailer();
-        SDbTrailer tra2 = new SDbTrailer();
-        SDbBolPerson driver = new SDbBolPerson();
-        SDbBolPerson owner = new SDbBolPerson();
-        SDbBolPerson lessee = new SDbBolPerson();
-        SDbBolPerson notified = new SDbBolPerson();
-        
-        veh.read(miClient.getSession(), moKeyVehicle.getValue());
-        tra1.read(miClient.getSession(), moKeyVehicle.getValue());
-        tra2.read(miClient.getSession(), moKeyVehicle.getValue());
-        driver.read(miClient.getSession(), moKeyVehicle.getValue());
-        owner.read(miClient.getSession(), moKeyVehicle.getValue());
-        lessee.read(miClient.getSession(), moKeyVehicle.getValue());
-        notified.read(miClient.getSession(), moKeyVehicle.getValue());
+        SDbVehicle veh = (SDbVehicle) miClient.getSession().readRegistry(SModConsts.LOG_VEH, moKeyVehicle.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbTrailer tra1 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, moKeyTrailer1.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbTrailer tra2 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, moKeyTrailer2.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson driver = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyDriver.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson owner = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyOwner.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson lessee = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyLessee.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson notified = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyNotified.getValue(), SLibConstants.EXEC_MODE_SILENT);
         
         transportation.setXtaVehicle(veh);
         transportation.setXtaTrailer1(tra1);
@@ -1585,6 +1644,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         for (SGridRow row : moGridLocations.getModel().getGridRows()) {
             registry.getBolLocations().add((SDbBolLocation) row);
         }
+        
+        saveDistanceLocations(registry);
         
         return registry;
     }
@@ -1698,6 +1759,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     @Override
     public void notifyRowNew(int gridType, int gridSubtype, int row, SGridRow gridRow) {
         updateTotalDistance();
+        updateGrossWeight();
     }
 
     @Override

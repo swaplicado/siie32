@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -145,7 +144,7 @@ public class SDbInsurer extends SDbRegistryUser {
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
-            msSql = "INSERT INTO " + getSqlTable() + "VALUES (" + 
+            msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkInsurerId + ", " + 
                     "'" + msName + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -175,7 +174,7 @@ public class SDbInsurer extends SDbRegistryUser {
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbInsurer clone() throws CloneNotSupportedException {
         SDbInsurer registry = new SDbInsurer();
         
         registry.setPkInsurerId(this.getPkInsurerId());

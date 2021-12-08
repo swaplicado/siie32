@@ -6,11 +6,14 @@
 package erp.mod;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
+import erp.gui.session.SSessionCustom;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mod.log.db.SDbBolLocation;
 import erp.mod.log.db.SDbBolMerchandise;
 import erp.mod.log.db.SDbBolMerchandiseQuantity;
 import erp.mod.log.db.SDbBolPerson;
+import erp.mod.log.db.SDbInsurer;
 import erp.mod.log.db.SDbRate;
 import erp.mod.log.db.SDbShipment;
 import erp.mod.log.db.SDbShipmentDestiny;
@@ -21,15 +24,20 @@ import erp.mod.log.db.SDbTrailer;
 import erp.mod.log.db.SDbVehicle;
 import erp.mod.log.db.SDbVehicleType;
 import erp.mod.log.form.SFormBillOfLading;
+import erp.mod.log.form.SFormBolPerson;
+import erp.mod.log.form.SFormInsurer;
 import erp.mod.log.form.SFormRate;
 import erp.mod.log.form.SFormShipment;
 import erp.mod.log.form.SFormShipmentDelivery;
 import erp.mod.log.form.SFormSpot;
 import erp.mod.log.form.SFormSpotCompanyBranch;
 import erp.mod.log.form.SFormSpotCompanyBranchEntity;
+import erp.mod.log.form.SFormTrailer;
 import erp.mod.log.form.SFormVehicle;
 import erp.mod.log.form.SFormVehicleType;
 import erp.mod.log.view.SViewBillOfLading;
+import erp.mod.log.view.SViewBolPerson;
+import erp.mod.log.view.SViewInsurer;
 import erp.mod.log.view.SViewRate;
 import erp.mod.log.view.SViewShipment;
 import erp.mod.log.view.SViewShipmentAuthorn;
@@ -42,8 +50,10 @@ import erp.mod.log.view.SViewShipmentDpsCost;
 import erp.mod.log.view.SViewSpot;
 import erp.mod.log.view.SViewSpotCompanyBranch;
 import erp.mod.log.view.SViewSpotCompanyBranchEntity;
+import erp.mod.log.view.SViewTrailer;
 import erp.mod.log.view.SViewVehicle;
 import erp.mod.log.view.SViewVehicleType;
+import erp.mtrn.data.SCfdUtils;
 import java.sql.ResultSet;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
@@ -71,11 +81,14 @@ public class SModuleLog extends SGuiModule {
     private SFormSpotCompanyBranchEntity moFormSpotCompanyBranchEntity;
     private SFormRate moFormRate;
     private SFormVehicle moFormVehicle;
+    private SFormTrailer moFormTrailer;
+    private SFormBolPerson moFormBolPerson;
+    private SFormInsurer moFormInsurer;
     private SFormShipment moFormShipment;
     private SFormBillOfLading moFormBillOfLading;
     private SFormShipmentDelivery moFormShipmentDelivery;
 
-    private SClientInterface miClient_xxx;
+    private final SClientInterface miClient_xxx;
 
     public SModuleLog(SGuiClient client, SClientInterface client_xxx) {
         super(client, SModConsts.MOD_LOG_N, SLibConsts.UNDEFINED);
@@ -129,6 +142,9 @@ public class SModuleLog extends SGuiModule {
                 break;
             case SModConsts.LOG_SHIP:
                 registry = new SDbShipment();
+                break;
+            case SModConsts.LOG_INSURER:
+                registry = new SDbInsurer();
                 break;
             case SModConsts.LOG_BOL:
                 registry = new SDbBillOfLading();
@@ -216,6 +232,13 @@ public class SModuleLog extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE b_del = 0 " + (params != null ? "AND fid_tp_dly = " + params.getKey()[0] : "") + " OR id_inc = " + SModSysConsts.LOGS_INC_NA + " "
                         + "ORDER BY sort, name ";
+                break;
+            case SModConsts.LOGS_TP_BOL_PERSON: 
+                settings = new SGuiCatalogueSettings("Tipo figura transporte", 1);
+                sql = "SELECT id_tp_bol_person AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " 
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY name ";
                 break;
             case SModConsts.LOGU_TP_VEH:
                 settings = new SGuiCatalogueSettings("Tipo vehículo", 1);
@@ -381,6 +404,12 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOG_VEH:
                 view = new SViewVehicle(miClient, "Vehículos");
                 break;
+            case SModConsts.LOG_TRAILER:
+                view = new SViewTrailer(miClient, "Remolques");
+                break;
+            case SModConsts.LOG_BOL_PERSON:
+                view = new SViewBolPerson(miClient, "Figuras transporte");
+                break;
             case SModConsts.LOG_SHIP:
                 switch (params.getType()) {
                     case SModConsts.VIEW_SC_DET:
@@ -396,10 +425,14 @@ public class SModuleLog extends SGuiModule {
 
                 break;
                 
+            case SModConsts.LOG_INSURER:
+                view = new SViewInsurer(miClient, "Aseguradoras");
+                break;
+                
             case SModConsts.LOG_BOL:
                 view = new SViewBillOfLading(miClient, "Traslados");
                 break;
-
+                
             case SModConsts.LOGX_SHIP_AUTH:
                 switch (subtype) {
                     case SModSysConsts.TRNS_ST_DPS_AUTHORN_AUTHORN:
@@ -582,6 +615,18 @@ public class SModuleLog extends SGuiModule {
                 if (moFormVehicle == null) moFormVehicle = new SFormVehicle(miClient, "Vehículo");
                 form = moFormVehicle;
                 break;
+            case SModConsts.LOG_TRAILER:
+                if (moFormTrailer == null) moFormTrailer = new SFormTrailer(miClient, "Remolque");
+                form = moFormTrailer;
+                break;
+            case SModConsts.LOG_BOL_PERSON:
+                if (moFormBolPerson == null) moFormBolPerson = new SFormBolPerson(miClient, "Figura transporte");
+                form = moFormBolPerson;
+                break;
+            case SModConsts.LOG_INSURER:
+                if (moFormInsurer == null) moFormInsurer = new SFormInsurer(miClient, "Aseguradora");
+                form = moFormInsurer;
+                break;
             case SModConsts.LOG_SHIP:
                 if (moFormShipment == null) moFormShipment = new SFormShipment(miClient, miClient_xxx, "Embarque");
                 form = moFormShipment;
@@ -615,5 +660,25 @@ public class SModuleLog extends SGuiModule {
         }
 
         return guiReport;
+    }
+    
+    @Override
+    public void afterRegistrySaved() {
+        
+        if (moLastRegistry instanceof SDbBillOfLading){}
+        
+        switch (moLastRegistry.getRegistryType()) {
+            case SModConsts.LOG_BOL:
+                try {
+                    SCfdUtils.computeCfdiBol((SClientInterface) miClient, (SDbBillOfLading) moLastRegistry, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_BOL));
+                }
+                catch (java.lang.Exception e) {
+                    miClient.showMsgBoxError("Ha ocurrido una excepción al generar el CFD: " + e);
+                }
+                break;
+
+            default:
+            
+        }
     }
 }

@@ -19,6 +19,8 @@ import erp.mod.log.db.SDbBolMerchandise;
 import erp.mod.log.db.SDbBolMerchandiseQuantity;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.DefaultListModel;
@@ -39,7 +41,7 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Isabel Servín
  */
-public class SFormBolMerchandise extends SBeanForm implements ActionListener, ItemListener, ListSelectionListener {
+public class SFormBolMerchandise extends SBeanForm implements ActionListener, ItemListener, ListSelectionListener, FocusListener {
     
     public static final int MERCHANDISE_DISCHARGED = 1;
     public static final int MERCHANDISE_CHARGED = 2;
@@ -88,6 +90,15 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
                     SDataConstants.ITMU_ITEM, moKeyItem.getValue(), SLibConstants.EXEC_MODE_SILENT);
             moKeyUnit.setValue(new int[] { item.getFkUnitId()}); 
             
+        }
+    }
+    
+    private void actionUnit() {
+        if (moKeyUnit.getValue()[0] == 59) { // Kilo
+            moDecimalWeight.setEnabled(false);
+        }
+        else {
+            moDecimalWeight.setEnabled(true);
         }
     }
     
@@ -143,11 +154,11 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         moKeyItem = new sa.lib.gui.bean.SBeanFieldKey();
         jbItem = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
-        jlUnit = new javax.swing.JLabel();
-        moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel13 = new javax.swing.JPanel();
         jlQty = new javax.swing.JLabel();
         moDecimalQty = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jPanel13 = new javax.swing.JPanel();
+        jlUnit = new javax.swing.JLabel();
+        moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel5 = new javax.swing.JPanel();
         jlWeight = new javax.swing.JLabel();
         moDecimalWeight = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -187,21 +198,21 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlUnit.setText("Unidad*:");
-        jlUnit.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel9.add(jlUnit);
-
-        moKeyUnit.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel9.add(moKeyUnit);
+        jlQty.setText("Cantidad*:");
+        jlQty.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlQty);
+        jPanel9.add(moDecimalQty);
 
         jPanel7.add(jPanel9);
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlQty.setText("Cantidad*:");
-        jlQty.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel13.add(jlQty);
-        jPanel13.add(moDecimalQty);
+        jlUnit.setText("Unidad*:");
+        jlUnit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlUnit);
+
+        moKeyUnit.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel13.add(moKeyUnit);
 
         jPanel7.add(jPanel13);
 
@@ -282,6 +293,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         moKeyItem.setFieldButton(jbItem);
         moKeyUnit.setKeySettings(miClient, SGuiUtils.getLabelName(jlUnit.getText()), true);
         moDecimalQty.setDecimalSettings(SGuiUtils.getLabelName(jlQty.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
+        moDecimalWeight.setDecimalSettings(SGuiUtils.getLabelName(jlWeight), SGuiConsts.GUI_TYPE_DEC_QTY, true);
         moTextUuid.setTextSettings(SGuiUtils.getLabelName(jlWeight.getText()), 32);
         
         reloadCatalogues();
@@ -305,7 +317,8 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         moKeyItem.addItemListener(this);
         jbItem.addActionListener(this);
         jListItems.addListSelectionListener(this); 
-       
+        moKeyUnit.addItemListener(this);
+        moDecimalQty.addFocusListener(this);
     }
 
     @Override
@@ -313,6 +326,8 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         moKeyItem.removeItemListener(this);
         jbItem.removeActionListener(this);
         jListItems.removeListSelectionListener(this);
+        moKeyUnit.removeItemListener(this);
+        moDecimalQty.addFocusListener(this);
     }
 
     @Override
@@ -364,6 +379,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
             registry.setFkDestinationBizPartnerAddress_n(0);
             registry.setFkDestinationAddressAddress_n(0);
             registry.setXtaOriginBizPartnerBranchAddress(add);
+            registry.getXtaMerchandise().setWeight(registry.getXtaMerchandise().getWeight() + moDecimalWeight.getValue());
         }
         else if (mnFormSubtype == 1) {
             registry.setFkOriginBizPartnerAddress_n(0);
@@ -372,7 +388,6 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
             registry.setFkDestinationAddressAddress_n(moLocationKey[1]);
             registry.setXtaDestinationBizPartnerBranchAddress(add);
         }
-        registry.getXtaMerchandise().setWeight(moDecimalWeight.getValue());
         registry.getXtaMerchandise().setFkItemId(moKeyItem.getValue()[0]);
         registry.getXtaMerchandise().setFkUnitId(moKeyUnit.getValue()[0]);
         registry.getXtaMerchandise().updateSatCodes(miClient.getSession());
@@ -420,6 +435,9 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
             if (comboBox == moKeyItem) {
                 actionItem();
             }
+            else if (comboBox == moKeyUnit) {
+                actionUnit();
+            }
         }
     }
 
@@ -430,8 +448,18 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         for (SDbBolMerchandise merch : moBillOfLading.getBolMerchandises()){
             if (merch.getFkItemId() == item.getPkItemId()) {
                 moKeyUnit.setValue(new int[] { merch.getFkUnitId()});
-                moDecimalWeight.setValue(merch.getWeight()); 
             }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (moKeyUnit.getValue()[0] == 59) { // Kilo
+             moDecimalWeight.setValue(moDecimalQty.getValue());
         }
     }
 }

@@ -40,6 +40,7 @@
   <xsl:include href="https://facturacion.finkok.com/static/cfdi/xslt/3.3/complementos/terceros11.xslt"/>
   <xsl:include href="https://facturacion.finkok.com/static/cfdi/xslt/3.3/complementos/Pagos10.xslt"/>
   <xsl:include href="https://facturacion.finkok.com/static/cfdi/xslt/3.3/complementos/detallista.xslt"/>
+  <xsl:include href="http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/CartaPorte20.xslt"/>
   <!--xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/EstadoDeCuentaCombustible/ecc11.xslt"/> 
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/donat/donat11.xslt"/>
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/divisas/divisas.xslt"/>

@@ -3148,9 +3148,7 @@ public abstract class SDataUtilities {
         request = new SServerRequest(SServerConstants.REQ_REPS);
         request.setRegistryType(reportType);
         request.setPacket(map);
-        response = client.getSessionXXX().request(request);
         
-        response = client.getSessionXXX().request(request);
         response = client.getSessionXXX().request(request);
         
         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {

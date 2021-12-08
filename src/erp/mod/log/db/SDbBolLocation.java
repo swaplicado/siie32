@@ -9,6 +9,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,7 +27,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbBolLocation extends SDbRegistryUser implements SGridRow {
+public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Serializable {
 
     protected final SDbBillOfLading moBillOfLading;
     
@@ -434,13 +435,14 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow {
         
         registry.setXtaBizPartner(this.getXtaBizPartner());
         registry.setXtaBizPartnerBranch(this.getXtaBizPartnerBranch());
+        registry.setXtaBizPartnerBranchAddress(this.getXtaBizPartnerBranchAddress());
+        registry.setXtaLocationType(this.getXtaLocationType()); 
         registry.setXtaIsOrigin(this.getXtaIsOrigin());
         registry.setXtaIsDestination(this.getXtaIsDestination());
-        registry.setXtaRowsCurrentCharge(this.getXtaRowsCurrentCharge());
-        registry.setXtaRowsPrecharged(this.getXtaRowsPrecharged());
-        registry.setXtaLocationType(this.getXtaLocationType()); 
         registry.setXtaMerchandiseQuantityCharge(this.getXtaMerchandiseQuantityCharge());
         registry.setXtaMerchandiseQuantityDischarge(this.getXtaMerchandiseQuantityDischarge());
+        registry.setXtaRowsCurrentCharge(this.getXtaRowsCurrentCharge());
+        registry.setXtaRowsPrecharged(this.getXtaRowsPrecharged());
         
         return registry;
     }

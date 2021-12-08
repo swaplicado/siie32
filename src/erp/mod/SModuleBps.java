@@ -168,6 +168,13 @@ public class SModuleBps extends SGuiModule {
                         + "WHERE b_del = 0 AND b_att_sal_agt = TRUE "
                         + "ORDER BY bp, id_bp ";
                 break;
+            case SModConsts.LOCU_STA:
+                settings = new SGuiCatalogueSettings("Estados", 1);
+                sql = "SELECT id_sta AS " + SDbConsts.FIELD_ID + "1, sta AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.LOCU_STA) + " "
+                        + "WHERE b_del = 0 " 
+                        + "ORDER BY sta";
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

@@ -7,6 +7,7 @@ package erp.mod.log.db;
 
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,7 +22,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridRow {
+public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridRow, Serializable {
 
     protected int mnPkBolId;
     protected int mnPkMerchandiseId;
@@ -254,7 +255,10 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
         registry.setFkOriginAddressAddress_n(this.getFkOriginAddressAddress_n());
         registry.setFkDestinationBizPartnerAddress_n(this.getFkDestinationBizPartnerAddress_n());
         registry.setFkDestinationAddressAddress_n(this.getFkDestinationAddressAddress_n());
+        
         registry.setXtaMerchandise(this.getXtaMerchandise());
+        registry.setXtaOriginBizPartnerBranchAddress(this.getXtaOriginBizPartnerBranchAddress());
+        registry.setXtaDestinationBizPartnerBranchAddress(this.getXtaDestinationBizPartnerBranchAddress());
         registry.setXtaItemName(this.getXtaItemName());
         registry.setXtaUnitName(this.getXtaUnitName());
 
