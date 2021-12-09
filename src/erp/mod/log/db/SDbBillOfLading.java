@@ -64,11 +64,13 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     protected String msEnvironmentalInsurerPolicy;
     protected String msMerchandiseInsurerPolicy;
     protected String msPremium;
+    protected String msBillOfLadingType;
     protected int mnFkCompanyBranchId;
     protected int mnFkInputOutputCountry;
     protected int mnFkGrossWeightUnit;
     protected int mnFkEnvironmentalInsurer_n;
     protected int mnFkMerchandiseInsurer_n;
+    protected int mnFkBolStatusId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -177,12 +179,14 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public void setEnviromentalInsurerPolicy(String s) { msEnvironmentalInsurerPolicy = s; }
     public void setMerchandiseInsurerPolicy(String s) { msMerchandiseInsurerPolicy = s; }
     public void setPremium(String s) { msPremium = s; }
+    public void setBillOfLadingType(String s) { msBillOfLadingType = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
     public void setFkInputOutputCountry(int n) { mnFkInputOutputCountry = n; }
     public void setFkGrossWeightUnit(int n) { mnFkGrossWeightUnit = n; }
     public void setFkEnvironmentalInsurer_n(int n) { mnFkEnvironmentalInsurer_n = n; }
     public void setFkMerchandiseInsurer_n(int n) { mnFkMerchandiseInsurer_n = n; }
+    public void setFkBolStatusId(int n) { mnFkBolStatusId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -203,12 +207,14 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public String getEnviromentalInsurerPolicy() { return msEnvironmentalInsurerPolicy; }
     public String getMerchandiseInsurerPolicy() { return msMerchandiseInsurerPolicy; }
     public String getPremium() { return msPremium; }
+    public String getBillOfLadingType() { return msBillOfLadingType; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkInputOutputCountry() { return mnFkInputOutputCountry; }
     public int getFkGrossWeightUnit() { return mnFkGrossWeightUnit; }
     public int getFkEnvironmentalInsurer_n() { return mnFkEnvironmentalInsurer_n; }
     public int getFkMerchandiseInsurer_n() { return mnFkMerchandiseInsurer_n; }
+    public int getFkBolStatusId() { return mnFkBolStatusId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -287,12 +293,14 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         msEnvironmentalInsurerPolicy = "";
         msMerchandiseInsurerPolicy = "";
         msPremium = "";
+        msBillOfLadingType = "";
         mbDeleted = false;
         mnFkCompanyBranchId = 0;
         mnFkInputOutputCountry = 0;
         mnFkGrossWeightUnit = 0;
         mnFkEnvironmentalInsurer_n = 0;
         mnFkMerchandiseInsurer_n = 0;
+        mnFkBolStatusId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -375,12 +383,14 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             msEnvironmentalInsurerPolicy = resultSet.getString("environmental_ins_policy");
             msMerchandiseInsurerPolicy = resultSet.getString("merchandise_ins_policy");
             msPremium = resultSet.getString("premium");
+            msBillOfLadingType = resultSet.getString("bol_tp");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkCompanyBranchId = resultSet.getInt("fk_cob");
             mnFkInputOutputCountry = resultSet.getInt("fk_input_output_cty");
             mnFkGrossWeightUnit = resultSet.getInt("fk_gross_weight_unit");
             mnFkEnvironmentalInsurer_n = resultSet.getInt("fk_environmental_ins_n");
             mnFkMerchandiseInsurer_n = resultSet.getInt("fk_merchandise_ins_n");
+            mnFkBolStatusId = resultSet.getInt("fk_st_bol");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -472,12 +482,14 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 "'" + msEnvironmentalInsurerPolicy + "', " + 
                 "'" + msMerchandiseInsurerPolicy + "', " + 
                 "'" + msPremium + "', " + 
+                "'" + msBillOfLadingType + "', " + 
                 (mbDeleted ? 1 : 0) + ", " + 
                 mnFkCompanyBranchId + ", " +
                 (mnFkInputOutputCountry == 0 ? "NULL, " : mnFkInputOutputCountry + ", ") + 
                 mnFkGrossWeightUnit + ", " + 
                 (mnFkEnvironmentalInsurer_n == 0 ? "NULL, " : mnFkEnvironmentalInsurer_n + ", ") + 
                 (mnFkMerchandiseInsurer_n == 0 ? "NULL, " : mnFkMerchandiseInsurer_n + ", ") + 
+                mnFkBolStatusId + ", " + 
                 mnFkUserInsertId + ", " + 
                 mnFkUserUpdateId + ", " + 
                 "NOW()" + ", " + 
@@ -557,12 +569,14 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         registry.setEnviromentalInsurerPolicy(this.getEnviromentalInsurerPolicy());
         registry.setMerchandiseInsurerPolicy(this.getMerchandiseInsurerPolicy());
         registry.setPremium(this.getPremium());
+        registry.setBillOfLadingType(this.getBillOfLadingType());
         registry.setDeleted(this.isDeleted());
         registry.setFkCompanyBranchId(this.getFkCompanyBranchId());
         registry.setFkInputOutputCountry(this.getFkInputOutputCountry());
         registry.setFkGrossWeightUnit(this.getFkGrossWeightUnit());
         registry.setFkEnvironmentalInsurer_n(this.getFkEnvironmentalInsurer_n());
         registry.setFkMerchandiseInsurer_n(this.getFkMerchandiseInsurer_n());
+        registry.setFkBolStatusId(this.getFkBolStatusId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
@@ -757,7 +771,6 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             concepto.setDescuento(0);
 
             conceptos.add(concepto);
-            break;
         }
 
         return conceptos;

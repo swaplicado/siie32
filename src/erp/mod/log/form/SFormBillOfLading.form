@@ -63,7 +63,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                 <Property name="columns" type="int" value="1"/>
-                <Property name="rows" type="int" value="16"/>
+                <Property name="rows" type="int" value="17"/>
                 <Property name="verticalGap" type="int" value="5"/>
               </Layout>
               <SubComponents>
@@ -90,6 +90,28 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextTaxRegime">
                       <Properties>
                         <Property name="toolTipText" type="java.lang.String" value="Regimen fiscal"/>
+                        <Property name="enabled" type="boolean" value="false"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel46">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JLabel" name="jlBolTp">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="CFDI tipo:*"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[125, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextBolTp">
+                      <Properties>
                         <Property name="enabled" type="boolean" value="false"/>
                       </Properties>
                     </Component>

@@ -54,8 +54,8 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     private javax.swing.JButton jbRestoreCfdCancelAck;
     private javax.swing.JButton jbDeactivateFlags;
     
-    public SViewBillOfLading(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_BOL, SLibConstants.UNDEFINED, title);
+    public SViewBillOfLading(SGuiClient client, int subType, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_BOL, subType, title);
         setRowButtonsEnabled(true, false, true, false, true);
         
         initComponetsCustom();
@@ -133,7 +133,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreCfdCancelAck);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDeactivateFlags);
     }
-
+    
     private void actionPrint() {
         if (jbPrint.isEnabled()) {
             if (jtTable.getSelectedRow() < 0) {

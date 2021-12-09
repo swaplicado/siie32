@@ -478,7 +478,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.LOGX_SHIP_DPS_SAL, SModConsts.VIEW_ST_DONE, new SGuiParams(SModConsts.VIEW_SC_SUM));
             }
             else if (item == jmiShipmentBol) {
-                miClient.getSession().showView(SModConsts.LOG_BOL, SLibConstants.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.LOG_BOL, SDataConstantsSys.TRNS_TP_CFD_BOL, null);
             }
             else if (item == jmiRepRate) {
                 new SDialogRepRate(miClient.getSession().getClient(), "Listado de tarifas").setVisible(true);

@@ -85,7 +85,8 @@ public class SModuleLog extends SGuiModule {
     private SFormBolPerson moFormBolPerson;
     private SFormInsurer moFormInsurer;
     private SFormShipment moFormShipment;
-    private SFormBillOfLading moFormBillOfLading;
+    private SFormBillOfLading moFormBillOfLadingTypeT;
+    private SFormBillOfLading moFormBillOfLadingTypeI;
     private SFormShipmentDelivery moFormShipmentDelivery;
 
     private final SClientInterface miClient_xxx;
@@ -430,7 +431,7 @@ public class SModuleLog extends SGuiModule {
                 break;
                 
             case SModConsts.LOG_BOL:
-                view = new SViewBillOfLading(miClient, "Traslados");
+                view = new SViewBillOfLading(miClient, subtype, "Carta porte T");
                 break;
                 
             case SModConsts.LOGX_SHIP_AUTH:
@@ -632,8 +633,14 @@ public class SModuleLog extends SGuiModule {
                 form = moFormShipment;
                 break;
             case SModConsts.LOG_BOL:
-                if (moFormBillOfLading == null) moFormBillOfLading = new SFormBillOfLading(miClient, "Traslados");
-                form = moFormBillOfLading;
+                switch (subtype) {
+                    case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                        if (moFormBillOfLadingTypeT == null) moFormBillOfLadingTypeT = new SFormBillOfLading(miClient, "Traslados", subtype);
+                        form = moFormBillOfLadingTypeT;
+                        break;
+                    case SDataConstantsSys.TRNS_TP_CFD_INV:
+                    default:        
+                }
                 break;
             case SModConsts.LOGX_SHIP_DLY:
                 if (moFormShipmentDelivery == null) moFormShipmentDelivery = new SFormShipmentDelivery(miClient, "Asignación fecha de entrega real");
