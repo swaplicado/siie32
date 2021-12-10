@@ -386,7 +386,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             msBillOfLadingType = resultSet.getString("bol_tp");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkCompanyBranchId = resultSet.getInt("fk_cob");
-            mnFkInputOutputCountry = resultSet.getInt("fk_input_output_cty");
+            mnFkInputOutputCountry = resultSet.getInt("fk_input_output_cty_n");
             mnFkGrossWeightUnit = resultSet.getInt("fk_gross_weight_unit");
             mnFkEnvironmentalInsurer_n = resultSet.getInt("fk_environmental_ins_n");
             mnFkMerchandiseInsurer_n = resultSet.getInt("fk_merchandise_ins_n");
@@ -516,7 +516,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 "premium = '" + msPremium + "', " +
                 "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                 "fk_cob = " + mnFkCompanyBranchId + ", " +
-                "fk_input_output_cty = " + (mnFkInputOutputCountry == 0 ? "NULL, " : mnFkInputOutputCountry + ", ") +
+                "fk_input_output_cty_n = " + (mnFkInputOutputCountry == 0 ? "NULL, " : mnFkInputOutputCountry + ", ") +
                 "fk_gross_weight_unit = " + mnFkGrossWeightUnit + ", " +
                 "fk_environmental_ins_n = " + (mnFkEnvironmentalInsurer_n == 0 ? "NULL, " : mnFkEnvironmentalInsurer_n + ", ") +
                 "fk_merchandise_ins_n = " + (mnFkMerchandiseInsurer_n == 0 ? "NULL, " : mnFkMerchandiseInsurer_n + ", ") +
