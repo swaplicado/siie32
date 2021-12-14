@@ -1614,13 +1614,13 @@ public abstract class SCfdUtils implements Serializable {
                             }
                             else if (elementFolios.getValue().getFolio().isEmpty()) {
                                 // Sign & Cancel Log step #4
-                                createSignCancelLogEntry(client, "Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_RECV_ERR, cfd, pac.getPkPacId());
+                                createSignCancelLogEntry(client, "Código PAC: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_RECV_ERR, cfd, pac.getPkPacId());
 
                                 updateCfdProcessingFlags(client, cfd, false);
                                 client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
                                 if (pacId == 0) {
-                                    throw new Exception("Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.");
+                                    throw new Exception("Código PAC: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.");
                                 }
                                 next = false;
                             }
@@ -3069,7 +3069,7 @@ public abstract class SCfdUtils implements Serializable {
                         }
                     }
 
-                    if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                    if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         // Open Sign & Cancel Log entry:
 
                         LogSignId = 0;

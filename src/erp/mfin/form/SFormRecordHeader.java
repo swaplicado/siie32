@@ -46,7 +46,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
     private erp.lib.form.SFormField moFieldFkAccountCashId_n;
     private java.lang.String msDefaultRecordType;
 
-    /** Creates new form SFormRecord */
+    /** Creates new form SFormRecordHeader */
     public SFormRecordHeader(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;

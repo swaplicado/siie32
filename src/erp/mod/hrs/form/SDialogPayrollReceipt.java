@@ -1596,6 +1596,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                     }
 
                     // resetting of specialized fields related to other payments:
+                    
                     moKeyEarningOtherPaymentType.setEnabled(moEarning.getFkOtherPaymentTypeId() == SModSysConsts.HRSS_TP_OTH_PAY_OTH);
                     moKeyEarningOtherPaymentType.removeItemListener(this); // prevent from triggering unwished item-state-changed event
                     moKeyEarningOtherPaymentType.setValue(new int[] { moEarning.getFkOtherPaymentTypeId() }); // will not trigger an item-state-changed event

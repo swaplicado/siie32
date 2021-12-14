@@ -44,6 +44,7 @@ import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.data.SDataExchangeRate;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
+import erp.mfin.data.SDataRecordType;
 import erp.mfin.data.SDataTax;
 import erp.mfin.data.SProcAccountBizPartnerBpTypeVal;
 import erp.mfin.data.SProcAccountBizPartnerBpVal;
@@ -678,6 +679,9 @@ public abstract class SDataUtilities {
                 registry = new SDataItem();
                 break;
 
+            case SDataConstants.FINU_TP_REC:
+                registry = new SDataRecordType();
+                break;
             case SDataConstants.FINU_TAX:
                 registry = new SDataTax();
                 break;
@@ -2183,6 +2187,11 @@ public abstract class SDataUtilities {
         return tDateLeadtime;
     }
 
+    /**
+     * Show DLPS record.
+     * @param client
+     * @param dps 
+     */
     public static void showDpsRecord(erp.client.SClientInterface client, erp.mtrn.data.SDataDps dps) {
         if (dps.getIsRecordAutomatic() && !dps.getAuxIsFormerRecordAutomatic() && dps.getDbmsRecordKey() != null) {
             Object[] key = (Object[]) dps.getDbmsRecordKey();
@@ -3390,6 +3399,15 @@ public abstract class SDataUtilities {
         return msg;
     }
 
+    /**
+     * Validate exchange rate.
+     * @param client
+     * @param valCy
+     * @param excRate
+     * @param val
+     * @param field
+     * @return 
+     */
     public static java.lang.String validateExchangeRate(erp.client.SClientInterface client, double valCy, double excRate, double val, java.lang.String field) {
         int decs = client.getSessionXXX().getParamsErp().getDecimalsValue();
         String msg = "";
@@ -3406,6 +3424,14 @@ public abstract class SDataUtilities {
         return msg;
     }
 
+    /**
+     * Validate DPS entry reference.
+     * @param session
+     * @param dpsClassKey
+     * @param reference
+     * @param dpsCurrentKey
+     * @throws Exception 
+     */
     public static void validateDpsEtyReference(final SGuiSession session, final int[] dpsClassKey, final String reference, final int[] dpsCurrentKey) throws Exception {
         int i = 0;
         String sql = "";

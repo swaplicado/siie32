@@ -466,8 +466,8 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     
     private void setBenefitAnniv(final int benefitAnniv) {
         moIntSeniority.setValue(benefitAnniv);
-        moIntSeniorityDays.setValue((int) SLibTimeUtils.getDaysDiff(mtDateCutoff, SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0)));
-        moIntDaysElapsed.setValue((int) SLibTimeUtils.getDaysDiff(mtDateCutoff, moDateBaseDate.getValue()));
+        moIntSeniorityDays.setValue(SLibTimeUtils.countPeriodDays(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0), mtDateCutoff));
+        moIntDaysElapsed.setValue(SLibTimeUtils.countPeriodDays(moDateBaseDate.getValue(), mtDateCutoff));
     }
     
     private void loadBenefitTables(SDbBenefitTable benefitTable, SDbBenefitTable benefitTableAux) throws Exception {

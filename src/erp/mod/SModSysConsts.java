@@ -934,13 +934,13 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_BEN_VAC = 21;       // Loan
     public static final int HRSS_TP_BEN_VAC_BON = 22;   // Home credit
 
-    public static final int HRSS_TP_LOAN_NON = 1;       // Non applicable
-    public static final int HRSS_TP_LOAN_LOAN_COM = 2;  // Company loans
-    public static final int HRSS_TP_LOAN_LOAN_UNI = 3;  // Union loans
-    public static final int HRSS_TP_LOAN_LOAN_3RD = 4;  // Third parties loans
-    public static final int HRSS_TP_LOAN_LOAN_GLASS = 6; // Glasses loans
-    public static final int HRSS_TP_LOAN_HOME = 11;     // Home credit
-    public static final int HRSS_TP_LOAN_CONS = 12;     // Consumer credit
+    public static final int HRSS_TP_LOAN_NON = 1;           // Non applicable
+    public static final int HRSS_TP_LOAN_LOAN_COM = 2;      // Company loans
+    public static final int HRSS_TP_LOAN_LOAN_UNI = 3;      // Union loans
+    public static final int HRSS_TP_LOAN_LOAN_3RD = 4;      // Third parties loans
+    public static final int HRSS_TP_LOAN_LOAN_GLASS = 6;    // Glasses loans
+    public static final int HRSS_TP_LOAN_HOME = 11;         // Home credit
+    public static final int HRSS_TP_LOAN_CONS = 12;         // Consumer credit
 
     public static final int HRSS_TP_LOAN_PAY_AMT = 1;       // Amount
     public static final int HRSS_TP_LOAN_PAY_FACT_SAL = 2;  // Factor Salary

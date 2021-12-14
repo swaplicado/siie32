@@ -175,8 +175,8 @@ public final class SPickerAccount extends JDialog implements MouseListener, KeyL
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-496)/2, (screenSize.height-338)/2, 496, 338);
+        setSize(new java.awt.Dimension(656, 439));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jrbFindByNumberItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbFindByNumberItemStateChanged
@@ -241,10 +241,10 @@ public final class SPickerAccount extends JDialog implements MouseListener, KeyL
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> columns = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ACC, SGuiConsts.TXT_LBL_NUM, 100));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, SGuiConsts.TXT_LBL_NAME, 300));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ACC, SGuiConsts.TXT_LBL_NUM, 150));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, SGuiConsts.TXT_LBL_NAME, 400));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, SGridConsts.COL_TITLE_IS_DEL));
 
                 return columns;
@@ -260,10 +260,10 @@ public final class SPickerAccount extends JDialog implements MouseListener, KeyL
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> columns = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, SGuiConsts.TXT_LBL_NAME, 300));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ACC, SGuiConsts.TXT_LBL_NUM, 100));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, SGuiConsts.TXT_LBL_NAME, 400));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ACC, SGuiConsts.TXT_LBL_NUM, 150));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, SGridConsts.COL_TITLE_IS_DEL));
 
                 return columns;

@@ -1,4 +1,19 @@
 ================================================================================
+SIIE 3.2 193.3*/ 2021-12-14
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de modificación de cuenta de dinero en pólizas contables.
+
+================================================================================
+SIIE 3.2 193.2*/ 2021-12-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al cálculo de pago de créditos y préstamos para considerar el nuevo tipo de préstamo 'lentes'.
+2) Corrección al diálogo del cárdex de pagos de créditos y préstamos para cerrarse con la tecla Escape.
+3) Ampliación al tamaño de columna de notas de las vistas de ajustes de incrementos y decrementos de créditos y préstamos.
+4) Ampliación al tamaño del diálogo option picker de cuentas contables.
+
+================================================================================
 SIIE 3.2 193.1*/ 2021-11-27
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -29,7 +29,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
     
@@ -259,8 +259,8 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         SGuiUtils.setWindowBounds(this, 800, 500);
         mtDateCut = null;
         
-        jbSave.setText("Cerrar");
-        jbCancel.setEnabled(false);
+        jbSave.setEnabled(false);
+        jbCancel.setText("Cerrar");
 
         moTextEmployeeName.setTextSettings(SGuiUtils.getLabelName(jlEmployeeName), 150);
         moTextLoanType.setTextSettings(SGuiUtils.getLabelName(jlLoanType), 150);

@@ -28,6 +28,7 @@ import erp.mfin.data.SDataCheck;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataRecordEntryRow;
+import erp.mfin.data.SDataRecordType;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinConsts;
 import erp.mtrn.data.SCfdUtils;
@@ -49,6 +50,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.xml.SXmlUtils;
 
 /**
@@ -71,6 +73,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private final erp.client.SClientInterface miClient;
 
     private erp.mfin.data.SDataRecord moRecord;
+    private erp.mfin.data.SDataRecordType moRecordType;
     private erp.mfin.data.SDataAccountCash moAccountCash;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldConcept;
@@ -135,7 +138,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jlConcept = new javax.swing.JLabel();
         jtfConcept = new javax.swing.JTextField();
         jckIsRecordConceptCopyEnabled = new javax.swing.JCheckBox();
-        jlConcept1 = new javax.swing.JLabel();
+        jlXmlFiles = new javax.swing.JLabel();
         jtfXmlFilesNumber = new javax.swing.JTextField();
         jbAddXml = new javax.swing.JButton();
         jbRecordToRecordEntryXml = new javax.swing.JButton();
@@ -144,6 +147,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jlFkAccountCashId_n = new javax.swing.JLabel();
         jcbFkAccountCashId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jtfAccountCashCurrencyKey = new javax.swing.JTextField();
+        jbAccountCashEdit = new javax.swing.JButton();
         jpRecord2 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         jlDebit = new javax.swing.JLabel();
@@ -337,10 +341,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jckIsRecordConceptCopyEnabled.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(jckIsRecordConceptCopyEnabled);
 
-        jlConcept1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlConcept1.setText("Archivos XML CFD:");
-        jlConcept1.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlConcept1);
+        jlXmlFiles.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlXmlFiles.setText("Archivos XML CFD:");
+        jlXmlFiles.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlXmlFiles);
 
         jtfXmlFilesNumber.setEditable(false);
         jtfXmlFilesNumber.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -374,7 +378,6 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jlFkAccountCashId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlFkAccountCashId_n);
 
-        jcbFkAccountCashId_n.setEnabled(false);
         jcbFkAccountCashId_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel9.add(jcbFkAccountCashId_n);
 
@@ -384,6 +387,11 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jtfAccountCashCurrencyKey.setFocusable(false);
         jtfAccountCashCurrencyKey.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jtfAccountCashCurrencyKey);
+
+        jbAccountCashEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbAccountCashEdit.setToolTipText("Modificar cuenta dinero");
+        jbAccountCashEdit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jbAccountCashEdit);
 
         jpRecord1.add(jPanel9);
 
@@ -984,6 +992,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbAddXml.addActionListener(this);
         jbRecordToRecordEntryXml.addActionListener(this);
         jbGetXml.addActionListener(this);
+        jbAccountCashEdit.addActionListener(this);
         jbEntryNew.addActionListener(this);
         jbEntryNewCopy.addActionListener(this);
         jbEntryNewInsert.addActionListener(this);
@@ -1072,7 +1081,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void updateRecord() {
+    private void updateRecord() throws Exception {
+        if (moRecordType.getIsAccountCashRequired() && jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
+            jcbFkAccountCashId_n.requestFocusInWindow();
+            throw new Exception(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkAccountCashId_n.getText() + "'.");
+        }
+        
         moRecord.setDate(moFieldDate.getDate());
         moRecord.setConcept(moFieldConcept.getString());
         if (moFieldFkAccountCashId_n.getComponent().isEnabled()) {
@@ -1147,16 +1161,11 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private void renderAccountCashSettings() {
         if (jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
             moAccountCash = null;
-        }
-        else {
-            moAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, moFieldFkAccountCashId_n.getKey(), SLibConstants.EXEC_MODE_SILENT);
-        }
-
-        if (moAccountCash == null) {
             jtfAccountCashCurrencyKey.setText("");
         }
         else {
-            jtfAccountCashCurrencyKey.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { moAccountCash.getFkCurrencyId() }, SLibConstants.DESCRIPTION_CODE));
+            moAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, moFieldFkAccountCashId_n.getKey(), SLibConstants.EXEC_MODE_SILENT);
+            jtfAccountCashCurrencyKey.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moAccountCash.getFkCurrencyId() }));
         }
     }
 
@@ -1272,7 +1281,17 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
     
-    private void actionPerformedEntryNew() {
+    private void actionPerformedAccountCashEdit() {
+        if (jbAccountCashEdit.isEnabled()) {
+            if (miClient.showMsgBoxConfirm("¿Está seguro que desea modificar el valor del campo '" + SGuiUtils.getLabelName(jlFkAccountCashId_n) + "'?") == JOptionPane.YES_OPTION) {
+                jbAccountCashEdit.setEnabled(false);
+                jcbFkAccountCashId_n.setEnabled(true);
+                jcbFkAccountCashId_n.requestFocusInWindow();
+            }
+        }
+    }
+    
+    private void actionPerformedEntryNew() throws Exception {
         if (jbEntryNew.isEnabled()) {
             SDataRecordEntry entry = null;
 
@@ -1315,7 +1334,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedEntryNewCopy() {
+    private void actionPerformedEntryNewCopy() throws Exception {
         if (jbEntryNewCopy.isEnabled()) {
             int index = moPaneGridEntries.getTable().getSelectedRow();
             SDataRecordEntry entry = null;
@@ -1357,7 +1376,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedEntryNewInsert() {
+    private void actionPerformedEntryNewInsert() throws Exception {
         if (jbEntryNewInsert.isEnabled()) {
             int index = moPaneGridEntries.getTable().getSelectedRow();
             SDataRecordEntry entry = null;
@@ -1403,7 +1422,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedEntryEdit() {
+    private void actionPerformedEntryEdit() throws Exception {
         if (jbEntryEdit.isEnabled()) {
             int index = moPaneGridEntries.getTable().getSelectedRow();
             SDataRecordEntry entry = null;
@@ -1594,7 +1613,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedMoneyInOut(final SDataAccountCash cash_n, final boolean in) {
+    private void actionPerformedMoneyInOut(final SDataAccountCash cash_n, final boolean in) throws Exception {
         updateRecord();
 
         moFormMoneyInOut.formRefreshCatalogues();
@@ -1614,7 +1633,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedMoneyInOutBizPartner(final int bizPartnerCategoryX, final int[] keyAccountingMoveSubclass) {
+    private void actionPerformedMoneyInOutBizPartner(final int bizPartnerCategoryX, final int[] keyAccountingMoveSubclass) throws Exception {
+        updateRecord();
+        
         moFormMoneyInOutBizPartner.setValue(SDataConstants.FIN_REC, moRecord);
         moFormMoneyInOutBizPartner.setValue(SDataConstants.BPSU_BP, bizPartnerCategoryX);
         moFormMoneyInOutBizPartner.setValue(SDataConstants.FINS_CLS_ACC_MOV, keyAccountingMoveSubclass);
@@ -1644,6 +1665,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 dialog = moDialogPaymentCus;
                 break;
             default:
+                // do nothing
         }
         
         if (dialog != null) {
@@ -1701,7 +1723,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 dialog = moDialogPaymentCompleteCus;
                 break;
             default:
-            
+                // do nothing
         }
         
         if (dialog != null) {
@@ -1796,7 +1818,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedCheck() {
+    private void actionPerformedCheck() throws Exception {
         updateRecord();
 
         moFormMoneyOutCheck.setValue(SDataConstants.FIN_REC, moRecord);
@@ -1815,10 +1837,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedTransfer() {
-        int userId = 0;
-        SDataRecord record = null;
-
+    private void actionPerformedTransfer() throws Exception {
         updateRecord();
 
         moFormMoneyOutTransfer.setValue(SDataConstants.FIN_REC, moRecord);
@@ -1827,8 +1846,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moFormMoneyOutTransfer.setFormVisible(true);
 
         if (moFormMoneyOutTransfer.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            userId = obtainNextUserId();
-            record = (SDataRecord) moFormMoneyOutTransfer.getRegistry();
+            int userId = obtainNextUserId();
+            SDataRecord record = (SDataRecord) moFormMoneyOutTransfer.getRegistry();
 
             if (record.getDbmsRecordEntries().size() > 0) {
                 for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
@@ -1903,19 +1922,39 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     }
 
     public void publicActionEntryNew() {
-        actionPerformedEntryNew();
+        try {
+            actionPerformedEntryNew();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     public void publicActionEntryNewInsert() {
-        actionPerformedEntryNewInsert();
+        try {
+            actionPerformedEntryNewInsert();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     public void publicActionEntryNewCopy() {
-        actionPerformedEntryNewCopy();
+        try {
+            actionPerformedEntryNewCopy();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     public void publicActionEntryEdit() {
-        actionPerformedEntryEdit();
+        try {
+            actionPerformedEntryEdit();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     public void publicActionEntryDelete() {
@@ -1957,6 +1996,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbAccountCashEdit;
     private javax.swing.JButton jbAddXml;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbCdtAdvanceCus;
@@ -2019,7 +2059,6 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JLabel jlBalance;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlConcept;
-    private javax.swing.JLabel jlConcept1;
     private javax.swing.JLabel jlCredit;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDebit;
@@ -2027,6 +2066,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JLabel jlGuiConceptPolicy;
     private javax.swing.JLabel jlPeriod;
     private javax.swing.JLabel jlPkNumberId;
+    private javax.swing.JLabel jlXmlFiles;
     private javax.swing.JPanel jpCommands;
     private javax.swing.JPanel jpCommands11;
     private javax.swing.JPanel jpCommands12;
@@ -2077,6 +2117,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         mbFirstTime = true;
 
         moRecord = null;
+        moRecordType = null;
         moAccountCash = null;
         mbOriginalIsDeleted = false;
         msAuxLastEntryConcept = "";
@@ -2102,6 +2143,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jftDate.setFocusable(true);
         jtfConcept.setEditable(true);
         jtfConcept.setFocusable(true);
+        jcbFkAccountCashId_n.setEnabled(false); // by default, is read only
+        jbAccountCashEdit.setEnabled(false);
         
         jbDate.setEnabled(true);
         jbAddXml.setEnabled(true);
@@ -2193,41 +2236,47 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_DATE_REC);
                 validation.setComponent(jftDate);
             }
+            else if (moRecordType.getIsAccountCashRequired() && jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkAccountCashId_n.getText() + "'.");
+                validation.setComponent(jcbFkAccountCashId_n);
+            }
+            if (moFieldIsDeleted.getBoolean()) {
+                int deleted = 0;
 
-            if (!validation.getIsError()) {
-                if (moFieldIsDeleted.getBoolean()) {
-                    int deleted = 0;
-
-                    for (STableRow row : moPaneGridEntries.getGridRows()) {
-                        SDataRecordEntry entry = (SDataRecordEntry) row.getData();
-                        if (entry.getIsSystem() && entry.getUserId() == 0) {
-                            deleted++;
-                        }
-                    }
-                    
-                    if (deleted > 0) {
-                        validation.setMessage("No se puede eliminar esta póliza contable porque tiene " + SLibUtils.DecimalFormatInteger.format(deleted) + " " + (deleted == 1 ? "partida" : "partidas") + " de sistema.");
+                for (STableRow row : moPaneGridEntries.getGridRows()) {
+                    SDataRecordEntry entry = (SDataRecordEntry) row.getData();
+                    if (entry.getIsSystem() && entry.getUserId() == 0) {
+                        deleted++;
                     }
                 }
 
-                if (!validation.getIsError()) {
-                    if (jcbFkAccountCashId_n.getSelectedIndex() > 0) {
-                        String currency = "";
-                        SDataRecordEntry entry = null;
+                if (deleted > 0) {
+                    validation.setMessage("No se puede eliminar esta póliza contable porque tiene " + SLibUtils.DecimalFormatInteger.format(deleted) + " " + (deleted == 1 ? "partida" : "partidas") + " de sistema.");
+                }
+            }
 
+            if (!validation.getIsError()) {
+                if (jcbFkAccountCashId_n.getSelectedIndex() > 0) {
+                    try {
+                        updateRecord();
+                    }
+                    catch (Exception e) {
+                        validation.setMessage(e.getMessage());
+                    }
+                    
+                    if (!validation.getIsError()) {
                         // Validate account cash currency:
 
-                        updateRecord();
-                        currency = SDataReadDescriptions.getCatalogueDescription(miClient,
-                                SDataConstants.CFGU_CUR, new int[] { moRecord.getDbmsDataAccountCash().getFkCurrencyId() });
+                        String currency = miClient.getSession().getSessionCustom().getCurrency(new int[] { moRecord.getDbmsDataAccountCash().getFkCurrencyId() });
 
                         for (STableRow row : moPaneGridEntries.getGridRows()) {
-                            entry = (SDataRecordEntry) row.getData();
+                            SDataRecordEntry entry = (SDataRecordEntry) row.getData();
+
                             if (!entry.getIsDeleted() && !entry.getIsExchangeDifference()) {
                                 if (entry.getFkCurrencyId() != moRecord.getDbmsDataAccountCash().getFkCurrencyId()) {
                                     if (miClient.showMsgBoxConfirm("Al menos una de las monedas de las partidas no coincide con " +
                                             "la moneda de la cuenta de efectivo de la póliza contable (" + currency + ").\n¿Desea continuar?") != JOptionPane.YES_OPTION) {
-                                        validation.setMessage("Se debe especificar la moneda de las partidas como '" + currency + "'.");
+                                        validation.setMessage("Se deben capturar todas las partidas con la moneda '" + currency + "'.");
                                     }
                                     break;
                                 }
@@ -2266,6 +2315,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         boolean isReadOnly = false;
 
         moRecord = (SDataRecord) registry;
+        moRecordType = (SDataRecordType) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TP_REC, new Object[] { moRecord.getPkRecordTypeId() }, SLibConstants.EXEC_MODE_VERBOSE);
         moAccountCash = moRecord.getDbmsDataAccountCash();
 
         SFormUtilities.populateComboBox(miClient, jcbFkAccountCashId_n, SDataConstants.FIN_ACC_CASH, new int[] { moRecord.getFkCompanyBranchId_n() });
@@ -2301,9 +2351,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             jftDate.setFocusable(false);
             jtfConcept.setEditable(false);
             jtfConcept.setFocusable(false);
-            
-            jftDate.setEnabled(false);
-            jtfConcept.setEnabled(false);
+            jcbFkAccountCashId_n.setEnabled(false);
+            jbAccountCashEdit.setEnabled(false);
             
             jbDate.setEnabled(false);
             jbAddXml.setEnabled(false);
@@ -2379,6 +2428,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             
             boolean enableCheck = !isReadOnly && moAccountCash.getIsCheckWalletApplying();
             jbMoneyOutCheck.setEnabled(enableCheck);
+            
+            jbAccountCashEdit.setEnabled(!isReadOnly);
         }
 
         if (!moRecord.getPkRecordTypeId().equalsIgnoreCase(SDataConstantsSys.FINU_TP_REC_JOURNAL)) {
@@ -2414,10 +2465,16 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             moRecord.setIsAdjustmentsYearEnd(moFieldIsAdjustmentYearEnd.getBoolean());
             moRecord.setIsAdjustmentsAudit(moFieldIsAdjustmentAudit.getBoolean());
             moRecord.setIsDeleted(moFieldIsDeleted.getBoolean());
-            if (moFieldFkAccountCashId_n.getComponent().isEnabled()) {
+            
+            if (jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
+                moRecord.setFkCompanyBranchId_n(0);
+                moRecord.setFkAccountCashId_n(0);
+            }
+            else {
                 moRecord.setFkCompanyBranchId_n(moFieldFkAccountCashId_n.getKeyAsIntArray()[0]);
                 moRecord.setFkAccountCashId_n(moFieldFkAccountCashId_n.getKeyAsIntArray()[1]);
             }
+            
             moRecord.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
 
             moRecord.getDbmsRecordEntries().clear();
@@ -2550,129 +2607,137 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
-        if (e.getSource() instanceof javax.swing.JButton) {
-            JButton button = (JButton) e.getSource();
+        try {
+            if (e.getSource() instanceof javax.swing.JButton) {
+                JButton button = (JButton) e.getSource();
 
-            if (button == jbOk) {
-                actionPerformedOk();
+                if (button == jbOk) {
+                    actionPerformedOk();
+                }
+                else if (button == jbCancel) {
+                    actionPerformedCancel();
+                }
+                else if (button == jbDate) {
+                    actionPerformedDate();
+                }
+                else if (button == jbAddXml) {
+                    actionPerformedAddXml();
+                }
+                else if (button == jbRecordToRecordEntryXml) {
+                    actionPerformedRecordToRecordEntryXml();
+                }
+                else if (button == jbGetXml) {
+                    actionPerformedGetXml();
+                }
+                else if (button == jbAccountCashEdit) {
+                    actionPerformedAccountCashEdit();
+                }
+                else if (button == jbEntryNew) {
+                    actionPerformedEntryNew();
+                }
+                else if (button == jbEntryNewCopy) {
+                    actionPerformedEntryNewCopy();
+                }
+                else if (button == jbEntryNewInsert) {
+                    actionPerformedEntryNewInsert();
+                }
+                else if (button == jbEntryEdit) {
+                    actionPerformedEntryEdit();
+                }
+                else if (button == jbEntryDelete) {
+                    actionPerformedEntryDelete();
+                }
+                else if (button == jbEntryMoveDown) {
+                    actionPerformedEntryMoveDown();
+                }
+                else if (button == jbEntryMoveUp) {
+                    actionPerformedEntryMoveUp();
+                }
+                else if (button == jbEntryViewSum) {
+                    actionPerformedEntryViewSum();
+                }
+                else if (button == jbEntryGetXml) {
+                    actionPerformedEntryGetXml();
+                }
+                else if (button == jbEntryShowDirectCfd) {
+                    actionPerformedEntryShowDirectCfd();
+                }
+                else if (button == jbEntryShowIndirectCfd) {
+                    actionPerformedEntryShowIndirectCfd();
+                }
+
+                else if (button == jbMoneyIn) {
+                    actionPerformedMoneyInOut(moRecord.getDbmsDataAccountCash(), true);
+                }
+                else if (button == jbMoneyInOther) {
+                    actionPerformedMoneyInOut(null, true);
+                }
+                else if (button == jbMoneyInPaymentCus) {
+                    actionPerformedPaymentComplete(SDataConstants.BPSX_BP_CUS);
+                }
+                else if (button == jbMiPaymentCus || button == jbCdtPaymentCus) {
+                    actionPerformedPayment(SDataConstants.BPSX_BP_CUS);
+                }
+                else if (button == jbMiAdvanceCus || button == jbCdtAdvanceCus) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CUS, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_CUS_ADV);
+                }
+                else if (button == jbMiAdvanceSupDev || button == jbCdtAdvanceSupDev) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_SUP, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_SUP_ADV_REF);
+                }
+                else if (button == jbMiCreditCdr || button == jbCdtCreditCdr) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CDR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_CDR);
+                }
+                else if (button == jbMiCreditDbr || button == jbCdtCreditDbr) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_DBR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_DBR);
+                }
+                else if (button == jbMiExchangeRateDiff || button == jbCdtExchangeRateDiff) {
+                    actionPerformedExchangeRateDiff(true);
+                }
+
+                else if (button == jbMoneyOut) {
+                    actionPerformedMoneyInOut(moRecord.getDbmsDataAccountCash(), false);
+                }
+                else if (button == jbMoneyOutOther) {
+                    actionPerformedMoneyInOut(null, false);
+                }
+                else if (button == jbMoneyOutPaymentSup) {
+                    actionPerformedPaymentComplete(SDataConstants.BPSX_BP_SUP);
+                }
+                else if (button == jbMoneyOutCheck) {
+                    actionPerformedCheck();
+                }
+                else if (button == jbMoneyOutTransfer) {
+                    actionPerformedTransfer();
+                }
+                else if (button == jbMoPaymentSup || button == jbDbtPaymentSup) {
+                    actionPerformedPayment(SDataConstants.BPSX_BP_SUP);
+                }
+                else if (button == jbMoAdvanceSup || button == jbDbtAdvanceSup) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_SUP, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_SUP_ADV);
+                }
+                else if (button == jbMoAdvanceCusDev || button == jbDbtAdvanceCusDev) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CUS, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_CUS_ADV_REF);
+                }
+                else if (button == jbMoDebitCdr || button == jbDbtDebitCdr) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CDR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_CDR);
+                }
+                else if (button == jbMoDebitDbr || button == jbDbtDebitDbr) {
+                    actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_DBR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_DBR);
+                }
+                else if (button == jbMoExchangeRateDiff || button == jbDbtExchangeRateDiff) {
+                    actionPerformedExchangeRateDiff(false);
+                }
             }
-            else if (button == jbCancel) {
-                actionPerformedCancel();
-            }
-            else if (button == jbDate) {
-                actionPerformedDate();
-            }
-            else if (button == jbAddXml) {
-                actionPerformedAddXml();
-            }
-            else if (button == jbRecordToRecordEntryXml) {
-                actionPerformedRecordToRecordEntryXml();
-            }
-            else if (button == jbGetXml) {
-                actionPerformedGetXml();
-            }
-            else if (button == jbEntryNew) {
-                actionPerformedEntryNew();
-            }
-            else if (button == jbEntryNewCopy) {
-                actionPerformedEntryNewCopy();
-            }
-            else if (button == jbEntryNewInsert) {
-                actionPerformedEntryNewInsert();
-            }
-            else if (button == jbEntryEdit) {
-                actionPerformedEntryEdit();
-            }
-            else if (button == jbEntryDelete) {
-                actionPerformedEntryDelete();
-            }
-            else if (button == jbEntryMoveDown) {
-                actionPerformedEntryMoveDown();
-            }
-            else if (button == jbEntryMoveUp) {
-                actionPerformedEntryMoveUp();
-            }
-            else if (button == jbEntryViewSum) {
-                actionPerformedEntryViewSum();
-            }
-            else if (button == jbEntryGetXml) {
-                actionPerformedEntryGetXml();
-            }
-            else if (button == jbEntryShowDirectCfd) {
-                actionPerformedEntryShowDirectCfd();
-            }
-            else if (button == jbEntryShowIndirectCfd) {
-                actionPerformedEntryShowIndirectCfd();
-            }
-            
-            else if (button == jbMoneyIn) {
-                actionPerformedMoneyInOut(moRecord.getDbmsDataAccountCash(), true);
-            }
-            else if (button == jbMoneyInOther) {
-                actionPerformedMoneyInOut(null, true);
-            }
-            else if (button == jbMoneyInPaymentCus) {
-                actionPerformedPaymentComplete(SDataConstants.BPSX_BP_CUS);
-            }
-            else if (button == jbMiPaymentCus || button == jbCdtPaymentCus) {
-                actionPerformedPayment(SDataConstants.BPSX_BP_CUS);
-            }
-            else if (button == jbMiAdvanceCus || button == jbCdtAdvanceCus) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CUS, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_CUS_ADV);
-            }
-            else if (button == jbMiAdvanceSupDev || button == jbCdtAdvanceSupDev) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_SUP, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_SUP_ADV_REF);
-            }
-            else if (button == jbMiCreditCdr || button == jbCdtCreditCdr) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CDR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_CDR);
-            }
-            else if (button == jbMiCreditDbr || button == jbCdtCreditDbr) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_DBR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_IN_EXT_DBR);
-            }
-            else if (button == jbMiExchangeRateDiff || button == jbCdtExchangeRateDiff) {
-                actionPerformedExchangeRateDiff(true);
-            }
-            
-            else if (button == jbMoneyOut) {
-                actionPerformedMoneyInOut(moRecord.getDbmsDataAccountCash(), false);
-            }
-            else if (button == jbMoneyOutOther) {
-                actionPerformedMoneyInOut(null, false);
-            }
-            else if (button == jbMoneyOutPaymentSup) {
-                actionPerformedPaymentComplete(SDataConstants.BPSX_BP_SUP);
-            }
-            else if (button == jbMoneyOutCheck) {
-                actionPerformedCheck();
-            }
-            else if (button == jbMoneyOutTransfer) {
-                actionPerformedTransfer();
-            }
-            else if (button == jbMoPaymentSup || button == jbDbtPaymentSup) {
-                actionPerformedPayment(SDataConstants.BPSX_BP_SUP);
-            }
-            else if (button == jbMoAdvanceSup || button == jbDbtAdvanceSup) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_SUP, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_SUP_ADV);
-            }
-            else if (button == jbMoAdvanceCusDev || button == jbDbtAdvanceCusDev) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CUS, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_CUS_ADV_REF);
-            }
-            else if (button == jbMoDebitCdr || button == jbDbtDebitCdr) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_CDR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_CDR);
-            }
-            else if (button == jbMoDebitDbr || button == jbDbtDebitDbr) {
-                actionPerformedMoneyInOutBizPartner(SDataConstants.BPSX_BP_DBR, SDataConstantsSys.FINS_CLS_ACC_MOV_CASH_OUT_EXT_DBR);
-            }
-            else if (button == jbMoExchangeRateDiff || button == jbDbtExchangeRateDiff) {
-                actionPerformedExchangeRateDiff(false);
+            else if (e.getSource() instanceof javax.swing.JToggleButton) {
+                JToggleButton toggleButton = (JToggleButton) e.getSource();
+
+                if (toggleButton == jtbEntryDeletedFilter) {
+                    actionPerformedEntryDeletedFilter();
+                }
             }
         }
-        else if (e.getSource() instanceof javax.swing.JToggleButton) {
-            JToggleButton toggleButton = (JToggleButton) e.getSource();
-
-            if (toggleButton == jtbEntryDeletedFilter) {
-                actionPerformedEntryDeletedFilter();
-            }
+        catch (Exception exception) {
+            SLibUtilities.renderException(this, exception);
         }
     }
 
