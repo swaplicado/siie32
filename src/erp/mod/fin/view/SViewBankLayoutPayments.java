@@ -5,13 +5,17 @@
 
 package erp.mod.fin.view;
 
+import erp.client.SClientInterface;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SFinConsts;
+import erp.redis.SRedisLockUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -28,6 +32,7 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDate;
 import sa.lib.gui.SGuiParams;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -68,7 +73,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
       
     }
     
-    private void actionApplyPayments() {
+    private void actionApplyPayments() throws Exception {
         if (jbApplyPayments.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -129,7 +134,11 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
     
     @Override
     public void actionMouseClicked() {
-        actionApplyPayments();
+        try {
+            actionApplyPayments();
+        } catch (Exception ex) {
+            Logger.getLogger(SViewBankLayoutPayments.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -238,7 +247,11 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
             JButton button = (JButton) e.getSource();
 
             if (button == jbApplyPayments) {
-                actionApplyPayments();
+                try {
+                    actionApplyPayments();
+                } catch (Exception ex) {
+                    Logger.getLogger(SViewBankLayoutPayments.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             else if (button == jbCloseLayout) {
                 actionCloseLayout();

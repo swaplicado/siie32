@@ -7,120 +7,183 @@ package erp.mfin.data;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author SW
  */
 public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.io.Serializable {
-    
-    protected ArrayList maBankNbDay;
+    protected int mnPkBankNonBizDayId;
+    protected java.lang.String msName;
+    protected java.util.Date mtNonBizDay;
+    protected boolean mbIsCanEdit;
+    protected boolean mbIsCanDelete;
     protected boolean mbIsDeleted;
-    protected int mnFkUserId;
-    protected int mnIdBankNbDay = 0;
-    
+    protected int mnFkUserNewId;
+    protected int mnFkUserEditId;
+    protected int mnFkUserDeleteId;
+    protected java.util.Date mtUserNewTs;
+    protected java.util.Date mtUserEditTs;
+    protected java.util.Date mtUserDeleteTs;
+
     public SDataBankNbDay() {
         super(SDataConstants.FINU_BANK_NB_DAY);
+        reset();
     }
     
-    public void setBankNbDay(ArrayList list){ maBankNbDay = list; }
+    public void setPkBankNonBizDayId(int n) { mnPkBankNonBizDayId = n; }
+    public void setName(java.lang.String s) { msName = s; }
+    public void setNonBizDay(java.util.Date t) { mtNonBizDay = t; }
+    public void setIsCanEdit(boolean b) { mbIsCanEdit = b; }
+    public void setIsCanDelete(boolean b) { mbIsCanDelete = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
-    public void setFkUserId(int n) { mnFkUserId = n; }
+    public void setFkUserNewId(int n) { mnFkUserNewId = n; }
+    public void setFkUserEditId(int n) { mnFkUserEditId = n; }
+    public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
+    public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
+    public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
+    public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
+
+    public int getPkBankNonBizDayId() { return mnPkBankNonBizDayId; }
+    public java.lang.String getName() { return msName; }
+    public java.util.Date getNonBizDay() { return mtNonBizDay; }
+    public boolean getIsCanEdit() { return mbIsCanEdit; }
+    public boolean getIsCanDelete() { return mbIsCanDelete; }
+    public boolean getIsDeleted() { return mbIsDeleted; }
+    public int getFkUserNewId() { return mnFkUserNewId; }
+    public int getFkUserEditId() { return mnFkUserEditId; }
+    public int getFkUserDeleteId() { return mnFkUserDeleteId; }
+    public java.util.Date getUserNewTs() { return mtUserNewTs; }
+    public java.util.Date getUserEditTs() { return mtUserEditTs; }
+    public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
+
     
-    public ArrayList getBankNbDay(){ return maBankNbDay; }
-    public boolean getIsDeleted(){ return mbIsDeleted; }
     
     @Override
     public void setPrimaryKey(Object pk) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        mnPkBankNonBizDayId = ((int[]) pk)[0];
     }
 
     @Override
     public Object getPrimaryKey() {
-        return null;
+        return new int[] { mnPkBankNonBizDayId };
     }
 
     @Override
     public void reset() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        super.resetRegistry();
+        
+        mnPkBankNonBizDayId = 0;
+        msName = "";
+        mtNonBizDay = null;
+        mbIsCanEdit = false;
+        mbIsCanDelete = false;
+        mbIsDeleted = false;
+        mnFkUserNewId = 0;
+        mnFkUserEditId = 0;
+        mnFkUserDeleteId = 0;
+        mtUserNewTs = null;
+        mtUserEditTs = null;
+        mtUserDeleteTs = null;
     }
 
     @Override
     public int read(Object pk, Statement statement) {
         java.lang.Object[] key = (java.lang.Object[]) pk;
-        java.lang.String sql = "";
-        java.sql.ResultSet resultSet = null;
-        
-        try{
-            sql = "SELECT * FROM erp.finu_bank_nb_day WHERE id_bank_nb_day = " + key[0];
+        String sql;
+        ResultSet resultSet = null;
+
+        mnLastDbActionResult = SLibConstants.UNDEFINED;
+        reset();
+
+        try {
+            sql = "SELECT * FROM erp.finu_bank_nb_day WHERE id_bank_nb_day = " + key[0] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
-                Date day = resultSet.getDate("nb_day");
-                String name = resultSet.getString("name");
-                String[] bankNbDay = {"" + (day.getYear() + 1900) + "-" + (day.getMonth() + 1) + "-" + day.getDate(),name};
-                maBankNbDay = new ArrayList();
-                maBankNbDay.add(bankNbDay);
+                mnPkBankNonBizDayId = resultSet.getInt("id_bank_nb_day");
+                msName = resultSet.getString("name");
+                mtNonBizDay = resultSet.getDate("nb_day");
+                mbIsCanEdit = resultSet.getBoolean("b_can_edit");
+                mbIsCanDelete = resultSet.getBoolean("b_can_del");
                 mbIsDeleted = resultSet.getBoolean("b_del");
-                mnFkUserId = resultSet.getInt("fid_usr_edit");
+                mnFkUserNewId = resultSet.getInt("fid_usr_new");
+                mnFkUserEditId = resultSet.getInt("fid_usr_edit");
+                mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
+                mtUserNewTs = resultSet.getTimestamp("ts_new");
+                mtUserEditTs = resultSet.getTimestamp("ts_edit");
+                mtUserDeleteTs = resultSet.getTimestamp("ts_del");
+
+
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
-                mnIdBankNbDay = Integer.parseInt(key[0].toString());
             }
-        }catch (Exception e){
-            System.err.println(e);
         }
-        
+        catch (java.sql.SQLException e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
+            SLibUtilities.printOutException(this, e);
+        }
+        catch (java.lang.Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
+            SLibUtilities.printOutException(this, e);
+        }
+
         return mnLastDbActionResult;
     }
 
     @Override
     public int save(Connection connection) {
+        int nParam = 1;
+        CallableStatement callableStatement = null;
+
         mnLastDbActionResult = SLibConstants.UNDEFINED;
-        Statement oStatement = null;
+
         try {
-            oStatement = connection.createStatement();
-            java.sql.CallableStatement callableStatement = null;
-            
-            for (Object bankNbDay : maBankNbDay) {
-                int nParam = 1;
-                if (bankNbDay instanceof String[]) {
-                    String[] date = (((String[]) bankNbDay)[0]).split("\\-");
-                    
-                    callableStatement = connection.prepareCall("{ CALL erp.finu_bank_nb_day_save(?, ?, ?, ?, ?, ?, ?) }");
-                    callableStatement.setInt(nParam++, mnIdBankNbDay);
-                    callableStatement.setString(nParam++, (((String[]) bankNbDay)[1]));
-                    callableStatement.setDate(nParam++, new java.sql.Date((Integer.parseInt(date[0]))-1900, (Integer.parseInt(date[1]))-1, Integer.parseInt(date[2])));
-                    callableStatement.setBoolean(nParam++, true);
-                    callableStatement.setBoolean(nParam++, true);
-                    callableStatement.setBoolean(nParam++, mbIsDeleted);
-                    callableStatement.setInt(nParam++, mnFkUserId);
-                    callableStatement.execute();
-                    
-                    mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
-                }
+            callableStatement = connection.prepareCall(
+                    "{ CALL erp.finu_bank_nb_day_save(" +
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+            callableStatement.setInt(nParam++, mnPkBankNonBizDayId);
+            callableStatement.setString(nParam++, msName);
+            callableStatement.setDate(nParam++, new java.sql.Date(mtNonBizDay.getTime()));
+            callableStatement.setBoolean(nParam++, mbIsCanEdit);
+            callableStatement.setBoolean(nParam++, mbIsCanDelete);
+            callableStatement.setBoolean(nParam++, mbIsDeleted);
+            callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
+            callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+            callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+            callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+            callableStatement.execute();
+
+            mnPkBankNonBizDayId = callableStatement.getInt(nParam - 3);
+            mnDbmsErrorId = callableStatement.getInt(nParam - 2);
+            msDbmsError = callableStatement.getString(nParam - 1);
+
+            if (mnDbmsErrorId != 0) {
+                throw new Exception(msDbmsError);
             }
-                
-            oStatement.close();
-        } catch (SQLException ex) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            System.err.println(ex);
-            Logger.getLogger(SDataBankNbDay.class.getName()).log(Level.SEVERE, null, ex);
+            else {
+                mbIsRegistryNew = false;
+                mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+            }
         }
-        return mnLastDbActionResult; //cambiar esto
+        catch (java.lang.Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return mnLastDbActionResult;
     }
 
     @Override
     public Date getLastDbUpdate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return mtUserEditTs;
     }
 }

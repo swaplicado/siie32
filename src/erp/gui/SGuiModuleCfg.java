@@ -84,6 +84,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatCompany;
     private javax.swing.JMenuItem jmiCatCompanyBranchEntity;
     private javax.swing.JMenuItem jmiImpCfdiGeneration;
+    private javax.swing.JMenuItem jmiNoWorkingDays;
 
     private erp.mcfg.form.SFormLanguage moFormLanguage;
     private erp.mcfg.form.SFormCurrency moFormCurrency;
@@ -147,6 +148,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgSystemNotes = new JMenuItem("Notas predefinidas de docs. de C/V");
         jmiCfgMmsItem = new JMenuItem("Configuración de ítems para envío por correo-e");
         jmiCfgItemRequiredDps = new JMenuItem("Configuración de ítems obligatorios con documentos origen");
+        jmiNoWorkingDays = new JMenuItem("Calendario dias no laborables");
 
         jmCfg.add(jmiCfgParamsCompany);
         jmCfg.add(jmiCfgParamsErp);
@@ -175,6 +177,8 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.add(jmiCfgMmsItem);
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgItemRequiredDps);
+        jmCfg.addSeparator();
+        jmCfg.add(jmiNoWorkingDays);
 
         jmCat = new JMenu("Catálogos");
         
@@ -212,6 +216,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgSystemNotes.addActionListener(this);
         jmiCfgMmsItem.addActionListener(this);
         jmiCfgItemRequiredDps.addActionListener(this);
+        jmiNoWorkingDays.addActionListener(this);
         
         jmiCatLanguage.addActionListener(this);
         jmiCatCurrency.addActionListener(this);

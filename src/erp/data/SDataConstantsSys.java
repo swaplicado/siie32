@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Sergio Flores, Isabel Servín, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -92,11 +92,11 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
-    
     public static final int USD_XRT_POLICY_BANXICO = 1;
     public static final int USD_XRT_POLICY_INFORMAL = 2;
     
     public static final int CFGX_IVM_FIFO = 1;
+    
     
     /* XXX 2019-08-16 Sergio Flores: Not used yet.
     public static final int USRS_TP_LEV_NO_PERMISSION = 0;
@@ -1228,6 +1228,13 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_DPS_SAL_DOC_AUT_AUT = 58;
     public static final int TRNX_DPS_SAL_DOC_AUT_PEND = 59;
     public static final int TRNX_DPS_SAL_DOC_AUT_REJ = 60;
+    
+    public static final int TRNX_DPS_PUR_CON_AUT_PEND = 61;
+    public static final int TRNX_DPS_PUR_CON_AUT_AUT = 62;
+    public static final int TRNX_DPS_PUR_CON_AUT_REJ = 63;
+    public static final int TRNX_DPS_SAL_CON_AUT_PEND = 64;
+    public static final int TRNX_DPS_SAL_CON_AUT_AUT = 65;
+    public static final int TRNX_DPS_SAL_CON_AUT_REJ = 66;
 
     public static final int TRNX_TP_IOG_IN_PUR_PUR = 101;
     public static final int TRNX_TP_IOG_IN_SAL_SAL = 102;

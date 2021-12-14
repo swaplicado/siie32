@@ -15,6 +15,7 @@ import erp.mloc.data.*;
 import erp.mloc.form.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import redis.clients.jedis.Jedis;
 /**
  *
  * @author Sergio Flores

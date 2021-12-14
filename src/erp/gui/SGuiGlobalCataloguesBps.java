@@ -28,6 +28,7 @@ import erp.mbps.form.SFormBizPartnerSimple;
 import erp.mbps.form.SFormBizPartnerType;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import redis.clients.jedis.Jedis;
 
 /**
  *

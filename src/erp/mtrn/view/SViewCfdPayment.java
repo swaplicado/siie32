@@ -27,6 +27,7 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
+import erp.redis.SRedisLockUtils;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -37,8 +38,9 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
+//import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvUtils;
 
 /**
  * User view for management of database registries of CFDI of Payments.
@@ -323,7 +325,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                     boolean annul = true;
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                     ArrayList<Object[]> journalVoucherKeys = SDataCfd.getDependentJournalVoucherKeys(miClient.getSession().getStatement(), cfd.getPkCfdId());
-                    ArrayList<SSrvLock> locks = new ArrayList<>();
+//                    ArrayList<SSrvLock> locks = new ArrayList<>();
+                    ArrayList<SRedisLock> rlocks = new ArrayList<>();
                     
                     try {
                         try {
@@ -331,8 +334,10 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                             
                             for (int index = 0; index < journalVoucherKeys.size(); index++) {
                                 if (journalVoucherKeys.get(index) != null) {
-                                    SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60 * 1000); // 10 min.
-                                    locks.add(lock);
+//                                    SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60 * 1000); // 10 min.
+//                                    locks.add(lock);
+                                    SRedisLock rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60); // 10 min.
+                                    rlocks.add(rlock);
                                 }
                             }
                         }
@@ -384,8 +389,11 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                         SLibUtils.showException(this, e);
                     }
                     finally {
-                        for (SSrvLock lock : locks) {
-                            SSrvUtils.releaseLock(miClient.getSession(), lock);
+//                        for (SSrvLock lock : locks) {
+//                            SSrvUtils.releaseLock(miClient.getSession(), lock);
+//                        }
+                        for (SRedisLock rlock : rlocks) {
+                            SRedisLockUtils.releaseLock(miClient, rlock);
                         }
                     }
                 }

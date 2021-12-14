@@ -30,11 +30,12 @@ import sa.lib.srv.redis.SRedisLockKey;
  */
 public abstract class SRedisLockUtils {
 
-    private static final String[] TsEditFieldNames = new String[] { "ts_edit", "ts_upd" };
+    private static final String[] TsEditFieldNames = new String[]{"ts_edit", "ts_upd", "ts_usr_upd"};
 
     public static final String LOCK_COUNT = "LockIdCount"; // contador de id de los locks
 
     private static final SimpleDateFormat DateFormatDatetime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    
 
     /**
      * Método para pasar el objeto PK a un string.
@@ -46,47 +47,26 @@ public abstract class SRedisLockUtils {
      * @return Regresa un <code>String</code> con la forma "pk_1/pk_2/.../pk_n/"
      * @throws java.sql.SQLException
      */
-    public static String setStringPk(final SClientInterface client, final int registryType, final Object registryPk) throws SQLException {
-        String stringPk = "";
-
-        try (Statement statement = client.getSession().getDatabase().getConnection().createStatement()) {
-            String tableName = SDataConstants.TablesMap.get(registryType);
-
-            if (tableName == null || tableName.isEmpty()) {
-                tableName = SModConsts.TablesMap.get(registryType);
+    public static String setFlattenPk(final int registryType, final Object registryPk) throws SQLException {
+        String flattenPk = "";
+        
+        if (registryPk instanceof int[]) {
+            for (int index = 0; index < ((int[]) registryPk).length; index++) {
+                flattenPk += (((int[]) registryPk)[index]) + "/" + "";
             }
-
-            String sql = "SHOW COLUMNS FROM " + tableName + " WHERE `Key` = 'PRI';";
-            ResultSet resultSet = statement.executeQuery(sql);
-            LinkedHashMap<String, String> primaryKeyNamesMap = new LinkedHashMap<>();
-
-            while (resultSet.next()) {
-                primaryKeyNamesMap.put(resultSet.getString("Field"), resultSet.getString("Type"));
-            }
-
-            int index = 0;
-
-            if (registryPk instanceof int[]) {
-                for (HashMap.Entry<String, String> entry : primaryKeyNamesMap.entrySet()) {
-                    stringPk += (((int[]) registryPk)[index++]) + "/" + "";
-                }
-            }
-            else if (registryPk instanceof Object[]) {
-                for (HashMap.Entry<String, String> entry : primaryKeyNamesMap.entrySet()) {
-                    if (entry.getValue().contains("char")) {
-                        stringPk += ((Object[]) registryPk)[index++] + "/" + "";
-                    }
-                    else if (entry.getValue().contains("date")) {
-                        stringPk += SLibUtils.DbmsDateFormatDate.format(((Object[]) registryPk)[index++]) + "/" + "";
-                    }
-                    else {
-                        stringPk += (((Object[]) registryPk)[index++]) + "/" + "";
-                    }
+        } 
+        else if (registryPk instanceof Object[]) {
+            for (int index = 0; index < ((Object[]) registryPk).length; index++) {
+                if (!((((Object[]) registryPk)[index]) instanceof Date)) {
+                    flattenPk += ((Object[]) registryPk)[index] + "/" + "";
+                } 
+                else if ((((Object[]) registryPk)[index]) instanceof Date) {
+                    flattenPk += SLibUtils.DbmsDateFormatDate.format(((Object[]) registryPk)[index]) + "/" + "";
                 }
             }
         }
 
-        return stringPk;
+        return flattenPk;
     }
 
     /**
@@ -114,8 +94,7 @@ public abstract class SRedisLockUtils {
         if (SRedisConnectionUtils.getConnectionStatus(client)) {
             Jedis jedis = client.getJedis();
             jedis.del(redisLock.getLockKey().getLockKey());
-        }
-        else if (!redisLock.getLockKey().isDummy()) {
+        } else if (!redisLock.getLockKey().isDummy()) {
             client.showMsgBoxWarning("No se eliminó el candado de acceso exclusivo al registro.\n"
                     + "Comunicarlo al administrador");
         }
@@ -182,8 +161,7 @@ public abstract class SRedisLockUtils {
     private static SRedisLock gainLockDummy(erp.client.SClientInterface client, int registryType, Object registryPk, long timeout) throws SQLException {
         int companyId = client.getSessionXXX().getCompany().getPkCompanyId();
         int userId = client.getSessionXXX().getUser().getPkUserId();
-
-        String registryPkFlatten = setStringPk(client, registryType, registryPk);
+        String registryPkFlatten = setFlattenPk(registryType, registryPk);
         SRedisLockKey rLockKey = new SRedisLockKey(0, companyId, registryType, registryPkFlatten, 0, userId);
         SRedisLock rLock = new SRedisLock(registryPk, timeout, rLockKey);
 
@@ -204,7 +182,7 @@ public abstract class SRedisLockUtils {
     public static SRedisLock gainLock(SClientInterface client, int registryType, Object registryPk, long timeout) throws Exception, SQLException {
         int companyId = client.getSessionXXX().getCompany().getPkCompanyId();
         int userId = client.getSessionXXX().getUser().getPkUserId();
-        String registryPkFlatten = setStringPk(client, registryType, registryPk);
+        String registryPkFlatten = setFlattenPk(registryType, registryPk);
         SRedisLock redisLock = null;
 
         if (SRedisConnectionUtils.getConnectionStatus(client)) {
@@ -212,16 +190,16 @@ public abstract class SRedisLockUtils {
             SRedisLockKey lockKey = getLockKeyFromRedis(jedis, companyId, registryType, registryPkFlatten);
             if (lockKey != null) {
                 // el candado de acceso exclusivo ya existe
-                if (lockKey.getUserId() != userId && lockKey.getCompanyId() != companyId) {
+                if (lockKey.getUserId() != userId || lockKey.getCompanyId() != companyId) {
                     // el candado de acceso exclusivo pertenece a otro usuario y/o empresa
                     throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
-                }
+                } 
                 else {
                     // el candado de acceso exclusivo pertenece al mismo usuario y empresa
                     if (client.showMsgBoxConfirm("El registro esta siendo utilizado por usted mismo,\n"
                             + "¿Desea obtener nuevamente el acceso exclusivo al mismo?") != JOptionPane.YES_OPTION) {
                         throw new Exception("El registro esta siendo utilizado por usted mismo.");
-                    }
+                    } 
                     else {
                         jedis.del(lockKey.getLockKey());
                     }
@@ -229,7 +207,7 @@ public abstract class SRedisLockUtils {
             }
             lockKey = setLock(jedis, companyId, registryType, registryPkFlatten, userId, timeout);     //crea nuevo candado
             redisLock = new SRedisLock(registryPk, timeout, lockKey);
-        }
+        } 
         else {
             redisLock = gainLockDummy(client, registryType, registryPk, timeout);
         }
@@ -251,60 +229,69 @@ public abstract class SRedisLockUtils {
                 tableName = SModConsts.TablesMap.get(registryType);
             }
 
-            String sql = "SHOW COLUMNS FROM " + tableName + " WHERE `Key` = 'PRI';";     //consulta los nombres de todas las pk del registro
-            ResultSet resultSet = statement.executeQuery(sql);
-            LinkedHashMap<String, String> primaryKeyNamesMap = new LinkedHashMap<>();
+            if (tableName != null) {
+                String sql = "SHOW COLUMNS FROM " + tableName + " WHERE `Key` = 'PRI';";     //consulta los nombres de todas las pk del registro
+                ResultSet resultSet = statement.executeQuery(sql);
+                LinkedHashMap<String, String> primaryKeyNamesMap = new LinkedHashMap<>();
 
-            while (resultSet.next()) {
-                primaryKeyNamesMap.put(resultSet.getString("Field"), resultSet.getString("Type"));   //guarda las pk el hash
-            }
-            resultSet.close();
+                while (resultSet.next()) {
+                    primaryKeyNamesMap.put(resultSet.getString("Field"), resultSet.getString("Type"));   //guarda las pk el hash
+                }
+                resultSet.close();
 
-            String lastUpdateTsFieldName = "";
+                String lastUpdateTsFieldName = "";
 
-            for (String tsEditFieldName : TsEditFieldNames) {
-                sql = "SHOW COLUMNS FROM " + tableName + " WHERE Field = '" + tsEditFieldName + "';";
+                for (String tsEditFieldName : TsEditFieldNames) {
+                    sql = "SHOW COLUMNS FROM " + tableName + " WHERE Field = '" + tsEditFieldName + "';";
+                    resultSet = statement.executeQuery(sql);
+
+                    if (resultSet.next()) {
+                        lastUpdateTsFieldName = resultSet.getString("Field");
+                        break;
+                    }
+                    resultSet.close();
+                }
+
+                int index = 0;
+                sql = "SELECT " + lastUpdateTsFieldName + " FROM " + tableName + " WHERE ";   //consulta la fecha de modificacion del registro
+
+                for (HashMap.Entry<String, String> entry : primaryKeyNamesMap.entrySet()) {
+                    sql += (index == 0 ? "" : "AND ") + entry.getKey() + " = ";
+
+                    if (registryPk instanceof int[]) {
+                        sql += ((int[]) registryPk)[index++] + " ";
+                    } 
+                    else if (registryPk instanceof Object[]) {
+                        if (entry.getValue().contains("char")) {
+                            sql += "'" + ((Object[]) registryPk)[index++] + "' ";
+                        } 
+                        else if (entry.getValue().contains("date")) {
+                            int i = index++;
+                            Object obj = ((Object[]) registryPk)[i];
+                            if (obj instanceof String) {
+                                sql += "'" + obj.toString() + "' ";
+                            }
+                            else {
+                                sql += "'" +  SLibUtils.DbmsDateFormatDate.format(obj) + "' ";
+                            }
+                        } 
+                        else {
+                            sql += (((Object[]) registryPk)[index++]) + " ";
+                        }
+                    } 
+                    else {
+                        throw new Exception("El tipo de dato del PK del registro es desconocido: " + registryPk.getClass().getName() + ".");
+                    }
+                }
+
                 resultSet = statement.executeQuery(sql);
 
                 if (resultSet.next()) {
-                    lastUpdateTsFieldName = resultSet.getString("Field");
-                    break;
-                }
-                resultSet.close();
-            }
-
-            int index = 0;
-            sql = "SELECT " + lastUpdateTsFieldName + " FROM " + tableName + " WHERE ";   //consulta la fecha de modificacion del registro
-
-            for (HashMap.Entry<String, String> entry : primaryKeyNamesMap.entrySet()) {
-                sql += (index == 0 ? "" : "AND ") + entry.getKey() + " = ";
-
-                if (registryPk instanceof int[]) {
-                    sql += ((int[]) registryPk)[index++] + " ";
-                }
-                else if (registryPk instanceof Object[]) {
-                    if (entry.getValue().contains("char")) {
-                        sql += "'" + ((Object[]) registryPk)[index++] + "' ";
-                    }
-                    else if (entry.getValue().contains("date")) {
-                        sql += "'" + SLibUtils.DbmsDateFormatDate.format(((Object[]) registryPk)[index++]) + "' ";
-                    }
-                    else {
-                        sql += (((Object[]) registryPk)[index++]) + " ";
-                    }
-                }
+                    lastUpdateTs = resultSet.getTimestamp(lastUpdateTsFieldName);
+                } 
                 else {
-                    throw new Exception("El tipo de dato del PK del registro es desconocido: " + registryPk.getClass().getName() + ".");
+                    throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
                 }
-            }
-
-            resultSet = statement.executeQuery(sql);
-
-            if (resultSet.next()) {
-                lastUpdateTs = resultSet.getTimestamp(lastUpdateTsFieldName);
-            }
-            else {
-                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
         }
 
@@ -316,38 +303,38 @@ public abstract class SRedisLockUtils {
      * Redis, si no, verifica que no exista un candado para el registro, si non
      * existe un candado, consulta la fecha de modificacion de registro para
      * recuperar el candado
-     *
      * @param client Cliente GUI.
-     * @param rlock
      * @return
      * @throws java.lang.Exception
      */
     public static SRedisLock verifyLockStatus(erp.client.SClientInterface client, SRedisLock rlock) throws Exception {
         Date lastTs = getLastUpdateTs(client, rlock.getLockKey().getRegistryType(), rlock.getRegistryPk());
 
-        if (!lastTs.after(rlock.getLockTimestamp())) {
-            if (SRedisConnectionUtils.getConnectionStatus(client)) {
-                Jedis jedis = client.getJedis();
-                if (!jedis.exists(rlock.getLockKey().getLockKey())) {
-                    Set<String> redisKeysSet = jedis.keys(rlock.getLockKey().getLockKeyForSearch());
-                    if (redisKeysSet.isEmpty()) {
+        if (lastTs != null) {
+            if (!lastTs.after(rlock.getLockTimestamp())) {
+                if (SRedisConnectionUtils.getConnectionStatus(client)) {
+                    Jedis jedis = client.getJedis();
+                    if (!jedis.exists(rlock.getLockKey().getLockKey())) {
+                        Set<String> redisKeysSet = jedis.keys(rlock.getLockKey().getLockKeyForSearch());
+                        if (redisKeysSet.isEmpty()) {
 
-                        Object registryPk = rlock.getRegistryPk();
-                        long timeout = rlock.getTimeout();
-                        SRedisLockKey rLockKey = setLock(jedis, rlock.getLockKey().getCompanyId(), rlock.getLockKey().getRegistryType(),
-                                rlock.getLockKey().getLockKey(), rlock.getLockKey().getUserId(), rlock.getTimeout());
-                        rlock = new SRedisLock(registryPk, timeout, rLockKey);
+                            Object registryPk = rlock.getRegistryPk();
+                            long timeout = rlock.getTimeout();
+                            SRedisLockKey rLockKey = setLock(jedis, rlock.getLockKey().getCompanyId(), rlock.getLockKey().getRegistryType(),
+                                    rlock.getLockKey().getLockKey(), rlock.getLockKey().getUserId(), rlock.getTimeout());
+                            rlock = new SRedisLock(registryPk, timeout, rLockKey);
 
-                    }
-                    else {
-                        SRedisLockKey lockKey = new SRedisLockKey((String) (redisKeysSet.toArray())[0]);
-                        throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
+                        } 
+                        else {
+                            SRedisLockKey lockKey = new SRedisLockKey((String) (redisKeysSet.toArray())[0]);
+                            throw new Exception("El registro esta siendo utilizado por: " + getUserName(client, lockKey.getUserId()) + ".");
+                        }
                     }
                 }
+            } 
+            else {
+                throw new Exception("El registro ha sido modificado");
             }
-        }
-        else {
-            throw new Exception("El registro ha sido modificado");
         }
         return rlock;
     }
@@ -361,6 +348,15 @@ public abstract class SRedisLockUtils {
     public static Vector<String> getLocksList(Jedis jedis) {
         Vector<String> vectorKeys = new Vector<>();
         Set<String> keys = jedis.keys(SRedisLockKey.LOCK + "+*");
+        for (int i = 0; i < keys.size(); i++) {
+            vectorKeys.add(keys.toArray()[i].toString());
+        }
+        return vectorKeys;
+    }
+
+    public static Vector<String> getLocksListFromUser(Jedis jedis, int id) {
+        Vector<String> vectorKeys = new Vector<>();
+        Set<String> keys = jedis.keys(SRedisLockKey.LOCK + "+*+" + id);
         for (int i = 0; i < keys.size(); i++) {
             vectorKeys.add(keys.toArray()[i].toString());
         }

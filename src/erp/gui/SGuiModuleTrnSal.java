@@ -74,6 +74,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import redis.clients.jedis.Jedis;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -82,7 +83,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín, Adrián Avilés
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -112,6 +113,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiContractsLinked;
     private javax.swing.JMenuItem jmiContractsLinkedEntry;
     private javax.swing.JMenuItem jmiContractsLinks;
+    private javax.swing.JMenuItem jmiContractsAutPending;
+    private javax.swing.JMenuItem jmiContractsAutAutorized;
+    private javax.swing.JMenuItem jmiContractsAutRejected;
     private javax.swing.JMenuItem jmiContractsLinkPendEntryPrice;
     private javax.swing.JMenuItem jmiContractsLinkedEntryPrice;
     private javax.swing.JMenuItem jmiContractsSendMail;
@@ -343,6 +347,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinked = new JMenuItem("Contratos procesados");
         jmiContractsLinkedEntry = new JMenuItem("Contratos procesados a detalle");
         jmiContractsLinks = new JMenuItem("Vínculos de contratos como origen");
+        jmiContractsAutPending = new JMenuItem("Contratos por autorizar");
+        jmiContractsAutAutorized = new JMenuItem("Contratos autorizados");
+        jmiContractsAutRejected = new JMenuItem("Contratos rechazados");
         jmiContractsLinkPendEntryPrice = new JMenuItem("Entregas mensuales de contratos por procesar");
         jmiContractsLinkedEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
         jmiContractsSendMail = new JMenuItem("Envío de contratos por correo-e");
@@ -355,6 +362,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCon.add(jmiContractsLinkedEntry);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinks);
+        jmCon.addSeparator();
+        jmCon.add(jmiContractsAutPending);
+        jmCon.add(jmiContractsAutAutorized);
+        jmCon.add(jmiContractsAutRejected);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinkPendEntryPrice);
         jmCon.add(jmiContractsLinkedEntryPrice);
@@ -695,6 +706,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinkPendEntry.addActionListener(this);
         jmiContractsLinkedEntry.addActionListener(this);
         jmiContractsLinks.addActionListener(this);
+        jmiContractsAutPending.addActionListener(this);
+        jmiContractsAutAutorized.addActionListener(this);
+        jmiContractsAutRejected.addActionListener(this);
         jmiContractsLinkPendEntryPrice.addActionListener(this);
         jmiContractsLinkedEntryPrice.addActionListener(this);
         jmiContractsSendMail.addActionListener(this);
@@ -1004,6 +1018,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 break;
             case SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_REJ:
                 viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " rechazad@s";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " x autorizar";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " autorizad@s";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " rechazad@s";
                 break;
             case SDataConstantsSys.TRNX_SAL_TOT:
                 viewTitle = "Ventas globales";
@@ -1808,6 +1831,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiContractsLinks) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_LINK_EST_CON_SRC);
+            }
+            else if (item == jmiContractsAutPending) {
+                showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND);
+            }
+            else if (item == jmiContractsAutAutorized) {
+                showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT);
+            }
+            else if (item == jmiContractsAutRejected) {
+                showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ);
             }
             else if (item == jmiContractsLinkPendEntryPrice) {
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_SAL_N, new SGuiParams(SModConsts.VIEW_ST_PEND));

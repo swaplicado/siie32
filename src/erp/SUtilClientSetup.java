@@ -89,6 +89,18 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabasePassword2 = new javax.swing.JLabel();
         jpfDatabasePassword2 = new javax.swing.JPasswordField();
         jlDatabasePassword2Example = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
+        jlRedisHost = new javax.swing.JLabel();
+        jtfRedisHost = new javax.swing.JTextField();
+        jlRedisHostExample = new javax.swing.JLabel();
+        jPanel17 = new javax.swing.JPanel();
+        jlRedisPassword1 = new javax.swing.JLabel();
+        jpfRedisPassword1 = new javax.swing.JPasswordField();
+        jlRedisPassword1Example1 = new javax.swing.JLabel();
+        jPanel18 = new javax.swing.JPanel();
+        jlRedisPassword2 = new javax.swing.JLabel();
+        jpfRedisPassword2 = new javax.swing.JPasswordField();
+        jlRedisPassword1Example2 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jlTimestpamp = new javax.swing.JLabel();
         jtfTimestamp = new javax.swing.JTextField();
@@ -112,7 +124,8 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuration parameters:"));
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setLayout(new java.awt.GridLayout(11, 0, 0, 5));
+        jPanel4.setPreferredSize(new java.awt.Dimension(485, 382));
+        jPanel4.setLayout(new java.awt.GridLayout(14, 0, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -293,6 +306,52 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
         jPanel4.add(jPanel14);
 
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRedisHost.setText("Redis server host for client:*");
+        jlRedisHost.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(jlRedisHost);
+
+        jtfRedisHost.setText("127.0.0.1");
+        jtfRedisHost.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jtfRedisHost);
+
+        jlRedisHostExample.setText("(e.g. 127.0.0.1)");
+        jlRedisHostExample.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jlRedisHostExample);
+
+        jPanel4.add(jPanel16);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRedisPassword1.setText("Redis password:*");
+        jlRedisPassword1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel17.add(jlRedisPassword1);
+
+        jpfRedisPassword1.setText("password");
+        jpfRedisPassword1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jpfRedisPassword1);
+
+        jlRedisPassword1Example1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jlRedisPassword1Example1);
+
+        jPanel4.add(jPanel17);
+
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRedisPassword2.setText("Redis password:*");
+        jlRedisPassword2.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel18.add(jlRedisPassword2);
+
+        jpfRedisPassword2.setText("password");
+        jpfRedisPassword2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel18.add(jpfRedisPassword2);
+
+        jlRedisPassword1Example2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel18.add(jlRedisPassword1Example2);
+
+        jPanel4.add(jPanel18);
+
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTimestpamp.setText("Last update:");
@@ -345,7 +404,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(616, 413));
+        setSize(new java.awt.Dimension(718, 484));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -388,6 +447,9 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -420,12 +482,20 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JLabel jlErpInstanceExample;
     private javax.swing.JLabel jlErpRmiRegistryPort;
     private javax.swing.JLabel jlErpRmiRegistryPortExample;
+    private javax.swing.JLabel jlRedisHost;
+    private javax.swing.JLabel jlRedisHostExample;
+    private javax.swing.JLabel jlRedisPassword1;
+    private javax.swing.JLabel jlRedisPassword1Example1;
+    private javax.swing.JLabel jlRedisPassword1Example2;
+    private javax.swing.JLabel jlRedisPassword2;
     private javax.swing.JLabel jlSeparatorClient;
     private javax.swing.JLabel jlSeparatorServer;
     private javax.swing.JLabel jlTimestampExample;
     private javax.swing.JLabel jlTimestpamp;
     private javax.swing.JPasswordField jpfDatabasePassword1;
     private javax.swing.JPasswordField jpfDatabasePassword2;
+    private javax.swing.JPasswordField jpfRedisPassword1;
+    private javax.swing.JPasswordField jpfRedisPassword2;
     private javax.swing.JTextField jtfDatabaseHostClient;
     private javax.swing.JTextField jtfDatabaseHostServer;
     private javax.swing.JTextField jtfDatabaseName;
@@ -435,6 +505,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JTextField jtfErpHost;
     private javax.swing.JTextField jtfErpInstance;
     private javax.swing.JTextField jtfErpRmiRegistryPort;
+    private javax.swing.JTextField jtfRedisHost;
     private javax.swing.JTextField jtfTimestamp;
     // End of variables declaration//GEN-END:variables
 
@@ -481,6 +552,9 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jtfDatabaseUser.setText("");
             jpfDatabasePassword1.setText("");
             jpfDatabasePassword2.setText("");
+            jtfRedisHost.setText("");
+            jpfRedisPassword1.setText("");
+            jpfRedisPassword2.setText("");
             jtfTimestamp.setText("");
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { SLibConsts.UNDEFINED });
         }
@@ -496,6 +570,9 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jtfDatabaseUser.setText(moParamsApp.getDatabaseUser());
             jpfDatabasePassword1.setText(moParamsApp.getDatabasePswd());
             jpfDatabasePassword2.setText(moParamsApp.getDatabasePswd());
+            jtfRedisHost.setText(moParamsApp.getRedisHost());
+            jpfRedisPassword1.setText(moParamsApp.getRedisPswd());
+            jpfRedisPassword2.setText(moParamsApp.getRedisPswd());
             jtfTimestamp.setText(SLibUtils.DateFormatDatetimeTimeZone.format(moParamsApp.getTimestamp()));
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { moParamsApp.getDatabaseType() });
         }
@@ -517,6 +594,9 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                     jtfDatabaseUser.getText().length() != 0 ||
                     jpfDatabasePassword1.getPassword().length != 0 ||
                     jpfDatabasePassword2.getPassword().length != 0 ||
+                    jtfRedisHost.getText().length() != 0 ||
+                    jpfRedisPassword1.getPassword().length != 0 ||
+                    jpfRedisPassword2.getPassword().length != 0 ||
                     jcbDatabaseType.getSelectedIndex() != 0) {
                 hasChanges = true;
             }
@@ -533,6 +613,9 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                     moParamsApp.getDatabaseUser().compareTo(jtfDatabaseUser.getText()) != 0 ||
                     moParamsApp.getDatabasePswd().compareTo(new String(jpfDatabasePassword1.getPassword())) != 0 ||
                     moParamsApp.getDatabasePswd().compareTo(new String(jpfDatabasePassword2.getPassword())) != 0 ||
+                    moParamsApp.getRedisHost().compareTo(jtfRedisHost.getText()) != 0 ||
+                    moParamsApp.getRedisPswd().compareTo(new String(jpfRedisPassword1.getPassword())) != 0 ||
+                    moParamsApp.getRedisPswd().compareTo(new String(jpfRedisPassword2.getPassword())) != 0 ||
                     moParamsApp.getDatabaseType() != ((SGuiItem) jcbDatabaseType.getSelectedItem()).getPrimaryKey()[0]) {
                 hasChanges = true;
             }
@@ -560,6 +643,8 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         boolean isNew = false;
         String password1 = new String(jpfDatabasePassword1.getPassword());
         String password2 = new String(jpfDatabasePassword2.getPassword());
+        String redisPassword1 = new String(jpfRedisPassword1.getPassword());
+        String redisPassword2 = new String(jpfRedisPassword2.getPassword());
 
         jtfErpInstance.setText(SLibUtils.textTrim(jtfErpInstance.getText()).toUpperCase());
         jtfErpHost.setText(SLibUtils.textTrim(jtfErpHost.getText()).toLowerCase());
@@ -570,7 +655,9 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfDatabasePortClient.setText(SLibUtils.textTrim(jtfDatabasePortClient.getText()));
         jtfDatabaseName.setText(SLibUtils.textTrim(jtfDatabaseName.getText()));
         jtfDatabaseUser.setText(SLibUtils.textTrim(jtfDatabaseUser.getText()));
-
+        jtfRedisHost.setText(SLibUtils.textTrim(jtfRedisHost.getText()).toLowerCase());
+        
+        
         if (jtfErpInstance.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlErpInstance) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
             jtfErpInstance.requestFocus();
@@ -659,6 +746,26 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Value for fields '" + SGuiUtils.getLabelName(jlDatabasePassword1) + "' and '" + SGuiUtils.getLabelName(jlDatabasePassword2) + "' must be the same.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
             jpfDatabasePassword1.requestFocus();
         }
+        else if (jtfRedisHost.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlRedisHost) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jtfRedisHost.requestFocus();
+        }
+        else if (jtfRedisHost.getText().indexOf(" ") != -1) {
+            JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlRedisHost) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jtfRedisHost.requestFocus();
+        }
+        else if (redisPassword1.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlRedisPassword1) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jpfRedisPassword1.requestFocus();
+        }
+        else if (redisPassword2.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlRedisPassword2) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jpfRedisPassword2.requestFocus();
+        }
+        else if (redisPassword1.compareTo(redisPassword2) != 0) {
+            JOptionPane.showMessageDialog(this, "Value for fields '" + SGuiUtils.getLabelName(jlRedisPassword1) + "' and '" + SGuiUtils.getLabelName(jlRedisPassword2) + "' must be the same.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jpfRedisPassword1.requestFocus();
+        }
         else {
             try {
                 if (moParamsApp == null) {
@@ -677,6 +784,8 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                 moParamsApp.setDatabaseUser(jtfDatabaseUser.getText());
                 moParamsApp.setDatabasePswd(password1);
                 moParamsApp.setDatabaseType(((SGuiItem) jcbDatabaseType.getSelectedItem()).getPrimaryKey()[0]);
+                moParamsApp.setRedisHost(jtfRedisHost.getText());
+                moParamsApp.setRedisPswd(redisPassword1);
                 if (moParamsApp.save()) {
                     save = true;
                     renderParams();

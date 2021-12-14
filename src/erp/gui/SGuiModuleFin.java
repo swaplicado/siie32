@@ -31,6 +31,7 @@ import erp.mfin.data.SDataCheckWallet;
 import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.data.SDataExchangeRate;
+import erp.mfin.data.SDataBankNbDay;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataTaxBasic;
 import erp.mfin.data.SDataTaxGroup;
@@ -208,9 +209,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmFin;
     private javax.swing.JMenuItem jmiFinExchangeRate;
+    private javax.swing.JMenuItem jmiFinBankNbDay;
     private javax.swing.JMenuItem jmiFinValuationBalances;
     private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
-    private javax.swing.JMenuItem jmiFinBankNbDay;
 
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;
@@ -588,7 +589,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdiMassiveValidationSal = new JMenuItem("Validación masiva de estatus de CFDI emitidos...");
 
         jmFin.add(jmiFinExchangeRate);
-//        jmFin.add(jmiFinBankNbDay);
+        jmFin.add(jmiFinBankNbDay);
         jmFin.addSeparator();
         jmFin.add(jmiFinValuationBalances);
         jmFin.add(jmiFinDpsExchangeRateDiff);

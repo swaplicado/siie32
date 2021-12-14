@@ -300,6 +300,7 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_INF_BP_TRIAL = "El asociado de negocios está en jurídico.";
     public static final java.lang.String MSG_INF_NOT_AUTHORN_ORD = "El pedido no está autorizado.";
     public static final java.lang.String MSG_INF_NOT_AUTHORN_DOC = "El documento no está autorizado.";
+    public static final java.lang.String MSG_INF_NOT_AUTHORN_CON = "El contrato no está autorizado.";
     
     public static final java.lang.String MSG_CNF_REG_DELETE = "¿Está seguro que desea eliminar el registro?";
     public static final java.lang.String MSG_CNF_REG_ANNUL = "¿Está seguro que desea anular el registro?";

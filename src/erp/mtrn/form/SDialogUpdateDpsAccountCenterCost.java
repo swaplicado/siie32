@@ -35,6 +35,7 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     private erp.client.SClientInterface miClient;
     private int mnFormResult;
     private int mnFormStatus;
+    private int mnRegistryType;
     private boolean mbFirstTime;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
@@ -301,7 +302,8 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
                     mnFormResult = SLibConstants.FORM_RESULT_OK;
                     
                     //Parameters added: original quantity and subtotal to use as filter in the query:
-                    SFinUtilities.updateAccountCostCenterForDpsEntry(miClient, (int[]) moDpsEntry.getPrimaryKey(), moAccountNew.getPkAccountIdXXX(), (moCostCenterNew == null ? "" : moCostCenterNew.getPkCostCenterIdXXX()), moDpsEntry.getOriginalQuantity(), moDpsEntry.getSubtotal_r());
+                    SFinUtilities.updateAccountCostCenterForDpsEntry(miClient, (int[]) moDpsEntry.getPrimaryKey(), moAccountNew.getPkAccountIdXXX(),
+                            (moCostCenterNew == null ? "" : moCostCenterNew.getPkCostCenterIdXXX()), moDpsEntry.getOriginalQuantity(), moDpsEntry.getSubtotal_r(), mnRegistryType);
                 }
                 this.setVisible(false);
             }
@@ -472,6 +474,10 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         }
     }
 
+    public void setRegistryType(int registryType){
+        mnRegistryType = registryType;
+    }
+    
     @Override
     public java.lang.Object getValue(int type) {
         throw new UnsupportedOperationException("Not supported yet.");

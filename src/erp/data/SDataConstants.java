@@ -127,6 +127,9 @@ public abstract class SDataConstants {
     public static final int USRU_ROL_USR = 202014;
     public static final int USRU_ROL_CO = 202015;
     public static final int USRU_USR = 202018;
+    public static final int USRU_USR_REDIS_LOCKS = 20219;
+    public static final int USRU_USR_UPDATED = 202020;
+    public static final int USRU_USR_REDIS = 202021;
 
     public static final int USRX_RIGHT = 202501;
     public static final int USRX_RIGHT_PRV = 202502;
@@ -525,6 +528,9 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DPS_AUTHORIZE_PEND = 207561;
     public static final int TRNX_DPS_AUTHORIZED = 207562;
+    
+    public static final int TRNX_CON_AUTHORIZE_PEND = 207563;
+    public static final int TRNX_CON_AUTHORIZED = 207564;
 
     public static final int TRNX_DPS_AUDIT_PEND = 207571;
     public static final int TRNX_DPS_AUDITED = 207572;
@@ -916,6 +922,7 @@ public abstract class SDataConstants {
         TablesMap.put(FIN_CC_ITEM, "fin_cc_item");
         TablesMap.put(FIN_COB_BKC, "fin_cob_bkc");
         TablesMap.put(FIN_LAY_BANK, "fin_lay_bank");
+        TablesMap.put(FINU_BANK_NB_DAY, "erp.finu_bank_nb_day");
         TablesMap.put(FIN_BKC, "fin_bkc");
 
         TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");

@@ -34,8 +34,10 @@ public class SParamsApp implements java.io.Serializable {
     private String msDatabaseName;
     private String msDatabaseUser;
     private String msDatabasePswd;
+    private String msRedisHost;
+    private String msRedisPswd;
     private Date mtTimestamp;
-
+    
     public SParamsApp() {
         reset();
     }
@@ -52,6 +54,8 @@ public class SParamsApp implements java.io.Serializable {
         msDatabaseName = "";
         msDatabaseUser = "";
         msDatabasePswd = "";
+        msRedisHost = "";
+        msRedisPswd = "";
         mtTimestamp = null;
     }
 
@@ -66,6 +70,8 @@ public class SParamsApp implements java.io.Serializable {
     public void setDatabaseName(String name) { msDatabaseName = name; }
     public void setDatabaseUser(String user) { msDatabaseUser = user; }
     public void setDatabasePswd(String pswd) { msDatabasePswd = pswd; }
+    public void setRedisHost(String redisHost) { msRedisHost = redisHost; }
+    public void setRedisPswd(String redisPswd) { msRedisPswd = redisPswd; }
     public void setTimestamp(Date t) { mtTimestamp = t; }
 
     public String getErpInstance() { return msErpInstance; }
@@ -79,6 +85,8 @@ public class SParamsApp implements java.io.Serializable {
     public String getDatabaseName() { return msDatabaseName; }
     public String getDatabaseUser() { return msDatabaseUser; }
     public String getDatabasePswd() { return msDatabasePswd; }
+    public String getRedisHost() { return msRedisHost; }
+    public String getRedisPswd() { return msRedisPswd; }
     public Date getTimestamp() { return mtTimestamp; }
 
     public boolean read() {
@@ -116,6 +124,8 @@ public class SParamsApp implements java.io.Serializable {
                 msDatabaseName = temp.getDatabaseName();
                 msDatabaseUser = temp.getDatabaseUser();
                 msDatabasePswd = temp.getDatabasePswd();
+                msRedisHost = temp.getRedisHost();
+                msRedisPswd = temp.getRedisPswd();
                 mtTimestamp = temp.getTimestamp();
             }
         }

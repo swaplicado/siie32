@@ -31,6 +31,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryEdit;
 import erp.mtrn.data.SRowDpsEdit;
+import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -43,8 +44,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
+//import sa.lib.srv.SSrvLock;
+//import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 
 /**
  * Modificar el ítem y el centro de costo de un documento y de todos los documentos asociados a este, sin necesidad de editar cada documento de forma manual.
@@ -250,7 +252,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             moConceptTablePane.getTable().requestFocus();
         }
         if(mbDocuentsLockedError) {
-            releaseDpsUserLock();
+//            releaseDpsUserLock();
+            releaseDpsUserRedisLock();
             setVisible(false);
         }
     }
@@ -407,10 +410,15 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         if (dps != moDps) {
             if (dps != null) { 
-            SSrvLock lock = gainDpsUserLock(dps);
+//            SSrvLock lock = gainDpsUserLock(dps);
+            SRedisLock rlock = gainDpsUserRedisLock(dps);
 
-                if (lock != null) {
-                    dps.setAuxUserLock(lock);
+//                if (lock != null) {
+//                    dps.setAuxUserLock(lock);
+//                    error = false;
+//                }
+                if (rlock != null) {
+                    dps.setAuxUserRedisLock(rlock);
                     error = false;
                 }
             }
@@ -420,28 +428,43 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         return error;
     }
     
-    private sa.lib.srv.SSrvLock gainDpsUserLock(SDataDps dps) {
-        SSrvLock lock;
+    private sa.lib.srv.redis.SRedisLock gainDpsUserRedisLock(SDataDps dps) {
+        SRedisLock rlock;
 
         try {
-            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), dps.getRegistryTimeout());
+            rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.TRN_DPS, dps.getPrimaryKey(), dps.getRegistryTimeout() / 1000);
         }
         catch (Exception e) {
-            lock = null;
+            rlock = null;
             miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + 
                     SLibUtils.DateFormatDateYearMonth.format(dps.getDateDoc()) + " " + dps.getNumberSeries() + dps.getNumber() + "'.\n" + e);
         }
 
-        return lock;
+        return rlock;
     }
     
-    private void releaseDpsUserLock() {
+//    private sa.lib.srv.SSrvLock gainDpsUserLock(SDataDps dps) {
+//        SSrvLock lock;
+//
+//        try {
+//            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), dps.getRegistryTimeout());
+//        }
+//        catch (Exception e) {
+//            lock = null;
+//            miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + 
+//                    SLibUtils.DateFormatDateYearMonth.format(dps.getDateDoc()) + " " + dps.getNumberSeries() + dps.getNumber() + "'.\n" + e);
+//        }
+//
+//        return lock;
+//    }
+    
+    private void releaseDpsUserRedisLock() {
         moDocuments.stream().forEach((document) -> {
-            sa.lib.srv.SSrvLock lock = document.getAuxUserLock();
-            if (lock != null) {
+            sa.lib.srv.redis.SRedisLock rlock = document.getAuxUserRedisLock();
+            if (rlock != null) {
                 try {
-                    SSrvUtils.releaseLock(miClient.getSession(), lock);
-                    document.setAuxUserLock(null);
+                    SRedisLockUtils.releaseLock(miClient, rlock);
+                    document.setAuxUserRedisLock(null);
                 }
                 catch (Exception e) {
                     miClient.showMsgBoxWarning("No fue posible liberar el acceso exclusivo del registro '" + 
@@ -450,6 +473,21 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
         });
     }
+//    private void releaseDpsUserLock() {
+//        moDocuments.stream().forEach((document) -> {
+//            sa.lib.srv.SSrvLock lock = document.getAuxUserLock();
+//            if (lock != null) {
+//                try {
+//                    SSrvUtils.releaseLock(miClient.getSession(), lock);
+//                    document.setAuxUserLock(null);
+//                }
+//                catch (Exception e) {
+//                    miClient.showMsgBoxWarning("No fue posible liberar el acceso exclusivo del registro '" + 
+//                            SLibUtils.DateFormatDateYearMonth.format(document.getDateDoc()) + " " + document.getNumberSeries() + document.getNumber() + "'.\n" + e);
+//                }
+//            }
+//        });
+//    }
     
     private void populateTable() {
         moConceptTablePane.createTable();
@@ -616,7 +654,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     }
 
     private void actionCancel() {
-        releaseDpsUserLock();
+//        releaseDpsUserLock();
+        releaseDpsUserRedisLock();
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }

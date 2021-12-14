@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import redis.clients.jedis.Jedis;
 import sa.lib.SLibConsts;
 
 /**

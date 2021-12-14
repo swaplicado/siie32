@@ -1379,6 +1379,11 @@ public abstract class SFinUtilities {
                 "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId();
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
+        if(!resultSet.next()){
+            throw new Exception("La nota de credito no se puede modificar");
+        }
+        resultSet.beforeFirst();
+        
         while (resultSet.next()) {
             account = resultSet.getString("fid_acc");
         }
@@ -1391,13 +1396,21 @@ public abstract class SFinUtilities {
         String costCenter = "";
         String sql = "";
         SDataDpsEntry entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
+        double unitBaseEquiv = 1;
+        
+        sql = "SELECT unit_base_equiv AS unitBaseEquiv FROM erp.itmu_unit WHERE id_unit = " + entry.getFkOriginalUnitId();
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        if (resultSet.next()) {
+            unitBaseEquiv = Double.parseDouble(resultSet.getString("unitBaseEquiv"));
+        }
         
         sql = "SELECT IF(fid_cc_n IS NULL, '', fid_cc_n) AS _cc " +
                 "FROM trn_dps_rec AS dr " +
                 "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
                 "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
                 "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId() + " AND " +
-                "re.units = " + entry.getQuantity() + " AND (re.credit = " + entry.getSubtotal_r() + " OR re.debit = " + entry.getSubtotal_r() + ") " ;
+                "re.units = " + (entry.getQuantity() / unitBaseEquiv) + " AND (re.credit = " + entry.getSubtotal_r() + " OR re.debit = " + entry.getSubtotal_r() + ") " ;
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
         while (resultSet.next()) {
@@ -1407,7 +1420,7 @@ public abstract class SFinUtilities {
         return costCenter;
     }
     
-    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, final int[] dpsEntryKey, final String account, final String costCenter, final double originalQuantity, final double subTotal) throws Exception {
+    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, final int[] dpsEntryKey, final String account, final String costCenter, final double originalQuantity, final double subTotal, int registryType) throws Exception {
         
         /* Debido a que no es posible determinar con precisión cuál es el movimiento contable generado por la partida deseada del docto.,
          * se infiere cuál es aquél por el ID de los renglones contables generados por el docto.
@@ -1442,13 +1455,26 @@ public abstract class SFinUtilities {
                     + "y/o la posición de la partida deseada del docto. entre las partidas similares del docto (= " + position + ").");
         }
         
+        String whereSql = "";
+        switch(registryType){
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                whereSql = "WHERE re.fid_dps_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_doc_n = " + dpsEntryKey[1] + " AND re.fid_item_n = " + dpsEntry.getFkItemId() + " AND " +
+                "re.units = " + originalQuantity + " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                whereSql = "WHERE re.fid_dps_adj_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_adj_doc_n = " + dpsEntryKey[1] + " AND re.fid_item_n = " + dpsEntry.getFkItemId() + " AND " +
+                "re.units = " + originalQuantity + " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
+                break;
+            default: 
+                break;
+        }
+        
         // contar renglones similares al renglón de documento deseado:
         
         String sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
-                "WHERE re.fid_dps_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_doc_n = " + dpsEntryKey[1] + " AND re.fid_item_n = " + dpsEntry.getFkItemId() + " AND " +
-                "re.units = " + originalQuantity + " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
+                whereSql;
         ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
         
         ArrayList<Object[]> entries = new ArrayList<>();

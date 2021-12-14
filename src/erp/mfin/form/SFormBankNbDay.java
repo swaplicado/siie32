@@ -5,40 +5,42 @@
  */
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mfin.data.SDataBankNbDay;
 import java.awt.event.ActionEvent;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.event.KeyEvent;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author SW
+ * @author Adrián Alejandro Avilés
  */
-public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener{
+public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    private erp.lib.form.SFormField moFieldDate;
-    private erp.client.SClientInterface miClient;
-    private ArrayList maBankNbDays = new ArrayList();
-    private erp.mfin.data.SDataBankNbDay moBankNbDay;
     private int mnFormResult;
+    private int mnFormStatus;
+    private boolean mbFirstTime;
+    private java.util.Vector<erp.lib.form.SFormField> mvFields;
+    private erp.lib.form.SFormField moFieldDate;
+    private erp.lib.form.SFormField moFieldNameDay;
+    private erp.lib.form.SFormField moFieldIsDeleted;
+    private erp.client.SClientInterface miClient;
+    private erp.mfin.data.SDataBankNbDay moBankNbDay;
     
-    
-    DefaultTableModel model = new DefaultTableModel();
-    
+    /**
+     * Creates new form SFormBankNbDayV2
+     */
     public SFormBankNbDay(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
+        
         initComponents();
         initComponentsExtra();
     }
@@ -54,222 +56,173 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTableCalendar = new javax.swing.JTable();
-        jPanel5 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
         jftDate = new javax.swing.JFormattedTextField();
         jbDate = new javax.swing.JButton();
-        jPanel8 = new javax.swing.JPanel();
-        jlCelebration = new javax.swing.JLabel();
-        jtCelebration = new javax.swing.JTextField();
-        jPanel9 = new javax.swing.JPanel();
-        jbAdd = new javax.swing.JButton();
-        jbEdit = new javax.swing.JButton();
-        jPanel12 = new javax.swing.JPanel();
+        jlName = new javax.swing.JLabel();
+        jtName = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
-        jbSave = new javax.swing.JButton();
-        jbClose = new javax.swing.JButton();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Días inhabiles bancarios");
+        setMinimumSize(new java.awt.Dimension(347, 147));
+        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(360, 360));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Día inhabil bancario"));
+        jPanel1.setMinimumSize(new java.awt.Dimension(347, 105));
+        jPanel1.setPreferredSize(new java.awt.Dimension(347, 105));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setPreferredSize(new java.awt.Dimension(360, 370));
-        jPanel3.setLayout(new java.awt.GridLayout(1, 1));
-
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(340, 360));
-
-        jTableCalendar.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(jTableCalendar);
-
-        jPanel4.add(jScrollPane1);
-
-        jPanel3.add(jPanel4);
-
-        jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
-
-        jPanel5.setPreferredSize(new java.awt.Dimension(280, 360));
-        jPanel5.setLayout(new java.awt.BorderLayout());
-
-        jPanel6.setPreferredSize(new java.awt.Dimension(129, 200));
-        jPanel6.setLayout(new java.awt.GridLayout(4, 1));
+        jPanel3.setMinimumSize(new java.awt.Dimension(337, 82));
+        jPanel3.setPreferredSize(new java.awt.Dimension(337, 100));
+        jPanel3.setLayout(new java.awt.GridLayout(3, 2, 5, 5));
 
         jlDate.setText("Fecha");
-        jPanel7.add(jlDate);
+        jPanel3.add(jlDate);
 
         jftDate.setText("yyyy/mm/dd");
         jftDate.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel7.add(jftDate);
+        jPanel4.add(jftDate);
 
         jbDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDate.setToolTipText("Seleccionar fecha");
         jbDate.setFocusable(false);
         jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel7.add(jbDate);
+        jPanel4.add(jbDate);
 
-        jPanel6.add(jPanel7);
+        jPanel3.add(jPanel4);
 
-        jlCelebration.setText("Celebación");
-        jPanel8.add(jlCelebration);
+        jlName.setText("Nombre");
+        jPanel3.add(jlName);
 
-        jtCelebration.setPreferredSize(new java.awt.Dimension(190, 30));
-        jPanel8.add(jtCelebration);
+        jtName.setPreferredSize(new java.awt.Dimension(190, 30));
+        jPanel3.add(jtName);
+        jPanel3.add(jLabel1);
 
-        jPanel6.add(jPanel8);
-
-        jbAdd.setText("Añadir");
-        jPanel9.add(jbAdd);
-
-        jbEdit.setText("Editar");
-        jPanel9.add(jbEdit);
-
-        jPanel6.add(jPanel9);
-
+        jckIsDeleted.setForeground(java.awt.Color.red);
         jckIsDeleted.setText("Registro eliminado");
-        jPanel12.add(jckIsDeleted);
+        jPanel3.add(jckIsDeleted);
 
-        jPanel6.add(jPanel12);
+        jPanel1.add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
-        jPanel5.add(jPanel6, java.awt.BorderLayout.NORTH);
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jPanel1.getAccessibleContext().setAccessibleName("Datos de día inhabil bancario");
 
-        getContentPane().add(jPanel5, java.awt.BorderLayout.EAST);
+        jPanel2.setMinimumSize(new java.awt.Dimension(171, 42));
+        jPanel2.setPreferredSize(new java.awt.Dimension(400, 33));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jPanel2.setPreferredSize(new java.awt.Dimension(640, 40));
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(81, 32));
+        jPanel2.add(jbOk);
 
-        jPanel10.setPreferredSize(new java.awt.Dimension(200, 10));
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jPanel2.add(jbCancel);
 
-        jbSave.setText("Guardar");
-        jPanel10.add(jbSave);
+        getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        jbClose.setText("Cerrar");
-        jPanel10.add(jbClose);
-
-        jPanel2.add(jPanel10, java.awt.BorderLayout.EAST);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
-
-        setSize(new java.awt.Dimension(640, 400));
+        setSize(new java.awt.Dimension(400, 250));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        windowActivated();
+    }//GEN-LAST:event_formWindowActivated
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTableCalendar;
-    private javax.swing.JButton jbAdd;
-    private javax.swing.JButton jbClose;
-    private javax.swing.JButton jbDate;
-    private javax.swing.JButton jbEdit;
-    private javax.swing.JButton jbSave;
-    private javax.swing.JCheckBox jckIsDeleted;
-    private javax.swing.JFormattedTextField jftDate;
-    private javax.swing.JLabel jlCelebration;
-    private javax.swing.JLabel jlDate;
-    private javax.swing.JTextField jtCelebration;
-    // End of variables declaration//GEN-END:variables
+    private void initComponentsExtra() {
+        mvFields = new Vector<SFormField>();
 
-    public void initComponentsExtra(){
         moFieldDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDate, jlDate);
         moFieldDate.setPickerButton(jbDate);
-        jtCelebration.setEditable(true);
-        jbDate.addActionListener(this);
-        jbAdd.addActionListener(this);
-        jbEdit.addActionListener(this);
-        jckIsDeleted.addActionListener(this);
-        jbSave.addActionListener(this);
-        jbClose.addActionListener(this);
-        
-        jbDate.setEnabled(true);
-        jbAdd.setEnabled(true);
-        jbEdit.setEnabled(false);
-        jckIsDeleted.setEnabled(false);
-        setTable();
-    }
-    
-    private void setTable(){
-        model = new DefaultTableModel();
-        
-        jTableCalendar.setModel(model);
-        
-        model.addColumn("Fecha");
-        model.addColumn("Nombre");
+        moFieldNameDay = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtName, jlName);
+        moFieldNameDay.setLengthMax(50);
+        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
-        int[] anchosSessions = {100, 250};
-        for (int i = 0; i < jTableCalendar.getColumnCount(); i++) {
-            jTableCalendar.getColumnModel().getColumn(i).setPreferredWidth(anchosSessions[i]);
-            jTableCalendar.getColumnModel().getClass();
+        mvFields.add(moFieldDate);
+        mvFields.add(moFieldNameDay);
+        mvFields.add(moFieldIsDeleted);
+
+        jbDate.addActionListener(this);
+        jbOk.addActionListener(this);
+        jbCancel.addActionListener(this);
+
+        AbstractAction actionOk = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { actionOk(); }
+        };
+
+        SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+
+        AbstractAction action = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { actionCancel(); }
+        };
+
+        SFormUtilities.putActionMap(getRootPane(), action, "cancel", KeyEvent.VK_ESCAPE, 0);
+    }
+    
+    private void windowActivated() {
+        if (mbFirstTime) {
+            mbFirstTime = false;
+            jftDate.requestFocus();
+            jtName.requestFocus();
         }
     }
     
-    private void actionDate() {
-        miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
-        jtCelebration.setText(null);
-    }
-    
-    private void actionAdd(){
-        String date = formatter.format(moFieldDate.getDate());
-        String celebration = jtCelebration.getText();
-        String[] row = {date,celebration};
-        model.addRow(row);
-    }
-    
-    private void actionEdit(){
-        String date = formatter.format(moFieldDate.getDate());
-        String celebration = jtCelebration.getText();
-        String[] row = {date,celebration};
-        model.removeRow(0);
-        model.insertRow(0, row);
-    }
-    
-    private void actionSave(){
-        mnFormResult = SLibConstants.FORM_RESULT_OK;
-        for(int i = 0; i<model.getRowCount(); i++){
-            String[] row = {model.getValueAt(i, 0).toString(),model.getValueAt(i, 1).toString()};
-            maBankNbDays.add(row);
+    private void actionOk() {
+        SFormValidation validation = formValidate();
+
+        if (validation.getIsError()) {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
         }
-        setVisible(false);
+        else {
+            mnFormResult = SLibConstants.FORM_RESULT_OK;
+            setVisible(false);
+        }
     }
-    
-    private void actionDel(){
-        
-    }
-    
-    private void actionCancel(){
+
+    private void actionCancel() {
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
     
+    private void actionDate(){
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbDate;
+    private javax.swing.JButton jbOk;
+    private javax.swing.JCheckBox jckIsDeleted;
+    private javax.swing.JFormattedTextField jftDate;
+    private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlName;
+    private javax.swing.JTextField jtName;
+    // End of variables declaration//GEN-END:variables
+
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -277,15 +230,17 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
 
     @Override
     public void formReset() {
-        jtCelebration.setText(null);
-        moFieldDate.setDate(null);
-        maBankNbDays = new ArrayList();
+        mnFormResult = SLibConstants.UNDEFINED;
+        mnFormStatus = SLibConstants.UNDEFINED;
+        mbFirstTime = true;
+
         moBankNbDay = null;
-        jbAdd.setEnabled(true);
-        jbEdit.setEnabled(false);
-        jckIsDeleted.setSelected(false);
+
+        for (int i = 0; i < mvFields.size(); i++) {
+            ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
+        }
+
         jckIsDeleted.setEnabled(false);
-        setTable();
     }
 
     @Override
@@ -295,24 +250,33 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
 
     @Override
     public SFormValidation formValidate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SFormValidation validation = new SFormValidation();
+
+        for (int i = 0; i < mvFields.size(); i++) {
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
+                validation.setIsError(true);
+                validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
+                break;
+            }
+        }
+        return validation;
     }
 
     @Override
     public void setFormStatus(int status) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        mnFormStatus = status;
     }
 
     @Override
     public void setFormVisible(boolean visible) {
-        setVisible(true);
+        setVisible(visible);
     }
 
     @Override
     public int getFormStatus() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return mnFormStatus;
     }
-
+    
     @Override
     public int getFormResult() {
         return mnFormResult;
@@ -321,39 +285,31 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
     @Override
     public void setRegistry(SDataRegistry registry) {
         moBankNbDay = (SDataBankNbDay) registry;
-        //maBankNbDays = moBankNbDay.getBankNbDay();
-        //Object bankNbDay = maBankNbDays.get(0);
-        Object bankNbDay = moBankNbDay.getBankNbDay().get(0);
-        if (bankNbDay instanceof String[]) {
-            try {
-                String dateFlatten = (((String[]) bankNbDay)[0]);
-                String name = (((String[]) bankNbDay)[1]);
-                Date date = formatter.parse(dateFlatten);
-                moFieldDate.setDate(date);
-                jtCelebration.setText(name);
-                actionAdd();
-                jbAdd.setEnabled(false);
-                jbEdit.setEnabled(true);
-                jckIsDeleted.setEnabled(true);
-            } catch (ParseException ex) {
-                Logger.getLogger(SFormBankNbDay.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
+        moFieldDate.setFieldValue(moBankNbDay.getNonBizDay());
+        moFieldNameDay.setFieldValue(moBankNbDay.getName());
+        moFieldIsDeleted.setFieldValue(moBankNbDay.getIsDeleted());
+
+        if (moBankNbDay.getIsCanDelete()) {
+            jckIsDeleted.setEnabled(true);
         }
     }
 
     @Override
-    public erp.mfin.data.SDataBankNbDay getRegistry() {
+    public SDataRegistry getRegistry() {
         if (moBankNbDay == null) {
             moBankNbDay = new SDataBankNbDay();
-            moBankNbDay.setBankNbDay(maBankNbDays);
-            moBankNbDay.setFkUserId(miClient.getSessionXXX().getUser().getPkUserId());
-            moBankNbDay.setIsDeleted(jckIsDeleted.isSelected());
+            moBankNbDay.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         }
         else {
-            moBankNbDay.setIsDeleted(jckIsDeleted.isSelected());
-            moBankNbDay.setBankNbDay(maBankNbDays);
-            moBankNbDay.setFkUserId(miClient.getSession().getUser().getPkUserId());
+            moBankNbDay.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
+
+        moBankNbDay.setNonBizDay(moFieldDate.getDate());
+        moBankNbDay.setName(moFieldNameDay.getString());
+        moBankNbDay.setIsCanEdit(true);
+        moBankNbDay.setIsCanDelete(true);
+        moBankNbDay.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         return moBankNbDay;
     }
@@ -378,16 +334,14 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
         if (e.getSource() instanceof javax.swing.JButton) {
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
-            if (button == jbDate) {
-                actionDate();
-            }else if (button == jbAdd) {
-                actionAdd();
-            }else if (button == jbEdit) {
-                actionEdit();
-            }else if (button == jbSave) {
-                actionSave();
-            }else if (button == jbClose) {
+            if (button == jbOk) {
+                actionOk();
+            }
+            else if (button == jbCancel) {
                 actionCancel();
+            }
+            else if (button == jbDate) {
+                actionDate();
             }
         }
     }
