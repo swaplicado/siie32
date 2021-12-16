@@ -25,7 +25,7 @@ public class SDataCounty extends erp.lib.data.SDataRegistry implements java.io.S
     protected java.lang.String msDescription;
 
     public SDataCounty() {
-        super(SDataConstants.LOCU_COUNTY);
+        super(SDataConstants.LOCS_CCP_COUNTY);
         reset();
     }
     
@@ -67,7 +67,7 @@ public class SDataCounty extends erp.lib.data.SDataRegistry implements java.io.S
         reset();
 
         try {
-            sql = "SELECT * FROM erp.locu_county WHERE id_county_code = '" + key[0] + "' AND id_sta_code = '" + key[1] +"' ";
+            sql = "SELECT * FROM erp.locs_ccp_county WHERE id_county_code = '" + key[0] + "' AND id_sta_code = '" + key[1] +"' ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -102,7 +102,7 @@ public class SDataCounty extends erp.lib.data.SDataRegistry implements java.io.S
 
         try {
             if (mbIsRegistryNew) {
-                sql = "SELECT COUNT(*) FROM erp.locu_county WHERE id_county_code = " + msPkCountyCode + " AND id_sta_code = " + msPkStateCode;
+                sql = "SELECT COUNT(*) FROM erp.locs_ccp_county WHERE id_county_code = " + msPkCountyCode + " AND id_sta_code = " + msPkStateCode;
                 resultSet = connection.createStatement().executeQuery(sql);
 
                 if (resultSet.next()) {
@@ -112,7 +112,7 @@ public class SDataCounty extends erp.lib.data.SDataRegistry implements java.io.S
 
             if (mbIsRegistryNew) {
                 
-                sql = "INSERT INTO erp.locu_county VALUES (" +
+                sql = "INSERT INTO erp.locs_ccp_county VALUES (" +
                         "'" + msPkCountyCode + "', " +
                         "'" + msPkStateCode + "', " +
                         "'" + msDescription + "', " +
@@ -120,7 +120,7 @@ public class SDataCounty extends erp.lib.data.SDataRegistry implements java.io.S
             }
             else {
 
-                sql = "UPDATE erp.locu_county SET " +
+                sql = "UPDATE erp.locs_ccp_county SET " +
 //                        "id_county_code='" + msPkCountyCode + "', " +
 //                        "id_sta_code='" + msPkStateCode + "', " +
                         "description='" + msDescription + "', " +

@@ -431,7 +431,14 @@ public class SModuleLog extends SGuiModule {
                 break;
                 
             case SModConsts.LOG_BOL:
-                view = new SViewBillOfLading(miClient, subtype, "Carta porte T");
+                switch (subtype) {
+                    case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                        view = new SViewBillOfLading(miClient, subtype, "Carta porte traslados");
+                        break;
+                    case SDataConstantsSys.TRNS_TP_CFD_INV:
+                        view = new SViewBillOfLading(miClient, subtype, "Carta porte facturas");
+                        break;
+                }
                 break;
                 
             case SModConsts.LOGX_SHIP_AUTH:
@@ -635,10 +642,12 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOG_BOL:
                 switch (subtype) {
                     case SDataConstantsSys.TRNS_TP_CFD_BOL:
-                        if (moFormBillOfLadingTypeT == null) moFormBillOfLadingTypeT = new SFormBillOfLading(miClient, "Traslados", subtype);
+                        if (moFormBillOfLadingTypeT == null) moFormBillOfLadingTypeT = new SFormBillOfLading(miClient, "Carta porte de traslados", subtype);
                         form = moFormBillOfLadingTypeT;
                         break;
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
+                        if (moFormBillOfLadingTypeI == null) moFormBillOfLadingTypeI = new SFormBillOfLading(miClient, "Carta porte para facturas", subtype);
+                        form = moFormBillOfLadingTypeI;
                     default:        
                 }
                 break;

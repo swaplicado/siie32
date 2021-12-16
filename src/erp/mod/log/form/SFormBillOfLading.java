@@ -1519,7 +1519,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
-            moRegistry.computeNumber(miClient.getSession());
+            moRegistry.computeNumber(miClient.getSession(), mnFormSubtype);
             jtfRegistryKey.setText("");
             moBoolInternationalShip.setSelected(false);
             moTextFiscalIdReceptor.setText(((SClientInterface) miClient).getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId());

@@ -6,6 +6,7 @@
 package erp.mod.log.db;
 
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -18,7 +19,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbTrailer extends SDbRegistryUser {
+public class SDbTrailer extends SDbRegistryUser implements Serializable {
 
     protected int mnPkTrailerId;
     protected String msName;

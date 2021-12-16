@@ -42,7 +42,7 @@ import sa.lib.gui.SGuiDate;
 public class SViewBillOfLading extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
-    private JButton jbPrint;
+    private javax.swing.JButton jbPrint;
     private javax.swing.JButton jbPrintCancelAck;
     private javax.swing.JButton jbGetXml;
     private javax.swing.JButton jbGetXmlCancelAck;
@@ -53,12 +53,28 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     private javax.swing.JButton jbRestoreCfdStamped;
     private javax.swing.JButton jbRestoreCfdCancelAck;
     private javax.swing.JButton jbDeactivateFlags;
+    private javax.swing.JButton jbAnnul;
     
     public SViewBillOfLading(SGuiClient client, int subType, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_BOL, subType, title);
         setRowButtonsEnabled(true, false, true, false, true);
         
         initComponetsCustom();
+    }
+    
+    private void dislabeButtons() {
+        jbPrint.setEnabled(false);
+        jbPrintCancelAck.setEnabled(false);
+        jbGetXml.setEnabled(false);
+        jbGetXmlCancelAck.setEnabled(false);
+        jbSignXml.setEnabled(false);
+        jbVerifyCfdi.setEnabled(false);
+        jbGetCfdiStatus.setEnabled(false);
+        jbSendCfdi.setEnabled(false);
+        jbRestoreCfdStamped.setEnabled(false);
+        jbRestoreCfdCancelAck.setEnabled(false);
+        jbDeactivateFlags.setEnabled(false);
+        jbAnnul.setEnabled(false);
     }
 
     private void initComponetsCustom() {
@@ -117,6 +133,15 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
         jbDeactivateFlags.setPreferredSize(new Dimension(23, 23));
         jbDeactivateFlags.addActionListener(this);
         jbDeactivateFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
+        
+        jbAnnul = new JButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL));
+        jbAnnul.setPreferredSize(new Dimension(23, 23));
+        jbAnnul.addActionListener(this);
+        jbAnnul.setToolTipText("Anular documento");
+        
+        if (mnGridSubtype == SDataConstantsSys.TRNS_TP_CFD_INV){
+            dislabeButtons();
+        }
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -132,6 +157,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreCfdStamped);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreCfdCancelAck);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDeactivateFlags);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
     }
     
     private void actionPrint() {
@@ -233,7 +259,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
                     SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
                     if (SCfdUtils.validateCfdi((SClientInterface)miClient, cfd, 0, true)) {
-//                        ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                        ((SClientInterface) miClient).getGuiModule(SModConsts.LOG_BOL).refreshCatalogues(mnGridType);
                     }
                 }
                 catch (Exception e) {
@@ -270,7 +296,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
                     SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
-                    SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, cfd, 0, true, false, true);
+                    SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, cfd, 0, true, false, true);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -341,6 +367,25 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
             }
         }
     }
+    
+    private void actionAnnul() {
+        if (jbAnnul.isEnabled()) {
+           if (jtTable.getSelectedRow() < 0) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
+                    SCfdUtils.resetCfdiDeactivateFlags((SClientInterface)miClient, cfd);
+//                    miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
 
     
     /*
@@ -375,6 +420,15 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
+        }
+        
+        switch (mnGridSubtype) {
+            case SDataConstantsSys.TRNS_TP_CFD_INV:
+                sql += (sql.isEmpty() ? "" : "AND ") + "b.bol_tp = 'I' ";
+                break;
+            case SDataConstantsSys.TRNS_TP_CFD_BOL:
+               sql += (sql.isEmpty() ? "" : "AND ") + "b.bol_tp = 'T' ";
+               break; 
         }
 
         msSql = "SELECT " 
@@ -494,6 +548,9 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                 actionRestoreSignedXmlCancelAck();
             }
             else if (button == jbDeactivateFlags) {
+                actionDeactivateFlags();
+            }
+            else if (button == jbAnnul) {
                 actionDeactivateFlags();
             }
         }

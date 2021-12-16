@@ -10,6 +10,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.mod.SModConsts;
 
 /**
  *
@@ -38,12 +39,12 @@ public class SCfdBolUtils {
                     try {
                         if (((SClientInterface) client).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticBol()) {
                             if (SCfdUtils.signAndSendCfdi(client, cfd, SLibConstants.UNDEFINED, true, true)) {
-                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRNX_CFD_PAY_REC);
+                                client.getGuiModule(SDataConstants.MOD_LOG).refreshCatalogues(SModConsts.LOG_BOL);
                             }
                         }
                         else {
                             if (SCfdUtils.signCfdi(client, cfd, SLibConstants.UNDEFINED)) {
-                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRNX_CFD_PAY_REC);
+                                client.getGuiModule(SDataConstants.MOD_LOG).refreshCatalogues(SModConsts.LOG_BOL);
                             }
                         }
                     }

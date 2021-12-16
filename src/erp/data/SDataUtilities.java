@@ -3262,7 +3262,7 @@ public abstract class SDataUtilities {
     public static boolean isCatalogueLog(int catalogue) {
         return catalogue >= SDataConstants.GLOBAL_CAT_LOG && catalogue < SDataConstants.GLOBAL_CAT_MFG ||
                 catalogue >= SDataConstants.MOD_LOG && catalogue < SDataConstants.MOD_MFG ||
-                catalogue >= SModConsts.LOGS_TP_SHIP && catalogue <= SModConsts.LOG_SHIP_DEST_ETY;
+                catalogue >= SModConsts.LOGS_TP_SHIP && catalogue <= SModConsts.LOG_BOL_MERCH_QTY;
     }
 
     /**

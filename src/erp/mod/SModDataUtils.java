@@ -62,11 +62,11 @@ public class SModDataUtils {
         ResultSet resultSet;
         
         switch (table) {
-            case SModConsts.LOCU_COUNTY:
-                sql = "SELECT description FROM erp.locu_county WHERE id_county_code = '" + code + "' AND id_sta_code = '" + stateCode + "'";
+            case SModConsts.LOCS_CCP_COUNTY:
+                sql = "SELECT description FROM erp.locs_ccp_county WHERE id_county_code = '" + code + "' AND id_sta_code = '" + stateCode + "'";
                 break;
-            case SModConsts.LOCU_LOCALITY:
-                sql = "SELECT description FROM erp.locu_locality WHERE id_locality_code = '" + code + "' AND id_sta_code = '" + stateCode + "'";
+            case SModConsts.LOCS_CCP_LOCALITY:
+                sql = "SELECT description FROM erp.locs_ccp_locality WHERE id_locality_code = '" + code + "' AND id_sta_code = '" + stateCode + "'";
                 break;
             default:
         }

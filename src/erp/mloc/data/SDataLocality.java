@@ -25,7 +25,7 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDescription;
 
     public SDataLocality() {
-        super(SDataConstants.LOCU_LOCALITY);
+        super(SDataConstants.LOCS_CCP_LOCALITY);
     }
     
     public void setPkLocalityCode(java.lang.String s) { msPkLocalityCode = s; }
@@ -66,7 +66,7 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
         reset();
 
         try {
-            sql = "SELECT * FROM erp.locu_locality WHERE id_locality_code = '" + key[0] + "' AND id_sta_code = '" + key[1] + "'";
+            sql = "SELECT * FROM erp.locs_ccp_locality WHERE id_locality_code = '" + key[0] + "' AND id_sta_code = '" + key[1] + "'";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -101,7 +101,7 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
 
         try {
             if (mbIsRegistryNew) {
-                sql = "SELECT COUNT(*) FROM erp.locu_locality WHERE id_locality_code = " + msPkLocalityCode + " AND id_sta_code = " + msPkStateCode;
+                sql = "SELECT COUNT(*) FROM erp.locs_ccp_locality WHERE id_locality_code = " + msPkLocalityCode + " AND id_sta_code = " + msPkStateCode;
                 resultSet = connection.createStatement().executeQuery(sql);
 
                 if (resultSet.next()) {
@@ -111,7 +111,7 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
 
             if (mbIsRegistryNew) {
                 
-                sql = "INSERT INTO erp.locu_locality VALUES (" +
+                sql = "INSERT INTO erp.locs_ccp_locality VALUES (" +
                         "'" + msPkLocalityCode + "', " +
                         "'" + msPkStateCode + "', " +
                         "'" + msDescription + "', " +
@@ -119,7 +119,7 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
             }
             else {
 
-                sql = "UPDATE erp.locu_locality SET " +
+                sql = "UPDATE erp.locs_ccp_locality SET " +
 //                        "id_locality_code='" + msPkLocalityCode + "', " +
 //                        "id_sta_code='" + msPkStateCode + "', " +
                         "description='" + msDescription + "', " +

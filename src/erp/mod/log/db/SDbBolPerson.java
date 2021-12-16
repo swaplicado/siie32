@@ -8,6 +8,7 @@ package erp.mod.log.db;
 import erp.mloc.data.SDataCountry;
 import erp.mloc.data.SDataState;
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -20,7 +21,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbBolPerson extends SDbRegistryUser {
+public class SDbBolPerson extends SDbRegistryUser implements Serializable {
 
     protected int mnPkBolPersonId;
     protected String msName;

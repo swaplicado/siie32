@@ -22,6 +22,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.lib.table.STableUtilities;
+import erp.mod.SModConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -59,6 +60,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
      * d) SDataConstants.TRNX_DPS_PEND_LINK
      * e) SDataConstants.TRNX_DPS_PEND_ADJ
      * f) SDataConstatnts.TRN_DPS_ACK
+     * g) SModConsts.LOG_BOL
      */
     public SDialogPickerDps(erp.client.SClientInterface client, int optionType) {
         super(client.getFrame(), true);
@@ -294,6 +296,13 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
                 break;
                 
+            case SModConsts.LOG_BOL:
+                tableColumns = new STableColumnForm[3];
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio", STableConstants.WIDTH_DOC_NUM);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha", STableConstants.WIDTH_DATE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Distancia recorrida", 100);
+                break;
+                
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
@@ -524,6 +533,14 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                     default:
                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
                 }
+                break;
+                
+            case SModConsts.LOG_BOL:
+                mnYear = ((int[]) moFilterKey)[0];
+                jtfDpsClass.setText("CARTA PORTE");
+                jtfDpsClass.setToolTipText(jtfDpsClass.getText());
+                jtfBizPartner.setText("N/A");
+                jtfBizPartner.setToolTipText(manBizPartnerPk == null ? null : jtfBizPartner.getText());
                 break;
 
             default:

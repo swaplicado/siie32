@@ -4963,6 +4963,7 @@ public abstract class SCfdUtils implements Serializable {
         int idBizPartner = SLibConsts.UNDEFINED;
         int idBizPartnerBranch = SLibConsts.UNDEFINED;
         SDataDps dps = null;
+        SDbBillOfLading bol = null;
         
         if (canSendCfd(cfd)) {
             switch (typeCfd) {
@@ -4972,6 +4973,14 @@ public abstract class SCfdUtils implements Serializable {
                     idBizPartnerBranch = dps.getFkBizPartnerBranchId();
                     break;
 
+                case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                    bol = new SDbBillOfLading();
+                    bol.read(client.getSession(), new int[] { cfd.getFkBillOfLadingId_n() });
+                    SDataBizPartnerBranch bpb = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { bol.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    idBizPartner = bpb.getFkBizPartnerId();
+                    idBizPartnerBranch = bpb.getPkBizPartnerBranchId();
+                    break;
+                    
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                     idBizPartner = SDataCfdPayment.getDbmsDataReceptorId(client.getSession().getStatement(), cfd.getPkCfdId());
                     idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
@@ -4981,7 +4990,7 @@ public abstract class SCfdUtils implements Serializable {
                     idBizPartner = payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n();
                     idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
                     break;
-
+                    
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }

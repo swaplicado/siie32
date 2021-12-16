@@ -254,12 +254,13 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public SDataBizPartner getAuxDbmsDataEmisor() { return moAuxDbmsDataEmisor; }
     public SDataBizPartnerBranch getAuxDbmsDataEmisorSucursal() { return moAuxDbmsDataEmisorSucursal; }
     
-    public void computeNumber(SGuiSession session) throws SQLException, Exception {
+    public void computeNumber(SGuiSession session, int type) throws SQLException, Exception {
         ResultSet resultSet;
         
         msNumber = "";
         
-        msSql = "SELECT COALESCE(MAX(num), 0) + 1 FROM " + getSqlTable() + " WHERE ser = '" + msSeries + "'";
+        msSql = "SELECT COALESCE(MAX(CONVERT(num, UNSIGNED INTEGER)), 0) + 1 FROM " + getSqlTable() + " WHERE ser = '" + msSeries + "' "
+                + "AND bol_tp = " + (SDataConstantsSys.TRNS_TP_CFD_INV == type ? "'I'" : "'T'");
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             msNumber = resultSet.getString(1);
