@@ -450,7 +450,7 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
     @Override
     public void actionSave() {
         String msg;
-//        SSrvLock lock = null;
+//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
         
         SValuationBalances sbe;
@@ -464,7 +464,9 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
             
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
                 try {
-//                    lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                    lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
+*/                    
                     rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout() / 1000);
                     
                     sbe = new SValuationBalances(miClient);
@@ -486,9 +488,11 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
                 }
                 finally {
                     try {
-//                        if (lock != null) {
-//                            SSrvUtils.releaseLock(miClient.getSession(), lock);
-//                        }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                        if (lock != null) {
+                            SSrvUtils.releaseLock(miClient.getSession(), lock);
+                        }
+*/
                         if (rlock != null) {
                             SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                         }

@@ -252,7 +252,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             moConceptTablePane.getTable().requestFocus();
         }
         if(mbDocuentsLockedError) {
-//            releaseDpsUserLock();
+//            releaseDpsUserLock(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             releaseDpsUserRedisLock();
             setVisible(false);
         }
@@ -410,13 +410,14 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         if (dps != moDps) {
             if (dps != null) { 
-//            SSrvLock lock = gainDpsUserLock(dps);
-            SRedisLock rlock = gainDpsUserRedisLock(dps);
-
-//                if (lock != null) {
-//                    dps.setAuxUserLock(lock);
-//                    error = false;
-//                }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            SSrvLock lock = gainDpsUserLock(dps);
+                if (lock != null) {
+                    dps.setAuxUserLock(lock);
+                    error = false;
+                }
+*/
+                SRedisLock rlock = gainDpsUserRedisLock(dps);
                 if (rlock != null) {
                     dps.setAuxUserRedisLock(rlock);
                     error = false;
@@ -443,20 +444,22 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         return rlock;
     }
     
-//    private sa.lib.srv.SSrvLock gainDpsUserLock(SDataDps dps) {
-//        SSrvLock lock;
-//
-//        try {
-//            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), dps.getRegistryTimeout());
-//        }
-//        catch (Exception e) {
-//            lock = null;
-//            miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + 
-//                    SLibUtils.DateFormatDateYearMonth.format(dps.getDateDoc()) + " " + dps.getNumberSeries() + dps.getNumber() + "'.\n" + e);
-//        }
-//
-//        return lock;
-//    }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    private sa.lib.srv.SSrvLock gainDpsUserLock(SDataDps dps) {
+        SSrvLock lock;
+
+        try {
+            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), dps.getRegistryTimeout());
+        }
+        catch (Exception e) {
+            lock = null;
+            miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + 
+                    SLibUtils.DateFormatDateYearMonth.format(dps.getDateDoc()) + " " + dps.getNumberSeries() + dps.getNumber() + "'.\n" + e);
+        }
+
+        return lock;
+    }
+*/
     
     private void releaseDpsUserRedisLock() {
         moDocuments.stream().forEach((document) -> {
@@ -473,22 +476,23 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
         });
     }
-//    private void releaseDpsUserLock() {
-//        moDocuments.stream().forEach((document) -> {
-//            sa.lib.srv.SSrvLock lock = document.getAuxUserLock();
-//            if (lock != null) {
-//                try {
-//                    SSrvUtils.releaseLock(miClient.getSession(), lock);
-//                    document.setAuxUserLock(null);
-//                }
-//                catch (Exception e) {
-//                    miClient.showMsgBoxWarning("No fue posible liberar el acceso exclusivo del registro '" + 
-//                            SLibUtils.DateFormatDateYearMonth.format(document.getDateDoc()) + " " + document.getNumberSeries() + document.getNumber() + "'.\n" + e);
-//                }
-//            }
-//        });
-//    }
-    
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    private void releaseDpsUserLock() {
+        moDocuments.stream().forEach((document) -> {
+            sa.lib.srv.SSrvLock lock = document.getAuxUserLock();
+            if (lock != null) {
+                try {
+                    SSrvUtils.releaseLock(miClient.getSession(), lock);
+                    document.setAuxUserLock(null);
+                }
+                catch (Exception e) {
+                    miClient.showMsgBoxWarning("No fue posible liberar el acceso exclusivo del registro '" + 
+                            SLibUtils.DateFormatDateYearMonth.format(document.getDateDoc()) + " " + document.getNumberSeries() + document.getNumber() + "'.\n" + e);
+                }
+            }
+        });
+    }
+*/    
     private void populateTable() {
         moConceptTablePane.createTable();
         
@@ -654,7 +658,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     }
 
     private void actionCancel() {
-//        releaseDpsUserLock();
+//        releaseDpsUserLock(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         releaseDpsUserRedisLock();
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);

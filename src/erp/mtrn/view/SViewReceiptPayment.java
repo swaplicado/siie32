@@ -318,7 +318,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                     boolean annul = true;
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                     ArrayList<Object[]> journalVoucherKeys = SDataCfd.getDependentJournalVoucherKeys(miClient.getSession().getStatement(), cfd.getPkCfdId());
-//                    ArrayList<SSrvLock> locks = new ArrayList<>();
+//                    ArrayList<SSrvLock> locks = new ArrayList<>(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                     ArrayList<SRedisLock> rlocks = new ArrayList<>();
                     
                     try {
@@ -327,8 +327,10 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                             
                             for (int index = 0; index < journalVoucherKeys.size(); index++) {
                                 if (journalVoucherKeys.get(index) != null) {
-//                                    SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60 * 1000); // 10 min.
-//                                    locks.add(lock);
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                                    SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60 * 1000); // 10 min.
+                                    locks.add(lock);
+*/
                                     SRedisLock rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60); // 10 min.
                                     rlocks.add(rlock);
                                 }
@@ -382,9 +384,11 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                         SLibUtils.showException(this, e);
                     }
                     finally {
-//                        for (SSrvLock lock : locks) {
-//                            SSrvUtils.releaseLock(miClient.getSession(), lock);
-//                        }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                        for (SSrvLock lock : locks) {
+                            SSrvUtils.releaseLock(miClient.getSession(), lock);
+                        }
+*/
                         for (SRedisLock rlock : rlocks) {
                             SRedisLockUtils.releaseLock(miClient, rlock);
                         }

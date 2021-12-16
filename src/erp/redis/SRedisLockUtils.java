@@ -96,7 +96,7 @@ public abstract class SRedisLockUtils {
             jedis.del(redisLock.getLockKey().getLockKey());
         } else if (!redisLock.getLockKey().isDummy()) {
             client.showMsgBoxWarning("No se eliminó el candado de acceso exclusivo al registro.\n"
-                    + "Comunicarlo al administrador");
+                    + "Favor de comunicarlo al administrador del sistema");
         }
     }
 

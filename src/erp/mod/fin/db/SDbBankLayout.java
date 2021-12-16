@@ -1547,19 +1547,19 @@ public class SDbBankLayout extends SDbRegistryUser {
      */
     public boolean updateLayoutStatus(SGuiClient client, int newLayoutStatus) throws Exception {
         boolean done = false;
-//        SSrvLock lock = null;
+//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
         
         try {
             mnLayoutStatus = newLayoutStatus;
-            
-//            lock = SSrvUtils.gainLock(client.getSession(), 
-//                    ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId(), 
-//                    SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
-            
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            lock = SSrvUtils.gainLock(client.getSession(), 
+                    ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId(), 
+                    SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
+*/            
             rlock = SRedisLockUtils.gainLock((SClientInterface) client, SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout() / 1000);
             
-//            if (lock != null && lock.getLockStatus() == SSrvConsts.LOCK_GAINED) {
+//            if (lock != null && lock.getLockStatus() == SSrvConsts.LOCK_GAINED) Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (rlock != null) {
                 String sql = "UPDATE " + getSqlTable() + " SET "
                         + "lay_st = " + mnLayoutStatus + "" + 
@@ -1573,9 +1573,11 @@ public class SDbBankLayout extends SDbRegistryUser {
             SLibUtils.showException(this, e);
         }
         finally {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(client.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(client.getSession(), lock);
+            }
+*/
             if (rlock != null) {
                 SRedisLockUtils.releaseLock((SClientInterface) (client), rlock);
             }

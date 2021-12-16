@@ -87,13 +87,14 @@ public class SHrsPayrollAnnul {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-//        SSrvLock lock = null;
+//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
         
         try {
             // Attempt to gain data lock:
-
-//            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+*/
             rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 60);
             // Read data registry:
 
@@ -155,18 +156,22 @@ public class SHrsPayrollAnnul {
             }
         }
         catch (Exception e) {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(miClient.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+*/            
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }
             throw e;
         }
         finally {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(miClient.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+*/
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }

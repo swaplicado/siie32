@@ -664,7 +664,7 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dataDps = null;
         SDataCfdPayment dataCfdPayment = null;
         SDataPayrollReceiptIssue dataPayrollReceiptIssue = null;
-//        SSrvLock lock = null;
+//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
         SCfdiSignature cfdiSignature = null;
         String xmlStamping = "";
@@ -677,20 +677,26 @@ public abstract class SCfdUtils implements Serializable {
             switch (dataCfd.getFkCfdTypeId()) {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
                     registryKey = new int[] { dataCfd.getFkDpsYearId_n(), dataCfd.getFkDpsDocId_n() };
-//                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60); // 1 minute timeout
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60); // 1 minute timeout
+*/
                     rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                     registryKey = new int[] { dataCfd.getPkCfdId() };
-//                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60); // 1 minute timeout
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60); // 1 minute timeout
+*/
                     rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                     if (payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
                         registryKey = new int[] { dataCfd.getFkPayrollReceiptPayrollId_n(), dataCfd.getFkPayrollReceiptEmployeeId_n(), dataCfd.getFkPayrollReceiptIssueId_n() };
-//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60); // 1 minute timeout
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60); // 1 minute timeout
+*/
                         rlock = SRedisLockUtils.gainLock(client, SModConsts.HRS_PAY_RCP_ISS, registryKey, 60);
                     }
                     break;
@@ -867,18 +873,22 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         catch (Exception e) {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(client.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(client.getSession(), lock);
+            }
+*/
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(client, rlock);
             }
             throw e;
         }
         finally {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(client.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(client.getSession(), lock);
+            }
+*/
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(client, rlock);
             }
@@ -2181,7 +2191,7 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dps = null;
         SDataCfdPayment cfdPayment = null;
         SDataPayrollReceiptIssue receiptIssue = null;
-//        SSrvLock lock = null;
+//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
         SServerRequest request = null;
         SServerResponse response = null;
@@ -2199,8 +2209,9 @@ public abstract class SCfdUtils implements Serializable {
                     }
                     else {
                         // lock registry:
-                        
-//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, key, 1000 * 60); // 1 min. timeout
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro                        
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, key, 1000 * 60); // 1 min. timeout
+*/                        
                         rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, key, 60);
                         // check if registry can be annuled:
                         
@@ -2250,8 +2261,9 @@ public abstract class SCfdUtils implements Serializable {
                     }
                     else {
                         // lock registry:
-
-//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, key, 1000 * 60); // 1 min. timeout
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, key, 1000 * 60); // 1 min. timeout
+*/
                         rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRNX_CFD_PAY_REC, key, 60);
                         // check if registry can be annuled:
                         
@@ -2301,8 +2313,9 @@ public abstract class SCfdUtils implements Serializable {
                         }
 
                         // lock registry:
-                        
-//                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, key, 1000 * 60); // 1 min. timeout
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, key, 1000 * 60); // 1 min. timeout
+*/
                         rlock = SRedisLockUtils.gainLock(client, SModConsts.HRS_PAY_RCP_ISS, key, 60); // 1 min. timeout
 
                         // check if registry can be annuled:
@@ -2346,18 +2359,22 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         catch (Exception e) {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(client.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(client.getSession(), lock);
+            }
+*/
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(client, rlock);
             }
             throw e;
         }
         finally {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(client.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(client.getSession(), lock);
+            }
+*/
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(client, rlock);
             }

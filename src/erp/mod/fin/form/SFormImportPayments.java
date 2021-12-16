@@ -90,7 +90,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     private int renderOption;
     
     private HashMap<Integer, Object> moParamsMap;
-//    private ArrayList<SSrvLock> maLocks;
+//    private ArrayList<SSrvLock> maLocks; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     private ArrayList<SRedisLock> maRedisLocks;
     
 
@@ -667,7 +667,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         moImportation = new SImportPayments(miClient);
         mvDeposits = new Vector<>();
         
-//        maLocks = new ArrayList<>();
+//        maLocks = new ArrayList<>(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         maRedisLocks = new ArrayList<>();
         
         renderOption = ST_REGISTRY_NEW;
@@ -768,7 +768,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     
     private void getRecordLocks() throws Exception {
         boolean exists = false;
-//        SSrvLock lock = null;
+//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
         SAnalystDepositRow anaRow = null;
         ArrayList<Object> recordKeys = new ArrayList<>();
@@ -785,9 +785,11 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                     }
                 }
                 if (!exists) {
-//                    lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                    lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
+                    maLocks.add(lock);
+*/
                     rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
-//                    maLocks.add(lock);
                     maRedisLocks.add(rlock);
                     recordKeys.add(anaRow.getRecord().getPrimaryKey());
                 }
@@ -1251,10 +1253,11 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         childRegistry.getDepositsRows().addAll(maAllDeposits);
         
         registry.getAnalystImportations().put(miClient.getSession().getUser().getPkUserId(), childRegistry);
-
-//        if (!maLocks.isEmpty()) {
-//            registry.getLocks().addAll(maLocks);
-//        }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        if (!maLocks.isEmpty()) {
+            registry.getLocks().addAll(maLocks);
+        }
+*/        
         if (!maRedisLocks.isEmpty()) {
             registry.getRedisLocks().addAll(maRedisLocks);
         }
@@ -1285,9 +1288,11 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
             
             if (validation.isValid()) {
                 try {
-//                    for (SSrvLock lock : maLocks) {
-//                        SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
-//                    }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                    for (SSrvLock lock : maLocks) {
+                        SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
+                    }
+*/
                     for (SRedisLock rlock : maRedisLocks) {
                         SRedisLockUtils.verifyLockStatus((SClientInterface) miClient, rlock);
                     }
@@ -1330,9 +1335,11 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     public void actionCancel() {
         if (jbCancel.isEnabled()) {
             try {
-//                for (SSrvLock lock : maLocks) {
-//                    SSrvUtils.releaseLock(miClient.getSession(), lock);
-//                }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                for (SSrvLock lock : maLocks) {
+                    SSrvUtils.releaseLock(miClient.getSession(), lock);
+                }
+*/
                 for (SRedisLock rlock : maRedisLocks) {
                     SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                 }

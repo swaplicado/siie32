@@ -684,44 +684,44 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
     @Override
     public SSrvResponse request(SSrvRequest request) throws RemoteException {
-//        SSrvLock lock = null;
         SSrvResponse response = new SSrvResponse(SSrvConsts.RESP_TYPE_OK);
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+        try {
+            switch (request.getRequestType()) {
+                case SSrvConsts.REQ_LOCK_GAIN:
+                    lock = (SSrvLock) request.getPacket();
+                    response.setPacket(moServer.getServiceDataLocks().gainLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout()));
+                    break;
 
-//        try {
-//            switch (request.getRequestType()) {
-//                case SSrvConsts.REQ_LOCK_GAIN:
-//                    lock = (SSrvLock) request.getPacket();
-//                    response.setPacket(moServer.getServiceDataLocks().gainLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout()));
-//                    break;
-//
-//                case SSrvConsts.REQ_LOCK_RECOVER:
-//                    lock = (SSrvLock) request.getPacket();
-//                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout(), lock.getTimestamp()));
-//                    break;
-//
-//                case SSrvConsts.REQ_LOCK_STATUS:
-//                    lock = (SSrvLock) request.getPacket();
-//                    response.setPacket(moServer.getServiceDataLocks().getLockStatus(lock.getLockId()));
-//                    if ((Integer) response.getPacket() == 0){
-//                        response.setPacket( SSrvConsts.LOCK_ST_EXPIRED );
-//                    }
-//                    break;
-//
-//                case SSrvConsts.REQ_LOCK_RELEASE:
-//                    lock = (SSrvLock) request.getPacket();
-//                    moServer.getServiceDataLocks().releaseLock(lock.getLockId());
-//                    break;
-//
-//                default:
-//                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-//            }
-//        }
-//        catch (Exception e) {
-//            response.setResponseType(SSrvConsts.RESP_TYPE_ERROR);
-//            response.setMessage(e.toString());
-//            moServer.renderMessageLn(msSessionServer + e);
-//        }
+                case SSrvConsts.REQ_LOCK_RECOVER:
+                    lock = (SSrvLock) request.getPacket();
+                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout(), lock.getTimestamp()));
+                    break;
 
+                case SSrvConsts.REQ_LOCK_STATUS:
+                    lock = (SSrvLock) request.getPacket();
+                    response.setPacket(moServer.getServiceDataLocks().getLockStatus(lock.getLockId()));
+                    if ((Integer) response.getPacket() == 0){
+                        response.setPacket( SSrvConsts.LOCK_ST_EXPIRED );
+                    }
+                    break;
+
+                case SSrvConsts.REQ_LOCK_RELEASE:
+                    lock = (SSrvLock) request.getPacket();
+                    moServer.getServiceDataLocks().releaseLock(lock.getLockId());
+                    break;
+
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+        }
+        catch (Exception e) {
+            response.setResponseType(SSrvConsts.RESP_TYPE_ERROR);
+            response.setMessage(e.toString());
+            moServer.renderMessageLn(msSessionServer + e);
+        }
+*/
         return response;
     }
 
