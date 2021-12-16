@@ -1201,10 +1201,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         double weight = 0;
         for (SGridRow row : moGridLocations.getModel().getGridRows()) {
             for (SDbBolMerchandiseQuantity qty : ((SDbBolLocation) row).getXtaMerchandiseQuantityCharge()) {
-                if (!itemKeys.contains(qty.getXtaMerchandise().getFkItemId())) {
-                    itemKeys.add(qty.getXtaMerchandise().getFkItemId());
-                    weight += qty.getQuantity();
-                }
+                itemKeys.add(qty.getXtaMerchandise().getFkItemId());
+                weight += qty.getQuantity();
             }
         }
         moDecimalGrossWeight.setValue(weight);
@@ -1801,5 +1799,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         for(int i = 0; i < merchandise.size(); i++){
             moRegistry.removeMerchandise(merchandise.get(i));
         }
+        updateTotalDistance();
+        updateGrossWeight();
     }
 }

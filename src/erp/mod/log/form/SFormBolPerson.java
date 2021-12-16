@@ -7,6 +7,12 @@ package erp.mod.log.form;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.log.db.SDbBolPerson;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -19,9 +25,10 @@ import sa.lib.gui.SGuiValidation;
  *
  * @author Isabel Servín
  */
-public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm {
+public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusListener {
 
     private SDbBolPerson moRegistry;
+    private SGuiClient moClient;
     
     /**
      * Creates new form SFormVehicle
@@ -32,6 +39,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.LOG_BOL_PERSON, SLibConstants.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
+        moClient = client;
     }
 
     /**
@@ -46,6 +54,18 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm {
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel23 = new javax.swing.JPanel();
+        jPanel38 = new javax.swing.JPanel();
+        jlCountry = new javax.swing.JLabel();
+        moKeyCountry = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel39 = new javax.swing.JPanel();
+        jlZipCode = new javax.swing.JLabel();
+        moTextZipCode = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel36 = new javax.swing.JPanel();
+        jlLocality = new javax.swing.JLabel();
+        moTextLocality = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel37 = new javax.swing.JPanel();
+        jlState = new javax.swing.JLabel();
+        moKeyState = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel24 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
@@ -79,23 +99,53 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm {
         jPanel35 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
         moTextReference = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel36 = new javax.swing.JPanel();
-        jlLocality = new javax.swing.JLabel();
-        moTextLocality = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel37 = new javax.swing.JPanel();
-        jlState = new javax.swing.JLabel();
-        moKeyState = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel38 = new javax.swing.JPanel();
-        jlCountry = new javax.swing.JLabel();
-        moKeyCountry = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel39 = new javax.swing.JPanel();
-        jlZipCode = new javax.swing.JLabel();
-        moTextZipCode = new sa.lib.gui.bean.SBeanFieldText();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel23.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
+
+        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCountry.setText("País*:");
+        jlCountry.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel38.add(jlCountry);
+
+        moKeyCountry.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel38.add(moKeyCountry);
+
+        jPanel23.add(jPanel38);
+
+        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlZipCode.setText("Código postal*:");
+        jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel39.add(jlZipCode);
+        jPanel39.add(moTextZipCode);
+
+        jPanel23.add(jPanel39);
+
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlLocality.setText("Localidad:");
+        jlLocality.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel36.add(jlLocality);
+
+        moTextLocality.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel36.add(moTextLocality);
+
+        jPanel23.add(jPanel36);
+
+        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlState.setText("Estado*:");
+        jlState.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel37.add(jlState);
+
+        moKeyState.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel37.add(moKeyState);
+
+        jPanel23.add(jPanel37);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -206,48 +256,6 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm {
 
         jPanel23.add(jPanel35);
 
-        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlLocality.setText("Localidad:");
-        jlLocality.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel36.add(jlLocality);
-
-        moTextLocality.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel36.add(moTextLocality);
-
-        jPanel23.add(jPanel36);
-
-        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlState.setText("Estado*:");
-        jlState.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel37.add(jlState);
-
-        moKeyState.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel37.add(moKeyState);
-
-        jPanel23.add(jPanel37);
-
-        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlCountry.setText("País*:");
-        jlCountry.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel38.add(jlCountry);
-
-        moKeyCountry.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel38.add(moKeyCountry);
-
-        jPanel23.add(jPanel38);
-
-        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlZipCode.setText("Código postal*:");
-        jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel39.add(jlZipCode);
-        jPanel39.add(moTextZipCode);
-
-        jPanel23.add(jPanel39);
-
         jPanel1.add(jPanel23, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -344,12 +352,12 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm {
 
     @Override
     public void addAllListeners() {
-        
+        moTextZipCode.addFocusListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        
+        moTextZipCode.removeFocusListener(this);
     }
 
     @Override
@@ -439,5 +447,45 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm {
         }
         
         return validation;
+    }
+    
+    private boolean isCountryMex() {
+        boolean isMex = false;
+        if (moKeyCountry.getValue()[0] == 251) {
+            isMex = true;
+        }
+        return isMex;
+    }
+
+    public void getZipCodeComplements() {
+        try {
+            String sql = "SELECT zip.id_sta_code, zip.locality_code, sta.id_sta, loc.description " +
+                    "FROM erp.locs_ccp_zip_code AS zip  " +
+                    "INNER JOIN erp.locu_sta AS sta ON zip.id_sta_code = sta.sta_code " +
+                    "LEFT OUTER JOIN erp.locs_ccp_locality AS loc ON zip.locality_code = loc.id_locality_code AND zip.id_sta_code = loc.id_sta_code " +
+                    "WHERE zip.id_zip_code = " + '"' + moTextZipCode.getValue() + '"';
+            ResultSet resultSet = moClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                moKeyState.setValue(new int [] { resultSet.getInt("id_sta") });
+                moTextLocality.setValue(resultSet.getString("description"));
+            }
+            else {
+                moClient.showMsgBoxWarning("Codigo zip no encontrado en el sistema");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SFormBolPerson.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    @Override
+    public void focusGained(FocusEvent e) {
+        
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (isCountryMex()) {
+            getZipCodeComplements();           
+        }
     }
 }

@@ -54,6 +54,10 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     public static final int MERCHANDISE_DISCHARGED = 1;
     public static final int MERCHANDISE_CHARGED = 2;
+    public static final int GRID_SUBTYPE_MERCHANDISE_CHARGED = 10;
+    public static final int GRID_SUBTYPE_MERCHANDISE_DISCHARGED = 20;
+    public static final int GRID_SUBTYPE_MERCHANDISE_PRECHARGE = 30;
+    public static final int GRID_SUBTYPE_MERCHANDISE_CURRENTCHARGE = 40;
     
     private SDbBolLocation moRegistry;
     private SDbBillOfLading moBillOfLading;
@@ -429,7 +433,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         
         moFields.setFormButton(jbSave);
 
-        moGridCharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, MERCHANDISE_CHARGED, "Carga") {
+        moGridCharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_CHARGED, "Carga") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(true, true, true);
@@ -507,7 +511,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridDischarge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, MERCHANDISE_DISCHARGED, "Descarga") {
+        moGridDischarge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_DISCHARGED, "Descarga") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(true, true, true);
@@ -558,7 +562,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridPrecharge = new SGridPaneForm(miClient, 2044015, 3, "Carga previa") {
+        moGridPrecharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_PRECHARGE, "Carga previa") {
             
             @Override
             public void initGrid() {
@@ -577,7 +581,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridCurrentCharge = new SGridPaneForm(miClient, 2044016, 4, "Carga actual") {
+        moGridCurrentCharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_CURRENTCHARGE, "Carga actual") {
             
             @Override
             public void initGrid() {
@@ -595,11 +599,6 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                 return gridColumnsForm;
             }
         };
-
-        /*mvFormGrids.add(moGridCharge);
-        mvFormGrids.add(moGridCurrentCharge);
-        mvFormGrids.add(moGridDischarge);
-        mvFormGrids.add(moGridPrecharge);*/
         
         moFormMerchandiseCharged = new SFormBolMerchandise(miClient, MERCHANDISE_CHARGED, "Carga");
         moGridCharge.setForm(moFormMerchandiseCharged);

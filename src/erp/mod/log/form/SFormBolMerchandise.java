@@ -330,7 +330,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         jbItem.removeActionListener(this);
         jListItems.removeListSelectionListener(this);
         moKeyUnit.removeItemListener(this);
-        moDecimalQty.addFocusListener(this);
+        moDecimalQty.removeFocusListener(this);
     }
 
     @Override
