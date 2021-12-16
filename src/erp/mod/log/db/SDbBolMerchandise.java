@@ -130,7 +130,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
                 "WHERE i.id_item = " + mnFkItemId + ";";
             ResultSet resultSet = session.getStatement().executeQuery(sql);
             if (resultSet.next()) {
-                msXtaItemClaveProdServ = resultSet.getString("item_code").isEmpty() ? resultSet.getString("igen_code") : resultSet.getString("item_code");
+                msXtaItemClaveProdServ = resultSet.getString("item_code") == null ? resultSet.getString("igen_code") : resultSet.getString("item_code");
             }
             
             sql = "SELECT ucfd.code FROM erp.itmu_unit AS u " +

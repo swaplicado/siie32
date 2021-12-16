@@ -70,6 +70,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         jbReadInfo.setEnabled(false);
         if (mnFormSubtype == MERCHANDISE_CHARGED) {
             moKeyItem.setEnabled(true);
+            jbItem.setEnabled(true);
             moKeyUnit.setEnabled(true);
             moDecimalQty.setEnabled(true);
             moDecimalWeight.setEnabled(true);
@@ -77,6 +78,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         }
         else if (mnFormSubtype == MERCHANDISE_DISCHARGED) {
             moKeyItem.setEnabled(false);
+            jbItem.setEnabled(false);
             moKeyUnit.setEnabled(false);
             moDecimalQty.setEnabled(true);
             moDecimalWeight.setEnabled(false);
@@ -304,6 +306,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyItem, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyUnit, SModConsts.ITMU_UNIT, SLibConsts.UNDEFINED, null);
+        jListItems.setEnabled(true);
     }
 
     @Override
@@ -360,8 +363,9 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
     @Override
     public SDbRegistry getRegistry() throws Exception {
         SDbBolMerchandiseQuantity registry = (SDbBolMerchandiseQuantity) moRegistry.clone();
+        registry.setRegistryNew(moRegistry.isRegistryNew());
         
-        if (registry.isRegistryNew()) {}
+        if (registry.isRegistryNew()) {
         
         SDataItem item = new SDataItem();
         item.read(moKeyItem.getValue(), miClient.getSession().getStatement());
@@ -394,9 +398,13 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         registry.getXtaMerchandise().setXtaItem(item);
         registry.getXtaMerchandise().setXtaUnit(unit);
         
+        registry.getXtaMerchandise().updateSatCodes(miClient.getSession());
+        
         registry.setXtaItemName(registry.getXtaMerchandise().getXtaItem().getItem());
         registry.setXtaUnitName(registry.getXtaMerchandise().getXtaUnit().getSymbol());
-        
+        }else{
+            registry.setQuantity(moDecimalQty.getValue());
+        }
         return registry;
     }
     

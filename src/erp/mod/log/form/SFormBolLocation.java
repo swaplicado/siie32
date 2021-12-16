@@ -84,15 +84,19 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     private void updateMerchandises(SGridRow gridRow) {
         SDbBolMerchandiseQuantity merchQty = (SDbBolMerchandiseQuantity) gridRow;
-        merchQty.getXtaMerchandise().getBolMerchandiseQuantity().add(merchQty);
+        if(merchQty.getXtaMerchandise().getBolMerchandiseQuantity().size() <= 0){
+            merchQty.getXtaMerchandise().getBolMerchandiseQuantity().add(merchQty);
+        }
+        else {
+            merchQty.getXtaMerchandise().getBolMerchandiseQuantity().set(0, merchQty);
+        }
         moBillOfLading.addMerchandise(merchQty.getXtaMerchandise());
         updateCurrentChargeData((SDbBolMerchandiseQuantity)gridRow);
         populateCurrentCharge();
     }
     
-    private void deleteMerchandises(SGridRow gridRow) {
+    public void deleteMerchandises(SGridRow gridRow) {
         SDbBolMerchandiseQuantity merchQty = (SDbBolMerchandiseQuantity) gridRow;
-        merchQty.getXtaMerchandise().getBolMerchandiseQuantity().add(merchQty);
         moBillOfLading.removeMerchandise(merchQty.getXtaMerchandise());
         populateCurrentCharge();
     }
@@ -554,7 +558,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridPrecharge = new SGridPaneForm(miClient, SModConsts.LOGX_BOL, 0, "Carga previa") {
+        moGridPrecharge = new SGridPaneForm(miClient, 2044015, 3, "Carga previa") {
             
             @Override
             public void initGrid() {
@@ -573,7 +577,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridCurrentCharge = new SGridPaneForm(miClient, SModConsts.LOGX_BOL, 0, "Carga actual") {
+        moGridCurrentCharge = new SGridPaneForm(miClient, 2044016, 4, "Carga actual") {
             
             @Override
             public void initGrid() {
@@ -592,10 +596,10 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
 
-        mvFormGrids.add(moGridCharge);
+        /*mvFormGrids.add(moGridCharge);
         mvFormGrids.add(moGridCurrentCharge);
         mvFormGrids.add(moGridDischarge);
-        mvFormGrids.add(moGridPrecharge);
+        mvFormGrids.add(moGridPrecharge);*/
         
         moFormMerchandiseCharged = new SFormBolMerchandise(miClient, MERCHANDISE_CHARGED, "Carga");
         moGridCharge.setForm(moFormMerchandiseCharged);
@@ -719,7 +723,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     }
     
     private void actionLocations() {
-        if (moRadioMyLocations.isSelected()) {
+      if (moRadioMyLocations.isSelected()) {
             moKeyBizPartner.removeAllItems();
             miClient.getSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, SLibConsts.UNDEFINED, null);
             moKeyBizPartner.setValue(new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
@@ -846,7 +850,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         if (moRegistry.getFkOriginAddressAddress_n() == 0 && moRegistry.getFkOriginBizPartnerAddress_n() == 0) {
             moKeyBizPartner.setValue(new int[] { moRegistry.getFkDestinationBizPartner_n() });
             moKeyBizPartnerBranch.setValue(new int[] { moRegistry.getFkDestinationBizPartnerAddress_n() });
-            moKeyBizPartnerBranchAddress.setValue(new int[] { moRegistry.getFkDestinationAddressAddress_n() });
+            moKeyBizPartnerBranchAddress.setValue(new int[] { moRegistry.getFkDestinationBizPartnerAddress_n(), moRegistry.getFkDestinationAddressAddress_n() });
             moRadioOrigin.setSelected(false);
             moRadioDestination.setSelected(true);
         }
@@ -910,6 +914,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         registry.setXtaLocationType(moRadioStart.isSelected() ? "Inicial" : moRadioMedium.isSelected() ? "Intermedia" : moRadioEnd.isSelected() ? "Final" : ""); 
         registry.setXtaBizPartner(bp);
         registry.setXtaBizPartnerBranch(bpb);
+        registry.setXtaBizPartnerBranchAddress(bpba);
         if (moRadioOrigin.isSelected()) {
             registry.setFkOriginBizPartner_n(moKeyBizPartner.getValue()[0]);
             registry.setFkOriginBizPartnerAddress_n(moKeyBizPartnerBranch.getValue()[0]);
@@ -951,7 +956,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     @Override
     public void setValue(int type, java.lang.Object value) {
 
-        switch (type) {
+       switch (type) {
             case SModConsts.BPSU_BP:
                 moKeyBizPartner.setValue((int[]) value);
                 break;

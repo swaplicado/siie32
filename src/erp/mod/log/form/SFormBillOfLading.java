@@ -1203,11 +1203,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             for (SDbBolMerchandiseQuantity qty : ((SDbBolLocation) row).getXtaMerchandiseQuantityCharge()) {
                 if (!itemKeys.contains(qty.getXtaMerchandise().getFkItemId())) {
                     itemKeys.add(qty.getXtaMerchandise().getFkItemId());
-                    weight += qty.getXtaMerchandise().getQuantity();
+                    weight += qty.getQuantity();
                 }
             }
         }
-        moDecimalTotalDistance.setValue(weight);
+        moDecimalGrossWeight.setValue(weight);
     }
     
     private void setVehicleDriver(int vehPk){
@@ -1791,11 +1791,15 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
     @Override
     public void notifyRowEdit(int gridType, int gridSubtype, int row, SGridRow gridRow) {
-
+        updateTotalDistance();
+        updateGrossWeight();
     }
-
+    
     @Override
     public void notifyRowDelete(int gridType, int gridSubtype, int row, SGridRow gridRow) {
-
+        ArrayList<SDbBolMerchandise> merchandise = moRegistry.getBolMerchandises();
+        for(int i = 0; i < merchandise.size(); i++){
+            moRegistry.removeMerchandise(merchandise.get(i));
+        }
     }
 }

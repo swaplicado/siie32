@@ -114,6 +114,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             if (merch.getFkItemId() == o.getFkItemId()) {
                 found = true;
                 merch.addMerchandiseQuantity(o.getBolMerchandiseQuantity().get(0));
+                //merch.addMerchandiseQuantity(o.getBolMerchandiseQuantity().get(o.getBolMerchandiseQuantity().size() - 1));
                 merch.updateTotalItemQuantity();
             }
         }
