@@ -137,9 +137,9 @@ public abstract class SDataConstants {
 
     public static final int LOCU_CTY = 203001;
     public static final int LOCU_STA = 203002;
-    public static final int LOCS_CCP_ZIP_CODE = 1032003;
-    public static final int LOCS_CCP_COUNTY = 1032004;
-    public static final int LOCS_CCP_LOCALITY = 1032005;
+    public static final int LOCS_BOL_ZIP_CODE = 1032003;
+    public static final int LOCS_BOL_COUNTY = 1032004;
+    public static final int LOCS_BOL_LOCALITY = 1032005;
 
     public static final int BPSS_CT_BP = 204001;
     public static final int BPSS_TP_BP_IDY = 204002;

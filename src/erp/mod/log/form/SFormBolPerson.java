@@ -5,7 +5,6 @@
 package erp.mod.log.form;
 
 import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.log.db.SDbBolPerson;
 import java.awt.event.ActionEvent;
@@ -474,10 +473,11 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     public void getZipCodeComplements(boolean canFill) {
         try {
             String sql = "SELECT zip.id_sta_code, zip.locality_code, sta.id_sta, loc.description " +
-                    "FROM erp.locs_ccp_zip_code AS zip  " +
+                    "FROM erp.locs_bol_zip_code AS zip  " +
                     "INNER JOIN erp.locu_sta AS sta ON zip.id_sta_code = sta.sta_code " +
-                    "LEFT OUTER JOIN erp.locs_ccp_locality AS loc ON zip.locality_code = loc.id_locality_code AND zip.id_sta_code = loc.id_sta_code " +
-                    "WHERE zip.id_zip_code = " + '"' + moTextZipCode.getValue() + '"';
+                    "LEFT OUTER JOIN erp.locs_bol_locality AS loc ON zip.locality_code = loc.id_locality_code AND zip.id_sta_code = loc.id_sta_code " +
+                    "WHERE zip.id_zip_code = " + '"' + moTextZipCode.getValue() + '"' +
+                    "AND NOT zip.b_del AND NOT loc.b_del";
             ResultSet resultSet = moClient.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
                 if (canFill) {
@@ -494,7 +494,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
                 }
             }
             else {
-                moClient.showMsgBoxWarning("Codigo zip no encontrado en el sistema");
+                moClient.showMsgBoxWarning("Código postal no encontrado en el sistema");
             }
         } catch (SQLException ex) {
             Logger.getLogger(SFormBolPerson.class.getName()).log(Level.SEVERE, null, ex);

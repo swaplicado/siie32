@@ -905,8 +905,8 @@ public class SCfdPrint {
                     
                     for (DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
                         DElementDomicilio dom = ub.getEltDomicilio();
-                        dom.getAttLocalidad().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_CCP_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
-                        dom.getAttMunicipio().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_CCP_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                        dom.getAttLocalidad().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                        dom.getAttMunicipio().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
                         dom.getAttEstado().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_STA, dom.getAttEstado().getString()));
                         dom.getAttPais().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_CTY, dom.getAttPais().getString()));
                     }
@@ -2304,8 +2304,8 @@ public class SCfdPrint {
                     
                     for (DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
                         DElementDomicilio dom = ub.getEltDomicilio();
-                        dom.getAttLocalidad().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_CCP_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
-                        dom.getAttMunicipio().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_CCP_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                        dom.getAttLocalidad().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                        dom.getAttMunicipio().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
                         dom.getAttEstado().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_STA, dom.getAttEstado().getString()));
                         dom.getAttPais().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_CTY, dom.getAttPais().getString()));
                     }

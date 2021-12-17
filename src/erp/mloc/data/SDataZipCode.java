@@ -29,7 +29,7 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
     protected SDataLocality moDbmsLocality;
 
     public SDataZipCode() {
-        super(SDataConstants.LOCS_CCP_ZIP_CODE);
+        super(SDataConstants.LOCS_BOL_ZIP_CODE);
         reset();
     }
     
@@ -83,7 +83,7 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
         reset();
 
         try {
-            sql = "SELECT * FROM erp.locs_ccp_zip_code WHERE id_zip_code = '" + key[0] + "' AND id_sta_code = '" + key[1] + "'";
+            sql = "SELECT * FROM erp.locs_bol_zip_code WHERE id_zip_code = '" + key[0] + "' AND id_sta_code = '" + key[1] + "'";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -133,7 +133,7 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
 
         try {
             if (mbIsRegistryNew) {
-                sql = "SELECT COUNT(*) FROM erp.locs_ccp_zip_code WHERE id_zip_code = " + msPkZipCode + " AND id_sta_code = " + msPkStateCode;
+                sql = "SELECT COUNT(*) FROM erp.locs_bol_zip_code WHERE id_zip_code = " + msPkZipCode + " AND id_sta_code = " + msPkStateCode;
                 resultSet = connection.createStatement().executeQuery(sql);
 
                 if (resultSet.next()) {
@@ -143,7 +143,7 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
 
             if (mbIsRegistryNew) {
                 
-                sql = "INSERT INTO erp.locs_ccp_zip_code VALUES (" +
+                sql = "INSERT INTO erp.locs_bol_zip_code VALUES (" +
                         "'" + msPkZipCode + "', " +
                         "'" + msPkStateCode + "', " +
                         "'" + msFkCountyCode + "', " +
@@ -152,7 +152,7 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
             }
             else {
 
-                sql = "UPDATE erp.locs_ccp_zip_code SET " +
+                sql = "UPDATE erp.locs_bol_zip_code SET " +
 //                        "id_zip_code='" + msPkZipCode + "', " +
 //                        "id_sta_code='" + msPkStateCode + "', " +
                         "county_code='" + msFkCountyCode + "', " +
