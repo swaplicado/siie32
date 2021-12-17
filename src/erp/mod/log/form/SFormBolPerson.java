@@ -5,14 +5,18 @@
 package erp.mod.log.form;
 
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.log.db.SDbBolPerson;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -25,7 +29,7 @@ import sa.lib.gui.SGuiValidation;
  *
  * @author Isabel Servín
  */
-public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusListener {
+public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusListener , ActionListener{
 
     private SDbBolPerson moRegistry;
     private SGuiClient moClient;
@@ -60,6 +64,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         jPanel39 = new javax.swing.JPanel();
         jlZipCode = new javax.swing.JLabel();
         moTextZipCode = new sa.lib.gui.bean.SBeanFieldText();
+        jbReloadZipComplements = new javax.swing.JButton();
         jPanel36 = new javax.swing.JPanel();
         jlLocality = new javax.swing.JLabel();
         moTextLocality = new sa.lib.gui.bean.SBeanFieldText();
@@ -122,6 +127,11 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel39.add(jlZipCode);
         jPanel39.add(moTextZipCode);
+
+        jbReloadZipComplements.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
+        jbReloadZipComplements.setToolTipText("Importar localidad y estado");
+        jbReloadZipComplements.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel39.add(jbReloadZipComplements);
 
         jPanel23.add(jPanel39);
 
@@ -280,6 +290,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
+    private javax.swing.JButton jbReloadZipComplements;
     private javax.swing.JLabel jlCountry;
     private javax.swing.JLabel jlDriverLic;
     private javax.swing.JLabel jlFiscalFrgId;
@@ -348,6 +359,9 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         moFields.addField(moTextZipCode);
         
         moFields.setFormButton(jbSave);
+        
+        jbReloadZipComplements.addActionListener(this);
+        jbReloadZipComplements.setEnabled(true);
     }
 
     @Override
@@ -457,7 +471,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         return isMex;
     }
 
-    public void getZipCodeComplements() {
+    public void getZipCodeComplements(boolean canFill) {
         try {
             String sql = "SELECT zip.id_sta_code, zip.locality_code, sta.id_sta, loc.description " +
                     "FROM erp.locs_ccp_zip_code AS zip  " +
@@ -466,8 +480,18 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
                     "WHERE zip.id_zip_code = " + '"' + moTextZipCode.getValue() + '"';
             ResultSet resultSet = moClient.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
-                moKeyState.setValue(new int [] { resultSet.getInt("id_sta") });
-                moTextLocality.setValue(resultSet.getString("description"));
+                if (canFill) {
+                    moKeyState.setValue(new int [] { resultSet.getInt("id_sta") });
+                    moTextLocality.setValue(resultSet.getString("description"));
+                } 
+                else {
+                   if (moTextLocality.getValue().isEmpty()) {
+                       moTextLocality.setValue(resultSet.getString("description"));
+                   }
+                   if (moKeyState.getValue().length == 0) {
+                       moKeyState.setValue(new int [] { resultSet.getInt("id_sta") });
+                   }
+                }
             }
             else {
                 moClient.showMsgBoxWarning("Codigo zip no encontrado en el sistema");
@@ -485,7 +509,19 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     @Override
     public void focusLost(FocusEvent e) {
         if (isCountryMex()) {
-            getZipCodeComplements();           
+            getZipCodeComplements(false);           
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof javax.swing.JButton) {
+            JButton button = (JButton) e.getSource();
+            if (button == jbReloadZipComplements) {
+                if (isCountryMex()) {
+                    getZipCodeComplements(true);           
+                }
+            }
         }
     }
 }
