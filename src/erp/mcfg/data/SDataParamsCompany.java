@@ -47,12 +47,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected int mnInventoryValuationMethod;
     protected int mnVersion;
     protected java.util.Date mtVersionTs;
+    protected boolean mbIsAuthorizationPurchasesConAutomatic;
     protected boolean mbIsAuthorizationPurchasesOrderAutomatic;
     protected boolean mbIsAuthorizationPurchasesDocAutomatic;
-    protected boolean mbIsAuthorizationPurchasesConAutomatic;
+    protected boolean mbIsAuthorizationSalesConAutomatic;
     protected boolean mbIsAuthorizationSalesOrderAutomatic;
     protected boolean mbIsAuthorizationSalesDocAutomatic;
-    protected boolean mbIsAuthorizationSalesConAutomatic;
     protected boolean mbIsLogisticsOrderAutomatic;
     protected boolean mbIsLastSearchItemPreserved;
     protected boolean mbIsExchangeRatePurPreserved;
@@ -151,12 +151,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setInventoryValuationMethod(int n) { mnInventoryValuationMethod = n; }
     public void setVersion(int n) { mnVersion = n; }
     public void setVersionTs(java.util.Date t) { mtVersionTs = t; }
+    public void setIsAuthorizationPurchasesConAutomatic(boolean b) { mbIsAuthorizationPurchasesConAutomatic = b; }
     public void setIsAuthorizationPurchasesOrderAutomatic(boolean b) { mbIsAuthorizationPurchasesOrderAutomatic = b; }
     public void setIsAuthorizationPurchasesDocAutomatic(boolean b) { mbIsAuthorizationPurchasesDocAutomatic = b; }
-    public void setIsAuthorizationPurchasesConAutomatic(boolean b) { mbIsAuthorizationPurchasesConAutomatic = b; }
+    public void setIsAuthorizationSalesConAutomatic(boolean b) { mbIsAuthorizationSalesConAutomatic = b; }
     public void setIsAuthorizationSalesOrderAutomatic(boolean b) { mbIsAuthorizationSalesOrderAutomatic = b; }
     public void setIsAuthorizationSalesDocAutomatic(boolean b) { mbIsAuthorizationSalesDocAutomatic = b; }
-    public void setIsAuthorizationSalesConAutomatic(boolean b) { mbIsAuthorizationSalesConAutomatic = b; }
     public void setIsLogisticsOrderAutomatic(boolean b) { mbIsLogisticsOrderAutomatic = b; }
     public void setIsLastSearchItemPreserved(boolean b) { mbIsLastSearchItemPreserved = b; }
     public void setIsExchangeRatePurPreserved(boolean b) { mbIsExchangeRatePurPreserved = b; }
@@ -246,12 +246,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public int getInventoryValuationMethod() { return mnInventoryValuationMethod; }
     public int getVersion() { return mnVersion; }
     public java.util.Date getVersionTs() { return mtVersionTs; }
+    public boolean getIsAuthorizationPurchasesConAutomatic() { return mbIsAuthorizationPurchasesConAutomatic; }
     public boolean getIsAuthorizationPurchasesOrderAutomatic() { return mbIsAuthorizationPurchasesOrderAutomatic; }
     public boolean getIsAuthorizationPurchasesDocAutomatic() { return mbIsAuthorizationPurchasesDocAutomatic; }
-    public boolean getIsAuthorizationPurchasesConAutomatic() { return mbIsAuthorizationPurchasesConAutomatic; }
+    public boolean getIsAuthorizationSalesConAutomatic() { return mbIsAuthorizationSalesConAutomatic; }
     public boolean getIsAuthorizationSalesOrderAutomatic() { return mbIsAuthorizationSalesOrderAutomatic; }
     public boolean getIsAuthorizationSalesDocAutomatic() { return mbIsAuthorizationSalesDocAutomatic; }
-    public boolean getIsAuthorizationSalesConAutomatic() { return mbIsAuthorizationSalesConAutomatic; }
     public boolean getIsLogisticsOrderAutomatic() { return mbIsLogisticsOrderAutomatic; }
     public boolean getIsLastSearchItemPreserved() { return mbIsLastSearchItemPreserved; }
     public boolean getIsExchangeRatePurPreserved() { return mbIsExchangeRatePurPreserved; }
@@ -376,12 +376,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mnInventoryValuationMethod = 0;
         mnVersion = 0;
         mtVersionTs = null;
+        mbIsAuthorizationPurchasesConAutomatic = false;
         mbIsAuthorizationPurchasesOrderAutomatic = false;
         mbIsAuthorizationPurchasesDocAutomatic = false;
-        mbIsAuthorizationPurchasesConAutomatic = false;
+        mbIsAuthorizationSalesConAutomatic = false;
         mbIsAuthorizationSalesOrderAutomatic = false;
         mbIsAuthorizationSalesDocAutomatic = false;
-        mbIsAuthorizationSalesConAutomatic = false;
         mbIsLogisticsOrderAutomatic = false;
         mbIsLastSearchItemPreserved = false;
         mbIsExchangeRatePurPreserved = false;
@@ -497,12 +497,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mnInventoryValuationMethod = resultSet.getInt("ivm");
                 mnVersion = resultSet.getInt("ver");
                 mtVersionTs = resultSet.getTimestamp("ts_ver");
+                mbIsAuthorizationPurchasesConAutomatic = resultSet.getBoolean("b_authorn_pur_con");
                 mbIsAuthorizationPurchasesOrderAutomatic = resultSet.getBoolean("b_authorn_pur_ord");
                 mbIsAuthorizationPurchasesDocAutomatic = resultSet.getBoolean("b_authorn_pur_doc");
-                mbIsAuthorizationPurchasesConAutomatic = resultSet.getBoolean("b_authorn_pur_con");
+                mbIsAuthorizationSalesConAutomatic = resultSet.getBoolean("b_authorn_sal_con");
                 mbIsAuthorizationSalesOrderAutomatic = resultSet.getBoolean("b_authorn_sal_ord");
                 mbIsAuthorizationSalesDocAutomatic = resultSet.getBoolean("b_authorn_sal_doc");
-                mbIsAuthorizationSalesConAutomatic = resultSet.getBoolean("b_authorn_sal_con");
                 mbIsLogisticsOrderAutomatic = resultSet.getBoolean("b_log_ord_aut");
                 mbIsLastSearchItemPreserved = resultSet.getBoolean("b_last_search_item");
                 mbIsExchangeRatePurPreserved = resultSet.getBoolean("b_keep_exc_rate_pur");

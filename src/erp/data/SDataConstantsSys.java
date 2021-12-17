@@ -1214,6 +1214,13 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_LINK_ORD_SRC = 3;
     public static final int TRNX_LINK_ORD_DES = 4;
     public static final int TRNX_LINK_DOC_DES = 5;
+    
+    public static final int TRNX_DPS_PUR_CON_AUT_PEND = 61;
+    public static final int TRNX_DPS_PUR_CON_AUT_AUT = 62;
+    public static final int TRNX_DPS_PUR_CON_AUT_REJ = 63;
+    public static final int TRNX_DPS_SAL_CON_AUT_PEND = 64;
+    public static final int TRNX_DPS_SAL_CON_AUT_AUT = 65;
+    public static final int TRNX_DPS_SAL_CON_AUT_REJ = 66;
 
     public static final int TRNX_DPS_PUR_ORD_AUT_AUT = 49;
     public static final int TRNX_DPS_PUR_ORD_AUT_PEND = 50;
@@ -1229,12 +1236,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_DPS_SAL_DOC_AUT_PEND = 59;
     public static final int TRNX_DPS_SAL_DOC_AUT_REJ = 60;
     
-    public static final int TRNX_DPS_PUR_CON_AUT_PEND = 61;
-    public static final int TRNX_DPS_PUR_CON_AUT_AUT = 62;
-    public static final int TRNX_DPS_PUR_CON_AUT_REJ = 63;
-    public static final int TRNX_DPS_SAL_CON_AUT_PEND = 64;
-    public static final int TRNX_DPS_SAL_CON_AUT_AUT = 65;
-    public static final int TRNX_DPS_SAL_CON_AUT_REJ = 66;
 
     public static final int TRNX_TP_IOG_IN_PUR_PUR = 101;
     public static final int TRNX_TP_IOG_IN_SAL_SAL = 102;

@@ -313,7 +313,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     private boolean isDpsAuthorizedEventUser(final erp.mtrn.data.SDataUserConfigurationTransaction userConfigTxn, final int[] dpsClassKey) throws java.sql.SQLException, java.lang.Exception {
         boolean authorized = false;
         
-        if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD)) {
+        if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CON)) {
+            authorized = userConfigTxn.getPurchasesConLimit_n() == 0; // limit of zero means no limit
+
+            if (!authorized) {
+                authorized = mdTotal_r <= userConfigTxn.getPurchasesConLimit_n();
+            }
+        }
+        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD)) {
             authorized = userConfigTxn.getPurchasesOrderLimit_n() == 0; // limit of zero means no limit
 
             if (!authorized) {
@@ -327,11 +334,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 authorized = mdTotal_r <= userConfigTxn.getPurchasesDocLimit_n();
             }
         }
-        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CON)) {
-            authorized = userConfigTxn.getPurchasesConLimit_n() == 0; // limit of zero means no limit
+        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+            authorized = userConfigTxn.getSalesConLimit_n() == 0; // limit of zero means no limit
 
             if (!authorized) {
-                authorized = mdTotal_r <= userConfigTxn.getPurchasesConLimit_n();
+                authorized = mdTotal_r <= userConfigTxn.getSalesConLimit_n();
             }
         }
         else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD)) {
@@ -346,13 +353,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             if (!authorized) {
                 authorized = mdTotal_r <= userConfigTxn.getSalesDocLimit_n();
-            }
-        }
-        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
-            authorized = userConfigTxn.getSalesConLimit_n() == 0; // limit of zero means no limit
-
-            if (!authorized) {
-                authorized = mdTotal_r <= userConfigTxn.getSalesConLimit_n();
             }
         }
         else {
@@ -418,7 +418,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         else {
             if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                if (isOrderPur()) {
+                if(isDpsTypeContractPur()){
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_PUR_CON);
+                    
+                    if (!autorized) {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
+                    }
+                    else {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                    }
+                }
+                else if (isOrderPur()) {
                     autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
 
                     if (!autorized) {
@@ -466,9 +476,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                     }
                 }
-                else if(isDpsTypeContractPur()){
-                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_PUR_CON);
-                    
+            }
+            else if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+                if (isDpsTypeContractSal()) {
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_SAL_CON);
+
                     if (!autorized) {
                         mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
                     }
@@ -476,9 +488,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
                     }
                 }
-            }
-            else if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                if (isOrderSal()) {
+                else if (isOrderSal()) {
                     autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD);
 
                     if (!autorized) {
@@ -498,16 +508,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
                     }
                 }
-                else if (isDpsTypeContractSal()) {
-                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_SAL_CON);
-
-                    if (!autorized) {
-                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
-                    }
-                    else {
-                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
-                    }
-                }
             }
         }
 
@@ -515,17 +515,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     private void updateAuthorizationStatus(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
+        boolean isAutPurCon = false;
         boolean isAutPurOrd = false;
         boolean isAutPurDps = false;
-        boolean isAutPurCon = false;
+        boolean isAutSalCon = false;
         boolean isAutSalOrd = false;
         boolean isAutSalDps = false;
-        boolean isAutSalCon = false;
         String sql = "";
         Statement statement = null;
         ResultSet resultSet = null;
 
-        if (!mbIsDeleted && (isOrder() || isDocument() || isDpsTypeContract())) {
+        if (!mbIsDeleted && (isDpsTypeContract() || isOrder() || isDocument())) {
             statement = connection.createStatement();
 
             // XXX It is needed a "session" object in SDataRegistry objects in order to know current company, company branch, current entities, decimal an date format objects, etc.
@@ -536,23 +536,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
             }
             else {
-                sql = "SELECT b_authorn_pur_ord, b_authorn_pur_doc, b_authorn_pur_con, b_authorn_sal_ord, b_authorn_sal_doc, b_authorn_sal_con FROM cfg_param_co WHERE id_co = " + resultSet.getInt("fid_bp") + " ";
+                sql = "SELECT b_authorn_pur_con, b_authorn_pur_ord, b_authorn_pur_doc, b_authorn_sal_con, b_authorn_sal_ord, b_authorn_sal_doc FROM cfg_param_co WHERE id_co = " + resultSet.getInt("fid_bp") + " ";
                 resultSet = statement.executeQuery(sql);
                 if (!resultSet.next()) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
                 else {
+                    isAutPurCon = resultSet.getBoolean("b_authorn_pur_con");
                     isAutPurOrd = resultSet.getBoolean("b_authorn_pur_ord");
                     isAutPurDps = resultSet.getBoolean("b_authorn_pur_doc");
-                    isAutPurCon = resultSet.getBoolean("b_authorn_pur_con");
+                    isAutSalCon = resultSet.getBoolean("b_authorn_sal_con");
                     isAutSalOrd = resultSet.getBoolean("b_authorn_sal_ord");
                     isAutSalDps = resultSet.getBoolean("b_authorn_sal_doc");
-                    isAutSalCon = resultSet.getBoolean("b_authorn_sal_con");
                 }
             }
 
-            if (isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps ||
-                    isDpsTypeContractPur() && isAutPurCon || isDpsTypeContractSal() && isAutSalCon) {
+            if (isDpsTypeContractPur() && isAutPurCon || isDpsTypeContractSal() && isAutSalCon || isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || 
+                    isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps) {
                 if (isDpsAuthorized(connection)) {
                     mbIsAuthorized = true;
                     mnFkDpsAuthorizationStatusId = SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN;
