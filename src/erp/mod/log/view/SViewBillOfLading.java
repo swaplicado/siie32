@@ -9,11 +9,14 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdBolUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
+import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -34,6 +38,7 @@ import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDate;
+import sa.lib.gui.SGuiParams;
 
 /**
  *
@@ -41,6 +46,8 @@ import sa.lib.gui.SGuiDate;
  */
 public class SViewBillOfLading extends SGridPaneView implements ActionListener {
 
+    private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
+    
     private SGridFilterDatePeriod moFilterDatePeriod;
     private javax.swing.JButton jbPrint;
     private javax.swing.JButton jbPrintCancelAck;
@@ -78,6 +85,8 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     }
 
     private void initComponetsCustom() {
+        
+        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient);
         
         jbPrint = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
         jbPrint.setPreferredSize(new Dimension(23, 23));
@@ -369,21 +378,59 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     }
     
     private void actionAnnul() {
-        if (jbAnnul.isEnabled()) {
-           if (jtTable.getSelectedRow() < 0) {
-                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
-            }
-            else {
-                try {
-                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-                    SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
-                    SCfdUtils.resetCfdiDeactivateFlags((SClientInterface)miClient, cfd);
-//                    miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+        SGuiParams params;
+        boolean annul = true;
+        try {
+            if (jbAnnul.isEnabled()) {
+                if (jtTable.getSelectedRow() < 0) {
+                    miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
                 }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
+                else {
+                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_ANNUL) == JOptionPane.YES_OPTION) {
+                        SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                        SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
+
+                        if (cfd != null && cfd.isCfdi()) {
+                            annul = false;
+                            params = new SGuiParams();
+
+                            if (cfd.isStamped()) {
+                                moDialogAnnulCfdi.formReset();
+                                moDialogAnnulCfdi.formRefreshCatalogues();
+                                moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
+                                moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, SDataConstantsSys.TRNS_TP_CFD_BOL);
+                                moDialogAnnulCfdi.setVisible(true);
+
+                                if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    annul = true;
+                                    params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
+                                    // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (true/false):
+                                    params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat());
+                                    // cause of annulation:
+                                    params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType());
+                                }
+                            }
+                            else {
+                                annul = true;
+                                params.getParamsMap().put(SGuiConsts.PARAM_DATE, miClient.getSession().getCurrentDate());
+                                // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (false):
+                                params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
+                                // cause of annulation:
+                                params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            }
+                        }
+
+    //                    if (annul) {
+    //                        if (miClient.getGuiModule(gui).annulRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey(), params) == SLibConstants.DB_ACTION_ANNUL_OK) {
+    //                            miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+    //                        }
+    //                    }
+                    }
                 }
             }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
         }
     }
 
@@ -453,6 +500,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
             + "b.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", " 
             + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
             + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
+            + "IF(b.fk_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " 
             + "IF(c.fid_st_xml IS NULL, " + SGridConsts.ICON_NULL + ", " /* not have CFDI associated */
             + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " /* CFDI pending sign */
             + "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
@@ -477,10 +525,11 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[18];
+        SGridColumnView[] columns = new SGridColumnView[19];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, SDbConsts.FIELD_NAME, "Folio");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE);
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_ico", "Status");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico_xml", "CFD");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "b.int_bol", "Transporte internacional");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "b.input_output_bol", "E/S");
@@ -551,7 +600,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                 actionDeactivateFlags();
             }
             else if (button == jbAnnul) {
-                actionDeactivateFlags();
+                actionAnnul();
             }
         }
     }

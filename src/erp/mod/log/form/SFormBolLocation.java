@@ -775,6 +775,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             moDateDeparture.setEnabled(false);
             moDecimalDistance.setEnabled(true);
         }
+        actionOriginDestination();
     }
     
      /*

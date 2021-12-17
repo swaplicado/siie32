@@ -452,10 +452,12 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
     @Override
     public void valueChanged(ListSelectionEvent e) {
         SDataItem item = (SDataItem) jListItems.getSelectedValue();
-        moKeyItem.setValue(new int[] { item.getPkItemId()});
-        for (SDbBolMerchandise merch : moBillOfLading.getBolMerchandises()){
-            if (merch.getFkItemId() == item.getPkItemId()) {
-                moKeyUnit.setValue(new int[] { merch.getFkUnitId()});
+        if (item != null) {
+            moKeyItem.setValue(new int[] { item.getPkItemId()});
+            for (SDbBolMerchandise merch : moBillOfLading.getBolMerchandises()){
+                if (merch.getFkItemId() == item.getPkItemId()) {
+                    moKeyUnit.setValue(new int[] { merch.getFkUnitId()});
+                }
             }
         }
     }
