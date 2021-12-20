@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridRow, Serializable {
 
-    protected int mnPkBolId;
+    protected int mnPkBillOfLadingId;
     protected int mnPkMerchandiseId;
     protected int mnPkMerchandiseQuantityId;
     protected double mdQuantity;
@@ -44,7 +44,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
         super(SModConsts.LOG_BOL_MERCH_QTY);
     }
     
-    public void setPkBolId(int n) { mnPkBolId = n; }
+    public void setPkBillOfLadingId(int n) { mnPkBillOfLadingId = n; }
     public void setPkMerchandiseId(int n) { mnPkMerchandiseId = n; }
     public void setPkMerchandiseQuantityId(int n) { mnPkMerchandiseQuantityId = n; }
     public void setQuantity(double d) { mdQuantity = d; }
@@ -54,7 +54,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
     public void setFkDestinationBizPartnerAddress_n(int n) { mnFkDestinationBizPartnerAddress_n = n; }
     public void setFkDestinationAddressAddress_n(int n) { mnFkDestinationAddressAddress_n = n; }
     
-    public int getPkBolId() { return mnPkBolId; }
+    public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public int getPkMerchandiseId() { return mnPkMerchandiseId; }
     public int getPkMerchandiseQuantityId() { return mnPkMerchandiseQuantityId; }
     public double getQuantity() { return mdQuantity; }
@@ -80,21 +80,21 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
     
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkBolId = pk[0];
+        mnPkBillOfLadingId = pk[0];
         mnPkMerchandiseId = pk[1];
         mnPkMerchandiseQuantityId = pk[2];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkBolId, mnPkMerchandiseId, mnPkMerchandiseQuantityId };
+        return new int[] { mnPkBillOfLadingId, mnPkMerchandiseId, mnPkMerchandiseQuantityId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkBolId = 0;
+        mnPkBillOfLadingId = 0;
         mnPkMerchandiseId = 0;
         mnPkMerchandiseQuantityId = 0;
         mdQuantity = 0;
@@ -119,7 +119,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_bol = " + mnPkBolId + " AND id_merch = " + mnPkMerchandiseId + " AND id_merch_qty = " + mnPkMerchandiseQuantityId + " ";
+        return "WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " AND id_merch_qty = " + mnPkMerchandiseQuantityId + " ";
     }
 
     @Override
@@ -160,7 +160,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             mnPkMerchandiseId = resultSet.getInt("id_merch");
             mnPkMerchandiseQuantityId = resultSet.getInt("id_merch_qty");
             mdQuantity = resultSet.getDouble("qty");
@@ -175,7 +175,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
             
             // Read merchandise
             
-            moXtaMerchandise.readXta(session, new int[] { mnPkBolId, mnPkMerchandiseId });
+            moXtaMerchandise.readXta(session, new int[] { mnPkBillOfLadingId, mnPkMerchandiseId });
             
             // Read BizPartnerBranchAddresses
             
@@ -210,7 +210,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkBolId + ", " + 
+                mnPkBillOfLadingId + ", " + 
                 mnPkMerchandiseId + ", " + 
                 mnPkMerchandiseQuantityId + ", " + 
                 mdQuantity + ", " + 
@@ -225,7 +225,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
             mnFkUserUpdateId = session.getUser().getPkUserId();
             
             msSql = "UPDATE " + getSqlTable() + " SET " + 
-                "id_bol = " + mnPkBolId + ", " +
+                "id_bol = " + mnPkBillOfLadingId + ", " +
                 "id_merch = " + mnPkMerchandiseId + ", " +
                 "id_merch_qty = " + mnPkMerchandiseQuantityId + ", " +
                 "qty = " + mdQuantity + ", " +
@@ -246,7 +246,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
     public SDbRegistry clone() throws CloneNotSupportedException {
         SDbBolMerchandiseQuantity registry = new SDbBolMerchandiseQuantity();
         
-        registry.setPkBolId(this.getPkBolId());
+        registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
         registry.setPkMerchandiseId(this.getPkMerchandiseId());
         registry.setPkMerchandiseQuantityId(this.getPkMerchandiseQuantityId());
         registry.setQuantity(this.getQuantity());

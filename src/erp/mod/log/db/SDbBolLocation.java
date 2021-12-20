@@ -31,7 +31,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
 
     protected final SDbBillOfLading moBillOfLading;
     
-    protected int mnPkBolId;
+    protected int mnPkBillOfLadingId;
     protected int mnPkLocationId;
     protected double mdDistance;
     protected Date mtDateDeparture_n;
@@ -135,7 +135,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         }
     }
 
-    public void setPkBolId(int n) { mnPkBolId = n; }
+    public void setPkBillOfLadingId(int n) { mnPkBillOfLadingId = n; }
     public void setPkLocationId(int n) { mnPkLocationId = n; }
     public void setDistance(double d) { mdDistance = d; }
     public void setDateDeparture_n(Date t) { mtDateDeparture_n = t; }
@@ -149,7 +149,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     public void setFkDestinationBizPartnerAddress_n(int n) { mnFkDestinationBizPartnerAddress_n = n; }
     public void setFkDestinationAddressAddress_n(int n) { mnFkDestinationAddressAddress_n = n; }
 
-    public int getPkBolId() { return mnPkBolId; }
+    public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public int getPkLocationId() { return mnPkLocationId; }
     public double getDistance() { return mdDistance; }
     public Date getDateDeparture_n() { return mtDateDeparture_n; }
@@ -191,20 +191,20 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkBolId = pk[0];
+        mnPkBillOfLadingId = pk[0];
         mnPkLocationId = pk[1];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkBolId, mnPkLocationId };
+        return new int[] { mnPkBillOfLadingId, mnPkLocationId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkBolId = 0;
+        mnPkBillOfLadingId = 0;
         mnPkLocationId = 0;
         mdDistance = 0;
         mtDateDeparture_n = null;
@@ -239,7 +239,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_bol = " + mnPkBolId + " AND id_location = " + mnPkLocationId + " ";
+        return "WHERE id_bol = " + mnPkBillOfLadingId + " AND id_location = " + mnPkLocationId + " ";
     }
 
     @Override
@@ -280,7 +280,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             mnPkLocationId = resultSet.getInt("id_location");
             mdDistance = resultSet.getDouble("distance");
             mtDateDeparture_n = resultSet.getTimestamp("dt_departure_n");
@@ -303,7 +303,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             maXtaMerchandiseQuantityCharge.clear();
             msSql = "SELECT id_bol, id_merch, id_merch_qty " + 
                     "FROM log_bol_merch_qty " + 
-                    "WHERE id_bol = " + mnPkBolId + " " + 
+                    "WHERE id_bol = " + mnPkBillOfLadingId + " " + 
                     "AND fk_orig_bpb_add_n " + (mnFkOriginBizPartnerAddress_n == 0 ? "IS NULL " : "= " + mnFkOriginBizPartnerAddress_n) + " " +
                     "AND fk_orig_add_add_n " + (mnFkOriginAddressAddress_n == 0 ? "IS NULL " : "= " + mnFkOriginAddressAddress_n) + " " +
                     "AND fk_dest_bpb_add_n IS NULL " +
@@ -322,7 +322,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             maXtaMerchandiseQuantityDischarge.clear();
             msSql = "SELECT id_bol, id_merch, id_merch_qty " + 
                     "FROM log_bol_merch_qty " + 
-                    "WHERE id_bol = " + mnPkBolId + " " + 
+                    "WHERE id_bol = " + mnPkBillOfLadingId + " " + 
                     "AND fk_orig_bpb_add_n IS NULL " +
                     "AND fk_orig_add_add_n IS NULL " +
                     "AND fk_dest_bpb_add_n " + (mnFkDestinationBizPartnerAddress_n == 0 ? "IS NULL " : "= " + mnFkDestinationBizPartnerAddress_n) + " " +
@@ -375,7 +375,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkBolId + ", " + 
+                mnPkBillOfLadingId + ", " + 
                 mnPkLocationId + ", " + 
                 mdDistance + ", " + 
                 (mtDateDeparture_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateDeparture_n) + "', ") + 
@@ -394,7 +394,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             mnFkUserUpdateId = session.getUser().getPkUserId();
             
             msSql = "UPDATE " + getSqlTable() + " SET " + 
-                //"id_bol = " + mnPkBolId + ", " +
+                //"id_bol = " + mnPkBillOfLadingId + ", " +
                 //"id_location = " + mnPkLocationId + ", " +
                 "distance = " + mdDistance + ", " +
                 "dt_departure_n = " + (mtDateDeparture_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateDeparture_n) + "', ") +
@@ -419,7 +419,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     public SDbRegistry clone() throws CloneNotSupportedException {
         SDbBolLocation registry = new SDbBolLocation(moBillOfLading);
         
-        registry.setPkBolId(this.getPkBolId());
+        registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
         registry.setPkLocationId(this.getPkLocationId());
         registry.setDistance(this.getDistance());
         registry.setDateDeparture_n(this.getDateDeparture_n());

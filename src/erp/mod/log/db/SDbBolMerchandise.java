@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
 
-    protected int mnPkBolId;
+    protected int mnPkBillOfLadingId;
     protected int mnPkMerchandiseId;
     protected double mdQuantity;
     protected boolean mbHazardousMaterial;
@@ -165,7 +165,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             mnPkMerchandiseId = resultSet.getInt("id_merch");
             mdQuantity = resultSet.getDouble("qty");
             mbHazardousMaterial = resultSet.getBoolean("hazardous_mat");
@@ -188,7 +188,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         mnQueryResultId = SDbConsts.READ_OK;
     }
     
-    public void setPkBolId(int n) { mnPkBolId = n; }
+    public void setPkBillOfLadingId(int n) { mnPkBillOfLadingId = n; }
     public void setPkMerchandiseId(int n) { mnPkMerchandiseId = n; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setHazardousMaterial(boolean b) { mbHazardousMaterial = b; }
@@ -205,7 +205,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     public void setXtaItem(SDataItem o) { moXtaItem = o; }
     public void setXtaUnit(SDataUnit o) { moXtaUnit = o; }
     
-    public int getPkBolId() { return mnPkBolId; }
+    public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public int getPkMerchandiseId() { return mnPkMerchandiseId; }
     public double getQuantity() { return mdQuantity; }
     public boolean isHazardousMaterial() { return mbHazardousMaterial; }
@@ -228,20 +228,20 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkBolId = pk[0];
+        mnPkBillOfLadingId = pk[0];
         mnPkMerchandiseId = pk[1];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkBolId, mnPkMerchandiseId };
+        return new int[] { mnPkBillOfLadingId, mnPkMerchandiseId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkBolId = 0;
+        mnPkBillOfLadingId = 0;
         mnPkMerchandiseId = 0;
         mdQuantity = 0;
         mbHazardousMaterial = false;
@@ -269,7 +269,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_bol = " + mnPkBolId + " AND id_merch = " + mnPkMerchandiseId + " ";
+        return "WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " ";
     }
 
     @Override
@@ -312,7 +312,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             mnPkMerchandiseId = resultSet.getInt("id_merch");
             mdQuantity = resultSet.getDouble("qty");
             mbHazardousMaterial = resultSet.getBoolean("hazardous_mat");
@@ -334,7 +334,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         // Read merchandise quantity
         
         msSql = "SELECT id_bol, id_merch, id_merch_qty FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + 
-                " WHERE id_bol = " + mnPkBolId + " AND id_merch = " + mnPkMerchandiseId + " ";
+                " WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " ";
         resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql);
         while (resultSet.next()) {
             SDbBolMerchandiseQuantity merchQty = new SDbBolMerchandiseQuantity();
@@ -372,7 +372,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkBolId + ", " + 
+                mnPkBillOfLadingId + ", " + 
                 mnPkMerchandiseId + ", " + 
                 mdQuantity + ", " + 
                 (mbHazardousMaterial ? 1 : 0) + ", " + 
@@ -388,7 +388,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                //"id_bol = " + mnPkBolId + ", " +
+                //"id_bol = " + mnPkBillOfLadingId + ", " +
                 //"id_merch = " + mnPkMerchandiseId + ", " +
                 "qty = " + mdQuantity + ", " +
                 "hazardous_mat = " + (mbHazardousMaterial ? 1 : 0) + ", " +
@@ -408,7 +408,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         // Save merchandise quantity
         
         for (SDbBolMerchandiseQuantity merchQty : maBolMerchandiseQuantity) {
-            merchQty.setPkBolId(mnPkBolId);
+            merchQty.setPkBillOfLadingId(mnPkBillOfLadingId);
             merchQty.setPkMerchandiseId(mnPkMerchandiseId);
             merchQty.save(session);
         }
@@ -421,7 +421,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     public SDbRegistry clone() throws CloneNotSupportedException {
         SDbBolMerchandise registry = new SDbBolMerchandise();
         
-        registry.setPkBolId(this.getPkBolId());
+        registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
         registry.setPkMerchandiseId(this.getPkMerchandiseId());
         registry.setQuantity(this.getQuantity());
         registry.setHazardousMaterial(this.isHazardousMaterial());

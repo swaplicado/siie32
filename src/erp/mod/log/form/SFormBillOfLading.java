@@ -92,8 +92,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextFiscalIdReceptor = new sa.lib.gui.bean.SBeanFieldText();
         moTextTaxRegime = new sa.lib.gui.bean.SBeanFieldText();
         jPanel46 = new javax.swing.JPanel();
-        jlBolTp = new javax.swing.JLabel();
-        moTextBolTp = new sa.lib.gui.bean.SBeanFieldText();
+        jlBillOfLadingTp = new javax.swing.JLabel();
+        moTextBillOfLadingTp = new sa.lib.gui.bean.SBeanFieldText();
         jPanel25 = new javax.swing.JPanel();
         moBoolInternationalShip = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel26 = new javax.swing.JPanel();
@@ -257,12 +257,12 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
         jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBolTp.setText("CFDI tipo:*");
-        jlBolTp.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel46.add(jlBolTp);
+        jlBillOfLadingTp.setText("CFDI tipo:*");
+        jlBillOfLadingTp.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel46.add(jlBillOfLadingTp);
 
-        moTextBolTp.setEnabled(false);
-        jPanel46.add(moTextBolTp);
+        moTextBillOfLadingTp.setEnabled(false);
+        jPanel46.add(moTextBillOfLadingTp);
 
         jPanel23.add(jPanel46);
 
@@ -871,8 +871,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JPanel jPanel81;
     private javax.swing.JPanel jPanel82;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JLabel jlBillOfLadingTp;
     private javax.swing.JLabel jlBizPartner;
-    private javax.swing.JLabel jlBolTp;
     private javax.swing.JLabel jlCfdiRelated;
     private javax.swing.JLabel jlCfdiUsage;
     private javax.swing.JLabel jlCountry;
@@ -944,7 +944,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private sa.lib.gui.bean.SBeanFieldRadio moRadioCustomerLocations;
     private sa.lib.gui.bean.SBeanFieldRadio moRadioMyLocations;
     private sa.lib.gui.bean.SBeanFieldRadio moRadioSupplierLocations;
-    private sa.lib.gui.bean.SBeanFieldText moTextBolTp;
+    private sa.lib.gui.bean.SBeanFieldText moTextBillOfLadingTp;
     private sa.lib.gui.bean.SBeanFieldText moTextCfdiRelated;
     private sa.lib.gui.bean.SBeanFieldText moTextDriverFiscalId;
     private sa.lib.gui.bean.SBeanFieldText moTextDriverLicense;
@@ -996,7 +996,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         
         //moFieldKeyBizPartnerGroup = new SGuiFieldKeyGroup(miClient);
         moTextFiscalIdReceptor.setTextSettings(SGuiUtils.getLabelName(jlFiscalIdReceptor.getText()), 20);
-        moTextBolTp.setTextSettings(SGuiUtils.getLabelName(jlBolTp), 1);
+        moTextBillOfLadingTp.setTextSettings(SGuiUtils.getLabelName(jlBillOfLadingTp), 1);
         moBoolInternationalShip.setBooleanSettings(moBoolInternationalShip.getText(), false);
         moKeyInputOutput.setKeySettings(miClient, SGuiUtils.getLabelName(jlInputOutput.getText()), false);
         moKeyInputOutputWay.setKeySettings(miClient, SGuiUtils.getLabelName(jlInputOutputWay.getText()), false);
@@ -1040,7 +1040,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextNotifiedFiscalId.setTextSettings(SGuiUtils.getLabelName(jlNotifiedFiscalId.getText()), 25);
         
         moFields.addField(moTextFiscalIdReceptor);
-        moFields.addField(moTextBolTp);
+        moFields.addField(moTextBillOfLadingTp);
         moFields.addField(moBoolInternationalShip);
         moFields.addField(moKeyInputOutput);
         moFields.addField(moKeyInputOutputWay);
@@ -1530,10 +1530,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
         moTextTaxRegime.setValue(((SClientInterface)miClient).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
         if (mnFormSubtype == SDataConstantsSys.TRNS_TP_CFD_BOL) {
-            moTextBolTp.setValue("T");
+            moTextBillOfLadingTp.setValue("T");
         }
         else if (mnFormSubtype == SDataConstantsSys.TRNS_TP_CFD_INV) {
-            moTextBolTp.setValue("I");
+            moTextBillOfLadingTp.setValue("I");
         }
         moKeyCountry.setValue(new int[] { moRegistry.getFkInputOutputCountry() });
         SGuiUtils.locateItemByCode(moKeyInputOutput, moRegistry.getInputOutputBol());
@@ -1611,7 +1611,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         SDbInsurer merchansise = (SDbInsurer) miClient.getSession().readRegistry(SModConsts.LOG_INSURER, moKeyMerchandiseInsurer.getValue(), SLibConstants.EXEC_MODE_SILENT);
  
         registry.setFiscalIdReceptor(moTextFiscalIdReceptor.getValue());
-        registry.setBillOfLadingType(moTextBolTp.getValue());
+        registry.setBillOfLadingType(moTextBillOfLadingTp.getValue());
         registry.setSeries(moTextSerie.getText());
         registry.setNumber(moTextNumber.getText());
         registry.setDate(moDateDate.getValue());
@@ -1629,7 +1629,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         registry.setFkGrossWeightUnit(moKeyGrossWeightUnit.getValue()[0]);
         registry.setFkEnvironmentalInsurer_n(moKeyEnvironmentalInsurer.getValue().length == 0 ? 0 : moKeyEnvironmentalInsurer.getValue()[0]);
         registry.setFkMerchandiseInsurer_n(moKeyMerchandiseInsurer.getValue().length == 0 ? 0 :moKeyMerchandiseInsurer.getValue()[0]);
-        registry.setFkBolStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
+        registry.setFkBillOfLadingStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
         registry.readBizPartner(miClient.getSession(), miClient.getSession().getConfigCompany().getCompanyId());
         registry.setXtaEnvironmentalInsurer(environmental);
         registry.setXtaMerchandiseInsurer(merchansise);
