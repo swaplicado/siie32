@@ -52,6 +52,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.log.db.SDbBillOfLading;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SCfdUtils;
@@ -94,6 +95,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -114,6 +116,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibMethod;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiConsts;
@@ -155,6 +158,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mbps.data.SDataBizPartnerBranchAddress moBizPartnerBranchAddressMain;
     private erp.mbps.data.SDataBizPartnerBranchAddress moBizPartnerBranchAddress;
     private erp.mbps.data.SDataBizPartnerCategory moBizPartnerCategory;
+    private erp.mod.log.db.SDbBillOfLading moBillOfLading;
     private java.util.ArrayList<SDataSystemNotes> maSystemNotes;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldDateDoc;
@@ -231,6 +235,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldCfdiConfirmation;
     private erp.lib.form.SFormField moFieldCfdiRelationType;
     private erp.lib.form.SFormField moFieldCfdiCfdiRelated;
+    private erp.lib.form.SFormField moFieldCfdiBillOfLading;
     private erp.lib.form.SFormField moFieldCfdCceApplies;
     private erp.lib.form.SFormField moFieldCfdCceMoveReason;
     private erp.lib.form.SFormField moFieldCfdCceOperationType;
@@ -309,6 +314,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForLink;
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForAdjustment;
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForCfdiRelated;
+    private erp.mtrn.form.SDialogPickerDps moDialogPickerBillOfLading;
     private erp.mtrn.form.SDialogDpsLink moDialogDpsLink;
     private erp.mtrn.form.SDialogDpsAdjustment moDialogDpsAdjustment;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
@@ -752,6 +758,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfFileXml = new javax.swing.JTextField();
         jbLoadFileXml = new javax.swing.JButton();
         jbDeleteFileXml = new javax.swing.JButton();
+        jlSpace = new javax.swing.JLabel();
+        jlBillOfLading = new javax.swing.JLabel();
+        jtfBillOfLading = new javax.swing.JTextField();
+        jbLoadBillOfLading = new javax.swing.JButton();
+        jbDeleteBillOfLading = new javax.swing.JButton();
         jPanel105 = new javax.swing.JPanel();
         jlFilePdf = new javax.swing.JLabel();
         jtfFilePdf = new javax.swing.JTextField();
@@ -2660,6 +2671,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDeleteFileXml.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel75.add(jbDeleteFileXml);
 
+        jlSpace.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel75.add(jlSpace);
+
+        jlBillOfLading.setText("Carta porte:");
+        jlBillOfLading.setPreferredSize(new java.awt.Dimension(70, 23));
+        jPanel75.add(jlBillOfLading);
+
+        jtfBillOfLading.setEditable(false);
+        jtfBillOfLading.setText("XML");
+        jtfBillOfLading.setOpaque(false);
+        jtfBillOfLading.setPreferredSize(new java.awt.Dimension(260, 23));
+        jPanel75.add(jtfBillOfLading);
+
+        jbLoadBillOfLading.setText("...");
+        jbLoadBillOfLading.setToolTipText("Seleccionar archivo XML...");
+        jbLoadBillOfLading.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel75.add(jbLoadBillOfLading);
+
+        jbDeleteBillOfLading.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbDeleteBillOfLading.setToolTipText("Eliminar archivo XML");
+        jbDeleteBillOfLading.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel75.add(jbDeleteBillOfLading);
+
         jPanel74.add(jPanel75);
 
         jPanel105.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -3051,6 +3085,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdiCfdiRelated.setLengthMax(3700); // (36 + 1) * 100: longitud UUID = 36 + 1 coma, aunque hay espacio de más para una última coma innecesaria
         moFieldCfdiCfdiRelated.setPickerButton(jbCfdiCfdiRelated);
         moFieldCfdiCfdiRelated.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldCfdiBillOfLading = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBillOfLading, jlBillOfLading);
+        moFieldCfdiBillOfLading.setLengthMax(3700); 
+        moFieldCfdiBillOfLading.setPickerButton(jbLoadBillOfLading);
+        moFieldCfdiBillOfLading.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         
         mvFields.add(moFieldDate);
         mvFields.add(moFieldNumberSeries);
@@ -3143,6 +3181,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldCfdiConfirmation);
         mvFields.add(moFieldCfdiRelationType);
         mvFields.add(moFieldCfdiCfdiRelated);
+        mvFields.add(moFieldCfdiBillOfLading);
         
         moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
         
@@ -3303,6 +3342,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbLoadFilePdf.addActionListener(this);
         jbDeleteFilePdf.addActionListener(this);
         jbCfdiCfdiRelated.addActionListener(this);
+        jbLoadBillOfLading.addActionListener(this);
+        jbDeleteBillOfLading.addActionListener(this);
         jtbEntryFilter.addActionListener(this);
         jtbNotesFilter.addActionListener(this);
 
@@ -3561,6 +3602,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlFilePdf.setEnabled(enableXmlFields);
         jbLoadFilePdf.setEnabled(enableXmlFields);
         jbDeleteFilePdf.setEnabled(enableXmlFields);
+        jbDeleteBillOfLading.setEnabled(true);
         
         jcbCfdiTaxRegime.setEnabled(enableFields && isCfdiVer33);
         jcbCfdiCfdiUsage.setEnabled(enableFields && isCfdiVer33);
@@ -3568,8 +3610,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfCfdiConfirmation.setFocusable(enableFields && isCfdiVer33);
         jcbCfdiRelationType.setEnabled(enableFields && isCfdiVer33);
         jtfCfdiCfdiRelated.setEnabled(enableFields && isCfdiVer33);
-        jtfCfdiCfdiRelated.setFocusable(enableFields && isCfdiVer33);
         jbCfdiCfdiRelated.setEnabled(enableFields && isCfdiVer33);
+        jtfBillOfLading.setFocusable(true);
+        jbLoadBillOfLading.setEnabled(true);
     }
 
     /**
@@ -4086,6 +4129,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
 
         return isUpdateNeeded;
+    }
+    
+    private void isBolAlreadySelected(int[] pk) {
+        try {
+            ResultSet resultSet;
+            String sql = "SELECT num_ser, num, id_year FROM trn_dps WHERE fid_bol_n = " + pk[0];
+            resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                miClient.showMsgBoxInformation("Este registro ya fue seleccionado anteriormente en la facura " + 
+                        (resultSet.getString(1).isEmpty() ? resultSet.getString(2) : resultSet.getString(1) + " - " + resultSet.getString(2)) +
+                        " con año " + resultSet.getInt(3));
+            }
+        }
+        catch(Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
     }
 
     private void renderEntries() {
@@ -7612,6 +7671,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         msXmlUuid = "";
     }
     
+    private void actionDeleteBillOfLading() {
+        moFieldCfdiBillOfLading.setFieldValue("");
+        moBillOfLading = null;
+    }
+    
     private void actionDeleteFilePdf() {
         moFieldCfdiPdfFile.setFieldValue("");
         moFilePdfJustLoaded = null;
@@ -7639,6 +7703,37 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 String cfdi = moFieldCfdiCfdiRelated.getString();
                 moFieldCfdiCfdiRelated.setString((cfdi.isEmpty() ? "" : cfdi + ",") + dps.getDbmsDataCfd().getUuid());
             }
+        }
+    }
+    
+    private void actionBillOfLading() {
+        try {
+            if (moDialogPickerBillOfLading == null) {
+                moDialogPickerBillOfLading = new SDialogPickerDps(miClient, SModConsts.LOG_BOL);
+            }
+
+            moDialogPickerBillOfLading.formReset();
+            moDialogPickerBillOfLading.setFilterKey(SLibTimeUtils.digestYear(moFieldDate.getDate()));
+            moDialogPickerBillOfLading.formRefreshOptionPane();
+            moDialogPickerBillOfLading.setFormVisible(true);
+
+            if (moDialogPickerBillOfLading.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                isBolAlreadySelected((int[]) moDialogPickerBillOfLading.getSelectedPrimaryKey());
+                moBillOfLading = new SDbBillOfLading();
+                moBillOfLading.read(miClient.getSession(), (int[]) moDialogPickerBillOfLading.getSelectedPrimaryKey() );
+
+                if (moBillOfLading.getDbmsDataCfd() == null) {
+                    miClient.showMsgBoxWarning("El documento " + moBillOfLading.getNumber() + " no cuenta con CFD.");
+                }
+                else {
+                    moFieldCfdiBillOfLading.setString(
+                            (moBillOfLading.getSeries().isEmpty() ? moBillOfLading.getNumber() : moBillOfLading.getSeries() + moBillOfLading.getNumber()) + " - " + 
+                            SLibUtils.DateFormatDate.format(moBillOfLading.getDate()));
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
 
@@ -8602,6 +8697,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbDateDocLapsing_n;
     private javax.swing.JButton jbDateMaturity;
     private javax.swing.JButton jbDateStartCredit;
+    private javax.swing.JButton jbDeleteBillOfLading;
     private javax.swing.JButton jbDeleteFilePdf;
     private javax.swing.JButton jbDeleteFileXml;
     private javax.swing.JButton jbEdit;
@@ -8624,6 +8720,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbFkModeOfTransportationTypeId;
     private javax.swing.JButton jbFkProductionOrderId_n;
     private javax.swing.JButton jbFkVehicleId_n;
+    private javax.swing.JButton jbLoadBillOfLading;
     private javax.swing.JButton jbLoadFilePdf;
     private javax.swing.JButton jbLoadFileXml;
     private javax.swing.JButton jbNotesDelete;
@@ -8729,6 +8826,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlAddSorianaRemisiónFolio;
     private javax.swing.JLabel jlAddSorianaTienda;
     private javax.swing.JLabel jlAdjustmentSubtypeId;
+    private javax.swing.JLabel jlBillOfLading;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlBizPartnerBranch;
     private javax.swing.JLabel jlBizPartnerBranchAddress01;
@@ -8798,6 +8896,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlSalesAgentBizPartner;
     private javax.swing.JLabel jlSalesSupervisor;
     private javax.swing.JLabel jlSalesSupervisorBizPartner;
+    private javax.swing.JLabel jlSpace;
     private javax.swing.JLabel jlSubtotal;
     private javax.swing.JLabel jlSubtotalProvisional;
     private javax.swing.JLabel jlTaxCharged;
@@ -8855,6 +8954,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfAddSorianaPedidoFolio;
     private javax.swing.JTextField jtfAddSorianaRemisiónFolio;
     private javax.swing.JTextField jtfAddSorianaTienda;
+    private javax.swing.JTextField jtfBillOfLading;
     private javax.swing.JTextField jtfBizPartnerBranchAddress01Ro;
     private javax.swing.JTextField jtfBizPartnerBranchAddressMain01Ro;
     private javax.swing.JTextField jtfBizPartnerBranchAddressMain02Ro;
@@ -10096,6 +10196,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moGuiDpsLink = new SGuiDpsLink(miClient);
             moGuiDpsLink.addDataDpsDestiny(moDps);
         }
+        
+        if (moDps.getDbmsDataCfdBol() != null) {
+            moBillOfLading = new SDbBillOfLading();
+            try {
+                moBillOfLading.read(miClient.getSession(), new int[] { moDps.getDbmsDataCfdBol().getFkBillOfLadingId_n() } );
+            }
+            catch (Exception e) {}
+            moFieldCfdiBillOfLading.setFieldValue((moBillOfLading.getSeries().isEmpty() ? moBillOfLading.getNumber() : moBillOfLading.getSeries() + moBillOfLading.getNumber()) + " - " + 
+                            SLibUtils.DateFormatDate.format(moBillOfLading.getDate()));
+        }
 
         mbResetingForm = false;
     }
@@ -10403,7 +10513,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                 pdf.setAuxXmlBaseDirectory(((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
             }
-
+            
+            if (!jtfBillOfLading.getText().isEmpty()) {
+                moDps.setFkBillOfLading_n(moBillOfLading.getPkBolId());
+                moDps.setDbmsDataCfdBol(moBillOfLading == null ? null : moBillOfLading.getDbmsDataCfd());
+            }
             return moDps;
         }
     }
@@ -10586,6 +10700,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbCfdiCfdiRelated) {
                     actionCfdiCfdiRelated();
+                }
+                else if (button == jbLoadBillOfLading) {
+                    actionBillOfLading();
+                }
+                else if (button == jbDeleteBillOfLading) {
+                    actionDeleteBillOfLading();
                 }
             }
             catch (SQLException se) {

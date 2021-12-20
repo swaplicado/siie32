@@ -6,12 +6,12 @@
 package erp.mod.log.db;
 
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbInsurer extends SDbRegistryUser {
+public class SDbInsurer extends SDbRegistryUser implements Serializable {
     
     protected int mnPkInsurerId;
     protected String msName;
@@ -145,7 +145,7 @@ public class SDbInsurer extends SDbRegistryUser {
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
-            msSql = "INSERT INTO " + getSqlTable() + "VALUES (" + 
+            msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkInsurerId + ", " + 
                     "'" + msName + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -175,7 +175,7 @@ public class SDbInsurer extends SDbRegistryUser {
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbInsurer clone() throws CloneNotSupportedException {
         SDbInsurer registry = new SDbInsurer();
         
         registry.setPkInsurerId(this.getPkInsurerId());

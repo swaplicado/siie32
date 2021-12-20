@@ -59,9 +59,9 @@ import erp.mod.hrs.db.SHrsFormerConceptIncident;
 import erp.mod.hrs.db.SHrsFormerPayroll;
 import erp.mod.hrs.db.SHrsFormerReceipt;
 import erp.mod.hrs.db.SHrsFormerReceiptConcept;
+import erp.mod.log.db.SDbBillOfLading;
 import erp.mtrn.form.SDialogRestoreCfdi;
 import erp.print.SDataConstantsPrint;
-import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -113,7 +113,8 @@ import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.redis.SRedisLock;
+import sa.lib.srv.SSrvLock;
+import sa.lib.srv.SSrvUtils;
 import sa.lib.xml.SXmlUtils;
 import views.core.soap.services.apps.CancelaCFDResult; 
 import views.core.soap.services.apps.FolioArray; 
@@ -122,7 +123,7 @@ import views.core.soap.services.apps.UUIDS;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores, Isabel Servín
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -662,10 +663,8 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dataDps = null;
         SDataCfdPayment dataCfdPayment = null;
         SDataPayrollReceiptIssue dataPayrollReceiptIssue = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SDbBillOfLading bol = null;
         SSrvLock lock = null;
-*/        
-        SRedisLock rlock = null;
         SCfdiSignature cfdiSignature = null;
         String xmlStamping = "";
         String xmlAckCancellation = "";
@@ -677,28 +676,24 @@ public abstract class SCfdUtils implements Serializable {
             switch (dataCfd.getFkCfdTypeId()) {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
                     registryKey = new int[] { dataCfd.getFkDpsYearId_n(), dataCfd.getFkDpsDocId_n() };
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                     lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60); // 1 minute timeout
-*/
-                    rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                     registryKey = new int[] { dataCfd.getPkCfdId() };
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                     lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60); // 1 minute timeout
-*/
-                    rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, 60);
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                     if (payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
                         registryKey = new int[] { dataCfd.getFkPayrollReceiptPayrollId_n(), dataCfd.getFkPayrollReceiptEmployeeId_n(), dataCfd.getFkPayrollReceiptIssueId_n() };
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                         lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60); // 1 minute timeout
-*/
-                        rlock = SRedisLockUtils.gainLock(client, SModConsts.HRS_PAY_RCP_ISS, registryKey, 60);
                     }
+                    break;
+                    
+                case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                    registryKey = new int[] { dataCfd.getFkBillOfLadingId_n() } ;
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.LOG_BOL, registryKey, 1000 * 60);
                     break;
                 default:
             }
@@ -825,7 +820,11 @@ public abstract class SCfdUtils implements Serializable {
                                         packet.setAuxDataPayrollReceiptIssue(dataPayrollReceiptIssue);
                                     }
                                     break;
+                                case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                                    bol = new SDbBillOfLading();
+                                    bol.read(client.getSession(), registryKey);
                                     
+                                    packet.setAuxDataBillOfLading(bol);
                                 default:
                             }
                         }
@@ -873,24 +872,14 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         catch (Exception e) {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
-            }
-*/
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
             }
             throw e;
         }
         finally {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
-            }
-*/
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
             }
             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -2191,10 +2180,7 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dps = null;
         SDataCfdPayment cfdPayment = null;
         SDataPayrollReceiptIssue receiptIssue = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
         SSrvLock lock = null;
-*/        
-        SRedisLock rlock = null;
         SServerRequest request = null;
         SServerResponse response = null;
 
@@ -2211,10 +2197,9 @@ public abstract class SCfdUtils implements Serializable {
                     }
                     else {
                         // lock registry:
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro                        
+                        
                         lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, key, 1000 * 60); // 1 min. timeout
-*/                        
-                        rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRN_DPS, key, 60);
+                        
                         // check if registry can be annuled:
                         
                         request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
@@ -2263,10 +2248,9 @@ public abstract class SCfdUtils implements Serializable {
                     }
                     else {
                         // lock registry:
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+
                         lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, key, 1000 * 60); // 1 min. timeout
-*/
-                        rlock = SRedisLockUtils.gainLock(client, SDataConstants.TRNX_CFD_PAY_REC, key, 60);
+
                         // check if registry can be annuled:
                         
                         request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
@@ -2315,10 +2299,8 @@ public abstract class SCfdUtils implements Serializable {
                         }
 
                         // lock registry:
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                        
                         lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, key, 1000 * 60); // 1 min. timeout
-*/
-                        rlock = SRedisLockUtils.gainLock(client, SModConsts.HRS_PAY_RCP_ISS, key, 60); // 1 min. timeout
 
                         // check if registry can be annuled:
                         
@@ -2361,24 +2343,14 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         catch (Exception e) {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
-            }
-*/
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
             }
             throw e;
         }
         finally {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
-            }
-*/
-            if (rlock != null) {
-                SRedisLockUtils.releaseLock(client, rlock);
             }
         }
     }
@@ -2823,6 +2795,7 @@ public abstract class SCfdUtils implements Serializable {
      */
     private static void computePrintCfd(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, int printMode, int numberCopies) throws Exception {
         SDataDps dps = null;
+        SDbBillOfLading bol = null;
         SCfdParams params = null;
         SCfdPrint cfdPrint = new SCfdPrint(client);
 
@@ -2875,6 +2848,16 @@ public abstract class SCfdUtils implements Serializable {
                         break;
                     default:
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+            case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                switch (cfd.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                        bol = new SDbBillOfLading();
+                        bol.read(client.getSession(), new int[]{ cfd.getFkBillOfLadingId_n() });
+                        cfdPrint.printBolReceip33_20(client, cfd, printMode, bol);
+                        break;
+                    default:
                 }
                 break;
 
@@ -3043,7 +3026,14 @@ public abstract class SCfdUtils implements Serializable {
                         idBizPartner = cfdSubtype == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n();
                         idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
                         break;
-
+                    
+                    case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                        SDbBillOfLading bol = new SDbBillOfLading();
+                        bol.read(client.getSession(), new int[] { cfd.mnFkBillOfLadingId_n });
+                        SDataBizPartnerBranch bpb = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { bol.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                        idBizPartner = bpb.getFkBizPartnerId();
+                        idBizPartnerBranch = bpb.getPkBizPartnerBranchId();
+                        break;
                     default:
                 }
 
@@ -3349,6 +3339,68 @@ public abstract class SCfdUtils implements Serializable {
 
         packet.setCfdCertNumber(client.getCfdSignature(cfdVersion).getCertNumber());
         packet.setCfdSignature(client.getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(cfdPayment.getComprobanteFecha())[0]));
+        packet.setBaseXUuid(cfd == null ? "" : cfd.getBaseXUuid());
+
+        switch (xmlType) {
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                comprobanteCfdi33.getAttSello().setString(packet.getCfdSignature());
+                packet.setAuxCfdRootElement(comprobanteCfdi33);
+                break;
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+
+        saveCfd(client, packet);
+    }
+    
+    public static void computeCfdiBol(final SClientInterface client, final SDbBillOfLading bol, final int xmlType) throws Exception {
+        SDataCfd cfd = bol.getDbmsDataCfd();
+        SCfdPacket packet = new SCfdPacket();
+        
+        if (cfd == null) {
+            packet.setCfdId(SLibConsts.UNDEFINED);
+            packet.setCfdSeries("");
+            packet.setCfdNumber(0);
+            packet.setFkCompanyBranchId(SLibConsts.UNDEFINED);
+            packet.setFkFactoringBankId(SLibConsts.UNDEFINED);
+        }
+        else {
+            packet.setCfdId(cfd.getPkCfdId());
+            packet.setCfdSeries(cfd.getSeries());
+            packet.setCfdNumber(cfd.getNumber());
+            packet.setFkCompanyBranchId(SLibConsts.UNDEFINED);
+            packet.setFkFactoringBankId(SLibConsts.UNDEFINED);
+        }
+
+        float cfdVersion = SLibConsts.UNDEFINED;
+        cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
+
+        switch (xmlType) {
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                bol.readBizPartner(client.getSession(), bol.getFkCompanyBranchId());
+                comprobanteCfdi33 = (cfd.ver33.DElementComprobante) createCfdi33RootElement(client, bol);
+                cfdVersion = comprobanteCfdi33.getVersion();
+
+                packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
+                packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
+                break;
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+
+        packet.setBillOfLadingId(bol.getPkBolId());
+        packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_BOL);
+        packet.setFkXmlTypeId(xmlType);
+        packet.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
+        packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
+        packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
+
+        if (packet.getCfdStringSigned().isEmpty()) {
+            throw new Exception("No fue posible generar la cadena original del comprobante.");
+        }
+
+        packet.setCfdCertNumber(client.getCfdSignature(cfdVersion).getCertNumber());
+        packet.setCfdSignature(client.getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(bol.getComprobanteFecha())[0]));
         packet.setBaseXUuid(cfd == null ? "" : cfd.getBaseXUuid());
 
         switch (xmlType) {
@@ -4062,6 +4114,10 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.getAttTipoCambio().setDouble(xmlCfdi.getComprobanteTipoCambio());
         }
         comprobante.getAttTotal().setDouble(xmlCfdi.getComprobanteTotal());
+        if (xmlCfdi.getComprobanteMoneda().equals(DCfdi33Catalogs.ClaveMonedaXxx)) {
+            comprobante.getAttSubTotal().setDecimals(0);
+            comprobante.getAttTotal().setDecimals(0);
+        }
         comprobante.getAttTipoDeComprobante().setString(xmlCfdi.getComprobanteTipoComprobante());
         comprobante.getAttMetodoPago().setString(xmlCfdi.getComprobanteMetodoPago());
         comprobante.getAttLugarExpedicion().setString(xmlCfdi.getComprobanteLugarExpedicion());
@@ -4164,7 +4220,7 @@ public abstract class SCfdUtils implements Serializable {
 
         // Impuestos:
 
-        if (!SLibUtils.belongsTo(xmlCfdi.getCfdType(), new int[] { SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SDataConstantsSys.TRNS_TP_CFD_PAY_REC })) {
+        if (!SLibUtils.belongsTo(xmlCfdi.getCfdType(), new int[] { SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SDataConstantsSys.TRNS_TP_CFD_BOL })) {
             boolean exemptTaxesAvailable = false;
             double dTotalImptoRetenido = 0;
             double dTotalImptoTrasladado = 0;
@@ -4217,7 +4273,7 @@ public abstract class SCfdUtils implements Serializable {
             }
         }
         
-        if (SLibUtils.belongsTo(xmlCfdi.getCfdType(), new int[] { SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SDataConstantsSys.TRNS_TP_CFD_PAY_REC })) {
+        if (SLibUtils.belongsTo(xmlCfdi.getCfdType(), new int[] { SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SDataConstantsSys.TRNS_TP_CFD_BOL })) {
             if (elementComplement == null) {
                 throw new Exception("Error al generar el complemento nómina o el complemento no existe.");
             }
@@ -4907,6 +4963,7 @@ public abstract class SCfdUtils implements Serializable {
         int idBizPartner = SLibConsts.UNDEFINED;
         int idBizPartnerBranch = SLibConsts.UNDEFINED;
         SDataDps dps = null;
+        SDbBillOfLading bol = null;
         
         if (canSendCfd(cfd)) {
             switch (typeCfd) {
@@ -4916,6 +4973,14 @@ public abstract class SCfdUtils implements Serializable {
                     idBizPartnerBranch = dps.getFkBizPartnerBranchId();
                     break;
 
+                case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                    bol = new SDbBillOfLading();
+                    bol.read(client.getSession(), new int[] { cfd.getFkBillOfLadingId_n() });
+                    SDataBizPartnerBranch bpb = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { bol.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    idBizPartner = bpb.getFkBizPartnerId();
+                    idBizPartnerBranch = bpb.getPkBizPartnerBranchId();
+                    break;
+                    
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                     idBizPartner = SDataCfdPayment.getDbmsDataReceptorId(client.getSession().getStatement(), cfd.getPkCfdId());
                     idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
@@ -4925,7 +4990,7 @@ public abstract class SCfdUtils implements Serializable {
                     idBizPartner = payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n();
                     idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
                     break;
-
+                    
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
@@ -5117,6 +5182,10 @@ public abstract class SCfdUtils implements Serializable {
                 
             case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                 sqlWhere = "WHERE id_cfd = " + cfdKey[0] + " ";
+                break;
+                
+            case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                sqlWhere = "WHERE fid_bol_n = " + cfdKey[0] + " ";
                 break;
                 
             case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:

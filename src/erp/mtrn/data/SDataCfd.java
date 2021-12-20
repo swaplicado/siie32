@@ -687,7 +687,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "fid_fin_rec_year_n, fid_fin_rec_per_n, fid_fin_rec_bkc_n, fid_fin_rec_tp_rec_n, fid_fin_rec_num_n, " + 
                         "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, " +
                         "fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, fid_pay_rcp_iss_n, " +
-                        "fid_rcp_pay_n, " +
+                        "fid_rcp_pay_n, " + 
                         "fid_bol_n, " +
                         "fid_usr_prc, " +
                         "fid_usr_dvy, " +

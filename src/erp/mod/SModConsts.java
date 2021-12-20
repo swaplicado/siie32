@@ -124,6 +124,9 @@ public abstract class SModConsts {
 
     public static final int LOCU_CTY = 1032001;
     public static final int LOCU_STA = 1032002;
+    public static final int LOCS_BOL_ZIP_CODE = 1032003;
+    public static final int LOCS_BOL_COUNTY = 1032004;
+    public static final int LOCS_BOL_LOCALITY = 1032005;
 
     /*
      * Business partners
@@ -826,6 +829,9 @@ public abstract class SModConsts {
 
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
         TablesMap.put(LOCU_STA, "erp.locu_sta");
+        TablesMap.put(LOCS_BOL_ZIP_CODE, "erp.locs_bol_zip_code");
+        TablesMap.put(LOCS_BOL_COUNTY, "erp.locs_bol_county");
+        TablesMap.put(LOCS_BOL_LOCALITY, "erp.locs_bol_locality");
 
         TablesMap.put(BPSS_CT_BP, "erp.bpss_ct_bp");
         TablesMap.put(BPSS_TP_BP_IDY, "erp.bpss_tp_bp_idy");

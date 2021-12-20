@@ -6,6 +6,7 @@
 package erp.mod.log.db;
 
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import sa.gui.util.SUtilConsts;
@@ -18,9 +19,9 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbBolTransportationMode extends SDbRegistryUser {
+public class SDbBolTransportationMode extends SDbRegistryUser implements Serializable {
     
-    protected int mnPkBolId;
+    protected int mnPkBillOfLadingId;
     protected int mnPkTransportationMode;
     protected String msTransportationPartOwner;
     protected String msTransportationPartLessee;
@@ -56,7 +57,7 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
         }
     }
     
-    public void setPkBolId(int n) { mnPkBolId = n; }
+    public void setPkBillOfLadingId(int n) { mnPkBillOfLadingId = n; }
     public void setPkTransportationMode(int n) { mnPkTransportationMode = n; }
     public void setTransportationPartOwner(String s) { msTransportationPartOwner = s; }
     public void setTransportationPartLessee(String s) { msTransportationPartLessee = s; }
@@ -68,7 +69,7 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
     public void setFkVehicleLesseeId_n(int n) { mnFkVehicleLesseeId_n = n; }
     public void setFkNotifiedId_n(int n) { mnFkNotifiedId_n = n; }
 
-    public int getPkBolId() { return mnPkBolId; }
+    public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public int getPkTransportationMode() { return mnPkTransportationMode; }
     public String getTransportationPartOwner() { return msTransportationPartOwner; }
     public String getTransportationPartLessee() { return msTransportationPartLessee; }
@@ -98,20 +99,20 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
     
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkBolId = pk[0];
+        mnPkBillOfLadingId = pk[0];
         mnPkTransportationMode = pk[1];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkBolId, mnPkTransportationMode };
+        return new int[] { mnPkBillOfLadingId, mnPkTransportationMode };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkBolId = 0;
+        mnPkBillOfLadingId = 0;
         mnPkTransportationMode = 0;
         msTransportationPartOwner = "";
         msTransportationPartLessee = "";
@@ -139,7 +140,7 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_bol = " + mnPkBolId + " AND id_transp_mode = " + mnPkTransportationMode + " ";
+        return "WHERE id_bol = " + mnPkBillOfLadingId + " AND id_transp_mode = " + mnPkTransportationMode + " ";
     }
 
     @Override
@@ -175,7 +176,7 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             mnPkTransportationMode = resultSet.getInt("id_transp_mode");
             msTransportationPartOwner = resultSet.getString("transp_part_owner");
             msTransportationPartLessee = resultSet.getString("transp_part_lessee");
@@ -235,7 +236,7 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkBolId + ", " + 
+                mnPkBillOfLadingId + ", " + 
                 mnPkTransportationMode + ", " + 
                 "'" + msTransportationPartOwner + "', " + 
                 "'" + msTransportationPartLessee + "', " + 
@@ -252,7 +253,7 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
             
             msSql = "UPDATE " + getSqlTable() + " SET " + 
-                //"id_bol = " + mnPkBolId + ", " +
+                //"id_bol = " + mnPkBillOfLadingId + ", " +
                 //"id_transp_mode = " + mnPkTransportationMode + ", " +
                 "transp_part_owner = '" + msTransportationPartOwner + "', " +
                 "transp_part_lessee = '" + msTransportationPartLessee + "', " +
@@ -279,7 +280,7 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
     public SDbRegistry clone() throws CloneNotSupportedException {
         SDbBolTransportationMode registry = new SDbBolTransportationMode();
         
-        registry.setPkBolId(this.getPkBolId());
+        registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
         registry.setPkTransportationMode(this.getPkTransportationMode());
         registry.setTransportationPartOwner(this.getTransportationPartOwner());
         registry.setTransportationPartLessee(this.getTransportationPartLessee());
@@ -290,6 +291,14 @@ public class SDbBolTransportationMode extends SDbRegistryUser {
         registry.setFkVehicleOwnerId_n(this.getFkVehicleOwnerId_n());
         registry.setFkVehicleLesseeId_n(this.getFkVehicleLesseeId_n());
         registry.setFkNotifiedId_n(this.getFkNotifiedId_n());
+        
+        registry.setXtaVehicle(this.getXtaVehicle());
+        registry.setXtaTrailer1(this.getXtaTrailer1());
+        registry.setXtaTrailer2(this.getXtaTrailer2());
+        registry.setXtaDriver(this.getXtaDriver());
+        registry.setXtaOwner(this.getXtaOwner());
+        registry.setXtaLessee(this.getXtaLessee());
+        registry.setXtaNotified(this.getXtaNotified());
 
         return registry;
     }

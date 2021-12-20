@@ -23,7 +23,6 @@ import erp.mod.SModSysConsts;
 import java.awt.event.ItemEvent;
 import java.util.Vector;
 import javax.swing.JComboBox;
-import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
@@ -566,7 +565,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         }
 
         moBizPartnerBranchAddress.setAddress(mbParamIsInMainWindow ? SModSysConsts.TXT_OFFICIAL : moFieldAddress.getString());
-        moBizPartnerBranchAddress.setAddressCode(SLibUtils.DecimalNumberFormat.format(SLibUtils.parseInt(jtfAddressCodeRo.getText())));
+        moBizPartnerBranchAddress.setAddressCode(jtfAddressCodeRo.getText());
         moBizPartnerBranchAddress.setStreet(moFieldStreet.getString());
         moBizPartnerBranchAddress.setStreetNumberExt(moFieldStreetNumberExt.getString());
         moBizPartnerBranchAddress.setStreetNumberInt(moFieldStreetNumberInt.getString());

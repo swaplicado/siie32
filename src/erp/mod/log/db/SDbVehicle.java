@@ -6,6 +6,7 @@
 package erp.mod.log.db;
 
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -18,7 +19,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Néstor Ávalos, Isabel Servín
  */
-public class SDbVehicle extends SDbRegistryUser {
+public class SDbVehicle extends SDbRegistryUser implements Serializable {
 
     protected int mnPkVehicleId;
     protected String msCode;
