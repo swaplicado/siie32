@@ -78,14 +78,12 @@ import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés
  */
 public class SFormBankLayout extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 
@@ -143,7 +141,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SGuiItem> maBeneficiaryAccountGuiItems;
     private ArrayList<SDataBizPartnerBranchBankAccount> maBizPartnerBranchBankAccounts;
     private HashMap<String, ArrayList<SGuiItem>> moAgreementReferencesMap;
-//    private ArrayList<SSrvLock> maLocks; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    private ArrayList<SSrvLock> maLocks;
+*/
     private ArrayList<SRedisLock> maRedisLocks;
     
     private boolean mbShowConfirmCloseDialog;
@@ -1949,7 +1949,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         boolean found = false;
         SDataRecord record = null;
         SLayoutBankRecord bankRecord = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+*/
         SRedisLock rlock = null;
         
         if (layoutBankRecordKey == null) {
@@ -2624,7 +2626,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jckShowOnlyBenefsWithAccounts.setSelected(isModeForTransfers());
 
         maLayoutBankRecords = new ArrayList<>();
-//        maLocks = new ArrayList<>(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        maLocks = new ArrayList<>();
+*/        
         maRedisLocks = new ArrayList<>();
 
         switch (mnFormSubtype) {

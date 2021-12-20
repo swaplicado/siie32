@@ -22,13 +22,11 @@ import java.util.Vector;
 import sa.lib.SLibMethod;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-//import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Adrián Avilés
  */
 public abstract class SGuiModule {
 
@@ -40,7 +38,9 @@ public abstract class SGuiModule {
     protected erp.lib.data.SDataRegistry moRegistry;
     protected erp.lib.form.SFormInterface miForm;
     protected java.awt.Cursor moCursor;
-//    protected java.util.Vector<sa.lib.srv.SSrvLock> mvIndependentLocks; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    protected java.util.Vector<sa.lib.srv.SSrvLock> mvIndependentLocks;
+*/
     protected java.util.Vector<sa.lib.srv.redis.SRedisLock> mvIndependentRedisLocks;
     
     // form option pickers:
@@ -57,8 +57,9 @@ public abstract class SGuiModule {
     public SGuiModule(erp.client.SClientInterface client, int type) {
         miClient = client;
         mnModuleType = type;
-
-//        mvIndependentLocks = new Vector<>(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        mvIndependentLocks = new Vector<>();
+*/
         mvIndependentRedisLocks = new Vector<>();
         mvOptionPickers = new Vector<>();
         
@@ -72,7 +73,9 @@ public abstract class SGuiModule {
         moRegistry = null;
         miForm = null;
         moCursor = null;
-//        mvIndependentLocks.clear(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        mvIndependentLocks.clear();
+*/        
         mvIndependentRedisLocks.clear();
     }
 
@@ -156,7 +159,9 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SDataRegistry registry = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock redisLock = null;
         SClientDaemonTimeout daemonTimeout = null;
         SLibMethod method = null;
@@ -371,7 +376,9 @@ public abstract class SGuiModule {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock redisLock = null;
         
         try {
@@ -473,7 +480,9 @@ public abstract class SGuiModule {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock redisLock = null;
 
         try {
@@ -579,7 +588,9 @@ public abstract class SGuiModule {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock redisLock = null;
         SDataRegistry registry = null;
 

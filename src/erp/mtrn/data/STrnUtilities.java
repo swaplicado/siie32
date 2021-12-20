@@ -68,13 +68,11 @@ import sa.lib.mail.SMail;
 import sa.lib.mail.SMailConsts;
 import sa.lib.mail.SMailSender;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-//import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
- * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés
  */
 public abstract class STrnUtilities {
 
@@ -1476,7 +1474,9 @@ public abstract class STrnUtilities {
      */
     public static boolean confirmSend(final SClientInterface client, final String title, final SDataCfd cfd, final SDataDps dps, final int idBizPartner, final int idBizPartnerBranch) throws RemoteException, Exception {
         boolean send = false;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock rlock = null;
         SServerRequest request = null;
         SServerResponse response = null;
@@ -1502,8 +1502,9 @@ public abstract class STrnUtilities {
                 request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
                 request.setPacket(bizPartner);
                 response = client.getSessionXXX().request(request);
-
-//                SSrvUtils.releaseLock(client.getSession(), lock); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                SSrvUtils.releaseLock(client.getSession(), lock);
+*/
                 SRedisLockUtils.releaseLock(client, rlock);
                 
                 if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {

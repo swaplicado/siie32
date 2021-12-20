@@ -50,13 +50,11 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
-//import sa.lib.srv.SSrvLock;
-//import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Adrián Avilés
  */
 public class SFormImportPayments extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {    
     private static final int COL_APPLICATION = 11;
@@ -90,7 +88,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     private int renderOption;
     
     private HashMap<Integer, Object> moParamsMap;
-//    private ArrayList<SSrvLock> maLocks; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    private ArrayList<SSrvLock> maLocks;
+*/
     private ArrayList<SRedisLock> maRedisLocks;
     
 
@@ -666,8 +666,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         jpSettings.add(moGridPayments, BorderLayout.CENTER);
         moImportation = new SImportPayments(miClient);
         mvDeposits = new Vector<>();
-        
-//        maLocks = new ArrayList<>(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        maLocks = new ArrayList<>();
+*/        
         maRedisLocks = new ArrayList<>();
         
         renderOption = ST_REGISTRY_NEW;
@@ -768,7 +769,9 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     
     private void getRecordLocks() throws Exception {
         boolean exists = false;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+*/      
         SRedisLock rlock = null;
         SAnalystDepositRow anaRow = null;
         ArrayList<Object> recordKeys = new ArrayList<>();

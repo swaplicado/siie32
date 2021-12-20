@@ -16,13 +16,11 @@ import erp.server.SServerResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Adrián Avilés
  */
 public class SHrsPayrollAnnul {
 
@@ -87,7 +85,9 @@ public class SHrsPayrollAnnul {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock rlock = null;
         
         try {

@@ -60,13 +60,12 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvRequest;
 import sa.lib.srv.SSrvResponse;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés
  * To generate stub:
  * ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SSessionServer
  */

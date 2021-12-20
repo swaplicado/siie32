@@ -62,15 +62,12 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
-import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés
  */
 public class SDbBankLayout extends SDbRegistryUser {
     
@@ -1547,7 +1544,9 @@ public class SDbBankLayout extends SDbRegistryUser {
      */
     public boolean updateLayoutStatus(SGuiClient client, int newLayoutStatus) throws Exception {
         boolean done = false;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+*/
         SRedisLock rlock = null;
         
         try {
@@ -1559,7 +1558,6 @@ public class SDbBankLayout extends SDbRegistryUser {
 */            
             rlock = SRedisLockUtils.gainLock((SClientInterface) client, SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout() / 1000);
             
-//            if (lock != null && lock.getLockStatus() == SSrvConsts.LOCK_GAINED) Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (rlock != null) {
                 String sql = "UPDATE " + getSqlTable() + " SET "
                         + "lay_st = " + mnLayoutStatus + "" + 

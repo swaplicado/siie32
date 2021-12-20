@@ -118,14 +118,12 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-//import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Isabel Servín, Claudio Peña, Adrián Avilés
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
     
@@ -296,7 +294,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private File moFilePdfJustLoaded;
     private erp.mtrn.data.cfd.SAddendaAmc71Manager moAddendaAmc71Manager;
     private java.lang.Object moRecordUserKey;
-//    private sa.lib.srv.SSrvLock moRecordUserLock; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    private sa.lib.srv.SSrvLock moRecordUserLock;
+*/
     private sa.lib.srv.redis.SRedisLock moRecordUserRedisLock;
     private erp.mfin.data.SDataRecord moRecordUser;
     private erp.form.SFormOptionPickerBizPartner moPickerBizPartner;
@@ -8290,7 +8290,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void actionCancel() {
         if (jbCancel.isEnabled()) {
             if (!mbFormSettingsOk || mbParamIsReadOnly || mnFormStatus == SLibConstants.FORM_STATUS_READ_ONLY || miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_FORM_CLOSE) == JOptionPane.YES_OPTION) {
-//                releaseRecordUserLock(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                releaseRecordUserLock();
+*/
                 releaseRecordUserRedisLock();
                 mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
                 setVisible(false);
@@ -8983,7 +8985,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moBizPartnerCategory = null;
         moRecordUserKey = null;
         moRecordUser = null;
-//        moRecordUserLock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        moRecordUserLock = null;
+*/  
         moRecordUserRedisLock = null;
         mnSalesAgentId_n = 0;
         mnSalesAgentBizPartnerId_n = 0;
@@ -9611,7 +9615,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                                 if (!validation.getIsError()) {
                                     try {
-                                        //SSrvUtils.verifyLockStatus(miClient.getSession(), moRecordUserLock); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro                                        
+                                        SSrvUtils.verifyLockStatus(miClient.getSession(), moRecordUserLock);
+*/
                                         SRedisLockUtils.verifyLockStatus(miClient, moRecordUserRedisLock);
                                     }
                                     catch (Exception e) {
@@ -10236,13 +10242,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             moDps.getRegistryComplements().clear();
             if (!jckRecordUser.isSelected()) {
-//                releaseRecordUserLock();    // if lock was gained, release it, Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro                 
+                releaseRecordUserLock();    // if lock was gained, release it
+*/
                 releaseRecordUserRedisLock();
                 moDps.setDbmsRecordKey(null);
             }
             else {
                 moDps.setDbmsRecordKey(moRecordUserKey);
-//                moDps.getRegistryComplements().add(moRecordUserLock); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                moDps.getRegistryComplements().add(moRecordUserLock); 
+*/
                 moDps.getRegistryComplements().add(moRecordUserRedisLock);
             }
 

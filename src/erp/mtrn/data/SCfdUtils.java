@@ -113,8 +113,6 @@ import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlUtils;
 import views.core.soap.services.apps.CancelaCFDResult; 
@@ -124,7 +122,7 @@ import views.core.soap.services.apps.UUIDS;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores, Isabel Servín, Adrián Avilés
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -664,7 +662,9 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dataDps = null;
         SDataCfdPayment dataCfdPayment = null;
         SDataPayrollReceiptIssue dataPayrollReceiptIssue = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+*/        
         SRedisLock rlock = null;
         SCfdiSignature cfdiSignature = null;
         String xmlStamping = "";
@@ -2191,7 +2191,9 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dps = null;
         SDataCfdPayment cfdPayment = null;
         SDataPayrollReceiptIssue receiptIssue = null;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock rlock = null;
         SServerRequest request = null;
         SServerResponse response = null;

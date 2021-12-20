@@ -34,13 +34,11 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
- * @author Gerardo Hernández, Uriel Castañeda, Isabel Servín
+ * @author Gerardo Hernández, Uriel Castañeda, Isabel Servín, Adrián Avilés
  */
 public class SDialogValuationBalances extends SBeanFormDialog implements ActionListener, ItemListener, ChangeListener {
 
@@ -450,7 +448,9 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
     @Override
     public void actionSave() {
         String msg;
-//        SSrvLock lock = null; Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+*/        
         SRedisLock rlock = null;
         
         SValuationBalances sbe;

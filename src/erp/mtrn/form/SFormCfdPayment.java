@@ -70,13 +70,11 @@ import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  * User form for input of database registry of CFDI of Payments.
- * @author  Sergio Flores, Isabel Servín
+ * @author  Sergio Flores, Isabel Servín, Adrián Avilés
  */
 public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
     
@@ -113,7 +111,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private java.lang.String msXmlRelationType;
     private java.awt.Color moBackgroundDefaultColor;
-//    private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;  // Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;
+*/
     private java.util.HashMap<java.lang.String, sa.lib.srv.redis.SRedisLock> moRecordRedisLocksMap;  
     private erp.mfin.form.SDialogRecordPicker moDialogPayRecordPicker;
     private erp.mtrn.form.SDialogPickerDps moDialogRecDpsRelatedPicker;
@@ -1592,7 +1592,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void gainRecordLock(final erp.mfin.data.SDataRecord record) throws Exception {
         // check if lock of desired record already exists:
         
-        SRedisLock rlock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
 /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SSrvLock lock = moRecordLocksMap.get(record.getRecordPrimaryKey()); // record's primary key as string used as map's key        
         if (lock == null) {
@@ -1602,6 +1601,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
 */
+        SRedisLock rlock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
         if (rlock == null) {
             rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, record.getPrimaryKey(), record.getRegistryTimeout() / 1000);
             if (rlock != null) {
@@ -1631,7 +1631,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         if (count == 1) {
             // lock used only once, proceed to release it:
             
-            SRedisLock rlock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
 /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro            
             SSrvLock lock = moRecordLocksMap.get(record.getRecordPrimaryKey());            
             if (lock != null) {
@@ -1639,6 +1638,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 moRecordLocksMap.remove(record.getRecordPrimaryKey());
             }
 */
+            SRedisLock rlock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
                 moRecordRedisLocksMap.remove(record.getRecordPrimaryKey());
@@ -1652,7 +1652,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
      */
     private void releaseAllRecordLocks() throws Exception {
         String exception = "";
-        ArrayList<SRedisLock> rlocks = new ArrayList<>(moRecordRedisLocksMap.values());
 /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         ArrayList<SSrvLock> locks = new ArrayList<>(moRecordLocksMap.values());
         for (int index = 0; index < locks.size(); index++) {
@@ -1664,6 +1663,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
 */
+        ArrayList<SRedisLock> rlocks = new ArrayList<>(moRecordRedisLocksMap.values());
         for (int index = 0; index < rlocks.size(); index++) {
             try {
                 SRedisLockUtils.releaseLock(miClient, rlocks.get(index));
@@ -1672,8 +1672,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 exception += (exception.isEmpty() ? "" : "\n") + e;
             }
         }
-        
-//        moRecordLocksMap.clear(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        moRecordLocksMap.clear();
+*/        
         moRecordRedisLocksMap.clear();
         
         if (!exception.isEmpty()) {
@@ -3641,7 +3642,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         msXmlRelationType = "";
         moBackgroundDefaultColor = jtfAccConceptDocsRo.getBackground();
-//        moRecordLocksMap = new HashMap<>(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        moRecordLocksMap = new HashMap<>();
+*/
         moRecordRedisLocksMap = new HashMap<>();
 
         for (int i = 0; i < mvFields.size(); i++) {

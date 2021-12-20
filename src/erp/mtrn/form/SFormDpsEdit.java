@@ -44,13 +44,11 @@ import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-//import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  * Modificar el ítem y el centro de costo de un documento y de todos los documentos asociados a este, sin necesidad de editar cada documento de forma manual.
- * @author Isabel Servín
+ * @author Isabel Servín, Adrián Avilés
  */
 public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
     
@@ -252,7 +250,9 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             moConceptTablePane.getTable().requestFocus();
         }
         if(mbDocuentsLockedError) {
-//            releaseDpsUserLock(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            releaseDpsUserLock();
+*/
             releaseDpsUserRedisLock();
             setVisible(false);
         }
@@ -658,7 +658,9 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     }
 
     private void actionCancel() {
-//        releaseDpsUserLock(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        releaseDpsUserLock();
+*/        
         releaseDpsUserRedisLock();
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
