@@ -28,7 +28,6 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenu jmMenuUser;
     private javax.swing.JMenuItem jmiUser;
     private javax.swing.JMenuItem jmiRedisSessions;
-    private javax.swing.JMenuItem jmiUpdatedUser;
     private javax.swing.JMenuItem jmiAccessCompany;
     private javax.swing.JMenuItem jmiAccessCompanyBranch;
     private javax.swing.JMenuItem jmiAccessCompanyBranchEntity;
@@ -59,7 +58,6 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmMenuUser = new JMenu("Usuarios");
         jmiUser = new JMenuItem("Usuarios");
         jmiRedisSessions = new JMenuItem("Sesiones en Redis");
-        jmiUpdatedUser = new JMenuItem("Get Updated Users");
         jmiAccessCompany = new JMenuItem("Acceso a empresas");
         jmiAccessCompanyBranch = new JMenuItem("Acceso a sucursales de empresas");
         jmiAccessCompanyBranchEntity = new JMenuItem("Acceso a entidades de sucursales");
@@ -71,7 +69,6 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
 
         jmMenuUser.add(jmiUser);
         jmMenuUser.add(jmiRedisSessions);
-        jmMenuUser.add(jmiUpdatedUser);
         jmMenuUser.addSeparator();
         jmMenuUser.add(jmiAccessCompany);
         jmMenuUser.add(jmiAccessCompanyBranch);
@@ -86,7 +83,6 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
 
         jmiUser.addActionListener(this);
         jmiRedisSessions.addActionListener(this);
-        jmiUpdatedUser.addActionListener(this);
         jmiAccessCompany.addActionListener(this);
         jmiAccessCompanyBranch.addActionListener(this);
         jmiAccessCompanyBranchEntity.addActionListener(this);
@@ -108,7 +104,6 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmMenuUser.setEnabled(hasRightUser);
         jmiUser.setEnabled(hasRightUser);
         jmiRedisSessions.setEnabled(hasRightUser);
-        jmiUpdatedUser.setEnabled(hasRightUser);
         jmiAccessCompany.setEnabled(hasRightUser);
         jmiAccessCompanyBranch.setEnabled(hasRightUser);
         jmiAccessCompanyBranchEntity.setEnabled(hasRightUser);
@@ -141,10 +136,6 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.USRU_USR_REDIS:
                     moFormRedisSessions = new SFormRedisSessions(miClient);
                     miForm = moFormRedisSessions;
-                    break;
-                case SDataConstants.USRU_USR_UPDATED:
-                    moFormUpdatedUser = new SFormUpdatedUser(miClient);
-                    miForm = moFormUpdatedUser;
                     break;
                 case SDataConstants.USRX_RIGHT:
                     if (moFormUserRolePrivilege == null) {
@@ -326,9 +317,6 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
             }
             else if (item == jmiRedisSessions) {
                 showForm(SDataConstants.USRU_USR_REDIS, null);
-            }
-            else if (item == jmiUpdatedUser) {
-                showForm(SDataConstants.USRU_USR_UPDATED, null);
             }
             else if (item == jmiAccessCompany) {
                 showView(SDataConstants.USRU_ACCESS_CO);
