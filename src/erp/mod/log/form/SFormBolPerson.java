@@ -464,7 +464,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     
     private boolean isCountryMex() {
         boolean isMex = false;
-        if (moKeyCountry.getValue()[0] == 251) {
+        if (moKeyCountry.getSelectedItem().getItem().equals("México")) {
             isMex = true;
         }
         return isMex;
