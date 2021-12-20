@@ -1629,7 +1629,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         registry.setFkGrossWeightUnit(moKeyGrossWeightUnit.getValue()[0]);
         registry.setFkEnvironmentalInsurer_n(moKeyEnvironmentalInsurer.getValue().length == 0 ? 0 : moKeyEnvironmentalInsurer.getValue()[0]);
         registry.setFkMerchandiseInsurer_n(moKeyMerchandiseInsurer.getValue().length == 0 ? 0 :moKeyMerchandiseInsurer.getValue()[0]);
-        registry.setFkBillOfLadingStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
+        registry.setFkBillOfLadingStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         registry.readBizPartner(miClient.getSession(), miClient.getSession().getConfigCompany().getCompanyId());
         registry.setXtaEnvironmentalInsurer(environmental);
         registry.setXtaMerchandiseInsurer(merchansise);

@@ -584,7 +584,10 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 if (bol != null) { 
                                     if (bol.canDisable()) {
                                         bol.setFkUserUpdateId(mnPkUserId);
-                                        //bol.disable();
+                                        result = bol.disable(moCompanyDatabase.getConnection());
+                                        if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                            result = SLibConstants.DB_CFD_OK;
+                                        }
                                     }
                                 }
                             default:

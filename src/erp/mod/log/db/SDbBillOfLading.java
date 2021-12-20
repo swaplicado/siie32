@@ -26,18 +26,21 @@ import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mloc.data.SDataZipCode;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataCfd;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
@@ -604,6 +607,78 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         registry.setAuxDbmsDataEmisorSucursal(this.getAuxDbmsDataEmisorSucursal());
 
         return registry;
+    }
+    
+    private boolean testDisable(java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
+        String msDbmsError;
+        String sMsg = psMsg;
+        String sMsgAux = "";
+        int mnDbmsErrorId;
+
+        if (pnAction == SDbConsts.ACTION_DELETE && mbDeleted) {
+            mnDbmsErrorId = 1;
+            msDbmsError = sMsg + "¡El documento ya está eliminado!";
+            throw new Exception(msDbmsError);
+        }
+        else if (pnAction == SDbConsts.ACTION_ANNUL && mnFkBillOfLadingStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+            mnDbmsErrorId = 2;
+            msDbmsError = sMsg + "¡El documento ya está anulado!";
+            throw new Exception(msDbmsError);
+        }
+        else if (mbSystem) {
+            mnDbmsErrorId = 11;
+            msDbmsError = sMsg + "¡El documento es de sistema!";
+            throw new Exception(msDbmsError);
+        }
+        
+        else if (pnAction == SDbConsts.ACTION_DELETE && moDbmsDataCfd != null && (moDbmsDataCfd.isStamped())) {
+            mnDbmsErrorId = 21;
+            msDbmsError = sMsg + "¡El documento está timbrado!";
+            throw new Exception(msDbmsError);
+        }
+        else if (mnFkBillOfLadingStatusId != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+            mnDbmsErrorId = 41;
+            msDbmsError = sMsg + "¡El documento debe tener estatus 'emitido'!";
+            throw new Exception(msDbmsError);
+        }
+        
+        return true;
+    }
+    
+    public int disable(Connection connection) {
+        String sSql;
+        Statement oStatement;
+        mnQueryResultId = SLibConsts.UNDEFINED;
+
+        try {
+            oStatement = connection.createStatement();
+
+            // Set BOL as annuled:
+
+            if (testDisable("No se pudo anular ", SDbConsts.ACTION_ANNUL)) {
+                mnFkBillOfLadingStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+
+                sSql = "UPDATE log_bol SET fid_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", "  +
+                        "fk_usr_upd = " + mnFkUserUpdateId + ", ts_usr_upd = NOW() " +
+                        "WHERE id_bol = " + mnPkBolId + " ";
+                oStatement.execute(sSql);
+                if (moDbmsDataCfd != null) {
+                    moDbmsDataCfd.annul(connection);
+                }
+
+                mnQueryResultId = SLibConstants.DB_ACTION_ANNUL_OK;
+            }
+            
+        }
+        
+        catch (Exception e) {
+            mnQueryResultId = SLibConstants.DB_ACTION_ANNUL_ERROR;
+            String msDbmsError = SLibConstants.MSG_ERR_DB_REG_ANNUL;
+            msDbmsError += "\n" + e.toString();
+            SLibUtilities.renderException(msDbmsError, e);
+        }
+
+        return mnQueryResultId;
     }
 
     @Override
