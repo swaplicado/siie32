@@ -39,7 +39,7 @@ public abstract class SRedisConnectionUtils {
 
         try {
             jedis = new Jedis(host, REDIS_PORT);
-            //jedis.auth(psw);
+            jedis.auth(psw);
             jedis.connect();
         }
         catch (Exception e) {

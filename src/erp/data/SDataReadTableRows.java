@@ -13,7 +13,6 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableRow;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import erp.server.SQueryRequest;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -2936,6 +2935,19 @@ public abstract class SDataReadTableRows {
                 sSql = "SELECT id_veh, name FROM log_veh " +
                         "WHERE b_del = 0 " + (filterKey == null ? "" : " AND fk_tp_veh = " + ((int[]) filterKey)[0] + " ") +
                         "ORDER BY name, id_veh ";
+                break;
+                
+            case SModConsts.LOG_BOL:
+                aoPkFields = new STableField[1];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_bol");
+                
+                i = 0;
+                aoQueryFields = new STableField[3];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "folio");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DATE, "dt");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "distance_tot");
+                
+                sSql = "SELECT id_bol, IF(ser <> '', CONCAT(ser, '-', num), num) AS folio, dt, distance_tot FROM log_bol WHERE YEAR(dt) = " + ((int[]) filterKey)[0] + " AND bol_tp = 'I' ";
                 break;
 
             default:

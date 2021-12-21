@@ -8,6 +8,7 @@ package erp.mod.log.db;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,9 +23,9 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbBolMerchandise extends SDbRegistryUser {
+public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
 
-    protected int mnPkBolId;
+    protected int mnPkBillOfLadingId;
     protected int mnPkMerchandiseId;
     protected double mdQuantity;
     protected boolean mbHazardousMaterial;
@@ -129,7 +130,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
                 "WHERE i.id_item = " + mnFkItemId + ";";
             ResultSet resultSet = session.getStatement().executeQuery(sql);
             if (resultSet.next()) {
-                msXtaItemClaveProdServ = resultSet.getString("item_code").isEmpty() ? resultSet.getString("igen_code") : resultSet.getString("item_code");
+                msXtaItemClaveProdServ = resultSet.getString("item_code") == null ? resultSet.getString("igen_code") : resultSet.getString("item_code");
             }
             
             sql = "SELECT ucfd.code FROM erp.itmu_unit AS u " +
@@ -156,15 +157,15 @@ public class SDbBolMerchandise extends SDbRegistryUser {
                 "INNER JOIN erp.itmu_igen AS igen ON igen.id_igen = i.fid_igen " +
                 "INNER JOIN erp.itms_cfd_prod_serv AS igencfd ON igencfd.id_cfd_prod_serv = igen.fid_cfd_prod_serv " +
                 "INNER JOIN erp.itmu_unit AS u ON u.id_unit = m.fk_unit " +
-                "INNER JOIN erp.itms_cfd_unit AS ucfd ON ucfd.id_cfd_unit = u.fid_cfd_unit" +
-                "LEFT OUTER JOIN erp.itms_cfd_prod_serv AS icfd ON icfd.id_cfd_prod_serv = i.fid_cfd_prod_serv_n" +
+                "INNER JOIN erp.itms_cfd_unit AS ucfd ON ucfd.id_cfd_unit = u.fid_cfd_unit " +
+                "LEFT OUTER JOIN erp.itms_cfd_prod_serv AS icfd ON icfd.id_cfd_prod_serv = i.fid_cfd_prod_serv_n " +
                 "WHERE id_bol = " + pk[0] + " AND id_merch = " + pk[1];
         resultSet = session.getStatement().executeQuery(msSql);
         if (!resultSet.next()) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             mnPkMerchandiseId = resultSet.getInt("id_merch");
             mdQuantity = resultSet.getDouble("qty");
             mbHazardousMaterial = resultSet.getBoolean("hazardous_mat");
@@ -177,7 +178,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
             mnFkItemId = resultSet.getInt("fk_item");
             mnFkUnitId = resultSet.getInt("fk_unit");
             
-            msXtaItemClaveProdServ = resultSet.getString("item_code").isEmpty() ? resultSet.getString("igen_code") : resultSet.getString("item_code");
+            msXtaItemClaveProdServ = resultSet.getString("item_code") == null ? resultSet.getString("igen_code") : resultSet.getString("item_code");
             msXtaClaveUnidad = resultSet.getString("unit_code");
 
             mbRegistryNew = false;
@@ -187,7 +188,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.READ_OK;
     }
     
-    public void setPkBolId(int n) { mnPkBolId = n; }
+    public void setPkBillOfLadingId(int n) { mnPkBillOfLadingId = n; }
     public void setPkMerchandiseId(int n) { mnPkMerchandiseId = n; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setHazardousMaterial(boolean b) { mbHazardousMaterial = b; }
@@ -204,7 +205,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
     public void setXtaItem(SDataItem o) { moXtaItem = o; }
     public void setXtaUnit(SDataUnit o) { moXtaUnit = o; }
     
-    public int getPkBolId() { return mnPkBolId; }
+    public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public int getPkMerchandiseId() { return mnPkMerchandiseId; }
     public double getQuantity() { return mdQuantity; }
     public boolean isHazardousMaterial() { return mbHazardousMaterial; }
@@ -224,23 +225,23 @@ public class SDbBolMerchandise extends SDbRegistryUser {
     public void setBolMerchandiseQuantity(ArrayList<SDbBolMerchandiseQuantity> a) { maBolMerchandiseQuantity = a; }
     
     public ArrayList<SDbBolMerchandiseQuantity> getBolMerchandiseQuantity() { return maBolMerchandiseQuantity; }
-
+    
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkBolId = pk[0];
+        mnPkBillOfLadingId = pk[0];
         mnPkMerchandiseId = pk[1];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkBolId, mnPkMerchandiseId };
+        return new int[] { mnPkBillOfLadingId, mnPkMerchandiseId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkBolId = 0;
+        mnPkBillOfLadingId = 0;
         mnPkMerchandiseId = 0;
         mdQuantity = 0;
         mbHazardousMaterial = false;
@@ -268,7 +269,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_bol = " + mnPkBolId + " AND id_merch = " + mnPkMerchandiseId + " ";
+        return "WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " ";
     }
 
     @Override
@@ -303,15 +304,15 @@ public class SDbBolMerchandise extends SDbRegistryUser {
                 "INNER JOIN erp.itmu_igen AS igen ON igen.id_igen = i.fid_igen " +
                 "INNER JOIN erp.itms_cfd_prod_serv AS igencfd ON igencfd.id_cfd_prod_serv = igen.fid_cfd_prod_serv " +
                 "INNER JOIN erp.itmu_unit AS u ON u.id_unit = m.fk_unit " +
-                "INNER JOIN erp.itms_cfd_unit AS ucfd ON ucfd.id_cfd_unit = u.fid_cfd_unit" +
-                "LEFT OUTER JOIN erp.itms_cfd_prod_serv AS icfd ON icfd.id_cfd_prod_serv = i.fid_cfd_prod_serv_n" +
+                "INNER JOIN erp.itms_cfd_unit AS ucfd ON ucfd.id_cfd_unit = u.fid_cfd_unit " +
+                "LEFT OUTER JOIN erp.itms_cfd_prod_serv AS icfd ON icfd.id_cfd_prod_serv = i.fid_cfd_prod_serv_n " +
                 "WHERE id_bol = " + pk[0] + " AND id_merch = " + pk[1];
         resultSet = session.getStatement().executeQuery(msSql);
         if (!resultSet.next()) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             mnPkMerchandiseId = resultSet.getInt("id_merch");
             mdQuantity = resultSet.getDouble("qty");
             mbHazardousMaterial = resultSet.getBoolean("hazardous_mat");
@@ -324,7 +325,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
             mnFkItemId = resultSet.getInt("fk_item");
             mnFkUnitId = resultSet.getInt("fk_unit");
             
-            msXtaItemClaveProdServ = resultSet.getString("item_code").isEmpty() ? resultSet.getString("igen_code") : resultSet.getString("item_code");
+            msXtaItemClaveProdServ = resultSet.getString("item_code") == null ? resultSet.getString("igen_code") : resultSet.getString("item_code");
             msXtaClaveUnidad = resultSet.getString("unit_code");
 
             mbRegistryNew = false;
@@ -333,9 +334,9 @@ public class SDbBolMerchandise extends SDbRegistryUser {
         // Read merchandise quantity
         
         msSql = "SELECT id_bol, id_merch, id_merch_qty FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + 
-                " WHERE id_bol = " + mnPkBolId + " AND id_merch = " + mnPkMerchandiseId + " ";
-        resultSet = session.getStatement().executeQuery(msSql);
-        if (resultSet.next()) {
+                " WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " ";
+        resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql);
+        while (resultSet.next()) {
             SDbBolMerchandiseQuantity merchQty = new SDbBolMerchandiseQuantity();
             merchQty.read(session, new int[] { resultSet.getInt("id_bol"), resultSet.getInt("id_merch"), resultSet.getInt("id_merch_qty") } );
             maBolMerchandiseQuantity.add(merchQty);
@@ -371,7 +372,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkBolId + ", " + 
+                mnPkBillOfLadingId + ", " + 
                 mnPkMerchandiseId + ", " + 
                 mdQuantity + ", " + 
                 (mbHazardousMaterial ? 1 : 0) + ", " + 
@@ -387,7 +388,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                //"id_bol = " + mnPkBolId + ", " +
+                //"id_bol = " + mnPkBillOfLadingId + ", " +
                 //"id_merch = " + mnPkMerchandiseId + ", " +
                 "qty = " + mdQuantity + ", " +
                 "hazardous_mat = " + (mbHazardousMaterial ? 1 : 0) + ", " +
@@ -407,7 +408,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
         // Save merchandise quantity
         
         for (SDbBolMerchandiseQuantity merchQty : maBolMerchandiseQuantity) {
-            merchQty.setPkBolId(mnPkBolId);
+            merchQty.setPkBillOfLadingId(mnPkBillOfLadingId);
             merchQty.setPkMerchandiseId(mnPkMerchandiseId);
             merchQty.save(session);
         }
@@ -420,7 +421,7 @@ public class SDbBolMerchandise extends SDbRegistryUser {
     public SDbRegistry clone() throws CloneNotSupportedException {
         SDbBolMerchandise registry = new SDbBolMerchandise();
         
-        registry.setPkBolId(this.getPkBolId());
+        registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
         registry.setPkMerchandiseId(this.getPkMerchandiseId());
         registry.setQuantity(this.getQuantity());
         registry.setHazardousMaterial(this.isHazardousMaterial());
@@ -434,6 +435,11 @@ public class SDbBolMerchandise extends SDbRegistryUser {
         registry.setFkUnitId(this.getFkUnitId());
         
         registry.setBolMerchandiseQuantity(this.getBolMerchandiseQuantity());
+        
+        registry.setXtaItemClaveProdServ(this.getXtaItemClaveProdServ());
+        registry.setXtaClaveUnidad(this.getXtaClaveUnidad());
+        registry.setXtaItem(this.getXtaItem());
+        registry.setXtaUnit(this.getXtaUnit());
 
         return registry;
     }

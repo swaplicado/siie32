@@ -1172,8 +1172,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
             SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
         } catch (Exception e) {
-            showMsgBoxWarning("No se encontró servidor de acceso exclusivo a registros\n"
-                                        + "favor de comunicarlo al administrador");
+            showMsgBoxWarning("No se encontró el servidor de acceso exclusivo a registros.\n"
+                                        + "Favor de comunicarlo al administrador del sistema");
             moJedis = null;
         }
     }

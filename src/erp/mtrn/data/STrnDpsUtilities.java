@@ -66,7 +66,21 @@ public abstract class STrnDpsUtilities {
      */
     public static boolean isDpsAuthorized(final SClientInterface client, final SDataDps dps) {
         boolean authorized = true;
-        if (dps.isOrder()) {
+        if (dps.isDpsTypeContract()) {
+            if (dps.isDpsTypeContractPur()) {
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesContractAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
+                }
+            }
+            else {
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesContractAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                    authorized = false;
+                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
+                }
+            }
+        }
+        else if (dps.isOrder()) {
             if (dps.isOrderPur()) {
                 if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesOrderAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
                     authorized = false;
@@ -91,20 +105,6 @@ public abstract class STrnDpsUtilities {
                 if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesDocAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
                     authorized = false;
                     client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_DOC);
-                }
-            }
-        }
-        else if (dps.isDpsTypeContract()) {
-            if (dps.isDpsTypeContractPur()) {
-                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesConAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                    authorized = false;
-                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
-                }
-            }
-            else {
-                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesConAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                    authorized = false;
-                    client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
                 }
             }
         }

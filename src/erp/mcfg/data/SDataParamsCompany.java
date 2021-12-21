@@ -47,12 +47,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected int mnInventoryValuationMethod;
     protected int mnVersion;
     protected java.util.Date mtVersionTs;
+    protected boolean mbIsAuthorizationPurchasesContractAutomatic;
     protected boolean mbIsAuthorizationPurchasesOrderAutomatic;
     protected boolean mbIsAuthorizationPurchasesDocAutomatic;
-    protected boolean mbIsAuthorizationPurchasesConAutomatic;
+    protected boolean mbIsAuthorizationSalesContractAutomatic;
     protected boolean mbIsAuthorizationSalesOrderAutomatic;
     protected boolean mbIsAuthorizationSalesDocAutomatic;
-    protected boolean mbIsAuthorizationSalesConAutomatic;
     protected boolean mbIsLogisticsOrderAutomatic;
     protected boolean mbIsLastSearchItemPreserved;
     protected boolean mbIsExchangeRatePurPreserved;
@@ -67,6 +67,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected boolean mbIsPaymentSunday;
     protected boolean mbIsCfdiProduction;
     protected boolean mbIsCfdiSendingAutomaticSal;
+    protected boolean mbIsCfdiSendingAutomaticBol;
     protected boolean mbIsCfdiSendingAutomaticHrs;
     protected boolean mbIsFunctionalAreas;
     protected boolean mbIsReportsBackground;
@@ -151,12 +152,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setInventoryValuationMethod(int n) { mnInventoryValuationMethod = n; }
     public void setVersion(int n) { mnVersion = n; }
     public void setVersionTs(java.util.Date t) { mtVersionTs = t; }
+    public void setIsAuthorizationPurchasesContractAutomatic(boolean b) { mbIsAuthorizationPurchasesContractAutomatic = b; }
     public void setIsAuthorizationPurchasesOrderAutomatic(boolean b) { mbIsAuthorizationPurchasesOrderAutomatic = b; }
     public void setIsAuthorizationPurchasesDocAutomatic(boolean b) { mbIsAuthorizationPurchasesDocAutomatic = b; }
-    public void setIsAuthorizationPurchasesConAutomatic(boolean b) { mbIsAuthorizationPurchasesConAutomatic = b; }
+    public void setIsAuthorizationSalesContractAutomatic(boolean b) { mbIsAuthorizationSalesContractAutomatic = b; }
     public void setIsAuthorizationSalesOrderAutomatic(boolean b) { mbIsAuthorizationSalesOrderAutomatic = b; }
     public void setIsAuthorizationSalesDocAutomatic(boolean b) { mbIsAuthorizationSalesDocAutomatic = b; }
-    public void setIsAuthorizationSalesConAutomatic(boolean b) { mbIsAuthorizationSalesConAutomatic = b; }
     public void setIsLogisticsOrderAutomatic(boolean b) { mbIsLogisticsOrderAutomatic = b; }
     public void setIsLastSearchItemPreserved(boolean b) { mbIsLastSearchItemPreserved = b; }
     public void setIsExchangeRatePurPreserved(boolean b) { mbIsExchangeRatePurPreserved = b; }
@@ -171,6 +172,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setIsPaymentSunday(boolean b) { mbIsPaymentSunday = b; }
     public void setIsCfdiProduction(boolean b) { mbIsCfdiProduction = b; }
     public void setIsCfdiSendingAutomaticSal(boolean b) { mbIsCfdiSendingAutomaticSal = b; }
+    public void setIsCfdiSendingAutomaticBol(boolean b) { mbIsCfdiSendingAutomaticBol = b; }
     public void setIsCfdiSendingAutomaticHrs(boolean b) { mbIsCfdiSendingAutomaticHrs = b; }
     public void setIsFunctionalAreas(boolean b) { mbIsFunctionalAreas = b; }
     public void setIsReportsBackground(boolean b) { mbIsReportsBackground = b; }
@@ -246,12 +248,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public int getInventoryValuationMethod() { return mnInventoryValuationMethod; }
     public int getVersion() { return mnVersion; }
     public java.util.Date getVersionTs() { return mtVersionTs; }
+    public boolean getIsAuthorizationPurchasesContractAutomatic() { return mbIsAuthorizationPurchasesContractAutomatic; }
     public boolean getIsAuthorizationPurchasesOrderAutomatic() { return mbIsAuthorizationPurchasesOrderAutomatic; }
     public boolean getIsAuthorizationPurchasesDocAutomatic() { return mbIsAuthorizationPurchasesDocAutomatic; }
-    public boolean getIsAuthorizationPurchasesConAutomatic() { return mbIsAuthorizationPurchasesConAutomatic; }
+    public boolean getIsAuthorizationSalesContractAutomatic() { return mbIsAuthorizationSalesContractAutomatic; }
     public boolean getIsAuthorizationSalesOrderAutomatic() { return mbIsAuthorizationSalesOrderAutomatic; }
     public boolean getIsAuthorizationSalesDocAutomatic() { return mbIsAuthorizationSalesDocAutomatic; }
-    public boolean getIsAuthorizationSalesConAutomatic() { return mbIsAuthorizationSalesConAutomatic; }
     public boolean getIsLogisticsOrderAutomatic() { return mbIsLogisticsOrderAutomatic; }
     public boolean getIsLastSearchItemPreserved() { return mbIsLastSearchItemPreserved; }
     public boolean getIsExchangeRatePurPreserved() { return mbIsExchangeRatePurPreserved; }
@@ -266,6 +268,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public boolean getIsPaymentSunday() { return mbIsPaymentSunday; }
     public boolean getIsCfdiProduction() { return mbIsCfdiProduction; }
     public boolean getIsCfdiSendingAutomaticSal() { return mbIsCfdiSendingAutomaticSal; }
+    public boolean getIsCfdiSendingAutomaticBol() { return mbIsCfdiSendingAutomaticBol; }
     public boolean getIsCfdiSendingAutomaticHrs() { return mbIsCfdiSendingAutomaticHrs; }
     public boolean getIsFunctionalAreas() { return mbIsFunctionalAreas; }
     public boolean getIsReportsBackground() { return mbIsReportsBackground; }
@@ -376,12 +379,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mnInventoryValuationMethod = 0;
         mnVersion = 0;
         mtVersionTs = null;
+        mbIsAuthorizationPurchasesContractAutomatic = false;
         mbIsAuthorizationPurchasesOrderAutomatic = false;
         mbIsAuthorizationPurchasesDocAutomatic = false;
-        mbIsAuthorizationPurchasesConAutomatic = false;
+        mbIsAuthorizationSalesContractAutomatic = false;
         mbIsAuthorizationSalesOrderAutomatic = false;
         mbIsAuthorizationSalesDocAutomatic = false;
-        mbIsAuthorizationSalesConAutomatic = false;
         mbIsLogisticsOrderAutomatic = false;
         mbIsLastSearchItemPreserved = false;
         mbIsExchangeRatePurPreserved = false;
@@ -396,6 +399,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         mbIsPaymentSunday = false;
         mbIsCfdiProduction = false;
         mbIsCfdiSendingAutomaticSal = false;
+        mbIsCfdiSendingAutomaticBol = false;
         mbIsCfdiSendingAutomaticHrs = false;
         mbIsFunctionalAreas = false;
         mbIsReportsBackground = false;
@@ -497,12 +501,12 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mnInventoryValuationMethod = resultSet.getInt("ivm");
                 mnVersion = resultSet.getInt("ver");
                 mtVersionTs = resultSet.getTimestamp("ts_ver");
+                mbIsAuthorizationPurchasesContractAutomatic = resultSet.getBoolean("b_authorn_pur_con");
                 mbIsAuthorizationPurchasesOrderAutomatic = resultSet.getBoolean("b_authorn_pur_ord");
                 mbIsAuthorizationPurchasesDocAutomatic = resultSet.getBoolean("b_authorn_pur_doc");
-                mbIsAuthorizationPurchasesConAutomatic = resultSet.getBoolean("b_authorn_pur_con");
+                mbIsAuthorizationSalesContractAutomatic = resultSet.getBoolean("b_authorn_sal_con");
                 mbIsAuthorizationSalesOrderAutomatic = resultSet.getBoolean("b_authorn_sal_ord");
                 mbIsAuthorizationSalesDocAutomatic = resultSet.getBoolean("b_authorn_sal_doc");
-                mbIsAuthorizationSalesConAutomatic = resultSet.getBoolean("b_authorn_sal_con");
                 mbIsLogisticsOrderAutomatic = resultSet.getBoolean("b_log_ord_aut");
                 mbIsLastSearchItemPreserved = resultSet.getBoolean("b_last_search_item");
                 mbIsExchangeRatePurPreserved = resultSet.getBoolean("b_keep_exc_rate_pur");
@@ -517,6 +521,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mbIsPaymentSunday = resultSet.getBoolean("b_pay_sun");
                 mbIsCfdiProduction = resultSet.getBoolean("b_cfdi_prod");
                 mbIsCfdiSendingAutomaticSal = resultSet.getBoolean("b_cfdi_snd_aut_sal");
+                mbIsCfdiSendingAutomaticBol = resultSet.getBoolean("b_cfdi_snd_aut_bol");
                 mbIsCfdiSendingAutomaticHrs = resultSet.getBoolean("b_cfdi_snd_aut_hrs");
                 mbIsFunctionalAreas = resultSet.getBoolean("b_func");
                 mbIsReportsBackground = resultSet.getBoolean("b_reps_bg");
@@ -644,7 +649,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
             callableStatement.setInt(nParam++, mnDaysOfGraceCustomer);
@@ -684,6 +689,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
             callableStatement.setBoolean(nParam++, mbIsPaymentSunday);
             callableStatement.setBoolean(nParam++, mbIsCfdiProduction);
             callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticSal);
+            callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticBol);
             callableStatement.setBoolean(nParam++, mbIsCfdiSendingAutomaticHrs);
             callableStatement.setBoolean(nParam++, mbIsFunctionalAreas);
             callableStatement.setBoolean(nParam++, mbIsReportsBackground);

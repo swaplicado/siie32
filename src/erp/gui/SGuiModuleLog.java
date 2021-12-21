@@ -44,6 +44,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiShipmentDpsSalesPending;
     private javax.swing.JMenuItem jmiShipmentDpsSales;
     private javax.swing.JMenuItem jmiShipmentBol;
+    private javax.swing.JMenuItem jmiShipmentBolInvoice;
 
     private javax.swing.JMenu jmShipmentSales;
     private javax.swing.JMenuItem jmiShipmentDps;
@@ -69,6 +70,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatalogueSpotCompanyBranchEntity;
     private javax.swing.JMenuItem jmiCatalogueVehicleType;
     private javax.swing.JMenuItem jmiCatalogueVehicle;
+    private javax.swing.JMenuItem jmiCatalogueTrailer;
+    private javax.swing.JMenuItem jmiCatalogueBolPerson;
+    private javax.swing.JMenuItem jmiCatalogueInsurer;
     private javax.swing.JMenuItem jmiCatalogueRate;
 
     private javax.swing.JMenu jmReports;
@@ -126,7 +130,8 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentBill = new JMenuItem("Embarques facturados");
         jmiShipmentDpsSalesPending = new JMenuItem("Embarques vs. facturas ventas por facturar");
         jmiShipmentDpsSales = new JMenuItem("Embarques vs. facturas ventas facturadas");
-        jmiShipmentBol = new JMenuItem("Traslados");
+        jmiShipmentBol = new JMenuItem("Carta porte traslados");
+        jmiShipmentBolInvoice = new JMenuItem("Carta porte facturas");
 
         jmCatalogue = new JMenu("Catálogos");
         jmiCatalogueSpot = new JMenuItem("Lugares");
@@ -134,6 +139,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatalogueSpotCompanyBranchEntity = new JMenuItem("Lugares de entidades de sucursales");
         jmiCatalogueVehicleType = new JMenuItem("Tipos de vehículo");
         jmiCatalogueVehicle = new JMenuItem("Vehículos");
+        jmiCatalogueTrailer = new JMenuItem("Remolques");
+        jmiCatalogueBolPerson = new JMenuItem("Figuras de transporte");
+        jmiCatalogueInsurer = new JMenuItem("Aseguradoras");
         jmiCatalogueRate = new JMenuItem("Tarifas");
 
         jmReports = new JMenu("Reportes");
@@ -166,6 +174,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmShipment.add(jmiShipmentDpsSales);
         jmShipment.addSeparator();
         jmShipment.add(jmiShipmentBol);
+        jmShipment.add(jmiShipmentBolInvoice);
 
         jmShipmentSales.add(jmiShipmentDpsPending);
         jmShipmentSales.add(jmiShipmentDpsPendingDetail);
@@ -190,6 +199,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCatalogue.add(jmiCatalogueSpotCompanyBranchEntity);
         jmCatalogue.add(jmiCatalogueVehicleType);
         jmCatalogue.add(jmiCatalogueVehicle);
+        jmCatalogue.add(jmiCatalogueTrailer);
+        jmCatalogue.add(jmiCatalogueBolPerson);
+        jmCatalogue.add(jmiCatalogueInsurer);
         jmCatalogue.add(jmiCatalogueRate);
         
         jmReports.add(jmiRepRate);
@@ -223,12 +235,16 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentDpsSalesPending.addActionListener(this);
         jmiShipmentDpsSales.addActionListener(this);
         jmiShipmentBol.addActionListener(this);
+        jmiShipmentBolInvoice.addActionListener(this);
 
         jmiCatalogueSpot.addActionListener(this);
         jmiCatalogueSpotCompanyBranch.addActionListener(this);
         jmiCatalogueSpotCompanyBranchEntity.addActionListener(this);
         jmiCatalogueVehicleType.addActionListener(this);
         jmiCatalogueVehicle.addActionListener(this);
+        jmiCatalogueTrailer.addActionListener(this);
+        jmiCatalogueBolPerson.addActionListener(this);
+        jmiCatalogueInsurer.addActionListener(this);
         jmiCatalogueRate.addActionListener(this);
 
         jmiRepRate.addActionListener(this);
@@ -255,6 +271,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatalogueSpotCompanyBranchEntity.setEnabled(hasRightMisc || hasRightRate);
         jmiCatalogueVehicleType.setEnabled(hasRightMisc || hasRightRate);
         jmiCatalogueVehicle.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueTrailer.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueBolPerson.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueInsurer.setEnabled(hasRightMisc || hasRightRate);
         jmiCatalogueRate.setEnabled(hasRightRate);
         
         jmiRepRate.setEnabled(hasRightRate);
@@ -366,6 +385,15 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatalogueVehicle) {
                 miClient.getSession().showView(SModConsts.LOG_VEH, SLibConstants.UNDEFINED, null);
             }
+            else if (item == jmiCatalogueTrailer) {
+                miClient.getSession().showView(SModConsts.LOG_TRAILER, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogueBolPerson) {
+                miClient.getSession().showView(SModConsts.LOG_BOL_PERSON, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogueInsurer) {
+                miClient.getSession().showView(SModConsts.LOG_INSURER, SLibConstants.UNDEFINED, null);
+            }
             else if (item == jmiCatalogueRate) {
                 miClient.getSession().showView(SModConsts.LOG_RATE, SLibConstants.UNDEFINED, null);
             }
@@ -455,7 +483,10 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.LOGX_SHIP_DPS_SAL, SModConsts.VIEW_ST_DONE, new SGuiParams(SModConsts.VIEW_SC_SUM));
             }
             else if (item == jmiShipmentBol) {
-                miClient.getSession().showView(SModConsts.LOG_BOL, SLibConstants.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.LOG_BOL, SDataConstantsSys.TRNS_TP_CFD_BOL, null);
+            }
+            else if (item == jmiShipmentBolInvoice) {
+                miClient.getSession().showView(SModConsts.LOG_BOL, SDataConstantsSys.TRNS_TP_CFD_INV, null);
             }
             else if (item == jmiRepRate) {
                 new SDialogRepRate(miClient.getSession().getClient(), "Listado de tarifas").setVisible(true);

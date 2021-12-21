@@ -99,7 +99,14 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
         mbHasRightAuthor = false;
 
-        if (isOrderPur()) {
+        if (isConPur()) {
+            hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).HasRight;
+            levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).Level;
+        }else if (isConSal()) {
+            hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_AUTHORN).HasRight;
+            levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_AUTHORN).Level;
+        }
+        else if (isOrderPur()) {
             hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).HasRight;
             mbHasRightRejectOwn = !hasRightAuthorize && miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_REJECT_OWN).HasRight;
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).Level;
@@ -118,14 +125,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         else if (isDocSal()) {
             hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_TRN).Level == SUtilConsts.LEV_MANAGER;
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_TRN).Level;
-        }else if (isConPur()) {
-            hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).HasRight;
-            levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_AUTHORN).Level;
-        }else if (isConSal()) {
-            hasRightAuthorize = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_AUTHORN).HasRight;
-            levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_AUTHORN).Level;
         }
-       
         mbHasRightAuthor = levelDoc == SUtilConsts.LEV_AUTHOR;
 
         mjbAuthorize = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE));
@@ -283,15 +283,29 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
     private boolean isPurchase() {
         return
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_AUT ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_REJ ||    
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_AUT ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_PEND ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_REJ ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_AUT ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_PEND ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_REJ ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_REJ;
+    }
+    
+    private boolean isConPur() {
+        return
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_AUT ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_REJ;
+    }
+
+    private boolean isConSal() {
+        return
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ;
     }
 
     private boolean isOrderPur() {
@@ -322,48 +336,35 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_REJ;
     }
     
-    private boolean isConPur() {
-        return
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_AUT ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_REJ;
-    }
-
-    private boolean isConSal() {
-        return
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ;
-    }
 
     private boolean isViewDocsPending() {
         return
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_PEND ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_PEND ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_PEND ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_PEND ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND;
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_PEND;
     }
 
     private boolean isViewDocsAuthorized() {
         return
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_AUT ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_AUT ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_AUT ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_AUT ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_AUT ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_AUT ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT;
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_AUT;
     }
 
     private boolean isViewDocsRejected() {
         return
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_REJ ||
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_REJ ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_REJ ||
             mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_REJ ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_REJ ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_REJ ||
-            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ;
+            mnTabTypeAux01 == SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_REJ;
     }
 
     private void actionAuthorizeDoc() {
@@ -448,8 +449,8 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
     private void actionViewDps() {
         int gui = isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
-        int[] type = isOrderPur() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD : isDocPur() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : isConPur() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CON : 
-            isOrderSal() ? SDataConstantsSys.TRNU_TP_DPS_SAL_ORD : isConSal() ? SDataConstantsSys.TRNU_TP_DPS_SAL_CON : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+        int[] type = isConPur() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CON : isOrderPur() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD : isDocPur() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : 
+            isConSal() ? SDataConstantsSys.TRNU_TP_DPS_SAL_CON : isOrderSal() ? SDataConstantsSys.TRNU_TP_DPS_SAL_ORD : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
 
         if (moTablePane.getSelectedTableRow() != null) {
             miClient.getGuiModule(gui).setFormComplement(type);  // document type key
@@ -664,6 +665,20 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         }
 
         switch (mnTabTypeAux01) {
+            case SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_AUT:
+            case SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND:
+            case SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_REJ:
+                sqlFilter = " AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[0] + " " +
+                        "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[1] + " " +
+                        "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[2] + " ";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT:
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND:
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ:
+                sqlFilter = " AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[0] + " " +
+                        "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[1] + " " +
+                        "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2] + " ";
+                break;
             case SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_AUT:
             case SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_PEND:
             case SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_REJ:
@@ -691,20 +706,6 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                 sqlFilter = " AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " " +
                         "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " " +
                         "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + " ";
-                break;
-            case SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_AUT:
-            case SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND:
-            case SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_REJ:
-                sqlFilter = " AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[0] + " " +
-                        "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[1] + " " +
-                        "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[2] + " ";
-                break;
-            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT:
-            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND:
-            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ:
-                sqlFilter = " AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[0] + " " +
-                        "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[1] + " " +
-                        "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2] + " ";
                 break;
             default:
         }

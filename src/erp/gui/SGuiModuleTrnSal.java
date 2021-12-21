@@ -1000,6 +1000,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         String viewTitle = "" ;
 
         switch (type) {
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " x autorizar";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " autorizad@s";
+                break;
+            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ:
+                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " rechazad@s";
+                break;
             case SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_PEND:
                 viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_ORD) + " x autorizar";
                 break;
@@ -1017,15 +1026,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 break;
             case SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_REJ:
                 viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_DOC) + " rechazad@s";
-                break;
-            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_PEND:
-                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " x autorizar";
-                break;
-            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_AUT:
-                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " autorizad@s";
-                break;
-            case SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ:
-                viewTitle = "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON) + " rechazad@s";
                 break;
             case SDataConstantsSys.TRNX_SAL_TOT:
                 viewTitle = "Ventas globales";

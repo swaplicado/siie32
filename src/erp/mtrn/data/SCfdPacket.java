@@ -7,6 +7,7 @@ package erp.mtrn.data;
 
 import cfd.DCfd;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
+import erp.mod.log.db.SDbBillOfLading;
 import sa.lib.xml.SXmlConsts;
 
 /**
@@ -60,6 +61,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private SDataDps moAuxDataDps;
     private SDataCfdPayment moAuxDataCfdPayment;
     private SDataPayrollReceiptIssue moAuxDataPayrollReceiptIssue;
+    private SDbBillOfLading moAuxDataBillOfLading;
 
     private cfd.DElement moAuxCfdRootElement;
     private int mnAuxPacId;
@@ -112,6 +114,7 @@ public final class SCfdPacket implements java.io.Serializable {
         moAuxDataDps = null;
         moAuxDataCfdPayment = null;
         moAuxDataPayrollReceiptIssue = null;
+        moAuxDataBillOfLading = null;
         
         moAuxCfdRootElement = null;
         mnAuxPacId = 0;
@@ -165,6 +168,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setAuxDataDps(SDataDps o) { moAuxDataDps = o; }
     public void setAuxDataCfdPayment(SDataCfdPayment o) { moAuxDataCfdPayment = o; }
     public void setAuxDataPayrollReceiptIssue(SDataPayrollReceiptIssue o) { moAuxDataPayrollReceiptIssue = o; }
+    public void setAuxDataBillOfLading(SDbBillOfLading o) { moAuxDataBillOfLading = o; }
 
     public void setAuxCfdRootElement(cfd.DElement o) { moAuxCfdRootElement = o; }
     public void setAuxPacId(int n) { mnAuxPacId = n; }
@@ -217,6 +221,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public SDataDps getAuxDataDps() { return moAuxDataDps; }
     public SDataCfdPayment getAuxDataCfdPayment() { return moAuxDataCfdPayment; }
     public SDataPayrollReceiptIssue getAuxDataPayrollReceiptIssue() { return moAuxDataPayrollReceiptIssue; }
+    public SDbBillOfLading getAuxDataBillOfLading() { return moAuxDataBillOfLading; }
     
     public cfd.DElement getAuxCfdRootElement() { return moAuxCfdRootElement; }
     public int getAuxPacId() { return mnAuxPacId; }

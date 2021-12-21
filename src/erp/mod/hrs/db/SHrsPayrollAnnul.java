@@ -16,13 +16,11 @@ import erp.server.SServerResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Adrián Avilés
  */
 public class SHrsPayrollAnnul {
 
@@ -87,13 +85,16 @@ public class SHrsPayrollAnnul {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-//        SSrvLock lock = null;
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        SSrvLock lock = null;
+*/        
         SRedisLock rlock = null;
         
         try {
             // Attempt to gain data lock:
-
-//            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+*/
             rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 60);
             // Read data registry:
 
@@ -155,18 +156,22 @@ public class SHrsPayrollAnnul {
             }
         }
         catch (Exception e) {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(miClient.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+*/            
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }
             throw e;
         }
         finally {
-//            if (lock != null) {
-//                SSrvUtils.releaseLock(miClient.getSession(), lock);
-//            }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+*/
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }

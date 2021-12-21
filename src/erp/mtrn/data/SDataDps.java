@@ -30,6 +30,7 @@ import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
 import cfd.ver2.DAttributeOptionTipoDeComprobante;
 import cfd.ver3.cce11.DElementDescripcionesEspecificas;
+import cfd.ver3.ccp20.DElementCartaPorte;
 import cfd.ver3.clf10.DElementLeyenda;
 import cfd.ver3.clf10.DElementLeyendasFiscales;
 import cfd.ver33.DCfdi33Catalogs;
@@ -230,6 +231,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkCarrierId_n;
     protected int mnFkVehicleTypeId_n;
     protected int mnFkVehicleId_n;
+    protected int mnFkBillOfLading_n;
     protected int mnFkSourceYearId_n;
     protected int mnFkSourceDocId_n;
     protected int mnFkMfgYearId_n;
@@ -276,7 +278,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxKeepExchangeRate;
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
-//    protected sa.lib.srv.SSrvLock moAuxUserLock;
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    protected sa.lib.srv.SSrvLock moAuxUserLock;
+*/    
     protected sa.lib.srv.redis.SRedisLock moAuxUserRedisLock;
     
     protected double mdTempCfdIvaPorcentaje;
@@ -285,7 +289,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected erp.mtrn.data.SDataCfd moDbmsDataCfd;
     protected erp.mtrn.data.SDataDpsCfd moDbmsDataDpsCfd;
     protected erp.mtrn.data.SDataDpsAddenda moDbmsDataAddenda;
-    protected erp.mtrn.data.SDataPdf moDbmsDataPdf;										   
+    protected erp.mtrn.data.SDataPdf moDbmsDataPdf;	
+    protected erp.mtrn.data.SDataCfd moDbmsDataCfdBol;
     
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
@@ -313,7 +318,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     private boolean isDpsAuthorizedEventUser(final erp.mtrn.data.SDataUserConfigurationTransaction userConfigTxn, final int[] dpsClassKey) throws java.sql.SQLException, java.lang.Exception {
         boolean authorized = false;
         
-        if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD)) {
+        if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CON)) {
+            authorized = userConfigTxn.getPurchasesContractLimit_n() == 0; // limit of zero means no limit
+
+            if (!authorized) {
+                authorized = mdTotal_r <= userConfigTxn.getPurchasesContractLimit_n();
+            }
+        }
+        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD)) {
             authorized = userConfigTxn.getPurchasesOrderLimit_n() == 0; // limit of zero means no limit
 
             if (!authorized) {
@@ -327,11 +339,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 authorized = mdTotal_r <= userConfigTxn.getPurchasesDocLimit_n();
             }
         }
-        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CON)) {
-            authorized = userConfigTxn.getPurchasesConLimit_n() == 0; // limit of zero means no limit
+        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+            authorized = userConfigTxn.getSalesContractLimit_n() == 0; // limit of zero means no limit
 
             if (!authorized) {
-                authorized = mdTotal_r <= userConfigTxn.getPurchasesConLimit_n();
+                authorized = mdTotal_r <= userConfigTxn.getSalesContractLimit_n();
             }
         }
         else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD)) {
@@ -346,13 +358,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             if (!authorized) {
                 authorized = mdTotal_r <= userConfigTxn.getSalesDocLimit_n();
-            }
-        }
-        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
-            authorized = userConfigTxn.getSalesConLimit_n() == 0; // limit of zero means no limit
-
-            if (!authorized) {
-                authorized = mdTotal_r <= userConfigTxn.getSalesConLimit_n();
             }
         }
         else {
@@ -418,7 +423,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         else {
             if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                if (isOrderPur()) {
+                if(isDpsTypeContractPur()){
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_PUR_CON);
+                    
+                    if (!autorized) {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
+                    }
+                    else {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                    }
+                }
+                else if (isOrderPur()) {
                     autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
 
                     if (!autorized) {
@@ -466,9 +481,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                     }
                 }
-                else if(isDpsTypeContractPur()){
-                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_PUR_CON);
-                    
+            }
+            else if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+                if (isDpsTypeContractSal()) {
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_SAL_CON);
+
                     if (!autorized) {
                         mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
                     }
@@ -476,9 +493,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
                     }
                 }
-            }
-            else if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                if (isOrderSal()) {
+                else if (isOrderSal()) {
                     autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD);
 
                     if (!autorized) {
@@ -498,16 +513,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
                     }
                 }
-                else if (isDpsTypeContractSal()) {
-                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNU_TP_DPS_SAL_CON);
-
-                    if (!autorized) {
-                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
-                    }
-                    else {
-                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
-                    }
-                }
             }
         }
 
@@ -515,17 +520,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     private void updateAuthorizationStatus(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
+        boolean isAutPurContract = false;
         boolean isAutPurOrd = false;
         boolean isAutPurDps = false;
-        boolean isAutPurCon = false;
+        boolean isAutSalContract = false;
         boolean isAutSalOrd = false;
         boolean isAutSalDps = false;
-        boolean isAutSalCon = false;
         String sql = "";
         Statement statement = null;
         ResultSet resultSet = null;
 
-        if (!mbIsDeleted && (isOrder() || isDocument() || isDpsTypeContract())) {
+        if (!mbIsDeleted && (isDpsTypeContract() || isOrder() || isDocument())) {
             statement = connection.createStatement();
 
             // XXX It is needed a "session" object in SDataRegistry objects in order to know current company, company branch, current entities, decimal an date format objects, etc.
@@ -536,23 +541,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
             }
             else {
-                sql = "SELECT b_authorn_pur_ord, b_authorn_pur_doc, b_authorn_pur_con, b_authorn_sal_ord, b_authorn_sal_doc, b_authorn_sal_con FROM cfg_param_co WHERE id_co = " + resultSet.getInt("fid_bp") + " ";
+                sql = "SELECT b_authorn_pur_con, b_authorn_pur_ord, b_authorn_pur_doc, b_authorn_sal_con, b_authorn_sal_ord, b_authorn_sal_doc FROM cfg_param_co WHERE id_co = " + resultSet.getInt("fid_bp") + " ";
                 resultSet = statement.executeQuery(sql);
                 if (!resultSet.next()) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
                 else {
+                    isAutPurContract = resultSet.getBoolean("b_authorn_pur_con");
                     isAutPurOrd = resultSet.getBoolean("b_authorn_pur_ord");
                     isAutPurDps = resultSet.getBoolean("b_authorn_pur_doc");
-                    isAutPurCon = resultSet.getBoolean("b_authorn_pur_con");
+                    isAutSalContract = resultSet.getBoolean("b_authorn_sal_con");
                     isAutSalOrd = resultSet.getBoolean("b_authorn_sal_ord");
                     isAutSalDps = resultSet.getBoolean("b_authorn_sal_doc");
-                    isAutSalCon = resultSet.getBoolean("b_authorn_sal_con");
                 }
             }
 
-            if (isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps ||
-                    isDpsTypeContractPur() && isAutPurCon || isDpsTypeContractSal() && isAutSalCon) {
+            if (isDpsTypeContractPur() && isAutPurContract || isDpsTypeContractSal() && isAutSalContract || isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || 
+                    isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps) {
                 if (isDpsAuthorized(connection)) {
                     mbIsAuthorized = true;
                     mnFkDpsAuthorizationStatusId = SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN;
@@ -1839,6 +1844,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkCarrierId_n(int n) { mnFkCarrierId_n = n; }
     public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
     public void setFkVehicleId_n(int n) { mnFkVehicleId_n = n; }
+    public void setFkBillOfLading_n(int n) { mnFkBillOfLading_n = n; }
     public void setFkSourceYearId_n(int n) { mnFkSourceYearId_n = n; }
     public void setFkSourceDocId_n(int n) { mnFkSourceDocId_n = n; }
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
@@ -1961,6 +1967,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkCarrierId_n() { return mnFkCarrierId_n; }
     public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
     public int getFkVehicleId_n() { return mnFkVehicleId_n; }
+    public int getFkBillOfLading_n() { return mnFkBillOfLading_n; }
     public int getFkSourceYearId_n() { return mnFkSourceYearId_n; }
     public int getFkSourceDocId_n() { return mnFkSourceDocId_n; }
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
@@ -2007,15 +2014,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
-//    public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+    public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
+*/
     public void setAuxUserRedisLock(sa.lib.srv.redis.SRedisLock o) { moAuxUserRedisLock = o; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
-	public void setDbmsDataPdf(erp.mtrn.data.SDataPdf o) { moDbmsDataPdf = o; }																		   
-
+    public void setDbmsDataPdf(erp.mtrn.data.SDataPdf o) { moDbmsDataPdf = o; }																		   
+    public void setDbmsDataCfdBol(erp.mtrn.data.SDataCfd o) { moDbmsDataCfdBol = o; }																		   
+    
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
     public java.lang.String getDbmsCurrency() { return msDbmsCurrency; }
@@ -2034,7 +2044,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
-//    public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro   
+    public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
+*/    
     public sa.lib.srv.redis.SRedisLock getAuxUserRedisLock() { return moAuxUserRedisLock; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
@@ -2042,6 +2054,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
     public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
     public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }																		
+    public erp.mtrn.data.SDataCfd getDbmsDataCfdBol() { return moDbmsDataCfdBol; }																		
     
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
@@ -2181,6 +2194,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkCarrierId_n = 0;
         mnFkVehicleTypeId_n = 0;
         mnFkVehicleId_n = 0;
+        mnFkBillOfLading_n = 0;
         mnFkSourceYearId_n = 0;
         mnFkSourceDocId_n = 0;
         mnFkMfgYearId_n = 0;
@@ -2227,15 +2241,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxKeepExchangeRate = false;
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
-//        moAuxUserLock = null;
-        
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+        moAuxUserLock = null;
+*/        
         mdTempCfdIvaPorcentaje = 0;
 
         moDbmsDataBookkeepingNumber = null;
         moDbmsDataCfd = null;
         moDbmsDataDpsCfd = null;
         moDbmsDataAddenda = null;
-		moDbmsDataPdf = null;					 
+        moDbmsDataPdf = null;					 
+        moDbmsDataCfdBol = null;					 
         
         msXtaTotalCyAsText = "";
         createXtaDpsType();
@@ -2361,6 +2377,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkCarrierId_n = oResultSet.getInt("d.fid_car_n");
                 mnFkVehicleTypeId_n = oResultSet.getInt("d.fid_tp_veh_n");
                 mnFkVehicleId_n = oResultSet.getInt("d.fid_veh_n");
+                mnFkBillOfLading_n = oResultSet.getInt("d.fid_bol_n");
                 mnFkSourceYearId_n = oResultSet.getInt("d.fid_src_year_n");
                 mnFkSourceDocId_n = oResultSet.getInt("d.fid_src_doc_n");
                 mnFkMfgYearId_n = oResultSet.getInt("d.fid_mfg_year_n");
@@ -2560,8 +2577,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
-                }						 
-																							
+                }	
+                
+                if (mnFkBillOfLading_n != 0) {
+                    sSql = "SELECT id_cfd FROM trn_cfd WHERE fid_bol_n = " + mnFkBillOfLading_n + " ";
+                    oResultSet = statement.executeQuery(sSql);
+                    if (oResultSet.next()) {
+                        moDbmsDataCfdBol = new SDataCfd();
+                        if (moDbmsDataCfdBol.read(new int[] { oResultSet.getInt("id_cfd") }, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                    }			 
+                }																					
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -2637,7 +2664,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2735,6 +2762,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             if (mnFkCarrierId_n > 0) oCallableStatement.setInt(nParam++, mnFkCarrierId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkVehicleTypeId_n > 0) oCallableStatement.setInt(nParam++, mnFkVehicleTypeId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkVehicleId_n > 0) oCallableStatement.setInt(nParam++, mnFkVehicleId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
+            if (mnFkBillOfLading_n > 0) oCallableStatement.setInt(nParam++, mnFkBillOfLading_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkSourceYearId_n > 0) oCallableStatement.setInt(nParam++, mnFkSourceYearId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkSourceDocId_n > 0) oCallableStatement.setInt(nParam++, mnFkSourceDocId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkMfgYearId_n > 0) oCallableStatement.setInt(nParam++, mnFkMfgYearId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
@@ -5777,6 +5805,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 complemento = new cfd.ver33.DElementComplemento();
             }
             complemento.getElements().add(createCfdiNodeComplementoLeyendasFiscales10());
+        }
+        
+        if (moDbmsDataCfdBol != null) {
+            if (complemento == null) {
+                complemento = new cfd.ver33.DElementComplemento();
+            }
+            cfd.ver33.DElementComprobante comprobanteCartaPorte = DCfdUtils.getCfdi33(moDbmsDataCfdBol.getDocXml());
+            cfd.ver3.ccp20.DElementCartaPorte ccp = new DElementCartaPorte();
+            if (comprobanteCartaPorte.getEltOpcComplemento() != null) {
+                for (DElement element : comprobanteCartaPorte.getEltOpcComplemento().getElements()) {
+                    if (element.getName().compareTo("cartaporte20:CartaPorte") == 0) {
+                        ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                    }
+                }
+            }
+            complemento.getElements().add((DElement) ccp);
         }
         
         return complemento;

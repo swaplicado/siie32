@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +54,10 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     public static final int MERCHANDISE_DISCHARGED = 1;
     public static final int MERCHANDISE_CHARGED = 2;
+    public static final int GRID_SUBTYPE_MERCHANDISE_CHARGED = 10;
+    public static final int GRID_SUBTYPE_MERCHANDISE_DISCHARGED = 20;
+    public static final int GRID_SUBTYPE_MERCHANDISE_PRECHARGE = 30;
+    public static final int GRID_SUBTYPE_MERCHANDISE_CURRENTCHARGE = 40;
     
     private SDbBolLocation moRegistry;
     private SDbBillOfLading moBillOfLading;
@@ -65,8 +70,9 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     private SFormBolMerchandise moFormMerchandiseCharged;
     private SFormBolMerchandise moFormMerchandiseDischarged;
-
     
+    private int[] moLocationStartKey;
+
     /**
      * Creates new form SFormBolLocation
      * @param client
@@ -82,16 +88,36 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     private void updateMerchandises(SGridRow gridRow) {
         SDbBolMerchandiseQuantity merchQty = (SDbBolMerchandiseQuantity) gridRow;
-        merchQty.getXtaMerchandise().getBolMerchandiseQuantity().add(merchQty);
+        if(merchQty.getXtaMerchandise().getBolMerchandiseQuantity().size() <= 0){
+            merchQty.getXtaMerchandise().getBolMerchandiseQuantity().add(merchQty);
+        }
+        else {
+            merchQty.getXtaMerchandise().getBolMerchandiseQuantity().set(0, merchQty);
+        }
         moBillOfLading.addMerchandise(merchQty.getXtaMerchandise());
         updateCurrentChargeData((SDbBolMerchandiseQuantity)gridRow);
         populateCurrentCharge();
     }
     
-    private void deleteMerchandises(SGridRow gridRow) {
+    public void deleteMerchandises(SGridRow gridRow) {
         SDbBolMerchandiseQuantity merchQty = (SDbBolMerchandiseQuantity) gridRow;
-        merchQty.getXtaMerchandise().getBolMerchandiseQuantity().add(merchQty);
         moBillOfLading.removeMerchandise(merchQty.getXtaMerchandise());
+        populateCurrentCharge();
+    }
+    
+    private void actionItemStateChangeKeyCustomerBranchAddress() {
+        try {
+            String sql = "SELECT distance FROM log_dist_location "
+                    + "WHERE (id_bpb_add_1 = " + moLocationStartKey[0] + " AND id_add_add_1 = " + moLocationStartKey[1] + " "
+                    + "AND id_bpb_add_2 = " + moKeyBizPartnerBranchAddress.getValue()[0] + " AND id_add_add_2 = " + moKeyBizPartnerBranchAddress.getValue()[1] + ") OR ("
+                    + "id_bpb_add_1 = " + moKeyBizPartnerBranchAddress.getValue()[0] + " AND id_add_add_1 = " + moKeyBizPartnerBranchAddress.getValue()[1] + " "
+                    + "AND id_bpb_add_2 = " + moLocationStartKey[0] + " AND id_add_add_2 = " + moLocationStartKey[1] + ")"; 
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                moDecimalDistance.setValue(resultSet.getDouble(1));
+            }
+        }
+        catch(Exception e) {}
     }
 
     /**
@@ -407,7 +433,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         
         moFields.setFormButton(jbSave);
 
-        moGridCharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, MERCHANDISE_CHARGED, "Carga") {
+        moGridCharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_CHARGED, "Carga") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(true, true, true);
@@ -485,7 +511,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridDischarge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, MERCHANDISE_DISCHARGED, "Descarga") {
+        moGridDischarge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_DISCHARGED, "Descarga") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(true, true, true);
@@ -536,7 +562,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridPrecharge = new SGridPaneForm(miClient, SModConsts.LOGX_BOL, 0, "Carga previa") {
+        moGridPrecharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_PRECHARGE, "Carga previa") {
             
             @Override
             public void initGrid() {
@@ -555,7 +581,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
         };
         
-        moGridCurrentCharge = new SGridPaneForm(miClient, SModConsts.LOGX_BOL, 0, "Carga actual") {
+        moGridCurrentCharge = new SGridPaneForm(miClient, SModConsts.LOG_BOL_MERCH_QTY, GRID_SUBTYPE_MERCHANDISE_CURRENTCHARGE, "Carga actual") {
             
             @Override
             public void initGrid() {
@@ -573,11 +599,6 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                 return gridColumnsForm;
             }
         };
-
-        mvFormGrids.add(moGridCharge);
-        mvFormGrids.add(moGridCurrentCharge);
-        mvFormGrids.add(moGridDischarge);
-        mvFormGrids.add(moGridPrecharge);
         
         moFormMerchandiseCharged = new SFormBolMerchandise(miClient, MERCHANDISE_CHARGED, "Carga");
         moGridCharge.setForm(moFormMerchandiseCharged);
@@ -688,7 +709,11 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     private void updatePrechargedData(Vector<SGridRow> rows) {
         moRegistry.getXtaRowsPrecharged().clear();
         for (SGridRow row : rows) {
-            moRegistry.updateRowsPrecharged((SDbBolLocation) row);
+            SDbBolLocation bol = (SDbBolLocation) row;
+            moRegistry.updateRowsPrecharged(bol);
+            if (bol.getLocationType() == 1) { // Inicial
+                moLocationStartKey = new int[] { bol.getFkOriginBizPartnerAddress_n(), bol.getFkOriginAddressAddress_n() };
+            }
         }
     }
     
@@ -697,7 +722,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     }
     
     private void actionLocations() {
-        if (moRadioMyLocations.isSelected()) {
+      if (moRadioMyLocations.isSelected()) {
             moKeyBizPartner.removeAllItems();
             miClient.getSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, SLibConsts.UNDEFINED, null);
             moKeyBizPartner.setValue(new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
@@ -716,18 +741,11 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     }
     
     private void actionOriginDestination() {
-        if (moRadioOrigin.isSelected()) {
-            moGridCharge.setEnabled(true);
-        }
-        else {
-            moGridCharge.setEnabled(false);
-        }
-        if (moRadioDestination.isSelected()) {
-            moGridDischarge.setEnabled(true);
-        }
-        else {
-            moGridDischarge.setEnabled(false);
-        }
+        moGridCharge.setEnabled(moRadioOrigin.isSelected());
+        moGridDischarge.setEnabled(moRadioDestination.isSelected());
+        moDecimalDistance.setEnabled(moRadioDestination.isSelected());
+        moDateArrival.setEnabled(moRadioDestination.isSelected());
+        moDateDeparture.setEnabled(moRadioOrigin.isSelected());
     }
     
     private void actionLocationType() {
@@ -757,6 +775,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             moDateDeparture.setEnabled(false);
             moDecimalDistance.setEnabled(true);
         }
+        actionOriginDestination();
     }
     
      /*
@@ -831,7 +850,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         if (moRegistry.getFkOriginAddressAddress_n() == 0 && moRegistry.getFkOriginBizPartnerAddress_n() == 0) {
             moKeyBizPartner.setValue(new int[] { moRegistry.getFkDestinationBizPartner_n() });
             moKeyBizPartnerBranch.setValue(new int[] { moRegistry.getFkDestinationBizPartnerAddress_n() });
-            moKeyBizPartnerBranchAddress.setValue(new int[] { moRegistry.getFkDestinationAddressAddress_n() });
+            moKeyBizPartnerBranchAddress.setValue(new int[] { moRegistry.getFkDestinationBizPartnerAddress_n(), moRegistry.getFkDestinationAddressAddress_n() });
             moRadioOrigin.setSelected(false);
             moRadioDestination.setSelected(true);
         }
@@ -888,13 +907,14 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         SDataBizPartnerBranchAddress bpba = new SDataBizPartnerBranchAddress();
         bpba.read(moKeyBizPartnerBranchAddress.getValue(), miClient.getSession().getStatement());
         
-        registry.setDistance(moDecimalDistance.getValue());
+        registry.setDistance(moDecimalDistance.isEnabled() ? moDecimalDistance.getValue() : 0.0);
         registry.setDateDeparture_n(moDateDeparture.isEnabled() ? moDateDeparture.getValue() : null);
         registry.setDateArrival_n(moDateArrival.isEnabled() ? moDateArrival.getValue() : null);
         registry.setLocationType(moRadioStart.isSelected() ? 1 : moRadioMedium.isSelected() ? 2 : moRadioEnd.isSelected() ? 3 : 0);
         registry.setXtaLocationType(moRadioStart.isSelected() ? "Inicial" : moRadioMedium.isSelected() ? "Intermedia" : moRadioEnd.isSelected() ? "Final" : ""); 
         registry.setXtaBizPartner(bp);
         registry.setXtaBizPartnerBranch(bpb);
+        registry.setXtaBizPartnerBranchAddress(bpba);
         if (moRadioOrigin.isSelected()) {
             registry.setFkOriginBizPartner_n(moKeyBizPartner.getValue()[0]);
             registry.setFkOriginBizPartnerAddress_n(moKeyBizPartnerBranch.getValue()[0]);
@@ -936,7 +956,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     @Override
     public void setValue(int type, java.lang.Object value) {
 
-        switch (type) {
+       switch (type) {
             case SModConsts.BPSU_BP:
                 moKeyBizPartner.setValue((int[]) value);
                 break;
@@ -954,6 +974,13 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                     moRadioStart.setEnabled(false);
                     moRadioMedium.setEnabled(false);
                     moRadioEnd.setEnabled(false);
+                    actionLocationType();
+                }
+                else {
+                    moRadioStart.setSelected(true);
+                    moRadioStart.setEnabled(true);
+                    moRadioMedium.setEnabled(true);
+                    moRadioEnd.setEnabled(true);
                     actionLocationType();
                 }
             break;
@@ -986,6 +1013,21 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (moRadioOrigin.isSelected() && moGridCharge.getModel().getRowCount() <= 0) {
+            validation.setMessage("El tipo de ubicación está marcado como origen, debe existir al menos un elemento de carga");
+        }
+        else if (!moRadioOrigin.isSelected() && moGridCharge.getModel().getRowCount() > 0) {
+            validation.setMessage("El tipo de ubicación no está marcado como origen, no deben existir elementos de carga");
+        }
+        
+        if (moRadioDestination.isSelected() && moGridDischarge.getModel().getRowCount() <= 0) {
+            validation.setMessage("El tipo de ubicación está marcado como destino, debe existir al menos un elemento de descarga");
+        }
+        else if (!moRadioDestination.isSelected() && moGridDischarge.getModel().getRowCount() > 0) {
+            validation.setMessage("El tipo de ubicación no está marcado como destino, no deben existir elementos de descarga");
+        }
+        
         return validation;
     }
 
@@ -1005,8 +1047,6 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     public void itemStateChanged(ItemEvent e) {
        if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
             JComboBox comboBox = (JComboBox)  e.getSource();
-
-            
             if(comboBox == moKeyBizPartner) {
                 //actionItemStateChangeKeyCustomer();
             }
@@ -1014,17 +1054,8 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                 //actionItemStateChangeKeyCustomerBranch();
             }
             else if(comboBox == moKeyBizPartnerBranchAddress) {
-                //actionItemStateChangeKeyCustomerBranchAddress();
+                actionItemStateChangeKeyCustomerBranchAddress();
             }
-            
-
-//            if (comboBox == moKeyBizPartner ||
-//                    comboBox == moKeyBizPartnerBranch ||
-//                    comboBox == moKeyBizPartnerBranchAddress ||
-//                    comboBox == moKeyWarehouseCompanyBranch ||
-//                    comboBox == moKeyWarehouseEntity) {
-//                actionGridChanged();
-//            }
          }
        
        if (e.getSource() instanceof javax.swing.JRadioButton) {

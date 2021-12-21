@@ -27,6 +27,7 @@ import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataEmployee;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
+import erp.mod.log.db.SDbBillOfLading;
 import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SDataCfd;
@@ -60,13 +61,12 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
-//import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvRequest;
 import sa.lib.srv.SSrvResponse;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés
  * To generate stub:
  * ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SSessionServer
  */
@@ -578,6 +578,18 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 }
                                 break;
                                 
+                            case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                                SDbBillOfLading bol = packet.getAuxDataBillOfLading();
+                                if (bol != null) { 
+                                    if (bol.canDisable()) {
+                                        bol.setFkUserUpdateId(mnPkUserId);
+                                        result = bol.disable(moCompanyDatabase.getConnection());
+                                        if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                            result = SLibConstants.DB_CFD_OK;
+                                        }
+                                    }
+                                }
+                                break;
                             default:
                         }
                     }
@@ -684,44 +696,44 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
     @Override
     public SSrvResponse request(SSrvRequest request) throws RemoteException {
-//        SSrvLock lock = null;
         SSrvResponse response = new SSrvResponse(SSrvConsts.RESP_TYPE_OK);
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+        try {
+            switch (request.getRequestType()) {
+                case SSrvConsts.REQ_LOCK_GAIN:
+                    lock = (SSrvLock) request.getPacket();
+                    response.setPacket(moServer.getServiceDataLocks().gainLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout()));
+                    break;
 
-//        try {
-//            switch (request.getRequestType()) {
-//                case SSrvConsts.REQ_LOCK_GAIN:
-//                    lock = (SSrvLock) request.getPacket();
-//                    response.setPacket(moServer.getServiceDataLocks().gainLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout()));
-//                    break;
-//
-//                case SSrvConsts.REQ_LOCK_RECOVER:
-//                    lock = (SSrvLock) request.getPacket();
-//                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout(), lock.getTimestamp()));
-//                    break;
-//
-//                case SSrvConsts.REQ_LOCK_STATUS:
-//                    lock = (SSrvLock) request.getPacket();
-//                    response.setPacket(moServer.getServiceDataLocks().getLockStatus(lock.getLockId()));
-//                    if ((Integer) response.getPacket() == 0){
-//                        response.setPacket( SSrvConsts.LOCK_ST_EXPIRED );
-//                    }
-//                    break;
-//
-//                case SSrvConsts.REQ_LOCK_RELEASE:
-//                    lock = (SSrvLock) request.getPacket();
-//                    moServer.getServiceDataLocks().releaseLock(lock.getLockId());
-//                    break;
-//
-//                default:
-//                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-//            }
-//        }
-//        catch (Exception e) {
-//            response.setResponseType(SSrvConsts.RESP_TYPE_ERROR);
-//            response.setMessage(e.toString());
-//            moServer.renderMessageLn(msSessionServer + e);
-//        }
+                case SSrvConsts.REQ_LOCK_RECOVER:
+                    lock = (SSrvLock) request.getPacket();
+                    response.setPacket(moServer.getServiceDataLocks().recoverLock(mnSessionId, lock.getCompanyId(), lock.getRegistryType(), lock.getPrimaryKey(), lock.getTimeout(), lock.getTimestamp()));
+                    break;
 
+                case SSrvConsts.REQ_LOCK_STATUS:
+                    lock = (SSrvLock) request.getPacket();
+                    response.setPacket(moServer.getServiceDataLocks().getLockStatus(lock.getLockId()));
+                    if ((Integer) response.getPacket() == 0){
+                        response.setPacket( SSrvConsts.LOCK_ST_EXPIRED );
+                    }
+                    break;
+
+                case SSrvConsts.REQ_LOCK_RELEASE:
+                    lock = (SSrvLock) request.getPacket();
+                    moServer.getServiceDataLocks().releaseLock(lock.getLockId());
+                    break;
+
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+        }
+        catch (Exception e) {
+            response.setResponseType(SSrvConsts.RESP_TYPE_ERROR);
+            response.setMessage(e.toString());
+            moServer.renderMessageLn(msSessionServer + e);
+        }
+*/
         return response;
     }
 

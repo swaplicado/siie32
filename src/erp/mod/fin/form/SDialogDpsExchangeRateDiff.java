@@ -28,13 +28,11 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
-//import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
- * @author Gerardo Hernández, Uriel Castañeda, Isabel Servín
+ * @author Gerardo Hernández, Uriel Castañeda, Isabel Servín, Adrián Avilés
  */
 public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements ActionListener {
 
@@ -331,7 +329,9 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
     @Override
     public void actionSave() {
         String msg;
-//        SSrvLock lock = null;
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+        SSrvLock lock = null;
+*/        
         SRedisLock rlock = null;
         SFinDpsExchangeRateDiff dpsExchangeRateDiff;
         
@@ -343,7 +343,9 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
             
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
                 try {
-//                    lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                    lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
+*/
                     rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout() / 1000);
                     dpsExchangeRateDiff = new SFinDpsExchangeRateDiff(miClient);
                     dpsExchangeRateDiff.setRecYear(SLibTimeUtils.digestYear(moDateDate.getValue())[0]);
@@ -361,9 +363,11 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
                 }
                 finally {
                     try {
-//                        if (lock != null) {
-//                            SSrvUtils.releaseLock(miClient.getSession(), lock);                            
-//                        }
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                        if (lock != null) {
+                            SSrvUtils.releaseLock(miClient.getSession(), lock);                            
+                        }
+*/
                         if (rlock != null) {
                             SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                         }

@@ -42,15 +42,15 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
     private erp.mtrn.data.SDataUserConfigurationTransaction moUserConfigurationTransaction;
     private erp.lib.form.SFormField moFieldIsPurchasesItemAllApplying;
+    private erp.lib.form.SFormField moFieldPurchasesConLimit_n;
     private erp.lib.form.SFormField moFieldPurchasesOrderLimit_n;
     private erp.lib.form.SFormField moFieldPurchasesOrderLimitMonthly_n;
     private erp.lib.form.SFormField moFieldPurchasesDocLimit_n;
-    private erp.lib.form.SFormField moFieldPurchasesConLimit_n;
     private erp.lib.form.SFormField moFieldIsSalesItemAllApplying;
+    private erp.lib.form.SFormField moFieldSalesConLimit_n;
     private erp.lib.form.SFormField moFieldSalesOrderLimit_n;
     private erp.lib.form.SFormField moFieldSalesOrderLimitMonthly_n;
     private erp.lib.form.SFormField moFieldSalesDocLimit_n;
-    private erp.lib.form.SFormField moFieldSalesConLimit_n;
     private erp.lib.form.SFormField moFieldCapacityVolumeMinPercentage;
     private erp.lib.form.SFormField moFieldCapacityMassMinPercentage;
     private java.util.Vector<erp.lib.form.SFormComponentItem> mvFunctionalsAreas;
@@ -83,6 +83,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfUser = new javax.swing.JTextField();
         jckIsPurchasesItemAllApplying = new javax.swing.JCheckBox();
         Dummy01 = new javax.swing.JLabel();
+        jlPurchasesConLimit_n = new javax.swing.JLabel();
+        jPanel15 = new javax.swing.JPanel();
+        jtfPurchasesConLimit_n = new javax.swing.JTextField();
+        jtfCurrencyKeyPurchasesCon = new javax.swing.JTextField();
         jlPurchasesOrderLimit_n = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jtfPurchasesOrderLimit_n = new javax.swing.JTextField();
@@ -95,12 +99,12 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel5 = new javax.swing.JPanel();
         jtfPurchasesDocLimit_n = new javax.swing.JTextField();
         jtfCurrencyKeyPurchasesDoc = new javax.swing.JTextField();
-        jlPurchasesConLimit_n = new javax.swing.JLabel();
-        jPanel15 = new javax.swing.JPanel();
-        jtfPurchasesConLimit_n = new javax.swing.JTextField();
-        jtfCurrencyKeyPurchasesCon = new javax.swing.JTextField();
         jckIsSalesItemAllApplying = new javax.swing.JCheckBox();
         Dummy02 = new javax.swing.JLabel();
+        jlSalesConLimit_n = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
+        jtfSalesConLimit_n = new javax.swing.JTextField();
+        jtfCurrencyKeySalesCon = new javax.swing.JTextField();
         jlSalesOrderLimit_n = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jtfSalesOrderLimit_n = new javax.swing.JTextField();
@@ -113,10 +117,6 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel7 = new javax.swing.JPanel();
         jtfSalesDocLimit_n = new javax.swing.JTextField();
         jtfCurrencyKeySalesDoc = new javax.swing.JTextField();
-        jlSalesConLimit_n = new javax.swing.JLabel();
-        jPanel16 = new javax.swing.JPanel();
-        jtfSalesConLimit_n = new javax.swing.JTextField();
-        jtfCurrencyKeySalesCon = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlCapacityVolumeMinPer = new javax.swing.JLabel();
@@ -185,6 +185,23 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         Dummy01.setText("(límite 0.00 = sin límite)");
         jPanel3.add(Dummy01);
 
+        jlPurchasesConLimit_n.setText("Límite máx. autorizado contratos compras:");
+        jPanel3.add(jlPurchasesConLimit_n);
+
+        jPanel15.setLayout(new java.awt.BorderLayout(2, 0));
+
+        jtfPurchasesConLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPurchasesConLimit_n.setText("0");
+        jPanel15.add(jtfPurchasesConLimit_n, java.awt.BorderLayout.CENTER);
+
+        jtfCurrencyKeyPurchasesCon.setEditable(false);
+        jtfCurrencyKeyPurchasesCon.setText("CUR");
+        jtfCurrencyKeyPurchasesCon.setFocusable(false);
+        jtfCurrencyKeyPurchasesCon.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel15.add(jtfCurrencyKeyPurchasesCon, java.awt.BorderLayout.LINE_END);
+
+        jPanel3.add(jPanel15);
+
         jlPurchasesOrderLimit_n.setText("Límite máx. autorizado pedidos compras:");
         jPanel3.add(jlPurchasesOrderLimit_n);
 
@@ -236,23 +253,6 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
         jPanel3.add(jPanel5);
 
-        jlPurchasesConLimit_n.setText("Límite máx. autorizado contratos compras:");
-        jPanel3.add(jlPurchasesConLimit_n);
-
-        jPanel15.setLayout(new java.awt.BorderLayout(2, 0));
-
-        jtfPurchasesConLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPurchasesConLimit_n.setText("0");
-        jPanel15.add(jtfPurchasesConLimit_n, java.awt.BorderLayout.CENTER);
-
-        jtfCurrencyKeyPurchasesCon.setEditable(false);
-        jtfCurrencyKeyPurchasesCon.setText("CUR");
-        jtfCurrencyKeyPurchasesCon.setFocusable(false);
-        jtfCurrencyKeyPurchasesCon.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel15.add(jtfCurrencyKeyPurchasesCon, java.awt.BorderLayout.LINE_END);
-
-        jPanel3.add(jPanel15);
-
         jckIsSalesItemAllApplying.setText("Puede vender todos los ítem");
         jPanel3.add(jckIsSalesItemAllApplying);
 
@@ -260,6 +260,23 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         Dummy02.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         Dummy02.setText("(límite 0.00 = sin límite)");
         jPanel3.add(Dummy02);
+
+        jlSalesConLimit_n.setText("Límite máx. autorizado contratos ventas:");
+        jPanel3.add(jlSalesConLimit_n);
+
+        jPanel16.setLayout(new java.awt.BorderLayout(2, 0));
+
+        jtfSalesConLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfSalesConLimit_n.setText("0");
+        jPanel16.add(jtfSalesConLimit_n, java.awt.BorderLayout.CENTER);
+
+        jtfCurrencyKeySalesCon.setEditable(false);
+        jtfCurrencyKeySalesCon.setText("CUR");
+        jtfCurrencyKeySalesCon.setFocusable(false);
+        jtfCurrencyKeySalesCon.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel16.add(jtfCurrencyKeySalesCon, java.awt.BorderLayout.LINE_END);
+
+        jPanel3.add(jPanel16);
 
         jlSalesOrderLimit_n.setText("Límite máx. autorizado pedidos ventas:");
         jPanel3.add(jlSalesOrderLimit_n);
@@ -311,23 +328,6 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel7.add(jtfCurrencyKeySalesDoc, java.awt.BorderLayout.LINE_END);
 
         jPanel3.add(jPanel7);
-
-        jlSalesConLimit_n.setText("Límite máx. autorizado contratos ventas:");
-        jPanel3.add(jlSalesConLimit_n);
-
-        jPanel16.setLayout(new java.awt.BorderLayout(2, 0));
-
-        jtfSalesConLimit_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfSalesConLimit_n.setText("0");
-        jPanel16.add(jtfSalesConLimit_n, java.awt.BorderLayout.CENTER);
-
-        jtfCurrencyKeySalesCon.setEditable(false);
-        jtfCurrencyKeySalesCon.setText("CUR");
-        jtfCurrencyKeySalesCon.setFocusable(false);
-        jtfCurrencyKeySalesCon.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel16.add(jtfCurrencyKeySalesCon, java.awt.BorderLayout.LINE_END);
-
-        jPanel3.add(jPanel16);
         jPanel3.add(jPanel10);
         jPanel3.add(jPanel11);
 
@@ -501,23 +501,23 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         mvFields = new Vector<SFormField>();
 
         moFieldIsPurchasesItemAllApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsPurchasesItemAllApplying);
+        moFieldPurchasesConLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesConLimit_n, jlPurchasesConLimit_n);
+        moFieldPurchasesConLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldPurchasesOrderLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesOrderLimit_n, jlPurchasesOrderLimit_n);
         moFieldPurchasesOrderLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldPurchasesOrderLimitMonthly_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesOrderLimitMonthly_n, jlPurchasesOrderLimitMonthly_n);
         moFieldPurchasesOrderLimitMonthly_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldPurchasesDocLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesDocLimit_n, jlPurchasesDocLimit_n);
         moFieldPurchasesDocLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldPurchasesConLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesConLimit_n, jlPurchasesConLimit_n);
-        moFieldPurchasesConLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldIsSalesItemAllApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesItemAllApplying);
+        moFieldSalesConLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesConLimit_n, jlSalesConLimit_n);
+        moFieldSalesConLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldSalesOrderLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesOrderLimit_n, jlSalesOrderLimit_n);
         moFieldSalesOrderLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldSalesOrderLimitMonthly_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesOrderLimitMonthly_n, jlSalesOrderLimitMonthly_n);
         moFieldSalesOrderLimitMonthly_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldSalesDocLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesDocLimit_n, jlSalesDocLimit_n);
         moFieldSalesDocLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldSalesConLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesConLimit_n, jlSalesConLimit_n);
-        moFieldSalesConLimit_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldCapacityVolumeMinPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCapacityVolumeMinPer, jlCapacityVolumeMinPer);
         moFieldCapacityVolumeMinPercentage.setIsPercent(true);
         moFieldCapacityVolumeMinPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
@@ -526,15 +526,15 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         moFieldCapacityMassMinPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
 
         mvFields.add(moFieldIsPurchasesItemAllApplying);
+        mvFields.add(moFieldPurchasesConLimit_n);
         mvFields.add(moFieldPurchasesOrderLimit_n);
         mvFields.add(moFieldPurchasesOrderLimitMonthly_n);
         mvFields.add(moFieldPurchasesDocLimit_n);
-        mvFields.add(moFieldPurchasesConLimit_n);
         mvFields.add(moFieldIsSalesItemAllApplying);
+        mvFields.add(moFieldSalesConLimit_n);
         mvFields.add(moFieldSalesOrderLimit_n);
         mvFields.add(moFieldSalesOrderLimitMonthly_n);
         mvFields.add(moFieldSalesDocLimit_n);
-        mvFields.add(moFieldSalesConLimit_n);
         mvFields.add(moFieldCapacityVolumeMinPercentage);
         mvFields.add(moFieldCapacityMassMinPercentage);
 
@@ -806,14 +806,14 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
+        jtfCurrencyKeyPurchasesCon.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeyPurchasesOrder.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeyPurchasesOrderLimitMonthly_n.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeyPurchasesDoc.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-        jtfCurrencyKeyPurchasesCon.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+        jtfCurrencyKeySalesCon.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeySalesOrder.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeySalesOrderLimitMonthly_n.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeySalesDoc.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-        jtfCurrencyKeySalesCon.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jltFunctionalAreasUser.setListData(mvEmptyListItems);
     }
 
@@ -879,15 +879,15 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
         jtfUser.setText(moUserConfigurationTransaction.getDbmsUser());
         moFieldIsPurchasesItemAllApplying.setFieldValue(moUserConfigurationTransaction.getIsPurchasesItemAllApplying());
+        moFieldPurchasesConLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesContractLimit_n());
         moFieldPurchasesOrderLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesOrderLimit_n());
         moFieldPurchasesOrderLimitMonthly_n.setFieldValue(moUserConfigurationTransaction.getPurchasesOrderLimitMonthly_n());
         moFieldPurchasesDocLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesDocLimit_n());
-        moFieldPurchasesConLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesConLimit_n());
         moFieldIsSalesItemAllApplying.setFieldValue(moUserConfigurationTransaction.getIsSalesItemAllApplying());
+        moFieldSalesConLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesContractLimit_n());
         moFieldSalesOrderLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesOrderLimit_n());
         moFieldSalesOrderLimitMonthly_n.setFieldValue(moUserConfigurationTransaction.getSalesOrderLimitMonthly_n());
         moFieldSalesDocLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesDocLimit_n());
-        moFieldSalesConLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesConLimit_n());
         moFieldCapacityVolumeMinPercentage.setFieldValue(moUserConfigurationTransaction.getCapacityVolumeMinPercentage());
         moFieldCapacityMassMinPercentage.setFieldValue(moUserConfigurationTransaction.getCapacityMassMinPercentage());
         
@@ -907,15 +907,15 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         }
 
         moUserConfigurationTransaction.setIsPurchasesItemAllApplying(moFieldIsPurchasesItemAllApplying.getBoolean());
+        moUserConfigurationTransaction.setPurchasesContractLimit_n(moFieldPurchasesConLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesConLimit_n.getDouble());
         moUserConfigurationTransaction.setPurchasesOrderLimit_n(moFieldPurchasesOrderLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesOrderLimit_n.getDouble());
         moUserConfigurationTransaction.setPurchasesOrderLimitMonthly_n(moFieldPurchasesOrderLimitMonthly_n.getDouble() == 0 ? -1 : moFieldPurchasesOrderLimitMonthly_n.getDouble());
         moUserConfigurationTransaction.setPurchasesDocLimit_n(moFieldPurchasesDocLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesDocLimit_n.getDouble());
-        moUserConfigurationTransaction.setPurchasesConLimit_n(moFieldPurchasesConLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesConLimit_n.getDouble());
         moUserConfigurationTransaction.setIsSalesItemAllApplying(moFieldIsSalesItemAllApplying.getBoolean());
+        moUserConfigurationTransaction.setSalesContractLimit_n(moFieldSalesConLimit_n.getDouble() == 0 ? -1 : moFieldSalesConLimit_n.getDouble());
         moUserConfigurationTransaction.setSalesOrderLimit_n(moFieldSalesOrderLimit_n.getDouble() == 0 ? -1 : moFieldSalesOrderLimit_n.getDouble());
         moUserConfigurationTransaction.setSalesOrderLimitMonthly_n(moFieldSalesOrderLimitMonthly_n.getDouble() == 0 ? -1 : moFieldSalesOrderLimitMonthly_n.getDouble());
         moUserConfigurationTransaction.setSalesDocLimit_n(moFieldSalesDocLimit_n.getDouble() == 0 ? -1 : moFieldSalesDocLimit_n.getDouble());
-        moUserConfigurationTransaction.setSalesConLimit_n(moFieldSalesConLimit_n.getDouble() == 0 ? -1 : moFieldSalesConLimit_n.getDouble());
         moUserConfigurationTransaction.setCapacityVolumeMinPercentage(moFieldCapacityVolumeMinPercentage.getDouble());
         moUserConfigurationTransaction.setCapacityMassMinPercentage(moFieldCapacityMassMinPercentage.getDouble());
         
