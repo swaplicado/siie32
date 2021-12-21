@@ -66,7 +66,7 @@ public class SModDataUtils {
                 sql = "SELECT description FROM erp.locs_bol_county WHERE id_county_code = '" + code + "' AND id_sta_code = '" + stateCode + "' AND NOT b_del";
                 break;
             case SModConsts.LOCS_BOL_LOCALITY:
-                sql = "SELECT description FROM erp.locs_ccp_locality WHERE id_locality_code = '" + code + "' AND id_sta_code = '" + stateCode + "' AND NOT b_del";
+                sql = "SELECT description FROM erp.locs_bol_locality WHERE id_locality_code = '" + code + "' AND id_sta_code = '" + stateCode + "' AND NOT b_del";
                 break;
             default:
         }

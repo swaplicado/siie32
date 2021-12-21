@@ -2180,6 +2180,7 @@ public abstract class SCfdUtils implements Serializable {
         SDataDps dps = null;
         SDataCfdPayment cfdPayment = null;
         SDataPayrollReceiptIssue receiptIssue = null;
+        SDbBillOfLading bol = null;
         SSrvLock lock = null;
         SServerRequest request = null;
         SServerResponse response = null;
@@ -2335,6 +2336,20 @@ public abstract class SCfdUtils implements Serializable {
                                 }
                             }
                         }
+                    }
+                    break;
+                   
+                case SDataConstantsSys.TRNS_TP_CFD_BOL:       
+                    key = new int[] { cfd.getFkBillOfLadingId_n() };
+                    bol = new SDbBillOfLading();
+                    bol.read(client.getSession(), (int[]) key);
+                    
+                    if (bol == null) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
+                    }
+                    else {
+                        bol.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
+                        bol.disable(client.getSession().getDatabase().getConnection());
                     }
                     break;
                     
@@ -2745,13 +2760,13 @@ public abstract class SCfdUtils implements Serializable {
                     if (pacId == 0 && !existsPacConfiguration(client, cfd)) {
                         throw new Exception("No existe ningún PAC configurado para este tipo de CFDI.");
                     }
-                    else if (validateStamp) {
-                        if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
-                            if (pacId == 0) {
-                                throw new Exception("No existen timbres disponibles.");
-                            }
-                        }
-                    }
+//                    else if (validateStamp) {
+//                        if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
+//                            if (pacId == 0) {
+//                                throw new Exception("No existen timbres disponibles.");
+//                            }
+//                        }
+//                    }
 
                     if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         // Open Sign & Cancel Log entry:
