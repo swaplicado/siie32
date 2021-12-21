@@ -658,7 +658,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             if (testDisable("No se pudo anular ", SDbConsts.ACTION_ANNUL)) {
                 mnFkBillOfLadingStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
-                sSql = "UPDATE log_bol SET fid_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", "  +
+                sSql = "UPDATE log_bol SET fk_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", "  +
                         "fk_usr_upd = " + mnFkUserUpdateId + ", ts_usr_upd = NOW() " +
                         "WHERE id_bol = " + mnPkBolId + " ";
                 oStatement.execute(sSql);

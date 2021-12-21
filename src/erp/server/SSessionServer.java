@@ -589,6 +589,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                         }
                                     }
                                 }
+                                break;
                             default:
                         }
                     }
