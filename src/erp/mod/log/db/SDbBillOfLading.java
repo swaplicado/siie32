@@ -818,7 +818,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Autotransporte:
         
-        DElementAutotransporte autotransporte = encabezadoMercancias.getAutotransporteFederal();
+        DElementAutotransporte autotransporte = encabezadoMercancias.getEltAutotransporte();
         autotransporte.getAttPermSCT().setString(moBolTransportationMode.getXtaVehicle().getPermissonSctType());
         autotransporte.getAttNumPermisoSCT().setString(moBolTransportationMode.getXtaVehicle().getPermissonSctNumber());
         
