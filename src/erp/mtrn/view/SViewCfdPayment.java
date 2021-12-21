@@ -326,7 +326,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                     ArrayList<Object[]> journalVoucherKeys = SDataCfd.getDependentJournalVoucherKeys(miClient.getSession().getStatement(), cfd.getPkCfdId());
 //                    ArrayList<SSrvLock> locks = new ArrayList<>(); Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
-                    ArrayList<SRedisLock> rlocks = new ArrayList<>();
+                    ArrayList<SRedisLock> rLocks = new ArrayList<>();
                     
                     try {
                         try {
@@ -339,7 +339,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                                     locks.add(lock);
 */
                                     SRedisLock rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60); // 10 min.
-                                    rlocks.add(rlock);
+                                    rLocks.add(rlock);
                                 }
                             }
                         }
@@ -396,7 +396,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                             SSrvUtils.releaseLock(miClient.getSession(), lock);
                         }
 */
-                        for (SRedisLock rlock : rlocks) {
+                        for (SRedisLock rlock : rLocks) {
                             SRedisLockUtils.releaseLock(miClient, rlock);
                         }
                     }

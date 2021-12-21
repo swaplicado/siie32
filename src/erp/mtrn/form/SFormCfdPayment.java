@@ -1601,11 +1601,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
 */
-        SRedisLock rlock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
-        if (rlock == null) {
-            rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, record.getPrimaryKey(), record.getRegistryTimeout() / 1000);
-            if (rlock != null) {
-                moRecordRedisLocksMap.put(record.getRecordPrimaryKey(), rlock);
+        SRedisLock rLock = moRecordRedisLocksMap.get(record.getRecordPrimaryKey());
+        if (rLock == null) {
+            rLock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, record.getPrimaryKey(), record.getRegistryTimeout() / 1000);
+            if (rLock != null) {
+                moRecordRedisLocksMap.put(record.getRecordPrimaryKey(), rLock);
             }
         }
     }

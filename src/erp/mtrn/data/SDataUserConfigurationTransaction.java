@@ -140,7 +140,7 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
         mtUserEditTs = null;
         mtUserDeleteTs = null;
         
-        maUserFunctionalArea = new ArrayList<SDataUserFunctionalArea>();
+        maUserFunctionalArea = new ArrayList<>();
         maUserDnsDps = new ArrayList<>();
     }
 
