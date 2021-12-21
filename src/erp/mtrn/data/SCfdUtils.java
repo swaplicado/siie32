@@ -2760,13 +2760,13 @@ public abstract class SCfdUtils implements Serializable {
                     if (pacId == 0 && !existsPacConfiguration(client, cfd)) {
                         throw new Exception("No existe ningún PAC configurado para este tipo de CFDI.");
                     }
-//                    else if (validateStamp) {
-//                        if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
-//                            if (pacId == 0) {
-//                                throw new Exception("No existen timbres disponibles.");
-//                            }
-//                        }
-//                    }
+                    else if (validateStamp) {
+                        if (isNeedStamps(client, cfd, SDbConsts.ACTION_ANNUL, pacId) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), pacId) <= 0) {
+                            if (pacId == 0) {
+                                throw new Exception("No existen timbres disponibles.");
+                            }
+                        }
+                    }
 
                     if (!isSingle || client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         // Open Sign & Cancel Log entry:
