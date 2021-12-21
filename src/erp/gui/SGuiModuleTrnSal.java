@@ -74,7 +74,6 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import redis.clients.jedis.Jedis;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -1254,7 +1253,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         Now, XML of CFD will be generated and saved client-side by method SCfdUtils.computeCfdInvoice().
                         */
                         try {
-                            SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, SDataConstants.TRNX_CFD_PAY_REC, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
+                            //SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, SDataConstants.TRNX_CFD_PAY_REC, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                            SDataCfdPayment cfdPayment = new SDataCfdPayment();
+                            cfdPayment.setAuxReadJournalVoucherHeadersOnly(true); // prevent from reading entries of journal vouchers
+                            cfdPayment.read(moRegistry.getPrimaryKey(), miClient.getSession().getStatement()); // get last updated data in DBMS (e.g. edition timestamp)
                             cfdPayment.copyCfdMembers((SDataCfdPayment) moRegistry);
                             SCfdUtils.computeCfdiPayment(miClient, cfdPayment, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAY_REC));
                         }

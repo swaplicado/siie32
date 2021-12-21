@@ -76,6 +76,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     // auxiliar members:
     protected boolean mbAuxIsProcessingValidation;
     protected boolean mbAuxIsProcessingStorageOnly; // for temporary use only, to create the storage of all former receipts of payments prior to SIIE 3.2 191
+    protected boolean mbAuxReadJournalVoucherHeadersOnly; // it reduces dramatically reading time when entries and extra stuff of journal vouchers are useless
     
     /**
      * Creates database registry of CFDI of Payments.
@@ -160,9 +161,11 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     
     public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
     public void setAuxIsProcessingStorageOnly(boolean b) { mbAuxIsProcessingStorageOnly = b; }
+    public void setAuxReadJournalVoucherHeadersOnly(boolean b) { mbAuxReadJournalVoucherHeadersOnly = b; }
     
     public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
     public boolean getAuxIsProcessingStorageOnly() { return mbAuxIsProcessingStorageOnly; }
+    public boolean getAuxReadJournalVoucherHeadersOnly() { return mbAuxReadJournalVoucherHeadersOnly; }
     
     public void copyCfdMembers(final SDataCfdPayment sourceCfdPayment) {
         this.msAuxCfdConfirmacion = sourceCfdPayment.msAuxCfdConfirmacion;
@@ -235,6 +238,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
      */
     private void readPaymentFromReceiptPayment(final Statement statement) throws Exception {
         moDbmsReceiptPayment = new SDataReceiptPayment();
+        moDbmsReceiptPayment.setAuxReadJournalVoucherHeadersOnly(mbAuxReadJournalVoucherHeadersOnly);
         moDbmsReceiptPayment.read(new int[] { moDbmsDataCfd.getFkReceiptPaymentId_n() }, statement);
 
         // read 'Emisor' branch and business partner data objects:
@@ -694,7 +698,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         mnAuxFkUserDeleteId = 0;
         
         mbAuxIsProcessingValidation = false;
-        //mbAuxIsProcessingStorageOnly = false; prevent from reseting this flag
+        //mbAuxIsProcessingStorageOnly = false; // prevent from reseting this flag
+        //mbAuxReadJournalVoucherHeadersOnly = false; // prevent from reseting this flag
     }
 
     @Override

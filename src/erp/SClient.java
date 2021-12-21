@@ -2323,7 +2323,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         return APP_PROVIDER;
     }
 
-    @Override
+//    @Override
     public Object getLockManager() {
         moRedisLockManager = new SRedisLockManager();
         return moRedisLockManager;

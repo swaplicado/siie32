@@ -51,6 +51,8 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
     
     protected ArrayList<SDataReceiptPaymentPayDoc> maDbmsReceiptPaymentPayDocs;
     
+    protected boolean mbAuxReadJournalVoucherHeaderOnly; // it reduces dramatically reading time when entries and extra stuff of journal voucher are useless
+    
     /**
      * Creates a new payment of a payment receipt.
      * @param parentReceiptPayment Parent payment receipt.
@@ -134,7 +136,11 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
     
     public SDataRecord getDbmsRecord() { return moDbmsRecord; }
 
-    protected ArrayList<SDataReceiptPaymentPayDoc> getDbmsReceiptPaymentPayDocs() { return maDbmsReceiptPaymentPayDocs; }
+    public ArrayList<SDataReceiptPaymentPayDoc> getDbmsReceiptPaymentPayDocs() { return maDbmsReceiptPaymentPayDocs; }
+    
+    public void setAuxReadJournalVoucherHeaderOnly(boolean b) { mbAuxReadJournalVoucherHeaderOnly = b; }
+    
+    public boolean getAuxReadJournalVoucherHeaderOnly() { return mbAuxReadJournalVoucherHeaderOnly; }
     
     public int[] getBankPayeeKey() { return new int[] { mnFkBankPayeeCompanyBranchId_n, mnFkBankPayeeAccountCashId_n }; }
     
@@ -180,6 +186,8 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         moDbmsRecord = null;
         
         maDbmsReceiptPaymentPayDocs.clear();
+        
+        //mbAuxReadJournalVoucherHeaderOnly = false; // prevent from reseting this flag
     }
 
     @Override
@@ -230,6 +238,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                     if (moDbmsRecord == null) {
                         // financial record has not been read yet:
                         moDbmsRecord = new SDataRecord();
+                        moDbmsRecord.setAuxReadHeaderOnly(mbAuxReadJournalVoucherHeaderOnly);
                         moDbmsRecord.read(new Object[] { mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId }, statement);
                         moParentReceiptPayment.getXtaRecordsMap().put(recordKey, moDbmsRecord);
                     }
@@ -416,6 +425,8 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         for (SDataReceiptPaymentPayDoc payDoc : maDbmsReceiptPaymentPayDocs) {
             clone.getDbmsReceiptPaymentPayDocs().add(payDoc.clone());
         }
+        
+        clone.setAuxReadJournalVoucherHeaderOnly(mbAuxReadJournalVoucherHeaderOnly);
 
         return clone;
     }

@@ -58,6 +58,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     /** Map of financial records (journal vouchers) to optimize its retrieval from database reading each of them only once. */
     protected HashMap<String, SDataRecord> moXtaRecordsMap; // key = financial record PK as String; value = financial record
     
+    protected boolean mbAuxReadJournalVouchersHeaderOnly; // it reduces dramatically reading time when entries and extra stuff of journal vouchers are useless
+    
     /**
      * Creates a new payment receipt.
      */
@@ -133,6 +135,10 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
      */
     public HashMap<String, SDataRecord> getXtaRecordsMap() { return moXtaRecordsMap; }
     
+    public void setAuxReadJournalVoucherHeadersOnly(boolean b) { mbAuxReadJournalVouchersHeaderOnly = b; }
+    
+    public boolean getAuxReadJournalVoucherHeadersOnly() { return mbAuxReadJournalVouchersHeaderOnly; }
+    
     public void computePaymentLoc() {
         mdPaymentLoc_r = 0;
         
@@ -181,6 +187,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         maDbmsReceiptPaymentPays.clear();
         
         moXtaRecordsMap.clear();
+        
+        //mbAuxReadJournalVouchersHeaderOnly = false; // prevent from reseting this flag
     }
 
     @Override
@@ -238,6 +246,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                         ResultSet resultSetPays = statementPays.executeQuery(sql);
                         while (resultSetPays.next()) {
                             SDataReceiptPaymentPay pay = new SDataReceiptPaymentPay(this);
+                            pay.setAuxReadJournalVoucherHeaderOnly(mbAuxReadJournalVouchersHeaderOnly);
                             pay.read(new int[] { mnPkReceiptId, resultSetPays.getInt("id_pay") }, statement);
                             maDbmsReceiptPaymentPays.add(pay);
                         }
@@ -425,6 +434,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         }
         
         clone.getXtaRecordsMap().putAll(moXtaRecordsMap);
+        
+        clone.setAuxReadJournalVoucherHeadersOnly(mbAuxReadJournalVouchersHeaderOnly);
 
         return clone;
     }
