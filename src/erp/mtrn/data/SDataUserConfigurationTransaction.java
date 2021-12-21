@@ -29,12 +29,12 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
 
     protected int mnPkUserId;
     protected boolean mbIsPurchasesItemAllApplying;
-    protected double mdPurchasesConLimit_n;
+    protected double mdPurchasesContractLimit_n;
     protected double mdPurchasesOrderLimit_n;
     protected double mdPurchasesOrderLimitMonthly_n;
     protected double mdPurchasesDocLimit_n;
     protected boolean mbIsSalesItemAllApplying;
-    protected double mdSalesConLimit_n;
+    protected double mdSalesContractLimit_n;
     protected double mdSalesOrderLimit_n;
     protected double mdSalesOrderLimitMonthly_n;
     protected double mdSalesDocLimit_n;
@@ -60,12 +60,12 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
 
     public void setPkUserId(int n) { mnPkUserId = n; }
     public void setIsPurchasesItemAllApplying(boolean b) { mbIsPurchasesItemAllApplying = b; }
-    public void setPurchasesConLimit_n(double d) { mdPurchasesConLimit_n = d; }
+    public void setPurchasesContractLimit_n(double d) { mdPurchasesContractLimit_n = d; }
     public void setPurchasesOrderLimit_n(double d) { mdPurchasesOrderLimit_n = d; }
     public void setPurchasesOrderLimitMonthly_n(double d) { mdPurchasesOrderLimitMonthly_n = d; }
     public void setPurchasesDocLimit_n(double d) { mdPurchasesDocLimit_n = d; }
     public void setIsSalesItemAllApplying(boolean b) { mbIsSalesItemAllApplying = b; }
-    public void setSalesConLimit_n(double d) { mdSalesConLimit_n = d; }
+    public void setSalesContractLimit_n(double d) { mdSalesContractLimit_n = d; }
     public void setSalesOrderLimit_n(double d) { mdSalesOrderLimit_n = d; }
     public void setSalesOrderLimitMonthly_n(double d) { mdSalesOrderLimitMonthly_n = d; }
     public void setSalesDocLimit_n(double d) { mdSalesDocLimit_n = d; }
@@ -81,12 +81,12 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
 
     public int getPkUserId() { return mnPkUserId; }
     public boolean getIsPurchasesItemAllApplying() { return mbIsPurchasesItemAllApplying; }
-    public double getPurchasesConLimit_n() { return mdPurchasesConLimit_n; }
+    public double getPurchasesContractLimit_n() { return mdPurchasesContractLimit_n; }
     public double getPurchasesOrderLimit_n() { return mdPurchasesOrderLimit_n; }
     public double getPurchasesOrderLimitMonthly_n() { return mdPurchasesOrderLimitMonthly_n; }
     public double getPurchasesDocLimit_n() { return mdPurchasesDocLimit_n; }
     public boolean getIsSalesItemAllApplying() { return mbIsSalesItemAllApplying; }
-    public double getSalesConLimit_n() { return mdSalesConLimit_n; }
+    public double getSalesContractLimit_n() { return mdSalesContractLimit_n; }
     public double getSalesOrderLimit_n() { return mdSalesOrderLimit_n; }
     public double getSalesOrderLimitMonthly_n() { return mdSalesOrderLimitMonthly_n; }
     public double getSalesDocLimit_n() { return mdSalesDocLimit_n; }
@@ -121,12 +121,12 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
 
         mnPkUserId = 0;
         mbIsPurchasesItemAllApplying = false;
-        mdPurchasesConLimit_n = 0;
+        mdPurchasesContractLimit_n = 0;
         mdPurchasesOrderLimit_n = 0;
         mdPurchasesOrderLimitMonthly_n = 0;
         mdPurchasesDocLimit_n = 0;
         mbIsSalesItemAllApplying = false;
-        mdSalesConLimit_n = 0;
+        mdSalesContractLimit_n = 0;
         mdSalesOrderLimit_n = 0;
         mdSalesOrderLimitMonthly_n = 0;
         mdSalesDocLimit_n = 0;
@@ -165,9 +165,9 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                 mnPkUserId = resultSet.getInt("t.id_usr");
                 mbIsPurchasesItemAllApplying = resultSet.getBoolean("t.b_pur_item_all");
                 
-                mdPurchasesConLimit_n = resultSet.getDouble("t.pur_con_lim_n");
+                mdPurchasesContractLimit_n = resultSet.getDouble("t.pur_con_lim_n");
                 if (resultSet.wasNull()) {
-                    mdPurchasesConLimit_n = 0;
+                    mdPurchasesContractLimit_n = 0;
                 }
                 
                 mdPurchasesOrderLimit_n = resultSet.getDouble("t.pur_ord_lim_n");
@@ -186,9 +186,9 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                 
                 mbIsSalesItemAllApplying = resultSet.getBoolean("t.b_sal_item_all");
                 
-                mdSalesConLimit_n = resultSet.getDouble("t.sal_con_lim_n");
+                mdSalesContractLimit_n = resultSet.getDouble("t.sal_con_lim_n");
                 if (resultSet.wasNull()) {
-                    mdSalesConLimit_n = 0;
+                    mdSalesContractLimit_n = 0;
                 }
                 
                 mdSalesOrderLimit_n = resultSet.getDouble("t.sal_ord_lim_n");
@@ -285,12 +285,12 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                     "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkUserId);
             callableStatement.setBoolean(nParam++, mbIsPurchasesItemAllApplying);
-            if (mdPurchasesConLimit_n >= 0) callableStatement.setDouble(nParam++, mdPurchasesConLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
+            if (mdPurchasesContractLimit_n >= 0) callableStatement.setDouble(nParam++, mdPurchasesContractLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
             if (mdPurchasesOrderLimit_n >= 0) callableStatement.setDouble(nParam++, mdPurchasesOrderLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
             if (mdPurchasesOrderLimitMonthly_n >= 0) callableStatement.setDouble(nParam++, mdPurchasesOrderLimitMonthly_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
             if (mdPurchasesDocLimit_n >= 0) callableStatement.setDouble(nParam++, mdPurchasesDocLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
             callableStatement.setBoolean(nParam++, mbIsSalesItemAllApplying);
-            if (mdSalesConLimit_n >= 0) callableStatement.setDouble(nParam++, mdSalesConLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
+            if (mdSalesContractLimit_n >= 0) callableStatement.setDouble(nParam++, mdSalesContractLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
             if (mdSalesOrderLimit_n >= 0) callableStatement.setDouble(nParam++, mdSalesOrderLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
             if (mdSalesOrderLimitMonthly_n >= 0) callableStatement.setDouble(nParam++, mdSalesOrderLimitMonthly_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);
             if (mdSalesDocLimit_n >= 0) callableStatement.setDouble(nParam++, mdSalesDocLimit_n); else callableStatement.setNull(nParam++, java.sql.Types.DECIMAL);

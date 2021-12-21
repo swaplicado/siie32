@@ -68,13 +68,13 @@ public abstract class STrnDpsUtilities {
         boolean authorized = true;
         if (dps.isDpsTypeContract()) {
             if (dps.isDpsTypeContractPur()) {
-                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesConAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationPurchasesContractAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
                     authorized = false;
                     client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
                 }
             }
             else {
-                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesConAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                if (client.getSessionXXX().getParamsCompany().getIsAuthorizationSalesContractAutomatic() && dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
                     authorized = false;
                     client.showMsgBoxWarning(SLibConstants.MSG_INF_NOT_AUTHORN_CON);
                 }

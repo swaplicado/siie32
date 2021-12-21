@@ -319,10 +319,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         boolean authorized = false;
         
         if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CON)) {
-            authorized = userConfigTxn.getPurchasesConLimit_n() == 0; // limit of zero means no limit
+            authorized = userConfigTxn.getPurchasesContractLimit_n() == 0; // limit of zero means no limit
 
             if (!authorized) {
-                authorized = mdTotal_r <= userConfigTxn.getPurchasesConLimit_n();
+                authorized = mdTotal_r <= userConfigTxn.getPurchasesContractLimit_n();
             }
         }
         else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD)) {
@@ -340,10 +340,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
         }
         else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
-            authorized = userConfigTxn.getSalesConLimit_n() == 0; // limit of zero means no limit
+            authorized = userConfigTxn.getSalesContractLimit_n() == 0; // limit of zero means no limit
 
             if (!authorized) {
-                authorized = mdTotal_r <= userConfigTxn.getSalesConLimit_n();
+                authorized = mdTotal_r <= userConfigTxn.getSalesContractLimit_n();
             }
         }
         else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD)) {
@@ -520,10 +520,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     private void updateAuthorizationStatus(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
-        boolean isAutPurCon = false;
+        boolean isAutPurContract = false;
         boolean isAutPurOrd = false;
         boolean isAutPurDps = false;
-        boolean isAutSalCon = false;
+        boolean isAutSalContract = false;
         boolean isAutSalOrd = false;
         boolean isAutSalDps = false;
         String sql = "";
@@ -547,16 +547,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
                 else {
-                    isAutPurCon = resultSet.getBoolean("b_authorn_pur_con");
+                    isAutPurContract = resultSet.getBoolean("b_authorn_pur_con");
                     isAutPurOrd = resultSet.getBoolean("b_authorn_pur_ord");
                     isAutPurDps = resultSet.getBoolean("b_authorn_pur_doc");
-                    isAutSalCon = resultSet.getBoolean("b_authorn_sal_con");
+                    isAutSalContract = resultSet.getBoolean("b_authorn_sal_con");
                     isAutSalOrd = resultSet.getBoolean("b_authorn_sal_ord");
                     isAutSalDps = resultSet.getBoolean("b_authorn_sal_doc");
                 }
             }
 
-            if (isDpsTypeContractPur() && isAutPurCon || isDpsTypeContractSal() && isAutSalCon || isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || 
+            if (isDpsTypeContractPur() && isAutPurContract || isDpsTypeContractSal() && isAutSalContract || isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || 
                     isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps) {
                 if (isDpsAuthorized(connection)) {
                     mbIsAuthorized = true;

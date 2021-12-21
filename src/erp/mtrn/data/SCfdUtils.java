@@ -62,6 +62,7 @@ import erp.mod.hrs.db.SHrsFormerReceiptConcept;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mtrn.form.SDialogRestoreCfdi;
 import erp.print.SDataConstantsPrint;
+import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -114,7 +115,6 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.redis.SRedisLock;
-import sa.lib.srv.SSrvUtils;
 import sa.lib.xml.SXmlUtils;
 import views.core.soap.services.apps.CancelaCFDResult; 
 import views.core.soap.services.apps.FolioArray; 
@@ -705,7 +705,10 @@ public abstract class SCfdUtils implements Serializable {
                     
                 case SDataConstantsSys.TRNS_TP_CFD_BOL:
                     registryKey = new int[] { dataCfd.getFkBillOfLadingId_n() } ;
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                     lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.LOG_BOL, registryKey, 1000 * 60);
+*/                    
+                    rlock = SRedisLockUtils.gainLock(client, SModConsts.LOG_BOL, registryKey, 60);
                     break;
                 default:
             }

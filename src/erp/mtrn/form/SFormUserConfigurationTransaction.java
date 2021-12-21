@@ -879,12 +879,12 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
 
         jtfUser.setText(moUserConfigurationTransaction.getDbmsUser());
         moFieldIsPurchasesItemAllApplying.setFieldValue(moUserConfigurationTransaction.getIsPurchasesItemAllApplying());
-        moFieldPurchasesConLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesConLimit_n());
+        moFieldPurchasesConLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesContractLimit_n());
         moFieldPurchasesOrderLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesOrderLimit_n());
         moFieldPurchasesOrderLimitMonthly_n.setFieldValue(moUserConfigurationTransaction.getPurchasesOrderLimitMonthly_n());
         moFieldPurchasesDocLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesDocLimit_n());
         moFieldIsSalesItemAllApplying.setFieldValue(moUserConfigurationTransaction.getIsSalesItemAllApplying());
-        moFieldSalesConLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesConLimit_n());
+        moFieldSalesConLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesContractLimit_n());
         moFieldSalesOrderLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesOrderLimit_n());
         moFieldSalesOrderLimitMonthly_n.setFieldValue(moUserConfigurationTransaction.getSalesOrderLimitMonthly_n());
         moFieldSalesDocLimit_n.setFieldValue(moUserConfigurationTransaction.getSalesDocLimit_n());
@@ -907,12 +907,12 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         }
 
         moUserConfigurationTransaction.setIsPurchasesItemAllApplying(moFieldIsPurchasesItemAllApplying.getBoolean());
-        moUserConfigurationTransaction.setPurchasesConLimit_n(moFieldPurchasesConLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesConLimit_n.getDouble());
+        moUserConfigurationTransaction.setPurchasesContractLimit_n(moFieldPurchasesConLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesConLimit_n.getDouble());
         moUserConfigurationTransaction.setPurchasesOrderLimit_n(moFieldPurchasesOrderLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesOrderLimit_n.getDouble());
         moUserConfigurationTransaction.setPurchasesOrderLimitMonthly_n(moFieldPurchasesOrderLimitMonthly_n.getDouble() == 0 ? -1 : moFieldPurchasesOrderLimitMonthly_n.getDouble());
         moUserConfigurationTransaction.setPurchasesDocLimit_n(moFieldPurchasesDocLimit_n.getDouble() == 0 ? -1 : moFieldPurchasesDocLimit_n.getDouble());
         moUserConfigurationTransaction.setIsSalesItemAllApplying(moFieldIsSalesItemAllApplying.getBoolean());
-        moUserConfigurationTransaction.setSalesConLimit_n(moFieldSalesConLimit_n.getDouble() == 0 ? -1 : moFieldSalesConLimit_n.getDouble());
+        moUserConfigurationTransaction.setSalesContractLimit_n(moFieldSalesConLimit_n.getDouble() == 0 ? -1 : moFieldSalesConLimit_n.getDouble());
         moUserConfigurationTransaction.setSalesOrderLimit_n(moFieldSalesOrderLimit_n.getDouble() == 0 ? -1 : moFieldSalesOrderLimit_n.getDouble());
         moUserConfigurationTransaction.setSalesOrderLimitMonthly_n(moFieldSalesOrderLimitMonthly_n.getDouble() == 0 ? -1 : moFieldSalesOrderLimitMonthly_n.getDouble());
         moUserConfigurationTransaction.setSalesDocLimit_n(moFieldSalesDocLimit_n.getDouble() == 0 ? -1 : moFieldSalesDocLimit_n.getDouble());
