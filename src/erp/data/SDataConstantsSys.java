@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Claudio Peña, Adrián Avilés
  * 
  */
 public abstract class SDataConstantsSys {
@@ -201,6 +201,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_DPS_DNC = 103002;
     public static final int PRV_PUR_DPS_PRT_FMT = 103003;
     public static final int PRV_PUR_DOC_EST = 103006;
+    public static final int PRV_PUR_DOC_EST_AUTHORN = 103071;
     public static final int PRV_PUR_DOC_ORD = 103007;
     public static final int PRV_PUR_DOC_ORD_AUTHORN = 103008;
     public static final int PRV_PUR_DOC_TRN = 103009;
@@ -225,13 +226,13 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_ITEM_SUP = 103051;
     public static final int PRV_PUR_DOC_EST_CLO = 103056;
     public static final int PRV_PUR_DOC_ORD_CLO = 103057;
-    public static final int PRV_PUR_DOC_CON_AUTHORN = 103071;
     public static final int PRV_PUR_REP = 103901;
     
     public static final int PRV_SAL_DPS_DNS = 104001;
     public static final int PRV_SAL_DPS_DNC = 104002;
     public static final int PRV_SAL_DPS_PRT_FMT = 104003;
     public static final int PRV_SAL_DOC_EST = 104006;
+    public static final int PRV_SAL_DOC_EST_AUTHORN = 104071;
     public static final int PRV_SAL_DOC_ORD = 104007;
     public static final int PRV_SAL_DOC_ORD_AUTHORN = 104008;
     public static final int PRV_SAL_DOC_TRN = 104009;
@@ -257,7 +258,6 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_ORD_CLO = 104057;
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
     public static final int PRV_SAL_COMP_SIGN_REST = 104062;
-    public static final int PRV_SAL_DOC_CON_AUTHORN = 104071;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;
@@ -361,6 +361,7 @@ public abstract class SDataConstantsSys {
 
     public static final int ROL_PUR_ADMOR = 103001;
     public static final int ROL_PUR_EST = 103002;
+    public static final int ROL_PUR_EST_SUPR = 103011;
     public static final int ROL_PUR_ORD = 103003;
     public static final int ROL_PUR_ORD_SUPR = 103004;
     public static final int ROL_PUR_TRN = 103005;
@@ -371,6 +372,7 @@ public abstract class SDataConstantsSys {
 
     public static final int ROL_SAL_ADMOR = 104001;
     public static final int ROL_SAL_EST = 104002;
+    public static final int ROL_SAL_EST_SUPR = 104011;
     public static final int ROL_SAL_ORD = 104003;
     public static final int ROL_SAL_ORD_SUPR = 104004;
     public static final int ROL_SAL_TRN = 104005;
