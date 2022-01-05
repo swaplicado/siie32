@@ -3210,6 +3210,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             aAccCfgPrepayments.add(oAccCfgPrepayments);
                             
                             for (int[] tax : taxes) {
+                                if (tax[0] == 0 && tax[1] == 0) continue;
+                                
                                 java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> v = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                     mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), tax, oStatement);
@@ -3232,6 +3234,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             aAccCfgPrepaymentsToInvoice.add(oAccCfgPrepaymentsToInvoice);
                             
                             for (int[] tax : taxes) {
+                                if (tax[0] == 0 && tax[1] == 0) continue;
+                                
                                 java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> v = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                                 mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                                 mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), tax, oStatement);
