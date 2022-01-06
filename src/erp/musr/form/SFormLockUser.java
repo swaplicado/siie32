@@ -33,7 +33,7 @@ public class SFormLockUser extends javax.swing.JDialog implements erp.lib.form.S
     public SFormLockUser(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        jedis = miClient.getJedis();
+        //jedis = miClient.getJedis();
         initComponents();
         initComponentsExtra();
     }

@@ -92,8 +92,10 @@ public abstract class SRedisLockUtils {
      */
     public static void releaseLock(erp.client.SClientInterface client, SRedisLock redisLock) {
         if (SRedisConnectionUtils.getConnectionStatus(client)) {
+/* Bloque de codigo correspondiente a los candados de Redis
             Jedis jedis = client.getJedis();
             jedis.del(redisLock.getLockKey().getLockKey());
+*/            
         } else if (!redisLock.getLockKey().isDummy()) {
             client.showMsgBoxWarning("No se eliminó el candado de acceso exclusivo al registro.\n"
                     + "Favor de comunicarlo al administrador del sistema");
@@ -184,7 +186,7 @@ public abstract class SRedisLockUtils {
         int userId = client.getSessionXXX().getUser().getPkUserId();
         String registryPkFlatten = setFlattenPk(registryType, registryPk);
         SRedisLock redisLock = null;
-
+/* Bloque de codigo correspondiente a los candados de Redis
         if (SRedisConnectionUtils.getConnectionStatus(client)) {
             Jedis jedis = client.getJedis();
             SRedisLockKey lockKey = getLockKeyFromRedis(jedis, companyId, registryType, registryPkFlatten);
@@ -211,7 +213,7 @@ public abstract class SRedisLockUtils {
         else {
             redisLock = gainLockDummy(client, registryType, registryPk, timeout);
         }
-
+*/
         return redisLock;
     }
 
@@ -309,7 +311,7 @@ public abstract class SRedisLockUtils {
      */
     public static SRedisLock verifyLockStatus(erp.client.SClientInterface client, SRedisLock rlock) throws Exception {
         Date lastTs = getLastUpdateTs(client, rlock.getLockKey().getRegistryType(), rlock.getRegistryPk());
-
+/* Bloque de codigo correspondiente a los candados de Redis
         if (lastTs != null) {
             if (!lastTs.after(rlock.getLockTimestamp())) {
                 if (SRedisConnectionUtils.getConnectionStatus(client)) {
@@ -336,6 +338,7 @@ public abstract class SRedisLockUtils {
                 throw new Exception("El registro ha sido modificado");
             }
         }
+*/        
         return rlock;
     }
 

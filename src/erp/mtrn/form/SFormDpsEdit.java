@@ -44,6 +44,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
+import sa.lib.srv.SSrvLock;
+import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
@@ -250,10 +252,11 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             moConceptTablePane.getTable().requestFocus();
         }
         if(mbDocuentsLockedError) {
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
             releaseDpsUserLock();
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
             releaseDpsUserRedisLock();
+*/            
             setVisible(false);
         }
     }
@@ -410,25 +413,26 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         if (dps != moDps) {
             if (dps != null) { 
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
             SSrvLock lock = gainDpsUserLock(dps);
                 if (lock != null) {
                     dps.setAuxUserLock(lock);
                     error = false;
                 }
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
                 SRedisLock rlock = gainDpsUserRedisLock(dps);
                 if (rlock != null) {
                     dps.setAuxUserRedisLock(rlock);
                     error = false;
                 }
+*/                
             }
         }
         else error = false;
 
         return error;
     }
-    
+/* Bloque de codigo correspondiente a los candados de Redis
     private sa.lib.srv.redis.SRedisLock gainDpsUserRedisLock(SDataDps dps) {
         SRedisLock rlock;
 
@@ -443,8 +447,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         return rlock;
     }
-    
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+*/    
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
     private sa.lib.srv.SSrvLock gainDpsUserLock(SDataDps dps) {
         SSrvLock lock;
 
@@ -459,8 +463,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         return lock;
     }
-*/
-    
+
+/* Bloque de codigo correspondiente a los candados de Redis    
     private void releaseDpsUserRedisLock() {
         moDocuments.stream().forEach((document) -> {
             sa.lib.srv.redis.SRedisLock rlock = document.getAuxUserRedisLock();
@@ -476,7 +480,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
         });
     }
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+*/    
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
     private void releaseDpsUserLock() {
         moDocuments.stream().forEach((document) -> {
             sa.lib.srv.SSrvLock lock = document.getAuxUserLock();
@@ -492,7 +497,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
         });
     }
-*/    
+    
     private void populateTable() {
         moConceptTablePane.createTable();
         
@@ -658,10 +663,11 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     }
 
     private void actionCancel() {
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
         releaseDpsUserLock();
-*/        
+/* Bloque de codigo correspondiente a los candados de Redis        
         releaseDpsUserRedisLock();
+*/        
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }

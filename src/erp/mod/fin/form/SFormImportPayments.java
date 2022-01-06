@@ -50,6 +50,8 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
+import sa.lib.srv.SSrvLock;
+import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
@@ -88,11 +90,11 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     private int renderOption;
     
     private HashMap<Integer, Object> moParamsMap;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
     private ArrayList<SSrvLock> maLocks;
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
     private ArrayList<SRedisLock> maRedisLocks;
-    
+*/    
 
     /**
      * Creates new form SFormImportPayments
@@ -666,11 +668,11 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         jpSettings.add(moGridPayments, BorderLayout.CENTER);
         moImportation = new SImportPayments(miClient);
         mvDeposits = new Vector<>();
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
         maLocks = new ArrayList<>();
-*/        
+/* Bloque de codigo correspondiente a los candados de Redis        
         maRedisLocks = new ArrayList<>();
-        
+*/        
         renderOption = ST_REGISTRY_NEW;
     }
     
@@ -769,10 +771,11 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     
     private void getRecordLocks() throws Exception {
         boolean exists = false;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
         SSrvLock lock = null;
-*/      
+/* Bloque de codigo correspondiente a los candados de Redis      
         SRedisLock rlock = null;
+*/        
         SAnalystDepositRow anaRow = null;
         ArrayList<Object> recordKeys = new ArrayList<>();
         
@@ -788,12 +791,13 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                     }
                 }
                 if (!exists) {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
                     maLocks.add(lock);
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
                     rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
                     maRedisLocks.add(rlock);
+*/                    
                     recordKeys.add(anaRow.getRecord().getPrimaryKey());
                 }
             }
@@ -1256,15 +1260,15 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         childRegistry.getDepositsRows().addAll(maAllDeposits);
         
         registry.getAnalystImportations().put(miClient.getSession().getUser().getPkUserId(), childRegistry);
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
         if (!maLocks.isEmpty()) {
             registry.getLocks().addAll(maLocks);
         }
-*/        
+/* Bloque de codigo correspondiente a los candados de Redis        
         if (!maRedisLocks.isEmpty()) {
             registry.getRedisLocks().addAll(maRedisLocks);
         }
-        
+*/        
         return registry;
     }
 
@@ -1291,14 +1295,15 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
             
             if (validation.isValid()) {
                 try {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
                     for (SSrvLock lock : maLocks) {
                         SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
                     }
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
                     for (SRedisLock rlock : maRedisLocks) {
                         SRedisLockUtils.verifyLockStatus((SClientInterface) miClient, rlock);
                     }
+*/                    
                 }
                 catch (Exception e) {
                     validation.setMessage("No fue posible validar el acceso exclusivo al registro de una de las pólizas seleccionadas." + e);
@@ -1338,14 +1343,15 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
     public void actionCancel() {
         if (jbCancel.isEnabled()) {
             try {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
                 for (SSrvLock lock : maLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
                 for (SRedisLock rlock : maRedisLocks) {
                     SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                 }
+*/        
             }
             catch (Exception e) {
                 SLibUtils.showException(this, e);

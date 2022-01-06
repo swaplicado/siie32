@@ -61,6 +61,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
+import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvRequest;
 import sa.lib.srv.SSrvResponse;
 
@@ -697,7 +698,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
     @Override
     public SSrvResponse request(SSrvRequest request) throws RemoteException {
         SSrvResponse response = new SSrvResponse(SSrvConsts.RESP_TYPE_OK);
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
         SSrvLock lock = null;
         try {
             switch (request.getRequestType()) {
@@ -733,7 +734,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
             response.setMessage(e.toString());
             moServer.renderMessageLn(msSessionServer + e);
         }
-*/
+
         return response;
     }
 

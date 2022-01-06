@@ -31,7 +31,7 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
     public java.util.Vector<java.lang.Object> getRegistryComplements(){
         java.util.Vector<java.lang.Object> locks = new java.util.Vector();
         moDocuments.stream().forEach((document) -> {
-            locks.add(document.getAuxUserRedisLock());
+            locks.add(document.getAuxUserLock());
         });
         return locks;
     }

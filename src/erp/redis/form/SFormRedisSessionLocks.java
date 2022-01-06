@@ -29,7 +29,9 @@ public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.l
      */
     public SFormRedisSessionLocks(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
+        /* Bloque de codigo correspondiente a los candados de Redis
         moJedis = client.getJedis();
+        */
         initComponents();
         initComponentsExtra();
     }

@@ -62,6 +62,8 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
+import sa.lib.srv.SSrvLock;
+import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
 
@@ -1544,21 +1546,22 @@ public class SDbBankLayout extends SDbRegistryUser {
      */
     public boolean updateLayoutStatus(SGuiClient client, int newLayoutStatus) throws Exception {
         boolean done = false;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
         SSrvLock lock = null;
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
         SRedisLock rlock = null;
+*/        
         
         try {
             mnLayoutStatus = newLayoutStatus;
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
             lock = SSrvUtils.gainLock(client.getSession(), 
                     ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId(), 
                     SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
-*/            
+/* Bloque de codigo correspondiente a los candados de Redis            
             rlock = SRedisLockUtils.gainLock((SClientInterface) client, SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout() / 1000);
-            
-            if (rlock != null) {
+*/            
+            if (lock != null) {
                 String sql = "UPDATE " + getSqlTable() + " SET "
                         + "lay_st = " + mnLayoutStatus + "" + 
                         (mnLayoutStatus == SDbBankLayout.STATUS_APPROVED ? ", auth_req = " + ++mnAuthorizationRequests : "") + " " + // if needed, increment count of requests
@@ -1566,19 +1569,21 @@ public class SDbBankLayout extends SDbRegistryUser {
                 client.getSession().getStatement().execute(sql);
                 done = true;
             }
+            
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
         finally {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
             }
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
             if (rlock != null) {
                 SRedisLockUtils.releaseLock((SClientInterface) (client), rlock);
             }
+*/            
         }
         
         return done;

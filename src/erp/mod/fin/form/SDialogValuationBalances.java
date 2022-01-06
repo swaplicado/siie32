@@ -34,6 +34,8 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
+import sa.lib.srv.SSrvLock;
+import sa.lib.srv.SSrvUtils;
 import sa.lib.srv.redis.SRedisLock;
 
 /**
@@ -448,11 +450,11 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
     @Override
     public void actionSave() {
         String msg;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
         SSrvLock lock = null;
-*/        
+/* Bloque de codigo correspondiente a los candados de Redis        
         SRedisLock rlock = null;
-        
+*/        
         SValuationBalances sbe;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
@@ -464,11 +466,11 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
             
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
                 try {
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
-*/                    
+/* Bloque de codigo correspondiente a los candados de Redis                    
                     rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout() / 1000);
-                    
+*/                    
                     sbe = new SValuationBalances(miClient);
                     sbe.setRecYear(moCalYear.getValue());
                     sbe.setRecPeriod(moCalPeriod.getValue());
@@ -488,14 +490,15 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
                 }
                 finally {
                     try {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
                         if (lock != null) {
                             SSrvUtils.releaseLock(miClient.getSession(), lock);
                         }
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
                         if (rlock != null) {
                             SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                         }
+*/        
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
