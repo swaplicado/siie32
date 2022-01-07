@@ -12,7 +12,7 @@ import erp.lib.form.SFormExtendedInterface;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
-import erp.redis.SRedisLockUtils;
+import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -21,10 +21,8 @@ import java.lang.reflect.Constructor;
 import java.util.Vector;
 import sa.lib.SLibMethod;
 import sa.lib.SLibUtils;
+import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -40,11 +38,13 @@ public abstract class SGuiModule {
     protected erp.lib.data.SDataRegistry moRegistry;
     protected erp.lib.form.SFormInterface miForm;
     protected java.awt.Cursor moCursor;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
+    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected java.util.Vector<sa.lib.srv.SSrvLock> mvIndependentLocks;
-/* Bloque de codigo correspondiente a los candados de Redis    
+    */
+    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
     protected java.util.Vector<sa.lib.srv.redis.SRedisLock> mvIndependentRedisLocks;
-*/    
+    */  
+    protected java.util.Vector<sa.lib.srv.SLock> mvIndependentSLocks;
     // form option pickers:
     protected java.util.Vector<erp.lib.form.SFormOptionPickerInterface> mvOptionPickers;
     
@@ -59,11 +59,13 @@ public abstract class SGuiModule {
     public SGuiModule(erp.client.SClientInterface client, int type) {
         miClient = client;
         mnModuleType = type;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         mvIndependentLocks = new Vector<>();
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */        
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         mvIndependentRedisLocks = new Vector<>();
-*/        
+        */
+        mvIndependentSLocks = new Vector<>();
         mvOptionPickers = new Vector<>();
         
         clearFormMembers();
@@ -76,11 +78,13 @@ public abstract class SGuiModule {
         moRegistry = null;
         miForm = null;
         moCursor = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro  */     
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro     
         mvIndependentLocks.clear();
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         mvIndependentRedisLocks.clear();
-*/        
+        */
+        mvIndependentSLocks.clear();
     }
 
     protected void clearFormComplement() {
@@ -163,11 +167,13 @@ public abstract class SGuiModule {
         SServerRequest request = null;
         SServerResponse response = null;
         SDataRegistry registry = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro  */     
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro     
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock redisLock = null;
-*/        
+        */
+        SLock slock = null;
         SClientDaemonTimeout daemonTimeout = null;
         SLibMethod method = null;
 
@@ -177,11 +183,13 @@ public abstract class SGuiModule {
         if (pk != null) {
             if (!mbIsFormReadOnly && !isCopy) {
                 // Attempt to gain data lock:
-/* Bloque de codigo correspondiente a los candados de Redis
-                redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout()/1000);
-*/
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
                 lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout());             
+                */
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout()/1000);
+                */
+                slock = SLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, moRegistry.getRegistryTimeout());
             }
 
             // Read data registry:
@@ -191,31 +199,37 @@ public abstract class SGuiModule {
             request.setPacket(moRegistry);
             response = miClient.getSessionXXX().request(request);
             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-/* Bloque de codigo correspondiente a los candados de Redis
-                if (redisLock != null) {
-                    SRedisLockUtils.releaseLock(miClient, redisLock);
-                }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-
+                */
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                if (redisLock != null) {
+                    SRedisLockUtils.releaseLock(miClient, redisLock);
+                }
+                */
+                if (slock != null) {
+                    SLockUtils.releaseLock(miClient, slock);
+                }
                 throw new Exception(response.getMessage());
             }
             else {
                 result = response.getResultType();
                 if (result != SLibConstants.DB_ACTION_READ_OK) {
-/* Bloque de codigo correspondiente a los candados de Redis                    
-                    if (redisLock != null) {
-                        SRedisLockUtils.releaseLock(miClient, redisLock);
-                    }
-*/                    
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
+                    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
                     if (lock != null) {
                         SSrvUtils.releaseLock(miClient.getSession(), lock);
                     }
-
+                    */
+                    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                    if (redisLock != null) {
+                        SRedisLockUtils.releaseLock(miClient, redisLock);
+                    }
+                    */
+                    if (slock != null) {
+                        SLockUtils.releaseLock(miClient, slock);
+                    }
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
                 }
                 else {
@@ -248,57 +262,72 @@ public abstract class SGuiModule {
         }
 
         if (result != SLibConstants.FORM_RESULT_OK) {
-/* Bloque de codigo correspondiente a los candados de Redis    
-            if (redisLock != null) {
-                SRedisLockUtils.releaseLock(miClient, redisLock);
-            }
-*/    
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+            if (redisLock != null) {
+                SRedisLockUtils.releaseLock(miClient, redisLock);
+            }
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
+            }
         }
         else {
             registry = miForm.getRegistry();
-/* Bloque de codigo correspondiente a los candados de Redis
-            if (redisLock != null) {
-                // Verify that user still has data lock:
-                redisLock = SRedisLockUtils.verifyLockStatus(miClient, redisLock);
-            }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
             if (lock != null) {
                 // Verify that user still has data lock:
                 lock = SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
+            }
+            */  
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+            if (redisLock != null) {
+                redisLock = SRedisLockUtils.verifyLockStatus(miClient, redisLock);
+            }
+            */
+            if (slock != null) {
+                slock = SLockUtils.verifyLockStatus(miClient, slock);
             }
             
             // Verify that independent locks are still valid:
 
             for (Object complement : registry.getRegistryComplements()) {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                 if (complement instanceof SSrvLock) {
                     mvIndependentLocks.add((SSrvLock) complement);
                 }
-/* Bloque de codigo correspondiente a los candados de Redis
+                */  
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                 if (complement instanceof SRedisLock) {
                     mvIndependentRedisLocks.add((SRedisLock) complement);
                 }
-*/                
+                */  
+                if (complement instanceof SLock) {
+                    mvIndependentSLocks.add((SLock) complement);
+                }
             }
             
-/* Bloque de codigo correspondiente a los candados de Redis            
-            for (int i = 0; i < mvIndependentRedisLocks.size(); i++) {
-                SRedisLock irl = SRedisLockUtils.verifyLockStatus(miClient, mvIndependentRedisLocks.get(i));
-                mvIndependentRedisLocks.set(i, irl);
-            }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             for (int i = 0; i < mvIndependentLocks.size(); i++) {
                 SSrvLock il = SSrvUtils.verifyLockStatus(miClient.getSession(), mvIndependentLocks.get(i));
                 mvIndependentLocks.set(i, il);
             }
-           
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+            for (int i = 0; i < mvIndependentRedisLocks.size(); i++) {
+                SRedisLock irl = SRedisLockUtils.verifyLockStatus(miClient, mvIndependentRedisLocks.get(i));
+                mvIndependentRedisLocks.set(i, irl);
+            }
+            */
+            for (int i = 0; i < mvIndependentSLocks.size(); i++) {
+                SLock sl = SLockUtils.verifyLockStatus(miClient, mvIndependentSLocks.get(i));
+                mvIndependentSLocks.set(i, sl);
+            }
+            
             // Save data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
@@ -306,16 +335,7 @@ public abstract class SGuiModule {
             response = miClient.getSessionXXX().request(request);
 
             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-/* Bloque de codigo correspondiente a los candados de Redis                
-                if (redisLock != null) {
-                    SRedisLockUtils.releaseLock(miClient, redisLock);
-                }
-                
-                for (SRedisLock irl : mvIndependentRedisLocks) {
-                    SRedisLockUtils.releaseLock(miClient, irl);
-                }
-*/                
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro  */              
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro             
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
@@ -323,40 +343,8 @@ public abstract class SGuiModule {
                 for (SSrvLock il : mvIndependentLocks) {
                    SSrvUtils.releaseLock(miClient.getSession(), il);
                 }
-                
-
-                throw new Exception(response.getMessage());
-            }
-            else {
-                result = response.getResultType();
-
-                if (result != SLibConstants.DB_ACTION_SAVE_OK) {
-/* Bloque de codigo correspondiente a los candados de Redis
-                    if (redisLock != null) {
-                        SRedisLockUtils.releaseLock(miClient, redisLock);
-                    }
-                    
-                    for (SRedisLock irl : mvIndependentRedisLocks) {
-                         SRedisLockUtils.releaseLock(miClient, irl);
-                    }
-*/                    
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro   */                 
-                    if (lock != null) {
-                        SSrvUtils.releaseLock(miClient.getSession(), lock);
-                    }
-                    
-                    for (SSrvLock il : mvIndependentLocks) {
-                        SSrvUtils.releaseLock(miClient.getSession(), il);
-                    }
-                    
-
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
-                }
-                else {
-                    moRegistry = (SDataRegistry) response.getPacket();
-                    moLastSavedPrimaryKey = moRegistry.getPrimaryKey();
-                }
-/* Bloque de codigo correspondiente a los candados de Redis
+                */  
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                 if (redisLock != null) {
                     SRedisLockUtils.releaseLock(miClient, redisLock);
                 }
@@ -364,8 +352,54 @@ public abstract class SGuiModule {
                 for (SRedisLock irl : mvIndependentRedisLocks) {
                     SRedisLockUtils.releaseLock(miClient, irl);
                 }
-*/                
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro    */            
+                */
+                if (slock != null) {
+                    SLockUtils.releaseLock(miClient, slock);
+                }
+                
+                for (SLock sl : mvIndependentSLocks) {
+                   SLockUtils.releaseLock(miClient, sl);
+                }
+
+                throw new Exception(response.getMessage());
+            }
+            else {
+                result = response.getResultType();
+
+                if (result != SLibConstants.DB_ACTION_SAVE_OK) {
+                    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro                 
+                    if (lock != null) {
+                        SSrvUtils.releaseLock(miClient.getSession(), lock);
+                    }
+                    
+                    for (SSrvLock il : mvIndependentLocks) {
+                        SSrvUtils.releaseLock(miClient.getSession(), il);
+                    }
+                    */
+                    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                    if (redisLock != null) {
+                        SRedisLockUtils.releaseLock(miClient, redisLock);
+                    }
+                    
+                    for (SRedisLock irl : mvIndependentRedisLocks) {
+                         SRedisLockUtils.releaseLock(miClient, irl);
+                    }
+                    */
+                    if (slock != null) {
+                        SLockUtils.releaseLock(miClient, slock);
+                    }
+                    
+                    for (SLock sl : mvIndependentSLocks) {
+                        SLockUtils.releaseLock(miClient, sl);
+                    }
+
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
+                }
+                else {
+                    moRegistry = (SDataRegistry) response.getPacket();
+                    moLastSavedPrimaryKey = moRegistry.getPrimaryKey();
+                }
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
@@ -374,7 +408,24 @@ public abstract class SGuiModule {
                 for (SSrvLock il : mvIndependentLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), il);
                 }
+                */
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                if (redisLock != null) {
+                    SRedisLockUtils.releaseLock(miClient, redisLock);
+                }
                 
+                for (SRedisLock irl : mvIndependentRedisLocks) {
+                    SRedisLockUtils.releaseLock(miClient, irl);
+                }
+                */
+                if (slock != null) {
+                    SLockUtils.releaseLock(miClient, slock);
+                }
+
+                
+                for (SLock sl : mvIndependentSLocks) {
+                    SLockUtils.releaseLock(miClient, sl);
+                }
 
                 if (result == SLibConstants.DB_ACTION_SAVE_OK && miForm instanceof SFormExtendedInterface) {
                     method = ((SFormExtendedInterface) miForm).getPostSaveMethod(moRegistry);
@@ -393,19 +444,22 @@ public abstract class SGuiModule {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       */
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock redisLock = null;
-*/        
+        */
+        SLock slock = null;
         try {
             // Attempt to gain data lock:
-/* Bloque de codigo correspondiente a los candados de Redis
-            redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60); // 1 minute timeout
-*/
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro            */
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro            
             lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, 1000 * 60); // 1 minute timeout
-
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+            redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60); // 1 minute timeout
+            */
+            slock = SLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 1000 * 60);
             // Read data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
@@ -466,27 +520,35 @@ public abstract class SGuiModule {
             }
         }
         catch (Exception e) {
-/* Bloque de codigo correspondiente a los candados de Redis            
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (redisLock != null) {
                 SRedisLockUtils.releaseLock(miClient, redisLock);
             }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro */
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
             }
 
             throw e;
         }
         finally {
-/* Bloque de codigo correspondiente a los candados de Redis            
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (redisLock != null) {
                 SRedisLockUtils.releaseLock(miClient, redisLock);
             }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
             }
 
             if (msgError.length() > 0) {
@@ -502,19 +564,22 @@ public abstract class SGuiModule {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       */
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock redisLock = null;
-*/
+        */
+        SLock slock = null;
         try {
             // Attempt to gain data lock:
-/* Bloque de codigo correspondiente a los candados de Redis            
-            redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60); // 1 minute timeou
-*/
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), pk, 1000 * 60); // 1 minute timeout
-
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+            redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 60); // 1 minute timeou
+            */
+            slock  = SLockUtils.gainLock(miClient, moRegistry.getRegistryType(), pk, 1000 * 60);
             // Read data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
@@ -580,27 +645,35 @@ public abstract class SGuiModule {
             }
         }
         catch (Exception e) {
-/* Bloque de codigo correspondiente a los candados de Redis            
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (redisLock != null) {
                 SRedisLockUtils.releaseLock(miClient, redisLock);
             }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
             }
 
             throw e;
         }
         finally {
-/* Bloque de codigo correspondiente a los candados de Redis            
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (redisLock != null) {
                 SRedisLockUtils.releaseLock(miClient, redisLock);
             }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
             }
 
             if (msgError.length() > 0) {
@@ -616,23 +689,26 @@ public abstract class SGuiModule {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       */
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock redisLock = null;
-*/        
+        */
+        SLock slock = null;
         SDataRegistry registry = null;
 
         try {
             // Attempt to gain data lock:
 
             if (!poRegistry.getIsRegistryNew()) {
-/* Bloque de codigo correspondiente a los candados de Redis
-                redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), poRegistry.getPrimaryKey(), 60); // 1 minute timeout
-*/
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro                */
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                 lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), poRegistry.getRegistryType(), poRegistry.getPrimaryKey(), 1000 * 60); // 1 minute timeout
-            
+                */
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                redisLock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), poRegistry.getPrimaryKey(), 60); // 1 minute timeout
+                */
+                slock = SLockUtils.gainLock(miClient, poRegistry.getRegistryType(), poRegistry.getPrimaryKey(), 1000 * 60);
             }
 
             // Read data registry:
@@ -656,27 +732,35 @@ public abstract class SGuiModule {
             }
         }
         catch (Exception e) {
-/* Bloque de codigo correspondiente a los candados de Redis            
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (redisLock != null) {
                 SRedisLockUtils.releaseLock(miClient, redisLock);
             }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
             }
             
             throw e;
         }
         finally {
-/* Bloque de codigo correspondiente a los candados de Redis            
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+            if (lock != null) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (redisLock != null) {
                 SRedisLockUtils.releaseLock(miClient, redisLock);
             }
-*/            
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
-            if (lock != null) {
-                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
             }
             
             if (msgError.length() > 0) {

@@ -14,7 +14,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.fin.db.SFinDpsExchangeRateDiff;
 import erp.mod.fin.db.SFinConsts;
-import erp.redis.SRedisLockUtils;
+import erp.redis.SLockUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -28,9 +28,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
+import sa.lib.srv.SLock;
 
 /**
  *
@@ -331,11 +329,13 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
     @Override
     public void actionSave() {
         String msg;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
-*/        
+        */
+        SLock slock = null;
         SFinDpsExchangeRateDiff dpsExchangeRateDiff;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
@@ -346,11 +346,14 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
             
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
                 try {
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
-/* Bloque de codigo correspondiente a los candados de Redis
+                    */
+                    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                     rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout() / 1000);
-*/                    
+                    */
+                    slock = SLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
+                    
                     dpsExchangeRateDiff = new SFinDpsExchangeRateDiff(miClient);
                     dpsExchangeRateDiff.setRecYear(SLibTimeUtils.digestYear(moDateDate.getValue())[0]);
                     dpsExchangeRateDiff.setEndOfMonth(moDateDate.getValue());
@@ -367,15 +370,19 @@ public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements Actio
                 }
                 finally {
                     try {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                         if (lock != null) {
                             SSrvUtils.releaseLock(miClient.getSession(), lock);                            
                         }
-/* Bloque de codigo correspondiente a los candados de Redis
+                        */
+                        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                         if (rlock != null) {
                             SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
                         }
-*/        
+                        */
+                        if (slock != null) {                          
+                            SLockUtils.releaseLock((SClientInterface) miClient, slock);
+                        }
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

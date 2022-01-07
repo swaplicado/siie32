@@ -278,11 +278,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxKeepExchangeRate;
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.SSrvLock moAuxUserLock;
-/* Bloque de codigo correspondiente a los candados de Redis    
+    */
+    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.redis.SRedisLock moAuxUserRedisLock;
-*/    
+    */
+    protected sa.lib.srv.SLock moAuxUserSLock;
     protected double mdTempCfdIvaPorcentaje;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
@@ -2014,11 +2016,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
-/* Bloque de codigo correspondiente a los candados de Redis
+    */
+    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
     public void setAuxUserRedisLock(sa.lib.srv.redis.SRedisLock o) { moAuxUserRedisLock = o; }
-*/
+    */
+    public void setAuxUserSLock(sa.lib.srv.SLock o) { moAuxUserSLock = o; }
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
@@ -2044,11 +2048,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro   */
+    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
-/* Bloque de codigo correspondiente a los candados de Redis    
+    */
+    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.redis.SRedisLock getAuxUserRedisLock() { return moAuxUserRedisLock; }
-*/
+    */
+    public sa.lib.srv.SLock getAuxUserSLock() { return moAuxUserSLock; }
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
@@ -2241,11 +2247,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxKeepExchangeRate = false;
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       */
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         moAuxUserLock = null;
-/* Bloque de codigo correspondiente a los candados de Redis         
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         moAuxUserRedisLock = null;
-*/        
+        */
+        moAuxUserSLock = null;
         mdTempCfdIvaPorcentaje = 0;
 
         moDbmsDataBookkeepingNumber = null;

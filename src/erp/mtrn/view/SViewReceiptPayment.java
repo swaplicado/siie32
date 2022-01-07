@@ -27,7 +27,7 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
-import erp.redis.SRedisLockUtils;
+import erp.redis.SLockUtils;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -38,9 +38,7 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
-import sa.lib.srv.redis.SRedisLock;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.SLock;
 
 /**
  * User view for management of database registries of CFDI of Payments.
@@ -318,24 +316,29 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                     boolean annul = true;
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                     ArrayList<Object[]> journalVoucherKeys = SDataCfd.getDependentJournalVoucherKeys(miClient.getSession().getStatement(), cfd.getPkCfdId());
-/*Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
-                    ArrayList<SSrvLock> locks = new ArrayList<>(); 
-/* Bloque de codigo correspondiente a los candados de Redis                    
+                    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                    ArrayList<SSrvLock> locks = new ArrayList<>();
+                    */
+                    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                     ArrayList<SRedisLock> rlocks = new ArrayList<>();
-*/                    
+                    */
+                    ArrayList<SLock> slocks = new ArrayList<>();
                     try {
                         try {
                             // gain locks for all journal vouchers:
                             
                             for (int index = 0; index < journalVoucherKeys.size(); index++) {
                                 if (journalVoucherKeys.get(index) != null) {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                                    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                                     SSrvLock lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60 * 1000); // 10 min.
                                     locks.add(lock);
-/* Bloque de codigo correspondiente a los candados de Redis
+                                    */
+                                    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                                     SRedisLock rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60); // 10 min.
                                     rlocks.add(rlock);
-*/                                    
+                                    */
+                                    SLock slock = SLockUtils.gainLock(miClient, SDataConstants.FIN_REC, journalVoucherKeys.get(index), 10 * 60 * 1000); // 10 min.
+                                    slocks.add(slock);
                                 }
                             }
                         }
@@ -387,15 +390,19 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                         SLibUtils.showException(this, e);
                     }
                     finally {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                         for (SSrvLock lock : locks) {
                             SSrvUtils.releaseLock(miClient.getSession(), lock);
                         }
-/* Bloque de codigo correspondiente a los candados de Redis
+                        */
+                        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                         for (SRedisLock rlock : rlocks) {
                             SRedisLockUtils.releaseLock(miClient, rlock);
                         }
-*/                        
+                        */
+                        for (SLock slock : slocks) {
+                            SLockUtils.releaseLock(miClient, slock);
+                        }
                     }
                 }
             }

@@ -37,6 +37,7 @@ public class SParamsApp implements java.io.Serializable {
     private String msRedisHost;
     private String msRedisPswd;
     private Date mtTimestamp;
+    private boolean mbWithServer;
     
     public SParamsApp() {
         reset();
@@ -57,6 +58,7 @@ public class SParamsApp implements java.io.Serializable {
         msRedisHost = "";
         msRedisPswd = "";
         mtTimestamp = null;
+        mbWithServer = false;
     }
 
     public void setErpInstance(String name) { msErpInstance = name; }
@@ -73,6 +75,7 @@ public class SParamsApp implements java.io.Serializable {
     public void setRedisHost(String redisHost) { msRedisHost = redisHost; }
     public void setRedisPswd(String redisPswd) { msRedisPswd = redisPswd; }
     public void setTimestamp(Date t) { mtTimestamp = t; }
+    public void setWithSerever(boolean b) { mbWithServer = b; }
 
     public String getErpInstance() { return msErpInstance; }
     public String getErpHost() { return msErpHost; }
@@ -88,6 +91,7 @@ public class SParamsApp implements java.io.Serializable {
     public String getRedisHost() { return msRedisHost; }
     public String getRedisPswd() { return msRedisPswd; }
     public Date getTimestamp() { return mtTimestamp; }
+    public boolean getWithServer() { return mbWithServer; }
 
     public boolean read() {
         boolean error = false;
@@ -127,6 +131,7 @@ public class SParamsApp implements java.io.Serializable {
                 msRedisHost = temp.getRedisHost();
                 msRedisPswd = temp.getRedisPswd();
                 mtTimestamp = temp.getTimestamp();
+                mbWithServer = temp.getWithServer();
             }
         }
         catch (Exception e) {

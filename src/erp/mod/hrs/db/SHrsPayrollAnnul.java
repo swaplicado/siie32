@@ -9,16 +9,14 @@ import erp.lib.SLibConstants;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
-import erp.redis.SRedisLockUtils;
+import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -87,18 +85,22 @@ public class SHrsPayrollAnnul {
         String msgError = "";
         SServerRequest request = null;
         SServerResponse response = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       */
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
-*/        
+        */
+        SLock slock = null;
         try {
             // Attempt to gain data lock:
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             lock = SSrvUtils.gainLock(miClient.getSession(), miClient.getSessionXXX().getCompany().getPkCompanyId(), moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-/* Bloque de codigo correspondiente a los candados de Redis
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             rlock = SRedisLockUtils.gainLock(miClient, moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 60);
-*/
+            */
+            slock = SLockUtils.gainLock(miClient, moRegistry.getRegistryType(), moRegistry.getPrimaryKey(), 1000 * 60);
             // Read data registry:
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
@@ -159,27 +161,36 @@ public class SHrsPayrollAnnul {
             }
         }
         catch (Exception e) {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-/* Bloque de codigo correspondiente a los candados de Redis            
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }
-*/            
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
+            }
             throw e;
         }
         finally {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (lock != null) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-/* Bloque de codigo correspondiente a los candados de Redis
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (rlock != null) {
                 SRedisLockUtils.releaseLock(miClient, rlock);
             }
-*/        
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock(miClient, slock);
+            }
+            
             if (msgError.length() > 0) {
                 throw new Exception(msgError);
             }

@@ -45,7 +45,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel3 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlErpInstance = new javax.swing.JLabel();
         jtfErpInstance = new javax.swing.JTextField();
@@ -54,6 +54,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlErpHost = new javax.swing.JLabel();
         jtfErpHost = new javax.swing.JTextField();
         jlErpHostExample = new javax.swing.JLabel();
+        jWithServer = new javax.swing.JCheckBox();
         jPanel7 = new javax.swing.JPanel();
         jlErpRmiRegistryPort = new javax.swing.JLabel();
         jtfErpRmiRegistryPort = new javax.swing.JTextField();
@@ -125,12 +126,13 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuration parameters:"));
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(14, 0, 0, 5));
+        jPanel4.setPreferredSize(new java.awt.Dimension(485, 382));
+        jPanel4.setLayout(new java.awt.GridLayout(14, 0, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlErpInstance.setText("ERP instance name:*");
-        jlErpInstance.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlErpInstance.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jlErpInstance);
 
         jtfErpInstance.setText("ERP");
@@ -141,12 +143,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlErpInstanceExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlErpInstanceExample);
 
-        jPanel1.add(jPanel5);
+        jPanel4.add(jPanel5);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlErpHost.setText("ERP server host for client:*");
-        jlErpHost.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlErpHost.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jlErpHost);
 
         jtfErpHost.setText("127.0.0.1");
@@ -157,12 +159,15 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlErpHostExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlErpHostExample);
 
-        jPanel1.add(jPanel6);
+        jWithServer.setText("With Server");
+        jPanel6.add(jWithServer);
+
+        jPanel4.add(jPanel6);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlErpRmiRegistryPort.setText("ERP RMI Registry port:*");
-        jlErpRmiRegistryPort.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlErpRmiRegistryPort.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel7.add(jlErpRmiRegistryPort);
 
         jtfErpRmiRegistryPort.setText("50001");
@@ -173,12 +178,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlErpRmiRegistryPortExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlErpRmiRegistryPortExample);
 
-        jPanel1.add(jPanel7);
+        jPanel4.add(jPanel7);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatabaseType.setText("Database type:*");
-        jlDatabaseType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDatabaseType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jlDatabaseType);
 
         jcbDatabaseType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -188,12 +193,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabaseTypeExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlDatabaseTypeExample);
 
-        jPanel1.add(jPanel9);
+        jPanel4.add(jPanel9);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatabaseHostServer.setText("Database host for server:*");
-        jlDatabaseHostServer.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDatabaseHostServer.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlDatabaseHostServer);
 
         jtfDatabaseHostServer.setText("127.0.0.1");
@@ -215,12 +220,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabaseServerExample.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlDatabaseServerExample);
 
-        jPanel1.add(jPanel10);
+        jPanel4.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatabaseHostClient.setText("Database host for client:*");
-        jlDatabaseHostClient.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDatabaseHostClient.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlDatabaseHostClient);
 
         jtfDatabaseHostClient.setText("127.0.0.1");
@@ -242,12 +247,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabaseClientExample.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlDatabaseClientExample);
 
-        jPanel1.add(jPanel11);
+        jPanel4.add(jPanel11);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatabaseName.setText("Database name:*");
-        jlDatabaseName.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDatabaseName.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel15.add(jlDatabaseName);
 
         jtfDatabaseName.setText("erp");
@@ -258,12 +263,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabaseNameExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlDatabaseNameExample);
 
-        jPanel1.add(jPanel15);
+        jPanel4.add(jPanel15);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatabaseUser.setText("Database user:*");
-        jlDatabaseUser.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDatabaseUser.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel12.add(jlDatabaseUser);
 
         jtfDatabaseUser.setText("root");
@@ -274,12 +279,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabaseUserExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jlDatabaseUserExample);
 
-        jPanel1.add(jPanel12);
+        jPanel4.add(jPanel12);
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatabasePassword1.setText("Database password:*");
-        jlDatabasePassword1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDatabasePassword1.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel13.add(jlDatabasePassword1);
 
         jpfDatabasePassword1.setText("password");
@@ -289,12 +294,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabasePassword1Example.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlDatabasePassword1Example);
 
-        jPanel1.add(jPanel13);
+        jPanel4.add(jPanel13);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDatabasePassword2.setText("Confirm database password:*");
-        jlDatabasePassword2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlDatabasePassword2.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel14.add(jlDatabasePassword2);
 
         jpfDatabasePassword2.setText("password");
@@ -304,12 +309,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlDatabasePassword2Example.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlDatabasePassword2Example);
 
-        jPanel1.add(jPanel14);
+        jPanel4.add(jPanel14);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlRedisHost.setText("Redis server host for client:*");
-        jlRedisHost.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlRedisHost.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jlRedisHost);
 
         jtfRedisHost.setText("127.0.0.1");
@@ -320,12 +325,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlRedisHostExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlRedisHostExample);
 
-        jPanel1.add(jPanel16);
+        jPanel4.add(jPanel16);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlRedisPassword1.setText("Redis password:*");
-        jlRedisPassword1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlRedisPassword1.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel17.add(jlRedisPassword1);
 
         jpfRedisPassword1.setText("password");
@@ -335,12 +340,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlRedisPassword1Example1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jlRedisPassword1Example1);
 
-        jPanel1.add(jPanel17);
+        jPanel4.add(jPanel17);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlRedisPassword2.setText("Confirm Redis password:*");
-        jlRedisPassword2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlRedisPassword2.setText("Redis password:*");
+        jlRedisPassword2.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel18.add(jlRedisPassword2);
 
         jpfRedisPassword2.setText("password");
@@ -350,12 +355,12 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlRedisPassword1Example2.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jlRedisPassword1Example2);
 
-        jPanel1.add(jPanel18);
+        jPanel4.add(jPanel18);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTimestpamp.setText("Last update:");
-        jlTimestpamp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlTimestpamp.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel8.add(jlTimestpamp);
 
         jtfTimestamp.setEditable(false);
@@ -367,9 +372,9 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jlTimestampExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlTimestampExample);
 
-        jPanel1.add(jPanel8);
+        jPanel4.add(jPanel8);
 
-        jPanel3.add(jPanel1, java.awt.BorderLayout.NORTH);
+        jPanel3.add(jPanel4, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -404,7 +409,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(716, 489));
+        setSize(new java.awt.Dimension(718, 484));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -448,7 +453,6 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -460,11 +464,13 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JCheckBox jWithServer;
     private javax.swing.JButton jbClear;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbSave;
@@ -563,6 +569,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jpfRedisPassword1.setText("");
             jpfRedisPassword2.setText("");
             jtfTimestamp.setText("");
+            jWithServer.setSelected(false);
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { SLibConsts.UNDEFINED });
         }
         else {
@@ -580,6 +587,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jtfRedisHost.setText(moParamsApp.getRedisHost());
             jpfRedisPassword1.setText(moParamsApp.getRedisPswd());
             jpfRedisPassword2.setText(moParamsApp.getRedisPswd());
+            jWithServer.setSelected(moParamsApp.getWithServer());
             jtfTimestamp.setText(SLibUtils.DateFormatDatetimeTimeZone.format(moParamsApp.getTimestamp()));
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { moParamsApp.getDatabaseType() });
         }
@@ -793,6 +801,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                 moParamsApp.setDatabaseType(((SGuiItem) jcbDatabaseType.getSelectedItem()).getPrimaryKey()[0]);
                 moParamsApp.setRedisHost(jtfRedisHost.getText());
                 moParamsApp.setRedisPswd(redisPassword1);
+                moParamsApp.setWithSerever(jWithServer.isSelected());
                 if (moParamsApp.save()) {
                     save = true;
                     renderParams();

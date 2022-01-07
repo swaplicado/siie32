@@ -17,11 +17,10 @@ public interface SClientInterface {
 
     public sa.lib.gui.SGuiSession getSession();
     public erp.server.SSessionXXX getSessionXXX();
-/* Bloque de codigo correspondiente a los candados de Redis
     public redis.clients.jedis.Jedis getJedis();
-    public void setJedis(Jedis j);    
+    public void setJedis(Jedis j);
     public SParamsApp getParamsApp();
-*/
+
     public javax.swing.JFrame getFrame();
     public javax.swing.JTabbedPane getTabbedPane();
 

@@ -36,7 +36,7 @@ import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
 import erp.mtrn.data.SCfdUtilsHandler;
-import erp.redis.SRedisLockUtils;
+import erp.redis.SLockUtils;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -78,9 +78,7 @@ import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
+import sa.lib.srv.SLock;
 import sa.lib.xml.SXmlElement;
 
 /**
@@ -143,11 +141,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SGuiItem> maBeneficiaryAccountGuiItems;
     private ArrayList<SDataBizPartnerBranchBankAccount> maBizPartnerBranchBankAccounts;
     private HashMap<String, ArrayList<SGuiItem>> moAgreementReferencesMap;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     private ArrayList<SSrvLock> maLocks;
-/* Bloque de codigo correspondiente a los candados de Redis
+    */
+    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
     private ArrayList<SRedisLock> maRedisLocks;
-*/    
+    */
+    private ArrayList<SLock> maSLocks;
     private boolean mbShowConfirmCloseDialog;
     
     /**
@@ -1951,11 +1951,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         boolean found = false;
         SDataRecord record = null;
         SLayoutBankRecord bankRecord = null;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
-*/        
+        */
+        SLock slock = null;
+        
         if (layoutBankRecordKey == null) {
             for (SLayoutBankRecord bankRecordRow : maLayoutBankRecords) {
                 bankRecordRow.removeLayoutBankPayment(layoutBankPayment.getBizPartnerId(), layoutBankPayment.getBizPartnerBranchId(), layoutBankPayment.getBizPartnerBranchBankAccountId());
@@ -1972,15 +1975,16 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
             if (!found) {
                 record = (SDataRecord) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-/* Bloque de codigo correspondiente a los candados de Redis                
-                rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout() / 1000);
-*/
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                 lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
                 maLocks.add(lock);
-/* Bloque de codigo correspondiente a los candados de Redis                
+                */ 
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                rlock = SRedisLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout() / 1000);
                 maRedisLocks.add(rlock);
-*/
+                */
+                slock = SLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
+                
                 bankRecord = new SLayoutBankRecord(layoutBankRecordKey);
                 bankRecord.getLayoutBankPayments().add(layoutBankPayment);
                 maLayoutBankRecords.add(bankRecord);
@@ -2645,11 +2649,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jckShowOnlyBenefsWithAccounts.setSelected(isModeForTransfers());
 
         maLayoutBankRecords = new ArrayList<>();
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         maLocks = new ArrayList<>();
-/* Bloque de codigo correspondiente a los candados de Redis        
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         maRedisLocks = new ArrayList<>();
-*/
+        */
+        maSLocks = new ArrayList<>();
+        
         switch (mnFormSubtype) {
             case SModSysConsts.FINX_LAY_BANK_ACC:
                 populateGridWithPaymentsFromXml();
@@ -2793,15 +2800,19 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         registry.setExchangeRate(1d);
         registry.setXtaBankPaymentTypeId(mnBankPaymentTypeId);
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         if (!maLocks.isEmpty()) {
             registry.getLocks().addAll(maLocks);
         }
-/* Bloque de codigo correspondiente a los candados de Redis
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         if (!maRedisLocks.isEmpty()) {
             registry.getRedisLocks().addAll(maRedisLocks);
         }
-*/
+        */
+        if (!maSLocks.isEmpty()) {
+            registry.getSLocks().addAll(maSLocks);
+        }
         return registry;
     }
 
@@ -2854,15 +2865,19 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             
             if (validation.isValid()) {
                 try {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                     for (SSrvLock lock : maLocks) {
                         SSrvUtils.verifyLockStatus(miClient.getSession(), lock);
                     }
-/* Bloque de codigo correspondiente a los candados de Redis
+                    */
+                    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                     for (SRedisLock rlock : maRedisLocks) {
                         SRedisLockUtils.verifyLockStatus((SClientInterface) miClient, rlock);
                     }
-*/                    
+                    */
+                    for (SLock slock : maSLocks) {
+                        SLockUtils.verifyLockStatus((SClientInterface)miClient, slock);
+                    }
                 }
                 catch (Exception e) {
                     validation.setMessage("No fue posible validar el acceso exclusivo al registro de una de las pólizas seleccionadas." + e);
@@ -2888,15 +2903,19 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     
     private void close() {
         try {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             for (SSrvLock lock : maLocks) {
                 SSrvUtils.releaseLock(miClient.getSession(), lock);
             }
-/* Bloque de codigo correspondiente a los candados de Redis          
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             for (SRedisLock rlock : maRedisLocks) {
                 SRedisLockUtils.releaseLock((SClientInterface) miClient, rlock);
             }
-*/            
+            */
+            for (SLock slock : maSLocks) {
+                SLockUtils.releaseLock((SClientInterface) miClient, slock);
+            }
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
