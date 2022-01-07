@@ -278,11 +278,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxKeepExchangeRate;
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
     protected sa.lib.srv.SSrvLock moAuxUserLock;
-*/    
+/* Bloque de codigo correspondiente a los candados de Redis    
     protected sa.lib.srv.redis.SRedisLock moAuxUserRedisLock;
-    
+*/    
     protected double mdTempCfdIvaPorcentaje;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
@@ -2014,11 +2014,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
-*/
+/* Bloque de codigo correspondiente a los candados de Redis
     public void setAuxUserRedisLock(sa.lib.srv.redis.SRedisLock o) { moAuxUserRedisLock = o; }
-
+*/
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
@@ -2044,11 +2044,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro   
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro   */
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
-*/    
+/* Bloque de codigo correspondiente a los candados de Redis    
     public sa.lib.srv.redis.SRedisLock getAuxUserRedisLock() { return moAuxUserRedisLock; }
-
+*/
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
@@ -2241,8 +2241,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxKeepExchangeRate = false;
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
+/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       */
         moAuxUserLock = null;
+/* Bloque de codigo correspondiente a los candados de Redis         
+        moAuxUserRedisLock = null;
 */        
         mdTempCfdIvaPorcentaje = 0;
 
@@ -3210,6 +3212,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             aAccCfgPrepayments.add(oAccCfgPrepayments);
                             
                             for (int[] tax : taxes) {
+                                if (tax[0] == 0 && tax[1] == 0) continue;
+                                
                                 java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> v = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                     mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), tax, oStatement);
@@ -3232,6 +3236,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             aAccCfgPrepaymentsToInvoice.add(oAccCfgPrepaymentsToInvoice);
                             
                             for (int[] tax : taxes) {
+                                if (tax[0] == 0 && tax[1] == 0) continue;
+                                
                                 java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> v = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                                 mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
                                                 mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), tax, oStatement);

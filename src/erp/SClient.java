@@ -110,7 +110,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 193.4"; // fecha release: 2021-12-21
+    public static final String APP_RELEASE = "3.2 194.1"; // fecha release: 2022-01-05
     public static final String APP_COPYRIGHT = "2007-2021";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -122,8 +122,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     
     public static final String ERR_PARAMS_APP_READING = "No fue posible leer los parámetros de configuración del sistema.";
 
+/* Bloque de codigo correspondiente a los candados de Redis
     private SRedisLockManager moRedisLockManager;
     private Jedis moJedis;
+*/    
     private boolean mbFirstActivation;
     private boolean mbLoggedIn;
     private SParamsApp moParamsApp;
@@ -1165,7 +1167,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         sessionCustom.updateSessionSettings();
         moSession.setSessionCustom(sessionCustom); // client database must be set already
     }
-
+/* Bloque de codigo correspondiente a los candados de Redis
     private void createRedisSession(final int companyId, final int userId, final String userName) throws Exception {
         try {
             moJedis = SRedisConnectionUtils.connect(moParamsApp.getRedisHost(), moParamsApp.getRedisPswd());
@@ -1177,7 +1179,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             moJedis = null;
         }
     }
-
+*/
     private void logout() {
         Cursor cursor = getCursor();
 
@@ -1209,12 +1211,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                     SLibUtils.showException(this, e);
                 }
             }
-
+/* Bloque de codigo correspondiente a los candados de Redis
             if (moJedis != null) {
                 moJedis.del(SRedisConnectionUtils.SESSION + "+" + moJedis.clientGetname());
                 moJedis.disconnect();
             }
-            
+*/           
             moServer = null;
             moSessionXXX = null;
             moSession = null;
@@ -1291,8 +1293,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                             mbLoggedIn = true;
                             moSessionXXX = response.getSession();
                             moSessionXXX.getFormatters().redefineTableCellRenderers();
+/* Bloque de codigo correspondiente a los candados de Redis                            
                             createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
                                     response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
+*/                            
                             prepareGui();
                             createSession();
                             actionFileSession(true);
@@ -1635,7 +1639,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SSessionXXX getSessionXXX() {
         return moSessionXXX;
     }
-    
+/* Bloque de codigo correspondiente a los candados de Redis
     @Override
     public Jedis getJedis() {
         return moJedis;
@@ -1645,7 +1649,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public void setJedis(Jedis jedis) {
         moJedis = jedis;
     }
-
+*/
     @Override
     public erp.lib.gui.SGuiModule getGuiModule(int moduleType) {
         erp.lib.gui.SGuiModule module = null;
@@ -2322,13 +2326,13 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public String getAppProvider() {
         return APP_PROVIDER;
     }
-
-//    @Override
+/* Bloque de codigo correspondiente a los candados de Redis
+    @Override
     public Object getLockManager() {
         moRedisLockManager = new SRedisLockManager();
         return moRedisLockManager;
     }
-    
+*/    
     @Override
     public void computeSessionSettings() {
         throw new UnsupportedOperationException("Not supported yet.");

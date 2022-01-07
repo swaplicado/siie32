@@ -35,7 +35,9 @@ public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.f
     public SFormRedisSessions(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
+        /* Bloque de codigo correspondiente a los candados de Redis
         moJedis = miClient.getJedis();
+        */
         initComponents();
         initComponentsExtra();
     }
