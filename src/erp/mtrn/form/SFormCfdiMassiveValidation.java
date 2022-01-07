@@ -12,6 +12,7 @@
 package erp.mtrn.form;
 
 import cfd.DCfdUtils;
+import cfd.ver33.DCfdi33Consts;
 import erp.SClientUtils;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -24,6 +25,7 @@ import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.mbps.data.SDataBizPartner;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SRowCfdSatStatus;
 import java.awt.BorderLayout;
@@ -31,7 +33,6 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.Date;
 import java.util.Vector;
@@ -42,7 +43,7 @@ import sa.lib.SLibUtils;
 
 /**
  * Validación de estatus SAT de documentos de manera masiva.
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -61,7 +62,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
     
     private erp.lib.table.STablePane moResultPane;
     private final int mnModuleType;
-    private final int mnModuleSubType;
+    private final int mnModuleSubtype;
     
     private boolean mbErrShowed;
 
@@ -74,7 +75,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         super(client.getFrame(), true);
         miClient = client;
         mnModuleType = moduleType;
-        mnModuleSubType = moduleSubType;
+        mnModuleSubtype = moduleSubType;
         initComponents();
         initComponentsExtra();
     }
@@ -284,7 +285,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo de doc.", 40);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio", 65);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
-        if (mnModuleSubType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+        if (mnModuleSubtype == SDataConstantsSys.TRNS_CT_DPS_PUR) {
             tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Emisor", 200);
             tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC emisor", 100);
         }
@@ -395,45 +396,61 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                 String fechaInicial = SLibUtils.DbmsDateFormatDate.format(moFieldDateStart.getDate());
                 String fechaFinal = SLibUtils.DbmsDateFormatDate.format(moFieldDateFinal.getDate());
 
-                int tipoCfd = ((int[]) moFieldCfdType.getKey())[0];
+                int cfdType = ((int[]) moFieldCfdType.getKey())[0];
 
-                String sqlFolio = "";
+                String colNumber = "";
+                String colFiscalId = "";
                 String sqlJoin = "";
-                String sqlColRfc = "";
                 String sqlOrder = "";
-                String sqlTipoDps = "";
-                switch (tipoCfd){
+                String sqlDpsType = "";
+                
+                switch (cfdType) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV: 
-                        sqlFolio = ", d.num_ser AS _serie, d.num AS _folio, d.fid_cl_dps AS _tipo";
-                        sqlJoin = "INNER JOIN trn_dps AS d ON c.fid_dps_year_n = d.id_year AND c.fid_dps_doc_n = d.id_doc";
-                        sqlColRfc = "c.xml_rfc_emi"; 
-                        sqlOrder = "ORDER BY b1.bp, b2.bp, c.id_cfd, c.ts ";
-                        switch (mnModuleSubType) {
+                        colNumber = ", d.num_ser AS _cfd_series, d.num AS _cfd_number, d.fid_cl_dps AS _dps_type";
+                        colFiscalId = "c.xml_rfc_emi";
+                        sqlJoin = "INNER JOIN trn_dps AS d ON c.fid_dps_year_n = d.id_year AND c.fid_dps_doc_n = d.id_doc ";
+                        sqlOrder = "ORDER BY bp_iss.bp, bp_rec.bp, c.id_cfd, c.ts ";
+                        
+                        int[] dpsKey = null;
+                        int[] adjKey = null;
+                        
+                        switch (mnModuleSubtype) {
                             case SDataConstantsSys.TRNS_CT_DPS_PUR:
-                                sqlTipoDps = "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + 
-                                        " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + 
-                                        " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2];
+                                dpsKey = SDataConstantsSys.TRNU_TP_DPS_PUR_INV;
+                                adjKey = SDataConstantsSys.TRNU_TP_DPS_PUR_CN;
                                 break;
+                                
                             case SDataConstantsSys.TRNS_CT_DPS_SAL:
-                                sqlTipoDps = " AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + 
-                                        " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + 
-                                        " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2];
+                                dpsKey = SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+                                adjKey = SDataConstantsSys.TRNU_TP_DPS_SAL_CN;
                                 break;
+                                
                             default:
+                                // do nothing
+                        }
+                        
+                        if (dpsKey != null && adjKey != null) {
+                            sqlDpsType = "AND ("
+                                    + "(d.fid_ct_dps = " + dpsKey[0] + " AND d.fid_cl_dps = " + dpsKey[1] + " AND d.fid_tp_dps = " + dpsKey[2] + ") OR"
+                                    + "(d.fid_ct_dps = " + adjKey[0] + " AND d.fid_cl_dps = " + adjKey[1] + " AND d.fid_tp_dps = " + adjKey[2] + ")) ";
                         }
                         break;
-                    case SDataConstantsSys.TRNS_TP_CFD_PAY_REC: 
-                        sqlFolio = ", c.ser AS _serie, c.num AS _folio";
-                        sqlColRfc = "c.xml_rfc_rec"; 
-                        sqlOrder  = "ORDER BY b2.bp, b1.bp, c.id_cfd, c.ts ";
+                        
+                    case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                        colNumber = ", c.ser AS _cfd_series, c.num AS _cfd_number";
+                        colFiscalId = "c.xml_rfc_rec";
+                        sqlOrder  = "ORDER BY bp_rec.bp, bp_iss.bp, c.id_cfd, c.ts ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_CFD_PAYROLL: 
-                        sqlFolio = ", i.num_ser AS _serie, i.num AS _folio";
-                        sqlJoin = "INNER JOIN hrs_pay_rcp_iss AS i ON c.fid_pay_rcp_pay_n = i.id_pay AND c.fid_pay_rcp_emp_n = i.id_emp AND c.fid_pay_rcp_iss_n = i.id_iss";
-                        sqlColRfc = "c.xml_rfc_rec"; 
-                        sqlOrder  = "ORDER BY b2.bp, b1.bp, c.id_cfd, c.ts ";
+                        colNumber = ", i.num_ser AS _cfd_series, i.num AS _cfd_number";
+                        colFiscalId = "c.xml_rfc_rec";
+                        sqlJoin = "INNER JOIN hrs_pay_rcp_iss AS i ON c.fid_pay_rcp_pay_n = i.id_pay AND c.fid_pay_rcp_emp_n = i.id_emp AND c.fid_pay_rcp_iss_n = i.id_iss ";
+                        sqlOrder  = "ORDER BY bp_rec.bp, bp_iss.bp, c.id_cfd, c.ts ";
                         break;
+                        
                     default:
+                        // do nothing
                 }
 
                 String sqlWhere = "c.ts BETWEEN '" + fechaInicial + "' AND '" + fechaFinal + "'";
@@ -446,89 +463,97 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                     sqlWhere += " AND IF (c.xml_tc = 0.0, c.xml_tot > " + mnCant + " , (c.xml_tot * c.xml_tc) > " + mnCant + ")";
                 }
 
-                String rfcAsocNegocio = "";
+                String bizPartnerFiscalId = "";
+                
                 if (((int[]) moFieldBizPartnerId.getKey())[0] != 0){
                     SDataBizPartner moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, 
                         SDataConstants.BPSU_BP, (int[]) moFieldBizPartnerId.getKey(), SLibConstants.EXEC_MODE_SILENT);
-                    rfcAsocNegocio = moBizPartner.getFiscalId();
+                    bizPartnerFiscalId = moBizPartner.getFiscalId();
                 }
                 try {
                     this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                    String sql = "SELECT c.id_cfd, c.ts, c.xml_rfc_emi, c.xml_rfc_rec, c.uuid, c.xml_tot, b1.bp AS emisor, b2.bp AS receptor, tc.doc_xml AS xml " + sqlFolio + " " +
-                        "FROM trn_cfd AS c " +
-                        "INNER JOIN " + SClientUtils.getComplementaryDdName(miClient) + ".trn_cfd AS tc ON c.id_cfd = tc.id_cfd " +
-                        "INNER JOIN erp.bpsu_bp AS b1 ON c.xml_rfc_emi = b1.fiscal_id " +
-                        "INNER JOIN erp.bpsu_bp AS b2 ON c.xml_rfc_rec = b2.fiscal_id " +
-                        sqlJoin + " " +
-                        "WHERE fid_tp_cfd = " + tipoCfd + " " + sqlTipoDps + " " +
-                        (rfcAsocNegocio.equals("") ? "" : "AND " + sqlColRfc + " = '" + rfcAsocNegocio + "' ") +
-                        "AND "+ sqlWhere + " " +
-                        //"AND tc.doc_xml <> '' " + 
-                        "GROUP BY c.id_cfd, c.ts " +
-                        sqlOrder + " ";
                     
-                    Connection connection;
-                    connection = miClient.getSession().getStatement().getConnection();
-
-                    try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
-                        int total = 0;
-                        int cancelados = 0;
-                        int vigentes = 0;
-                        int no_encontrados = 0;
-                        int sin_xml = 0;
+                    String sql = "SELECT c.id_cfd, c.ts, c.uuid, c.xml_tot, " +
+                            "c.xml_rfc_emi, bp_iss.bp AS _bp_issuer, " +
+                            "c.xml_rfc_rec, bp_rec.bp AS _bp_receiver, tc.doc_xml AS xml" + colNumber + " " +
+                            "FROM trn_cfd AS c " +
+                            "INNER JOIN " + SClientUtils.getComplementaryDdName(miClient) + ".trn_cfd AS tc ON c.id_cfd = tc.id_cfd " +
+                            "INNER JOIN erp.bpsu_bp AS bp_iss ON c.xml_rfc_emi = bp_iss.fiscal_id " +
+                            "INNER JOIN erp.bpsu_bp AS bp_rec ON c.xml_rfc_rec = bp_rec.fiscal_id " +
+                            sqlJoin +
+                            "WHERE fid_tp_cfd = " + cfdType + " " + sqlDpsType +
+                            (bizPartnerFiscalId.isEmpty() ? "" : "AND " + colFiscalId + " = '" + bizPartnerFiscalId + "' ") +
+                            "AND "+ sqlWhere + " " +
+                            "GROUP BY c.id_cfd, c.ts " +
+                            sqlOrder + ";";
+                    
+                    try (ResultSet resultSet = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql)) {
+                        int cfdiTotal = 0;
+                        int cfdiValid = 0;
+                        int cfdiCanceled = 0;
+                        int cfdiNotFound = 0;
+                        int cfdiWithOutXml = 0;
+                        boolean results = false;
                         
                         moResultPane.createTable();
                         moResultPane.clearTableRows();
-                        boolean results = false;
+                        
                         while (resultSet.next()) {
-                            total++;
+                            cfdiTotal++;
                             results = true;
-                            String tipoDoc = "";
-                            if (tipoCfd == SDataConstantsSys.TRNS_TP_CFD_INV) {
-                                switch(resultSet.getInt("_tipo")) {
+                            String docType = "";
+                            
+                            if (cfdType == SDataConstantsSys.TRNS_TP_CFD_INV) {
+                                switch(resultSet.getInt("_dps_type")) {
                                     case SDataConstantsSys.TRNS_CL_DPS_DOC:
-                                        tipoDoc = "F";
+                                        docType = "F";
                                         break;
                                     case SDataConstantsSys.TRNS_CL_DPS_ADJ:
-                                        tipoDoc = "N";
+                                        docType = "N";
                                         break;
                                     default: 
                                 }
                             }
                             
-                            String folio = !resultSet.getString("_serie").equals("") ? resultSet.getString("_serie") + "-" + resultSet.getString("_folio") : resultSet.getString("_folio");
-                            String emisor = resultSet.getString("emisor");
-                            String receptor = resultSet.getString("receptor");
-                            Date fecha = resultSet.getDate("c.ts");
-                            String rfcEmi = resultSet.getString("c.xml_rfc_emi");
-                            String rfcRec = resultSet.getString("c.xml_rfc_rec");
+                            String docNumber = STrnUtils.formatDocNumber(resultSet.getString("_cfd_series"), resultSet.getString("_cfd_number"));
                             String uuid = resultSet.getString("c.uuid");
                             String xml = resultSet.getString("xml");
                             
                             if (xml.isEmpty()) {
-                                sin_xml++;
+                                cfdiWithOutXml++;
                             }
                             else {
-                                cfd.ver33.DElementComprobante comprobante = null;
+                                cfd.ver33.DElementComprobante comprobante33 = null;
+                                
                                 try {
-                                    comprobante = DCfdUtils.getCfdi33(xml);
+                                    comprobante33 = DCfdUtils.getCfdi33(xml);
                                 }
-                                catch (Exception e) {}
-                                if (comprobante != null) {
-                                    float ver = comprobante.getVersion();
-                                    String[] status = new SCfdUtilsHandler(miClient).getCfdiSatStatus(ver, rfcEmi, rfcRec, uuid, resultSet.getDouble("c.xml_tot")).getArrayStatus();
+                                catch (Exception e) {
+                                    SLibUtils.printException(this, e);
+                                }
+                                
+                                if (comprobante33 != null) {
+                                    SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery = new SCfdUtilsHandler(miClient).getCfdiSatStatus(comprobante33);
 
-                                    switch (status[0].toLowerCase()){
-                                        case "vigente": vigentes++; break;
-                                        case "cancelado": cancelados++; break;
-                                        case "no encontrado": no_encontrados++; break;
+                                    switch (cfdiAckQuery.CfdiStatus){
+                                        case DCfdi33Consts.CFDI_ESTATUS_VIG:
+                                            cfdiValid++;
+                                            break;
+                                        case DCfdi33Consts.CFDI_ESTATUS_CAN:
+                                            cfdiCanceled++;
+                                            break;
+                                        case DCfdi33Consts.CFDI_ESTATUS_NO_ENC:
+                                            cfdiNotFound++;
+                                            break;
+                                        default:
+                                            // do nothing
                                     }
 
-                                    if (tipoCfd == SDataConstantsSys.TRNS_TP_CFD_INV) {
-                                        addResultPaneRow(tipoDoc, folio, fecha, emisor, rfcEmi, uuid, status);
+                                    if (cfdType == SDataConstantsSys.TRNS_TP_CFD_INV) {
+                                        addResultPaneRow(docType, docNumber, resultSet.getDate("c.ts"), resultSet.getString("_bp_issuer"), resultSet.getString("c.xml_rfc_emi"), uuid, cfdiAckQuery);
                                     }
                                     else {
-                                        addResultPaneRow(tipoDoc, folio, fecha, receptor, rfcRec, uuid, status);
+                                        addResultPaneRow(docType, docNumber, resultSet.getDate("c.ts"), resultSet.getString("_bp_receiver"), resultSet.getString("c.xml_rfc_rec"), uuid, cfdiAckQuery);
                                     }
                                 }
                             }
@@ -541,11 +566,12 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                             miClient.showMsgBoxInformation("No se encontraron CFDI a validar para los parámetros proporcionados.");
                         }
                         else {
-                            miClient.showMsgBoxInformation("Se validaron un total de " + total + " CFDs, de los cuales resultaron:\n" 
-                                    + (vigentes == 0 ? "" : vigentes + " vigentes\n") + (cancelados == 0 ? "" : cancelados + " cancelados\n") + (no_encontrados == 0 ? "" : no_encontrados + " no encontrados\n")
-                                    + (sin_xml == 0 ? "" : sin_xml + " sin XML"));
+                            miClient.showMsgBoxInformation("Se validaron un total de " + cfdiTotal + " CFDI, de los cuales resultaron:\n" 
+                                    + (cfdiValid == 0 ? "" : cfdiValid + " vigentes\n") + (cfdiCanceled == 0 ? "" : cfdiCanceled + " cancelados\n") + (cfdiNotFound == 0 ? "" : cfdiNotFound + " no encontrados\n")
+                                    + (cfdiWithOutXml == 0 ? "" : cfdiWithOutXml + " sin XML."));
                         }
                     }
+                    
                     this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
                 catch (Exception e) {
@@ -556,8 +582,8 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         }
     }
     
-    private void addResultPaneRow(String tipoDoc, String folio, Date fecha, String asocNeg, String rfcAsocNeg, String uuid, String[] status){
-        SRowCfdSatStatus row = new SRowCfdSatStatus(tipoDoc, folio, fecha, asocNeg, rfcAsocNeg, uuid, status);
+    private void addResultPaneRow(final String docType, final String docNumber, final Date docDate, final String bpName, final String bpFiscalId, final String uuid, final SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery){
+        SRowCfdSatStatus row = new SRowCfdSatStatus(docType, docNumber, docDate, bpName, bpFiscalId, uuid, cfdiAckQuery);
         moResultPane.addTableRow(row);
     }
     
@@ -625,11 +651,11 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
             SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_EMP);
             jlBizPartnerId.setText("Empleado:");
         }
-        else if (mnModuleSubType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+        else if (mnModuleSubtype == SDataConstantsSys.TRNS_CT_DPS_PUR) {
             SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_SUP);
             jlBizPartnerId.setText("Emisor:");
         }
-        else if (mnModuleSubType == SDataConstantsSys.TRNS_CT_DPS_SAL) {
+        else if (mnModuleSubtype == SDataConstantsSys.TRNS_CT_DPS_SAL) {
             SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_CUS);
             jlBizPartnerId.setText("Receptor:");
         }

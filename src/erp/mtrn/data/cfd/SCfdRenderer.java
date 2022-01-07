@@ -8,10 +8,8 @@ package erp.mtrn.data.cfd;
 import cfd.DCfd;
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
-import cfd.DElement;
 import cfd.ver33.DCfdi33Consts;
 import cfd.ver33.DElementConcepto;
-import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -118,7 +116,8 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         
         if (!validation.getIsError()) {
             String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(comprobante).getCfdiStatus(); 
-            if (!cfdiStatus.equals(SCfdConsts.STATUS_VALID)) {
+            
+            if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                 validation.setMessage("No se puede importar el CFDI ya que su estatus es : " + cfdiStatus + ".");
             }
         }
@@ -205,11 +204,10 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         }
         
         if (!validation.getIsError()) {
-            int[] key;
-            SDataDps dps;
-            key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, new int[] { idEmisor });
+            int[] key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, new int[] { idEmisor });
+            
             if (key != null) {
-                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
                 //moDps.poliza contable año-mes sucursal poliz, num de poliza getdbmsregisrtry
                 Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
                 validation.setMessage("El documento ya existe en la siguiente póliza contable:\n" +
@@ -219,14 +217,10 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             }
             
             if (!validation.getIsError()) {
-                if (comprobante.getEltOpcComplemento() != null) {
-                    for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-                        if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                            cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
-                            if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0){
-                                validation.setMessage("El UUID del documento ya existe en la base de datos.");
-                            }
-                        }
+                cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
+                if (tfd != null) {
+                    if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0){
+                        validation.setMessage("El UUID del documento ya existe en la base de datos.");
                     }
                 }
             }
@@ -329,20 +323,16 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             // Stamp:
             
             String sello = "";
-            if (comprobante.getEltOpcComplemento() != null) {
-                for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-                    if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                        cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
-                        moParamsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
-                        moParamsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
-                        moParamsMap.put("sCfdiSelloCFD", sello = tfd.getAttSelloCFD().getString());
-                        moParamsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
-                        moParamsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
-                        moParamsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
-                        moParamsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
-                        moParamsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
-                    }
-                }
+            cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
+            if (tfd != null) {
+                moParamsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
+                moParamsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
+                moParamsMap.put("sCfdiSelloCFD", sello = tfd.getAttSelloCFD().getString());
+                moParamsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                moParamsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                moParamsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+                moParamsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
+                moParamsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
             }
             moParamsMap.put("sSelloCfdiUltDig", sello.isEmpty() ? SLibUtils.textRepeat("0", DCfdi33Consts.STAMP_LAST_CHARS) : sello.substring(sello.length() - DCfdi33Consts.STAMP_LAST_CHARS, sello.length()));
             

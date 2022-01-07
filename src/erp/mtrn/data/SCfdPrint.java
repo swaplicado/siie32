@@ -608,18 +608,14 @@ public class SCfdPrint {
 
         // Stamp:
 
-        if (comprobante.getEltOpcComplemento() != null) {
-            for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    cfd.ver32.DElementTimbreFiscalDigital tfd = (cfd.ver32.DElementTimbreFiscalDigital) element;
-                    map.put("sCfdiVersion", tfd.getAttVersion().getString());
-                    map.put("sCfdiUuid", tfd.getAttUUID().getString());
-                    map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
-                    map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
-                    map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
-                    map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
-                }
-            }
+        cfd.ver32.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
+        if (tfd != null) {
+            map.put("sCfdiVersion", tfd.getAttVersion().getString());
+            map.put("sCfdiUuid", tfd.getAttUUID().getString());
+            map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+            map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+            map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+            map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
         }
 
         // QR Code:
@@ -1293,7 +1289,6 @@ public class SCfdPrint {
         map.put("dCfdConceptoImporte", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttImporte().getDouble());
 
         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-
             if (element.getName().compareTo("nomina:Nomina") == 0) {
 
                 map.put("RegistroPatronal", ((cfd.ver3.nom11.DElementNomina) element).getAttRegistroPatronal().getString());
@@ -1589,7 +1584,6 @@ public class SCfdPrint {
         map.put("dCfdConceptoImporte", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttImporte().getDouble());
         
         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-
             if (element.getName().compareTo("nomina12:Nomina") == 0) {
 
                 map.put("TipoNomina", ((cfd.ver3.nom12.DElementNomina) element).getAttTipoNomina().getString());
@@ -2204,6 +2198,7 @@ public class SCfdPrint {
                     break;
                     
                 default:
+                    // do nothing
             }
         }
         
@@ -2282,96 +2277,103 @@ public class SCfdPrint {
         
         if (comprobante.getEltOpcComplemento() != null) {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
-                    paramsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
-                    paramsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
-                    paramsMap.put("sCfdiSelloCFD", sello = tfd.getAttSelloCFD().getString());
-                    paramsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
-                    paramsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
-                    paramsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
-                    paramsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
-                    paramsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
-                }
-                if (element.getName().compareTo("cartaporte20:CartaPorte") == 0) {
-                    cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
-                    
-                    paramsMap.put("bCcp", true);
-                    paramsMap.put("sCcpComplemento", ccp.getElementForXml());
-                    paramsMap.put("sCcpVersion", ccp.getAttVersion().getString());
-                    paramsMap.put("sCcpTranspInternac", ccp.getAttTransInternac().getString());
-                    paramsMap.put("dCcpTotalDistRec", ccp.getAttTotalDistRec().getDouble());
-                    
-                    for (DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
-                        DElementDomicilio dom = ub.getEltDomicilio();
-                        dom.getAttLocalidad().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
-                        dom.getAttMunicipio().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
-                        dom.getAttEstado().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_STA, dom.getAttEstado().getString()));
-                        dom.getAttPais().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_CTY, dom.getAttPais().getString()));
-                    }
-                    
-                    paramsMap.put("oCcpUbicaciones", ccp.getEltUbicaciones().getEltUbicaciones());
-                    paramsMap.put("dCcpPesoBrutoTotal", ccp.getEltMercancias().getAttPesoBrutoTotal().getDouble());
-                    paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
-                    paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
-                    paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
-                    
-                    cfd.ver3.ccp20.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
-                    paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
-                    paramsMap.put("sCcpNumPermSCT", aut.getAttNumPermisoSCT().getString());
-                    paramsMap.put("sCcpConfVeh", aut.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
-                    paramsMap.put("sCcpPlacaVM", aut.getEltIdentificacionVehicular().getAttPlacaVM().getString());
-                    paramsMap.put("nCcpAnio", aut.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
-                    if (aut.getEltRemolques() != null) {
-                        int i = 1;
-                        for (cfd.ver3.ccp20.DElementRemolque rem : aut.getEltRemolques().getEltRemolques()) {
-                            paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
-                            paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
-                            i++;
+                switch (element.getName()) {
+                    case "tfd:TimbreFiscalDigital":
+                        cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                        paramsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
+                        paramsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
+                        paramsMap.put("sCfdiSelloCFD", sello = tfd.getAttSelloCFD().getString());
+                        paramsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                        paramsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                        paramsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+                        paramsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
+                        paramsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
+                        
+                        break;
+                        
+                    case "cartaporte20:CartaPorte":
+                        cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+
+                        paramsMap.put("bCcp", true);
+                        paramsMap.put("sCcpComplemento", ccp.getElementForXml());
+                        paramsMap.put("sCcpVersion", ccp.getAttVersion().getString());
+                        paramsMap.put("sCcpTranspInternac", ccp.getAttTransInternac().getString());
+                        paramsMap.put("dCcpTotalDistRec", ccp.getAttTotalDistRec().getDouble());
+
+                        for (DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
+                            DElementDomicilio dom = ub.getEltDomicilio();
+                            dom.getAttLocalidad().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                            dom.getAttMunicipio().setString(SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                            dom.getAttEstado().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_STA, dom.getAttEstado().getString()));
+                            dom.getAttPais().setString(SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOCU_CTY, dom.getAttPais().getString()));
                         }
-                    }
-                    paramsMap.put("sCcpAsegRespCivil", aut.getEltSeguros().getAttAseguraRespCivil().getString());
-                    paramsMap.put("sCcpPolRespCivil", aut.getEltSeguros().getAttPolizaRespCivil().getString());
-                    paramsMap.put("sCcpAsegMedAmbiente", aut.getEltSeguros().getAttAseguraMedAmbiente().getString());
-                    paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
-                    paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
-                    paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                    paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
-                    
-                    paramsMap.put("sCcpRfcChofer", bol.getBolTransportationMode().getXtaDriver().getFiscalId());
-                    paramsMap.put("sCcpRegTribChofer", bol.getBolTransportationMode().getXtaDriver().getFiscalForeginId());
-                    paramsMap.put("sCcpResFiscalChofer", bol.getBolTransportationMode().getXtaDriver().getXtaCountry() != null ? 
-                            bol.getBolTransportationMode().getXtaDriver().getXtaCountry().getCountry() : "");
-                    paramsMap.put("sCcpNombreChofer", bol.getBolTransportationMode().getXtaDriver().getName());
-                    paramsMap.put("sCcpLicenciaChofer", bol.getBolTransportationMode().getXtaDriver().getDriverLicense());
-                    
-                    if (bol.getBolTransportationMode().getXtaOwner() != null) {
-                        paramsMap.put("bCcpPropietario", true);
-                        paramsMap.put("sCcpRfcPropietario", bol.getBolTransportationMode().getXtaOwner().getFiscalId());
-                        paramsMap.put("sCcpRegTribPropietario", bol.getBolTransportationMode().getXtaOwner().getFiscalForeginId());
-                        paramsMap.put("sCcpResFiscalPropietario", bol.getBolTransportationMode().getXtaOwner().getXtaCountry() != null ? 
-                            bol.getBolTransportationMode().getXtaOwner().getXtaCountry().getCountry() : "");
-                        paramsMap.put("sCcpNombrePropietario", bol.getBolTransportationMode().getXtaOwner().getName());
-                        paramsMap.put("sCcpParteTranspPropietario", bol.getBolTransportationMode().getTransportationPartOwner());
-                    }
-                    
-                    if (bol.getBolTransportationMode().getXtaLessee() != null) {
-                        paramsMap.put("bCcpArrendatario", true);
-                        paramsMap.put("sCcpRfcArrendatario", bol.getBolTransportationMode().getXtaLessee().getFiscalId());
-                        paramsMap.put("sCcpRegTribArrendatario", bol.getBolTransportationMode().getXtaLessee().getFiscalForeginId());
-                        paramsMap.put("sCcpResFiscalArrendatario", bol.getBolTransportationMode().getXtaLessee().getXtaCountry().getCountry());
-                        paramsMap.put("sCcpNombreArrendatario", bol.getBolTransportationMode().getXtaLessee().getName());
-                        paramsMap.put("sCcpParteTranspArrendatario", bol.getBolTransportationMode().getTransportationPartLessee());
-                    }
-                    
-                    if (bol.getBolTransportationMode().getXtaNotified() != null) {
-                        paramsMap.put("bCcpNotificado", true);
-                        paramsMap.put("sCcpRfcNotificado", bol.getBolTransportationMode().getXtaNotified().getFiscalId());
-                        paramsMap.put("sCcpRegTribNotificado", bol.getBolTransportationMode().getXtaNotified().getFiscalForeginId());
-                        paramsMap.put("sCcpResFiscalNotificado", bol.getBolTransportationMode().getXtaNotified().getXtaCountry() != null ? 
-                            bol.getBolTransportationMode().getXtaNotified().getXtaCountry().getCountry() : "");
-                        paramsMap.put("sCcpNombreNotificado", bol.getBolTransportationMode().getXtaNotified().getName());
-                    }
+
+                        paramsMap.put("oCcpUbicaciones", ccp.getEltUbicaciones().getEltUbicaciones());
+                        paramsMap.put("dCcpPesoBrutoTotal", ccp.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                        paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
+                        paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                        paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
+
+                        cfd.ver3.ccp20.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
+                        paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
+                        paramsMap.put("sCcpNumPermSCT", aut.getAttNumPermisoSCT().getString());
+                        paramsMap.put("sCcpConfVeh", aut.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                        paramsMap.put("sCcpPlacaVM", aut.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                        paramsMap.put("nCcpAnio", aut.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                        if (aut.getEltRemolques() != null) {
+                            int i = 1;
+                            for (cfd.ver3.ccp20.DElementRemolque rem : aut.getEltRemolques().getEltRemolques()) {
+                                paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                                paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                                i++;
+                            }
+                        }
+                        paramsMap.put("sCcpAsegRespCivil", aut.getEltSeguros().getAttAseguraRespCivil().getString());
+                        paramsMap.put("sCcpPolRespCivil", aut.getEltSeguros().getAttPolizaRespCivil().getString());
+                        paramsMap.put("sCcpAsegMedAmbiente", aut.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                        paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                        paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
+                        paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
+                        paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
+
+                        paramsMap.put("sCcpRfcChofer", bol.getBolTransportationMode().getXtaDriver().getFiscalId());
+                        paramsMap.put("sCcpRegTribChofer", bol.getBolTransportationMode().getXtaDriver().getFiscalForeginId());
+                        paramsMap.put("sCcpResFiscalChofer", bol.getBolTransportationMode().getXtaDriver().getXtaCountry() != null ? 
+                                bol.getBolTransportationMode().getXtaDriver().getXtaCountry().getCountry() : "");
+                        paramsMap.put("sCcpNombreChofer", bol.getBolTransportationMode().getXtaDriver().getName());
+                        paramsMap.put("sCcpLicenciaChofer", bol.getBolTransportationMode().getXtaDriver().getDriverLicense());
+
+                        if (bol.getBolTransportationMode().getXtaOwner() != null) {
+                            paramsMap.put("bCcpPropietario", true);
+                            paramsMap.put("sCcpRfcPropietario", bol.getBolTransportationMode().getXtaOwner().getFiscalId());
+                            paramsMap.put("sCcpRegTribPropietario", bol.getBolTransportationMode().getXtaOwner().getFiscalForeginId());
+                            paramsMap.put("sCcpResFiscalPropietario", bol.getBolTransportationMode().getXtaOwner().getXtaCountry() != null ? 
+                                bol.getBolTransportationMode().getXtaOwner().getXtaCountry().getCountry() : "");
+                            paramsMap.put("sCcpNombrePropietario", bol.getBolTransportationMode().getXtaOwner().getName());
+                            paramsMap.put("sCcpParteTranspPropietario", bol.getBolTransportationMode().getTransportationPartOwner());
+                        }
+
+                        if (bol.getBolTransportationMode().getXtaLessee() != null) {
+                            paramsMap.put("bCcpArrendatario", true);
+                            paramsMap.put("sCcpRfcArrendatario", bol.getBolTransportationMode().getXtaLessee().getFiscalId());
+                            paramsMap.put("sCcpRegTribArrendatario", bol.getBolTransportationMode().getXtaLessee().getFiscalForeginId());
+                            paramsMap.put("sCcpResFiscalArrendatario", bol.getBolTransportationMode().getXtaLessee().getXtaCountry().getCountry());
+                            paramsMap.put("sCcpNombreArrendatario", bol.getBolTransportationMode().getXtaLessee().getName());
+                            paramsMap.put("sCcpParteTranspArrendatario", bol.getBolTransportationMode().getTransportationPartLessee());
+                        }
+
+                        if (bol.getBolTransportationMode().getXtaNotified() != null) {
+                            paramsMap.put("bCcpNotificado", true);
+                            paramsMap.put("sCcpRfcNotificado", bol.getBolTransportationMode().getXtaNotified().getFiscalId());
+                            paramsMap.put("sCcpRegTribNotificado", bol.getBolTransportationMode().getXtaNotified().getFiscalForeginId());
+                            paramsMap.put("sCcpResFiscalNotificado", bol.getBolTransportationMode().getXtaNotified().getXtaCountry() != null ? 
+                                bol.getBolTransportationMode().getXtaNotified().getXtaCountry().getCountry() : "");
+                            paramsMap.put("sCcpNombreNotificado", bol.getBolTransportationMode().getXtaNotified().getName());
+                        }
+                        
+                        break;
+                        
+                    default:
                 }
             }
         }

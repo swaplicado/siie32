@@ -895,11 +895,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double amountPrepayment = 0;
         
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (!entry.getIsDeleted() && entry.getIsPrepayment()) {
+            if (!entry.getIsDeleted() && entry.getIsPrepayment() && (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY)) {
                 for (SDataDpsEntryTax entryTax : entry.getDbmsEntryTaxes()) {
-                    taxAmount = SLibUtilities.round(taxAmount + (amountPrepaymentType == AMT_PRE_PAY_CY ? entryTax.getTaxCy() : entryTax.getTax()), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                    taxAmount = SLibUtils.roundAmount(taxAmount + (amountPrepaymentType == AMT_PRE_PAY_CY ? entryTax.getTaxCy() : entryTax.getTax()));
                 }
-                amountPrepayment = SLibUtilities.round((amountPrepayment + (amountPrepaymentType == AMT_PRE_PAY_CY ? entry.getSubtotalCy_r() : entry.getSubtotal_r()) + taxAmount), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                amountPrepayment = SLibUtils.roundAmount((amountPrepayment + (amountPrepaymentType == AMT_PRE_PAY_CY ? entry.getSubtotalCy_r() : entry.getSubtotal_r()) + taxAmount));
             }
         }
         
@@ -1024,8 +1024,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 double dPrepayments = obtainAmountPrepayments(AMT_PRE_PAY);
                 double dPrepaymentsCy = obtainAmountPrepayments(AMT_PRE_PAY_CY);
 
-                dAuxBalance = SLibUtilities.round(dBalance + (dPrepayments <= 0 ? 0 : dPrepayments), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                dAuxBalanceCy = SLibUtilities.round(dBalanceCy + (dPrepaymentsCy <= 0 ? 0 : dPrepaymentsCy), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                dAuxBalance = SLibUtils.roundAmount(dBalance + (dPrepayments <= 0 ? 0 : dPrepayments));
+                dAuxBalanceCy = SLibUtils.roundAmount(dBalanceCy + (dPrepaymentsCy <= 0 ? 0 : dPrepaymentsCy));
                 
                 if (dAuxBalance != mdTotal_r) {
                     mnDbmsErrorId = 101;

@@ -6,9 +6,9 @@
 package erp.mtrn.form;
 
 import cfd.DCfdUtils;
-import cfd.DElement;
 import cfd.ver3.DCfdVer3Consts;
 import cfd.ver33.DCfdi33Catalogs;
+import cfd.ver33.DCfdi33Consts;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
@@ -7608,13 +7608,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         String cfdi = SXmlUtils.readXml(absolutePath);
                         msXmlUuid = "";
                         moComprobante = DCfdUtils.getCfdi33(cfdi);
-                        if (moComprobante.getEltOpcComplemento() != null) {
-                            for (DElement element : moComprobante.getEltOpcComplemento().getElements()) {
-                                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                                    cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
-                                    msXmlUuid = tfd.getAttUUID().getString();
-                                }
-                            }
+                        cfd.ver33.DElementTimbreFiscalDigital tfd = moComprobante.getEltOpcComplementoTimbreFiscalDigital();
+                        if (tfd != null) {
+                            msXmlUuid = tfd.getAttUUID().getString();
                         }
                         if (!moComprobante.getAttSerie().getString().isEmpty() && jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
                             jcbNumberSeries.setSelectedItem(moComprobante.getAttSerie().getString());
@@ -8402,7 +8398,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             String message = "No se puede guardar el CFDI porque ";
             String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(moComprobante).getCfdiStatus(); 
             
-            if (!cfdiStatus.equals(SCfdConsts.STATUS_VALID)) {
+            if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                 validation.setMessage(message + "su estatus es: '" + cfdiStatus + "'.");
             }
             else if (!moBizPartner.getFiscalId().equals(moComprobante.getEltEmisor().getAttRfc().getString())) {

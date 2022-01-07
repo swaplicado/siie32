@@ -6,8 +6,8 @@
 package erp.mod.fin.form;
 
 import cfd.DCfdUtils;
+import cfd.ver33.DCfdi33Consts;
 import erp.SClientUtils;
-import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -2485,15 +2485,30 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             try {
                 for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
                     SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
-                    if (row.isXml()) {
+                    if (row.isXml() && !row.getXmlUuid().isEmpty()) {
                         cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(row.getXml());
-                        float ver = comprobante.getVersion();
-                        String status = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(ver, /*row.getXmlType(), rfcProvCertif,*/ row.getXmlRfcEmi(), row.getXmlRfcRec(), row.getXmlUuid(), row.getXmlTotal()).getCfdiStatus() + ".\n";
-                        if (!status.equals(SCfdConsts.STATUS_VALID)) {
+                        cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
+                        
+                        if (tfd == null) {
+                            message += (message.isEmpty() ? "" : "\n");
+                            message += "beneficiario: " + row.getBizPartner() + ": ";
+                            message += "folio CFDI = " + row.getReference() + "; ";
+                            message += "estatus CFDI = ¡Sin timbrar!.";
+                        }
+                        else if (!row.getXmlUuid().equals(tfd.getAttUUID().getString())) {
+                            message += (message.isEmpty() ? "" : "\n");
+                            message += "beneficiario: '" + row.getBizPartner() + "': ";
+                            message += "folio CFDI = '" + row.getReference() + "'; ";
+                            message += "estatus CFDI = ¡El CFDI relacionado con el del pago: UUID del pago = '" + row.getXmlUuid() + "', UUID del CFDI = '" + tfd.getAttUUID().getString() + "'!.";
+                        }
+                        
+                        String cfdiStatus = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(comprobante).getCfdiStatus();
+                        
+                        if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                             message += (message.isEmpty() ? "" : "\n");
                             message += row.getBizPartner() + ": ";
                             message += "folio CFDI = " + row.getReference() + "; ";
-                            message += "estatus CFDI = " + status + ".";
+                            message += "estatus CFDI = " + cfdiStatus + ".";
                         }
                     }
                 }

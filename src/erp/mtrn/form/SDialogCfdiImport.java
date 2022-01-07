@@ -11,7 +11,6 @@
 
 package erp.mtrn.form;
 
-import cfd.DElement;
 import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DElementConcepto;
 import cfd.ver33.DElementConceptoImpuestoRetencion;
@@ -1885,14 +1884,11 @@ public class SDialogCfdiImport extends javax.swing.JDialog implements java.awt.e
         else {
             moDpsNew.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
+        
         String uuid = "";
-        if (moComprobante.getEltOpcComplemento() != null) {
-            for (DElement element : moComprobante.getEltOpcComplemento().getElements()) {
-                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
-                    uuid = tfd.getAttUUID().getString().toUpperCase();
-                }
-            }
+        cfd.ver33.DElementTimbreFiscalDigital tfd = moComprobante.getEltOpcComplementoTimbreFiscalDigital();
+        if (tfd != null) {
+            uuid = tfd.getAttUUID().getString().toUpperCase();
         }
 
         moDpsNew.setDate(moComprobante.getAttFecha().getDatetime());

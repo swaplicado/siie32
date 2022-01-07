@@ -15,7 +15,6 @@ import cfd.ver33.DCfdi33Consts;
 import cfd.ver33.DElementCfdiRelacionados;
 import cfd.ver33.DElementImpuestos;
 import com.finkok.facturacion.cancel.CancelSOAP;
-import com.finkok.facturacion.cancellation.StringArray; 
 import com.finkok.stamp.AcuseRecepcionCFDI; 
 import com.finkok.stamp.Incidencia;
 import com.finkok.stamp.IncidenciaArray;
@@ -94,7 +93,6 @@ import javax.mail.MessagingException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerConfigurationException;
@@ -118,8 +116,10 @@ import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlUtils;
 import views.core.soap.services.apps.CancelaCFDResult; 
 import views.core.soap.services.apps.FolioArray; 
+import views.core.soap.services.apps.ObjectFactory;
 import views.core.soap.services.apps.ReceiptResult; 
-import views.core.soap.services.apps.UUIDS; 
+import views.core.soap.services.apps.UUID;
+import views.core.soap.services.apps.UUIDArray;
 
 /**
  *
@@ -165,23 +165,22 @@ public abstract class SCfdUtils implements Serializable {
             switch (cfd.getFkXmlTypeId()) {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                     cfd.ver32.DElementComprobante comprobante32 = DCfdUtils.getCfdi32(cfd.getDocXml());
-                    for (DElement element : comprobante32.getEltOpcComplemento().getElements()) {
-                        if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                            certSAT = ((cfd.ver32.DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
-                            break;
-                        }
+                    cfd.ver32.DElementTimbreFiscalDigital tft32 = comprobante32.getEltOpcComplementoTimbreFiscalDigital();
+                    if (tft32 != null) {
+                        certSAT = tft32.getAttNoCertificadoSAT().getString();
                     }
                     break;
+                    
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                     cfd.ver33.DElementComprobante comprobante33 = DCfdUtils.getCfdi33(cfd.getDocXml());
-                    for (DElement element : comprobante33.getEltOpcComplemento().getElements()) {
-                        if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                            certSAT = ((cfd.ver33.DElementTimbreFiscalDigital) element).getAttNoCertificadoSAT().getString();
-                            break;
-                        }
+                    cfd.ver33.DElementTimbreFiscalDigital tft33 = comprobante33.getEltOpcComplementoTimbreFiscalDigital();
+                    if (tft33 != null) {
+                        certSAT = tft33.getAttNoCertificadoSAT().getString();
                     }
                     break;
+                    
                 default:
+                    // to nothing
             }
 
             cfdPacType = getCfdPacType(client, cfd.getFkCfdTypeId()); 
@@ -1340,8 +1339,8 @@ public abstract class SCfdUtils implements Serializable {
             String userPswd = pac.getUserPassword();
             SDataCertificate companyCertificate = client.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n();
             
-            ArrayList<String> uuidArray = new ArrayList<>();
-            uuidArray.add(cfd.getUuid());
+            ArrayList<String> uuids = new ArrayList<>();
+            uuids.add(cfd.getUuid());
 
             client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
             if (client.getSessionXXX().getParamsCompany().getIsCfdiProduction()) {
@@ -1408,7 +1407,7 @@ public abstract class SCfdUtils implements Serializable {
                             // Sign & Cancel Log step #3
                             createSignCancelLogEntry(client, "", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_SEND_RECV, cfd, pac.getPkPacId());
 
-                            canceladoResponse = fcgPort.cancelacion1(fiscalIdIssuer, SLibUtils.DbmsDateFormatDate.format(date), uuidArray, companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getExtraPrivateKeyBytes_n(), "", autenticarResponse.getToken());
+                            canceladoResponse = fcgPort.cancelacion1(fiscalIdIssuer, SLibUtils.DbmsDateFormatDate.format(date), uuids, companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getExtraPrivateKeyBytes_n(), "", autenticarResponse.getToken());
 
                             if (canceladoResponse.getMensaje() != null) {
                                 // Sign & Cancel Log step #4
@@ -1420,7 +1419,7 @@ public abstract class SCfdUtils implements Serializable {
                                 if (pacId == 0) {
                                     System.err.println("WsCancelacionResponse Codigo: [" + canceladoResponse.getCodEstatus() + "]");
                                     System.err.println("WsCancelacionResponse Mensaje: [" + canceladoResponse.getMensaje() + "]");
-                                    System.err.println("UUID: [" + uuidArray + "]\t");
+                                    System.err.println("UUID: [" + uuids + "]\t");
                                     throw new Exception("Error al cancelar el comprobante:\nCódigo: " + canceladoResponse.getCodEstatus() + "\nMensaje: " + canceladoResponse.getMensaje());
                                 }
                                 next = false;
@@ -1467,9 +1466,9 @@ public abstract class SCfdUtils implements Serializable {
                         boolean getAckCancellation = false;
                         boolean isDirectlyCancellable = false;
                         SCfdUtilsHandler cfdUtilsHandler = new SCfdUtilsHandler(client);
-                        SCfdUtilsHandler.CfdiAckQuery ackQuery = cfdUtilsHandler.getCfdiSatStatus(cfd);
+                        SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery = cfdUtilsHandler.getCfdiSatStatus(cfd);
                         
-                        switch (ackQuery.CfdiStatus) {
+                        switch (cfdiAckQuery.CfdiStatus) {
                             case DCfdi33Consts.CFDI_ESTATUS_CAN:
                                 // CFDI is 'cancelled' before fiscal authority, but is still active in system:
                                 
@@ -1488,7 +1487,7 @@ public abstract class SCfdUtils implements Serializable {
                                 }
                                 
                                 // check cancellable status:
-                                switch (ackQuery.CancellableInfo) {
+                                switch (cfdiAckQuery.CancellableInfo) {
                                     case DCfdi33Consts.CANCELABLE_SIN_ACEPT:
                                         isDirectlyCancellable = true;
                                         // CFDI is cancellable, go through...
@@ -1508,12 +1507,12 @@ public abstract class SCfdUtils implements Serializable {
                                         throw new Exception("El CFDI es no cancelable.");
                                         
                                     default:
-                                        throw new Exception("Estatus de cancelación desconocido: '" + ackQuery.CancellableInfo + "'");
+                                        throw new Exception("Estatus de cancelación desconocido: '" + cfdiAckQuery.CancellableInfo + "'");
                                 }
 
                                 // check cancellation status:
-                                if (!ackQuery.CancelStatus.isEmpty()) { // since december 2020, cancel status is empty for all cancellable CFDI types!, awkward!
-                                    switch (ackQuery.CancelStatus) {
+                                if (!cfdiAckQuery.CancelStatus.isEmpty()) { // since december 2020, cancel status is empty for all cancellable CFDI types!, awkward!
+                                    switch (cfdiAckQuery.CancelStatus) {
                                         case DCfdi33Consts.ESTATUS_CANCEL_PROC: // CFDI cancellation is in process
                                             cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
                                             client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
@@ -1540,7 +1539,7 @@ public abstract class SCfdUtils implements Serializable {
                                             break;
 
                                         default:
-                                            throw new Exception("El estatus de cancelación del CFDI es desconocido: [" + ackQuery.CancelStatus + "]");
+                                            throw new Exception("El estatus de cancelación del CFDI es desconocido: [" + cfdiAckQuery.CancelStatus + "]");
                                     }
                                 }
                                 break;
@@ -1554,16 +1553,16 @@ public abstract class SCfdUtils implements Serializable {
                                 throw new Exception("El CFD no fue encontrado ante el SAT.");
 
                             default:
-                                throw new Exception("Estatus de CFDI desconocido: '" + ackQuery.CfdiStatus + "'");
+                                throw new Exception("Estatus de CFDI desconocido: '" + cfdiAckQuery.CfdiStatus + "'");
                         }
                         
-                        CancelSOAP service = new CancelSOAP();
-                        com.finkok.facturacion.cancel.Application port = service.getApplication();
+                        CancelSOAP cancelSoap = new CancelSOAP();
+                        com.finkok.facturacion.cancel.Application cancelApp = cancelSoap.getApplication();
                         
                         if (isValidation || getAckCancellation) {
                             // validating cancellation:
                             
-                            ReceiptResult receiptResult = port.getReceipt(userName, userPswd, fiscalIdIssuer, cfd.getUuid(), "C");
+                            ReceiptResult receiptResult = cancelApp.getReceipt(userName, userPswd, fiscalIdIssuer, cfd.getUuid(), "C");
                             
                             if (receiptResult != null) {
                                 if (receiptResult.getSuccess() == null) {
@@ -1593,7 +1592,7 @@ public abstract class SCfdUtils implements Serializable {
                                     else {
                                         String cancelStatusCode = "?";
                                         
-                                        switch (ackQuery.CancelStatus) {
+                                        switch (cfdiAckQuery.CancelStatus) {
                                             case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
                                                 cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE;
                                                 break;
@@ -1624,6 +1623,7 @@ public abstract class SCfdUtils implements Serializable {
                         else {
                             // cancelling CFDI:
                             
+                            /* Valid code up to 2021-12-31:
                             StringArray stringArray = new StringArray();
                             stringArray.getString().addAll(uuidArray);
 
@@ -1632,8 +1632,23 @@ public abstract class SCfdUtils implements Serializable {
 
                             UUIDS uuids = new UUIDS();
                             uuids.setUuids(elementUuids);
-
-                            CancelaCFDResult cancelaCFDResult = port.cancel(uuids, userName, userPswd, fiscalIdIssuer, companyCertificate.getExtraFnkPublicKeyBytes_n(), companyCertificate.getExtraFnkPrivateKeyBytes_n(), true);
+                            
+                            CancelaCFDResult cancelaCFDResult = cancelApp.cancel(uuids, userName, userPswd, fiscalIdIssuer, companyCertificate.getExtraFnkPublicKeyBytes_n(), companyCertificate.getExtraFnkPrivateKeyBytes_n(), true);
+                            */
+                            
+                            ObjectFactory objectFactory = new ObjectFactory();
+                            UUID uuid = objectFactory.createUUID();
+                            uuid.setUUID(uuids.get(0));
+                            uuid.setMotivo("03");
+                            uuid.setFolioSustitucion("");
+                            
+                            UUIDArray uuidArray = new UUIDArray();
+                            uuidArray.getUUID().add(uuid);
+                            //JAXBElement<UUIDArray> array = objectFactory.createUUIDArray(uuidArray); // it seems to be unnecesary this varibale
+                            
+                            //CancelaCFDResult cancelaCFDResult = cancelApp.cancel(array.getValue(), userName, userPswd, fiscalIdIssuer, companyCertificate.getExtraFnkPublicKeyBytes_n(), companyCertificate.getExtraFnkPrivateKeyBytes_n(), true);// it seems to be unnecesary this way of getting the first parameter
+                            CancelaCFDResult cancelaCFDResult = cancelApp.cancel(uuidArray, userName, userPswd, fiscalIdIssuer, companyCertificate.getExtraFnkPublicKeyBytes_n(), companyCertificate.getExtraFnkPrivateKeyBytes_n(), true);
+                            
                             JAXBElement<FolioArray> elementFolios = cancelaCFDResult.getFolios();
 
                             if (elementFolios == null) {
@@ -1821,7 +1836,7 @@ public abstract class SCfdUtils implements Serializable {
                             // Sign & Cancel Log step #3
                             createSignCancelLogEntry(client, "", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_SEND_RECV, cfd, pac.getPkPacId());
 
-                            canceladoResponse = fcgPort.cancelacion1(fiscalIdIssuer, SLibUtils.DbmsDateFormatDate.format(date), uuidArray, companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getExtraPrivateKeyBytes_n(), "", autenticarResponse.getToken());
+                            canceladoResponse = fcgPort.cancelacion1(fiscalIdIssuer, SLibUtils.DbmsDateFormatDate.format(date), uuids, companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getExtraPrivateKeyBytes_n(), "", autenticarResponse.getToken());
 
                             if (canceladoResponse.getMensaje() != null) {
                                 // Sign & Cancel Log step #4
@@ -1833,7 +1848,7 @@ public abstract class SCfdUtils implements Serializable {
                                 if (pacId == 0) {
                                     System.err.println("WsCancelacionResponse Codigo: [" + canceladoResponse.getCodEstatus() + "]");
                                     System.err.println("WsCancelacionResponse Mensaje: [" + canceladoResponse.getMensaje() + "]");
-                                    System.err.println("UUID: [" + uuidArray + "]\t");
+                                    System.err.println("UUID: [" + uuids + "]\t");
                                     throw new Exception("Error al cancelar el comprobante:\nCódigo: " + canceladoResponse.getCodEstatus() + "\nMensaje: " + canceladoResponse.getMensaje());
                                 }
                                 next = false;

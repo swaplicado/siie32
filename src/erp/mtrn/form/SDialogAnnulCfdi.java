@@ -4,7 +4,6 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
-import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mod.SModConsts;
@@ -40,7 +39,9 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     
     private Date mtDateDps;
     
-    /** Creates new form SDialogAnnulCfdi */
+    /** Creates new form SDialogAnnulCfdi.
+     * @param client GUI client.
+     */
     public SDialogAnnulCfdi(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -166,7 +167,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         moFieldTypeAnnul = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyDpsAnnulationType.getComponent(), jlDpsAnnulationType);
         moKeyDpsAnnulationType.setKeySettings((SGuiClient) miClient, jlDpsAnnulationType.getName(), true);
         
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldDate);
         mvFields.add(moFieldAnnulSat);
         mvFields.add(moFieldTypeAnnul);

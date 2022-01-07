@@ -6,8 +6,7 @@ package erp.mtrn.data;
 
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
-import cfd.DElement;
-import erp.cfd.SCfdConsts;
+import cfd.ver33.DCfdi33Consts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
@@ -23,7 +22,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SCfdUtilsHandler {
     
@@ -111,8 +110,9 @@ public class SCfdUtilsHandler {
     }
     
     /**
-     * Devuelve el estatus del SAT a traves de un SDataCfd
-     * @param cfd SDataCfd
+     * Devuelve el estatus del SAT a traves de un SDataCfd.
+     /* @param cfdTypeId Se comentó porque ya no es necesario conocer el tipo de CFD con la nueva validación.
+     * @param cfd CFDI.
      * @return CfdiAckQuery
      * @throws java.lang.Exception 
     */
@@ -121,29 +121,23 @@ public class SCfdUtilsHandler {
     }
     
     /**
-     * Devuelve el estatus del SAT a traves de un DElementComprobante
-     * @param comprobante cfd.ver33.DElementComprobante.
+     * Devuelve el estatus del SAT a traves de un DElementComprobante.
+     /* @param cfdTypeId Se comentó porque ya no es necesario conocer el tipo de CFD con la nueva validación.
+     * @param comprobante CFDI.
      * @return CfdiAckQuery
      * @throws java.lang.Exception 
     */
     public CfdiAckQuery getCfdiSatStatus(/*final int cfdTypeId, */final cfd.ver33.DElementComprobante comprobante) throws Exception {
-        cfd.ver33.DElementTimbreFiscalDigital tfd = null;
-        if (comprobante.getEltOpcComplemento() != null) {
-            for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
-                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
-                    tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
-                    break;
-                }
-            }
-        }
+        cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
         
         if (tfd != null) {
-            float ver = comprobante.getVersion();
+            float version = comprobante.getVersion();
             String rfcEmisor = comprobante.getEltEmisor().getAttRfc().getString();
             String rfcReceptor = comprobante.getEltReceptor().getAttRfc().getString();
             double total = comprobante.getAttTotal().getDouble();
+            String sello = comprobante.getAttSello().getString();
             
-            return getCfdiSatStatus(ver, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total);
+            return getCfdiSatStatus(version, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total, sello);
         }
         
         return null;
@@ -151,23 +145,24 @@ public class SCfdUtilsHandler {
     
     /**
      * Devuelve el estatus del SAT a recibiendo los parámetros necesarios para la validación.
-     * @param ver
+     * @param version Versión del CFDI.
      /* @param cfdTypeId Se comentó porque ya no es necesario conocer el tipo de cfd con la nueva validación.
      /* @param rfcProvCertif Se comentó porque ya no es necesario conocer el RFC de quien emitió el certificado.
-     * @param rfcEmisor
-     * @param rfcReceptor
-     * @param uuid
-     * @param total
+     * @param rfcEmisor RFC del emisor del CFDI.
+     * @param rfcReceptor RFC del receptor del CFDI.
+     * @param uuid UUID del CFDI.
+     * @param total Total del CFDI.
+     * @param sello Sello (firma electrónica) del CFDI generada con el CSD del emisor.
      * @return CfdiAckQuery
      * @throws java.lang.Exception 
     */
-    public CfdiAckQuery getCfdiSatStatus(final float ver, /*final int cfdTypeId, final String rfcProvCertif, */
-            final String rfcEmisor, final String rfcReceptor, final String uuid, final double total) throws Exception {
+    public CfdiAckQuery getCfdiSatStatus(final float version, /*final int cfdTypeId, final String rfcProvCertif, */
+            final String rfcEmisor, final String rfcReceptor, final String uuid, final double total, final String sello) throws Exception {
         miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         String data = "";
         
-        if (ver == DCfdConsts.CFDI_VER_32){
+        if (version == DCfdConsts.CFDI_VER_32) {
             DecimalFormat decimalFormat32 = new DecimalFormat("0000000000.000000");
             
             data += "?re=" + rfcEmisor;
@@ -175,13 +170,16 @@ public class SCfdUtilsHandler {
             data += "&tt=" + decimalFormat32.format(total);
             data += "&id=" + uuid;
         }
-        else if (ver == DCfdConsts.CFDI_VER_33){
-            DecimalFormat decimalFormat33 = new DecimalFormat("#." + SLibUtils.textRepeat("#", 6));
+        else if (version == DCfdConsts.CFDI_VER_33) {
+            DecimalFormat decimalFormat33 = new DecimalFormat("#." + SLibUtils.textRepeat("#", 6)); // max decimals for total according to XSD of CFDI 3.3
             
-            data += "?id=" + (uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", 40) : uuid);
-            data += "&re=" + (rfcEmisor == null || rfcEmisor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcEmisor.replaceAll("&", "&amp;"));
-            data += "&rr=" + (rfcReceptor == null || rfcReceptor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcReceptor.replaceAll("&", "&amp;"));
+            data += "?id=" + (uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", 36) : uuid); // UUID length hyphens included: 36
+            data += "&re=" + (rfcEmisor == null || rfcEmisor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcEmisor.replaceAll("&", "&amp;")); // fiscal ID length: 13; some fiscal ID contains character '&', and must be encoded
+            data += "&rr=" + (rfcReceptor == null || rfcReceptor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcReceptor.replaceAll("&", "&amp;")); // fiscal ID length: 13; some fiscal ID contains character '&', and must be encoded
             data += "&tt=" + decimalFormat33.format(SLibUtils.roundAmount(total));
+            if (sello != null && !sello.isEmpty()) {
+                data += "&fe=" + SLibUtils.textRight(sello, 8); // last 8 characters of electronic signature
+            }
         }
         
         ConsultaCFDIService service = new ConsultaCFDIService(); 
@@ -344,24 +342,10 @@ public class SCfdUtilsHandler {
          * @return Estatus del CFDI: "Vigente" en caso de que el CFDI esté vigente; "En proceso de cancelación" si está en proceso de cancelación.
          */
         public String getCfdiStatus() {
-            if (CfdiStatus.equals(SCfdConsts.STATUS_VALID) && CancelStatus.toLowerCase().equals(SCfdConsts.STATUS_CANCEL_PROCESSING.toLowerCase())) {
+            if (CfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG) && CancelStatus.toLowerCase().equals(DCfdi33Consts.ESTATUS_CANCEL_PROC.toLowerCase())) {
                 return "En proceso de cancelación";
             }
             return CfdiStatus;
-        }
-        
-        /**
-         * Obtener todos los datos que conforman el estatus del SAT de un CFDI.
-         * @return Un arreglo de todos los datos que conforman el estatus del SAT de un CFDI.
-         * - Estatus
-         * - Código de estatus
-         * - Información de cancelación y
-         * - Estatus de cancelación
-         * en ese orden.
-         */
-        public String[] getArrayStatus() {
-            String[] statusArray = { CfdiStatus, RetrievalInfo, CancellableInfo, CancelStatus }; 
-            return statusArray;
         }
     }
     

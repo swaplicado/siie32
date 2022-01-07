@@ -183,7 +183,6 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                     mdPurchasesDocLimit_n = 0;
                 }
                 
-                
                 mbIsSalesItemAllApplying = resultSet.getBoolean("t.b_sal_item_all");
                 
                 mdSalesContractLimit_n = resultSet.getDouble("t.sal_con_lim_n");
@@ -203,7 +202,6 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                 if (resultSet.wasNull()) {
                     mdSalesDocLimit_n = 0;
                 }
-                
                 
                 mdCapacityVolumeMinPercentage = resultSet.getDouble("t.cap_vol_min_per");
                 mdCapacityMassMinPercentage = resultSet.getDouble("t.cap_mass_min_per");

@@ -13,32 +13,32 @@ import java.util.Date;
  */
 public final class SRowCfdSatStatus extends erp.lib.table.STableRow {
     
-    private final String msTipoDoc;
-    private final String msFolio;
-    private final Date mdFecha;
-    private final String msAsocNegocio;
-    private final String msRfcAsocNegocio;
+    private final String msDocType;
+    private final String msDocNumber;
+    private final Date mdDocDate;
+    private final String msBpName;
+    private final String msBpFiscalId;
     private final String msUuid;
-    private final String[] moStatus; // Arreglo de cuatro pocisiones que contiene el estatus del SAT: Estatus, código de estatus, información de cancelación y estatus de cancelación
+    private final SCfdUtilsHandler.CfdiAckQuery moCfdiAckQuery;
     
     /**
      * 
-     * @param tipoDoc
-     * @param folio
-     * @param fecha
-     * @param asocNegocio
-     * @param rfcAsocNegocio
+     * @param docType
+     * @param docNumber
+     * @param docDate
+     * @param bpName
+     * @param bpFiscalId
      * @param uuid
-     * @param status Arreglo de cuatro pocisiones que contiene el estatus del SAT: Estatus, código de estatus, información de cancelación y estatus de cancelación
+     * @param cfdiAckQuery
      */
-    public SRowCfdSatStatus(String tipoDoc, String folio, Date fecha, String asocNegocio, String rfcAsocNegocio, String uuid, String[] status) {
-        msTipoDoc = tipoDoc;
-        msFolio = folio;
-        msAsocNegocio = asocNegocio;
-        msRfcAsocNegocio = rfcAsocNegocio;
+    public SRowCfdSatStatus(String docType, String docNumber, Date docDate, String bpName, String bpFiscalId, String uuid, SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery) {
+        msDocType = docType;
+        msDocNumber = docNumber;
+        mdDocDate = docDate;
+        msBpName = bpName;
+        msBpFiscalId = bpFiscalId;
         msUuid = uuid;
-        mdFecha = fecha;
-        moStatus = status;
+        moCfdiAckQuery = cfdiAckQuery;
         prepareTableRow();
     }
 
@@ -46,15 +46,15 @@ public final class SRowCfdSatStatus extends erp.lib.table.STableRow {
     public void prepareTableRow() {
         mvValues.clear();
         
-        mvValues.add(msTipoDoc);
-        mvValues.add(msFolio);
-        mvValues.add(mdFecha);
-        mvValues.add(msAsocNegocio);
-        mvValues.add(msRfcAsocNegocio);
+        mvValues.add(msDocType);
+        mvValues.add(msDocNumber);
+        mvValues.add(mdDocDate);
+        mvValues.add(msBpName);
+        mvValues.add(msBpFiscalId);
         mvValues.add(msUuid);
-        mvValues.add(moStatus[0]);
-        mvValues.add(moStatus[1]);
-        mvValues.add(moStatus[2]);
-        mvValues.add(moStatus[3]);
+        mvValues.add(moCfdiAckQuery.CfdiStatus);
+        mvValues.add(moCfdiAckQuery.RetrievalInfo);
+        mvValues.add(moCfdiAckQuery.CancellableInfo);
+        mvValues.add(moCfdiAckQuery.CancelStatus);
     }
 }
