@@ -268,7 +268,7 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 
                 if (!msZipCode.isEmpty() && moDbmsDataState != null) {
                     moDbmsDataZipCode = new SDataZipCode();
-                    moDbmsDataZipCode.read(new String[] { msZipCode, moDbmsDataState.getStateCode() }, statement);
+                    moDbmsDataZipCode.read(new String[] { msZipCode }, statement);
                 }
                 
                 mbIsRegistryNew = false;

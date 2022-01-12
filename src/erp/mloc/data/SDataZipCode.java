@@ -83,7 +83,7 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
         reset();
 
         try {
-            sql = "SELECT * FROM erp.locs_bol_zip_code WHERE id_zip_code = '" + key[0] + "' AND id_sta_code = '" + key[1] + "'";
+            sql = "SELECT * FROM erp.locs_bol_zip_code WHERE id_zip_code = '" + key[0] + ( key.length > 1 ? "' AND id_sta_code = '" + key[1] + "'" : "'");
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
