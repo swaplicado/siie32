@@ -27,7 +27,6 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
-import erp.redis.SRedisLockUtils;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -38,7 +37,6 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
-import sa.lib.srv.redis.SRedisLock;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
 
@@ -75,9 +73,10 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         mnAuxType = auxType01;
         initComponents();
         miClient.showMsgBoxInformation("ACLARACIÓN:\n"
-                + "Esta vista está próxima a ser obsoleta.\n"
-                + "Favor de confirmar con soporte técnico SIIE si ya debe dejar de usarse.\n"
-                + "Tel. 443 204-1032 ext. 105\n"
+                + "¡Esta vista es obsoleta!\n"
+                + "Usar de favor la vista de la opción de menú 'Registros CFDI recepción de pagos'.\n"
+                + "Para cualquier duda contactar a soporte técnico SIIE:\n"
+                + "Tel.: 443 204-1032 ext. 105\n"
                 + "Mail: claudio.pena@swaplicado.com.mx");
     }
 
@@ -366,11 +365,14 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
 
                                     if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                         annul = true;
-                                        params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
+                                        params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getAnnulDate());
                                         // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (true/false):
                                         params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat());
                                         // cause of annulation:
-                                        params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType());
+                                        params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulType());
+                                
+                                        params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, moDialogAnnulCfdi.getAnnulReason());
+                                        params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, moDialogAnnulCfdi.getAnnulRelatedUuid());
                                     }
                                 }
                                 else {
@@ -380,6 +382,9 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                                     params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
                                     // cause of annulation:
                                     params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            
+                                    params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, "");
+                                    params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, "");
                                 }
                             }
 

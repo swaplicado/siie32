@@ -85,7 +85,6 @@ import erp.mtrn.data.cfd.SAddendaAmc71CompanyBranch;
 import erp.mtrn.data.cfd.SAddendaAmc71Manager;
 import erp.mtrn.data.cfd.SAddendaAmc71Supplier;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
-import erp.redis.SRedisLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -123,7 +122,6 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlUtils;
 
 /**
@@ -8403,7 +8401,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         try {
             String message = "No se puede guardar el CFDI porque ";
-            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(moComprobante).getCfdiStatus(); 
+            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, moComprobante).getCfdiStatus(); 
             
             if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                 validation.setMessage(message + "su estatus es: '" + cfdiStatus + "'.");

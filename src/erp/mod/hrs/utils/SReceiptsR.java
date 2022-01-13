@@ -10,6 +10,7 @@ import cfd.DElement;
 import cfd.ver3.DCfdVer3Utils;
 import cfd.ver33.DElementCfdiRelacionados;
 import cfd.ver33.DElementConcepto;
+import cfd.ver4.DCfdi4Consts;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -292,10 +293,10 @@ public class SReceiptsR {
         try {
             boolean cancel;
             if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA, DCfdi4Consts.CAN_MOTIVO_ERROR_SIN_REL, "");
             }
             else {
-                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA, DCfdi4Consts.CAN_MOTIVO_ERROR_SIN_REL, "");
             }
             
             if (cancel) {

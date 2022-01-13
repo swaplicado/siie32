@@ -342,7 +342,12 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         moDialogAnnulCfdi.setVisible(true);
 
                         if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, getPayrollCfdVersion(), mnGridSubtype == SModConsts.VIEW_SC_SUM, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulationType());
+                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, getPayrollCfdVersion(), mnGridSubtype == SModConsts.VIEW_SC_SUM, 
+                                    moDialogAnnulCfdi.getAnnulDate(), 
+                                    moDialogAnnulCfdi.getAnnulSat(), 
+                                    moDialogAnnulCfdi.getDpsAnnulType(), 
+                                    moDialogAnnulCfdi.getAnnulReason(), 
+                                    moDialogAnnulCfdi.getAnnulRelatedUuid());
                             needUpdate = payrollAnnul.annulPayroll();
                         }
 

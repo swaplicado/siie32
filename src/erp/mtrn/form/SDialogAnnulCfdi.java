@@ -1,5 +1,6 @@
 package erp.mtrn.form;
 
+import cfd.ver4.DCfdi4Consts;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
@@ -9,7 +10,9 @@ import erp.lib.form.SFormValidation;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -18,12 +21,14 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiItem;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
  * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
-public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormResult;
     private int mnFormStatus;
@@ -33,9 +38,13 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     
     private erp.client.SClientInterface miClient;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
-    private erp.lib.form.SFormField moFieldDate;
+    private erp.lib.form.SFormField moFieldAnnulDate;
+    private erp.lib.form.SFormField moFieldDpsAnnulType;
     private erp.lib.form.SFormField moFieldAnnulSat;
-    private erp.lib.form.SFormField moFieldTypeAnnul;
+    private erp.lib.form.SFormField moFieldAnnulReason;
+    private erp.lib.form.SFormField moFieldAnnulRelatedUuid;
+    private erp.lib.form.SFormField moFieldForceAnnul;
+    private DecimalFormat moAnnulReasonFormat;
     
     private Date mtDateDps;
     
@@ -62,14 +71,22 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         jPanel8 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jlDateStart = new javax.swing.JLabel();
-        jtfDateStart = new javax.swing.JFormattedTextField();
-        jbDate = new javax.swing.JButton();
+        jlAnnulDate = new javax.swing.JLabel();
+        jtfAnnulDate = new javax.swing.JFormattedTextField();
+        jbAnnulDate = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jlDpsAnnulType = new javax.swing.JLabel();
+        moKeyDpsAnnulType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel3 = new javax.swing.JPanel();
         jckAnnulSat = new javax.swing.JCheckBox();
-        jPanel5 = new javax.swing.JPanel();
-        jlDpsAnnulationType = new javax.swing.JLabel();
-        moKeyDpsAnnulationType = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel6 = new javax.swing.JPanel();
+        jlAnnulReason = new javax.swing.JLabel();
+        moKeyAnnulReason = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel7 = new javax.swing.JPanel();
+        jlAnnulRelatedUuid = new javax.swing.JLabel();
+        jtfAnnulRelatedUuid = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
+        jckForceAnnul = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -89,25 +106,36 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanel8.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(3, 1));
+        jPanel1.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateStart.setText("Fecha de cancelación: *");
-        jlDateStart.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel4.add(jlDateStart);
+        jlAnnulDate.setText("Fecha cancelación: *");
+        jlAnnulDate.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel4.add(jlAnnulDate);
 
-        jtfDateStart.setText("dd/mm/yyyy");
-        jtfDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jtfDateStart);
+        jtfAnnulDate.setText("dd/mm/yyyy");
+        jtfAnnulDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jtfAnnulDate);
 
-        jbDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbDate.setToolTipText("Seleccionar fecha");
-        jbDate.setFocusable(false);
-        jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel4.add(jbDate);
+        jbAnnulDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbAnnulDate.setToolTipText("Seleccionar fecha");
+        jbAnnulDate.setFocusable(false);
+        jbAnnulDate.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel4.add(jbAnnulDate);
 
         jPanel1.add(jPanel4);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDpsAnnulType.setText("Causa cancelación: *");
+        jlDpsAnnulType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel5.add(jlDpsAnnulType);
+
+        moKeyDpsAnnulType.setPreferredSize(new java.awt.Dimension(325, 23));
+        jPanel5.add(moKeyDpsAnnulType);
+
+        jPanel1.add(jPanel5);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -115,20 +143,40 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         jckAnnulSat.setText("Cancelar ante el SAT");
         jckAnnulSat.setFocusable(false);
         jckAnnulSat.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jckAnnulSat.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel3.add(jckAnnulSat);
 
         jPanel1.add(jPanel3);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDpsAnnulationType.setText("Causa de cancelación: *");
-        jlDpsAnnulationType.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel5.add(jlDpsAnnulationType);
+        jlAnnulReason.setText("Motivo cancelación: *");
+        jlAnnulReason.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel6.add(jlAnnulReason);
 
-        moKeyDpsAnnulationType.setPreferredSize(new java.awt.Dimension(225, 23));
-        jPanel5.add(moKeyDpsAnnulationType);
+        moKeyAnnulReason.setPreferredSize(new java.awt.Dimension(325, 23));
+        jPanel6.add(moKeyAnnulReason);
 
-        jPanel1.add(jPanel5);
+        jPanel1.add(jPanel6);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAnnulRelatedUuid.setText("UUID relacionado:");
+        jlAnnulRelatedUuid.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel7.add(jlAnnulRelatedUuid);
+
+        jtfAnnulRelatedUuid.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel7.add(jtfAnnulRelatedUuid);
+
+        jPanel1.add(jPanel7);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckForceAnnul.setText("Intentar aunque el comprobante sea no cancelable");
+        jckForceAnnul.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel9.add(jckForceAnnul);
+
+        jPanel1.add(jPanel9);
 
         jPanel8.add(jPanel1, java.awt.BorderLayout.NORTH);
 
@@ -150,7 +198,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(416, 289));
+        setSize(new java.awt.Dimension(496, 339));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -161,23 +209,39 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     private void initComponentsExtra() {
         mnCfdiType = SLibConstants.UNDEFINED;
         
-        moFieldDate = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateStart, jlDateStart);
-        moFieldDate.setPickerButton(jbDate);
+        moFieldAnnulDate = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfAnnulDate, jlAnnulDate);
+        moFieldAnnulDate.setPickerButton(jbAnnulDate);
+        moFieldDpsAnnulType = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyDpsAnnulType, jlDpsAnnulType);
+        moKeyDpsAnnulType.setKeySettings((SGuiClient) miClient, jlDpsAnnulType.getName(), true);
         moFieldAnnulSat = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckAnnulSat, jckAnnulSat);
-        moFieldTypeAnnul = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyDpsAnnulationType.getComponent(), jlDpsAnnulationType);
-        moKeyDpsAnnulationType.setKeySettings((SGuiClient) miClient, jlDpsAnnulationType.getName(), true);
+        moFieldAnnulReason = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyAnnulReason, jlAnnulReason);
+        moKeyAnnulReason.setKeySettings((SGuiClient) miClient, jlAnnulReason.getName(), true);
+        moFieldAnnulRelatedUuid = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAnnulRelatedUuid, jlAnnulRelatedUuid);
+        moFieldForceAnnul = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckForceAnnul, jckForceAnnul);
         
         mvFields = new Vector<>();
-        mvFields.add(moFieldDate);
+        mvFields.add(moFieldAnnulDate);
+        mvFields.add(moFieldDpsAnnulType);
         mvFields.add(moFieldAnnulSat);
-        mvFields.add(moFieldTypeAnnul);
+        mvFields.add(moFieldAnnulReason);
+        mvFields.add(moFieldAnnulRelatedUuid);
+        mvFields.add(moFieldForceAnnul);
 
         jbCancel.addActionListener(this);
         jbOk.addActionListener(this);
-        jbDate.addActionListener(this);
+        jbAnnulDate.addActionListener(this);
+        jckAnnulSat.addItemListener(this);
         
-        miClient.getSession().populateCatalogue(moKeyDpsAnnulationType, SModConsts.TRNU_TP_DPS_ANN, SLibConsts.UNDEFINED, null);
-        moKeyDpsAnnulationType.setValue(new int[] { SModSysConsts.TRNU_TP_DPS_ANN_NA });
+        miClient.getSession().populateCatalogue(moKeyDpsAnnulType, SModConsts.TRNU_TP_DPS_ANN, SLibConsts.UNDEFINED, null);
+        moKeyDpsAnnulType.setValue(new int[] { SModSysConsts.TRNU_TP_DPS_ANN_NA });
+        
+        moKeyAnnulReason.removeAllItems();
+        moKeyAnnulReason.addItem(new SGuiItem("- " + SGuiUtils.getLabelName(jlAnnulReason) + " -"));
+        for (String code : DCfdi4Consts.CancelaciónMotivos.keySet()) {
+            moKeyAnnulReason.addItem(new SGuiItem(new int[] { SLibUtils.parseInt(code) }, DCfdi4Consts.CancelaciónMotivos.get(code)));
+        }
+        
+        moAnnulReasonFormat = new DecimalFormat("00");
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -195,18 +259,35 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void enableFieldDpsAnnulationType() {
-        moKeyDpsAnnulationType.setEnabled(SLibUtils.belongsTo(mnCfdiType, new int[] { SDataConstantsSys.TRNS_TP_CFD_INV, SDataConstantsSys.TRNS_TP_CFD_PAY_REC }));
+        moKeyDpsAnnulType.setEnabled(SLibUtils.belongsTo(mnCfdiType, new int[] { SDataConstantsSys.TRNS_TP_CFD_INV, SDataConstantsSys.TRNS_TP_CFD_PAY_REC }));
     }
 
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jtfDateStart.requestFocus();
+            jtfAnnulDate.requestFocus();
         }
     }
 
-    private void actionDate() {
-        miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
+    private void actionAnnulDate() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldAnnulDate.getDate(), moFieldAnnulDate);
+    }
+    
+    private void itemStateChangedAnnulSat() {
+        moFieldAnnulReason.resetField();
+        moFieldAnnulRelatedUuid.resetField();
+        moFieldForceAnnul.resetField();
+        
+        if (jckAnnulSat.isSelected()) {
+            moKeyAnnulReason.setEnabled(true);
+            jtfAnnulRelatedUuid.setEnabled(true);
+            jckForceAnnul.setEnabled(false);
+        }
+        else {
+            moKeyAnnulReason.setEnabled(false);
+            jtfAnnulRelatedUuid.setEnabled(false);
+            jckForceAnnul.setEnabled(false);
+        }
     }
     
     private void actionOk() {
@@ -222,15 +303,15 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
             }
         }
         else {
-            if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
+            if (!SDataUtilities.isPeriodOpen(miClient, moFieldAnnulDate.getDate())) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
             }
-            else if (moFieldDate.getDate().before(SLibTimeUtilities.convertToDateOnly(mtDateDps))) {
+            else if (moFieldAnnulDate.getDate().before(SLibTimeUtilities.convertToDateOnly(mtDateDps))) {
                 miClient.showMsgBoxWarning("La fecha de cancelación no puede ser anterior a la fecha del documento.");
-                jtfDateStart.requestFocus();
+                jtfAnnulDate.requestFocus();
             }
             else {
-                if (!SLibTimeUtilities.isBelongingToPeriod(mtDateDps, SLibTimeUtilities.digestYear(moFieldDate.getDate())[0], SLibTimeUtilities.digestYearMonth(moFieldDate.getDate())[1])) {
+                if (!SLibTimeUtilities.isBelongingToPeriod(mtDateDps, SLibTimeUtilities.digestYear(moFieldAnnulDate.getDate())[0], SLibTimeUtilities.digestYearMonth(moFieldAnnulDate.getDate())[1])) {
                     cancel = miClient.showMsgBoxConfirm("La fecha de cancelación no pertenece al periodo de creación del documento.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
                 }
             
@@ -239,7 +320,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
                     setVisible(false);
                 }
                 else {
-                    jtfDateStart.requestFocus();
+                    jtfAnnulDate.requestFocus();
                 }
             }
         }
@@ -256,28 +337,44 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbAnnulDate;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbDate;
     private javax.swing.JButton jbOk;
     private javax.swing.JCheckBox jckAnnulSat;
-    private javax.swing.JLabel jlDateStart;
-    private javax.swing.JLabel jlDpsAnnulationType;
+    private javax.swing.JCheckBox jckForceAnnul;
+    private javax.swing.JLabel jlAnnulDate;
+    private javax.swing.JLabel jlAnnulReason;
+    private javax.swing.JLabel jlAnnulRelatedUuid;
+    private javax.swing.JLabel jlDpsAnnulType;
     private javax.swing.JPanel jpData;
-    private javax.swing.JFormattedTextField jtfDateStart;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyDpsAnnulationType;
+    private javax.swing.JFormattedTextField jtfAnnulDate;
+    private javax.swing.JTextField jtfAnnulRelatedUuid;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyAnnulReason;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDpsAnnulType;
     // End of variables declaration//GEN-END:variables
 
-    public Date getDate() {
-        return moFieldDate.getDate();
+    public Date getAnnulDate() {
+        return moFieldAnnulDate.getDate();
+    }
+    
+    public int getDpsAnnulType() {
+        return mnCfdiType != SDataConstantsSys.TRNS_TP_CFD_INV ? SModSysConsts.TRNU_TP_DPS_ANN_NA : moKeyDpsAnnulType.getValue()[0];
     }
     
     public boolean getAnnulSat() {
         return moFieldAnnulSat.getBoolean();
     }
     
-    public int getDpsAnnulationType() {
-        return mnCfdiType != SDataConstantsSys.TRNS_TP_CFD_INV ? SModSysConsts.TRNU_TP_DPS_ANN_NA : moKeyDpsAnnulationType.getValue()[0];
+    public String getAnnulReason() {
+        return moAnnulReasonFormat.format(moKeyAnnulReason.getSelectedIndex() <= 0 ? 0 : moKeyAnnulReason.getValue()[0]);
+    }
+    
+    public String getAnnulRelatedUuid() {
+        return jtfAnnulRelatedUuid.getText();
     }
     
     @Override
@@ -295,11 +392,11 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
         
-        moFieldDate.setDate(miClient.getSessionXXX().getWorkingDate());
+        moFieldAnnulDate.setDate(miClient.getSessionXXX().getWorkingDate());
         jckAnnulSat.setSelected(true);
         mtDateDps = null;
         
-        moKeyDpsAnnulationType.setValue(new int[] { SModSysConsts.TRNU_TP_DPS_ANN_NA });
+        moKeyDpsAnnulType.setValue(new int[] { SModSysConsts.TRNU_TP_DPS_ANN_NA });
         enableFieldDpsAnnulationType();
     }
 
@@ -317,13 +414,6 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;
-            }
-        }
-        
-        if (!validation.getIsError()) {
-            if (moKeyDpsAnnulationType.isEnabled() && moKeyDpsAnnulationType.getSelectedIndex() <= SLibConsts.UNDEFINED) {
-                validation.setIsError(true);
-                validation.setComponent(moKeyDpsAnnulationType.getComponent());
             }
         }
         
@@ -401,8 +491,19 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbDate) {
-                actionDate();
+            else if (button == jbAnnulDate) {
+                actionAnnulDate();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof javax.swing.JCheckBox) {
+            javax.swing.JCheckBox checkBox = (javax.swing.JCheckBox) e.getSource();
+            
+            if (checkBox == jckAnnulSat) {
+                itemStateChangedAnnulSat();
             }
         }
     }

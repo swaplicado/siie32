@@ -533,7 +533,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                                 }
                                 
                                 if (comprobante33 != null) {
-                                    SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery = new SCfdUtilsHandler(miClient).getCfdiSatStatus(comprobante33);
+                                    SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery = new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfdType, comprobante33);
 
                                     switch (cfdiAckQuery.CfdiStatus){
                                         case DCfdi33Consts.CFDI_ESTATUS_VIG:

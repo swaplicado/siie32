@@ -13,37 +13,38 @@ import java.util.Date;
 
 /**
  *
- * @author Juan Barajas
+ * @author Isabel García, Sergio Flores
  */
 public class SLogBillOfLadingAnnul {
 
     protected SClientInterface miClient;
     protected SDataCfd moCfd;
     protected ArrayList<SDataPayrollReceiptIssue> maReceiptIssues;
-    protected int mnCfdiVersion;
     protected Date mtDateAnnul;
     protected boolean mbAnnulSat;
-    protected int mnTpDpsAnn;
+    protected int mnDpsAnnulType;
+    protected String msAnnulReason;
+    protected String msAnnulRelatedUuid;
     
-    public SLogBillOfLadingAnnul(SClientInterface client, SDataCfd cfd, Date dateAnnul, boolean annulSat, int tpDpsAnn, int cfdType) {
+    public SLogBillOfLadingAnnul(SClientInterface client, SDataCfd cfd, Date dateAnnul, boolean annulSat, int dpsAnnulType, String annulReason, String annulRelatedUuid) {
         miClient = client;
         moCfd = cfd;
         mtDateAnnul = dateAnnul;
         mbAnnulSat = annulSat;
-        mnTpDpsAnn = tpDpsAnn;
-        mnCfdiVersion = cfdType;
+        mnDpsAnnulType = dpsAnnulType;
+        msAnnulReason = annulReason;
+        msAnnulRelatedUuid = annulRelatedUuid;
     }
-
     
     public boolean annulBillOfLading() throws Exception {
         boolean cancel = false;
         
         if (mbAnnulSat) {
             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                cancel = SCfdUtils.cancelAndSendCfdi(miClient, moCfd, mnCfdiVersion, mtDateAnnul, mbAnnulSat, true, mnTpDpsAnn);
+                cancel = SCfdUtils.cancelAndSendCfdi(miClient, moCfd, 0, mtDateAnnul, mbAnnulSat, true, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid);
             }
             else {
-                cancel = SCfdUtils.cancelCfdi(miClient, moCfd, mnCfdiVersion, mtDateAnnul, mbAnnulSat, true, mnTpDpsAnn);
+                cancel = SCfdUtils.cancelCfdi(miClient, moCfd, 0, mtDateAnnul, mbAnnulSat, true, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid);
             }
         }
         else {
@@ -55,5 +56,4 @@ public class SLogBillOfLadingAnnul {
         
         return cancel;
     }
-    
 }
