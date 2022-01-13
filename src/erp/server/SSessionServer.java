@@ -536,17 +536,14 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                     
                                     result = dps.canAnnul(moCompanyDatabase.getConnection());
 
-                                    if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                        throw new Exception(dps.getDbmsError());
-                                    }
-                                    else {
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
                                         dps.setFkUserEditId(mnPkUserId); // preserve the user that requested the action
                                         result = dps.annul(moCompanyDatabase.getConnection());
 
                                         if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
                                             result = SLibConstants.DB_CFD_OK;
                                         }
-                                    }
+                                    } 
                                 }
                                 break;
                                 
@@ -554,19 +551,13 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 SDataCfdPayment cfdPayment = packet.getAuxDataCfdPayment();
                                 
                                 if (cfdPayment != null) {
-                                    result = cfdPayment.canAnnul(moCompanyDatabase.getConnection());
+                                    result = ((SDataRegistry) packet.getAuxDataCfdPayment()).canAnnul(moCompanyDatabase.getConnection());
 
-                                    if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                        throw new Exception(cfdPayment.getDbmsError());
-                                    }
-                                    else {
-                                        cfdPayment.setFkUserEditId(mnPkUserId);
-                                        cfdPayment.setFkUserDeleteId(mnPkUserId);   // preserve the user that requested the action when deleting accounting
-                                        result = cfdPayment.annul(moCompanyDatabase.getConnection());
-                                        
-                                        if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
-                                            result = SLibConstants.DB_CFD_OK;
-                                        }
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                        // irregular way to annul registries (CFD has just been annulled):
+                                        cfdPayment.setFkUserDeleteId(mnPkUserId); // preserve the user that requested the action
+                                        cfdPayment.deleteAccounting(moCompanyDatabase.getConnection());
+                                        result = SLibConstants.DB_CFD_OK;
                                     } 
                                 }
                                 break;
@@ -577,10 +568,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 if (payrollReceiptIssue != null) {
                                     result = payrollReceiptIssue.canAnnul(moCompanyDatabase.getConnection());
 
-                                    if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                        throw new Exception(payrollReceiptIssue.getDbmsError());
-                                    }
-                                    else {
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
                                         payrollReceiptIssue.setFkUserUpdateId(mnPkUserId);
                                         result = payrollReceiptIssue.annul(moCompanyDatabase.getConnection());
 
@@ -593,7 +581,6 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 
                             case SDataConstantsSys.TRNS_TP_CFD_BOL:
                                 SDbBillOfLading bol = packet.getAuxDataBillOfLading();
-                                
                                 if (bol != null) { 
                                     if (bol.canDisable()) {
                                         bol.setFkUserUpdateId(mnPkUserId);
@@ -954,7 +941,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     oResponse.setResultType(nResult);
                     break;
                 default:
-                    // do nothing
+                    break;
             }
 
             if (!mbIsTransactionClosed) {

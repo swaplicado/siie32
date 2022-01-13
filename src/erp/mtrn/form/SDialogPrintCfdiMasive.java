@@ -281,7 +281,7 @@ public class SDialogPrintCfdiMasive extends javax.swing.JDialog implements erp.l
             actionClose();
             
             SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) miClient, "Procesamiento de impresión", SCfdConsts.REQ_PRINT_DOC);
-            dialog.setFormParams(cfds, null, 0, null, true, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, "", "");
+            dialog.setFormParams(cfds, null, 0, null, true, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED);
             dialog.setVisible(true);
         }
     }

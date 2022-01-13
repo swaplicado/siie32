@@ -56,9 +56,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
     protected final boolean mbIsCfdiSendingAutomaticHrs;
     protected int mnPayrollCfdVersion;
     protected int mnNumberCopies;
-    protected int mnDpsAnnulType;
-    protected String msAnnulReason;
-    protected String msAnnulRelatedUuid;
+    protected int mnDpsAnnulmentType;
     
     /**
      * Creates new form SDialogResult
@@ -546,7 +544,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                                 break;
 
                             case SCfdConsts.REQ_ANNUL:
-                                SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid);
+                                SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado.\n";
                                 break;
 
@@ -581,10 +579,10 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
 
                             case SCfdConsts.REQ_ANNUL_SEND:
                                 if (mbIsCfdiSendingAutomaticHrs) {
-                                    SCfdUtils.cancelAndSendCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid);
+                                    SCfdUtils.cancelAndSendCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 }
                                 else {
-                                    SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid);
+                                    SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                                 }
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
                                 break;
@@ -661,9 +659,9 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
      * @param annulmentDate
      * @param validateStamp
      * @param payrollCfdVersion Constants defined in SCfdConsts.CFDI_PAYROLL_VER_...
-     * @param dpsAnnulType 
+     * @param dpsAnnulmentType 
      */
-    public void setFormParams(final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int payrollCfdVersion, final int dpsAnnulType, final String annulReason, final String annulRelatedUuid) {
+    public void setFormParams(final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int payrollCfdVersion, final int dpsAnnulmentType) {
         mbFirstTime = true;
         
         maCfds = cfds;
@@ -672,9 +670,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
         mtAnnulmentDate = annulmentDate;
         mbValidateStamp = validateStamp;
         mnPayrollCfdVersion = payrollCfdVersion;
-        mnDpsAnnulType = dpsAnnulType;
-        msAnnulReason = annulReason;
-        msAnnulRelatedUuid = annulRelatedUuid;
+        mnDpsAnnulmentType = dpsAnnulmentType;
     }
     
     public void setPayrollReceipts(final ArrayList<SDbPayrollReceipt> payrollReceipts) {

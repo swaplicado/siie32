@@ -115,7 +115,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(msCfdiXml);
         
         if (!validation.getIsError()) {
-            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
+            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(comprobante).getCfdiStatus(); 
             
             if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                 validation.setMessage("No se puede importar el CFDI ya que su estatus es : " + cfdiStatus + ".");

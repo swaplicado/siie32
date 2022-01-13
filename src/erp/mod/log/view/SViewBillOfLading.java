@@ -83,6 +83,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     }
 
     private void initComponetsCustom() {
+        
         moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient);
         
         jbPrint = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
@@ -408,12 +409,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                         moDialogAnnulCfdi.setVisible(true);
 
                         if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            bolAnnul = new SLogBillOfLadingAnnul((SClientInterface) miClient, cfd, 
-                                    moDialogAnnulCfdi.getAnnulDate(), 
-                                    moDialogAnnulCfdi.getAnnulSat(), 
-                                    moDialogAnnulCfdi.getDpsAnnulType(), 
-                                    moDialogAnnulCfdi.getAnnulReason(), 
-                                    moDialogAnnulCfdi.getAnnulRelatedUuid());
+                            bolAnnul = new SLogBillOfLadingAnnul((SClientInterface) miClient, cfd, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulationType(), SDataConstantsSys.TRNS_TP_CFD_BOL);
                             bolAnnul.annulBillOfLading();
                         }
 

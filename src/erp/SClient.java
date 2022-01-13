@@ -1244,6 +1244,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
     }
 
+
     private void login() {
         boolean lookup = false;
         Cursor cursor = getCursor();

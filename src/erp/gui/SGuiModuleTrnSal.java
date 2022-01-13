@@ -1650,17 +1650,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                                 SCfdUtils.cancelAndSendCfdi(miClient, cfd, 0, 
                                                         (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
                                                         (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
-                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                             }
                                             else {
                                                 SCfdUtils.cancelCfdi(miClient, cfd, 0, 
                                                         (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
                                                         (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
-                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                             }
                                             
                                             result = SLibConstants.DB_ACTION_ANNUL_OK;
@@ -1705,17 +1701,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                             SCfdUtils.cancelAndSendCfdi(miClient, cfd, 0, 
                                                     (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
                                                     (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
-                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                         }
                                         else {
                                             SCfdUtils.cancelCfdi(miClient, cfd, 0, 
                                                     (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
                                                     (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
-                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
                                         }
                                         
                                         result = SLibConstants.DB_ACTION_ANNUL_OK;

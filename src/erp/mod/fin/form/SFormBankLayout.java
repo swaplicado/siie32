@@ -36,6 +36,7 @@ import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
 import erp.mtrn.data.SCfdUtilsHandler;
+import erp.redis.SRedisLockUtils;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -79,6 +80,7 @@ import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
+import sa.lib.srv.redis.SRedisLock;
 import sa.lib.xml.SXmlElement;
 
 /**
@@ -2504,7 +2506,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             message += "estatus CFDI = ¡El CFDI relacionado con el del pago: UUID del pago = '" + row.getXmlUuid() + "', UUID del CFDI = '" + tfd.getAttUUID().getString() + "'!.";
                         }
                         
-                        String cfdiStatus = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
+                        String cfdiStatus = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(comprobante).getCfdiStatus();
                         
                         if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                             message += (message.isEmpty() ? "" : "\n");
