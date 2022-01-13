@@ -9,7 +9,6 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
 import erp.mod.log.db.SLogBillOfLadingAnnul;
 import erp.mtrn.data.SCfdBolUtils;
@@ -490,13 +489,13 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
             + "b.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", " 
             + "b.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", " 
             + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-            + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
-            + "IF(b.fk_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " 
+            + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", " 
+            + "IF(b.fk_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS f_ico, " 
             + "IF(c.fid_st_xml IS NULL, " + SGridConsts.ICON_NULL + ", " /* not have CFDI associated */
             + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " /* CFDI pending sign */
             + "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
-            + "IF(LENGTH(xc.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */
-            + "IF(xc.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */
+            + "IF(LENGTH(xc.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL + ", " /* CFDI canceled with cancellation acknowledgment in XML format */
+            + "IF(xc.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */
             + SGridConsts.ICON_XML_ISSU + " " /* CFDI signed, canceled only SIIE */
             + "))))) AS _ico_xml "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL) + " AS b " 

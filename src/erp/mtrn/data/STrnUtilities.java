@@ -37,7 +37,7 @@ import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
-import erp.redis.SRedisLockUtils;
+import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -67,10 +67,8 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.mail.SMail;
 import sa.lib.mail.SMailConsts;
 import sa.lib.mail.SMailSender;
+import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
 
 /**
  *
@@ -1476,11 +1474,13 @@ public abstract class STrnUtilities {
      */
     public static boolean confirmSend(final SClientInterface client, final String title, final SDataCfd cfd, final SDataDps dps, final int idBizPartner, final int idBizPartnerBranch) throws RemoteException, Exception {
         boolean send = false;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       */
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
         SSrvLock lock = null;        
-/* Bloque de codigo correspondiente a los candados de Redis        
-        SRedisLock rlock = null;
 */        
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+        SRedisLock rlock = null;
+        */
+        SLock slock = null;
         SServerRequest request = null;
         SServerResponse response = null;
         SDialogCfdSend dlgCfdSend = null;
@@ -1491,11 +1491,14 @@ public abstract class STrnUtilities {
 
         if (dlgCfdSend.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             if ((boolean) dlgCfdSend.getValue(SDialogCfdSend.VAL_IS_EMAIL_EDITED)) {
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                 lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
-/* Bloque de codigo correspondiente a los candados de Redis
+                */
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                 rlock = SRedisLockUtils.gainLock(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout() / 1000);
-*/                
+                */
+                slock = SLockUtils.gainLock(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
+                
                 if (idBizPartnerBranch == SLibConsts.UNDEFINED) {
                     bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
                 }
@@ -1506,11 +1509,14 @@ public abstract class STrnUtilities {
                 request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
                 request.setPacket(bizPartner);
                 response = client.getSessionXXX().request(request);
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+                /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                 SSrvUtils.releaseLock(client.getSession(), lock);
-/* Bloque de codigo correspondiente a los candados de Redis
+                */
+                /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
                 SRedisLockUtils.releaseLock(client, rlock);
-*/                
+                */
+                SLockUtils.releaseLock(client, slock);
+                
                 if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
                 }

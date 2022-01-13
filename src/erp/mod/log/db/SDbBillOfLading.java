@@ -26,6 +26,7 @@ import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
@@ -33,6 +34,7 @@ import erp.mloc.data.SDataZipCode;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataCfd;
 import java.io.Serializable;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -98,6 +100,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     protected String msAuxCfdCfdiRelacionadoUuid; // available when CFDI is not stored in SIIE, e.g., third-party
     protected SDataBizPartner moAuxDbmsDataEmisor;
     protected SDataBizPartnerBranch moAuxDbmsDataEmisorSucursal;
+    
+    protected int mnLastDbActionResult;
+    protected int mnDbmsErrorId;
+    protected java.lang.String msDbmsError;
+    
     
     public SDbBillOfLading() {
         super(SModConsts.LOG_BOL);
@@ -165,8 +172,27 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         catch (Exception e) {}
     }
     
-    public boolean canDisable() {
-        return true;
+    public int canDisable(Connection connection) {
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+
+        try {
+            if (testDisable(connection, "No se pudo anular ", SDbConsts.ACTION_ANNUL)) {
+                mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_YES;
+            }
+        }
+        catch (Exception exception) {
+            mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_NO;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_ANNUL + "\n" + exception.toString();
+            }
+            SLibUtilities.printOutException(this, exception);
+        }
+
+        return mnLastDbActionResult;
+    }
+    
+    public String getDisableError() {
+        return msDbmsError;
     }
     
     public void setPkBolId(int n) { mnPkBolId = n; }
@@ -609,11 +635,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         return registry;
     }
     
-    private boolean testDisable(java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
-        String msDbmsError;
+    private boolean testDisable(Connection connection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
+        int i;
+        int[] anPeriodKey = null;
         String sMsg = psMsg;
-        String sMsgAux = "";
-        int mnDbmsErrorId;
+        CallableStatement oCallableStatement = null;
 
         if (pnAction == SDbConsts.ACTION_DELETE && mbDeleted) {
             mnDbmsErrorId = 1;
@@ -641,6 +667,24 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             msDbmsError = sMsg + "¡El documento debe tener estatus 'emitido'!";
             throw new Exception(msDbmsError);
         }
+        else {
+
+            // Check that document's date belongs to an open period:
+
+            i = 1;
+            anPeriodKey = SLibTimeUtilities.digestYearMonth(mtDate);
+            oCallableStatement = connection.prepareCall("{ CALL fin_year_per_st(?, ?, ?) }");
+            oCallableStatement.setInt(i++, anPeriodKey[0]);
+            oCallableStatement.setInt(i++, anPeriodKey[1]);
+            oCallableStatement.registerOutParameter(i++, java.sql.Types.INTEGER);
+            oCallableStatement.execute();
+
+            if (oCallableStatement.getBoolean(i - 1)) {
+                mnDbmsErrorId = 101;
+                msDbmsError = sMsg + "¡El período contable de la fecha del documento está cerrado!";
+                throw new Exception(msDbmsError);
+            }
+        }
         
         return true;
     }
@@ -655,18 +699,18 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
 
             // Set BOL as annuled:
 
-            if (testDisable("No se pudo anular ", SDbConsts.ACTION_ANNUL)) {
-                mnFkBillOfLadingStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+            if (testDisable(connection, "No se pudo anular ", SDbConsts.ACTION_ANNUL)) {
+            mnFkBillOfLadingStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
-                sSql = "UPDATE log_bol SET fk_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", "  +
-                        "fk_usr_upd = " + mnFkUserUpdateId + ", ts_usr_upd = NOW() " +
-                        "WHERE id_bol = " + mnPkBolId + " ";
-                oStatement.execute(sSql);
-                if (moDbmsDataCfd != null) {
-                    moDbmsDataCfd.annul(connection);
-                }
+            sSql = "UPDATE log_bol SET fk_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", "  +
+                    "fk_usr_upd = " + mnFkUserUpdateId + ", ts_usr_upd = NOW() " +
+                    "WHERE id_bol = " + mnPkBolId + " ";
+            oStatement.execute(sSql);
+            if (moDbmsDataCfd != null) {
+                moDbmsDataCfd.annul(connection);
+            }
 
-                mnQueryResultId = SLibConstants.DB_ACTION_ANNUL_OK;
+            mnQueryResultId = SLibConstants.DB_ACTION_ANNUL_OK;
             }
             
         }

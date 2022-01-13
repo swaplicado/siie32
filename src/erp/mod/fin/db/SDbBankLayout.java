@@ -36,7 +36,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDsm;
 import erp.mtrn.data.SDataDsmEntry;
 import erp.mtrn.data.STrnUtilities;
-import erp.redis.SRedisLockUtils;
+import erp.redis.SLockUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,9 +62,7 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
-import sa.lib.srv.SSrvLock;
-import sa.lib.srv.SSrvUtils;
-import sa.lib.srv.redis.SRedisLock;
+import sa.lib.srv.SLock;
 import sa.lib.xml.SXmlElement;
 
 /**
@@ -1546,22 +1544,26 @@ public class SDbBankLayout extends SDbRegistryUser {
      */
     public boolean updateLayoutStatus(SGuiClient client, int newLayoutStatus) throws Exception {
         boolean done = false;
-/* Linea de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SSrvLock lock = null;
-/* Bloque de codigo correspondiente a los candados de Redis
+        */
+        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
-*/        
+        */
+        SLock slock = null;
         
         try {
             mnLayoutStatus = newLayoutStatus;
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             lock = SSrvUtils.gainLock(client.getSession(), 
                     ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId(), 
                     SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
-/* Bloque de codigo correspondiente a los candados de Redis            
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             rlock = SRedisLockUtils.gainLock((SClientInterface) client, SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout() / 1000);
-*/            
-            if (lock != null) {
+            */
+            slock = SLockUtils.gainLock((SClientInterface) client, SModConsts.FIN_LAY_BANK, getPrimaryKey(), getTimeout());
+            if (slock != null) {
                 String sql = "UPDATE " + getSqlTable() + " SET "
                         + "lay_st = " + mnLayoutStatus + "" + 
                         (mnLayoutStatus == SDbBankLayout.STATUS_APPROVED ? ", auth_req = " + ++mnAuthorizationRequests : "") + " " + // if needed, increment count of requests
@@ -1575,15 +1577,19 @@ public class SDbBankLayout extends SDbRegistryUser {
             SLibUtils.showException(this, e);
         }
         finally {
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+            /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             if (lock != null) {
                 SSrvUtils.releaseLock(client.getSession(), lock);
             }
-/* Bloque de codigo correspondiente a los candados de Redis
+            */
+            /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
             if (rlock != null) {
                 SRedisLockUtils.releaseLock((SClientInterface) (client), rlock);
             }
-*/            
+            */
+            if (slock != null) {
+                SLockUtils.releaseLock((SClientInterface) client, slock);
+            }
         }
         
         return done;

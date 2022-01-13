@@ -128,8 +128,7 @@ public abstract class SRedisConnectionUtils {
      * @return regresa true si existe conexión, false si no.
      */
     public static boolean getConnectionStatus(erp.client.SClientInterface client) {
-        boolean connection = false;
-/* Bloque de codigo correspondiente a los candados de Redis        
+        boolean connection = false;      
         Jedis jedis = client.getJedis();
         try {
             jedis.ping();
@@ -153,7 +152,6 @@ public abstract class SRedisConnectionUtils {
                 connection = false;
             }
         }
-*/
         return connection;
     }
 }
