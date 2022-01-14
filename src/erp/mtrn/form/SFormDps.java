@@ -8441,7 +8441,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         try {
             String message = "No se puede guardar el CFDI porque ";
-            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(moComprobante).getCfdiStatus(); 
+            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, moComprobante).getCfdiStatus();
             
             if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                 validation.setMessage(message + "su estatus es: '" + cfdiStatus + "'.");

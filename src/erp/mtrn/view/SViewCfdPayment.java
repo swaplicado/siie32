@@ -370,11 +370,14 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
 
                                     if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                         annul = true;
-                                        params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getDate());
+                                        params.getParamsMap().put(SGuiConsts.PARAM_DATE, moDialogAnnulCfdi.getAnnulDate());
                                         // SGuiConsts.PARAM_REQ_DOC is used to indicate if SAT cancellation is required (true/false):
                                         params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, moDialogAnnulCfdi.getAnnulSat());
                                         // cause of annulation:
-                                        params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulationType());
+                                        params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, moDialogAnnulCfdi.getDpsAnnulType());
+                                        
+                                        params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, moDialogAnnulCfdi.getAnnulReason());
+                                        params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, moDialogAnnulCfdi.getAnnulRelatedUuid());
                                     }
                                 }
                                 else {
@@ -384,6 +387,9 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                                     params.getParamsMap().put(SGuiConsts.PARAM_REQ_DOC, false);
                                     // cause of annulation:
                                     params.getParamsMap().put(SModConsts.TRNU_TP_DPS_ANN, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                                    
+                                    params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, "");
+                                    params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, "");
                                 }
                             }
 

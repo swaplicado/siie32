@@ -74,7 +74,6 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import redis.clients.jedis.Jedis;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -1625,6 +1624,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     else {
                         SDataCfd cfd = ((SDataDps) moRegistry).getDbmsDataCfd();
+                        
                         if (cfd != null) {
                             if (cfd.getFkDpsYearId_n() != SLibConstants.UNDEFINED) {
                                 if (cfd.isCfdi() && cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
@@ -1646,15 +1646,19 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                         else {
                                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
                                                 SCfdUtils.cancelAndSendCfdi(miClient, cfd, 0, 
-                                                        (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
-                                                        (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                                        (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE),
+                                                        (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true,
+                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
+                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
+                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
                                             }
                                             else {
                                                 SCfdUtils.cancelCfdi(miClient, cfd, 0, 
                                                         (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
                                                         (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
+                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
+                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
                                             }
                                             
                                             result = SLibConstants.DB_ACTION_ANNUL_OK;
@@ -1699,13 +1703,17 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                             SCfdUtils.cancelAndSendCfdi(miClient, cfd, 0, 
                                                     (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
                                                     (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
+                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
+                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
                                         }
                                         else {
                                             SCfdUtils.cancelCfdi(miClient, cfd, 0, 
                                                     (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
                                                     (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
-                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
+                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
+                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
                                         }
                                         
                                         result = SLibConstants.DB_ACTION_ANNUL_OK;

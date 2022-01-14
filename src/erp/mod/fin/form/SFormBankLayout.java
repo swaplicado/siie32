@@ -2510,7 +2510,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             message += "estatus CFDI = ¡El CFDI relacionado con el del pago: UUID del pago = '" + row.getXmlUuid() + "', UUID del CFDI = '" + tfd.getAttUUID().getString() + "'!.";
                         }
                         
-                        String cfdiStatus = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(comprobante).getCfdiStatus();
+                        String cfdiStatus = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
                         
                         if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
                             message += (message.isEmpty() ? "" : "\n");
