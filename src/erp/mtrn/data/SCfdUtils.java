@@ -1510,7 +1510,14 @@ public abstract class SCfdUtils implements Serializable {
 
                                     // Sign & Cancel Log step #6
                                     createSignCancelLogEntry(client, "", SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
-                                    throw new Exception("El CFDI está vigente.");
+                                    
+                                    if (!cfdiAckQuery.CancelStatus.isEmpty()) {
+                                        throw new Exception("El CFDI está vigente, pero en proceso de ser cancelado: [" + cfdiAckQuery.CancelStatus + "]");
+                                    }
+                                    else {
+                                        cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, "");
+                                        throw new Exception("El CFDI está vigente.");
+                                    }
                                 }
                                 
                                 // check cancellable status:
@@ -1529,7 +1536,7 @@ public abstract class SCfdUtils implements Serializable {
                                         //throw new Exception("El CFDI es no cancelable.");
                                         
                                     default:
-                                        throw new Exception("Estatus de cancelación desconocido: '" + cfdiAckQuery.CancellableInfo + "'");
+                                        throw new Exception("Estatus de cancelación desconocido: [" + cfdiAckQuery.CancellableInfo + "]");
                                 }
 
                                 // check cancellation status:
