@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp;
+package erp.cfd.utils;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.utils.SCsvFileManager;
@@ -27,7 +27,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Edwin Carmona, Sergio Flores
  */
-public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.ActionListener {
+public class SDialogReissueCfdis extends SBeanFormDialog implements java.awt.event.ActionListener {
     
     protected String msCsvPath;
     protected String msCsvGenPath;
@@ -43,7 +43,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
      * @param client
      * @param title
      */
-    public SDialogCfdR(SGuiClient client, String title) {
+    public SDialogReissueCfdis(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT,  SModConsts.HRSR_VAC_CSV, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -170,14 +170,14 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAll.setText("Total recibos:");
-        jlAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlAll.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jlAll);
 
         sBTotal.setEditable(false);
         jPanel17.add(sBTotal);
 
         jlErrors.setText("Errores:");
-        jlErrors.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlErrors.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jlErrors);
 
         sBErrors.setEditable(false);
@@ -188,14 +188,14 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCanceled.setText("Cancelados:");
-        jlCanceled.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlCanceled.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlCanceled);
 
         sBCanceled.setEditable(false);
         jPanel16.add(sBCanceled);
 
         jlNa.setText("Omitidos/No aplica:");
-        jlNa.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlNa.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlNa);
 
         sBNa.setEditable(false);
@@ -206,7 +206,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlIssues.setText("Re-expedidos:");
-        jlIssues.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlIssues.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlIssues);
 
         sBSuccess.setEditable(false);

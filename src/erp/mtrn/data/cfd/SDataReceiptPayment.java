@@ -8,11 +8,13 @@ package erp.mtrn.data.cfd;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataRecord;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPayment;
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -27,8 +29,8 @@ import sa.lib.SLibUtils;
  */
 public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
-    public static final int FIELD_NUM = 1;
-    public static final int FIELD_ST_RCP = 2;
+    public static final int FIELD_NUM = 1001; // number
+    public static final int FIELD_ST_RCP = 1002; // receipt status
 
     protected int mnPkReceiptId;
     protected java.lang.String msSeries;
@@ -44,6 +46,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     protected int mnFkCompanyBranchId;
     protected int mnFkBizPartnerId;
     protected int mnFkFactoringBankId_n;
+    protected int mnFkReceiptAnnulationTypeId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -59,6 +62,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     protected HashMap<String, SDataRecord> moXtaRecordsMap; // key = financial record PK as String; value = financial record
     
     protected boolean mbAuxReadJournalVouchersHeaderOnly; // it reduces dramatically reading time when entries and extra stuff of journal vouchers are useless
+    protected int mnAuxAnnulType;
+    
     
     /**
      * Creates a new payment receipt.
@@ -87,6 +92,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
     public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
     public void setFkFactoringBankId_n(int n) { mnFkFactoringBankId_n = n; }
+    public void setFkReceiptAnnulationTypeId(int n) { mnFkReceiptAnnulationTypeId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -108,6 +114,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkBizPartnerId() { return mnFkBizPartnerId; }
     public int getFkFactoringBankId_n() { return mnFkFactoringBankId_n; }
+    public int getFkReceiptAnnulationTypeId() { return mnFkReceiptAnnulationTypeId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -136,17 +143,39 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public HashMap<String, SDataRecord> getXtaRecordsMap() { return moXtaRecordsMap; }
     
     public void setAuxReadJournalVoucherHeadersOnly(boolean b) { mbAuxReadJournalVouchersHeaderOnly = b; }
+    public void setAuxAnnulType(int n) { mnAuxAnnulType = n; }
     
     public boolean getAuxReadJournalVoucherHeadersOnly() { return mbAuxReadJournalVouchersHeaderOnly; }
+    public int getAuxAnnulType() { return mnAuxAnnulType; }
     
-    public void computePaymentLoc() {
+    private void computePaymentLoc() {
         mdPaymentLoc_r = 0;
         
-        for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
-            mdPaymentLoc_r = SLibUtils.roundAmount(mdPaymentLoc_r + pay.getPaymentLoc());
+        if (mnFkReceiptStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+            for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
+                mdPaymentLoc_r = SLibUtils.roundAmount(mdPaymentLoc_r + pay.getPaymentLoc());
+            }
         }
     }
     
+    private boolean testAnnulment(java.sql.Connection connection, java.lang.String msg) throws java.lang.Exception {
+        int param = 1;
+        int[] periodKey = SLibTimeUtilities.digestYearMonth(mtDatetime);
+        CallableStatement callableStatement = connection.prepareCall("{ CALL fin_year_per_st(?, ?, ?) }");
+        callableStatement.setInt(param++, periodKey[0]);
+        callableStatement.setInt(param++, periodKey[1]);
+        callableStatement.registerOutParameter(param++, java.sql.Types.INTEGER);
+        callableStatement.execute();
+
+        if (callableStatement.getBoolean(param - 1)) {
+            mnDbmsErrorId = 101;
+            msDbmsError = msg + "¡El período contable de la fecha del comprobante está cerrado!";
+            throw new Exception(msDbmsError);
+        }
+
+        return true; // if this line is reached, no errors were found
+    }
+
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkReceiptId = ((int[]) pk)[0];
@@ -175,6 +204,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         mnFkCompanyBranchId = 0;
         mnFkBizPartnerId = 0;
         mnFkFactoringBankId_n = 0;
+        mnFkReceiptAnnulationTypeId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -188,7 +218,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         
         moXtaRecordsMap.clear();
         
-        //mbAuxReadJournalVouchersHeaderOnly = false; // prevent from reseting this flag
+        //mbAuxReadJournalVouchersHeaderOnly = false; // commented to prevent from reseting this flag!
+        mnAuxAnnulType = 0;
     }
 
     @Override
@@ -221,6 +252,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                     mnFkCompanyBranchId = resultSet.getInt("fid_cob");
                     mnFkBizPartnerId = resultSet.getInt("fid_bp");
                     mnFkFactoringBankId_n = resultSet.getInt("fid_fact_bank_n");
+                    mnFkReceiptAnnulationTypeId = resultSet.getInt("fid_tp_rcp_ann");
                     mnFkUserNewId = resultSet.getInt("fid_usr_new");
                     mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                     mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -317,6 +349,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             mnFkCompanyBranchId + ", " +
                             mnFkBizPartnerId + ", " +
                             (mnFkFactoringBankId_n == 0 ? "NULL" : mnFkFactoringBankId_n) + ", " +
+                            mnFkReceiptAnnulationTypeId + ", " +
                             mnFkUserNewId + ", " +
                             mnFkUserEditId + ", " +
                             mnFkUserDeleteId + ", " +
@@ -345,6 +378,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "fid_cob = " + mnFkCompanyBranchId + ", " +
                             "fid_bp = " + mnFkBizPartnerId + ", " +
                             "fid_fact_bank_n = " + (mnFkFactoringBankId_n == 0 ? "NULL" : mnFkFactoringBankId_n) + ", " +
+                            "fid_tp_rcp_ann = " + mnFkReceiptAnnulationTypeId + ", " +
                             "fid_usr_new = " + mnFkUserNewId + ", " +
                             "fid_usr_edit = " + mnFkUserEditId + ", " +
                             "fid_usr_del = " + mnFkUserDeleteId + ", " +
@@ -403,6 +437,52 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     }
 
     @Override
+    public int canAnnul(java.sql.Connection connection) {
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+
+        try {
+            if (testAnnulment(connection, "No se puede anular el comprobante: ")) {
+                mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_YES;
+            }
+        }
+        catch (Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_NO;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_ANNUL;
+            }
+            msDbmsError += "\n" + e.toString();
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return mnLastDbActionResult;
+    }
+
+    @Override
+    public int annul(java.sql.Connection connection) {
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+
+        try {
+            if (testAnnulment(connection, "No se puede anular el comprobante: ")) {
+                mdPaymentLoc_r = 0;
+                mnFkReceiptStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                mnFkReceiptAnnulationTypeId = mnAuxAnnulType;
+                save(connection);
+                mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;
+            }
+        }
+        catch (Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_ERROR;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_ANNUL;
+            }
+            msDbmsError += "\n" + e.toString();
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return mnLastDbActionResult;
+    }
+
+    @Override
     public erp.mtrn.data.cfd.SDataReceiptPayment clone() throws CloneNotSupportedException {
         SDataReceiptPayment clone = new SDataReceiptPayment();
 
@@ -422,6 +502,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         clone.setFkCompanyBranchId(mnFkCompanyBranchId);
         clone.setFkBizPartnerId(mnFkBizPartnerId);
         clone.setFkFactoringBankId_n(mnFkFactoringBankId_n);
+        clone.setFkReceiptAnnulationTypeId(mnFkReceiptAnnulationTypeId);
         clone.setFkUserNewId(mnFkUserNewId);
         clone.setFkUserEditId(mnFkUserEditId);
         clone.setFkUserDeleteId(mnFkUserDeleteId);
@@ -436,6 +517,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         clone.getXtaRecordsMap().putAll(moXtaRecordsMap);
         
         clone.setAuxReadJournalVoucherHeadersOnly(mbAuxReadJournalVouchersHeaderOnly);
+        clone.setAuxAnnulType(mnAuxAnnulType);
 
         return clone;
     }
@@ -498,6 +580,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         mnFkCompanyBranchId = cfd.getFkCompanyBranchId_n();
         mnFkBizPartnerId = cfdPayment.getAuxCfdDbmsDataReceptor().getPkBizPartnerId();
         //mnFkFactoringBankId_n = ...; // set in setDbmsFactoringBank_n()
+        mnFkReceiptAnnulationTypeId = mnFkReceiptAnnulationTypeId == 0 ? SDataConstantsSys.TRNU_TP_DPS_ANN_NA : mnFkReceiptAnnulationTypeId;
         mnFkUserNewId = cfdPayment.getFkUserNewId() != 0 ? cfdPayment.getFkUserNewId() : SUtilConsts.USR_NA_ID;
         mnFkUserEditId = cfdPayment.getFkUserEditId() != 0 ? cfdPayment.getFkUserEditId() : SUtilConsts.USR_NA_ID;
         mnFkUserDeleteId = cfdPayment.getFkUserDeleteId() != 0 ? cfdPayment.getFkUserDeleteId() : SUtilConsts.USR_NA_ID;

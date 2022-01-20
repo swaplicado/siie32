@@ -26,6 +26,8 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
     protected java.util.Date mtDate;
     protected int mnCodeAction;
     protected int mnCodeStep;
+    protected java.lang.String msAnnulReasonCode;
+    protected java.lang.String msAnnulRelatedUuid;
     protected boolean mbIsSystem;
     protected boolean mbIsDeleted;
     protected int mnFkCfdId;
@@ -44,6 +46,8 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
     public void setDate(java.util.Date t) { mtDate = t; }
     public void setCodeAction(int n) { mnCodeAction = n; }
     public void setCodeStep(int n) { mnCodeStep = n; }
+    public void setAnnulReasonCode(java.lang.String s) { msAnnulReasonCode = s; }
+    public void setAnnulRelatedUuid(java.lang.String s) { msAnnulRelatedUuid = s; }
     public void setIsSystem(boolean b) { mbIsSystem = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkCfdId(int n) { mnFkCfdId = n; }
@@ -57,6 +61,8 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
     public java.util.Date getDate() { return mtDate; }
     public int getCodeAction() { return mnCodeAction; }
     public int getCodeStep() { return mnCodeStep; }
+    public java.lang.String getAnnulReasonCode() { return msAnnulReasonCode; }
+    public java.lang.String getAnnulRelatedUuid() { return msAnnulRelatedUuid; }
     public boolean getIsSystem() { return mbIsSystem; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkCfdId() { return mnFkCfdId; }
@@ -84,6 +90,8 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
         mtDate = null;
         mnCodeAction = 0;
         mnCodeStep = 0;
+        msAnnulReasonCode = "";
+        msAnnulRelatedUuid = "";
         mbIsSystem = false;
         mbIsDeleted = false;
         mnFkCfdId = 0;
@@ -115,6 +123,8 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
                 mtDate = resultSet.getDate("dt");
                 mnCodeAction = resultSet.getInt("code_act");
                 mnCodeStep = resultSet.getInt("code_stp");
+                msAnnulReasonCode = resultSet.getString("ann_reason_code");
+                msAnnulRelatedUuid = resultSet.getString("ann_related_uuid");
                 mbIsSystem = resultSet.getBoolean("b_sys");
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkCfdId = resultSet.getInt("fid_cfd");
@@ -156,7 +166,7 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
     @Override
     public int save(java.sql.Connection connection) {
         int index = 1;
-        boolean isUpd = false;
+        boolean isUpdate = false;
         String sql = "";
         ResultSet resultSet = null;
         Statement statement = null;
@@ -179,12 +189,14 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
                 }
 
                 sql = "INSERT INTO trn_cfd_sign_log (id_log, " +
-                        "dt, code_act, code_stp, b_sys, b_del, fid_cfd, fid_pac_n, fid_usr, ts) " +
+                        "dt, code_act, code_stp, ann_reason_code, ann_related_uuid, " +
+                        "b_sys, b_del, fid_cfd, fid_pac_n, fid_usr, ts) " +
                         "VALUES (" + mnPkLogId + ", " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                        "?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, ?, NOW())";
             }
             else {
-                isUpd = true;
+                isUpdate = true;
                 
                 sql = "UPDATE trn_cfd_sign_log SET code_act = ?, code_stp = ? " +
                         "WHERE id_log = " + mnPkLogId + " ";
@@ -193,12 +205,14 @@ public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.
             if (!sql.isEmpty()) {
                 preparedStatement = connection.prepareStatement(sql);
 
-                if (!isUpd) {
+                if (!isUpdate) {
                     preparedStatement.setDate(index++, new java.sql.Date(mtDate.getTime()));
                 }
                 preparedStatement.setInt(index++, mnCodeAction);
                 preparedStatement.setInt(index++, mnCodeStep);
-                if (!isUpd) {
+                if (!isUpdate) {
+                    preparedStatement.setString(index++, msAnnulReasonCode);
+                    preparedStatement.setString(index++, msAnnulRelatedUuid);
                     preparedStatement.setBoolean(index++, mbIsSystem);
                     preparedStatement.setBoolean(index++, mbIsDeleted);
                     preparedStatement.setInt(index++, mnFkCfdId);

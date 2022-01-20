@@ -419,7 +419,10 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         
         if (!validation.getIsError()) {
             if (!jckAnnulSat.isSelected()) {
-                miClient.showMsgBoxWarning("El sistema no anulará el CFDI ante el SAT, debe hacerlo manualmente en el portal del mismo.");
+                miClient.showMsgBoxWarning("IMPORTANTE:\n"
+                        + "Ha elegido no cancelar el CFDI ante el SAT.\n"
+                        + "Si aún no está cancelado, habrá que hacerlo manualmente en el portal web del SAT.\n"
+                        + "No olvide anexar el acuse de cancelación del CFDI al registro en esta misma vista.");
             }
         }
 

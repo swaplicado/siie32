@@ -68,6 +68,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     protected SDataCfd moAuxCfdDbmsDataCfdCfdiRelacionado; // available when CFDI is stored in SIIE
     protected ArrayList<SCfdPaymentEntry> maAuxCfdPaymentEntries;
     
+    // members for CFDI annulment:
+    protected int mnAuxAnnulType;
+    
     // members that belong to SDataRecord:
     protected int mnAuxFkUserNewId;
     protected int mnAuxFkUserEditId;
@@ -150,6 +153,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public String getAuxCfdCfdiRelacionadoUuid() { return msAuxCfdCfdiRelacionadoUuid; }
     public SDataCfd getAuxCfdDbmsDataCfdCfdiRelacionado() { return moAuxCfdDbmsDataCfdCfdiRelacionado; }
     public ArrayList<SCfdPaymentEntry> getAuxCfdPaymentEntries() { return maAuxCfdPaymentEntries; }
+    
+    public void setAuxAnnulType(int n) { mnAuxAnnulType = n; }
+    
+    public int getAuxAnnulType() { return mnAuxAnnulType; }
     
     public void setFkUserNewId(int n) { mnAuxFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnAuxFkUserEditId = n; }
@@ -239,15 +246,21 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     private void readPaymentFromReceiptPayment(final Statement statement) throws Exception {
         moDbmsReceiptPayment = new SDataReceiptPayment();
         moDbmsReceiptPayment.setAuxReadJournalVoucherHeadersOnly(mbAuxReadJournalVoucherHeadersOnly);
-        moDbmsReceiptPayment.read(new int[] { moDbmsDataCfd.getFkReceiptPaymentId_n() }, statement);
+        if (moDbmsReceiptPayment.read(new int[] { moDbmsDataCfd.getFkReceiptPaymentId_n() }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nRecibo de pago.");
+        };
 
         // read 'Emisor' branch and business partner data objects:
 
         moAuxDbmsDataEmisorSucursal = new SDataBizPartnerBranch();
-        moAuxDbmsDataEmisorSucursal.read(new int[] { moDbmsReceiptPayment.getFkCompanyBranchId() }, statement);
+        if (moAuxDbmsDataEmisorSucursal.read(new int[] { moDbmsReceiptPayment.getFkCompanyBranchId() }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nSucursal del emisor.");
+        }
 
         moAuxDbmsDataEmisor = new SDataBizPartner();
-        moAuxDbmsDataEmisor.read(new int[] { moAuxDbmsDataEmisorSucursal.getFkBizPartnerId() }, statement);
+        if (moAuxDbmsDataEmisor.read(new int[] { moAuxDbmsDataEmisorSucursal.getFkBizPartnerId() }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nEmisor.");
+        }
 
         mnAuxFkUserNewId = moDbmsReceiptPayment.getFkUserNewId();
         mnAuxFkUserEditId = moDbmsReceiptPayment.getFkUserEditId();
@@ -265,15 +278,16 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             if (id != 0) {
                 moAuxCfdDbmsDataCfdCfdiRelacionado = new SDataCfd();
                 if (moAuxCfdDbmsDataCfdCfdiRelacionado.read(new int[] { id }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n"
-                            + "CFDI relacionado (ID = " + id + ")");
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\nCFDI relacionado (ID = " + id + ")");
                 }
             }
         }
 
         if (moDbmsReceiptPayment.getFkFactoringBankId_n() != 0) {
             moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
-            moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsReceiptPayment.getFkFactoringBankId_n() }, statement);
+            if (moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsReceiptPayment.getFkFactoringBankId_n() }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nReceptor de factoraje.");
+            }
         }
         
         for (SDataReceiptPaymentPay pay : moDbmsReceiptPayment.getDbmsReceiptPaymentPays()) {
@@ -282,7 +296,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         }
 
         moAuxCfdDbmsDataReceptor = new SDataBizPartner();
-        moAuxCfdDbmsDataReceptor.read(new int[] { moDbmsReceiptPayment.getFkBizPartnerId() }, statement);
+        if (moAuxCfdDbmsDataReceptor.read(new int[] { moDbmsReceiptPayment.getFkBizPartnerId() }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nReceptor.");
+        }
     }
     
     /**
@@ -693,6 +709,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         moAuxCfdDbmsDataCfdCfdiRelacionado = null;
         maAuxCfdPaymentEntries = new ArrayList<>();
         
+        mnAuxAnnulType = 0;
+        
         mnAuxFkUserNewId = 0;
         mnAuxFkUserEditId = 0;
         mnAuxFkUserDeleteId = 0;
@@ -861,7 +879,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     deleteAccounting(connection);
 
                     if (moDbmsReceiptPayment != null) {
-                        moDbmsReceiptPayment.saveField(connection, SDataReceiptPayment.FIELD_ST_RCP, moDbmsDataCfd.getFkXmlStatusId(), mnAuxFkUserEditId);
+                        moDbmsReceiptPayment.setAuxAnnulType(mnAuxAnnulType != 0 ? mnAuxAnnulType : SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
+                        moDbmsReceiptPayment.annul(connection);
                     }
                     
                     mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;

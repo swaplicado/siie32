@@ -5,8 +5,8 @@
 
 package erp.gui;
 
-import erp.SDialogCfdR;
-import erp.SDialogVerifyCfdis;
+import erp.cfd.utils.SDialogReissueCfdis;
+import erp.cfd.utils.SDialogVerifyCfdis;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -38,7 +38,6 @@ import erp.mtrn.form.SFormCfdiMassiveValidation;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import redis.clients.jedis.Jedis;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.gui.SGuiClient;
@@ -141,7 +140,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployeeDet;
     private javax.swing.JMenuItem jmiPayCalculatedAmountMonth;
     private javax.swing.JMenuItem jmiPayCalculatedEstimateIncomeTax;
-    private javax.swing.JMenuItem jmiPayReReceipts;
+    private javax.swing.JMenuItem jmiPayReissueCfdis;
     private javax.swing.JMenuItem jmiPayVerifyCfdis;
     
     private javax.swing.JMenu jmImp;
@@ -350,7 +349,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsByEmployeeDet = new JMenuItem("Por empleado a detalle");
         jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
         jmiPayCalculatedEstimateIncomeTax = new JMenuItem("Calcular impuesto acumulado");
-        jmiPayReReceipts = new JMenuItem("Reexpedición de recibos");
+        jmiPayReissueCfdis = new JMenuItem("Reexpedición de recibos");
         jmiPayVerifyCfdis = new JMenuItem("Verificar CFDIs");
 
         jmPay.add(jmiPayPayrollWeekly);
@@ -387,7 +386,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.add(jmiPayCalculatedAmountMonth);
         jmPay.add(jmiPayCalculatedEstimateIncomeTax);
         //jmPay.addSeparator();
-        //jmPay.add(jmiPayReReceipts);
+        //jmPay.add(jmiPayReissueCfdis);
         //jmPay.add(jmiPayVerifyCfdis);
                 
         jmImp = new JMenu("Importación");
@@ -532,7 +531,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsByEmployeeDet.addActionListener(this);
         jmiPayCalculatedAmountMonth.addActionListener(this);
         jmiPayCalculatedEstimateIncomeTax.addActionListener(this);
-        jmiPayReReceipts.addActionListener(this);
+        jmiPayReissueCfdis.addActionListener(this);
         jmiPayVerifyCfdis.addActionListener(this);
         
         jmiImpFormerPayroll.addActionListener(this);
@@ -660,7 +659,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsByEmployeeDet.setEnabled(isPermissionPay);
         jmiPayCalculatedAmountMonth.setEnabled(isPermissionPay);
         jmiPayCalculatedEstimateIncomeTax.setEnabled(isPermissionPay);
-        jmiPayReReceipts.setEnabled(isPermissionPay);
+        jmiPayReissueCfdis.setEnabled(isPermissionPay);
         jmiPayVerifyCfdis.setEnabled(isPermissionPay);
         
         jmImp.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_IMP).HasRight);
@@ -1108,8 +1107,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiPayCalculatedEstimateIncomeTax) {
                 new SDialogCalculateIncomeTax((SGuiClient) miClient, "Calcular impuesto acumulado").setFormVisible(true);
             }
-            else if (item == jmiPayReReceipts) {
-                new SDialogCfdR((SGuiClient) miClient, "Reexpedición de recibos").setFormVisible(true);
+            else if (item == jmiPayReissueCfdis) {
+                new SDialogReissueCfdis((SGuiClient) miClient, "Reexpedición de recibos").setFormVisible(true);
             }
             else if (item == jmiPayVerifyCfdis) {
                 new SDialogVerifyCfdis((SGuiClient) miClient, "Verificación de CFDIs").setFormVisible(true);

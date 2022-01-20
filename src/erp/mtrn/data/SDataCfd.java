@@ -991,7 +991,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             // Set CFD as annuled:
 
             if (testDeletion("No se puede anular el comprobante: ", SDbConsts.ACTION_ANNUL)) {
-                sSql = "UPDATE trn_cfd SET fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " " +
+                mnFkXmlStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                sSql = "UPDATE trn_cfd SET fid_st_xml = " + mnFkXmlStatusId + " " +
                         "WHERE id_cfd = " + mnPkCfdId + " ";
                 oStatement.execute(sSql);
 

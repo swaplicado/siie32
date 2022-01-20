@@ -245,7 +245,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         String[] asAditionalFieldNames = new String[nColsAditional];
         Object[] aoAditionalData = null;
         ResultSet oResultSet = null;
-        Vector<STableRow> vTableRows = new Vector<STableRow>();
+        Vector<STableRow> vTableRows = new Vector<>();
 
         // To increase performance, data types and field names are stored in arrays:
 
@@ -436,12 +436,12 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
      private Vector<Vector<Object>> requestExecuteQuerySimple(String sql) throws SQLException, Exception {
         int i = 0;
         int cols = 0;
-        Vector<Vector<Object>> vectors = new Vector<Vector<Object>>();
+        Vector<Vector<Object>> vectors = new Vector<>();
         ResultSet oResultSet = getStatement().executeQuery(sql);
 
         cols = oResultSet.getMetaData().getColumnCount();
         while (oResultSet.next()) {
-            Vector<Object> vector = new Vector<Object>();
+            Vector<Object> vector = new Vector<>();
             for (i = 1; i <= cols; i++) {
                 vector.add(oResultSet.getObject(i));
             }
@@ -488,8 +488,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 SDataCfdSignLog cfdSignLog = new SDataCfdSignLog();
 
-                if (packet.getAuxLogSignId() != SLibConstants.UNDEFINED) {
-                    cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR);
+                if (packet.getAuxSignAndCancelLogEntryId() != SLibConstants.UNDEFINED) {
+                    cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxSignAndCancelLogEntryId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR);
                 }
 
                 dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_PRC_WS, false);
@@ -514,8 +514,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     
                     // XXX Guardar bitácora de timbrado 7
 
-                    if (packet.getAuxLogSignId() != SLibConstants.UNDEFINED) {
-                        cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STEP_CODE_CONSUME_STAMP);
+                    if (packet.getAuxSignAndCancelLogEntryId() != SLibConstants.UNDEFINED) {
+                        cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxSignAndCancelLogEntryId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STEP_CODE_CONSUME_STAMP);
                     }
 
                     if (sign.save(moCompanyDatabase.getConnection()) == SLibConstants.DB_ACTION_SAVE_OK) {
@@ -540,7 +540,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                         throw new Exception(dps.getDbmsError());
                                     }
                                     else {
-                                        dps.setFkUserEditId(mnPkUserId); // preserve the user that requested the action
+                                        dps.setFkDpsAnnulationTypeId(packet.getAuxAnnulType());
+                                        dps.setFkUserEditId(mnPkUserId); // preserve the user that requested action
+                                        dps.setFkUserDeleteId(mnPkUserId); // preserve the user that requested action
                                         result = dps.annul(moCompanyDatabase.getConnection());
 
                                         if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
@@ -560,8 +562,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                         throw new Exception(cfdPayment.getDbmsError());
                                     }
                                     else {
+                                        cfdPayment.setAuxAnnulType(packet.getAuxAnnulType());
                                         cfdPayment.setFkUserEditId(mnPkUserId);
-                                        cfdPayment.setFkUserDeleteId(mnPkUserId);   // preserve the user that requested the action when deleting accounting
+                                        cfdPayment.setFkUserDeleteId(mnPkUserId);   // preserve the user that requested action
                                         result = cfdPayment.annul(moCompanyDatabase.getConnection());
                                         
                                         if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
@@ -939,6 +942,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
             moServer.renderMessageLn(msSessionServer + e);
         }
         finally {
+            sw: // label to prevent switch breaks from breaking finally statement
             switch (poRequest.getRequestType()) {
                 case SServerConstants.REQ_DB_ACTION_READ:
                 case SServerConstants.REQ_DB_ACTION_SAVE:
@@ -947,6 +951,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     oResponse.setPacket(((SDataRegistry) poRequest.getPacket()));
                     oResponse.setMessage(((SDataRegistry) poRequest.getPacket()).getDbmsError());
                     break;
+                    
                 case SServerConstants.REQ_DB_CAN_READ:
                 case SServerConstants.REQ_DB_CAN_SAVE:
                 case SServerConstants.REQ_DB_CAN_ANNUL:
@@ -956,9 +961,11 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     oResponse.setResultType(nResult);
                     oResponse.setMessage(((SDataRegistry) poRequest.getPacket()).getDbmsError());
                     break;
+                    
                 case SServerConstants.REQ_CFD:
                     oResponse.setResultType(nResult);
                     break;
+                    
                 default:
                     // do nothing
             }

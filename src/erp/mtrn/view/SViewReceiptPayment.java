@@ -69,11 +69,6 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
     public SViewReceiptPayment(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.TRN_PAY);
         initComponents();
-        miClient.showMsgBoxInformation("ACLARACIÓN:\n"
-                + "Esta vista está en versión beta.\n"
-                + "Favor de confirmar con soporte técnico SIIE si ya es posible usarla.\n"
-                + "Tel. 443 204-1032 ext. 105\n"
-                + "Mail: claudio.pena@swaplicado.com.mx");
     }
 
     private void initComponents() {
@@ -168,7 +163,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         moTablePane.getPrimaryKeyFields().add(aoKeyFields[0]);
 
         int col = 0;
-        STableColumn[] aoTableColumns = new STableColumn[18];
+        STableColumn[] aoTableColumns = new STableColumn[19];
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Folio CFDI", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "p.dt", "Fecha-hora CFDI", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
@@ -176,6 +171,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
         aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_ico_xml", "CFD", STableConstants.WIDTH_ICON);
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.can_st", "Estatus cancelación", 35);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Deudor", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC Deudor", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "p.pay_loc_r", "Total loc $", 100);
@@ -644,7 +640,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         }
          
         msSql = "SELECT c.id_cfd, p.dt, CONCAT(p.ser, IF(length(p.ser) = 0, '', '-'), p.num) AS _num, p.pay_loc_r, p.b_del, " +
-                "c.uuid, cob.code AS _cob_code, bp.bp, bp.fiscal_id, fb.bp, fb.fiscal_id, " +
+                "c.uuid, c.can_st, cob.code AS _cob_code, bp.bp, bp.fiscal_id, fb.bp, fb.fiscal_id, " +
                 "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS _ico, " +
                 "IF(c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
                 "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */

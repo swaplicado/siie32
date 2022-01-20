@@ -22,14 +22,16 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Adrián Avilés
  */
 public class SUtilClientSetup extends javax.swing.JFrame {
 
     private boolean mbFirstActivation;
     private SParamsApp moParamsApp;
 
-    /** Creates new form SSetupClient */
+    /**
+     * Creates new form SSetupClient
+     */
     public SUtilClientSetup() {
         initComponents();
         initComponentsCustom();
@@ -44,17 +46,20 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroupMode = new javax.swing.ButtonGroup();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlErpInstance = new javax.swing.JLabel();
         jtfErpInstance = new javax.swing.JTextField();
         jlErpInstanceExample = new javax.swing.JLabel();
+        jlSystemMode = new javax.swing.JLabel();
+        jrbModeServer = new javax.swing.JRadioButton();
+        jrbModeRedis = new javax.swing.JRadioButton();
         jPanel6 = new javax.swing.JPanel();
         jlErpHost = new javax.swing.JLabel();
         jtfErpHost = new javax.swing.JTextField();
         jlErpHostExample = new javax.swing.JLabel();
-        jWithServer = new javax.swing.JCheckBox();
         jPanel7 = new javax.swing.JPanel();
         jlErpRmiRegistryPort = new javax.swing.JLabel();
         jtfErpRmiRegistryPort = new javax.swing.JTextField();
@@ -127,7 +132,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jPanel3.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setPreferredSize(new java.awt.Dimension(485, 382));
-        jPanel4.setLayout(new java.awt.GridLayout(14, 0, 0, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(14, 0, 0, 3));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -139,9 +144,25 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfErpInstance.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jtfErpInstance);
 
+        jlErpInstanceExample.setForeground(java.awt.Color.gray);
         jlErpInstanceExample.setText("(e.g. ERP)");
         jlErpInstanceExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlErpInstanceExample);
+
+        jlSystemMode.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlSystemMode.setText("System mode:");
+        jlSystemMode.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlSystemMode);
+
+        buttonGroupMode.add(jrbModeServer);
+        jrbModeServer.setText("SIIE Server");
+        jrbModeServer.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jrbModeServer);
+
+        buttonGroupMode.add(jrbModeRedis);
+        jrbModeRedis.setText("Redis");
+        jrbModeRedis.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel5.add(jrbModeRedis);
 
         jPanel4.add(jPanel5);
 
@@ -155,12 +176,10 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfErpHost.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jtfErpHost);
 
+        jlErpHostExample.setForeground(java.awt.Color.gray);
         jlErpHostExample.setText("(e.g. 127.0.0.1)");
         jlErpHostExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlErpHostExample);
-
-        jWithServer.setText("With Server");
-        jPanel6.add(jWithServer);
 
         jPanel4.add(jPanel6);
 
@@ -174,6 +193,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfErpRmiRegistryPort.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfErpRmiRegistryPort);
 
+        jlErpRmiRegistryPortExample.setForeground(java.awt.Color.gray);
         jlErpRmiRegistryPortExample.setText("(e.g. 50001)");
         jlErpRmiRegistryPortExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlErpRmiRegistryPortExample);
@@ -190,6 +210,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jcbDatabaseType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel9.add(jcbDatabaseType);
 
+        jlDatabaseTypeExample.setForeground(java.awt.Color.gray);
         jlDatabaseTypeExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlDatabaseTypeExample);
 
@@ -216,6 +237,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfDatabasePortServer.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel10.add(jtfDatabasePortServer);
 
+        jlDatabaseServerExample.setForeground(java.awt.Color.gray);
         jlDatabaseServerExample.setText("(e.g. 127.0.0.1 : 3306)");
         jlDatabaseServerExample.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlDatabaseServerExample);
@@ -243,6 +265,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfDatabasePortClient.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel11.add(jtfDatabasePortClient);
 
+        jlDatabaseClientExample.setForeground(java.awt.Color.gray);
         jlDatabaseClientExample.setText("(e.g. 127.0.0.1 : 3306)");
         jlDatabaseClientExample.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlDatabaseClientExample);
@@ -259,6 +282,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfDatabaseName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jtfDatabaseName);
 
+        jlDatabaseNameExample.setForeground(java.awt.Color.gray);
         jlDatabaseNameExample.setText("(e.g. erp)");
         jlDatabaseNameExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlDatabaseNameExample);
@@ -275,6 +299,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfDatabaseUser.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jtfDatabaseUser);
 
+        jlDatabaseUserExample.setForeground(java.awt.Color.gray);
         jlDatabaseUserExample.setText("(e.g. root)");
         jlDatabaseUserExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jlDatabaseUserExample);
@@ -291,6 +316,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jpfDatabasePassword1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jpfDatabasePassword1);
 
+        jlDatabasePassword1Example.setForeground(java.awt.Color.gray);
         jlDatabasePassword1Example.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlDatabasePassword1Example);
 
@@ -306,6 +332,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jpfDatabasePassword2.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jpfDatabasePassword2);
 
+        jlDatabasePassword2Example.setForeground(java.awt.Color.gray);
         jlDatabasePassword2Example.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlDatabasePassword2Example);
 
@@ -321,6 +348,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfRedisHost.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jtfRedisHost);
 
+        jlRedisHostExample.setForeground(java.awt.Color.gray);
         jlRedisHostExample.setText("(e.g. 127.0.0.1)");
         jlRedisHostExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlRedisHostExample);
@@ -337,6 +365,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jpfRedisPassword1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jpfRedisPassword1);
 
+        jlRedisPassword1Example1.setForeground(java.awt.Color.gray);
         jlRedisPassword1Example1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jlRedisPassword1Example1);
 
@@ -352,6 +381,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jpfRedisPassword2.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jpfRedisPassword2);
 
+        jlRedisPassword1Example2.setForeground(java.awt.Color.gray);
         jlRedisPassword1Example2.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jlRedisPassword1Example2);
 
@@ -369,6 +399,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfTimestamp.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel8.add(jtfTimestamp);
 
+        jlTimestampExample.setForeground(java.awt.Color.gray);
         jlTimestampExample.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlTimestampExample);
 
@@ -409,7 +440,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(718, 484));
+        setSize(new java.awt.Dimension(736, 489));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -453,6 +484,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroupMode;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -470,7 +502,6 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JCheckBox jWithServer;
     private javax.swing.JButton jbClear;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbSave;
@@ -503,12 +534,15 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JLabel jlRedisPassword2;
     private javax.swing.JLabel jlSeparatorClient;
     private javax.swing.JLabel jlSeparatorServer;
+    private javax.swing.JLabel jlSystemMode;
     private javax.swing.JLabel jlTimestampExample;
     private javax.swing.JLabel jlTimestpamp;
     private javax.swing.JPasswordField jpfDatabasePassword1;
     private javax.swing.JPasswordField jpfDatabasePassword2;
     private javax.swing.JPasswordField jpfRedisPassword1;
     private javax.swing.JPasswordField jpfRedisPassword2;
+    private javax.swing.JRadioButton jrbModeRedis;
+    private javax.swing.JRadioButton jrbModeServer;
     private javax.swing.JTextField jtfDatabaseHostClient;
     private javax.swing.JTextField jtfDatabaseHostServer;
     private javax.swing.JTextField jtfDatabaseName;
@@ -544,7 +578,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private void windowActivated() {
         if (mbFirstActivation) {
             mbFirstActivation = false;
-            jtfErpInstance.requestFocus();
+            jtfErpInstance.requestFocusInWindow();
         }
     }
 
@@ -554,6 +588,8 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
     private void renderParams() {
         if (moParamsApp == null) {
+            jrbModeServer.setSelected(true);
+            jrbModeRedis.setSelected(false);
             jtfErpInstance.setText("");
             jtfErpHost.setText("");
             jtfErpRmiRegistryPort.setText("");
@@ -569,10 +605,11 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jpfRedisPassword1.setText("");
             jpfRedisPassword2.setText("");
             jtfTimestamp.setText("");
-            jWithServer.setSelected(false);
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { SLibConsts.UNDEFINED });
         }
         else {
+            jrbModeServer.setSelected(moParamsApp.getWithServer());
+            jrbModeRedis.setSelected(!moParamsApp.getWithServer());
             jtfErpInstance.setText(moParamsApp.getErpInstance());
             jtfErpHost.setText(moParamsApp.getErpHost());
             jtfErpRmiRegistryPort.setText(moParamsApp.getErpRmiRegistryPort());
@@ -587,7 +624,6 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jtfRedisHost.setText(moParamsApp.getRedisHost());
             jpfRedisPassword1.setText(moParamsApp.getRedisPswd());
             jpfRedisPassword2.setText(moParamsApp.getRedisPswd());
-            jWithServer.setSelected(moParamsApp.getWithServer());
             jtfTimestamp.setText(SLibUtils.DateFormatDatetimeTimeZone.format(moParamsApp.getTimestamp()));
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { moParamsApp.getDatabaseType() });
         }
@@ -598,7 +634,8 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         boolean hasChanges = false;
 
         if (moParamsApp == null) {
-            if (jtfErpInstance.getText().length() != 0 ||
+            if (!jrbModeServer.isSelected() ||
+                    jtfErpInstance.getText().length() != 0 ||
                     jtfErpHost.getText().length() != 0 ||
                     jtfErpRmiRegistryPort.getText().length() != 0 ||
                     jtfDatabaseHostServer.getText().length() != 0 ||
@@ -617,7 +654,8 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             }
         }
         else {
-            if (moParamsApp.getErpInstance().compareTo(jtfErpInstance.getText()) != 0 ||
+            if ((moParamsApp.getWithServer() && !jrbModeServer.isSelected() || !moParamsApp.getWithServer() && jrbModeServer.isSelected()) ||
+                    moParamsApp.getErpInstance().compareTo(jtfErpInstance.getText()) != 0 ||
                     moParamsApp.getErpHost().compareTo(jtfErpHost.getText()) != 0 ||
                     moParamsApp.getErpRmiRegistryPort().compareTo(jtfErpRmiRegistryPort.getText()) != 0 ||
                     moParamsApp.getDatabaseHostSrv().compareTo(jtfDatabaseHostServer.getText()) != 0 ||
@@ -650,14 +688,14 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
     private void actionClear() {
         renderParams();
-        jtfErpInstance.requestFocus();
+        jtfErpInstance.requestFocusInWindow();
     }
 
     private boolean actionSave() {
         boolean save = false;
         boolean isNew = false;
-        String password1 = new String(jpfDatabasePassword1.getPassword());
-        String password2 = new String(jpfDatabasePassword2.getPassword());
+        String dbmsPassword1 = new String(jpfDatabasePassword1.getPassword());
+        String dbmsPassword2 = new String(jpfDatabasePassword2.getPassword());
         String redisPassword1 = new String(jpfRedisPassword1.getPassword());
         String redisPassword2 = new String(jpfRedisPassword2.getPassword());
 
@@ -672,114 +710,117 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfDatabaseUser.setText(SLibUtils.textTrim(jtfDatabaseUser.getText()));
         jtfRedisHost.setText(SLibUtils.textTrim(jtfRedisHost.getText()).toLowerCase());
         
-        
-        if (jtfErpInstance.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlErpInstance) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfErpInstance.requestFocus();
+        if (!jrbModeServer.isSelected() && !jrbModeRedis.isSelected()) {
+            JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlSystemMode) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jrbModeServer.requestFocusInWindow();
         }
-        else if (jtfErpInstance.getText().indexOf(" ") != -1) {
+        else if (jtfErpInstance.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlErpInstance) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jtfErpInstance.requestFocusInWindow();
+        }
+        else if (jtfErpInstance.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlErpInstance) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfErpInstance.requestFocus();
+            jtfErpInstance.requestFocusInWindow();
         }
         else if (jtfErpHost.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlErpHost) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfErpHost.requestFocus();
+            jtfErpHost.requestFocusInWindow();
         }
-        else if (jtfErpHost.getText().indexOf(" ") != -1) {
+        else if (jtfErpHost.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlErpHost) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfErpHost.requestFocus();
+            jtfErpHost.requestFocusInWindow();
         }
         else if (jtfErpRmiRegistryPort.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlErpRmiRegistryPort) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfErpRmiRegistryPort.requestFocus();
+            jtfErpRmiRegistryPort.requestFocusInWindow();
         }
-        else if (jtfErpRmiRegistryPort.getText().indexOf(" ") != -1) {
+        else if (jtfErpRmiRegistryPort.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlErpRmiRegistryPort) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfErpRmiRegistryPort.requestFocus();
+            jtfErpRmiRegistryPort.requestFocusInWindow();
         }
         else if (jcbDatabaseType.getSelectedIndex() <= 0) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabaseType) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jcbDatabaseType.requestFocus();
+            jcbDatabaseType.requestFocusInWindow();
         }
         else if (jtfDatabaseHostServer.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabaseHostServer) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseHostServer.requestFocus();
+            jtfDatabaseHostServer.requestFocusInWindow();
         }
-        else if (jtfDatabaseHostServer.getText().indexOf(" ") != -1) {
+        else if (jtfDatabaseHostServer.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlDatabaseHostServer) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseHostServer.requestFocus();
+            jtfDatabaseHostServer.requestFocusInWindow();
         }
         else if (jtfDatabasePortServer.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabaseHostServer) + " (" + jtfDatabasePortServer.getToolTipText() + ")'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabasePortServer.requestFocus();
+            jtfDatabasePortServer.requestFocusInWindow();
         }
-        else if (jtfDatabasePortServer.getText().indexOf(" ") != -1) {
+        else if (jtfDatabasePortServer.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlDatabaseHostServer) + " (" + jtfDatabasePortServer.getToolTipText() + ")' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabasePortServer.requestFocus();
+            jtfDatabasePortServer.requestFocusInWindow();
         }
         else if (jtfDatabaseHostClient.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabaseHostClient) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseHostClient.requestFocus();
+            jtfDatabaseHostClient.requestFocusInWindow();
         }
-        else if (jtfDatabaseHostClient.getText().indexOf(" ") != -1) {
+        else if (jtfDatabaseHostClient.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlDatabaseHostClient) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseHostClient.requestFocus();
+            jtfDatabaseHostClient.requestFocusInWindow();
         }
         else if (jtfDatabasePortClient.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabaseHostClient) + " (" + jtfDatabasePortClient.getToolTipText() + ")'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabasePortClient.requestFocus();
+            jtfDatabasePortClient.requestFocusInWindow();
         }
-        else if (jtfDatabasePortClient.getText().indexOf(" ") != -1) {
+        else if (jtfDatabasePortClient.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlDatabaseHostClient) + " (" + jtfDatabasePortClient.getToolTipText() + ")' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabasePortClient.requestFocus();
+            jtfDatabasePortClient.requestFocusInWindow();
         }
         else if (jtfDatabaseName.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabaseName) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseName.requestFocus();
+            jtfDatabaseName.requestFocusInWindow();
         }
-        else if (jtfDatabaseName.getText().indexOf(" ") != -1) {
+        else if (jtfDatabaseName.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlDatabaseName) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseName.requestFocus();
+            jtfDatabaseName.requestFocusInWindow();
         }
         else if (jtfDatabaseUser.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabaseUser) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseUser.requestFocus();
+            jtfDatabaseUser.requestFocusInWindow();
         }
-        else if (jtfDatabaseUser.getText().indexOf(" ") != -1) {
+        else if (jtfDatabaseUser.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlDatabaseUser) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfDatabaseUser.requestFocus();
+            jtfDatabaseUser.requestFocusInWindow();
         }
-        else if (password1.isEmpty()) {
+        else if (dbmsPassword1.isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabasePassword1) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jpfDatabasePassword1.requestFocus();
+            jpfDatabasePassword1.requestFocusInWindow();
         }
-        else if (password2.isEmpty()) {
+        else if (dbmsPassword2.isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlDatabasePassword2) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jpfDatabasePassword2.requestFocus();
+            jpfDatabasePassword2.requestFocusInWindow();
         }
-        else if (password1.compareTo(password2) != 0) {
+        else if (dbmsPassword1.compareTo(dbmsPassword2) != 0) {
             JOptionPane.showMessageDialog(this, "Value for fields '" + SGuiUtils.getLabelName(jlDatabasePassword1) + "' and '" + SGuiUtils.getLabelName(jlDatabasePassword2) + "' must be the same.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jpfDatabasePassword1.requestFocus();
+            jpfDatabasePassword1.requestFocusInWindow();
         }
         else if (jtfRedisHost.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlRedisHost) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfRedisHost.requestFocus();
+            jtfRedisHost.requestFocusInWindow();
         }
-        else if (jtfRedisHost.getText().indexOf(" ") != -1) {
+        else if (jtfRedisHost.getText().contains(" ")) {
             JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlRedisHost) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jtfRedisHost.requestFocus();
+            jtfRedisHost.requestFocusInWindow();
         }
         else if (redisPassword1.isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlRedisPassword1) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jpfRedisPassword1.requestFocus();
+            jpfRedisPassword1.requestFocusInWindow();
         }
         else if (redisPassword2.isEmpty()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlRedisPassword2) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jpfRedisPassword2.requestFocus();
+            jpfRedisPassword2.requestFocusInWindow();
         }
         else if (redisPassword1.compareTo(redisPassword2) != 0) {
             JOptionPane.showMessageDialog(this, "Value for fields '" + SGuiUtils.getLabelName(jlRedisPassword1) + "' and '" + SGuiUtils.getLabelName(jlRedisPassword2) + "' must be the same.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
-            jpfRedisPassword1.requestFocus();
+            jpfRedisPassword1.requestFocusInWindow();
         }
         else {
             try {
@@ -797,15 +838,15 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                 moParamsApp.setDatabasePortClt(jtfDatabasePortClient.getText());
                 moParamsApp.setDatabaseName(jtfDatabaseName.getText());
                 moParamsApp.setDatabaseUser(jtfDatabaseUser.getText());
-                moParamsApp.setDatabasePswd(password1);
+                moParamsApp.setDatabasePswd(dbmsPassword1);
                 moParamsApp.setDatabaseType(((SGuiItem) jcbDatabaseType.getSelectedItem()).getPrimaryKey()[0]);
                 moParamsApp.setRedisHost(jtfRedisHost.getText());
                 moParamsApp.setRedisPswd(redisPassword1);
-                moParamsApp.setWithSerever(jWithServer.isSelected());
+                moParamsApp.setWithSerever(jrbModeServer.isSelected());
                 if (moParamsApp.save()) {
                     save = true;
                     renderParams();
-                    jbClose.requestFocus();
+                    jbClose.requestFocusInWindow();
                 }
             }
             catch (Exception e) {

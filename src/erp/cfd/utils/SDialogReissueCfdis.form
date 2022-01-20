@@ -209,7 +209,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Total recibos:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -222,7 +222,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Errores:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[50, 23]"/>
+                      <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -244,7 +244,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cancelados:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -257,7 +257,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Omitidos/No aplica:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[50, 23]"/>
+                      <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -279,7 +279,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Re-expedidos:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

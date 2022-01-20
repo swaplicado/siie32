@@ -55,9 +55,10 @@ public final class SCfdPacket implements java.io.Serializable {
     private int mnPayrollReceiptPayrollId;      // used in creation of SDataCfd
     private int mnPayrollReceiptEmployeeId;     // used in creation of SDataCfd
     private int mnPayrollReceiptIssueId;        // used in creation of SDataCfd
-    private int mnReceiptPaymentId;
-    private int mnBillOfLadingId;
+    private int mnReceiptPaymentId;             // used in creation of SDataCfd
+    private int mnBillOfLadingId;               // used in creation of SDataCfd
     
+    private int mnAuxAnnulType;
     private SDataDps moAuxDataDps;
     private SDataCfdPayment moAuxDataCfdPayment;
     private SDataPayrollReceiptIssue moAuxDataPayrollReceiptIssue;
@@ -65,7 +66,7 @@ public final class SCfdPacket implements java.io.Serializable {
 
     private cfd.DElement moAuxCfdRootElement;
     private int mnAuxPacId;
-    private int mnAuxLogSignId;
+    private int mnAuxSignAndCancelLogEntryId;
     private int mnAuxStampQuantity;
     private boolean mbAuxStampConsume;
     
@@ -111,6 +112,7 @@ public final class SCfdPacket implements java.io.Serializable {
         mnReceiptPaymentId = 0;
         mnBillOfLadingId = 0;
         
+        mnAuxAnnulType = 0;
         moAuxDataDps = null;
         moAuxDataCfdPayment = null;
         moAuxDataPayrollReceiptIssue = null;
@@ -118,7 +120,7 @@ public final class SCfdPacket implements java.io.Serializable {
         
         moAuxCfdRootElement = null;
         mnAuxPacId = 0;
-        mnAuxLogSignId = 0;
+        mnAuxSignAndCancelLogEntryId = 0;
         mnAuxStampQuantity = 0;
         mbAuxStampConsume = false;
     }
@@ -165,6 +167,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setReceiptPaymentId(int n) { mnReceiptPaymentId = n; }
     public void setBillOfLadingId(int n) { mnBillOfLadingId = n; }
     
+    public void setAuxAnnulType(int n) { mnAuxAnnulType = n; }
     public void setAuxDataDps(SDataDps o) { moAuxDataDps = o; }
     public void setAuxDataCfdPayment(SDataCfdPayment o) { moAuxDataCfdPayment = o; }
     public void setAuxDataPayrollReceiptIssue(SDataPayrollReceiptIssue o) { moAuxDataPayrollReceiptIssue = o; }
@@ -172,7 +175,7 @@ public final class SCfdPacket implements java.io.Serializable {
 
     public void setAuxCfdRootElement(cfd.DElement o) { moAuxCfdRootElement = o; }
     public void setAuxPacId(int n) { mnAuxPacId = n; }
-    public void setAuxLogSignId(int n) { mnAuxLogSignId = n; }
+    public void setAuxSignAndCancelLogEntryId(int n) { mnAuxSignAndCancelLogEntryId = n; }
     public void setAuxStampQuantity(int n) { mnAuxStampQuantity = n; }
     public void setAuxStampConsume(boolean b) { mbAuxStampConsume = b; }
     
@@ -218,6 +221,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public int getReceiptPaymentId() { return mnReceiptPaymentId; }
     public int getBillOfLadingId() { return mnBillOfLadingId; }
     
+    public int getAuxAnnulType() { return mnAuxAnnulType; }
     public SDataDps getAuxDataDps() { return moAuxDataDps; }
     public SDataCfdPayment getAuxDataCfdPayment() { return moAuxDataCfdPayment; }
     public SDataPayrollReceiptIssue getAuxDataPayrollReceiptIssue() { return moAuxDataPayrollReceiptIssue; }
@@ -225,7 +229,7 @@ public final class SCfdPacket implements java.io.Serializable {
     
     public cfd.DElement getAuxCfdRootElement() { return moAuxCfdRootElement; }
     public int getAuxPacId() { return mnAuxPacId; }
-    public int getAuxLogSignId() { return mnAuxLogSignId; }
+    public int getAuxSignAndCancelLogEntryId() { return mnAuxSignAndCancelLogEntryId; }
     public int getAuxStampQuantity() { return mnAuxStampQuantity; }
     public boolean getAuxStampConsume() { return mbAuxStampConsume; }
     

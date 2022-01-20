@@ -23,7 +23,6 @@ import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataAccountItem;
 import erp.mfin.data.SDataAccountTax;
 import erp.mfin.data.SDataAdministrativeConceptType;
-import erp.mfin.data.SDataBankNbDay;
 import erp.mfin.data.SDataCardIssuer;
 import erp.mfin.data.SDataCheck;
 import erp.mfin.data.SDataCheckPrintingFormat;
@@ -212,7 +211,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinBankNbDay;
     private javax.swing.JMenuItem jmiFinValuationBalances;
     private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
-
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;
     private javax.swing.JSeparator jsFinCash;
@@ -596,7 +594,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinCashCheck);
         jmFin.add(jmiFinCashCounterReceipt);
-        jmFin.add(jsFinCash);   // separator
+        jmFin.add(jsFinCash); // separator
         jmFin.add(jmiFinLayoutBank);
         jmFin.add(jmiFinLayoutBankPending);
         jmFin.add(jmiFinLayoutBankDone);
@@ -607,8 +605,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinItemCost);
         jmFin.addSeparator();
+        /* Deprecated way of creatin receipt of payments:
         jmFin.add(jmiFinCfdPayment);
         jmFin.add(jmiFinCfdPaymentExtended);
+        */
         jmFin.add(jmiFinReceiptPayment);
         jmFin.addSeparator();
         jmFin.add(jmiFinMassDownloadCfdi);

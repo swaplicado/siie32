@@ -10557,6 +10557,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     pdf = new SDataPdf();
                     moDps.setDbmsDataPdf(pdf);
                 }
+                
                 if (moFilePdfJustLoaded != null) {
                     pdf.setAuxDocPdfFile(moFilePdfJustLoaded);
                 }

@@ -1,4 +1,17 @@
 ================================================================================
+SIIE 3.2 195.0/ 2022-01-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la preservación del motivo de cancelación y UUID relacionado para la cancelación de CFDI 2022.
+2) Implementación de tipo de anulación de registros de recepción de pagos.
+
+================================================================================
+SIIE 3.2 193.6/ 2022-01-17
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación del nuevo servicio de cancelación de CFDI 2022.
+
+================================================================================
 SIIE 3.2 193.5/ 2022-01-06
 Adrián Alejandro AVILÉS GÓMEZ
 --------------------------------------------------------------------------------
