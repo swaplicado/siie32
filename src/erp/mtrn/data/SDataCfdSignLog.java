@@ -16,7 +16,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataCfdSignLog extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     

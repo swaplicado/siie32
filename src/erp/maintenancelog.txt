@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 195.1/ 2022-01-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al tratamiento de la condición de cancelabilidad de un CFDI, "no cancelable", cuando está siendo relacionado únicamente por el CFDI que lo sistuirá.
+
+================================================================================
 SIIE 3.2 195.0/ 2022-01-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

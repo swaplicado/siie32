@@ -1569,7 +1569,8 @@ public abstract class SCfdUtils implements Serializable {
 
                                     case DCfdi33Consts.CANCELABLE_NO:
                                         // CFDI is not cancellable, but should be if CFDI has only one relation and this is its replacement, so, go through, the authority will resolve it:
-                                        //throw new Exception("El CFDI es no cancelable.");
+                                        //throw new Exception("Estatus de cancelación: [" + cfdiAckQuery.CancellableInfo + "]");
+                                        break;
                                         
                                     default:
                                         throw new Exception("Estatus de cancelación desconocido: [" + cfdiAckQuery.CancellableInfo + "]");
