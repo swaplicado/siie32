@@ -60,11 +60,13 @@ public class SPayrollUtils {
                 urls = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_CAP);
                 String arrayUrls[] = urls.split(";");
                 url = arrayUrls[1];
-            } catch (Exception ex) {
+                
+            }
+            catch (Exception ex) {
                 Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            SAbsDelays delaysAndAbsEmployees = SPayrollUtils.requestAbsAndDelays(url, configuredEmployeesIds, tStartDate, tEndDate, payType, companyKey);
+            SAbsDelays delaysAndAbsEmployees = SPayrollUtils.requestAbsAndDelays(client, url, configuredEmployeesIds, tStartDate, tEndDate, payType, companyKey);
             
             if (delaysAndAbsEmployees == null) {
                 return null;
@@ -121,7 +123,7 @@ public class SPayrollUtils {
                                         ArrayList<Integer> employeesIds, 
                                             ArrayList<Integer> bonus, 
                                                 Date payDay) throws SQLException {
-        String sqlEarnByBonus = "SELECT DISTINCT fk_ear FROM erp_otsa.hrs_cond_ear WHERE NOT b_del AND fk_bonus = ";
+        String sqlEarnByBonus = "SELECT DISTINCT fk_ear FROM hrs_cond_ear WHERE NOT b_del AND fk_bonus = ";
         
         final int scopeGbl = 1;
         final int scopeDpt = 2;
@@ -143,10 +145,10 @@ public class SPayrollUtils {
                         "  INNER JOIN " +
                         "    erp.bpsu_bp bp ON e.id_emp = bp.id_bp " +
                         "  INNER JOIN " +
-                        "    erp_otsa.hrs_cond_ear cear ON cear.fk_ref = ";
+                        "    hrs_cond_ear cear ON cear.fk_ref = ";
         
         String sql1 = "INNER JOIN" +
-                        " erp_otsa.hrs_ear ear ON cear.fk_ear = ear.id_ear " +
+                        " hrs_ear ear ON cear.fk_ear = ear.id_ear " +
                         " INNER JOIN " +
                         " erp.hrss_bonus bonus ON cear.fk_bonus = bonus.id_bonus " +
                         " WHERE " +
@@ -296,7 +298,7 @@ public class SPayrollUtils {
         return confDept;
     }
     
-    private static SAbsDelays requestAbsAndDelays(String sURL, ArrayList<Integer> lEmployees, Date tStartDate, Date tEndDate, int payType, String companyKey) {
+    private static SAbsDelays requestAbsAndDelays(SGuiClient client, String sURL, ArrayList<Integer> lEmployees, Date tStartDate, Date tEndDate, int payType, String companyKey) {
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -323,13 +325,20 @@ public class SPayrollUtils {
             try (Scanner scanner = new Scanner(response)) {
                 String responseBody = scanner.useDelimiter("\\A").next();
                 System.out.println(responseBody);
-
+                
                 ObjectMapper mapper = new ObjectMapper();
-                SAbsDelays absDelays = mapper.readValue(responseBody, SAbsDelays.class);
-
-                SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.VOUCHER);
-
-                return absDelays;
+                SCAPResponse resp = mapper.readValue(responseBody, SCAPResponse.class);
+                switch (resp.getCode()) {
+                    case SCAPResponse.RESPONSE_OK:
+                        SAbsDelays absDelays = mapper.readValue(responseBody, SAbsDelays.class);
+                        SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.VOUCHER);
+                        return absDelays;
+                        
+                    case SCAPResponse.RESPONSE_NOT_VOBO:
+                    case SCAPResponse.RESPONSE_ERROR:
+                        client.showMsgBoxError(resp.getData());
+                        break;
+                }
             }
         }
         catch (UnsupportedEncodingException ex) {

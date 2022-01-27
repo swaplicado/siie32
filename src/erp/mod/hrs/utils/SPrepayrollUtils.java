@@ -77,9 +77,11 @@ public class SPrepayrollUtils {
                         " FROM " +
                         "    hrs_pre_pay_cut_cal " +
                         " WHERE " +
-                        " NOT b_del AND (num = " + payrollNumber + " OR num = " + numAux +") " +
+                        " NOT b_del" +
                         " AND fk_tp_pay = " + payType +
-                        "  AND (year = " + year + " OR year = " + yearAux + "); ";
+                        " AND ((num = " + payrollNumber + " AND year = " + year + ") " +
+                            "OR (num = " + numAux +" AND year = " + yearAux + "))" +
+                        " ORDER BY dt_cut ASC";
         
         Date [] dates = new Date[2];
         ResultSet resulReceipts;
@@ -90,7 +92,7 @@ public class SPrepayrollUtils {
                     executeQuery(sql);
             
             int pos = 0;
-            while (resulReceipts.next()) {
+            while (resulReceipts.next() && pos < dates.length) {
                 dates[pos] = resulReceipts.getDate("dt_cut");
                 pos++;
             }

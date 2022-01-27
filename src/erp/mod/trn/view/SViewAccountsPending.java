@@ -7,9 +7,11 @@ package erp.mod.trn.view;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.table.SFilterConstants;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
@@ -32,6 +34,7 @@ import sa.lib.gui.SGuiDate;
 public class SViewAccountsPending extends SGridPaneView {
 
     private SGridFilterDateCutOff moFilterDateCutOff;
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
 
     /**
      * Create view for pending accounts: receivable accounts & payable accounts.
@@ -51,6 +54,9 @@ public class SViewAccountsPending extends SGridPaneView {
         moFilterDateCutOff.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_DATE, miClient.getSession().getCurrentDate().getTime()));
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 
     @Override
@@ -59,6 +65,7 @@ public class SViewAccountsPending extends SGridPaneView {
         Date date = null;
         int[] keySysMov = null;
         String sql = "";
+        String sqlWhereFuncAreas = "";
         Object filter = null;
 
         moPaneSettings = new SGridPaneSettings(2);
@@ -70,6 +77,11 @@ public class SViewAccountsPending extends SGridPaneView {
                 date = SLibTimeUtils.getEndOfYear(miClient.getSession().getSystemDate());
             }
             year = SLibTimeUtils.digestYear(date)[0];
+        }
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null && !((String) filter).isEmpty()) {
+            sqlWhereFuncAreas += "AND (d.fid_func IS NULL OR (d.fid_func IS NOT NULL AND d.fid_func IN ( " + filter + "))) ";
         }
         
         switch (mnGridSubtype) {
@@ -123,6 +135,7 @@ public class SViewAccountsPending extends SGridPaneView {
                 + "WHERE "
                 + "NOT r.b_del AND NOT re.b_del AND r.id_year = " + year + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(date) + "' AND "
                 + "re.fid_ct_sys_mov_xxx = " + keySysMov[0] + " AND re.fid_tp_sys_mov_xxx = " + keySysMov[1] + " "
+                + sqlWhereFuncAreas
                 + "GROUP BY "
                 + "b.bp, b.id_bp, d.id_year, d.id_doc, re.fid_cur "
                 + "HAVING "

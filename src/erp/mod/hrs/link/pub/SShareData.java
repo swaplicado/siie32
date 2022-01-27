@@ -27,7 +27,9 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
+import erp.mod.hrs.utils.SCAPResponse;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -98,7 +100,7 @@ public class SShareData {
     public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        Date tLastSyncDate = formatterd.parse(sLastSyncDate);
+        formatterd.parse(sLastSyncDate);
 
         return SUtilsJSON.getData(sLastSyncDate);
     }
@@ -178,11 +180,19 @@ public class SShareData {
                 System.out.println(responseBody);
                 
                 ObjectMapper mapper = new ObjectMapper();
-                SPrepayroll prepayroll = mapper.readValue(responseBody, SPrepayroll.class);
-                
-                SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.PREPAYROLL);
-                
-                return prepayroll;
+                SCAPResponse resp = mapper.readValue(responseBody, SCAPResponse.class);
+                switch (resp.getCode()) {
+                    case SCAPResponse.RESPONSE_OK:
+                        SPrepayroll prepayroll = mapper.readValue(responseBody, SPrepayroll.class);
+                        SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.PREPAYROLL);
+                        
+                        return prepayroll;
+                        
+                    case SCAPResponse.RESPONSE_NOT_VOBO:
+                    case SCAPResponse.RESPONSE_ERROR:
+                        JOptionPane.showMessageDialog(null, resp.getData(), "ERROR", JOptionPane.ERROR_MESSAGE);
+                        break;
+                }
             }
         }
         catch (UnsupportedEncodingException ex) {
