@@ -8,25 +8,40 @@ import java.util.Collection;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SFinAccountConfig {
     
     private ArrayList<SFinAccountConfigEntry> maAccountConfigEntries;
     private double[] madPercentages;
-    private int[] tax;
+    private int[] manTaxKey;
     
-    public SFinAccountConfig(Collection<SFinAccountConfigEntry> configEntries) {
-        maAccountConfigEntries = new ArrayList(configEntries);
+    public SFinAccountConfig(Collection<SFinAccountConfigEntry> accountConfigEntries) {
+        this(accountConfigEntries, new int[] { 0, 0 });
+    }
+    
+    public SFinAccountConfig(Collection<SFinAccountConfigEntry> accountConfigEntries, int[] taxKey) {
+        maAccountConfigEntries = new ArrayList(accountConfigEntries);
         
         madPercentages = new double[maAccountConfigEntries.size()];
-
         for (int i = 0; i < madPercentages.length; i++) {
             madPercentages[i] = maAccountConfigEntries.get(i).getPercentage();
         }
+        
+        manTaxKey = taxKey;
+    }
+
+    public void setTaxKey(int[] taxKey) {
+        manTaxKey = taxKey;
+    }
+
+    public int[] getTaxKey() {
+        return manTaxKey;
     }
     
-    public ArrayList<SFinAccountConfigEntry> getAccountConfigEntries() { return maAccountConfigEntries; };
+    public ArrayList<SFinAccountConfigEntry> getAccountConfigEntries() {
+        return maAccountConfigEntries;
+    };
     
     public ArrayList<SFinAmount> prorateAmount(final SFinAmount amount) {
         double[] values = null;
@@ -41,13 +56,5 @@ public class SFinAccountConfig {
         }
         
         return amounts;
-    }
-
-    public int[] getTax() {
-        return tax;
-    }
-
-    public void setTax(int[] tax) {
-        this.tax = tax;
     }
 }

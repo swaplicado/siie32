@@ -320,16 +320,12 @@ public class SLayoutBankAccountingAdvance {
     }
     
     private void createRecordEntries() {
-        String concept = "";
-        SFinAccountConfig oConfigBizPartnerOps = null;
-        SDataRecordEntry entry = null;
-        
         try {
-            concept = createConceptRecordEntry();
-             oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnBizPartnerId, SModSysConsts.BPSS_CT_BP_SUP, mnBookkeepingCenterId, 
+            String concept = createConceptRecordEntry();
+            SFinAccountConfig oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnBizPartnerId, SModSysConsts.BPSS_CT_BP_SUP, mnBookkeepingCenterId, 
                                                             mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, false, null, moSession.getStatement()));
 
-            entry = createRecordEntryAccountCash();
+            SDataRecordEntry entry = createRecordEntryAccountCash();
             entry.setConcept(concept);
 
             maRecordEntries.add(entry);
@@ -339,7 +335,6 @@ public class SLayoutBankAccountingAdvance {
                         oConfigBizPartnerOps.getAccountConfigEntries().get(j).getCostCenterId());
                 entry.setConcept(concept);
                 maRecordEntries.add(entry);
-                
             }
         }
         catch (Exception e) {

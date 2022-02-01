@@ -7,7 +7,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SFinAmount {
     
@@ -18,19 +18,20 @@ public class SFinAmount {
     public SFinMovementType MovementType;
     public boolean OmitWhenAmountsChecked;
     
-    public int[] KeyRefDocument;
-    public int[] KeyRefCashAccount;
-    public int[] KeyTax;
+    public int[] RefDocumentKey;
+    public int[] RefCashAccountKey;
+    public int[] RefTaxKey;
 
     public SFinAmount(SFinAmount amount) {
         this(amount.Amount, amount.AmountCy, amount.IsPrepaymentInvoiced, amount.AccountType, amount.MovementType, amount.OmitWhenAmountsChecked);
-        this.KeyTax = amount.getKeyTax();
-        KeyRefDocument = amount.KeyRefDocument;
-        KeyRefCashAccount = amount.KeyRefCashAccount;
+        
+        RefDocumentKey = amount.RefDocumentKey;
+        RefCashAccountKey = amount.RefCashAccountKey;
+        RefTaxKey = amount.RefTaxKey;
     }
 
     public SFinAmount(double amount, double amountCy) {
-        this(amount, amountCy, false, SFinAccountType.ACC_BIZ_PARTNER, SFinMovementType.MOVT_INCREMENT, false);
+        this(amount, amountCy, false, SFinAccountType.ACC_BIZ_PARTNER, SFinMovementType.Increment, false);
     }
 
     public SFinAmount(double amount, double amountCy, boolean isPrepaymentInvoiced, SFinAccountType accountType, SFinMovementType movementType) {
@@ -45,19 +46,11 @@ public class SFinAmount {
         MovementType = movementType;
         OmitWhenAmountsChecked = omitWhenAmountsChecked;
         
-        KeyRefDocument = null;
-        KeyRefCashAccount = null;
-        KeyTax = null;
+        RefDocumentKey = null;
+        RefCashAccountKey = null;
+        RefTaxKey = null;
     }
 
-    public int[] getKeyTax() {
-        return KeyTax == null ? new int[] { 0, 0 } : KeyTax;
-    }
-
-    public void setKeyTax(int[] keyTax) {
-        this.KeyTax = keyTax;
-    }
-    
     public void addAmount(SFinAmount amount) {
         addAmount(amount.Amount, amount.AmountCy);
     }

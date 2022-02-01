@@ -88,7 +88,7 @@ public class SFinDpsTaxes {
             mnFkTaxTypeId = 0;
             mnFkTaxCalculationTypeId = 0;
             mnFkTaxApplicationTypeId = 0;
-            meMovementType = SFinMovementType.MOVT_INCREMENT;
+            meMovementType = SFinMovementType.Increment;
         }
 
         public void setPkDpsYearId(int n) { mnPkDpsYearId = n; }
