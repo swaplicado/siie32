@@ -24,7 +24,12 @@ import sa.lib.SLibUtils;
 public abstract class SCfdPaymentUtils {
     
     public static void sign(final SClientInterface client, final int idCfd) throws Exception {
-        SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, new int[] { idCfd }, SLibConstants.EXEC_MODE_VERBOSE);
+        //SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, new int[] { idCfd }, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        SDataCfdPayment cfdPayment = new SDataCfdPayment();
+        cfdPayment.setAuxReadJournalVoucherHeadersOnly(true);
+        cfdPayment.read(new int[] { idCfd}, client.getSession().getStatement());
+        
         SDataCfd cfd = cfdPayment.getDbmsDataCfd();
 
         if (!cfd.getUuid().isEmpty()) {

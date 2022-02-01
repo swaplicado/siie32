@@ -206,6 +206,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         mnCfdiType = SLibConstants.UNDEFINED;
         
@@ -238,7 +239,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         moKeyAnnulReason.removeAllItems();
         moKeyAnnulReason.addItem(new SGuiItem("- " + SGuiUtils.getLabelName(jlAnnulReason) + " -"));
         for (String code : DCfdi4Consts.CancelaciónMotivos.keySet()) {
-            moKeyAnnulReason.addItem(new SGuiItem(new int[] { SLibUtils.parseInt(code) }, DCfdi4Consts.CancelaciónMotivos.get(code)));
+            moKeyAnnulReason.addItem(new SGuiItem(new int[] { SLibUtils.parseInt(code) }, code + " - " + DCfdi4Consts.CancelaciónMotivos.get(code)));
         }
         
         moAnnulReasonFormat = new DecimalFormat("00");

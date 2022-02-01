@@ -859,13 +859,18 @@ public abstract class SCfdUtils implements Serializable {
                             switch (dataCfd.getFkCfdTypeId()) {
                                 case SDataConstantsSys.TRNS_TP_CFD_INV:
                                     dataDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, registryKey, SLibConstants.EXEC_MODE_SILENT);
+                                    
                                     dataDps.setAuxIsProcessingValidation(isValidation);
                                     
                                     packet.setAuxDataDps(dataDps);
                                     break;
 
                                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
-                                    dataCfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, SLibConstants.EXEC_MODE_SILENT);
+                                    //dataCfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, SLibConstants.EXEC_MODE_SILENT);
+                                    dataCfdPayment = new SDataCfdPayment();
+                                    dataCfdPayment.setAuxReadJournalVoucherHeadersOnly(true);
+                                    dataCfdPayment.read(registryKey, client.getSession().getStatement());
+                                    
                                     dataCfdPayment.setAuxIsProcessingValidation(isValidation);
                                     
                                     packet.setAuxDataCfdPayment(dataCfdPayment);

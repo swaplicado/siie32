@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 195.2/ 2022-01-31
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la lectura de CFDI de recepción de pagos al procesar su timbrado y cancelación, obteniendo sólo los encabezados de las pólizas contables correspondientes.
+2) Mejoramiento a la contabilización de documentos para configuraciones de impuestos predeterminadas y por tasa de impuesto trasladado.
+
+================================================================================
 SIIE 3.2 195.1/ 2022-01-21
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
