@@ -3534,7 +3534,7 @@ public abstract class SCfdUtils implements Serializable {
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
 
-        packet.setBillOfLadingId(bol.getPkBolId());
+        packet.setBillOfLadingId(bol.getPkBillOfLadingId());
         packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_BOL);
         packet.setFkXmlTypeId(xmlType);
         packet.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);

@@ -55,7 +55,7 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlCfdi33, Serializable {
     
-    protected int mnPkBolId;
+    protected int mnPkBillOfLadingId;
     protected String msBillOfLadingType;
     protected String msSeries;
     protected String msNumber;
@@ -70,12 +70,14 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     protected String msEnvironmentalInsurerPolicy;
     protected String msMerchandiseInsurerPolicy;
     protected String msPremium;
-    protected int mnFkCompanyBranchId;
-    protected int mnFkInputOutputCountry;
-    protected int mnFkGrossWeightUnit;
-    protected int mnFkEnvironmentalInsurer_n;
-    protected int mnFkMerchandiseInsurer_n;
+//    protected boolean mbDeleted;
     protected int mnFkBillOfLadingStatusId;
+    protected int mnFkCompanyBranchId;
+    protected int mnFkInputOutputCountry_n;
+    protected int mnFkGrossWeightUnit;
+    protected int mnFkEnviromentalInsurer_n;
+    protected int mnFkMerchandiseInsurer_n;
+
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -150,7 +152,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     
     public void updateSatCtyCode (SGuiSession session) {
         try {
-            String sql = "SELECT cty_code FROM erp.locu_cty where id_cty = " + mnFkInputOutputCountry + ";";
+            String sql = "SELECT cty_code FROM erp.locu_cty where id_cty = " + mnFkInputOutputCountry_n + ";";
             ResultSet resultSet = session.getStatement().executeQuery(sql);
             if (resultSet.next()) {
                 msXtaCtyCode = resultSet.getString(1);
@@ -195,7 +197,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         return msDbmsError;
     }
     
-    public void setPkBolId(int n) { mnPkBolId = n; }
+    public void setPkBillOfLadingId(int n) { mnPkBillOfLadingId = n; }
     public void setBillOfLadingType(String s) { msBillOfLadingType = s; }
     public void setSeries(String s) { msSeries = s; }
     public void setNumber(String s) { msNumber = s; }
@@ -211,19 +213,19 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public void setMerchandiseInsurerPolicy(String s) { msMerchandiseInsurerPolicy = s; }
     public void setPremium(String s) { msPremium = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
-    public void setFkInputOutputCountry(int n) { mnFkInputOutputCountry = n; }
-    public void setFkGrossWeightUnit(int n) { mnFkGrossWeightUnit = n; }
-    public void setFkEnvironmentalInsurer_n(int n) { mnFkEnvironmentalInsurer_n = n; }
-    public void setFkMerchandiseInsurer_n(int n) { mnFkMerchandiseInsurer_n = n; }
     public void setFkBillOfLadingStatusId(int n) { mnFkBillOfLadingStatusId = n; }
+    public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
+    public void setFkInputOutputCountry_n(int n) { mnFkInputOutputCountry_n = n; }
+    public void setFkGrossWeightUnit(int n) { mnFkGrossWeightUnit = n; }
+    public void setFkEnviromentalInsurer_n(int n) { mnFkEnviromentalInsurer_n = n; }
+    public void setFkMerchandiseInsurer_n(int n) { mnFkMerchandiseInsurer_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     public void setDbmsDataCfd (SDataCfd o) { moDbmsDataCfd = o;}
     
-    public int getPkBolId() { return mnPkBolId; }
+    public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public String getBillOfLadingType() { return msBillOfLadingType; }
     public String getSeries() { return msSeries; }
     public String getNumber() { return msNumber; }
@@ -239,12 +241,12 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public String getMerchandiseInsurerPolicy() { return msMerchandiseInsurerPolicy; }
     public String getPremium() { return msPremium; }
     public boolean isDeleted() { return mbDeleted; }
-    public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
-    public int getFkInputOutputCountry() { return mnFkInputOutputCountry; }
-    public int getFkGrossWeightUnit() { return mnFkGrossWeightUnit; }
-    public int getFkEnvironmentalInsurer_n() { return mnFkEnvironmentalInsurer_n; }
-    public int getFkMerchandiseInsurer_n() { return mnFkMerchandiseInsurer_n; }
     public int getFkBillOfLadingStatusId() { return mnFkBillOfLadingStatusId; }
+    public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
+    public int getFkInputOutputCountry_n() { return mnFkInputOutputCountry_n; }
+    public int getFkGrossWeightUnit() { return mnFkGrossWeightUnit; }
+    public int getFkEnviromentalInsurer_n() { return mnFkEnviromentalInsurer_n; }
+    public int getFkMerchandiseInsurer_n() { return mnFkMerchandiseInsurer_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -298,19 +300,19 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkBolId = pk[0];
+        mnPkBillOfLadingId = pk[0];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkBolId };
+        return new int[] { mnPkBillOfLadingId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkBolId = 0;
+        mnPkBillOfLadingId = 0;
         msBillOfLadingType = "";
         msSeries = "";
         msNumber = "";
@@ -326,12 +328,12 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         msMerchandiseInsurerPolicy = "";
         msPremium = "";
         mbDeleted = false;
-        mnFkCompanyBranchId = 0;
-        mnFkInputOutputCountry = 0;
-        mnFkGrossWeightUnit = 0;
-        mnFkEnvironmentalInsurer_n = 0;
-        mnFkMerchandiseInsurer_n = 0;
         mnFkBillOfLadingStatusId = 0;
+        mnFkCompanyBranchId = 0;
+        mnFkInputOutputCountry_n = 0;
+        mnFkGrossWeightUnit = 0;
+        mnFkEnviromentalInsurer_n = 0;
+        mnFkMerchandiseInsurer_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -361,7 +363,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_bol = " + mnPkBolId + " ";
+        return "WHERE id_bol = " + mnPkBillOfLadingId + " ";
     }
 
     @Override
@@ -373,12 +375,12 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet;
         
-        mnPkBolId = 0;
+        mnPkBillOfLadingId = 0;
         
         msSql = "SELECT COALESCE(MAX(id_bol), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkBolId = resultSet.getInt(1);
+            mnPkBillOfLadingId = resultSet.getInt(1);
         }
     }
 
@@ -400,7 +402,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkBolId = resultSet.getInt("id_bol");
+            mnPkBillOfLadingId = resultSet.getInt("id_bol");
             msBillOfLadingType = resultSet.getString("bol_tp");
             msSeries = resultSet.getString("ser");
             msNumber = resultSet.getString("num");
@@ -416,12 +418,12 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             msMerchandiseInsurerPolicy = resultSet.getString("merchandise_ins_policy");
             msPremium = resultSet.getString("premium");
             mbDeleted = resultSet.getBoolean("b_del");
-            mnFkCompanyBranchId = resultSet.getInt("fk_cob");
-            mnFkInputOutputCountry = resultSet.getInt("fk_input_output_cty_n");
-            mnFkGrossWeightUnit = resultSet.getInt("fk_gross_weight_unit");
-            mnFkEnvironmentalInsurer_n = resultSet.getInt("fk_environmental_ins_n");
-            mnFkMerchandiseInsurer_n = resultSet.getInt("fk_merchandise_ins_n");
             mnFkBillOfLadingStatusId = resultSet.getInt("fk_st_bol");
+            mnFkCompanyBranchId = resultSet.getInt("fk_cob");
+            mnFkInputOutputCountry_n = resultSet.getInt("fk_input_output_cty_n");
+            mnFkGrossWeightUnit = resultSet.getInt("fk_gross_weight_unit");
+            mnFkEnviromentalInsurer_n = resultSet.getInt("fk_environmental_ins_n");
+            mnFkMerchandiseInsurer_n = resultSet.getInt("fk_merchandise_ins_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -434,7 +436,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Read transportation mode:
         
-        msSql = "SELECT id_bol, id_transp_mode FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_TRANSP_MODE) + " WHERE id_bol = " + mnPkBolId + " ";
+        msSql = "SELECT id_bol, id_transp_mode FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_TRANSP_MODE) + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
             moBolTransportationMode.read(session, new int[] { resultSet.getInt("id_bol"), resultSet.getInt("id_transp_mode") } ) ;
@@ -442,7 +444,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Read locations:
         
-        msSql = "SELECT id_bol, id_location FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_LOCATION) + " WHERE id_bol = " + mnPkBolId + " ";
+        msSql = "SELECT id_bol, id_location FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_LOCATION) + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
             SDbBolLocation location = new SDbBolLocation(this);
@@ -452,7 +454,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Read merchandises:
         
-        msSql = "SELECT id_bol, id_merch FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH) + " WHERE id_bol = " + mnPkBolId + " ";
+        msSql = "SELECT id_bol, id_merch FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH) + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
             SDbBolMerchandise merch = new SDbBolMerchandise();
@@ -462,8 +464,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Read Insurers
         
-        if (mnFkEnvironmentalInsurer_n != 0) {
-            moXtaEnvironmentalInsurer.read(session, new int[] { mnFkEnvironmentalInsurer_n });
+        if (mnFkEnviromentalInsurer_n != 0) {
+            moXtaEnvironmentalInsurer.read(session, new int[] { mnFkEnviromentalInsurer_n });
         }
         if (mnFkMerchandiseInsurer_n != 0) {
             moXtaMerchandiseInsurer.read(session, new int[] { mnFkMerchandiseInsurer_n });
@@ -499,10 +501,10 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkBolId + ", " + 
+                mnPkBillOfLadingId + ", " + 
                 "'" + msBillOfLadingType + "', " + 
                 "'" + msSeries + "', " + 
-                msNumber + ", " + 
+                "'" + msNumber + "', " + 
                 "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " + 
                 "'" + msFiscalIdReceptor + "', " + 
                 (mbInternationalBol ? 1 : 0) + ", " + 
@@ -515,16 +517,16 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 "'" + msMerchandiseInsurerPolicy + "', " + 
                 "'" + msPremium + "', " + 
                 (mbDeleted ? 1 : 0) + ", " + 
-                mnFkCompanyBranchId + ", " +
-                (mnFkInputOutputCountry == 0 ? "NULL, " : mnFkInputOutputCountry + ", ") + 
-                mnFkGrossWeightUnit + ", " + 
-                (mnFkEnvironmentalInsurer_n == 0 ? "NULL, " : mnFkEnvironmentalInsurer_n + ", ") + 
-                (mnFkMerchandiseInsurer_n == 0 ? "NULL, " : mnFkMerchandiseInsurer_n + ", ") + 
                 mnFkBillOfLadingStatusId + ", " + 
+                mnFkCompanyBranchId + ", " + 
+                (mnFkInputOutputCountry_n == 0 ? "NULL, " : mnFkInputOutputCountry_n + ", ") + 
+                mnFkGrossWeightUnit + ", " + 
+                (mnFkEnviromentalInsurer_n == 0 ? "NULL, " : mnFkEnviromentalInsurer_n + ", ") + 
+                (mnFkMerchandiseInsurer_n == 0 ? "NULL, " : mnFkMerchandiseInsurer_n + ", ") + 
                 mnFkUserInsertId + ", " + 
                 mnFkUserUpdateId + ", " + 
                 "NOW()" + ", " + 
-                "NOW()" + " " +
+                "NOW()" + " " + 
                 ")";
         }
         else {
@@ -534,7 +536,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 //"id_bol = " + mnPkBillOfLadingId + ", " +
                 "bol_tp = '" + msBillOfLadingType + "', " +
                 "ser = '" + msSeries + "', " +
-                "num = " + msNumber + ", " +
+                "num = '" + msNumber + "', " +
                 "dt = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
                 "fiscal_id_rec = '" + msFiscalIdReceptor + "', " +
                 "int_bol = " + (mbInternationalBol ? 1 : 0) + ", " +
@@ -547,10 +549,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 "merchandise_ins_policy = '" + msMerchandiseInsurerPolicy + "', " +
                 "premium = '" + msPremium + "', " +
                 "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                "fk_st_bol = " + mnFkBillOfLadingStatusId + ", " +
                 "fk_cob = " + mnFkCompanyBranchId + ", " +
-                "fk_input_output_cty_n = " + (mnFkInputOutputCountry == 0 ? "NULL, " : mnFkInputOutputCountry + ", ") +
+                "fk_input_output_cty_n = " + (mnFkInputOutputCountry_n == 0 ? "NULL, " : mnFkInputOutputCountry_n + ", ") +
                 "fk_gross_weight_unit = " + mnFkGrossWeightUnit + ", " +
-                "fk_environmental_ins_n = " + (mnFkEnvironmentalInsurer_n == 0 ? "NULL, " : mnFkEnvironmentalInsurer_n + ", ") +
+                "fk_environmental_ins_n = " + (mnFkEnviromentalInsurer_n == 0 ? "NULL, " : mnFkEnviromentalInsurer_n + ", ") +
                 "fk_merchandise_ins_n = " + (mnFkMerchandiseInsurer_n == 0 ? "NULL, " : mnFkMerchandiseInsurer_n + ", ") +
                 //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                 "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -562,20 +565,20 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         // Save transportation mode:
         
-        moBolTransportationMode.setPkBillOfLadingId(mnPkBolId);
+        moBolTransportationMode.setPkBillOfLadingId(mnPkBillOfLadingId);
         moBolTransportationMode.save(session);
         
         // Save locations:
         
         for (SDbBolLocation location : maBolLocations) {
-            location.setPkBillOfLadingId(mnPkBolId);
+            location.setPkBillOfLadingId(mnPkBillOfLadingId);
             location.save(session);
         }
         
         // Save merchandises
         
         for (SDbBolMerchandise merchandise : maBolMerchandises) {
-            merchandise.setPkBillOfLadingId(mnPkBolId);
+            merchandise.setPkBillOfLadingId(mnPkBillOfLadingId);
             merchandise.save(session);
         }
         
@@ -587,7 +590,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public SDbRegistry clone() throws CloneNotSupportedException {
         SDbBillOfLading registry = new SDbBillOfLading();
         
-        registry.setPkBolId(this.getPkBolId());
+        registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
         registry.setBillOfLadingType(this.getBillOfLadingType());
         registry.setSeries(this.getSeries());
         registry.setNumber(this.getNumber());
@@ -603,17 +606,17 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         registry.setMerchandiseInsurerPolicy(this.getMerchandiseInsurerPolicy());
         registry.setPremium(this.getPremium());
         registry.setDeleted(this.isDeleted());
-        registry.setFkCompanyBranchId(this.getFkCompanyBranchId());
-        registry.setFkInputOutputCountry(this.getFkInputOutputCountry());
-        registry.setFkGrossWeightUnit(this.getFkGrossWeightUnit());
-        registry.setFkEnvironmentalInsurer_n(this.getFkEnvironmentalInsurer_n());
-        registry.setFkMerchandiseInsurer_n(this.getFkMerchandiseInsurer_n());
         registry.setFkBillOfLadingStatusId(this.getFkBillOfLadingStatusId());
+        registry.setFkCompanyBranchId(this.getFkCompanyBranchId());
+        registry.setFkInputOutputCountry_n(this.getFkInputOutputCountry_n());
+        registry.setFkGrossWeightUnit(this.getFkGrossWeightUnit());
+        registry.setFkEnviromentalInsurer_n(this.getFkEnviromentalInsurer_n());
+        registry.setFkMerchandiseInsurer_n(this.getFkMerchandiseInsurer_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
-        
+
         registry.setBolTransportationMode(this.getBolTransportationMode());
         registry.setBolLocations(this.getBolLocations());
         registry.setBolMerchandises(this.getBolMerchandises());
@@ -704,7 +707,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
 
             sSql = "UPDATE log_bol SET fk_st_bol = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", "  +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", ts_usr_upd = NOW() " +
-                    "WHERE id_bol = " + mnPkBolId + " ";
+                    "WHERE id_bol = " + mnPkBillOfLadingId + " ";
             oStatement.execute(sSql);
             if (moDbmsDataCfd != null) {
                 moDbmsDataCfd.annul(connection);
