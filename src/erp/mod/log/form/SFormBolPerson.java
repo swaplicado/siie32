@@ -394,9 +394,11 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
+            moKeyCountry.setValue(new int [] { 251 }); // México
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
+            moKeyCountry.setValue(new int [] { moRegistry.getFkCountryId_n() });
         }
         
         moTextName.setValue(moRegistry.getName());
@@ -412,7 +414,6 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         moTextReference.setValue(moRegistry.getReference());
         moTextLocality.setValue(moRegistry.getLocality());
         moKeyState.setValue(new int [] { moRegistry.getFkStateId_n() });
-        moKeyCountry.setValue(new int [] { moRegistry.getFkCountryId_n() });
         moTextZipCode.setValue(moRegistry.getZipCode());
         
         setFormEditable(true);
@@ -455,8 +456,8 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         if (moTextFiscalId.getValue().isEmpty() && moTextFiscalFrgId.getValue().isEmpty()) {
             validation.setMessage("La figura debe tener un RFC ya sea nacional o extranjero."); 
         }
-        if (moKeyPersonTp.getValue()[0] == 1) {
-            
+        if (moKeyPersonTp.getValue()[0] == 1 && moTextDriverLic.getValue().isEmpty()) {
+            validation.setMessage("Los choferes deben tener un número de licencia.");
         }
         
         return validation;

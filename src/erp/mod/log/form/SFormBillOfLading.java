@@ -1521,11 +1521,13 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             jtfRegistryKey.setText("");
             moBoolInternationalShip.setSelected(false);
             moTextFiscalIdReceptor.setText(((SClientInterface) miClient).getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId());
+            moKeyGrossWeightUnit.setValue(new int[] { 59 }); // KILOGRAMOS
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
             moBoolInternationalShip.setSelected(moRegistry.isInternationalBol());
             moTextFiscalIdReceptor.setText(((SClientInterface) miClient).getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId());
+            moKeyGrossWeightUnit.setValue(new int[] { moRegistry.getFkGrossWeightUnit() });
         }
 
         moTextTaxRegime.setValue(((SClientInterface)miClient).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
@@ -1535,7 +1537,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         else if (mnFormSubtype == SDataConstantsSys.TRNS_TP_CFD_INV) {
             moTextBillOfLadingTp.setValue("I");
         }
-        moKeyCountry.setValue(new int[] { moRegistry.getFkInputOutputCountry() });
+        moKeyCountry.setValue(new int[] { moRegistry.getFkInputOutputCountry_n() });
         SGuiUtils.locateItemByCode(moKeyInputOutput, moRegistry.getInputOutputBol());
         SGuiUtils.locateItemByCode(moKeyInputOutputWay, moRegistry.getInputOutputWay());
         moTextSerie.setText(moRegistry.getSeries());
@@ -1543,8 +1545,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moDateDate.setValue(moRegistry.getDate());
         moDecimalTotalDistance.setValue(moRegistry.getTotalDistance());
         moDecimalGrossWeight.setValue(moRegistry.getGrossWeight());
-        moKeyGrossWeightUnit.setValue(new int[] { moRegistry.getFkGrossWeightUnit() });
-        moKeyEnvironmentalInsurer.setValue(new int[] { moRegistry.getFkEnvironmentalInsurer_n() }); 
+        moKeyEnvironmentalInsurer.setValue(new int[] { moRegistry.getFkEnviromentalInsurer_n() }); 
         moTextEnvironmentalPolicy.setText(moRegistry.getEnviromentalInsurerPolicy());
         moKeyMerchandiseInsurer.setValue(new int[] { moRegistry.getFkMerchandiseInsurer_n() });
         moTextMerchandisePolicy.setText(moRegistry.getMerchandiseInsurerPolicy());
@@ -1625,9 +1626,9 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         registry.setMerchandiseInsurerPolicy(moTextMerchandisePolicy.getValue());
         registry.setPremium(moTextPremium.getValue());
         registry.setFkCompanyBranchId(((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId());
-        registry.setFkInputOutputCountry(moKeyCountry.getValue().length == 0 ? 0 : moKeyCountry.getValue()[0]);
+        registry.setFkInputOutputCountry_n(moKeyCountry.getValue().length == 0 ? 0 : moKeyCountry.getValue()[0]);
         registry.setFkGrossWeightUnit(moKeyGrossWeightUnit.getValue()[0]);
-        registry.setFkEnvironmentalInsurer_n(moKeyEnvironmentalInsurer.getValue().length == 0 ? 0 : moKeyEnvironmentalInsurer.getValue()[0]);
+        registry.setFkEnviromentalInsurer_n(moKeyEnvironmentalInsurer.getValue().length == 0 ? 0 : moKeyEnvironmentalInsurer.getValue()[0]);
         registry.setFkMerchandiseInsurer_n(moKeyMerchandiseInsurer.getValue().length == 0 ? 0 :moKeyMerchandiseInsurer.getValue()[0]);
         registry.setFkBillOfLadingStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         registry.readBizPartner(miClient.getSession(), miClient.getSession().getConfigCompany().getCompanyId());
