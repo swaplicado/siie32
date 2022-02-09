@@ -293,6 +293,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayPaymentEntryAdd = new javax.swing.JButton();
         jbPayPaymentEntryModify = new javax.swing.JButton();
         jbPayPaymentEntryDelete = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        jlPayCounter = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jbPayPaymentEntryOk = new javax.swing.JButton();
         jbPayPaymentEntryCancel = new javax.swing.JButton();
@@ -352,6 +354,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbDocPaymentEntryDocAdd = new javax.swing.JButton();
         jbDocPaymentEntryDocModify = new javax.swing.JButton();
         jbDocPaymentEntryDocDelete = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        jlDocCounter = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jbDocPaymentEntryDocOk = new javax.swing.JButton();
         jbDocPaymentEntryDocCancel = new javax.swing.JButton();
@@ -524,7 +528,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouUuidRo.setText("402A8A38-B980-412A-9485-29222D7095C4");
         jtfVouUuidRo.setToolTipText("UUID");
         jtfVouUuidRo.setFocusable(false);
-        jtfVouUuidRo.setPreferredSize(new java.awt.Dimension(225, 23));
+        jtfVouUuidRo.setPreferredSize(new java.awt.Dimension(230, 23));
         jPanel5.add(jtfVouUuidRo);
 
         jtfVouVersionRo.setEditable(false);
@@ -923,6 +927,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayPaymentEntryDelete.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel1.add(jbPayPaymentEntryDelete);
 
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator1.setPreferredSize(new java.awt.Dimension(5, 23));
+        jPanel1.add(jSeparator1);
+
+        jlPayCounter.setText("Pagos: 0");
+        jlPayCounter.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jlPayCounter);
+
         jPanel33.add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
@@ -1002,7 +1014,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocDpsRelatedUuid.setText("402A8A38-B980-412A-9485-29222D7095C4");
         jtfDocDpsRelatedUuid.setToolTipText("UUID");
         jtfDocDpsRelatedUuid.setFocusable(false);
-        jtfDocDpsRelatedUuid.setPreferredSize(new java.awt.Dimension(225, 23));
+        jtfDocDpsRelatedUuid.setPreferredSize(new java.awt.Dimension(230, 23));
         jPanel14.add(jtfDocDpsRelatedUuid);
 
         jtfDocDpsRelatedVersionRo.setEditable(false);
@@ -1229,6 +1241,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbDocPaymentEntryDocDelete.setText("Eliminar");
         jbDocPaymentEntryDocDelete.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel2.add(jbDocPaymentEntryDocDelete);
+
+        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator2.setPreferredSize(new java.awt.Dimension(5, 23));
+        jPanel2.add(jSeparator2);
+
+        jlDocCounter.setText("Docs. 0");
+        jlDocCounter.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel2.add(jlDocCounter);
 
         jPanel39.add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -2077,6 +2097,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         // accounting documents:
         renderAccConceptDocs(paymentEntry);
+        
+        // counter:
+        jlDocCounter.setText("Docs.: " + SLibUtils.DecimalFormatInteger.format(paymentEntry == null ? 0 : paymentEntry.PaymentEntryDocs.size()));
     }
     
     private void computeVouTotal() {
@@ -2105,6 +2128,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         // local currency:
         jtfVouTotalLocalRo.setText(SLibUtils.getDecimalFormatAmount().format(totalLocal));
+        
+        // counter:
+        jlPayCounter.setText("Pagos: " + SLibUtils.DecimalFormatInteger.format(moPaneGridPayments.getGridRows().size()));
     }
 
     private boolean isPayerForeign() {
@@ -2112,9 +2138,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void enableVouFields(final boolean enable) {
-        jftVouDate.setEditable(true);
-        jftVouDate.setFocusable(true);
-        jbVouDatePick.setEnabled(true);
+        jftVouDate.setEditable(!mbIsFormReadOnly);
+        jftVouDate.setFocusable(!mbIsFormReadOnly);
+        jbVouDatePick.setEnabled(!mbIsFormReadOnly);
         jcbVouTaxRegime.setEnabled(enable);
         jtfVouConfirm.setEditable(enable);
         jtfVouConfirm.setFocusable(enable);
@@ -3455,6 +3481,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JButton jbAccConceptDocsEdit;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDocDpsRelatedPickAll;
@@ -3498,6 +3526,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JFormattedTextField jftVouDate;
     private javax.swing.JLabel jlDocBalancePend;
     private javax.swing.JLabel jlDocBalancePrev;
+    private javax.swing.JLabel jlDocCounter;
     private javax.swing.JLabel jlDocCurrency;
     private javax.swing.JLabel jlDocDpsRelated;
     private javax.swing.JLabel jlDocExchangeRate;
@@ -3512,6 +3541,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlPayAccountNumber;
     private javax.swing.JLabel jlPayAccountSrc;
     private javax.swing.JLabel jlPayAmount;
+    private javax.swing.JLabel jlPayCounter;
     private javax.swing.JLabel jlPayCurrency;
     private javax.swing.JLabel jlPayDate;
     private javax.swing.JLabel jlPayFactoringBank;
@@ -4084,13 +4114,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         computeVouTotal();
         valueChangedPayments();
         
-        if (!SDataUtilities.isPeriodOpen(miClient, cfd.getTimestamp()) || !cfd.getUuid().isEmpty()) {
+        if (!SDataUtilities.isPeriodOpen(miClient, cfd.getTimestamp()) || cfd.isStamped()) {
             mbIsFormReadOnly = true;
         }
         
         if (mbIsFormReadOnly) {
             jbVouResume.setEnabled(false);
             
+            enableVouFields(false);
             enablePayControls(false);
             enableDocControls(false);
             

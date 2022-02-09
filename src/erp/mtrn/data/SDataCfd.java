@@ -337,7 +337,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean testDeletion(java.lang.String msg, int action) throws java.lang.Exception {
         String sMsg = msg;
         
-        if (action == SDbConsts.ACTION_DELETE && isStamped()) {
+        if (action == SDbConsts.ACTION_STAMP && msSignature.isEmpty()) {
+            msDbmsError = sMsg + "¡El comprobante no está sellado!";
+            throw new Exception(msDbmsError);
+        }
+        if (action == SDbConsts.ACTION_STAMP && isStamped()) {
             msDbmsError = sMsg + "¡El comprobante está timbrado!";
             throw new Exception(msDbmsError);
         }
@@ -940,7 +944,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             mnLastDbActionResult = SLibConstants.UNDEFINED;
             
             try {
-                if (testDeletion("No se puede timbrar el comprobante: ", SDbConsts.ACTION_DELETE)) {
+                if (testDeletion("No se puede timbrar el comprobante: ", SDbConsts.ACTION_STAMP)) {
                     mnLastDbActionResult = SLibConstants.DB_CAN_SAVE_YES;
                 }
             }

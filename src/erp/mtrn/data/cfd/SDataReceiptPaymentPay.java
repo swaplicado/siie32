@@ -245,17 +245,19 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                     
                     // read as well all documents:
                     
-                    sql = "SELECT id_doc "
-                            + "FROM trn_pay_pay_doc "
-                            + "WHERE id_rcp = " + key[0] + " AND id_pay = " + key[1] + " "
-                            + "ORDER BY id_doc;";
-                    
-                    try (Statement statementDocs = statement.getConnection().createStatement()) {
-                        ResultSet resultSetDocs = statementDocs.executeQuery(sql);
-                        while (resultSetDocs.next()) {
-                            SDataReceiptPaymentPayDoc payDoc = new SDataReceiptPaymentPayDoc();
-                            payDoc.read(new int[] { mnPkReceiptId, mnPkPaymentId, resultSetDocs.getInt("id_doc") }, statement);
-                            maDbmsReceiptPaymentPayDocs.add(payDoc);
+                    if (!mbAuxReadJournalVoucherHeaderOnly) {
+                        sql = "SELECT id_doc "
+                                + "FROM trn_pay_pay_doc "
+                                + "WHERE id_rcp = " + key[0] + " AND id_pay = " + key[1] + " "
+                                + "ORDER BY id_doc;";
+
+                        try (Statement statementDocs = statement.getConnection().createStatement()) {
+                            ResultSet resultSetDocs = statementDocs.executeQuery(sql);
+                            while (resultSetDocs.next()) {
+                                SDataReceiptPaymentPayDoc payDoc = new SDataReceiptPaymentPayDoc();
+                                payDoc.read(new int[] { mnPkReceiptId, mnPkPaymentId, resultSetDocs.getInt("id_doc") }, statement);
+                                maDbmsReceiptPaymentPayDocs.add(payDoc);
+                            }
                         }
                     }
                     

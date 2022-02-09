@@ -24,13 +24,27 @@ import sa.lib.SLibUtils;
 public abstract class SCfdPaymentUtils {
     
     public static void sign(final SClientInterface client, final int idCfd) throws Exception {
-        //SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, new int[] { idCfd }, SLibConstants.EXEC_MODE_VERBOSE);
+        /*
+        XXX 2022-02-01, Sergio Flores.
+        Código preservado para referencias futuras.
+        Se comentó porque antes de leer el comprobante es necesario indicar que no se desea leer los renglones de las pólizas contables relacionadas con él.
+        
+        SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, new int[] { idCfd }, SLibConstants.EXEC_MODE_VERBOSE);
+        */
+        
+        /*
+        XXX 2022-02-01, Sergio Flores.
+        Código preservado para referencias futuras.
+        Se comentó porque es más eficiente leer solamente el puro registro CFD, para no leer ni las pólizas contables ni los documentos relacionados con el comprobante.
         
         SDataCfdPayment cfdPayment = new SDataCfdPayment();
         cfdPayment.setAuxReadJournalVoucherHeadersOnly(true);
-        cfdPayment.read(new int[] { idCfd}, client.getSession().getStatement());
+        cfdPayment.read(new int[] { idCfd }, client.getSession().getStatement());
         
         SDataCfd cfd = cfdPayment.getDbmsDataCfd();
+        */
+        
+        SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { idCfd }, SLibConstants.EXEC_MODE_VERBOSE);
 
         if (!cfd.getUuid().isEmpty()) {
             throw new Exception("El CFDI '" + cfd.getCfdNumber() + "' ya está timbrado.");

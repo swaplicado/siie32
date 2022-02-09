@@ -342,7 +342,7 @@
                         <Property name="toolTipText" type="java.lang.String" value="UUID"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[225, 23]"/>
+                          <Dimension value="[230, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -1148,6 +1148,22 @@
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="javax.swing.JSeparator" name="jSeparator1">
+                              <Properties>
+                                <Property name="orientation" type="int" value="1"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[5, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlPayCounter">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Pagos: 0"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                         <Container class="javax.swing.JPanel" name="jPanel3">
@@ -1318,7 +1334,7 @@
                             <Property name="toolTipText" type="java.lang.String" value="UUID"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[225, 23]"/>
+                              <Dimension value="[230, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1748,6 +1764,22 @@
                             <Component class="javax.swing.JButton" name="jbDocPaymentEntryDocDelete">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Eliminar"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JSeparator" name="jSeparator2">
+                              <Properties>
+                                <Property name="orientation" type="int" value="1"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[5, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlDocCounter">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Docs. 0"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[75, 23]"/>
                                 </Property>

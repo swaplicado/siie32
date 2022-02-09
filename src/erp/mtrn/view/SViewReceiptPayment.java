@@ -176,7 +176,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC Deudor", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "p.pay_loc_r", "Total loc $", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.uuid", "UUID CFDI", 250);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.bp", "Banco factoraje", 250);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.bp", "Banco factoraje", 150);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.fiscal_id", "RFC banco factoraje", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "p.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_usr_new", "Usr. creación", STableConstants.WIDTH_USER);

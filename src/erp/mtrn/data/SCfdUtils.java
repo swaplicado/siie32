@@ -866,7 +866,14 @@ public abstract class SCfdUtils implements Serializable {
                                     break;
 
                                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
-                                    //dataCfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, SLibConstants.EXEC_MODE_SILENT);
+                                    /*
+                                    XXX 2022-02-01, Sergio Flores.
+                                    Código preservado para referencias futuras.
+                                    Se comentó porque antes de leer el comprobante es necesario indicar que no se desea leer los renglones de las pólizas contables relacionadas con él.
+                                    
+                                    dataCfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, SLibConstants.EXEC_MODE_SILENT);
+                                    */
+                                    
                                     dataCfdPayment = new SDataCfdPayment();
                                     dataCfdPayment.setAuxReadJournalVoucherHeadersOnly(true);
                                     dataCfdPayment.read(registryKey, client.getSession().getStatement());

@@ -394,7 +394,8 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
 
                     // Read aswell record entries:
 
-                    sql = "SELECT id_ety FROM fin_rec_ety " +
+                    sql = "SELECT id_ety " +
+                            "FROM fin_rec_ety " +
                             "WHERE id_year = " + (Integer) key[0] + " AND id_per = " + (Integer) key[1] + " AND " +
                             "id_bkc = " + (Integer) key[2] + " AND id_tp_rec = '" + (String) key[3] + "' AND id_num = " + (Integer) key[4] + " " +
                             "ORDER BY sort_pos, id_ety ";
@@ -411,9 +412,10 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
 
                     // CFD
 
-                    sql = "SELECT id_cfd FROM trn_cfd WHERE fid_fin_rec_year_n = " + key[0] + " AND fid_fin_rec_per_n = " + key[1] + " AND "
-                            + "fid_fin_rec_bkc_n = " + key[2] + " AND fid_fin_rec_tp_rec_n = '" + key[3] + "' AND "
-                            + "fid_fin_rec_num_n = " + key[4] + ";";
+                    sql = "SELECT id_cfd " +
+                            "FROM trn_cfd " +
+                            "WHERE fid_fin_rec_year_n = " + key[0] + " AND fid_fin_rec_per_n = " + key[1] + " AND " +
+                            "fid_fin_rec_bkc_n = " + key[2] + " AND fid_fin_rec_tp_rec_n = '" + key[3] + "' AND fid_fin_rec_num_n = " + key[4] + ";";
                     readCfds(statement, sql);
 
                     mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
