@@ -183,14 +183,14 @@ public class SShareData {
                 SCAPResponse resp = mapper.readValue(responseBody, SCAPResponse.class);
                 switch (resp.getCode()) {
                     case SCAPResponse.RESPONSE_OK:
-                        SPrepayroll prepayroll = mapper.readValue(responseBody, SPrepayroll.class);
+                        SPrepayroll prepayroll = resp.getPrepayrollData();
                         SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.PREPAYROLL);
                         
                         return prepayroll;
                         
                     case SCAPResponse.RESPONSE_NOT_VOBO:
                     case SCAPResponse.RESPONSE_ERROR:
-                        JOptionPane.showMessageDialog(null, resp.getData(), "ERROR", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, resp.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
                         break;
                 }
             }

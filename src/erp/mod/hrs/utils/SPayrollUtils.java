@@ -81,6 +81,14 @@ public class SPayrollUtils {
                             hasBonus = SPayrollBonusUtils.hasBonus(tStartDate, tEndDate, row);
                             comments += hasBonus ? "" : "Con retardos o faltas.";
                         }
+                        else {
+                            if (row.getIncidents() != null && row.getIncidents().size() > 0) {
+                                for (String incident : row.getIncidents()) {
+                                    comments += incident + " ";
+                                }
+                            }
+                        }
+                        
                         comments += (row.isHasNoChecks() ? " Omitió checar." : "");
                         oEarnConfiguration.setHasWon(hasBonus ? 1d : 0d);
                         oEarnConfiguration.setComments(comments);
@@ -330,13 +338,13 @@ public class SPayrollUtils {
                 SCAPResponse resp = mapper.readValue(responseBody, SCAPResponse.class);
                 switch (resp.getCode()) {
                     case SCAPResponse.RESPONSE_OK:
-                        SAbsDelays absDelays = mapper.readValue(responseBody, SAbsDelays.class);
+                        SAbsDelays absDelays = resp.getAbsData();
                         SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.VOUCHER);
                         return absDelays;
                         
                     case SCAPResponse.RESPONSE_NOT_VOBO:
                     case SCAPResponse.RESPONSE_ERROR:
-                        client.showMsgBoxError(resp.getData());
+                        client.showMsgBoxError(resp.getMessage());
                         break;
                 }
             }

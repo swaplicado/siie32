@@ -5,6 +5,8 @@
  */
 package erp.mod.hrs.link.db;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Edwin Carmona
@@ -16,6 +18,7 @@ public class SDataRow {
     private int absences;
     private boolean hasNoChecks;
     private boolean lostBonus;
+    private ArrayList<String> incidents;
 
     public int getIdEmployee() {
         return idEmployee;
@@ -56,5 +59,12 @@ public class SDataRow {
     public void setLostBonus(boolean lostBonus) {
         this.lostBonus = lostBonus;
     }
-    
+
+    public ArrayList<String> getIncidents() {
+        return incidents;
+    }
+
+    public void setIncidents(ArrayList<String> incidents) {
+        this.incidents = incidents;
+    }
 }

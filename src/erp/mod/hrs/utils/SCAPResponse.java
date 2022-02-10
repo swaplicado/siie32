@@ -5,6 +5,9 @@
  */
 package erp.mod.hrs.utils;
 
+import erp.mod.hrs.link.db.SAbsDelays;
+import erp.mod.hrs.link.utils.SPrepayroll;
+
 /**
  *
  * @author Edwin Carmona
@@ -15,7 +18,9 @@ public class SCAPResponse {
     public static final int RESPONSE_NOT_VOBO = 550;
     
     private int code;
-    private String data;
+    private String message;
+    private SAbsDelays absData;
+    private SPrepayroll prepayrollData;
 
     public int getCode() {
         return code;
@@ -25,11 +30,29 @@ public class SCAPResponse {
         this.code = code;
     }
 
-    public String getData() {
-        return data;
+    public String getMessage() {
+        return message;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setMessage(String message) {
+        this.message = message;
     }
+
+    public SAbsDelays getAbsData() {
+        return absData;
+    }
+
+    public void setAbsData(SAbsDelays absData) {
+        this.absData = absData;
+    }
+
+    public SPrepayroll getPrepayrollData() {
+        return prepayrollData;
+    }
+
+    public void setPrepayrollData(SPrepayroll prepayrollData) {
+        this.prepayrollData = prepayrollData;
+    }
+    
+    
 }
