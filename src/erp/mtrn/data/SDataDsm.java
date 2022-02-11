@@ -1477,9 +1477,14 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         Statement statementAux = null;
         ResultSet resultSet = null;
         
-        // si esto pasa significa que hay una configuración disponible y por ende se obtiene el balance correspondiente al impuesto
+        // Si esto pasa significa que hay una configuración disponible y por ende se obtiene el balance correspondiente al impuesto:
+        
         if (taxPk != null) {
-            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, nTpSysMovId[0], nTpSysMovId[1], null);
+            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(connection, 
+                    nDpsYearId, nDpsDocId, 
+                    nTpSysMovId[0], nTpSysMovId[1], 
+                    null);
+            
             for (SFinBalanceTax balance : balances) {
                 if (balance.getTaxPk()[0] == taxPk[0] && balance.getTaxPk()[1] == taxPk[1]) {
                     return new double[] { balance.getBalance(), balance.getBalanceCurrency() };
@@ -1508,13 +1513,14 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                     "GROUP BY d.fid_cur ";
 
-            //System.out.println("DpsBalanceNet: " + sSql);
-
             resultSet = statementAux.executeQuery(sSql);
+            
             if (resultSet.next()) {
                 dDpsBalanceNet = resultSet.getDouble("f_tot_net");
                 dDpsBalanceCurNet = resultSet.getDouble("f_tot_net_cur");
             }
+            
+            statementAux.close();
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
@@ -1524,7 +1530,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return new double[] { dDpsBalanceNet, dDpsBalanceCurNet };
     }
 
-    private java.lang.Object calculateDpsTaxBalanceNet(java.sql.Connection connection, int nDpsYearId, int nDpsDocId, int nTpSysMovId[], int nBizPartnerId, int nPkTaxType, int nPkTaxBasicId, int nPkTaxId) {
+    private java.lang.Object calculateDpsTaxBalanceNet(java.sql.Connection connection, int nDpsYearId, int nDpsDocId, int[] anSysMoveKey, int nBizPartnerId, int nPkTaxType, int nPkTaxBasicId, int nPkTaxId) {
         double dTaxBalance = 0.0;
         double dTaxBalanceCur = 0.0;
         String sSql = "";
@@ -1542,8 +1548,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 "d.b_del = FALSE AND d.fid_bp_r = " + nBizPartnerId + " " +
                 "INNER JOIN trn_dps_dps_adj AS ad ON et.id_year = ad.id_dps_year AND et.id_doc = ad.id_dps_doc AND et.id_ety = ad.id_dps_ety " +
                 "INNER JOIN trn_dps_ety AS et1 ON et1.b_del = FALSE AND ad.id_adj_year = et1.id_year AND ad.id_adj_doc = et1.id_doc AND ad.id_adj_ety = et1.id_ety " +
-                "INNER JOIN trn_dps AS d1 ON d1.b_del = FALSE AND et1.id_year = d1.id_year AND et1.id_doc = d1.id_doc AND d1.fid_ct_dps = " + renderTypeDps(nTpSysMovId, 0) + " AND " +
-                "d1.fid_cl_dps = " + renderTypeDps(nTpSysMovId, 1) + " AND d1.fid_tp_dps =  " + renderTypeDps(nTpSysMovId, 2) + " " +
+                "INNER JOIN trn_dps AS d1 ON d1.b_del = FALSE AND et1.id_year = d1.id_year AND et1.id_doc = d1.id_doc AND d1.fid_ct_dps = " + renderTypeDps(anSysMoveKey, 0) + " AND " +
+                "d1.fid_cl_dps = " + renderTypeDps(anSysMoveKey, 1) + " AND d1.fid_tp_dps =  " + renderTypeDps(anSysMoveKey, 2) + " " +
                 "INNER JOIN trn_dps_ety_tax AS tax ON et.id_year = tax.id_year AND et.id_doc = tax.id_doc AND et.id_ety = tax.id_ety AND et.b_del = FALSE AND " +
                 "tax.id_tax_bas = " + nPkTaxBasicId + " AND tax.id_tax = " + nPkTaxId + " ";
 
@@ -1608,15 +1614,15 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return new double[] { dBalance, dBalanceCur };
     }
 
-    private int renderTypeDps(int[] nTpSysMovId, int pos) {
+    private int renderTypeDps(int[] anSysMoveKey, int pos) {
         int type = 0;
 
-        if (SLibUtilities.compareKeys(nTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP) ||
-                SLibUtilities.compareKeys(nTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR)) {
+        if (SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP) ||
+                SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR)) {
             type = SDataConstantsSys.TRNU_TP_DPS_PUR_CN[pos];
         }
-        else if (SLibUtilities.compareKeys(nTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS) ||
-                SLibUtilities.compareKeys(nTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR)) {
+        else if (SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS) ||
+                SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR)) {
             type = SDataConstantsSys.TRNU_TP_DPS_SAL_CN[pos];
         }
 

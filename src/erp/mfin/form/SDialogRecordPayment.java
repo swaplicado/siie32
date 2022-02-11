@@ -48,6 +48,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -1134,15 +1135,18 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
-        ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
-                                                    mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
-                                                    mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], null);
+        ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), 
+                moDps.getPkYearId(), moDps.getPkDocId(), 
+                mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
+                mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], 
+                null);
         
         double dTotalBalance = 0d;
         double dTotalBalanceCur = 0d;
+        
         for (SFinBalanceTax balance : balances) {
-            dTotalBalance += balance.getBalance();
-            dTotalBalanceCur += balance.getBalanceCurrency();
+            dTotalBalance = SLibUtils.roundAmount(dTotalBalance + balance.getBalance());
+            dTotalBalanceCur = SLibUtils.roundAmount(dTotalBalanceCur + balance.getBalanceCurrency());
         }
         
         HashMap<String, double[]> taxBalances = new HashMap<>();

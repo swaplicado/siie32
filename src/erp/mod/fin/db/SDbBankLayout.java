@@ -693,17 +693,19 @@ public class SDbBankLayout extends SDbRegistryUser {
                             double paymentCy = layoutBankDps.getPaymentCy();
                             double payment = (new SMoney(session, layoutBankDps.getPaymentCy(), layoutBankDps.getDps().getFkCurrencyId(), exchangeRate)).getLocalAmount();
                             
-                            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), layoutBankDps.getDps().getPkDocId(), layoutBankDps.getDps().getPkYearId(), 
-                                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
-                                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1],
-                                                    null);
+                            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
+                                    layoutBankDps.getDps().getPkDocId(), layoutBankDps.getDps().getPkYearId(), 
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1],
+                                    null);
         
-							double dTotalBalance = 0d;
-							double dTotalBalanceCur = 0d;
-							for (SFinBalanceTax balance : balances) {
-								dTotalBalance += balance.getBalance();
-								dTotalBalanceCur += balance.getBalanceCurrency();
-							}
+                            double dTotalBalance = 0d;
+                            double dTotalBalanceCur = 0d;
+                            
+                            for (SFinBalanceTax balance : balances) {
+                                dTotalBalance = SLibUtils.roundAmount(dTotalBalance + balance.getBalance());
+                                dTotalBalanceCur = SLibUtils.roundAmount(dTotalBalanceCur + balance.getBalanceCurrency());
+                            }
 
                             HashMap<String, double[]> taxBalances = new HashMap();
                             String tax;

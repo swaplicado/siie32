@@ -3,6 +3,7 @@ package erp.mtrn.data;
 import erp.lib.SLibConstants;
 import erp.lib.data.SThinData;
 import erp.mod.trn.db.STrnUtils;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -11,7 +12,7 @@ import java.sql.Statement;
  * Se usa para agilizar el procesamiento de CFDI de recepción de pagos.
  * @author Sergio Flores
  */
-public class SThinDps implements SThinData {
+public class SThinDps implements Serializable, SThinData {
 
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -20,6 +21,8 @@ public class SThinDps implements SThinData {
     protected int mnFkDpsCategoryId;
     protected int mnFkDpsClassId;
     protected int mnFkDpsTypeId;
+    protected int mnFkBizPartnerId_r;
+    protected int mnFkBizPartnerBranchId;
     protected int mnFkCurrencyId;
     
     protected String msDbmsCurrency;
@@ -42,6 +45,8 @@ public class SThinDps implements SThinData {
         mnFkDpsCategoryId = 0;
         mnFkDpsClassId = 0;
         mnFkDpsTypeId = 0;
+        mnFkBizPartnerId_r = 0;
+        mnFkBizPartnerBranchId = 0;
         mnFkCurrencyId = 0;
         
         msDbmsCurrency = "";
@@ -80,6 +85,14 @@ public class SThinDps implements SThinData {
         return mnFkDpsTypeId;
     }
 
+    public int getFkBizPartnerId_r() {
+        return mnFkBizPartnerId_r;
+    }
+    
+    public int getFkBizPartnerBranchId() {
+        return mnFkBizPartnerBranchId;
+    }
+    
     public int getFkCurrencyId() {
         return mnFkCurrencyId;
     }
@@ -126,14 +139,14 @@ public class SThinDps implements SThinData {
         
         int[] key = (int[]) primaryKey;
         String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, "
-                + "d.fid_cur, c.cur, c.cur_key "
+                + "d.fid_bp_r, d.fid_bpb, d.fid_cur, c.cur, c.cur_key "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
                 + "WHERE d.id_year = " + key[0] + " AND d.id_doc = " + key[1] + ";";
         
         try (ResultSet resultSetDps = statement.executeQuery(sql)) {
             if (!resultSetDps.next()) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nDocumento.");
             }
             else {
                 mnPkYearId = resultSetDps.getInt("d.id_year");
@@ -143,6 +156,8 @@ public class SThinDps implements SThinData {
                 mnFkDpsCategoryId = resultSetDps.getInt("d.fid_ct_dps");
                 mnFkDpsClassId = resultSetDps.getInt("d.fid_cl_dps");
                 mnFkDpsTypeId = resultSetDps.getInt("d.fid_tp_dps");
+                mnFkBizPartnerId_r = resultSetDps.getInt("d.fid_bp_r");
+                mnFkBizPartnerBranchId = resultSetDps.getInt("d.fid_bpb");
                 mnFkCurrencyId = resultSetDps.getInt("d.fid_cur");
                 
                 msDbmsCurrency = resultSetDps.getString("c.cur");
@@ -167,5 +182,10 @@ public class SThinDps implements SThinData {
                 moThinCfd.read(new int[] { mnDbmsCfdId }, statement);
             }
         }
+    }
+
+    @Override
+    public Object getPrimaryKey() {
+        return new int[] { mnPkYearId, mnPkDocId };
     }
 }

@@ -91,7 +91,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public boolean AuxAllowTotalPaymentsLocalGreaterThanAmountLocal;
     public ArrayList<SDataRecordEntry> AuxDbmsRecordEntries;
     
-    public SCfdPaymentEntry(SDataCfdPayment parentPayment, int entryNumber, int entryType, Date paymentDate, String paymentWay, int currencyId, String currencyKey, double amount, double exchangeRate, SDataRecord dataRecord) {
+    public SCfdPaymentEntry(SDataCfdPayment parentPayment, int entryNumber, int entryType, Date paymentDate, String paymentWay, int currencyId, String currencyKey, double amount, double exchangeRate, SDataRecord record) {
         DataParentPayment = parentPayment;
         EntryNumber = entryNumber;
         EntryType = entryType;
@@ -109,7 +109,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         AccountDestFiscalId = "";
         AccountDestNumber = "";
         AccountDestKey = null;
-        DataRecord = dataRecord;
+        DataRecord = record;
         PaymentEntryDocs = new ArrayList<>();
         
         AuxGridIndex = -1;
@@ -160,7 +160,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             AuxTotalLimMin += paymentEntryDoc.PayPaymentLimMin; // sum without rounding!
             AuxTotalLimMax += paymentEntryDoc.PayPaymentLimMax; // sum without rounding!
             
-            docsSet.add(paymentEntryDoc.DataDps.getDpsNumber());
+            docsSet.add(paymentEntryDoc.ThinDps.getDpsNumber());
         }
         
         AuxConceptDocs = "";
@@ -264,7 +264,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
         recordEntry.setFkUserNewId(session.getUser().getPkUserId());
         recordEntry.setDbmsAccountingMoveSubclass(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME).toString());
-        //recordEntry.setConcept(...);          // will be set in method processRecord()
+        //recordEntry.setConcept(...);          // will be set in method generateRecordEntries()
         recordEntry.setDebit(amountLoc);
         recordEntry.setCredit(0);
         recordEntry.setExchangeRate(xrt);
@@ -311,8 +311,8 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setFkDpsDocId_n(0);
         recordEntry.setFkDpsAdjustmentYearId_n(0);
         recordEntry.setFkDpsAdjustmentDocId_n(0);
-        //recordEntry.setFkBookkeepingYearId_n(...);    // will be set in method processRecord()
-        //recordEntry.setFkBookkeepingNumberId_n(...);  // will be set in method processRecord()
+        //recordEntry.setFkBookkeepingYearId_n(...);    // will be set in method generateRecordEntries()
+        //recordEntry.setFkBookkeepingNumberId_n(...);  // will be set in method generateRecordEntries()
 
         return recordEntry;
     }
@@ -327,7 +327,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
         recordEntry.setFkUserNewId(session.getUser().getPkUserId());
         recordEntry.setDbmsAccountingMoveSubclass(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME).toString());
-        //recordEntry.setConcept(...);          // will be set in method processRecord()
+        //recordEntry.setConcept(...);          // will be set in method generateRecordEntries()
         recordEntry.setDebit(amountLoc);
         recordEntry.setCredit(0);
         recordEntry.setExchangeRate(xrt);
@@ -374,8 +374,8 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setFkDpsDocId_n(0);
         recordEntry.setFkDpsAdjustmentYearId_n(0);
         recordEntry.setFkDpsAdjustmentDocId_n(0);
-        //recordEntry.setFkBookkeepingYearId_n(...);    // will be set in method processRecord()
-        //recordEntry.setFkBookkeepingNumberId_n(...);  // will be set in method processRecord()
+        //recordEntry.setFkBookkeepingYearId_n(...);    // will be set in method generateRecordEntries()
+        //recordEntry.setFkBookkeepingNumberId_n(...);  // will be set in method generateRecordEntries()
 
         return recordEntry;
     }
@@ -390,7 +390,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
         recordEntry.setFkUserNewId(session.getUser().getPkUserId());
         recordEntry.setDbmsAccountingMoveSubclass(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME).toString());
-        //recordEntry.setConcept(...);          // will be set in method processRecord()
+        //recordEntry.setConcept(...);          // will be set in method generateRecordEntries()
         if (difference >= 0) {
             recordEntry.setDebit(0);
             recordEntry.setCredit(difference);   // income
@@ -443,8 +443,8 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setFkDpsDocId_n(0);
         recordEntry.setFkDpsAdjustmentYearId_n(0);
         recordEntry.setFkDpsAdjustmentDocId_n(0);
-        //recordEntry.setFkBookkeepingYearId_n(...);    // will be set in method processRecord()
-        //recordEntry.setFkBookkeepingNumberId_n(...);  // will be set in method processRecord()
+        //recordEntry.setFkBookkeepingYearId_n(...);    // will be set in method generateRecordEntries()
+        //recordEntry.setFkBookkeepingNumberId_n(...);  // will be set in method generateRecordEntries()
 
         return recordEntry;
     }
@@ -498,7 +498,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
      * @param session GUI session.
      * @throws Exception 
      */
-    public void processRecord(final SGuiSession session) throws Exception {
+    public void generateRecordEntries(final SGuiSession session) throws Exception {
         /* Structure of the journal voucher movements to be generated:
          * section 1: accounting of document payments: that is, one or more set of entries for each document payment;
          * section 2: accounting of payment: that is, one entry for the payment (bank deposit), only if it is required;
@@ -536,11 +536,11 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             
             double destXrt;
             
-            if (session.getSessionCustom().isLocalCurrency(new int[] { paymentEntryDoc.DataDps.getFkCurrencyId() })) {
+            if (session.getSessionCustom().isLocalCurrency(new int[] { paymentEntryDoc.ThinDps.getFkCurrencyId() })) {
                 destXrt = 1d;
                 
                 if (Math.abs(SLibUtils.roundAmount(paymentEntryDoc.DocPayment - paymentEntryDoc.PayPaymentLocal)) >= 0.01) {
-                    throw new Exception("Hay una diferencia considerable en el pago en moneda local al documento " + paymentEntryDoc.DataDps.getDpsNumber() + ": " +
+                    throw new Exception("Hay una diferencia considerable en el pago en moneda local al documento " + paymentEntryDoc.ThinDps.getDpsNumber() + ": " +
                             SLibUtils.getDecimalFormatAmount().format(SLibUtils.roundAmount(paymentEntryDoc.DocPayment - paymentEntryDoc.PayPaymentLocal)) + ".");
                 }
             }
@@ -552,14 +552,17 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             
             // generate DSM entry for the accounting of current payment (to process payment and related taxes):
             
-            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
-                                                SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], paymentEntryDoc.ParentPaymentEntry.DataRecord);
+            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
+                    paymentEntryDoc.ThinDps.getPkYearId(), paymentEntryDoc.ThinDps.getPkDocId(), 
+                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], 
+                    paymentEntryDoc.ParentPaymentEntry.DataRecord);
                         
             double dTotalBalance = 0d;
             double dTotalBalanceCur = 0d;
+            
             for (SFinBalanceTax balance : balances) {
-                dTotalBalance += balance.getBalance();
-                dTotalBalanceCur += balance.getBalanceCurrency();
+                dTotalBalance = SLibUtils.roundAmount(dTotalBalance + balance.getBalance());
+                dTotalBalanceCur = SLibUtils.roundAmount(dTotalBalanceCur + balance.getBalanceCurrency());
             }
 
             HashMap<String, double[]> taxBalances = new HashMap<>();
@@ -639,16 +642,16 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 oDsmEntry.setFkTaxBasId_n(balance.getTaxBasId());
                 oDsmEntry.setFkTaxId_n(balance.getTaxId());
 
-                oDsmEntry.setFkDestinyDpsYearId_n(paymentEntryDoc.DataDps.getPkYearId());
-                oDsmEntry.setFkDestinyDpsDocId_n(paymentEntryDoc.DataDps.getPkDocId());
-                oDsmEntry.setFkDestinyCurrencyId(paymentEntryDoc.DataDps.getFkCurrencyId());
+                oDsmEntry.setFkDestinyDpsYearId_n(paymentEntryDoc.ThinDps.getPkYearId());
+                oDsmEntry.setFkDestinyDpsDocId_n(paymentEntryDoc.ThinDps.getPkDocId());
+                oDsmEntry.setFkDestinyCurrencyId(paymentEntryDoc.ThinDps.getFkCurrencyId());
                 oDsmEntry.setDestinyExchangeRateSystem(destXrt);
                 oDsmEntry.setDestinyExchangeRate(destXrt);
-                oDsmEntry.setDbmsFkDpsCategoryId(paymentEntryDoc.DataDps.getFkDpsCategoryId());
-                oDsmEntry.setDbmsDestinyDps(paymentEntryDoc.DataDps.getDpsNumber());
+                oDsmEntry.setDbmsFkDpsCategoryId(paymentEntryDoc.ThinDps.getFkDpsCategoryId());
+                oDsmEntry.setDbmsDestinyDps(paymentEntryDoc.ThinDps.getDpsNumber());
                 oDsmEntry.setDbmsSubclassMove(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP, SDbRegistry.FIELD_NAME).toString());
                 oDsmEntry.setDbmsBizPartner(bizPartnerName);
-                oDsmEntry.setDbmsDestinyTpDps(session.readField(SModConsts.TRNU_TP_DPS, paymentEntryDoc.DataDps.getDpsTypeKey(), SDbRegistry.FIELD_CODE).toString());
+                oDsmEntry.setDbmsDestinyTpDps(session.readField(SModConsts.TRNU_TP_DPS, paymentEntryDoc.ThinDps.getDpsTypeKey(), SDbRegistry.FIELD_CODE).toString());
 
                 oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
                 oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
@@ -656,11 +659,11 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 oDsmEntry.setDbmsCtSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
                 oDsmEntry.setDbmsTpSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
 
-                oDsmEntry.setFkBizPartnerId(paymentEntryDoc.DataDps.getFkBizPartnerId_r());
-                oDsmEntry.setDbmsFkBizPartnerBranchId_n(paymentEntryDoc.DataDps.getFkBizPartnerBranchId());
+                oDsmEntry.setFkBizPartnerId(paymentEntryDoc.ThinDps.getFkBizPartnerId_r());
+                oDsmEntry.setDbmsFkBizPartnerBranchId_n(paymentEntryDoc.ThinDps.getFkBizPartnerBranchId());
 
-                Vector<SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), paymentEntryDoc.DataDps.getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_CUS,
-                        DataRecord.getPkBookkeepingCenterId(), DataRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, paymentEntryDoc.DataDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, oDsmEntry.getTaxPk());
+                Vector<SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), paymentEntryDoc.ThinDps.getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_CUS,
+                        DataRecord.getPkBookkeepingCenterId(), DataRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, paymentEntryDoc.ThinDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, oDsmEntry.getTaxPk());
 
                 if (! accountConfigEntries.isEmpty()) {
                     oDsmEntry.setDbmsAccountOp(accountConfigEntries.get(0).getAccountId());
@@ -689,10 +692,10 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             String paymentConcept;
             
             if (isPayCurrencyLocal) {
-                paymentConcept = composeConcept(paymentEntryDoc.DataDps.getDpsNumber(), bizPartnerName, accountCashDest);
+                paymentConcept = composeConcept(paymentEntryDoc.ThinDps.getDpsNumber(), bizPartnerName, accountCashDest);
             }
             else {
-                paymentConcept = composeConcept(paymentEntryDoc.DataDps.getDpsNumber(), bizPartnerName, accountCashDest, paymentEntryDoc.PayPayment, ExchangeRate);
+                paymentConcept = composeConcept(paymentEntryDoc.ThinDps.getDpsNumber(), bizPartnerName, accountCashDest, paymentEntryDoc.PayPayment, ExchangeRate);
             }
             
             for (SDataRecordEntry recordEntry : oDsm.getDbmsRecord().getDbmsRecordEntries()) {

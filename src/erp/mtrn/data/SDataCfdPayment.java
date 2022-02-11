@@ -77,9 +77,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     protected int mnAuxFkUserDeleteId;
     
     // auxiliar members:
-    protected boolean mbAuxIsProcessingValidation;
+    protected boolean mbAuxIsProcessingCfdi; // to reduce reading time when extra stuff is useless
+    protected boolean mbAuxIsProcessingCfdiValidation;
     protected boolean mbAuxIsProcessingStorageOnly; // for temporary use only, to create the storage of all former receipts of payments prior to SIIE 3.2 191
-    protected boolean mbAuxReadJournalVoucherHeadersOnly; // it reduces dramatically reading time when entries and extra stuff of journal vouchers are useless
     
     /**
      * Creates database registry of CFDI of Payments.
@@ -98,7 +98,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     }
     
     private boolean testAnnulment(java.sql.Connection connection, java.lang.String msg) throws java.lang.Exception {
-        moDbmsDataCfd.setAuxIsProcessingValidation(mbAuxIsProcessingValidation);
+        moDbmsDataCfd.setAuxIsProcessingValidation(mbAuxIsProcessingCfdiValidation);
         
         if (moDbmsDataCfd.testDeletion(msg, SDbConsts.ACTION_ANNUL)) {
             // Check that document's date belongs to an open period:
@@ -166,13 +166,13 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public int getFkUserEditId() { return mnAuxFkUserEditId; }
     public int getFkUserDeleteId() { return mnAuxFkUserDeleteId; }
     
-    public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
+    public void setAuxIsProcessingCfdi(boolean b) { mbAuxIsProcessingCfdi = b; }
+    public void setAuxIsProcessingCfdiValidation(boolean b) { mbAuxIsProcessingCfdiValidation = b; }
     public void setAuxIsProcessingStorageOnly(boolean b) { mbAuxIsProcessingStorageOnly = b; }
-    public void setAuxReadJournalVoucherHeadersOnly(boolean b) { mbAuxReadJournalVoucherHeadersOnly = b; }
     
-    public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
+    public boolean getAuxIsProcessingCfdi() { return mbAuxIsProcessingCfdi; }
+    public boolean getAuxIsProcessingCfdiValidation() { return mbAuxIsProcessingCfdiValidation; }
     public boolean getAuxIsProcessingStorageOnly() { return mbAuxIsProcessingStorageOnly; }
-    public boolean getAuxReadJournalVoucherHeadersOnly() { return mbAuxReadJournalVoucherHeadersOnly; }
     
     public void copyCfdMembers(final SDataCfdPayment sourceCfdPayment) {
         this.msAuxCfdConfirmacion = sourceCfdPayment.msAuxCfdConfirmacion;
@@ -245,7 +245,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
      */
     private void readPaymentFromReceiptPayment(final Statement statement) throws Exception {
         moDbmsReceiptPayment = new SDataReceiptPayment();
-        moDbmsReceiptPayment.setAuxReadJournalVoucherHeadersOnly(mbAuxReadJournalVoucherHeadersOnly);
+        moDbmsReceiptPayment.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
         if (moDbmsReceiptPayment.read(new int[] { moDbmsDataCfd.getFkReceiptPaymentId_n() }, statement) != SLibConstants.DB_ACTION_READ_OK) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nRecibo de pago.");
         };
@@ -429,15 +429,14 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                             + "Póliza contable del pago #" + numberPago + ".");
                                 }
                                 else {
-                                    record = mapRecords.get(SDataRecord.getRecordPrimaryKey(resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num")));
+                                    String recordKey = SDataRecord.getRecordPrimaryKey(resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num"));
+                                    record = mapRecords.get(recordKey);
 
                                     if (record == null) {
                                         record = new SDataRecord();
-                                        if (mbAuxIsProcessingStorageOnly) {
-                                            record.setAuxReadHeaderOnly(true); // to reduce dramatically reading time when entries and extra stuff are useless
-                                        }
+                                        record.setAuxReadHeaderOnly(true); // to reduce dramatically reading time, besides entries are useless
                                         record.read(new Object[] { resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num") }, statementAux);
-                                        mapRecords.put(record.getRecordPrimaryKey(), record);
+                                        mapRecords.put(recordKey, record);
                                     }
 
                                     paymentEntryType = resultSet.getInt("ety_type");
@@ -493,7 +492,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                     The document retrieval is done by its document number (there is no way of doing it other way, by now), instead of its primary key.
                                     */
 
-                                    SDataDps dps;
+                                    SThinDps thinDps;
 
                                     sql = "SELECT d.id_year, d.id_doc "
                                             + "FROM trn_dps AS d "
@@ -509,8 +508,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                                 + doctoRelacionado.getAttIdDocumento().getString() + ", del documento #" + numberDoctoRelacionado + ", del pago #" + numberPago + ".");
                                     }
                                     else {
-                                        dps = new SDataDps();
-                                        dps.read(new int[] { resultSet.getInt(1), resultSet.getInt(2) }, statementAux);
+                                        thinDps = new SThinDps();
+                                        thinDps.read(new int[] { resultSet.getInt(1), resultSet.getInt(2) }, statementAux);
                                     }
 
                                     // add XML related document of XML payment:
@@ -539,13 +538,13 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
                                     SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
                                             paymentEntry,
-                                            dps,
+                                            thinDps,
                                             numberDoctoRelacionado,
                                             paymentEntryDocType,
                                             doctoRelacionado.getAttNumParcialidad().getInteger(),
                                             doctoRelacionado.getAttImpSaldoAnt().getDouble(),
                                             doctoRelacionado.getAttImpPagado().getDouble(),
-                                            currencyId == dps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble());
+                                            currencyId == thinDps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble());
 
                                     paymentEntryDoc.prepareTableRow();
                                     paymentEntry.PaymentEntryDocs.add(paymentEntryDoc);
@@ -615,10 +614,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
      */
     private void saveFinRecords(final Connection connection, final boolean isRegistryNew) throws Exception {
         if (!isRegistryNew) {
-            // delete last CFDI accounting movements IN DATABASE:
+            // delete last CFDI accounting movements in database:
             mnAuxFkUserDeleteId = mnAuxFkUserEditId;
             deleteAccounting(connection);
-
+/*
             // delete last CFDI accounting movements IN MEMORY:
             for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
                 for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
@@ -627,6 +626,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
             }
+*/
         }
 
         int numberEntry = 0;
@@ -638,11 +638,13 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
             int nextSortingPosition;
 
-            if (mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
-                nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
+            if (!mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
+                // find out what is the next sorting position:
+                nextSortingPosition = SDataRecord.getLastSortingPosition(connection, paymentEntry.DataRecord.getPrimaryKey()) + 1;
             }
             else {
-                nextSortingPosition = paymentEntry.DataRecord.getLastSortingPosition() + 1;
+                // get the last sorting position associated to current journal voucher:
+                nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
             }
 
             // save new financial record (journal voucher) entries:
@@ -715,9 +717,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         mnAuxFkUserEditId = 0;
         mnAuxFkUserDeleteId = 0;
         
-        mbAuxIsProcessingValidation = false;
-        //mbAuxIsProcessingStorageOnly = false; // prevent from reseting this flag
-        //mbAuxReadJournalVoucherHeadersOnly = false; // prevent from reseting this flag
+        //mbAuxIsProcessingCfdi = false; // prevent from reseting this flag!
+        //mbAuxIsProcessingCfdiValidation = false; // prevent from reseting this flag!
+        //mbAuxIsProcessingStorageOnly = false; // prevent from reseting this flag!
     }
 
     @Override
@@ -1107,14 +1109,14 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             
             for (SCfdPaymentEntryDoc paymentEntryDoc : paymentEntry.PaymentEntryDocs) {
                 DElementDoctoRelacionado doctoRelacionado = new DElementDoctoRelacionado();
-                doctoRelacionado.getAttIdDocumento().setString(paymentEntryDoc.DataDps.getDbmsDataCfd().getUuid());
-                doctoRelacionado.getAttSerie().setString(paymentEntryDoc.DataDps.getNumberSeries());
-                doctoRelacionado.getAttFolio().setString(paymentEntryDoc.DataDps.getNumber());
-                doctoRelacionado.getAttMonedaDR().setString(paymentEntryDoc.DataDps.getDbmsCurrencyKey());
+                doctoRelacionado.getAttIdDocumento().setString(paymentEntryDoc.ThinDps.getThinCfd().getUuid());
+                doctoRelacionado.getAttSerie().setString(paymentEntryDoc.ThinDps.getNumberSeries());
+                doctoRelacionado.getAttFolio().setString(paymentEntryDoc.ThinDps.getNumber());
+                doctoRelacionado.getAttMonedaDR().setString(paymentEntryDoc.ThinDps.getDbmsCurrencyKey());
                 if (!pago.getAttMonedaP().getString().equals(doctoRelacionado.getAttMonedaDR().getString())) {
                     doctoRelacionado.getAttTipoCambioDR().setDouble(paymentEntryDoc.ExchangeRate);
                 }
-                doctoRelacionado.getAttMetodoDePagoDR().setString(paymentEntryDoc.DataDps.getDbmsDataDpsCfd().getPaymentMethod());
+                doctoRelacionado.getAttMetodoDePagoDR().setString(paymentEntryDoc.ThinDps.getThinDpsCfd().getPaymentMethod());
                 doctoRelacionado.getAttNumParcialidad().setInteger(paymentEntryDoc.Installment);
                 doctoRelacionado.getAttImpSaldoAnt().setDouble(paymentEntryDoc.DocBalancePrev);
                 doctoRelacionado.getAttImpPagado().setDouble(paymentEntryDoc.DocPayment);

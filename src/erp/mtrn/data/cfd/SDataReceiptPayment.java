@@ -61,9 +61,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     /** Map of financial records (journal vouchers) to optimize its retrieval from database reading each of them only once. */
     protected HashMap<String, SDataRecord> moXtaRecordsMap; // key = financial record PK as String; value = financial record
     
-    protected boolean mbAuxReadJournalVouchersHeaderOnly; // it reduces dramatically reading time when entries and extra stuff of journal vouchers are useless
     protected int mnAuxAnnulType;
-    
+    protected boolean mbAuxIsProcessingCfdi; // to reduce reading time when extra stuff is useless
     
     /**
      * Creates a new payment receipt.
@@ -142,11 +141,11 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
      */
     public HashMap<String, SDataRecord> getXtaRecordsMap() { return moXtaRecordsMap; }
     
-    public void setAuxReadJournalVoucherHeadersOnly(boolean b) { mbAuxReadJournalVouchersHeaderOnly = b; }
     public void setAuxAnnulType(int n) { mnAuxAnnulType = n; }
+    public void setAuxIsProcessingCfdi(boolean b) { mbAuxIsProcessingCfdi = b; }
     
-    public boolean getAuxReadJournalVoucherHeadersOnly() { return mbAuxReadJournalVouchersHeaderOnly; }
     public int getAuxAnnulType() { return mnAuxAnnulType; }
+    public boolean getAuxIsProcessingCfdi() { return mbAuxIsProcessingCfdi; }
     
     private void computePaymentLoc() {
         mdPaymentLoc_r = 0;
@@ -218,8 +217,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         
         moXtaRecordsMap.clear();
         
-        //mbAuxReadJournalVouchersHeaderOnly = false; // commented to prevent from reseting this flag!
         mnAuxAnnulType = 0;
+        //mbAuxIsProcessingCfdi = false; // prevent from reseting this flag!
     }
 
     @Override
@@ -278,7 +277,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                         ResultSet resultSetPays = statementPays.executeQuery(sql);
                         while (resultSetPays.next()) {
                             SDataReceiptPaymentPay pay = new SDataReceiptPaymentPay(this);
-                            pay.setAuxReadJournalVoucherHeaderOnly(mbAuxReadJournalVouchersHeaderOnly);
+                            pay.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
                             pay.read(new int[] { mnPkReceiptId, resultSetPays.getInt("id_pay") }, statement);
                             maDbmsReceiptPaymentPays.add(pay);
                         }
@@ -516,7 +515,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         
         clone.getXtaRecordsMap().putAll(moXtaRecordsMap);
         
-        clone.setAuxReadJournalVoucherHeadersOnly(mbAuxReadJournalVouchersHeaderOnly);
+        clone.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
         clone.setAuxAnnulType(mnAuxAnnulType);
 
         return clone;

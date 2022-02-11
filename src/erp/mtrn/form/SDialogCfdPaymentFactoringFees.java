@@ -10,7 +10,7 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mtrn.data.SCfdUtils;
-import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SCfdPaymentEntry;
 import erp.mtrn.data.cfd.SCfdPaymentEntryDoc;
@@ -51,9 +51,13 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
     private erp.lib.form.SFormField moFieldDocPaymentFeeVat;
     
     private erp.mtrn.form.SDialogPickerDps moDialogDocDpsRelatedPicker;
-    private erp.mtrn.data.SDataDps moDataDocDpsRelated;
+    private erp.mtrn.data.SThinDps moThinDocDpsRelated;
     
-    /** Creates new form SDialogCfdPaymentFactoringFees */
+    /**
+     * Creates new form SDialogCfdPaymentFactoringFees
+     * @param client
+     * @param formCfdPayment
+     */
     public SDialogCfdPaymentFactoringFees(erp.client.SClientInterface client, erp.mtrn.form.SFormCfdPayment formCfdPayment) {
         super(client.getFrame(), true);
         miClient = client;
@@ -665,7 +669,7 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
         if (mbFirstTime) {
             mbFirstTime = false;
             
-            if (moDataDocDpsRelated == null) {
+            if (moThinDocDpsRelated == null) {
                 jbDocDpsRelatedPick.doClick();
             }
             else {
@@ -706,7 +710,7 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
     }
 
     private void renderDocDpsRelated() throws Exception {
-        if (moDataDocDpsRelated == null) {
+        if (moThinDocDpsRelated == null) {
             jtfDocDpsRelatedNumberRo.setText("");
             jtfDocDpsRelatedUuid.setText("");
             jtfDocDpsRelatedVersionRo.setText("");
@@ -726,30 +730,30 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
             jbDocExchangeRateInvert.setEnabled(false);
         }
         else {
-            if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+            if (moThinDocDpsRelated.getThinCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
                 throw new Exception("El documento relacionado debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + ".");
             }
             
-            jtfDocDpsRelatedNumberRo.setText(moDataDocDpsRelated.getDpsNumber());
-            jtfDocDpsRelatedUuid.setText(moDataDocDpsRelated.getDbmsDataCfd().getUuid());
-            jtfDocDpsRelatedVersionRo.setText("" + SCfdUtils.getCfdVersion(moDataDocDpsRelated.getDbmsDataCfd().getFkXmlTypeId()));
-            jtfDocCurrencyRo.setText(moDataDocDpsRelated.getDbmsCurrency());
+            jtfDocDpsRelatedNumberRo.setText(moThinDocDpsRelated.getDpsNumber());
+            jtfDocDpsRelatedUuid.setText(moThinDocDpsRelated.getThinCfd().getUuid());
+            jtfDocDpsRelatedVersionRo.setText("" + SCfdUtils.getCfdVersion(moThinDocDpsRelated.getThinCfd().getFkXmlTypeId()));
+            jtfDocCurrencyRo.setText(moThinDocDpsRelated.getDbmsCurrency());
             
             jtfDocDpsRelatedNumberRo.setCaretPosition(0);
             jtfDocDpsRelatedUuid.setCaretPosition(0);
             jtfDocDpsRelatedVersionRo.setCaretPosition(0);
             jtfDocCurrencyRo.setCaretPosition(0);
             
-            jtfDocDocBalancePrevCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentIntCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentFeeCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentFeeVatCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocBalancePendCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
-            jtfPayTotalPaymentCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocBalancePrevCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocPaymentIntCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocPaymentFeeCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocPaymentFeeVatCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocBalancePendCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfPayTotalPaymentCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
             
-            jtfDocExchangeRateCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey() + "/" + moParamPaymentEntry.CurrencyKey);
+            jtfDocExchangeRateCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey() + "/" + moParamPaymentEntry.CurrencyKey);
             
-            if (moParamPaymentEntry.CurrencyId == moDataDocDpsRelated.getFkCurrencyId()) {
+            if (moParamPaymentEntry.CurrencyId == moThinDocDpsRelated.getFkCurrencyId()) {
                 jtfDocExchangeRate.setEditable(false);
                 jtfDocExchangeRate.setFocusable(false);
                 jbDocExchangeRateInvert.setEnabled(false);
@@ -851,12 +855,14 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
             double[] balance = new double[] { 0, 0 };
             SFormCfdPayment.DpsRelatedInfo dpsRelatedInfo = null;
             
-            moDataDocDpsRelated = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moDialogDocDpsRelatedPicker.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-
+            
             try {
+                moThinDocDpsRelated = new SThinDps();
+                moThinDocDpsRelated.read(moDialogDocDpsRelatedPicker.getSelectedPrimaryKey(), miClient.getSession().getStatement());
+
                 renderDocDpsRelated();
-                balance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moDataDocDpsRelated.getPrimaryKey(), mnParamYear);
-                dpsRelatedInfo = moFormCfdPayment.getDpsRelatedInfo(moDataDocDpsRelated.getDbmsDataCfd().getUuid());
+                balance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moThinDocDpsRelated.getPrimaryKey(), mnParamYear);
+                dpsRelatedInfo = moFormCfdPayment.getDpsRelatedInfo(moThinDocDpsRelated.getThinCfd().getUuid());
 
             }
             catch (Exception e) {
@@ -870,11 +876,11 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
                 installment = dpsRelatedInfo.LastInstallment;
             }
             else {
-                installment = STrnUtilities.countDpsPayments(miClient.getSession().getStatement(), (int[]) moDataDocDpsRelated.getPrimaryKey(), mnParamCfdId) + 1;
+                installment = STrnUtilities.countDpsPayments(miClient.getSession().getStatement(), (int[]) moThinDocDpsRelated.getPrimaryKey(), mnParamCfdId) + 1;
             }
             moFieldDocInstallment.setFieldValue(installment + 1);
 
-            if (moParamPaymentEntry.CurrencyId == moDataDocDpsRelated.getFkCurrencyId()) {
+            if (moParamPaymentEntry.CurrencyId == moThinDocDpsRelated.getFkCurrencyId()) {
                 moFieldDocExchangeRate.setFieldValue(1d);
             }
             else {
@@ -1054,7 +1060,7 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
             if (payment.getDouble() > 0) {
                 SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
                         moParamPaymentEntry, 
-                        moDataDocDpsRelated, 
+                        moThinDocDpsRelated, 
                         number++, 
                         paymentTypes.get(payment), 
                         installment++, 
@@ -1093,7 +1099,7 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
         mnParamBizPartnerId = 0;
         mnParamCfdId = 0;
         moParamPaymentEntry = null;
-        moDataDocDpsRelated = null;
+        moThinDocDpsRelated = null;
         
         try {
             renderPaymentEntry();
@@ -1122,15 +1128,15 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
         }
         
         if (!validation.getIsError()) {
-            if (moDataDocDpsRelated == null) {
+            if (moThinDocDpsRelated == null) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + "'.");
                 validation.setComponent(jbDocDpsRelatedPick);
             }
-            else if (moDataDocDpsRelated.getDbmsDataCfd().getUuid().isEmpty()) {
+            else if (moThinDocDpsRelated.getThinCfd().getUuid().isEmpty()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + ": " + jtfDocDpsRelatedUuid.getToolTipText() + "'.");
                 validation.setComponent(jbDocDpsRelatedPick);
             }
-            else if (!moDataDocDpsRelated.getDbmsDataDpsCfd().getPaymentMethod().equals(DCfdi33Catalogs.MDP_PPD)) {
+            else if (!moThinDocDpsRelated.getThinDpsCfd().getPaymentMethod().equals(DCfdi33Catalogs.MDP_PPD)) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'método pago'.");
                 validation.setComponent(jbDocDpsRelatedPick);
             }
@@ -1149,9 +1155,9 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
                     
                     if (totalPayment > moFieldDocBalancePrev.getDouble()) {
                         validation.setMessage("El monto total pagado "
-                                + "$" + SLibUtils.getDecimalFormatAmount().format(totalPayment) + " " + moDataDocDpsRelated.getDbmsCurrencyKey() + " "
+                                + "$" + SLibUtils.getDecimalFormatAmount().format(totalPayment) + " " + moThinDocDpsRelated.getDbmsCurrencyKey() + " "
                                 + "no puede ser mayor que el saldo anterior del documento relacionado "
-                                + "$" + SLibUtils.getDecimalFormatAmount().format(moFieldDocBalancePrev.getDouble()) + " " + moDataDocDpsRelated.getDbmsCurrencyKey() + ".");
+                                + "$" + SLibUtils.getDecimalFormatAmount().format(moFieldDocBalancePrev.getDouble()) + " " + moThinDocDpsRelated.getDbmsCurrencyKey() + ".");
                         validation.setComponent(jtfDocDocPaymentInt);
                     }
                     else if (totalAmount > moParamPaymentEntry.Amount) {

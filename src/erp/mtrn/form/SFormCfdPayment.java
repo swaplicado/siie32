@@ -37,7 +37,7 @@ import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPayment;
-import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SCfdPaymentEntry;
 import erp.mtrn.data.cfd.SCfdPaymentEntryDoc;
@@ -105,7 +105,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     
     private erp.mfin.data.SDataRecord moDataPayRecord;
     private erp.mfin.data.SDataAccountCash moDataPayAccountCashDest;
-    private erp.mtrn.data.SDataDps moDataDocDpsRelated;
+    private erp.mtrn.data.SThinDps moThinDocDpsRelated;
     private erp.mtrn.data.cfd.SCfdPaymentEntry moPaymentEntry;
     private erp.mtrn.data.cfd.SCfdPaymentEntryDoc moPaymentEntryDoc;
 
@@ -1813,25 +1813,25 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
     
     private void validateDpsRelated() throws Exception {
-        if (moDataDocDpsRelated == null) {
+        if (moThinDocDpsRelated == null) {
             throw new Exception("El documento relacionado no existe.");
         }
         else {
-            String msg = "El documento relacionado " + moDataDocDpsRelated.getDpsNumber() + " ";
+            String msg = "El documento relacionado " + moThinDocDpsRelated.getDpsNumber() + " ";
             
-            if (moDataDocDpsRelated.getDbmsDataCfd() == null) {
+            if (moThinDocDpsRelated.getThinCfd() == null) {
                 throw new Exception(msg + "carece de CFDI.");
             }
-            else if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+            else if (moThinDocDpsRelated.getThinCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
                 throw new Exception(msg + "debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + ".");
             }
-            else if (!moDataDocDpsRelated.getDbmsDataCfd().isStamped()) {
+            else if (!moThinDocDpsRelated.getThinCfd().isStamped()) {
                 throw new Exception(msg + "no está timbrado.");
             }
-            else if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+            else if (moThinDocDpsRelated.getThinCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                 throw new Exception(msg + "está cancelado.");
             }
-            else if (moDataDocDpsRelated.getDbmsDataCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+            else if (moThinDocDpsRelated.getThinCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                 throw new Exception(msg + "no está emitido.");
             }
         }
@@ -1894,7 +1894,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private void renderDocPaymentEntryDoc() {
         if (moPaymentEntryDoc == null) {
-            moDataDocDpsRelated = null;
+            moThinDocDpsRelated = null;
             
             moFieldDocInstallment.resetField();
             moFieldDocExchangeRate.resetField();
@@ -1909,7 +1909,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfDocPaymentTypeRo.setText("");
         }
         else {
-            moDataDocDpsRelated = moPaymentEntryDoc.DataDps;
+            moThinDocDpsRelated = moPaymentEntryDoc.ThinDps;
             
             moFieldDocInstallment.setFieldValue(moPaymentEntryDoc.Installment);
             moFieldDocExchangeRate.setFieldValue(moPaymentEntryDoc.ExchangeRate);
@@ -1925,7 +1925,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
-        String docCurrencyKey = moPaymentEntryDoc == null ? "" : moPaymentEntryDoc.DataDps.getDbmsCurrencyKey();
+        String docCurrencyKey = moPaymentEntryDoc == null ? "" : moPaymentEntryDoc.ThinDps.getDbmsCurrencyKey();
         String payCurrencyKey = moPaneGridPayments.getSelectedTableRow() == null ? "" : paymentEntry.CurrencyKey;
         
         jtfDocPayBalancePrevCurRo.setText(payCurrencyKey);
@@ -1972,7 +1972,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void renderDocDpsRelated() throws Exception {
-        if (moDataDocDpsRelated == null) {
+        if (moThinDocDpsRelated == null) {
             jtfDocDpsRelatedNumberRo.setText("");
             jtfDocDpsRelatedUuid.setText("");
             jtfDocDpsRelatedVersionRo.setText("");
@@ -1993,11 +1993,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         else {
             validateDpsRelated();
             
-            jtfDocDpsRelatedNumberRo.setText(moDataDocDpsRelated.getDpsNumber());
-            jtfDocDpsRelatedUuid.setText(moDataDocDpsRelated.getDbmsDataCfd().getUuid());
-            jtfDocDpsRelatedVersionRo.setText("" + SCfdUtils.getCfdVersion(moDataDocDpsRelated.getDbmsDataCfd().getFkXmlTypeId()));
-            jtfDocPaymentMethodRo.setText(moDataDocDpsRelated.getDbmsDataDpsCfd().getPaymentMethod());
-            jtfDocCurrencyRo.setText(moDataDocDpsRelated.getDbmsCurrency());
+            jtfDocDpsRelatedNumberRo.setText(moThinDocDpsRelated.getDpsNumber());
+            jtfDocDpsRelatedUuid.setText(moThinDocDpsRelated.getThinCfd().getUuid());
+            jtfDocDpsRelatedVersionRo.setText("" + SCfdUtils.getCfdVersion(moThinDocDpsRelated.getThinCfd().getFkXmlTypeId()));
+            jtfDocPaymentMethodRo.setText(moThinDocDpsRelated.getThinDpsCfd().getPaymentMethod());
+            jtfDocCurrencyRo.setText(moThinDocDpsRelated.getDbmsCurrency());
             
             jtfDocDpsRelatedNumberRo.setCaretPosition(0);
             jtfDocDpsRelatedUuid.setCaretPosition(0);
@@ -2005,14 +2005,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfDocPaymentMethodRo.setCaretPosition(0);
             jtfDocCurrencyRo.setCaretPosition(0);
             
-            jtfDocDocBalancePrevCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocBalancePendCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocBalancePrevCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocPaymentCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocBalancePendCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
             
             SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
-            jtfDocExchangeRateCurRo.setText(moDataDocDpsRelated.getDbmsCurrencyKey() + "/" + paymentEntry.CurrencyKey);
+            jtfDocExchangeRateCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey() + "/" + paymentEntry.CurrencyKey);
             
-            if (paymentEntry.CurrencyId == moDataDocDpsRelated.getFkCurrencyId()) {
+            if (paymentEntry.CurrencyId == moThinDocDpsRelated.getFkCurrencyId()) {
                 jtfDocExchangeRate.setEditable(false);
                 jtfDocExchangeRate.setFocusable(false);
                 jbDocExchangeRateInvert.setEnabled(false);
@@ -2916,8 +2916,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             int installments = 0;
             
             for (SCfdPaymentEntryDoc paymentEntryDoc : paymentEntry.PaymentEntryDocs) {
-                if (SLibUtils.compareKeys(paymentEntryDoc.DataDps.getPrimaryKey(), pickerDps.getSelectedPrimaryKey())) {
-                    if (miClient.showMsgBoxConfirm("El documento relacionado " + paymentEntryDoc.DataDps.getDpsNumber() + " ya está agregado en el pago #" + paymentEntry.EntryNumber + ".\n"
+                if (SLibUtils.compareKeys(paymentEntryDoc.ThinDps.getPrimaryKey(), pickerDps.getSelectedPrimaryKey())) {
+                    if (miClient.showMsgBoxConfirm("El documento relacionado " + paymentEntryDoc.ThinDps.getDpsNumber() + " ya está agregado en el pago #" + paymentEntry.EntryNumber + ".\n"
                             + "¿Está seguro que desea agregarlo otra vez?") != JOptionPane.YES_OPTION) {
                         isValid = false;
                         jbDocDpsRelatedPickPend.requestFocusInWindow();
@@ -2934,19 +2934,20 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
                     double[] balance = new double[] { 0, 0 };
 
-                    moDataDocDpsRelated = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, pickerDps.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                    moThinDocDpsRelated = new SThinDps();
+                    moThinDocDpsRelated.read(pickerDps.getSelectedPrimaryKey(), miClient.getSession().getStatement());
 
                     renderDocDpsRelated();
-                    balance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moDataDocDpsRelated.getPrimaryKey(), year);
+                    balance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moThinDocDpsRelated.getPrimaryKey(), year);
                     if (docPayments != 0) {
                         balance[1] = SLibUtils.roundAmount(balance[1] + docPayments);
                     }
 
                     // set default doc values:
-                    int installment = STrnUtilities.countDpsPayments(miClient.getSession().getStatement(), (int[]) moDataDocDpsRelated.getPrimaryKey(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId()) + installments;
+                    int installment = STrnUtilities.countDpsPayments(miClient.getSession().getStatement(), (int[]) moThinDocDpsRelated.getPrimaryKey(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId()) + installments;
                     moFieldDocInstallment.setFieldValue(installment + 1);
 
-                    if (paymentEntry.CurrencyId == moDataDocDpsRelated.getFkCurrencyId()) {
+                    if (paymentEntry.CurrencyId == moThinDocDpsRelated.getFkCurrencyId()) {
                         moFieldDocExchangeRate.setFieldValue(1d);
                     }
                     else {
@@ -3112,17 +3113,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void actionPerformedDocPaymentEntryDocOk() {
         boolean valid = true;
         
-        if (moDataDocDpsRelated == null) {
+        if (moThinDocDpsRelated == null) {
             valid = false;
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + "'.");
             jbDocDpsRelatedPickPend.requestFocusInWindow();
         }
-        else if (moDataDocDpsRelated.getDbmsDataCfd().getUuid().isEmpty()) {
+        else if (moThinDocDpsRelated.getThinCfd().getUuid().isEmpty()) {
             valid = false;
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + ": " + jtfDocDpsRelatedUuid.getToolTipText() + "'.");
             jbDocDpsRelatedPickPend.requestFocusInWindow();
         }
-        else if (!moDataDocDpsRelated.getDbmsDataDpsCfd().getPaymentMethod().equals(DCfdi33Catalogs.MDP_PPD)) {
+        else if (!moThinDocDpsRelated.getThinDpsCfd().getPaymentMethod().equals(DCfdi33Catalogs.MDP_PPD)) {
             valid = false;
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDocPaymentMethod.getText() + "'.");
             jbDocDpsRelatedPickPend.requestFocusInWindow();
@@ -3176,7 +3177,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 // adding document...
                 moPaymentEntryDoc = new SCfdPaymentEntryDoc(
                         paymentEntry, 
-                        moDataDocDpsRelated, 
+                        moThinDocDpsRelated, 
                         moPaneGridPaymentDocs.getTable().getRowCount() + 1, 
                         SCfdPaymentEntryDoc.TYPE_PAY, 
                         moFieldDocInstallment.getInteger(), 
@@ -3188,7 +3189,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 // modifying document...
                 //moPaymentEntryDoc.EntryDocNumber
                 //moPaymentEntryDoc.EntryDocType
-                moPaymentEntryDoc.DataDps = moDataDocDpsRelated;
+                moPaymentEntryDoc.ThinDps = moThinDocDpsRelated;
                 moPaymentEntryDoc.Installment = moFieldDocInstallment.getInteger();
                 moPaymentEntryDoc.DocBalancePrev = moFieldDocBalancePrev.getDouble();
                 moPaymentEntryDoc.DocPayment = moFieldDocPayment.getDouble();
@@ -3650,7 +3651,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         for (STableRow row : moPaneGridPayments.getGridRows()) {
             SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
             for (SCfdPaymentEntryDoc paymentEntryDoc : paymentEntry.PaymentEntryDocs) {
-                if (paymentEntryDoc.DataDps.getDbmsDataCfd().getUuid().equals(uuid)) {
+                if (paymentEntryDoc.ThinDps.getThinCfd().getUuid().equals(uuid)) {
                     payments = SLibUtils.roundAmount(payments + paymentEntryDoc.DocPayment);
                     if (paymentEntryDoc.Installment > lastInstallment) {
                         lastInstallment = paymentEntryDoc.Installment;
@@ -3692,7 +3693,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         moDataPayRecord = null;
         moDataPayAccountCashDest = null;
-        moDataDocDpsRelated = null;
+        moThinDocDpsRelated = null;
         moPaymentEntry = null;
         moPaymentEntryDoc = null;
         
@@ -3894,7 +3895,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
                             if (isPaymentCompletelyLocal) {
                                 for (SCfdPaymentEntryDoc doc : paymentEntry.PaymentEntryDocs) {
-                                    if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { doc.DataDps.getFkCurrencyId() })) {
+                                    if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { doc.ThinDps.getFkCurrencyId() })) {
                                         isPaymentCompletelyLocal = false;
                                         break;
                                     }
@@ -4015,9 +4016,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             
             try {
                 for (STableRow row : moPaneGridPayments.getGridRows()) {
-                    SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
-                    paymentEntry.DataParentPayment = dummyPayment;
-                    paymentEntry.processRecord(miClient.getSession()); // very important to process journal voucher entries, to do the accounting!
+                    SCfdPaymentEntry dummyPaymentEntry = (SCfdPaymentEntry) row;
+                    dummyPaymentEntry.DataParentPayment = dummyPayment;
+                    dummyPaymentEntry.generateRecordEntries(miClient.getSession()); // very important to process journal voucher entries, to do the accounting!
                     index++;
                 }
             }
@@ -4243,7 +4244,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             for (STableRow row : moPaneGridPayments.getGridRows()) {
                 SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
                 paymentEntry.DataParentPayment = moDataCfdPayment;
-                paymentEntry.processRecord(miClient.getSession()); // very important to process journal voucher entries, to do the accounting!
+                paymentEntry.generateRecordEntries(miClient.getSession()); // very important to process journal voucher entries, to do the accounting!
                 moDataCfdPayment.getAuxCfdPaymentEntries().add(paymentEntry);
             }
         }
@@ -4266,6 +4267,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         for (SLock slock : moRecordSLocksMap.values()) {
             moDataCfdPayment.getRegistryComplements().add(slock);
         }
+        
         return moDataCfdPayment;
     }
     

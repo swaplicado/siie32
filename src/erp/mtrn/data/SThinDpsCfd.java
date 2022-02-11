@@ -2,6 +2,7 @@ package erp.mtrn.data;
 
 import erp.lib.SLibConstants;
 import erp.lib.data.SThinData;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -10,7 +11,7 @@ import java.sql.Statement;
  * Se usa para agilizar el procesamiento de CFDI de recepción de pagos.
  * @author Sergio Flores
  */
-public class SThinDpsCfd implements SThinData {
+public class SThinDpsCfd implements Serializable, SThinData {
     
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -50,7 +51,7 @@ public class SThinDpsCfd implements SThinData {
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (!resultSet.next()) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ);
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nDocumento CFD.");
             }
             else {
                 mnPkYearId = key[0];
@@ -58,5 +59,10 @@ public class SThinDpsCfd implements SThinData {
                 msPaymentMethod = resultSet.getString("pay_met");
             }
         }
+    }
+
+    @Override
+    public Object getPrimaryKey() {
+        return new int[] { mnPkYearId, mnPkDocId };
     }
 }

@@ -1,6 +1,8 @@
 package erp.mtrn.data;
 
+import erp.lib.SLibConstants;
 import erp.lib.data.SThinData;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -9,39 +11,43 @@ import java.sql.Statement;
  * Se usa para agilizar el procesamiento de CFDI de recepción de pagos.
  * @author Sergio Flores
  */
-public class SThinCfd implements SThinData {
+public class SThinCfd implements Serializable, SThinData {
     
-    protected int mnCfdId;
+    protected int mnPkCfdId;
     protected String msUuid;
-    protected int mnXmlTypeId;
-    protected int mnXmlStatusId;
+    protected int mnFkXmlTypeId;
+    protected int mnFkXmlStatusId;
     
     public SThinCfd() {
         reset();
     }
     
-    public int getCfdId() {
-        return mnCfdId;
+    public int getPkCfdId() {
+        return mnPkCfdId;
     }
     
     public String getUuid() {
         return msUuid;
     }
     
-    public int getXmlTypeId() {
-        return mnXmlTypeId;
+    public int getFkXmlTypeId() {
+        return mnFkXmlTypeId;
     }
     
-    public int getXmlStatusId() {
-        return mnXmlStatusId;
+    public int getFkXmlStatusId() {
+        return mnFkXmlStatusId;
+    }
+    
+    public boolean isStamped() {
+        return !msUuid.isEmpty();
     }
     
     @Override
     public void reset() {
-        mnCfdId = 0;
+        mnPkCfdId = 0;
         msUuid = "";
-        mnXmlTypeId = 0;
-        mnXmlStatusId = 0;
+        mnFkXmlTypeId = 0;
+        mnFkXmlStatusId = 0;
     }
     
     @Override
@@ -54,10 +60,20 @@ public class SThinCfd implements SThinData {
                 + "WHERE id_cfd = " + key[0] + ";";
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
-            mnCfdId = key[0];
-            msUuid = resultSet.getString("uuid");
-            mnXmlTypeId = resultSet.getInt("fid_tp_xml");
-            mnXmlStatusId = resultSet.getInt("fid_st_xml");
+            if (!resultSet.next()) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nCFD.");
+            }
+            else {
+                mnPkCfdId = key[0];
+                msUuid = resultSet.getString("uuid");
+                mnFkXmlTypeId = resultSet.getInt("fid_tp_xml");
+                mnFkXmlStatusId = resultSet.getInt("fid_st_xml");
+            }
         }
+    }
+
+    @Override
+    public Object getPrimaryKey() {
+        return new int[] { mnPkCfdId };
     }
 }

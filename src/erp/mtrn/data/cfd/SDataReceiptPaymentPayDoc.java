@@ -8,7 +8,7 @@ package erp.mtrn.data.cfd;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -34,7 +34,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
     protected int mnFkDocDocId;
     protected int mnFkDocCurrencyId;
     
-    protected SDataDps moDbmsDps;
+    protected SThinDps moThinDps;
 
     /**
      * Creates a new document of a payment of a payment receipt.
@@ -78,22 +78,22 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
     public int getFkDocDocId() { return mnFkDocDocId; }
     public int getFkDocCurrencyId() { return mnFkDocCurrencyId; }
 
-    public void setDbmsDps(SDataDps o) {
-        moDbmsDps = o;
+    public void setThinDps(SThinDps o) {
+        moThinDps = o;
         
-        if (moDbmsDps == null) {
+        if (moThinDps == null) {
             mnFkDocYearId = 0;
             mnFkDocDocId = 0;
             mnFkDocCurrencyId = 0;
         }
         else {
-            mnFkDocYearId = moDbmsDps.getPkYearId();
-            mnFkDocDocId = moDbmsDps.getPkDocId();
-            mnFkDocCurrencyId = moDbmsDps.getFkCurrencyId();
+            mnFkDocYearId = moThinDps.getPkYearId();
+            mnFkDocDocId = moThinDps.getPkDocId();
+            mnFkDocCurrencyId = moThinDps.getFkCurrencyId();
         }
     }
 
-    public SDataDps getDbmsDps() { return moDbmsDps; }
+    public SThinDps getThinDps() { return moThinDps; }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -128,7 +128,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
         mnFkDocDocId = 0;
         mnFkDocCurrencyId = 0;
         
-        moDbmsDps = null;
+        moThinDps = null;
     }
 
     @Override
@@ -164,10 +164,10 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
                     mnFkDocDocId = resultSet.getInt("fid_doc_doc");
                     mnFkDocCurrencyId = resultSet.getInt("fid_doc_cur");
                     
-                    // read as well document:
+                    // read as well 'thin' document:
                     
-                    moDbmsDps = new SDataDps();
-                    moDbmsDps.read(new int[] { mnFkDocYearId, mnFkDocDocId }, statement);
+                    moThinDps = new SThinDps();
+                    moThinDps.read(new int[] { mnFkDocYearId, mnFkDocDocId }, statement);
                     
                     // finish reading registry:
                     
@@ -290,13 +290,22 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
         clone.setFkDocDocId(mnFkDocDocId);
         clone.setFkDocCurrencyId(mnFkDocCurrencyId);
         
-        clone.setDbmsDps(moDbmsDps);
+        clone.setThinDps(moThinDps);
 
         return clone;
     }
     
     public SCfdPaymentEntryDoc createCfdPaymentEntryDoc(final SCfdPaymentEntry paymentEntry, final Statement statement) {
-        SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(paymentEntry, moDbmsDps, mnPkDocumentId, mnEntryType, mnInstallment, mdDocBalancePrevCcy, mdPaymentCcy, mdExchangeRate); // convenience variable
+        SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
+                paymentEntry, 
+                moThinDps, 
+                mnPkDocumentId, 
+                mnEntryType, 
+                mnInstallment, 
+                mdDocBalancePrevCcy, 
+                mdPaymentCcy, 
+                mdExchangeRate); // convenience variable
+        
         return paymentEntryDoc;
     }
     
@@ -314,10 +323,10 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
         mdPaymentPay = paymentEntryDoc.PayPayment;
         mdDocBalanceUnpaidPay_r = paymentEntryDoc.PayBalancePend;
         mdPaymentLoc = paymentEntryDoc.PayPaymentLocal;
-        //mnFkDocYearId = ...; // set in setDbmsDps()
-        //mnFkDocDocId = ...; // set in setDbmsDps()
-        //mnFkDocCurrencyId = ...; // set in setDbmsDps()
+        //mnFkDocYearId = ...; // set in setThinDps()
+        //mnFkDocDocId = ...; // set in setThinDps()
+        //mnFkDocCurrencyId = ...; // set in setThinDps()
         
-        setDbmsDps(paymentEntryDoc.DataDps);
+        setThinDps(paymentEntryDoc.ThinDps);
     }
 }

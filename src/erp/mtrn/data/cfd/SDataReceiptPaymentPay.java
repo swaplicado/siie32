@@ -51,7 +51,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
     
     protected ArrayList<SDataReceiptPaymentPayDoc> maDbmsReceiptPaymentPayDocs;
     
-    protected boolean mbAuxReadJournalVoucherHeaderOnly; // it reduces dramatically reading time when entries and extra stuff of journal voucher are useless
+    protected boolean mbAuxIsProcessingCfdi; // to reduce reading time when extra stuff is useless
     
     /**
      * Creates a new payment of a payment receipt.
@@ -138,9 +138,9 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
 
     public ArrayList<SDataReceiptPaymentPayDoc> getDbmsReceiptPaymentPayDocs() { return maDbmsReceiptPaymentPayDocs; }
     
-    public void setAuxReadJournalVoucherHeaderOnly(boolean b) { mbAuxReadJournalVoucherHeaderOnly = b; }
+    public void setAuxIsProcessingCfdi(boolean b) { mbAuxIsProcessingCfdi = b; }
     
-    public boolean getAuxReadJournalVoucherHeaderOnly() { return mbAuxReadJournalVoucherHeaderOnly; }
+    public boolean isAuxIsProcessingCfdi() { return mbAuxIsProcessingCfdi; }
     
     public int[] getBankPayeeKey() { return new int[] { mnFkBankPayeeCompanyBranchId_n, mnFkBankPayeeAccountCashId_n }; }
     
@@ -187,7 +187,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         
         maDbmsReceiptPaymentPayDocs.clear();
         
-        //mbAuxReadJournalVoucherHeaderOnly = false; // prevent from reseting this flag
+        //mbAuxIsProcessingCfdi = false; // prevent from reseting this flag!
     }
 
     @Override
@@ -230,22 +230,22 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                     msFkFinRecordRecordTypeId = resultSet.getString("fid_fin_rec_tp_rec");
                     mnFkFinRecordNumberId = resultSet.getInt("fid_fin_rec_num");
                     
-                    // read as well financial record:
-                    
-                    String recordKey = SDataRecord.getRecordPrimaryKey(mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId);
-                    moDbmsRecord = moParentReceiptPayment.getXtaRecordsMap().get(recordKey);
+                    if (!mbAuxIsProcessingCfdi) {
+                        // read as well financial record:
 
-                    if (moDbmsRecord == null) {
-                        // financial record has not been read yet:
-                        moDbmsRecord = new SDataRecord();
-                        moDbmsRecord.setAuxReadHeaderOnly(mbAuxReadJournalVoucherHeaderOnly);
-                        moDbmsRecord.read(new Object[] { mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId }, statement);
-                        moParentReceiptPayment.getXtaRecordsMap().put(recordKey, moDbmsRecord);
-                    }
+                        String recordKey = SDataRecord.getRecordPrimaryKey(mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId);
+                        moDbmsRecord = moParentReceiptPayment.getXtaRecordsMap().get(recordKey);
+
+                        if (moDbmsRecord == null) {
+                            // financial record has not been read yet:
+                            moDbmsRecord = new SDataRecord();
+                            moDbmsRecord.setAuxReadHeaderOnly(true); // to reduce dramatically reading time, besides entries are useless
+                            moDbmsRecord.read(new Object[] { mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId }, statement);
+                            moParentReceiptPayment.getXtaRecordsMap().put(recordKey, moDbmsRecord);
+                        }
+
+                        // read as well all documents:
                     
-                    // read as well all documents:
-                    
-                    if (!mbAuxReadJournalVoucherHeaderOnly) {
                         sql = "SELECT id_doc "
                                 + "FROM trn_pay_pay_doc "
                                 + "WHERE id_rcp = " + key[0] + " AND id_pay = " + key[1] + " "
@@ -428,13 +428,23 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
             clone.getDbmsReceiptPaymentPayDocs().add(payDoc.clone());
         }
         
-        clone.setAuxReadJournalVoucherHeaderOnly(mbAuxReadJournalVoucherHeaderOnly);
+        clone.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
 
         return clone;
     }
     
     public SCfdPaymentEntry createCfdPaymentEntry(final SDataCfdPayment payment, final Statement statement) {
-        SCfdPaymentEntry paymentEntry = new SCfdPaymentEntry(payment, mnPkPaymentId, mnEntryType, mtDatetime, msPaymentWayCode, mnFkPaymentCurrencyId, msPaymentCurrencyCode, mdPaymentCcy, mdExchangeRate, moDbmsRecord);
+        SCfdPaymentEntry paymentEntry = new SCfdPaymentEntry(
+                payment, 
+                mnPkPaymentId, 
+                mnEntryType, 
+                mtDatetime, 
+                msPaymentWayCode, 
+                mnFkPaymentCurrencyId, 
+                msPaymentCurrencyCode, 
+                mdPaymentCcy, 
+                mdExchangeRate, 
+                moDbmsRecord);
         
         paymentEntry.Operation = msOperationNum;
         paymentEntry.AccountSrcFiscalId = msPayerBankFiscalId;

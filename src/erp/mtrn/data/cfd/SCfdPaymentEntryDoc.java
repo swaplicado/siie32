@@ -7,7 +7,7 @@
 package erp.mtrn.data.cfd;
 
 import erp.mod.SModSysConsts;
-import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SThinDps;
 import java.util.HashMap;
 import sa.lib.SLibUtils;
 
@@ -33,7 +33,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     }
     
     public SCfdPaymentEntry ParentPaymentEntry;
-    public SDataDps DataDps;
+    public SThinDps ThinDps;
     public int EntryDocNumber;
     public int EntryDocType;
     public int Installment;
@@ -51,9 +51,9 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
     public int AuxGridIndex;
     
-    public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SDataDps dataDps, int entryNumber, int entryType, int installment, double balancePrev, double payment, double exchangeRate) {
+    public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SThinDps thinDps, int entryNumber, int entryType, int installment, double balancePrev, double payment, double exchangeRate) {
         ParentPaymentEntry = parentPaymentEntry;
-        DataDps = dataDps;
+        ThinDps = thinDps;
         EntryDocNumber = entryNumber;
         EntryDocType = entryType;
         Installment = installment;
@@ -118,7 +118,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
             PayPaymentLimMax = (DocPayment + (Math.pow(10d, -2d) / 2d) - 0.0000000001) / (ExchangeRate - (Math.pow(10d, -2d) / 2d));
             
             // compute payment in local currency:
-            if (DataDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_MXN) {
+            if (ThinDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_MXN) {
                 // related document is in local currency
                 PayPaymentLocal = DocPayment;
             }
@@ -140,13 +140,13 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     public void prepareTableRow() {
         mvValues.clear();
         mvValues.add(EntryDocNumber);
-        mvValues.add(DataDps.getDpsNumber());
-        mvValues.add(DataDps.getDbmsDataCfd().getUuid());
+        mvValues.add(ThinDps.getDpsNumber());
+        mvValues.add(ThinDps.getThinCfd().getUuid());
         mvValues.add(Installment);
         mvValues.add(DocBalancePrev);
         mvValues.add(DocPayment);
         mvValues.add(DocBalancePend);
-        mvValues.add(DataDps.getDbmsCurrencyKey());
+        mvValues.add(ThinDps.getDbmsCurrencyKey());
         mvValues.add(ExchangeRate);
         mvValues.add(PayPayment);
         mvValues.add(ParentPaymentEntry.CurrencyKey);

@@ -875,10 +875,10 @@ public abstract class SCfdUtils implements Serializable {
                                     */
                                     
                                     dataCfdPayment = new SDataCfdPayment();
-                                    dataCfdPayment.setAuxReadJournalVoucherHeadersOnly(true);
+                                    dataCfdPayment.setAuxIsProcessingCfdi(true);
                                     dataCfdPayment.read(registryKey, client.getSession().getStatement());
                                     
-                                    dataCfdPayment.setAuxIsProcessingValidation(isValidation);
+                                    dataCfdPayment.setAuxIsProcessingCfdiValidation(isValidation);
                                     
                                     packet.setAuxDataCfdPayment(dataCfdPayment);
                                     break;

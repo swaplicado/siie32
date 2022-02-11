@@ -245,6 +245,27 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         return lastSortingPosition;
     }
 
+    public static int getLastSortingPosition(Connection connection, Object primaryKey) throws Exception {
+        int lastSortingPosition = 0;
+        
+        String sql = "SELECT MAX(sort_pos) "
+                + "FROM fin_rec_ety "
+                + "WHERE id_year = " + ((Object[]) primaryKey)[0] + " AND "
+                + "id_docr = " + ((Object[]) primaryKey)[1] + " AND "
+                + "id_bkc = " + ((Object[]) primaryKey)[2] + " AND "
+                + "id_tp_rec = '" + ((Object[]) primaryKey)[3] + "' AND "
+                + "id_num = " + ((Object[]) primaryKey)[4] + " AND "
+                + "NOT b_del;";
+        
+        try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                lastSortingPosition = resultSet.getInt(1);
+            }
+        }
+        
+        return lastSortingPosition;
+    }
+
     public void checkIsEditable(final Connection connection) throws Exception {
         if (mbIsSystem) {
             throw new Exception("¡La póliza contable '" + getRecordNumber() + "' es de sistema!");
