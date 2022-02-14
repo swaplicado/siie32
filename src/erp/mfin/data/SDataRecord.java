@@ -251,7 +251,7 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         String sql = "SELECT MAX(sort_pos) "
                 + "FROM fin_rec_ety "
                 + "WHERE id_year = " + ((Object[]) primaryKey)[0] + " AND "
-                + "id_docr = " + ((Object[]) primaryKey)[1] + " AND "
+                + "id_per = " + ((Object[]) primaryKey)[1] + " AND "
                 + "id_bkc = " + ((Object[]) primaryKey)[2] + " AND "
                 + "id_tp_rec = '" + ((Object[]) primaryKey)[3] + "' AND "
                 + "id_num = " + ((Object[]) primaryKey)[4] + " AND "

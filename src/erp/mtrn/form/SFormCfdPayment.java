@@ -4157,7 +4157,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         if (!moPaneGridPayments.getGridRows().isEmpty()) {
             SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getGridRows().get(0);
-            factoringBankId = paymentEntry.AuxFactoringBankId;
+            factoringBankId = paymentEntry.AuxFactoringBankId; // there is only a factoring bank, it has been validated already
         }
         
         // create CFD packet:
