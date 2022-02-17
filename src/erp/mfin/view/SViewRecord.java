@@ -348,14 +348,13 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     }
     
     private void actionAudit(boolean audit) {
-        SDataRecord record;
         String msg = audit ? SLibConstants.MSG_CNF_DOC_AUDIT_YES : SLibConstants.MSG_CNF_DOC_AUDIT_NO;
         
         if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
-            record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-            record.setPrimaryKey(moTablePane.getSelectedTableRow().getPrimaryKey());
+            SDataRecord record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
             
             try {
+                record.setFkUserEditId(miClient.getSession().getUser().getPkUserId()); // bizarre, but current edit user is used to set audit user
                 record.saveField(miClient.getSession().getDatabase().getConnection(), SDataRecord.FIELD_AUDIT, audit);
                 populateTable();
             }

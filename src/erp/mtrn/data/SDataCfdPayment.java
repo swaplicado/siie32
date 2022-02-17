@@ -247,7 +247,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         moDbmsReceiptPayment = new SDataReceiptPayment();
         moDbmsReceiptPayment.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
         if (moDbmsReceiptPayment.read(new int[] { moDbmsDataCfd.getFkReceiptPaymentId_n() }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nRecibo de pago.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nComprobante de recepción de pagos.");
         };
 
         // read 'Emisor' branch and business partner data objects:
@@ -665,10 +665,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
             // leave user trace into financial record (journal voucher) that it was modified:
 
-            paymentEntry.DataRecord.setFkUserEditId(paymentEntry.AuxUserId);
-            if (paymentEntry.DataRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-            }
+            paymentEntry.DataRecord.saveField(connection, SDataRecord.FIELD_USER_EDIT_ID, paymentEntry.AuxUserId);
 
             String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", " + paymentEntry.EntryType + ", "
                     + paymentEntry.DataRecord.getPkYearId() + ", " + paymentEntry.DataRecord.getPkPeriodId() + ", " + paymentEntry.DataRecord.getPkBookkeepingCenterId() + ", "

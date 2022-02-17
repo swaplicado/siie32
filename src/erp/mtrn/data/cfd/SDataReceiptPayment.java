@@ -234,7 +234,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
             
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 if (!resultSet.next()) {
-                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\nComprobante de recepción de pagos.");
                 }
                 else {
                     mnPkReceiptId = resultSet.getInt("id_rcp");
@@ -278,7 +278,12 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                         while (resultSetPays.next()) {
                             SDataReceiptPaymentPay pay = new SDataReceiptPaymentPay(this);
                             pay.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
-                            pay.read(new int[] { mnPkReceiptId, resultSetPays.getInt("id_pay") }, statement);
+                            
+                            int[] payKey = new int[] { mnPkReceiptId, resultSetPays.getInt("id_pay") };
+                            if (pay.read(payKey, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nPago #" + SLibUtils.textImplode(payKey, "-") + ".");
+                            }
+                            
                             maDbmsReceiptPaymentPays.add(pay);
                         }
                     }
@@ -411,8 +416,9 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                 for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
                     pay.setPkReceiptId(mnPkReceiptId);
                     pay.setPkPaymentId(0);
+                    
                     if (pay.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nTipo de registro: Pago.");
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nPago.");
                     }
                 }
                 
@@ -515,8 +521,8 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         
         clone.getXtaRecordsMap().putAll(moXtaRecordsMap);
         
-        clone.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
         clone.setAuxAnnulType(mnAuxAnnulType);
+        clone.setAuxIsProcessingCfdi(mbAuxIsProcessingCfdi);
 
         return clone;
     }

@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 195.7/ 2022-02-17
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la contabilización de pagos de layouts bancarios por cambio en parámetros de saldos de documentos por impuesto.
+2) Corrección a la contabilización de pagos de documentos por refactorización de procesamiento de saldos de documentos por impuesto.
+3) Refactorización a las validaciones de contabilización de nóminas para identificar configuraciones inexistentes.
+4) Implementación de funcionalidad de compleción y eliminación de registros obsoletos de configuraciones de contabilización de nóminas.
+
+================================================================================
 SIIE 3.2 195.6/ 2022-02-14
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -1486,7 +1486,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                     null);
             
             for (SFinBalanceTax balance : balances) {
-                if (balance.getTaxPk()[0] == taxPk[0] && balance.getTaxPk()[1] == taxPk[1]) {
+                if (balance.getTaxKey()[0] == taxPk[0] && balance.getTaxKey()[1] == taxPk[1]) {
                     return new double[] { balance.getBalance(), balance.getBalanceCurrency() };
                 }
             }

@@ -11,6 +11,7 @@ import erp.lib.SLibUtilities;
 import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import sa.lib.SLibUtils;
 
 /**
  * @author Sergio Flores
@@ -144,7 +145,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
             
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 if (!resultSet.next()) {
-                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\nDocumento relacionado #" + SLibUtils.textImplode(key, "-") + ".");
                 }
                 else {
                     mnPkReceiptId = resultSet.getInt("id_rcp");

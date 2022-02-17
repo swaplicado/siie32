@@ -37,6 +37,7 @@ import sa.lib.db.SDbConsts;
 public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     public static final int FIELD_AUDIT = 1;
+    public static final int FIELD_USER_EDIT_ID = 2;
     
     protected int mnPkYearId;
     protected int mnPkPeriodId;
@@ -610,26 +611,27 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     }
     
     public void saveField(java.sql.Connection connection, final int field, final Object value) throws Exception {
-        if (mbAuxReadHeaderOnly) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NON_UPDATABLE);
-        }
-
-        Statement statement = null;    
-        String msSql = "UPDATE " + "fin_rec " + "SET ";
+        String sql = "UPDATE fin_rec SET ";
         
         switch (field) {
             case FIELD_AUDIT:
-                msSql += "b_audit = " + (boolean) value + ", ts_audit = NOW(), fid_usr_audit = " + mnFkUserEditId + " ";
+                mbIsAudited = (boolean) value;
+                sql += "b_audit = " + mbIsAudited + ", ts_audit = NOW(), fid_usr_audit = " + mnFkUserEditId + " ";
+                break;
+            case FIELD_USER_EDIT_ID:
+                mnFkUserEditId = (int) value;
+                sql += "fid_usr_edit = " + mnFkUserEditId + ", ts_edit = NOW() ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        statement = connection.createStatement();
-        msSql += "WHERE id_year = " + mnPkYearId + " AND id_per = " + mnPkPeriodId + " AND " +
+        try (Statement statement = connection.createStatement()) {
+            sql += "WHERE id_year = " + mnPkYearId + " AND id_per = " + mnPkPeriodId + " AND " +
                     "id_bkc = " + mnPkBookkeepingCenterId + " AND id_tp_rec = '" + msPkRecordTypeId + "' AND id_num = " + mnPkNumberId + " ";
-
-        statement.execute(msSql);
+            
+            statement.execute(sql);
+        }
     }
 
     @Override

@@ -203,7 +203,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
             
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 if (!resultSet.next()) {
-                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\nPago #" + SLibUtils.textImplode(key, "-") + ".");
                 }
                 else {
                     mnPkReceiptId = resultSet.getInt("id_rcp");
@@ -238,9 +238,14 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
 
                         if (moDbmsRecord == null) {
                             // financial record has not been read yet:
+                            
                             moDbmsRecord = new SDataRecord();
                             moDbmsRecord.setAuxReadHeaderOnly(true); // to reduce dramatically reading time, besides entries are useless
-                            moDbmsRecord.read(new Object[] { mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId }, statement);
+                            
+                            if (moDbmsRecord.read(new Object[] { mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nPóliza contable #" + SDataRecord.getRecordPrimaryKey(mnFkFinRecordYearId, mnFkFinRecordPeriodId, mnFkFinRecordBookkeepingCenterId, msFkFinRecordRecordTypeId, mnFkFinRecordNumberId) + ".");
+                            }
+                            
                             moParentReceiptPayment.getXtaRecordsMap().put(recordKey, moDbmsRecord);
                         }
 
@@ -255,7 +260,12 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                             ResultSet resultSetDocs = statementDocs.executeQuery(sql);
                             while (resultSetDocs.next()) {
                                 SDataReceiptPaymentPayDoc payDoc = new SDataReceiptPaymentPayDoc();
-                                payDoc.read(new int[] { mnPkReceiptId, mnPkPaymentId, resultSetDocs.getInt("id_doc") }, statement);
+                                
+                                int[] payDocKey = new int[] { mnPkReceiptId, mnPkPaymentId, resultSetDocs.getInt("id_doc") };
+                                if (payDoc.read(payDocKey, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nDocumento relacionado #" + SLibUtils.textImplode(payDocKey, "-") + ".");
+                                }
+                                
                                 maDbmsReceiptPaymentPayDocs.add(payDoc);
                             }
                         }
@@ -368,8 +378,9 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                     payDoc.setPkReceiptId(mnPkReceiptId);
                     payDoc.setPkPaymentId(mnPkPaymentId);
                     payDoc.setPkDocumentId(0);
+                    
                     if (payDoc.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nTipo de registro: Documento relacionado.");
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nDocumento relacionado.");
                     }
                 }
                 

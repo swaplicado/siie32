@@ -6,50 +6,50 @@
 package erp.mfin.data;
 
 /**
- * Estructura para la obtención de saldos de documentos
+ * Estructura para la obtención de saldos de documentos.
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SFinBalanceTax {
-    private int taxBasId;
-    private int taxId;
-    private double balance;
-    private double balanceCurrency;
+    
+    private int mnTaxBasicId;
+    private int mnTaxId;
+    private double mdBalanceLocal;
+    private double mdBalanceCurrency;
 
-    public int getTaxBasId() {
-        return taxBasId;
+    public int getTaxBasicId() {
+        return mnTaxBasicId;
     }
 
-    public void setTaxBasId(int taxBasId) {
-        this.taxBasId = taxBasId;
+    public void setTaxBasicId(int taxBasicId) {
+        mnTaxBasicId = taxBasicId;
     }
 
     public int getTaxId() {
-        return taxId;
+        return mnTaxId;
     }
 
     public void setTaxId(int taxId) {
-        this.taxId = taxId;
+        mnTaxId = taxId;
     }
 
     public double getBalance() {
-        return balance;
+        return mdBalanceLocal;
     }
 
-    public void setBalance(double balance) {
-        this.balance = balance;
+    public void setBalanceLocal(double balanceLocal) {
+        mdBalanceLocal = balanceLocal;
     }
 
     public double getBalanceCurrency() {
-        return balanceCurrency;
+        return mdBalanceCurrency;
     }
 
     public void setBalanceCurrency(double balanceCurrency) {
-        this.balanceCurrency = balanceCurrency;
+        mdBalanceCurrency = balanceCurrency;
     }
     
-    public int[] getTaxPk() {
-        return new int[] { taxBasId, taxId };
+    public int[] getTaxKey() {
+        return new int[] { mnTaxBasicId, mnTaxId };
     }
-    
 }

@@ -20,6 +20,7 @@ import erp.mhrs.form.SDialogFormerPayrollImport;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.form.SDialogCalculateIncomeTax;
 import erp.mod.hrs.form.SDialogLayoutAF02;
 import erp.mod.hrs.form.SDialogLayoutEmployee;
@@ -38,10 +39,13 @@ import erp.mtrn.form.SFormCfdiMassiveValidation;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
@@ -71,6 +75,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgBkkDeductionGlobal;
     private javax.swing.JMenuItem jmiCfgBkkDeductionDepartament;
     private javax.swing.JMenuItem jmiCfgBkkDeductionEmployee;
+    private javax.swing.JMenuItem jmiCfgUpdtateAccountingConfigs;
     private javax.swing.JMenuItem jmiCfgConfig;
     
     private javax.swing.JMenu jmCat;
@@ -202,6 +207,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBkkDeductionGlobal = new JMenuItem("Globales");
         jmiCfgBkkDeductionDepartament = new JMenuItem("Por departamento");
         jmiCfgBkkDeductionEmployee = new JMenuItem("Por empleado");
+        jmiCfgUpdtateAccountingConfigs = new JMenuItem("Actualizar configuraciones faltantes...");
         jmiCfgConfig = new JMenuItem("Configuración del módulo");
 
         jmCfg.add(jmiCfgTaxTable);
@@ -230,6 +236,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfgBkkDeduction.add(jmiCfgBkkDeductionDepartament);
         jmCfgBkkDeduction.add(jmiCfgBkkDeductionEmployee);
         jmCfg.add(jmCfgBkkDeduction);
+        jmCfg.add(jmiCfgUpdtateAccountingConfigs);
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgConfig);
 
@@ -468,6 +475,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBkkDeductionGlobal.addActionListener(this);
         jmiCfgBkkDeductionDepartament.addActionListener(this);
         jmiCfgBkkDeductionEmployee.addActionListener(this);
+        jmiCfgUpdtateAccountingConfigs.addActionListener(this);
         jmiCfgConfig.addActionListener(this);
         
         jmiCatEmployee.addActionListener(this);
@@ -579,6 +587,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBkkDeductionGlobal.setEnabled(true);
         jmiCfgBkkDeductionDepartament.setEnabled(true);
         jmiCfgBkkDeductionEmployee.setEnabled(true);
+        jmiCfgUpdtateAccountingConfigs.setEnabled(true);
         jmiCfgConfig.setEnabled(true);
         jmCfg.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CFG).HasRight);
         
@@ -740,6 +749,24 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getTabbedPane().setTabComponentAt(count, new STableTabComponent(miClient.getTabbedPane(), miClient.getImageIcon(mnModuleType)));
                 miClient.getTabbedPane().setSelectedIndex(count);
             }
+        }
+    }
+    
+    private void updtateAccountingConfigs() {
+        try {
+            if (miClient.showMsgBoxConfirm("Este proceso actualizará las configuraciones de contabilización faltantes de percepciones y deducciones,\n"
+                    + "así como borrará las configuraciones obsoletas.\n"
+                    + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                SGuiUtils.setCursorWait((SGuiClient) miClient);
+                SHrsFinUtils.updateAccountingConfigs(miClient.getSession());
+                miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        finally {
+            SGuiUtils.setCursorDefault((SGuiClient) miClient);
         }
     }
 
@@ -926,6 +953,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgBkkDeductionEmployee) {
                 miClient.getSession().showView(SModConsts.HRS_ACC_DED, SModSysConsts.HRSS_TP_ACC_EMP, null);
+            }
+            else if (item == jmiCfgUpdtateAccountingConfigs) {
+                updtateAccountingConfigs();
             }
             else if (item == jmiCfgConfig) {
                 miClient.getSession().showView(SModConsts.HRS_CFG, SLibConsts.UNDEFINED, null);

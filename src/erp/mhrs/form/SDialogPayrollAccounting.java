@@ -305,11 +305,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         jPanel4.add(jPanel8, java.awt.BorderLayout.NORTH);
 
-        jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados disponibles:"));
+        jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados pendientes:"));
         jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(450, 100));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
-        jlTotalAvailables.setText("Empleados disponibles...");
+        jlTotalAvailables.setText("Empleados pendientes...");
         jlTotalAvailables.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
@@ -506,8 +506,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             amountSelected = SLibUtils.roundAmount(amountSelected + ((SRowEmployee) moTablePaneEmpSelected.getTableRow(row)).getPayment());
         }
         
-        jlTotalAvailables.setText("Empleados disponibles: " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpAvailable.getTableGuiRowCount()) + " | "
-                + "Monto disponible: $" + SLibUtils.getDecimalFormatAmount().format(amountAvailable) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+        jlTotalAvailables.setText("Empleados pendientes: " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpAvailable.getTableGuiRowCount()) + " | "
+                + "Monto pendiente: $" + SLibUtils.getDecimalFormatAmount().format(amountAvailable) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jlTotalSelected.setText("Empleados seleccionados:  " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpSelected.getTableGuiRowCount()) + " | "
                 + "Monto seleccionado: $" + SLibUtils.getDecimalFormatAmount().format(amountSelected) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
     }
@@ -857,6 +857,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         double totalDebit = 0;
         double totalCredit = 0;
         
+        HashMap<Integer, String> accountPksMap = new HashMap<>();
         HashMap<String, SDataAccount> accountsMap = new HashMap<>();
         HashMap<String, SDataAccount> ledgerAccountsMap = new HashMap<>();
         HashMap<Integer, String> costCenterPksMap = new HashMap<>();
@@ -865,7 +866,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         oStatementRec = miClient.getSession().getStatement().getConnection().createStatement();
         SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, "Errores de configuración de contabilización", "Lista de errores de configuración de contabilización:");
         
-        if (SHrsFinUtils.existsAccountingSettingsForPayrollAll(miClient.getSession(), moPayroll.getPkPayrollId())) {
+        if (SHrsFinUtils.validateAccountingSettingsForPayroll(miClient.getSession(), moPayroll.getPkPayrollId())) {
             initPayrollRecords();
 
             for (Object[] records : mvRecords) {
@@ -875,8 +876,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 nEntryId = oRecord.getDbmsRecordEntries().size();
                 
                 /*
-                iteration 1: processing of perceptions;
-                iteration 2: processing of deductions.
+                iteration #1: processing of perceptions;
+                iteration #2: processing of deductions.
                 */
 
                 for (nType = 1; nType <= 2; nType++) {
@@ -884,116 +885,114 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         /* Perception:
                          * Accountable link level:
                          * 1. Global
-                         * 2. By departatment
+                         * 2. By department
                          * 3. By employee
                          */
-
-                        sql = "SELECT v.id_tp_acc AS f_tp_acc, ear.id_ear AS f_id_concept, rtrim(ear.code) AS f_concept_code, rtrim(ear.name) AS f_concept, rtrim(ear.name_abbr) AS f_concept_abbr, " +
-                                "v.id_ref AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ear.b_del AND v.id_tp_acc = ear.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_tp_acc, ear.id_ear AS f_id_concept, rtrim(ear.code) AS f_concept_code, rtrim(ear.name) AS f_concept, rtrim(ear.name_abbr) AS f_concept_abbr, " +
-                                "v.id_ref AS f_id_ref, rtrim(d.name) AS f_ref, rtrim(d.code) AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ear.b_del AND v.id_tp_acc = ear.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_tp_acc, ear.id_ear AS f_id_concept, rtrim(ear.code) AS f_concept_code, rtrim(ear.name) AS f_concept, rtrim(ear.name_abbr) AS f_concept_abbr, " +
-                                "v.id_ref AS f_id_ref, rtrim(bp.bp) AS f_ref, emp.num AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
-                                "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ear.b_del AND v.id_tp_acc = ear.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "ORDER BY f_tp_acc, f_id_concept, f_id_ref; ";
+                        
                         conceptType = "percepción";
+
+                        sql = "SELECT " + SModSysConsts.HRSS_TP_ACC_GBL + " AS _tp_acc, c.id_ear AS _id_concept, 0 AS _id_ref, "
+                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                + "'' AS _ref_code, '' AS _ref "
+                                + "FROM hrs_pay AS p "
+                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
+                                + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ref = 0 "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
+                                + "UNION "
+                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_DEP + " AS _tp_acc, c.id_ear AS _id_concept, pr.fk_dep AS _id_ref, "
+                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                + "d.code AS _ref_code, d.name AS _ref "
+                                + "FROM hrs_pay AS p "
+                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
+                                + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ref = pr.fk_dep "
+                                + "LEFT OUTER JOIN erp.hrsu_dep AS d ON d.id_dep = pr.fk_dep "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
+                                + "UNION "
+                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_EMP + " AS _tp_acc, c.id_ear AS _id_concept, pr.id_emp AS _id_ref, "
+                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                + "e.num AS _ref_code, b.bp AS _ref "
+                                + "FROM hrs_pay AS p "
+                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
+                                + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ref = pr.id_emp "
+                                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = pr.id_emp "
+                                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = pr.id_emp "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
+                                + "ORDER BY _tp_acc, _concept, _concept_code, _id_concept, _ref, _ref_code, _id_ref;";
                     }
                     else {
                         /* Deduction:
                          * Accountable link level:
                          * 1. Global
-                         * 2. By departatment
+                         * 2. By department
                          * 3. By employee
                          */
-
-                        sql = "SELECT v.id_tp_acc AS f_tp_acc, ded.id_ded AS f_id_concept, rtrim(ded.code) AS f_concept_code, rtrim(ded.name) AS f_concept, rtrim(ded.name_abbr) AS f_concept_abbr, " +
-                                "v.id_ref AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ded.b_del AND v.id_tp_acc = ded.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND " +
-                                "p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_tp_acc, ded.id_ded AS f_id_concept, rtrim(ded.code) AS f_concept_code, rtrim(ded.name) AS f_concept, rtrim(ded.name_abbr) AS f_concept_abbr, " +
-                                "v.id_ref AS f_id_ref, rtrim(d.name) AS f_ref, rtrim(d.code) AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ded.b_del AND v.id_tp_acc = ded.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND " +
-                                "p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-
-                                "UNION " +
-
-                                "SELECT v.id_tp_acc AS f_tp_acc, ded.id_ded AS f_id_concept, rtrim(ded.code) AS f_concept_code, rtrim(ded.name) AS f_concept, rtrim(ded.name_abbr) AS f_concept_abbr, " +
-                                "v.id_ref AS f_id_ref, rtrim(bp.bp) AS f_ref, emp.num AS f_ref_cve, " +
-                                "v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
-                                "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ded.b_del AND v.id_tp_acc = ded.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND " +
-                                "p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
-                                "ORDER BY f_tp_acc, f_id_concept, f_id_ref ";
+                        
                         conceptType = "deducción";
+
+                        sql = "SELECT " + SModSysConsts.HRSS_TP_ACC_GBL + " AS _tp_acc, c.id_ded AS _id_concept, 0 AS _id_ref, "
+                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                + "'' AS _ref_code, '' AS _ref "
+                                + "FROM hrs_pay AS p "
+                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
+                                + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ref = 0 "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
+                                + "UNION "
+                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_DEP + " AS _tp_acc, c.id_ded AS _id_concept, pr.fk_dep AS _id_ref, "
+                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                + "d.code AS _ref_code, d.name AS _ref "
+                                + "FROM hrs_pay AS p "
+                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
+                                + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ref = pr.fk_dep "
+                                + "LEFT OUTER JOIN erp.hrsu_dep AS d ON d.id_dep = pr.fk_dep "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
+                                + "UNION "
+                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_EMP + " AS _tp_acc, c.id_ded AS _id_concept, pr.id_emp AS _id_ref, "
+                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                + "e.num AS _ref_code, b.bp AS _ref "
+                                + "FROM hrs_pay AS p "
+                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
+                                + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ref = pr.id_emp "
+                                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = pr.id_emp "
+                                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = pr.id_emp "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
+                                + "ORDER BY _tp_acc, _concept, _concept_code, _id_concept, _ref, _ref_code, _id_ref;";
                     }
 
                     oResultSetCfg = oStatementCfg.executeQuery(sql);
+                    
                     while (oResultSetCfg.next()) {
-                        int accountingType = oResultSetCfg.getInt("f_tp_acc");
-                        int conceptId = oResultSetCfg.getInt("f_id_concept");
-                        String conceptCode = oResultSetCfg.getString("f_concept_code");
-                        String concept = oResultSetCfg.getString("f_concept");
-                        String conceptAbbr = oResultSetCfg.getString("f_concept_abbr");
-                        int referenceId = oResultSetCfg.getInt("f_id_ref");
-                        String reference = oResultSetCfg.getString("f_ref");
-                        String referenceCode = oResultSetCfg.getString("f_ref_cve");
+                        int accountingType = oResultSetCfg.getInt("_tp_acc");
+                        int conceptId = oResultSetCfg.getInt("_id_concept");
+                        String conceptCode = oResultSetCfg.getString("_concept_code");
+                        String concept = oResultSetCfg.getString("_concept");
+                        String conceptAbbr = oResultSetCfg.getString("_concept_abbr");
+                        int referenceId = oResultSetCfg.getInt("_id_ref");
+                        String referenceCode = oResultSetCfg.getString("_ref_code");
+                        String reference = oResultSetCfg.getString("_ref");
                         int accountId = oResultSetCfg.getInt("fk_acc");
                         int costCenterId = oResultSetCfg.getInt("fk_cc_n");
                         int itemId = oResultSetCfg.getInt("fk_item_n");
@@ -1014,12 +1013,13 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 message += "del empleado clave '" + referenceCode + "', '" + reference + "', tiene un problema:\n";
                                 break;
                             default:
+                                // do nothing
                         }
 
                         // Validate account:
 
                         if (accountId == 0) {
-                            messages.appendMessage(message + "El campo 'cuenta contable' no ha sido especificada aún.");
+                            messages.appendMessage(message + "La 'cuenta contable' no ha sido especificada aún.");
                         }
                         else {
                             try {
@@ -1039,10 +1039,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { itemId }, SLibConstants.EXEC_MODE_VERBOSE);
                             
                             if (item == null) {
-                                messages.appendMessage(message + "El registro relacionado con el campo 'ítem' (ID: " + itemId + ") no existe.");
+                                messages.appendMessage(message + "El registro del 'ítem' (ID: " + itemId + ") no existe.");
                             }
                             else if (item.getIsDeleted()) {
-                                messages.appendMessage(message + "El registro relacionado con el campo 'ítem' (ID: " + itemId + ") está eliminado.");
+                                messages.appendMessage(message + "El registro del 'ítem' (ID: " + itemId + ") está eliminado.");
                             }
                         }
 
@@ -1052,17 +1052,17 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         
                         if (bizPartnerId == 0) {
                             if (accountingType == SModSysConsts.HRSS_TP_ACC_EMP) {
-                                messages.appendMessage(message + "El campo 'asociado de negocios' no ha sido especificado aún.");
+                                messages.appendMessage(message + "El 'asociado de negocios' no ha sido especificado aún.");
                             }
                         }
                         else {
                             bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_VERBOSE);
                             
                             if (bizPartner == null) {
-                                messages.appendMessage(message + "El registro relacionado con el campo 'asociado de negocios' (ID: " + bizPartnerId + ") no existe.");
+                                messages.appendMessage(message + "El registro del 'asociado de negocios' (ID: " + bizPartnerId + ") no existe.");
                             }
                             else if (bizPartner.getIsDeleted()) {
-                                messages.appendMessage(message + "El registro relacionado con el campo 'asociado de negocios' (ID: " + bizPartnerId + ") está eliminado.");
+                                messages.appendMessage(message + "El registro del 'asociado de negocios' (ID: " + bizPartnerId + ") está eliminado.");
                             }
                         }
 
@@ -1074,10 +1074,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { taxBasicId, taxTaxId }, SLibConstants.EXEC_MODE_VERBOSE);
                             
                             if (tax == null) {
-                                messages.appendMessage(message + "El registro relacionado con el campo 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") no existe.");
+                                messages.appendMessage(message + "El registro del 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") no existe.");
                             }
                             else if (tax.getIsDeleted()) {
-                                messages.appendMessage(message + "El registro relacionado con el campo 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") está eliminado.");
+                                messages.appendMessage(message + "El registro del 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") está eliminado.");
                             }
                         }
 
@@ -1089,42 +1089,41 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                              * 3. By employee
                              */
 
-                            sql = "SELECT ear.fk_tp_acc_rec AS f_tp_acc_rec, ear.id_ear, ear.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_amt " +
-                                        "FROM hrs_pay AS p " +
-                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                        "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ear.id_ear = " + conceptId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                        "GROUP BY ear.id_ear, ear.name_abbr " +
-
-                                        "UNION " +
-
-                                        "SELECT ear.fk_tp_acc_rec AS f_tp_acc_rec, ear.id_ear, ear.name_abbr, d.id_dep AS f_id_ref, d.name AS f_ref, d.code AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_amt " +
-                                        "FROM hrs_pay AS p " +
-                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                        "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ear.id_ear = " + conceptId + " AND rcp.id_emp IN (" + sEmployees + ")" + (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + referenceId + " ") : "") + 
-                                        "GROUP BY ear.id_ear, ear.name_abbr, d.id_dep, d.name, d.code " +
-
-                                        "UNION " +
-
-                                        "SELECT ear.fk_tp_acc_rec AS f_tp_acc_rec, ear.id_ear, ear.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, '' AS f_ref_cve, SUM(rcp_ear.amt_r) AS f_amt " +
-                                        "FROM hrs_pay AS p " +
-                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
-                                        "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ear.id_ear = " + conceptId + " AND rcp.id_emp IN (" + sEmployees + ") " + ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + referenceId + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
-                                        "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
-                                        "ORDER BY f_tp_acc_rec, id_ear, f_ref; ";
                             conceptType = "percepción";
+                            
+                            sql = "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
+                                    "FROM hrs_pay AS p " +
+                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                                    "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                    "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY e.id_ear, e.name_abbr " +
+                                    "UNION " +
+                                    "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, dep.id_dep AS f_id_ref, dep.name AS f_ref, dep.code AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
+                                    "FROM hrs_pay AS p " +
+                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                                    "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                    "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ")" +
+                                    (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND dep.id_dep = " + referenceId + " ") : "") + 
+                                    "GROUP BY e.id_ear, e.name_abbr, dep.id_dep, dep.name, dep.code " +
+                                    "UNION " +
+                                    "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, '' AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
+                                    "FROM hrs_pay AS p " +
+                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                                    "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
+                                    "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                    "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " + 
+                                    ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND dep.id_dep = " + referenceId + " ") : "") +
+                                    "GROUP BY e.id_ear, e.name_abbr, bp.id_bp, bp.bp " +
+                                    "ORDER BY f_tp_acc_rec, id_ear, f_ref;";
                         }
                         else {
                             /* Deduction:
@@ -1133,43 +1132,42 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                              * 2. By departatment
                              * 3. By employee
                              */
-
-                            sql = "SELECT ded.fk_tp_acc_rec AS f_tp_acc_rec, ded.id_ded, ded.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_amt " +
-                                        "FROM hrs_pay AS p " +
-                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                        "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ded.id_ded = " + conceptId + " AND rcp.id_emp IN (" + sEmployees + ") " +
-                                        "GROUP BY ded.id_ded, ded.name_abbr " +
-
-                                        "UNION " +
-
-                                        "SELECT ded.fk_tp_acc_rec AS f_tp_acc_rec, ded.id_ded, ded.name_abbr, d.id_dep AS f_id_ref, d.name AS f_ref, d.code AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_amt " +
-                                        "FROM hrs_pay AS p " +
-                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                        "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ded.id_ded = " + conceptId + " AND rcp.id_emp IN (" + sEmployees + ")" + (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + referenceId + " ") : "") +
-                                        "GROUP BY ded.id_ded, ded.name_abbr, d.id_dep, d.name, d.code " +
-
-                                        "UNION " +
-
-                                        "SELECT ded.fk_tp_acc_rec AS f_tp_acc_rec, ded.id_ded, ded.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, emp.num AS f_ref_cve, SUM(rcp_ded.amt_r) AS f_amt " +
-                                        "FROM hrs_pay AS p " +
-                                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                                        "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ded.id_ded = " + conceptId + " AND rcp.id_emp IN (" + sEmployees + ") " + ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + referenceId + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
-                                        "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
-                                        "ORDER BY f_tp_acc_rec, id_ded, f_ref; ";
+                            
                             conceptType = "deducción";
+
+                            sql = "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
+                                    "FROM hrs_pay AS p " +
+                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                                    "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                    "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " +
+                                    "GROUP BY d.id_ded, d.name_abbr " +
+                                    "UNION " +
+                                    "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, dep.id_dep AS f_id_ref, dep.name AS f_ref, dep.code AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
+                                    "FROM hrs_pay AS p " +
+                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                                    "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                    "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ")" +
+                                    (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND dep.id_dep = " + referenceId + " ") : "") +
+                                    "GROUP BY d.id_ded, d.name_abbr, dep.id_dep, dep.name, dep.code " +
+                                    "UNION " +
+                                    "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, emp.num AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
+                                    "FROM hrs_pay AS p " +
+                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                                    "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
+                                    "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                    "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " +
+                                    ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND dep.id_dep = " + referenceId + " ") : "") +
+                                    "GROUP BY d.id_ded, d.name_abbr, bp.id_bp, bp.bp " +
+                                    "ORDER BY f_tp_acc_rec, id_ded, f_ref;";
                         }
 
                         oResultSetRec = oStatementRec.executeQuery(sql);
@@ -1182,7 +1180,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             double debit = 0;
                             double credit = 0;
 
-                            // Create record entry:
+                            // Set up record entry:
                             
                             String entryConcept = "";
 
@@ -1197,6 +1195,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     entryConcept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + conceptAbbr + "; " + referenceCode + ". " + reference;
                                     break;
                                 default:
+                                    // do nothing
                             }
 
                             if (nType == 1) {
@@ -1222,60 +1221,81 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                             totalDebit = SLibUtils.roundAmount(totalDebit + debit);
                             totalCredit = SLibUtils.roundAmount(totalCredit + credit);
+                            
+                            // Set up account:
 
-                            String accountPk = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), accountId);
+                            String accountPk = "";
                             
-                            SDataAccount account = accountsMap.get(accountPk);
-                            if (account == null) {
-                                account = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { accountPk }, SLibConstants.EXEC_MODE_VERBOSE);
-                                accountsMap.put(accountPk, account);
+                            if (accountId != 0) {
+                                accountPk = accountPksMap.get(accountId);
+                                
+                                if (accountPk == null) {
+                                    accountPk = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), accountId);
+                                    accountPksMap.put(accountId, accountPk);
+                                }
+                                
+                                SDataAccount account = accountsMap.get(accountPk);
+                                if (account == null) {
+                                    account = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { accountPk }, SLibConstants.EXEC_MODE_VERBOSE);
+                                    accountsMap.put(account.getPkAccountIdXXX(), account);
+                                }
+
+                                SDataAccount ledgerAccount = account.getDeep() == 1 ? account : ledgerAccountsMap.get(account.getDbmsPkAccountMajorId());
+                                if (ledgerAccount == null) {
+                                    ledgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                                    ledgerAccountsMap.put(ledgerAccount.getPkAccountIdXXX(), ledgerAccount);
+                                }
+
+                                switch (ledgerAccount.getFkAccountSystemTypeId()) {
+                                    case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
+                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
+                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
+                                        break;
+                                    case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
+                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
+                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
+                                        break;
+                                    case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL;
+                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
+                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR;
+                                        break;
+                                    case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL;
+                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
+                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR;
+                                        break;
+                                    default:
+                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
+                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+                                }
                             }
-                            
-                            SDataAccount ledgerAccount = account.getDeep() == 1 ? account : ledgerAccountsMap.get(account.getDbmsPkAccountMajorId());
-                            if (ledgerAccount == null) {
-                                ledgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                                ledgerAccountsMap.put(account.getDbmsPkAccountMajorId(), ledgerAccount);
+                            else {
+                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+                                anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
+                                anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
                             }
+
+                            // Set up cost center:
                             
                             String costCenterPk = "";
                                     
                             if (costCenterId != 0) {
                                 costCenterPk = costCenterPksMap.get(costCenterId);
+                                
                                 if (costCenterPk == null) {
                                     costCenterPk = SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), costCenterId);
                                     costCenterPksMap.put(costCenterId, costCenterPk);
                                 }
                             }
+                            
+                            // Create record entry:
         
-                            switch (ledgerAccount.getFkAccountSystemTypeId()) {
-                                case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
-                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
-                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
-                                    break;
-                                case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
-                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
-                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
-                                    break;
-                                case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL;
-                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
-                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR;
-                                    break;
-                                case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL;
-                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
-                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR;
-                                    break;
-                                default:
-                                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
-                                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
-                                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
-                            }
-
                             oRecord.getDbmsRecordEntries().add(createRecordEntry(oRecord.getPrimaryKey(), SLibUtilities.textLeft(entryConcept, 100),
-                                    debit, credit, account.getPkAccountIdXXX(), costCenterPk, itemId,
+                                    debit, credit, accountPk, costCenterPk, itemId,
                                     bizPartner == null ? 0 : bizPartner.getPkBizPartnerId(),
                                     bizPartner == null ? 0 : bizPartner.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId(),
                                     new int[] { taxBasicId, taxTaxId }, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX));
@@ -1314,7 +1334,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             }
             else {
                 messages.setVisible(true);
-                throw new Exception("Corregir los problemas de configuración de contabilización de nóminas.");
+                throw new Exception("Favor de corregir los errores de configuración de contabilización de nóminas indicados.");
             }
         }
         
@@ -1494,7 +1514,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             }
             
             if (bankSelected && employeesAdded == 0) {
-                miClient.showMsgBoxInformation("Ninguno de los empleados disponibles coincide con el banco: '" + (!bank.isEmpty() ? bank : SHrsConsts.EMPTY_BANK) + "'.");
+                miClient.showMsgBoxInformation("Ninguno de los empleados pendientes coincide con el banco: '" + (!bank.isEmpty() ? bank : SHrsConsts.EMPTY_BANK) + "'.");
             }
         }
     }
@@ -1554,7 +1574,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             moTablePaneEmpAvailable.requestFocus();
         }
         else if (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
-            miClient.showMsgBoxWarning("Todavía quedan empleados disponibles sin ser seleccionados.");
+            miClient.showMsgBoxWarning("Todavía quedan empleados pendientes sin ser seleccionados.");
             moTablePaneEmpAvailable.requestFocus();
         }
         else {

@@ -1984,6 +1984,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 maRedisLocks.add(rlock);
                 */
                 slock = SLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, layoutBankRecordKey.getPrimaryKey(), record.getRegistryTimeout());
+                maSLocks.add(slock);
                 
                 bankRecord = new SLayoutBankRecord(layoutBankRecordKey);
                 bankRecord.getLayoutBankPayments().add(layoutBankPayment);
@@ -2813,6 +2814,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         if (!maSLocks.isEmpty()) {
             registry.getSLocks().addAll(maSLocks);
         }
+        
         return registry;
     }
 

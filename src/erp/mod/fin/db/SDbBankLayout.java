@@ -694,9 +694,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                             double payment = (new SMoney(session, layoutBankDps.getPaymentCy(), layoutBankDps.getDps().getFkCurrencyId(), exchangeRate)).getLocalAmount();
                             
                             ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
-                                    layoutBankDps.getDps().getPkDocId(), layoutBankDps.getDps().getPkYearId(), 
+                                    layoutBankDps.getDps().getPkYearId(), layoutBankDps.getDps().getPkDocId(), 
                                     SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
-                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1],
+                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1], 
                                     null);
         
                             double dTotalBalance = 0d;
@@ -716,7 +716,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                             int[] taxMax = new int[] { 0, 0 };
                             double amtMaj = 0d;
                             for (SFinBalanceTax balance : balances) {
-                                tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+                                tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
                                 perc = balance.getBalance() / dTotalBalance;
                                 percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
 
@@ -727,7 +727,7 @@ public class SDbBankLayout extends SDbRegistryUser {
 
                                 if (balance.getBalanceCurrency() > amtMaj) {
                                     amtMaj = balance.getBalanceCurrency();
-                                    taxMax = new int[] { balance.getTaxBasId(), balance.getTaxId() };
+                                    taxMax = new int[] { balance.getTaxBasicId(), balance.getTaxId() };
                                 }
                             }
 
@@ -743,7 +743,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                             for (SFinBalanceTax balance : balances) {
                                 SDataDsmEntry dsmEntry = new SDataDsmEntry();
                                 
-                                tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+                                tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
 
                                 dsmEntry.setSourceValue(SLibUtils.roundAmount(payment * taxBalances.get(tax)[0]));
                                 dsmEntry.setSourceValueCy(SLibUtils.roundAmount(paymentCy * taxBalances.get(tax)[1]));
@@ -751,7 +751,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                                 dsmEntry.setDestinyValue(SLibUtils.roundAmount(payment * taxBalances.get(tax)[0]));
                                 dsmEntry.setDestinyValueCy(SLibUtils.roundAmount(paymentCy * taxBalances.get(tax)[1]));
                                 
-                                if (balance.getTaxBasId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
+                                if (balance.getTaxBasicId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
                                     dsmEntry.setSourceValue(SLibUtils.roundAmount(dsmEntry.getSourceValue() + diff));
                                     dsmEntry.setSourceValueCy(SLibUtils.roundAmount(dsmEntry.getSourceValueCy() + diffCur));
 
@@ -759,7 +759,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                                     dsmEntry.setDestinyValueCy(SLibUtils.roundAmount(dsmEntry.getDestinyValueCy() + diffCur));
                                 }
                                 
-                                dsmEntry.setFkTaxBasId_n(balance.getTaxBasId());
+                                dsmEntry.setFkTaxBasId_n(balance.getTaxBasicId());
                                 dsmEntry.setFkTaxId_n(balance.getTaxId());
                                 
                                 dsmEntry.setPkYearId(session.getCurrentYear());

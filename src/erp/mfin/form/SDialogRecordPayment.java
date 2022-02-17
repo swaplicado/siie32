@@ -1158,7 +1158,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         int[] taxMax = new int[]{ 0, 0 };
         double amtMaj = 0d;
         for (SFinBalanceTax balance : balances) {
-            tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+            tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
             perc = balance.getBalance() / dTotalBalance;
             percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
             
@@ -1169,7 +1169,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             
             if (balance.getBalanceCurrency() > amtMaj) {
                 amtMaj = balance.getBalanceCurrency();
-                taxMax = new int[] { balance.getTaxBasId(), balance.getTaxId() };
+                taxMax = new int[] { balance.getTaxBasicId(), balance.getTaxId() };
             }
         }
         
@@ -1189,21 +1189,21 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             
             SDataDsmEntry oDsmEntry = new SDataDsmEntry();
             
-            tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+            tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
             
             oDsmEntry.setSourceValue(SLibUtilities.round(moFieldDpsValue.getDouble() * taxBalances.get(tax)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
             oDsmEntry.setDestinyValue(SLibUtilities.round(moFieldDpsValue.getDouble() * taxBalances.get(tax)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
             oDsmEntry.setSourceValueCy(SLibUtilities.round(moFieldDpsValueCy.getDouble() * taxBalances.get(tax)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
             oDsmEntry.setDestinyValueCy(SLibUtilities.round(moFieldDpsValueCy.getDouble() * taxBalances.get(tax)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
             
-            if (balance.getTaxBasId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
+            if (balance.getTaxBasicId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
                 oDsmEntry.setSourceValue(SLibUtilities.round(oDsmEntry.getSourceValue() + diff, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
                 oDsmEntry.setDestinyValue(SLibUtilities.round(oDsmEntry.getDestinyValue() + diff, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
                 oDsmEntry.setSourceValueCy(SLibUtilities.round(oDsmEntry.getSourceValueCy() + diffCur, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
                 oDsmEntry.setDestinyValueCy(SLibUtilities.round(oDsmEntry.getDestinyValueCy() + diffCur, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
             }
             
-            oDsmEntry.setFkTaxBasId_n(balance.getTaxBasId());
+            oDsmEntry.setFkTaxBasId_n(balance.getTaxBasicId());
             oDsmEntry.setFkTaxId_n(balance.getTaxId());
             
             oDsmEntry.setPkYearId(miClient.getSessionXXX().getWorkingYear());
@@ -1241,7 +1241,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
             try {
                 Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
-                        moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, balance.getTaxPk());
+                        moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, balance.getTaxKey());
                 if (config.size() > 0) {
                     oDsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
                 }

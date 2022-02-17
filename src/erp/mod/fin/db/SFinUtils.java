@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public abstract class SFinUtils {
 
@@ -394,112 +394,63 @@ public abstract class SFinUtils {
     }
 
     /**
-     * Obtiene el saldo de un documento agrupado por impuesto
-     *
-     * @param connection
-     * @param dpsDocId
-     * @param dpsYearId
-     * @param sysMoveCategory
-     * @param sysMoveType
-     * @param record
-     *
+     * Obtiener el saldo de un documento agrupado por impuesto, en caso que el documento haya sido contabilizado así, por impuesto.
+     * En caso contrario, sólo se devuelve una entrada en el arreglo con el saldo global del documento, asociado a la clave no asociada a algún impuesto en particular (ID impuesto básico = 0 e ID impuesto = 0).
+     * @param connection DB connection.
+     * @param dpsYearId Documents primary key's year.
+     * @param dpsDocId Document primary key's document.
+     * @param sysMoveCategory Category of system movement.
+     * @param sysMoveType Type of system movement.
+     * @param record Accounting record (journal voucher to exclude.)
      * @return ArrayList
      */
     public static ArrayList<SFinBalanceTax> getBalanceByTax(Connection connection, int dpsYearId, int dpsDocId, int sysMoveCategory, int sysMoveType, SDataRecord record) {
-        /* Query 1. Moves without document: */
-        String sql = "" + "SELECT " + 
-                        "    b.id_bp," + 
-                        "    b.bp," + 
-                        "    d.id_year," + 
-                        "    d.id_doc," + 
-                        "    d.dt," + 
-                        "    dt.code AS f_doc_code," + 
-                        "    CONCAT(d.num_ser," + 
-                        "            IF(LENGTH(d.num_ser) = 0, '', '-')," + 
-                        "            d.num) AS f_num," + "    d.tot_r," + 
-                        "    d.exc_rate," + 
-                        "    d.tot_cur_r," + 
-                        "    c.id_cur," + 
-                        "    c.cur_key," + 
-                        "    cob.code AS f_cob_code," + 
-                        "    SUM(re.debit - re.credit) AS f_bal," + 
-                        "    SUM(IF(d.fid_cur IS NULL" + 
-                        "            OR d.fid_cur <> re.fid_cur," + 
-                        "        0," + 
-                        "        re.debit_cur - re.credit_cur)) AS f_bal_cur," + 
-                        "    btp.id_tp_bp," + 
-                        "    btp.tp_bp," + 
-                        "    re.fid_tax_bas_n," + 
-                        "    re.fid_tax_n " + 
-                        "FROM " + 
-                        "    fin_rec AS r" + 
-                        "        INNER JOIN" + 
-                        "    fin_rec_ety AS re ON r.id_year = re.id_year" + 
-                        "        AND r.id_per = re.id_per" + 
-                        "        AND r.id_bkc = re.id_bkc" + 
-                        "        AND r.id_tp_rec = re.id_tp_rec" + 
-                        "        AND r.id_num = re.id_num" + 
-                        "        AND NOT r.b_del" + 
-                        "        AND NOT re.b_del" + 
-                        "        AND re.fid_ct_sys_mov_xxx = " + sysMoveCategory + 
-                        "        AND re.fid_tp_sys_mov_xxx = " + sysMoveType + 
-                        "        INNER JOIN" + "    erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp" + 
-                        "        INNER JOIN" + "    erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp" + 
-                        "        AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx" + 
-                        "        INNER JOIN" + "    erp.bpsu_tp_bp AS btp ON bct.fid_tp_bp = btp.id_tp_bp" + 
-                        "        AND btp.id_ct_bp = re.fid_tp_sys_mov_xxx" + 
-                        "        INNER JOIN" + "    trn_dps AS d ON re.fid_dps_year_n = d.id_year" + 
-                        "        AND re.fid_dps_doc_n = d.id_doc" + 
-                        "        AND d.b_del = 0" + 
-                        "        AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + 
-                        "        AND re.fid_dps_year_n = " + dpsYearId + " " + 
-                        "        AND re.fid_dps_doc_n = " + dpsDocId + " ";
+        ArrayList<SFinBalanceTax> taxBalances = new ArrayList<>();
+        String sqlRecordToExclude = "";
+        
         if (record != null) {
-            sql +=      "       AND NOT (re.id_year = " + record.getPkYearId() + " AND re.id_per = " + record.getPkPeriodId()+ " " +
-                        "        AND re.id_bkc = " + record.getPkBookkeepingCenterId() + " " +
-                        "        AND re.id_tp_rec = '" + record.getPkRecordTypeId()+ "' " +
-                        "        AND re.id_num = " + record.getPkNumberId()+ " )";
+            sqlRecordToExclude = "AND NOT (re.id_year = " + record.getPkYearId() + " AND re.id_per = " + record.getPkPeriodId()+ " AND "
+                    + "re.id_bkc = " + record.getPkBookkeepingCenterId() + " AND re.id_tp_rec = '" + record.getPkRecordTypeId()+ "' AND re.id_num = " + record.getPkNumberId()+ " )";
         }
-                        
-        sql +=    "        INNER JOIN" + "    erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps" + 
-                        "        AND d.fid_cl_dps = dt.id_cl_dps" + 
-                        "        AND d.fid_tp_dps = dt.id_tp_dps" + 
-                        "        INNER JOIN" + 
-                        "    erp.cfgu_cur AS c ON d.fid_cur = c.id_cur" + 
-                        "        INNER JOIN" + "    erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " + 
-                        "GROUP BY btp.id_tp_bp , b.id_bp , b.bp , d.id_year , d.id_doc , " + 
-                        "  d.dt , dt.code , d.num_ser , d.num , d.tot_r , d.exc_rate , " + 
-                        "  d.tot_cur_r , c.id_cur , c.cur_key , cob.code , re.fid_tax_bas_n , re.fid_tax_n " + 
-                        "HAVING f_bal <> 0 OR f_bal_cur <> 0 " + "ORDER BY tp_bp , id_tp_bp , bp , id_bp , f_num , dt , id_year , id_doc , id_cur;";
+        
+        String sql = "SELECT re.fid_tax_bas_n, re.fid_tax_n, "
+                + "SUM(re.debit - re.credit) AS f_bal, "
+                + "SUM(IF(d.fid_cur <> re.fid_cur, 0, re.debit_cur - re.credit_cur)) AS f_bal_cur "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc "
+                + "WHERE NOT r.b_del AND NOT re.b_del AND re.fid_ct_sys_mov_xxx = " + sysMoveCategory + " AND re.fid_tp_sys_mov_xxx = " + sysMoveType + " AND "
+                + "re.fid_dps_year_n = " + dpsYearId + " AND re.fid_dps_doc_n = " + dpsDocId + " " + sqlRecordToExclude
+                + "GROUP BY re.fid_tax_bas_n, re.fid_tax_n "
+                + "HAVING f_bal <> 0 OR f_bal_cur <> 0 "
+                + "ORDER BY re.fid_tax_bas_n, re.fid_tax_n;";
         
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
-            ArrayList<SFinBalanceTax> taxBalances = new ArrayList<>();
-            SFinBalanceTax tax;
-            
-            while (resultSet.next()) {
-                tax = new SFinBalanceTax();
-                tax.setTaxBasId(resultSet.getInt("fid_tax_bas_n"));
-                tax.setTaxId(resultSet.getInt("fid_tax_n"));
+            try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+                SFinBalanceTax tax;
                 
-                if (sysMoveType == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) {
-                    tax.setBalance(resultSet.getDouble("f_bal"));
-                    tax.setBalanceCurrency(resultSet.getDouble("f_bal_cur"));
+                while (resultSet.next()) {
+                    tax = new SFinBalanceTax();
+                    tax.setTaxBasicId(resultSet.getInt("fid_tax_bas_n"));
+                    tax.setTaxId(resultSet.getInt("fid_tax_n"));
+                    
+                    if (sysMoveType == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) {
+                        tax.setBalanceLocal(resultSet.getDouble("f_bal"));
+                        tax.setBalanceCurrency(resultSet.getDouble("f_bal_cur"));
+                    }
+                    else {
+                        tax.setBalanceLocal(resultSet.getDouble("f_bal") * -1);
+                        tax.setBalanceCurrency(resultSet.getDouble("f_bal_cur") * -1);
+                    }
+                    
+                    taxBalances.add(tax);
                 }
-                else {
-                    tax.setBalance(resultSet.getDouble("f_bal") * -1);
-                    tax.setBalanceCurrency(resultSet.getDouble("f_bal_cur") * -1);
-                }
-                
-                taxBalances.add(tax);
             }
-            
-            return taxBalances;
         }
         catch (SQLException ex) { 
             Logger.getLogger(SFinUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return new ArrayList<>();
+        return taxBalances;
     }
 }

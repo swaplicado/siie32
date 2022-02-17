@@ -576,7 +576,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             int[] taxMax = new int[] { 0, 0 };
             double amtMaj = 0d;
             for (SFinBalanceTax balance : balances) {
-                tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+                tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
 
                 perc = balance.getBalance() / dTotalBalance;
                 percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
@@ -591,7 +591,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
 
                 if (balance.getBalanceCurrency() > amtMaj) {
                     amtMaj = balance.getBalanceCurrency();
-                    taxMax = new int[] { balance.getTaxBasId(), balance.getTaxId() };
+                    taxMax = new int[] { balance.getTaxBasicId(), balance.getTaxId() };
                 }
             }
 
@@ -615,7 +615,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             for (SFinBalanceTax balance : balances) {
                 SDataDsmEntry oDsmEntry = new SDataDsmEntry();
 
-                tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+                tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
 
                 oDsmEntry.setSourceValue(SLibUtils.roundAmount((paymentEntryDoc.PayPayment * ExchangeRate) * taxBalances.get(tax)[0]));
                 oDsmEntry.setSourceValueCy(SLibUtils.roundAmount(paymentEntryDoc.PayPayment * taxBalances.get(tax)[1]));
@@ -623,7 +623,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 oDsmEntry.setDestinyValue(SLibUtils.roundAmount(paymentEntryDoc.PayPaymentLocal * taxBalances.get(tax)[0]));
                 oDsmEntry.setDestinyValueCy(SLibUtils.roundAmount(paymentEntryDoc.DocPayment * taxBalances.get(tax)[1]));
 
-                if (balance.getTaxBasId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
+                if (balance.getTaxBasicId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
                     oDsmEntry.setSourceValue(SLibUtils.roundAmount(oDsmEntry.getSourceValue() + diff));
                     oDsmEntry.setSourceValueCy(SLibUtils.roundAmount(oDsmEntry.getSourceValueCy() + diffCur));
 
@@ -639,7 +639,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 oDsmEntry.setSourceExchangeRateSystem(ExchangeRate);
                 oDsmEntry.setSourceExchangeRate(ExchangeRate);
                 
-                oDsmEntry.setFkTaxBasId_n(balance.getTaxBasId());
+                oDsmEntry.setFkTaxBasId_n(balance.getTaxBasicId());
                 oDsmEntry.setFkTaxId_n(balance.getTaxId());
 
                 oDsmEntry.setFkDestinyDpsYearId_n(paymentEntryDoc.ThinDps.getPkYearId());

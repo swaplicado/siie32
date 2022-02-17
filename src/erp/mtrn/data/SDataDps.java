@@ -770,16 +770,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         String type = "";
         int[] docClassKey = getDpsClassKey();
 
-        if (SLibUtilities.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
+        if (SLibUtils.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
             type = SDataConstantsSys.FINU_TP_REC_PUR;
         }
-        else if (SLibUtilities.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ)) {
+        else if (SLibUtils.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ)) {
             type = SDataConstantsSys.FINU_TP_REC_PUR;
         }
-        else if (SLibUtilities.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC)) {
+        else if (SLibUtils.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC)) {
             type = SDataConstantsSys.FINU_TP_REC_SAL;
         }
-        else if (SLibUtilities.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ)) {
+        else if (SLibUtils.compareKeys(docClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ)) {
             type = SDataConstantsSys.FINU_TP_REC_SAL;
         }
 
@@ -2069,7 +2069,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         SDataDpsEntry entry = null;
 
         for (SDataDpsEntry e : mvDbmsDpsEntries) {
-            if (SLibUtilities.compareKeys(pk, e.getPrimaryKey())) {
+            if (SLibUtils.compareKeys(pk, e.getPrimaryKey())) {
                 entry = e;
                 break;
             }
@@ -3322,7 +3322,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         // user requested accounting of prepayments into prepayments to be invoiced:
                                         
                                         for (SFinAccountConfig config : aAccountConfigsPrepaymentsToInvoiceArray) {
-                                            if (amount.RefTaxKey[0] == config.getTaxKey()[0] && amount.RefTaxKey[1] == config.getTaxKey()[1]) {
+                                            if (SLibUtils.compareKeys(amount.RefTaxKey != null ? amount.RefTaxKey : new int[] { 0, 0 }, config.getTaxKey())) {
                                                 aAmountsEntriesArray = config.prorateAmount(amount);
 
                                                 for (int i = 0; i < config.getAccountConfigEntries().size(); i++) {
@@ -3418,7 +3418,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                      
                                     for (SFinAccountConfig aAccCfg : aAccCfgs) {
-                                        if (aAccCfg.getTaxKey()[0] == amount.RefTaxKey[0] && aAccCfg.getTaxKey()[1] == amount.RefTaxKey[1]) {
+                                        if (SLibUtils.compareKeys(aAccCfg.getTaxKey(), amount.RefTaxKey)) {
                                             aAmountsEntriesArray = aAccCfg.prorateAmount(amount);
 
                                             for (int i = 0; i < aAccCfg.getAccountConfigEntries().size(); i++) {
@@ -4451,7 +4451,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         Vector<DElementArticulos> vArticulos = new Vector<>();
         DElementDSCargaRemisionProv addendaSoriana = new DElementDSCargaRemisionProv();
 
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
+        if (SLibUtils.compareKeys(anDateDps, anDateEdit)) {
             tDate = mtUserEditTs;
         }
         else {
@@ -4552,7 +4552,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         Vector<DElementCuerpo> vCuerpo = new Vector<>();
         DElementFacturaInterfactura addendaLoreal = new DElementFacturaInterfactura();
 
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
+        if (SLibUtils.compareKeys(anDateDps, anDateEdit)) {
             tDate = mtUserEditTs;
         }
         else {
@@ -4657,7 +4657,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         Vector<DElementLineItem> vLineItems = new Vector<>();
         cfd.ext.bachoco.DElementPayment addendaBachoco = new cfd.ext.bachoco.DElementPayment();
 
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
+        if (SLibUtils.compareKeys(anDateDps, anDateEdit)) {
             tDate = mtUserEditTs;
         }
         else {
@@ -4681,10 +4681,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 break;
         }
 
-        if (SLibUtilities.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
+        if (SLibUtils.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
             sEntityType = "INVOICE";
         }
-        else if (SLibUtilities.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
+        else if (SLibUtils.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
             sEntityType = "CREDIT_NOTE";
         }
 
@@ -4782,7 +4782,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         Vector<cfd.ext.grupomodelo.DElementLineItem> vLineItem = new Vector<>();
         cfd.ext.grupomodelo.DElementAddendaModelo addendaGrupoModelo = new cfd.ext.grupomodelo.DElementAddendaModelo();
 
-        if (SLibUtilities.compareKeys(anDateDps, anDateEdit)) {
+        if (SLibUtils.compareKeys(anDateDps, anDateEdit)) {
             tDate = mtUserEditTs;
         }
         else {
@@ -4804,7 +4804,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 break;
         }
 
-        if (SLibUtilities.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
+        if (SLibUtils.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
             sEntityType = "FA";
         }
 
@@ -4838,13 +4838,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 vItem.getEltTotalLineAmount().getEltNetAmount().getEltAmount().setValue("" + oDecimalFormat.format(entry.getTotalCy_r()));
                 vLineItem.add(vItem);
 
-                if (SLibUtilities.compareKeys(anSubTypeDoc, SDataConstantsSys.TRNS_STP_DPS_ADJ_RET_RET)) {
+                if (SLibUtils.compareKeys(anSubTypeDoc, SDataConstantsSys.TRNS_STP_DPS_ADJ_RET_RET)) {
                     sEntityType = "ND";
                 }
-                else if (SLibUtilities.compareKeys(anSubTypeDoc, SDataConstantsSys.TRNS_STP_DPS_ADJ_DISC_PRICE)) {
+                else if (SLibUtils.compareKeys(anSubTypeDoc, SDataConstantsSys.TRNS_STP_DPS_ADJ_DISC_PRICE)) {
                     sEntityType = "NA";
                 }
-                else if (SLibUtilities.compareKeys(anSubTypeDoc, SDataConstantsSys.TRNS_STP_DPS_ADJ_DISC_DISC)) {
+                else if (SLibUtils.compareKeys(anSubTypeDoc, SDataConstantsSys.TRNS_STP_DPS_ADJ_DISC_DISC)) {
                     sEntityType = "NE";
                 }
             }
@@ -4997,9 +4997,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         addendaElektra.getAttSchemaLocation().setString("http://www.tiendasneto.com/ap addenda_prov.xsd");
 
         addendaElektra.getAttTipoComprobante().setString(
-                SLibUtilities.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_INV) ? "FE" :
-                SLibUtilities.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CN) ? "NC" :
-                SLibUtilities.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_REC) ? "ND" : "?");
+                SLibUtils.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_INV) ? "FE" :
+                SLibUtils.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_CN) ? "NC" :
+                SLibUtils.compareKeys(anDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_REC) ? "ND" : "?");
         addendaElektra.getAttPlazoPago().setString(mnDaysOfCredit + " DIAS"); // XXX: Validate is 'DIAS' is declared like a constant
         addendaElektra.getAttObservaciones().setString(sNotes);
         addendaElektra.getEltDetalleProductos().getEltDetalle().addAll(oDetailItems.getEltDetalle());
@@ -5046,10 +5046,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         String entityType = "";
         int[] dpsTypeKey = getDpsTypeKey();
         
-        if (SLibUtilities.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
+        if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
             entityType = "INVOICE";
         }
-        else if (SLibUtilities.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
+        else if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
             entityType = "CREDIT_NOTE";
         }
         
@@ -5557,7 +5557,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int[] modification = SLibTimeUtilities.digestDate(mtUserEditTs);
         java.util.Date date = null;
 
-        if (SLibUtilities.compareKeys(creation, modification)) {
+        if (SLibUtils.compareKeys(creation, modification)) {
             // when modification done the same day as creation, set the former's datetime as document's datetime:
             date = mtUserEditTs;
         }
