@@ -804,6 +804,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
                     maRedisLocks.add(rlock);
                     */
                     slock = SLockUtils.gainLock((SClientInterface) miClient, SDataConstants.FIN_REC, anaRow.getRecord(), anaRow.getRecord().getRegistryTimeout());
+                    maSLocks.add(slock);
                     
                     recordKeys.add(anaRow.getRecord().getPrimaryKey());
                 }
