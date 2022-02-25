@@ -80,7 +80,7 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     public SDataDsmEntry () {
         super(SDataConstants.TRN_DSM_ETY);
 
-        mvDbmsDsmEntryNotes = new Vector<SDataDsmEntryNotes>();
+        mvDbmsDsmEntryNotes = new Vector<>();
         reset();
     }
 

@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 195.8/ 2022-02-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la contabilización de impuestos en pagos de documentos que tienen ajustes contables manuales.
+2) Mejoramiento a la validación de serie y folio del XML del CFDI vs. los datos del documento.
+3) Validación de captura de CFDI 4.0 provisionalmente como CFDI 3.3.
+
+================================================================================
 SIIE 3.2 195.7/ 2022-02-17
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

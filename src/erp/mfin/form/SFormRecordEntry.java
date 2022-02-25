@@ -351,13 +351,13 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         bgTax.add(jrbTaxCash);
         jrbTaxCash.setSelected(true);
-        jrbTaxCash.setText("Efectivo");
-        jrbTaxCash.setPreferredSize(new java.awt.Dimension(75, 23));
+        jrbTaxCash.setText("Efectivamente pagado");
+        jrbTaxCash.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jrbTaxCash);
 
         bgTax.add(jrbTaxPend);
-        jrbTaxPend.setText("Pendiente");
-        jrbTaxPend.setPreferredSize(new java.awt.Dimension(75, 23));
+        jrbTaxPend.setText("Pendiente de pago");
+        jrbTaxPend.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jrbTaxPend);
 
         jpSettings.add(jPanel6);
@@ -1553,28 +1553,29 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     private int[] getSystemMoveTypeKey() {
         int[] key = null;
+        boolean isDebitLike = moFieldDebit.getDouble() > 0 || moFieldCredit.getDouble() < 0 || moFieldDebit.getDouble() == 0;
 
         if (moPanelFkAccountId.getDataAccountMajor() != null) {
             switch (moPanelFkAccountId.getDataAccountMajor().getFkAccountSystemTypeId()) {
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_MI_ADJ : SModSysConsts.FINS_TP_SYS_MOV_MO_ADJ;
+                    key = isDebitLike ? SModSysConsts.FINS_TP_SYS_MOV_MI_ADJ : SModSysConsts.FINS_TP_SYS_MOV_MO_ADJ;
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
+                    key = isDebitLike ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
+                    key = isDebitLike ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
+                    key = isDebitLike ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
+                    key = isDebitLike ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
                     break;
 
                 case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
@@ -1602,7 +1603,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     break;
 
                 default:
-                    key = moFieldDebit.getDouble() >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
+                    key = isDebitLike ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
             }
         }
 

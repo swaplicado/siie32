@@ -12,12 +12,10 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
-import erp.mfin.data.SFinBalanceTax;
 import erp.mod.SModSysConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibConsts;
@@ -86,147 +84,134 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
      */
 
     private erp.mfin.data.SDataRecord saveRecord(java.sql.Connection connection, boolean isNewRecord) {
-        String sConcept = "";
-
-        SDataRecord oRecord = null;
-        Statement oStatement = null;
+        SDataRecord record = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-
-            // Render concept:
-            sConcept = msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + SLibUtils.DateFormatDate.format(mtDate);
-
             // 4.2.2 Save accounting record:
 
-            oRecord = new SDataRecord();
-            oStatement = connection.createStatement();
+            record = new SDataRecord();
+            Statement statement = connection.createStatement();
+            String concept = msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + SLibUtils.DateFormatDate.format(mtDate);
+            
             if (!isNewRecord) {
-                if (oRecord.read(moDbmsRecordKey, oStatement) != SLibConstants.DB_ACTION_READ_OK) {
+                if (record.read(moDbmsRecordKey, statement) != SLibConstants.DB_ACTION_READ_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
-                if (oRecord.getIsDeleted()) {
-                    oRecord.setIsDeleted(false);
+                if (record.getIsDeleted()) {
+                    record.setIsDeleted(false);
                 }
 
                 if (mbIsRecordAutomatic) {
-                    oRecord.setConcept(sConcept.length() > 100 ? sConcept.substring(0, 96).trim() + "..." : sConcept);
+                    record.setConcept(concept.length() > 100 ? concept.substring(0, 96).trim() + "..." : concept);
                 }
             }
             else {
-                oRecord.setPkYearId(moDbmsRecordKey != null ? (Integer) ((Object[]) moDbmsRecordKey)[0] : mnPkYearId);
-                oRecord.setPkPeriodId(moDbmsRecordKey != null ? (Integer) ((Object[]) moDbmsRecordKey)[1] : mnDbmsPkPeriodId);
-                oRecord.setPkBookkeepingCenterId(moDbmsRecordKey != null ? (Integer) ((Object[]) moDbmsRecordKey)[2] : mnDbmsPkBookkeepingCenterId);
-                oRecord.setPkRecordTypeId(moDbmsRecordKey != null ? (String) ((Object[]) moDbmsRecordKey)[3] : msDbmsPkRecordTypeId);
-                oRecord.setPkNumberId(0);
-                oRecord.setConcept(sConcept.length() > 100 ? sConcept.substring(0, 96).trim() + "..." : sConcept);
-                oRecord.setDate(mtDate);
-                oRecord.setIsAudited(false);
-                oRecord.setIsAuthorized(false);
-                oRecord.setIsSystem(true);
-                oRecord.setIsDeleted(false);
-                oRecord.setFkCompanyBranchId(mnFkCompanyBranchId);
-                oRecord.setFkCompanyBranchId_n(0);
-                oRecord.setFkAccountCashId_n(0);
+                record.setPkYearId(moDbmsRecordKey != null ? (Integer) ((Object[]) moDbmsRecordKey)[0] : mnPkYearId);
+                record.setPkPeriodId(moDbmsRecordKey != null ? (Integer) ((Object[]) moDbmsRecordKey)[1] : mnDbmsPkPeriodId);
+                record.setPkBookkeepingCenterId(moDbmsRecordKey != null ? (Integer) ((Object[]) moDbmsRecordKey)[2] : mnDbmsPkBookkeepingCenterId);
+                record.setPkRecordTypeId(moDbmsRecordKey != null ? (String) ((Object[]) moDbmsRecordKey)[3] : msDbmsPkRecordTypeId);
+                record.setPkNumberId(0);
+                record.setConcept(concept.length() > 100 ? concept.substring(0, 96).trim() + "..." : concept);
+                record.setDate(mtDate);
+                record.setIsAudited(false);
+                record.setIsAuthorized(false);
+                record.setIsSystem(true);
+                record.setIsDeleted(false);
+                record.setFkCompanyBranchId(mnFkCompanyBranchId);
+                record.setFkCompanyBranchId_n(0);
+                record.setFkAccountCashId_n(0);
 
                 if (mbIsRegistryNew) {
-                    oRecord.setFkUserNewId(mnFkUserNewId);
-                    oRecord.setFkUserEditId(mnFkUserNewId);
+                    record.setFkUserNewId(mnFkUserNewId);
+                    record.setFkUserEditId(mnFkUserNewId);
                 }
                 else {
-                    oRecord.setFkUserNewId(mnFkUserEditId);
-                    oRecord.setFkUserEditId(mnFkUserEditId);
+                    record.setFkUserNewId(mnFkUserEditId);
+                    record.setFkUserEditId(mnFkUserEditId);
                 }
             }
 
             // Save record entries:
 
-            mnLastDbActionResult = saveRecordEntries(connection, oRecord);
+            mnLastDbActionResult = saveRecordEntries(connection, record);
 
             if (mbDbmsIsRecordSaved) {
-                if (oRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                if (record.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                 }
             }
 
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK; // h6l2s9u1 773190995 4504
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
 
-        return oRecord;
+        return record;
     }
 
-    private int saveRecordEntries(java.sql.Connection connection, erp.mfin.data.SDataRecord oRecord) {
-        int nSortPos = 0;
-        String sConcept = "";
-        Vector<Object> vEntries = new Vector<Object>();
-
-        SDataDsmEntry oDsmEntry = null;
-        SDataRecordEntry oRecordEntry = null;
-
+    private int saveRecordEntries(java.sql.Connection connection, erp.mfin.data.SDataRecord record) {
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            // se determina si existe configuración de impuestos
-            boolean hasTaxCfg = false;
-            for (int m = 0; m < mvDbmsDsmEntries.size(); m++) {
-                oDsmEntry = (SDataDsmEntry) mvDbmsDsmEntries.get(m);
-                hasTaxCfg = oDsmEntry.getTaxPk() != null;
-                if (hasTaxCfg) {
+            // Determinar si existe configuración de impuestos:
+            
+            boolean hasTaxConfig = false;
+            
+            for (SDataDsmEntry dsmEntry : mvDbmsDsmEntries) {
+                hasTaxConfig = dsmEntry.getTaxPk() != null;
+                if (hasTaxConfig) {
                     break;
                 }
             }
             
-            nSortPos = 1;
-            for (int m = 0; m < mvDbmsDsmEntries.size(); m++) {
-                oDsmEntry = (SDataDsmEntry) mvDbmsDsmEntries.get(m);
-                if (oDsmEntry != null) {
-
+            // Procesar movimientos contables:
+            
+            int sortPos = 1;
+            Vector<String> accounts = new Vector<>();
+            
+            for (SDataDsmEntry dsmEntry : mvDbmsDsmEntries) {
+                if (dsmEntry != null) {
                     // Render concept for the entry:
 
-                    sConcept = renderSubsystemSourceToDestiny(oDsmEntry);
+                    String concept = renderSubsystemSourceToDestiny(dsmEntry);
 
                     // Get accounts debit and credit:
 
-                    vEntries.removeAllElements();
-                    vEntries.add(oDsmEntry.getDbmsAccountPay());
-                    vEntries.add(oDsmEntry.getDbmsAccountOp());
+                    accounts.removeAllElements();
+                    accounts.add(dsmEntry.getDbmsAccountPay());
+                    accounts.add(dsmEntry.getDbmsAccountOp());
 
-                    for (int n = 0; n < vEntries.size(); n++) {
-
+                    for (int accountCase = 0; accountCase < accounts.size(); accountCase++) {
                         // Check if account isn't empty [SFormRecordApp]:
 
-                        if (vEntries.get(n).toString().length() > 0) {
-                            oRecordEntry = new SDataRecordEntry();
-
-                            // oRecordEntry = createRecordEntryHeader(oRecordEntry, nPkNumberId > 0 ? nPkNumberId : oRecord.getPkNumberId());
-                            oRecordEntry = createRecordEntryHeader(oRecordEntry, 0);
-                            oRecordEntry = createRecordEntry(oRecordEntry, oDsmEntry, sConcept, nSortPos);
+                        if (!accounts.get(accountCase).isEmpty()) {
+                            SDataRecordEntry recordEntry = new SDataRecordEntry();
+                            prepareRecordEntry(recordEntry, 0, dsmEntry, concept, sortPos);
 
                             // Save accounting data depending of subsystem type:
 
-                            oRecordEntry = renderReferenceDps(n, oDsmEntry, oRecordEntry);
-                            oRecordEntry.setIsSystem(true);
-                            oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                            recordEntry = renderReferenceDps(accountCase, dsmEntry, recordEntry);
+                            recordEntry.setIsSystem(true);
+                            record.getDbmsRecordEntries().add(recordEntry);
 
-                            nSortPos = nSortPos + 1;
+                            sortPos++;
                         }
                     }
 
                     // Record entry for taxes source:
 
-                    if (oDsmEntry.getFkSourceDpsYearId_n() > 0 && oDsmEntry.getFkSourceDpsDocId_n() > 0) {
-                        nSortPos = calculateDpsTaxes(connection, oRecord, oDsmEntry, SDataConstants.TRNX_DSM_ETY_SOURCE, nSortPos, 0, oDsmEntry.getFkSourceDpsYearId_n(), oDsmEntry.getFkSourceDpsDocId_n(), sConcept);
+                    if (dsmEntry.getFkSourceDpsYearId_n() != 0 && dsmEntry.getFkSourceDpsDocId_n() != 0) {
+                        sortPos = calculateDpsTaxes(connection, record, dsmEntry, SDataConstants.TRNX_DSM_ETY_SOURCE, sortPos, 0, dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(), concept);
                     }
 
                     // Record entry for taxes destiny:
 
-                    if (oDsmEntry.getFkDestinyDpsYearId_n() > 0 && oDsmEntry.getFkDestinyDpsDocId_n() > 0) {
-                        nSortPos = calculateDpsTaxes(connection, oRecord, oDsmEntry, SDataConstants.TRNX_DSM_ETY_DESTINY, nSortPos, 0, oDsmEntry.getFkDestinyDpsYearId_n(), oDsmEntry.getFkDestinyDpsDocId_n(), sConcept);
+                    if (dsmEntry.getFkDestinyDpsYearId_n() != 0 && dsmEntry.getFkDestinyDpsDocId_n() != 0) {
+                        sortPos = calculateDpsTaxes(connection, record, dsmEntry, SDataConstants.TRNX_DSM_ETY_DESTINY, sortPos, 0, dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(), concept);
                     }
 
                     mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
@@ -241,67 +226,69 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return mnLastDbActionResult;
     }
 
-    private erp.mfin.data.SDataRecordEntry createRecordEntryHeader(erp.mfin.data.SDataRecordEntry  oRecordEntry, int nPkNumberId) {
+    private void prepareRecordEntry(erp.mfin.data.SDataRecordEntry recordEntry, int numberId, erp.mtrn.data.SDataDsmEntry dsmEntry, java.lang.String concept, int sortPos) {
+        // Prepare record entry header:
 
-        // Create record entry header:
+        if (moDbmsRecordKey != null) {
+            recordEntry.setPkYearId((Integer) ((Object[]) moDbmsRecordKey)[0]);
+            recordEntry.setPkPeriodId((Integer) ((Object[]) moDbmsRecordKey)[1]);
+            recordEntry.setPkBookkeepingCenterId((Integer) ((Object[]) moDbmsRecordKey)[2]);
+            recordEntry.setPkRecordTypeId((String) ((Object[]) moDbmsRecordKey)[3]);
+        }
+        else {
+            recordEntry.setPkYearId(mnPkYearId);
+            recordEntry.setPkPeriodId(mnDbmsPkPeriodId);
+            recordEntry.setPkBookkeepingCenterId(mnDbmsPkBookkeepingCenterId);
+            recordEntry.setPkRecordTypeId(msDbmsPkRecordTypeId);
+        }
+        
+        recordEntry.setPkNumberId(numberId);
+        recordEntry.setPkEntryId(0);
+        
+        // Prepare record entry body:
 
-        oRecordEntry.setPkYearId(moDbmsRecordKey != null ? (Integer)((Object[]) moDbmsRecordKey)[0] : mnPkYearId);
-        oRecordEntry.setPkPeriodId(moDbmsRecordKey != null ? (Integer)((Object[]) moDbmsRecordKey)[1] : mnDbmsPkPeriodId);
-        oRecordEntry.setPkBookkeepingCenterId(moDbmsRecordKey != null ? (Integer) ((Object[]) moDbmsRecordKey)[2] : mnDbmsPkBookkeepingCenterId);
-        oRecordEntry.setPkRecordTypeId(moDbmsRecordKey != null ? (String)((Object[]) moDbmsRecordKey)[3] : msDbmsPkRecordTypeId);
-        oRecordEntry.setPkNumberId(nPkNumberId);
-        oRecordEntry.setPkEntryId(0);
-
-        return oRecordEntry;
-    }
-
-    private erp.mfin.data.SDataRecordEntry createRecordEntry(erp.mfin.data.SDataRecordEntry oRecordEntry, erp.mtrn.data.SDataDsmEntry oDsmEntry, java.lang.String sConcept, int nSortPos) {
-        // Create record entry complement:
-
-        oRecordEntry.setConcept(sConcept.length() > 100 ? sConcept.substring(0, 96).trim() + "..." : sConcept);
-        oRecordEntry.setReference("");
-        oRecordEntry.setFkDpsYearId_n(0);
-        oRecordEntry.setFkDpsDocId_n(0);
-        oRecordEntry.setFkAccountIdXXX("");
-        oRecordEntry.setUnits(0);
-        oRecordEntry.setSortingPosition(nSortPos);
-        oRecordEntry.setIsDeleted(oDsmEntry.getIsDeleted());
-        oRecordEntry.setFkAccountingMoveTypeId(oDsmEntry.getFkAccountingMoveTypeId());
-        oRecordEntry.setFkAccountingMoveClassId(oDsmEntry.getFkAccountingMoveClassId());
-        oRecordEntry.setFkAccountingMoveSubclassId(oDsmEntry.getFkAccountingMoveSubclassId());
-        oRecordEntry.setFkCostCenterIdXXX_n("");
-        oRecordEntry.setFkCompanyBranchId_n(mnFkCompanyBranchId);
-        oRecordEntry.setFkEntityId_n(0);
-        oRecordEntry.setFkTaxBasicId_n(oDsmEntry.getFkTaxBasId_n());
-        oRecordEntry.setFkTaxId_n(oDsmEntry.getFkTaxId_n());
-        oRecordEntry.setFkBizPartnerId_nr(oDsmEntry.getFkBizPartnerId());
-        oRecordEntry.setFkBizPartnerBranchId_n(oDsmEntry.getDbmsFkBizPartnerBranchId_n());
-        oRecordEntry.setFkYearId_n(0);
+        recordEntry.setConcept(concept.length() > 100 ? concept.substring(0, 96).trim() + "..." : concept);
+        recordEntry.setReference("");
+        recordEntry.setFkDpsYearId_n(0);
+        recordEntry.setFkDpsDocId_n(0);
+        recordEntry.setFkAccountIdXXX("");
+        recordEntry.setUnits(0);
+        recordEntry.setSortingPosition(sortPos);
+        recordEntry.setIsDeleted(dsmEntry.getIsDeleted());
+        recordEntry.setFkAccountingMoveTypeId(dsmEntry.getFkAccountingMoveTypeId());
+        recordEntry.setFkAccountingMoveClassId(dsmEntry.getFkAccountingMoveClassId());
+        recordEntry.setFkAccountingMoveSubclassId(dsmEntry.getFkAccountingMoveSubclassId());
+        recordEntry.setFkCostCenterIdXXX_n("");
+        recordEntry.setFkCompanyBranchId_n(mnFkCompanyBranchId);
+        recordEntry.setFkEntityId_n(0);
+        recordEntry.setFkTaxBasicId_n(dsmEntry.getFkTaxBasId_n());
+        recordEntry.setFkTaxId_n(dsmEntry.getFkTaxId_n());
+        recordEntry.setFkBizPartnerId_nr(dsmEntry.getFkBizPartnerId());
+        recordEntry.setFkBizPartnerBranchId_n(dsmEntry.getDbmsFkBizPartnerBranchId_n());
+        recordEntry.setFkYearId_n(0);
         //oRecordEntry.setFkDsmYearId_n(mnPkYearId);    XXX obsolete code (sflores, 2013-06-27)
         //oRecordEntry.setFkDsmDocId_n(mnPkDocId);      XXX obsolete code (sflores, 2013-06-27)
-        oRecordEntry.setFkReferenceCategoryId_n(mnFkSubsystemCategoryId);
-        oRecordEntry.setFkDpsAdjustmentYearId_n(0);
-        oRecordEntry.setFkDpsAdjustmentDocId_n(0);
-        oRecordEntry.setFkDiogYearId_n(0);
-        oRecordEntry.setFkDiogDocId_n(0);
-        oRecordEntry.setFkItemId_n(0);
-        oRecordEntry.setFkCheckWalletId_n(0);
-        oRecordEntry.setFkCheckId_n(0);
-        oRecordEntry.setFkUserNewId(mnFkUserNewId);
-        oRecordEntry.setFkUserEditId(1);
-        oRecordEntry.setFkUserDeleteId(1);
-        oRecordEntry.setUserNewTs(mtDate);
-        oRecordEntry.setUserEditTs(mtDate);
-        oRecordEntry.setUserDeleteTs(mtDate);
-
-        return oRecordEntry;
+        recordEntry.setFkReferenceCategoryId_n(mnFkSubsystemCategoryId);
+        recordEntry.setFkDpsAdjustmentYearId_n(0);
+        recordEntry.setFkDpsAdjustmentDocId_n(0);
+        recordEntry.setFkDiogYearId_n(0);
+        recordEntry.setFkDiogDocId_n(0);
+        recordEntry.setFkItemId_n(0);
+        recordEntry.setFkCheckWalletId_n(0);
+        recordEntry.setFkCheckId_n(0);
+        recordEntry.setFkUserNewId(mnFkUserNewId);
+        recordEntry.setFkUserEditId(1);
+        recordEntry.setFkUserDeleteId(1);
+        recordEntry.setUserNewTs(mtDate);
+        recordEntry.setUserEditTs(mtDate);
+        recordEntry.setUserDeleteTs(mtDate);
     }
 
     private int saveRecordEntriesTaxes(java.sql.Connection connection, erp.mfin.data.SDataRecord oRecord, erp.mfin.data.SDataRecordEntry oRecordEntry, erp.mtrn.data.SDataDsmEntry dataDsmEntry,
             int nPkNumberId, java.lang.String sConcept, int nDpsYearId, int nDpsDocId, int nDpsCategoryId,
             int nSortPos, Vector<Object> vTpSysMovId, int nPkTaxBasicId, int nPkTaxId, double dValueTax, double dValueTaxCur, int nTypeSource) {
 
-        Vector<Object> vAccs = new Vector<Object>();
+        Vector<Object> vAccs = new Vector<>();
 
         // Add accounts (debit, credit):
 
@@ -312,8 +299,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             for (int j = 0; j < vAccs.size(); j++) {
 
                 oRecordEntry = new SDataRecordEntry();
-                oRecordEntry = createRecordEntryHeader(oRecordEntry, nPkNumberId);
-                oRecordEntry = createRecordEntry(oRecordEntry, dataDsmEntry, sConcept, nSortPos);
+                prepareRecordEntry(oRecordEntry, nPkNumberId, dataDsmEntry, sConcept, nSortPos);
 
                 // Complement record entry:
 
@@ -432,10 +418,17 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return oRecordEntry;
     }
 
-    private erp.mfin.data.SDataRecordEntry renderReferenceDps(int pnMoveType, erp.mtrn.data.SDataDsmEntry poDsmEntry, erp.mfin.data.SDataRecordEntry poRecordEntry) {
+    /**
+     * 
+     * @param pnAccCase 0 = payment; 1 = operations
+     * @param poDsmEntry
+     * @param poRecordEntry
+     * @return 
+     */
+    private erp.mfin.data.SDataRecordEntry renderReferenceDps(int pnAccCase, erp.mtrn.data.SDataDsmEntry poDsmEntry, erp.mfin.data.SDataRecordEntry poRecordEntry) {
         int[] anAccMovSubtype = new int[] {poDsmEntry.getFkAccountingMoveTypeId(), poDsmEntry.getFkAccountingMoveClassId(), poDsmEntry.getFkAccountingMoveSubclassId() };
 
-        if (pnMoveType == 0) {
+        if (pnAccCase == 0) {
             if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
@@ -1155,8 +1148,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return vTpSysMov;
     }
 
-    private java.util.Vector<Object> renderTaxAccDbtCdt(erp.mtrn.data.SDataDsmEntry oDsmEntry, java.util.Vector<Object> vTpSysMov, java.lang.Object oKey, java.lang.String sAccount, java.lang.String sAccTaxPay,
-            java.lang.String sAccTaxPayPend, java.lang.String sAccTaxPayPendAdv, int nPkTaxType, int nTypeSource) {
+    private java.util.Vector<Object> renderTaxAccDbtCdt(java.util.Vector<Object> vTpSysMov, java.lang.Object oKey, 
+            java.lang.String sAccTaxPay, java.lang.String sAccTaxPayPend, java.lang.String sAccTaxPayPendAdv, int nPkTaxType, int nTypeSource) {
 
         if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
             vTpSysMov = renderTaxAccDbtCdtPayApp(sAccTaxPay, sAccTaxPayPend, nPkTaxType);
@@ -1186,276 +1179,291 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return vTpSysMov;
     }
 
-    private int calculateDpsTaxes(java.sql.Connection connection, erp.mfin.data.SDataRecord oRecord, erp.mtrn.data.SDataDsmEntry oDsmEntry, int nTypeSource, int nSortPos, int nPkNumberId, int nDpsYearId, int nDpsDocId, java.lang.String sConcept) {
-        boolean bRefTax = false;
-        double dValueTax = 0;
-        double dValueTaxCur = 0;
-        int nPkTaxBasicId = 0;
-        int nPkTaxId = 0;
-        int nPkTaxType = 0;
-        int nPkTaxTypeApp = 0;
-        int nDpsCategory = SLibConsts.UNDEFINED;
-        Date tPkDateStartId = null;
-        Object oDpsBalance = null;
-        Object oDpsTaxBalance = null;
-        String sSql = "";
-        String sTaxAccountPayId = "";
-        String sTaxAccountPayPendId = "";
-        Vector<Object> vTpSysMov = new Vector<>();
-        int[] anTypeSystemMove = new int[] {0, 0};
-
-        Statement statementAux = null;
-        Statement statementAux1 = null;
-        ResultSet resultSet = null;
-        ResultSet resultSet1 = null;
-        SDataRecordEntry oRecordEntry = null;
+    private double[] getDpsBalance(java.sql.Connection connection, int dpsYearId, int dpsDocId, int[] sysMoveTypeKey) {
+        double balance = 0;
+        double balanceCur = 0;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            statementAux = connection.createStatement();
+            int nParam = 1;
+            CallableStatement callableStatement = connection.prepareCall("{ CALL trn_dps_bal_get(?, ?, ?, ?, ?, ?, ?) }");
+            callableStatement.setInt(nParam++, dpsYearId);
+            callableStatement.setInt(nParam++, dpsDocId);
+            callableStatement.setInt(nParam++, sysMoveTypeKey[0]);
+            callableStatement.setInt(nParam++, sysMoveTypeKey[1]);
+            callableStatement.registerOutParameter(nParam, java.sql.Types.DOUBLE); nParam++;
+            callableStatement.registerOutParameter(nParam, java.sql.Types.DOUBLE); nParam++;
+            callableStatement.registerOutParameter(nParam, java.sql.Types.INTEGER); nParam++;
+            callableStatement.execute();
 
-            // Get DPS category:
+            balance = callableStatement.getDouble(nParam - 3);
+            balanceCur = callableStatement.getDouble(nParam - 2);
+            
+            mnLastDbActionResult = SLibConstants.DB_PROCEDURE_OK;
+        }
+        catch (java.lang.Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_PROCEDURE_ERROR;
+            SLibUtilities.printOutException(this, e);
+        }
 
-            sSql = "SELECT fid_ct_dps FROM trn_dps WHERE id_year = " + nDpsYearId + " AND id_doc = " + nDpsDocId + " ";
-            resultSet = statementAux.executeQuery(sSql);
+        return new double[] { balance, balanceCur };
+    }
+
+    private double[] getTaxBalance(java.sql.Connection connection, int dpsCategoryId, int dpsYearId, int dpsDocId, int[] sysMoveTypeKey, int taxType, int taxBasicId, int taxId) throws Exception {
+        double balanceLoc = 0;
+        double balanceCur = 0;
+        
+        String fieldsLoc = "";
+        String fieldsCur = "";
+        
+        switch (dpsCategoryId) {
+            case SDataConstantsSys.TRNS_CT_DPS_PUR:
+                switch (taxType) {
+                    case SModSysConsts.FINS_TP_TAX_CHARGED: // same case as customer & tax withheld
+                        fieldsLoc = "re.debit - re.credit";
+                        fieldsCur = "re.debit_cur - re.credit_cur";
+                        break;
+                    case SModSysConsts.FINS_TP_TAX_RETAINED: // same case as customer & tax
+                        fieldsLoc = "re.credit - re.debit";
+                        fieldsCur = "re.credit_cur - re.debit_cur";
+                        break;
+                    default:
+                        // do nothing
+                }
+                break;
+                
+            case SDataConstantsSys.TRNS_CT_DPS_SAL:
+                switch (taxType) {
+                    case SModSysConsts.FINS_TP_TAX_CHARGED: // same case as supplier & tax withheld
+                        fieldsLoc = "re.credit - re.debit";
+                        fieldsCur = "re.credit_cur - re.debit_cur";
+                        break;
+                    case SModSysConsts.FINS_TP_TAX_RETAINED: // same case as supplier & tax
+                        fieldsLoc = "re.debit - re.credit";
+                        fieldsCur = "re.debit_cur - re.credit_cur";
+                        break;
+                    default:
+                        // do nothing
+                }
+                break;
+                
+            default:
+                // do nothing
+        }
+        
+        String sql = "SELECT SUM(" + fieldsLoc + ") AS _balance_loc, SUM(" + fieldsCur + ") AS _balance_cur "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
+                + "WHERE NOT r.b_del AND NOT re.b_del AND "
+                + "re.fid_dps_year_n = " + dpsYearId +  " AND re.fid_dps_doc_n = " + dpsDocId +  " AND "
+                + "re.fid_tax_bas_n = " + taxBasicId + " AND re.fid_tax_n = " + taxId + " AND "
+                + "re.fid_ct_sys_mov_xxx = " + sysMoveTypeKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeKey[1] + ";";
+
+        try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
             if (resultSet.next()) {
-                nDpsCategory = resultSet.getInt(1);
+                balanceLoc = resultSet.getDouble("_balance_loc");
+                balanceCur = resultSet.getDouble("_balance_cur");
             }
+        }
 
-            // Get type taxes for DPS document:
+        return new double[] { balanceLoc, balanceCur };
+    }
 
-            sSql = "SELECT tx.* " +
-                "FROM trn_dps_ety AS et " +
-                "INNER JOIN trn_dps_ety_tax AS tx ON et.id_year = tx.id_year AND et.id_doc = tx.id_doc AND et.id_ety = tx.id_ety AND " +
-                "et.b_del = FALSE " +
-                "WHERE tx.id_year = " + nDpsYearId + " AND " +
-                "tx.id_doc = " + nDpsDocId + " " +
-                "GROUP BY tx.id_tax_bas, tx.id_tax";
+    /**
+     * Compute payment of DPS taxes.
+     * @param connection
+     * @param record
+     * @param dsmEntry
+     * @param sourceType SDataConstants.TRNX_DSM_ETY_...
+     * @param sortPos
+     * @param numberId
+     * @param dpsYearId
+     * @param dpsDocId
+     * @param concept
+     * @return 
+     */
+    private int calculateDpsTaxes(java.sql.Connection connection, erp.mfin.data.SDataRecord record, erp.mtrn.data.SDataDsmEntry dsmEntry, int sourceType, int sortPos, int numberId, int dpsYearId, int dpsDocId, java.lang.String concept) {
+        SDataRecordEntry recordEntry = null;
 
-            resultSet = statementAux.executeQuery(sSql);
-            while (resultSet.next()) {
-                // Read type tax:
+        mnLastDbActionResult = SLibConstants.UNDEFINED;
 
-                nPkTaxType = resultSet.getInt("tx.fid_tp_tax");
-                nPkTaxBasicId = resultSet.getInt("tx.id_tax_bas");
-                nPkTaxId = resultSet.getInt("tx.id_tax");
-                nPkTaxTypeApp = resultSet.getInt("tx.fid_tp_tax_app");
-                tPkDateStartId = mtDate;
-                if (nPkTaxTypeApp == SModSysConsts.FINS_TP_TAX_APP_CASH) {
-                    // Check if reference has taxes:
+        try {
+            boolean isRefTax = false; // allways remains false, why?, no idea!
+            
+            try (Statement statement = connection.createStatement()) {
+                String sql;
+                ResultSet resultSet;
+                
+                // Get DPS category:
 
-                    if (bRefTax) {
-
-                        // Code for next version:
-
-                        //Read from table: TRN_ACC_TAX
-                        //Parameters: ID_TAX_BAS, ID_TAX, ID_TP_DOC, APPLICATION_DATE
-                        //Read account FID_ACC_PAY_PEND_ADV
-                        //Add to vector: vEntries
-                    }
-                    else {
-                        // Find account for debit and credit:
-
-                        statementAux1 = connection.createStatement();
-                        sSql = "SELECT a.*, t.per " +
-                            "FROM fin_acc_tax AS a " +
-                            "INNER JOIN erp.finu_tax AS t ON a.id_tax_bas = t.id_tax_bas AND a.id_tax = t.id_tax " +
-                            "WHERE a.b_del = FALSE AND " +
-                            "a.id_tax_bas = " + nPkTaxBasicId + " AND " +
-                            "a.id_tax = " + nPkTaxId + " AND " +
-                            "a.id_ct_dps = " + oDsmEntry.getDbmsFkDpsCategoryId() + " AND " +
-                            "a.id_dt_start <= '" + SLibUtils.DbmsDateFormatDate.format(tPkDateStartId) + "' " +
-                            "ORDER BY a.id_dt_start DESC ";
-
-                        resultSet1 = statementAux1.executeQuery(sSql);
-                        if (resultSet1.next()) {
-                            sTaxAccountPayId = resultSet1.getString("a.fid_acc_pay");
-                            sTaxAccountPayPendId = resultSet1.getString("a.fid_acc_pay_pend");
-                            //dPercentageTax = resultSet1.getDouble("t.per");
-
-                            // Get accountId for debit and credit, and systemMoveId (ct and tp):
-
-                            vTpSysMov = renderTaxAccDbtCdt(oDsmEntry, vTpSysMov,
-                                    new int [] { oDsmEntry.getFkAccountingMoveTypeId(), oDsmEntry.getFkAccountingMoveClassId(), oDsmEntry.getFkAccountingMoveSubclassId() },
-                                    (oDsmEntry.getFkSourceAccountId_n().length() > 0 ? oDsmEntry.getFkSourceAccountId_n() : oDsmEntry.getFkDestinyAccountId_n()),
-                                    sTaxAccountPayId, sTaxAccountPayPendId, "", nPkTaxType, nTypeSource);
-
-                            // Obtain tp_sys_mov_id (purchase, sales):
-
-                            if (oDsmEntry.getDbmsTpSysMovId() == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]) {
-
-                                if (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                                    anTypeSystemMove = (int[]) (Object) vTpSysMov.get(4);
-                                }
-                                else{
-                                    anTypeSystemMove = (int[]) (Object) vTpSysMov.get(1);
-                                }
-                            }
-                            else {
-                                if (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                                    anTypeSystemMove = (int[]) (Object) vTpSysMov.get(1);
-                                }
-                                else{
-                                    anTypeSystemMove = (int[]) (Object) vTpSysMov.get(4);
-                                }
-                            }
-                        }
-                    }
-
-                    // Get current balance of dps:
-
-                    oDpsBalance = calculateCurrentBalanceDps(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() });
-
-                    // If balance of Dps is 0 (zero), assign all tax balance:
-
-                    if ((((double [])oDpsBalance)[1]) == 0 || ((double [])oDpsBalance)[1] == oDsmEntry.getSourceValueCy())  {
-
-                        // Read the balance net of tax:
-
-                         oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId);
-
-                        // Read the current balance of tax:
-
-                        statementAux1 = connection.createStatement();
-
-                        sSql = "SELECT " + (oDsmEntry.getDbmsTpSysMovId() == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] ?
-                                ((nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.debit - fe.credit) AS balance, " : "SUM(fe.credit - fe.debit) AS balance, ") +
-                                (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.debit_cur - fe.credit_cur) AS balance_cur " : "SUM(fe.credit_cur - fe.debit_cur) AS balance_cur ")) :
-                                ((nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.credit - fe.debit) AS balance, " : "SUM(fe.debit - fe.credit) AS balance, ") +
-                                (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(fe.credit_cur - fe.debit_cur) AS balance_cur " : "SUM(fe.debit_cur - fe.credit_cur) AS balance_cur "))) +
-                                "FROM fin_rec AS f " +
-                                "INNER JOIN fin_rec_ety AS fe ON fe.id_year = f.id_year AND fe.id_per = f.id_per AND fe.id_bkc = f.id_bkc AND fe.id_tp_rec = f.id_tp_rec AND fe.id_num = f.id_num " +
-                                "WHERE f.b_del = FALSE AND fe.b_del = FALSE AND " +
-                                "fe.fid_bp_nr = " + oDsmEntry.getFkBizPartnerId() + " AND fe.fid_tax_bas_n = " + nPkTaxBasicId + " AND " +
-                                "fe.fid_tax_n = " + nPkTaxId + " AND fe.fid_dps_year_n = " + nDpsYearId +  " AND fe.fid_dps_doc_n = " + nDpsDocId +  " AND " +
-                                "fe.fid_ct_sys_mov_xxx = " + anTypeSystemMove[0] + " AND fe.fid_tp_sys_mov_xxx = " + anTypeSystemMove[1] + " ";
-                        resultSet1 = statementAux1.executeQuery(sSql);
-                        if (resultSet1.next()) {
-                            dValueTax = resultSet1.getDouble("balance");
-                            dValueTaxCur = resultSet1.getDouble("balance_cur");
-
-                            // Verify if 'dValueTax' is equal to 0 for calculate 'dValueTax' based in document taxes:
-
-                            if (dValueTax == 0) {
-                                // Read the balance net of tax:
-
-                                oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId);
-
-                                switch (mnDbmsTaxModel) {
-                                    case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
-                                        dValueTaxCur = SLibUtilities.round(((double [])oDpsTaxBalance)[1], mnDbmsErpDecimalsValue);
-                                        dValueTax = SLibUtilities.round(((double [])oDpsTaxBalance)[0], mnDbmsErpDecimalsValue);
-                                        break;
-                                    case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
-                                        dValueTaxCur = SLibUtilities.round(((double [])oDpsTaxBalance)[1], mnDbmsErpDecimalsValue);
-                                        dValueTax = SLibUtilities.round(dValueTaxCur * (nTypeSource == SDataConstants.TRNX_DSM_ETY_SOURCE ? oDsmEntry.getSourceExchangeRate() : oDsmEntry.getDestinyExchangeRate()), mnDbmsErpDecimalsValue);
-                                        break;
-                                    default:
-                                        dValueTaxCur = 0;
-                                        dValueTax = 0;
-                                }
-                            }
-                            else {
-                                switch (mnDbmsTaxModel) {
-                                    case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
-                                        dValueTax = SLibUtilities.round(dValueTaxCur * (nTypeSource == SDataConstants.TRNX_DSM_ETY_SOURCE ? oDsmEntry.getSourceExchangeRate() : oDsmEntry.getDestinyExchangeRate()), mnDbmsErpDecimalsValue);
-                                        break;
-                                    case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
-                                        break;
-                                    default:
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        // Read the balance net of DPS:
-
-                        oDpsBalance = calculateDpsBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] {oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId()},
-                            oDsmEntry.getFkBizPartnerId(), (oDsmEntry.getDbmsFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS),
-                            null);
-
-                        // Read the balance net of tax:
-                        oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId);
-
-                        // Check if apply all balance when quantity cur is equal to balance_cur:
-
-                        if ((((double [])oDpsBalance)[1]) == oDsmEntry.getSourceValueCy()) {
-                            switch (mnDbmsTaxModel) {
-                                case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
-                                    dValueTaxCur = SLibUtilities.round(((double [])oDpsTaxBalance)[1], mnDbmsErpDecimalsValue);
-                                    dValueTax = SLibUtilities.round(((double [])oDpsTaxBalance)[0], mnDbmsErpDecimalsValue);
-                                    break;
-                                case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
-                                    dValueTaxCur = SLibUtilities.round(((double [])oDpsTaxBalance)[1], mnDbmsErpDecimalsValue);
-                                    dValueTax = SLibUtilities.round(dValueTaxCur * (nTypeSource == SDataConstants.TRNX_DSM_ETY_SOURCE ? oDsmEntry.getSourceExchangeRate() : oDsmEntry.getDestinyExchangeRate()), mnDbmsErpDecimalsValue);
-                                    break;
-                                default:
-                                    dValueTaxCur = 0;
-                                    dValueTax = 0;
-                            }
+                int dpsCategory = SLibConsts.UNDEFINED;
+                
+                sql = "SELECT fid_ct_dps " +
+                        "FROM trn_dps " +
+                        "WHERE id_year = " + dpsYearId + " AND id_doc = " + dpsDocId + ";";
+                
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    dpsCategory = resultSet.getInt(1);
+                }
+                resultSet.close();
+                
+                // Get type taxes for DPS document:
+                
+                sql = "SELECT DISTINCT det.id_tax_bas, det.id_tax, det.fid_tp_tax, det.fid_tp_tax_app " +
+                        "FROM trn_dps_ety AS de " +
+                        "INNER JOIN trn_dps_ety_tax AS det ON det.id_year = de.id_year AND det.id_doc = de.id_doc AND det.id_ety = de.id_ety " +
+                        "WHERE det.id_year = " + dpsYearId + " AND det.id_doc = " + dpsDocId + " AND NOT de.b_del " +
+                        "ORDER BY det.id_tax_bas, det.id_tax;";
+                
+                resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    // Read type tax:
+                    
+                    int taxType = resultSet.getInt("det.fid_tp_tax");
+                    int taxTypeApp = resultSet.getInt("det.fid_tp_tax_app");
+                    int taxBasicId = resultSet.getInt("det.id_tax_bas");
+                    int taxId = resultSet.getInt("det.id_tax");
+                    int[] sysMoveTypeKeyDps = new int[] { dsmEntry.getDbmsCtSysMovId(), dsmEntry.getDbmsTpSysMovId() };
+                    int[] sysMoveTypeKeyTax = null;
+                    Vector<Object> sysMoveTypeKeys = new Vector<>();
+                    
+                    if (taxTypeApp == SModSysConsts.FINS_TP_TAX_APP_CASH) {
+                        // Check if reference has taxes:
+                        
+                        if (isRefTax) {
+                            // Code for next version:
+                            
+                            //Read from table: TRN_ACC_TAX
+                            //Parameters: ID_TAX_BAS, ID_TAX, ID_TP_DOC, APPLICATION_DATE
+                            //Read account FID_ACC_PAY_PEND_ADV
+                            //Add to vector: vEntries
                         }
                         else {
-                            if (((double [])oDpsBalance)[1] > 0) {
+                            // Find account for debit and credit:
+                            
+                            try (Statement statementAux = connection.createStatement()) {
+                                sql = "SELECT a.id_dt_start, a.fid_acc_pay, a.fid_acc_pay_pend, t.per " +
+                                        "FROM fin_acc_tax AS a " +
+                                        "INNER JOIN erp.finu_tax AS t ON a.id_tax_bas = t.id_tax_bas AND a.id_tax = t.id_tax " +
+                                        "WHERE NOT a.b_del AND " +
+                                        "a.id_tax_bas = " + taxBasicId + " AND " +
+                                        "a.id_tax = " + taxId + " AND " +
+                                        "a.id_ct_dps = " + dsmEntry.getDbmsFkDpsCategoryId() + " AND " +
+                                        "a.id_dt_start <= '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' " +
+                                        "ORDER BY a.id_dt_start DESC;";
 
-                                if (nTypeSource == SDataConstants.TRNX_DSM_ETY_SOURCE) {
-                                    switch (mnDbmsTaxModel) {
-                                        case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
-                                            dValueTaxCur = SLibUtilities.round(((((double []) oDpsTaxBalance)[1]/((double [])oDpsBalance)[1])*oDsmEntry.getSourceValueCy()), mnDbmsErpDecimalsValue);
-                                            dValueTax = SLibUtilities.round(((((double []) oDpsTaxBalance)[0]/((double [])oDpsBalance)[0])*oDsmEntry.getSourceValue()), mnDbmsErpDecimalsValue);
-                                            break;
-                                        case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
-                                            dValueTaxCur = SLibUtilities.round(((((double []) oDpsTaxBalance)[1]/((double [])oDpsBalance)[1])*oDsmEntry.getSourceValueCy()), mnDbmsErpDecimalsValue);
-                                            dValueTax = SLibUtilities.round(dValueTaxCur * oDsmEntry.getSourceExchangeRate(), mnDbmsErpDecimalsValue);
-                                            break;
-                                        default:
-                                            dValueTaxCur = 0;
-                                            dValueTax = 0;
+                                ResultSet resultSetAux = statementAux.executeQuery(sql);
+                                if (resultSetAux.next()) {
+                                    String accountPayId = resultSetAux.getString("a.fid_acc_pay");
+                                    String accountPayPendId = resultSetAux.getString("a.fid_acc_pay_pend");
+                                    //dPercentageTax = resultSet1.getDouble("t.per");
+
+                                    // Get accountId for debit and credit, and systemMoveId (ct and tp):
+
+                                    sysMoveTypeKeys = renderTaxAccDbtCdt(sysMoveTypeKeys,
+                                            new int[] { dsmEntry.getFkAccountingMoveTypeId(), dsmEntry.getFkAccountingMoveClassId(), dsmEntry.getFkAccountingMoveSubclassId() },
+                                            accountPayId, accountPayPendId, "", taxType, sourceType);
+
+                                    // Obtain tp_sys_mov_id (purchase, sales):
+
+                                    if (dsmEntry.getDbmsTpSysMovId() == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]) {
+                                        // is supplier:
+                                        if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(4);
+                                        }
+                                        else{
+                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(1);
+                                        }
                                     }
-                                }
-                                else {
-                                    switch (mnDbmsTaxModel) {
-                                        case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
-                                            dValueTaxCur = SLibUtilities.round(((((double []) oDpsTaxBalance)[1]/((double [])oDpsBalance)[1])*oDsmEntry.getDestinyValueCy()), mnDbmsErpDecimalsValue);
-                                            dValueTax = SLibUtilities.round(((((double []) oDpsTaxBalance)[0]/((double [])oDpsBalance)[0])*oDsmEntry.getDestinyValue()), mnDbmsErpDecimalsValue);
-                                            break;
-                                        case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
-                                            dValueTaxCur = SLibUtilities.round(((((double []) oDpsTaxBalance)[1]/((double [])oDpsBalance)[1])*oDsmEntry.getDestinyValueCy()), mnDbmsErpDecimalsValue);
-                                            dValueTax = SLibUtilities.round(dValueTaxCur * oDsmEntry.getDestinyExchangeRate(), mnDbmsErpDecimalsValue);
-                                            break;
-                                        default:
-                                            dValueTaxCur = 0;
-                                            dValueTax = 0;
+                                    else {
+                                        // is customer:
+                                        if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(1);
+                                        }
+                                        else{
+                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(4);
+                                        }
                                     }
-                                }
 
-                                // Check that 'dValueTax' and 'dValueTaxCur' is less or equal that 'oDpsTaxBalance[]':
+                                    // Get current balance of DPS:
 
-                                switch (mnDbmsTaxModel) {
-                                    case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
-                                        if (dValueTax > ((double [])oDpsTaxBalance)[0]) {
-                                            dValueTax = SLibUtilities.round(((double [])oDpsTaxBalance)[0], mnDbmsErpDecimalsValue);
+                                    double valueTaxLoc = 0;
+                                    double valueTaxCur = 0;
+                                    double[] dpsBalance = getDpsBalance(connection, dpsYearId, dpsDocId, sysMoveTypeKeyDps);
+                                    double[] taxBalance = getTaxBalance(connection, dpsCategory, dpsYearId, dpsDocId, sysMoveTypeKeyTax, taxType, taxBasicId, taxId);
+
+                                    if (dpsBalance[1] == 0 || dpsBalance[1] == dsmEntry.getSourceValueCy()) {
+                                        // account all tax balance:
+
+                                        valueTaxCur = SLibUtils.roundAmount(taxBalance[1]);
+
+                                        if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC) {
+                                            valueTaxLoc = SLibUtils.roundAmount(valueTaxCur * (sourceType == SDataConstants.TRNX_DSM_ETY_SOURCE ? dsmEntry.getSourceExchangeRate() : dsmEntry.getDestinyExchangeRate()));
+                                        }
+                                        else {
+                                            valueTaxLoc = SLibUtils.roundAmount(taxBalance[0]);
+                                        }
+                                    }
+                                    else if (dpsBalance[1] > 0) {
+                                        // account proportional tax balance:
+
+                                        switch (sourceType) {
+                                            case SDataConstants.TRNX_DSM_ETY_SOURCE:
+                                                valueTaxCur = SLibUtils.roundAmount(((taxBalance[1] / dpsBalance[1]) * dsmEntry.getSourceValueCy()));
+
+                                                if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC) {
+                                                    valueTaxLoc = SLibUtils.roundAmount(valueTaxCur * dsmEntry.getSourceExchangeRate());
+                                                }
+                                                else {
+                                                    valueTaxLoc = SLibUtils.roundAmount(((taxBalance[0] / dpsBalance[0]) * dsmEntry.getSourceValue()));
+                                                }
+                                                break;
+
+                                            case SDataConstants.TRNX_DSM_ETY_DESTINY:
+                                                valueTaxCur = SLibUtils.roundAmount(((taxBalance[1] / dpsBalance[1]) * dsmEntry.getDestinyValueCy()));
+
+                                                if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC) {
+                                                    valueTaxLoc = SLibUtils.roundAmount(valueTaxCur * dsmEntry.getDestinyExchangeRate());
+                                                }
+                                                else {
+                                                    valueTaxLoc = SLibUtils.roundAmount(((taxBalance[0] / dpsBalance[0]) * dsmEntry.getDestinyValue()));
+                                                }
+                                                break;
+
+                                            default:
+                                                // do nothing
                                         }
 
-                                        if (dValueTaxCur > ((double [])oDpsTaxBalance)[1]) {
-                                            dValueTaxCur = SLibUtilities.round(((double [])oDpsTaxBalance)[1], mnDbmsErpDecimalsValue);
+                                        // validate tax to be accounted:
+
+                                        switch (mnDbmsTaxModel) {
+                                            case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
+                                                if (valueTaxCur > taxBalance[1]) {
+                                                    valueTaxCur = SLibUtils.roundAmount(taxBalance[1]);
+                                                }
+
+                                                if (valueTaxLoc > taxBalance[0]) {
+                                                    valueTaxLoc = SLibUtils.roundAmount(taxBalance[0]);
+                                                }
+                                                break;
+
+                                            case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
+                                                // do nothing
+                                                break;
+
+                                            default:
+                                                // do nothing
                                         }
-                                        break;
-                                    case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
-                                    default:
-                                        break;
+                                    }
+                                    
+                                    sortPos = saveRecordEntriesTaxes(connection, record, recordEntry, dsmEntry, numberId, concept, dpsYearId, dpsDocId, dpsCategory, sortPos, sysMoveTypeKeys, taxBasicId, taxId, valueTaxLoc, valueTaxCur, sourceType);
                                 }
-                            }
-                            else {
-                                dValueTax = 0;
-                                dValueTaxCur = 0;
                             }
                         }
+                        
                     }
-
-                    // Save record entry taxes:
-
-                    nSortPos = saveRecordEntriesTaxes(connection, oRecord, oRecordEntry, oDsmEntry, nPkNumberId, sConcept, nDpsYearId, nDpsDocId, nDpsCategory, nSortPos, vTpSysMov, nPkTaxBasicId, nPkTaxId, dValueTax, dValueTaxCur, nTypeSource);
                 }
             }
 
@@ -1466,167 +1474,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             SLibUtilities.printOutException(this, e);
         }
 
-        return nSortPos;
-    }
-
-    private java.lang.Object calculateDpsBalanceNet(java.sql.Connection connection, int nDpsYearId, int nDpsDocId, int[] nTpSysMovId, int nBizPartnerId, int nCtBpId, int taxPk[]) {
-        double dDpsBalanceNet = 0.0;
-        double dDpsBalanceCurNet = 0.0;
-        String sSql = "";
-
-        Statement statementAux = null;
-        ResultSet resultSet = null;
-        
-        // Si esto pasa significa que hay una configuración disponible y por ende se obtiene el balance correspondiente al impuesto:
-        
-        if (taxPk != null) {
-            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(connection, 
-                    nDpsYearId, nDpsDocId, 
-                    nTpSysMovId[0], nTpSysMovId[1], 
-                    null);
-            
-            for (SFinBalanceTax balance : balances) {
-                if (balance.getTaxKey()[0] == taxPk[0] && balance.getTaxKey()[1] == taxPk[1]) {
-                    return new double[] { balance.getBalance(), balance.getBalanceCurrency() };
-                }
-            }
-        }
-
-        try {
-            statementAux = connection.createStatement();
-
-            sSql = "SELECT " +
-                "d.tot_cur_r - COALESCE((" +
-                    "SELECT SUM(dda.val_cur) FROM trn_dps_dps_adj AS dda " +
-                    "WHERE dda.id_dps_year = d.id_year AND dda.id_dps_doc = d.id_doc), 0) AS f_tot_net_cur, " +
-                "d.tot_r - COALESCE((" +
-                    "SELECT SUM(dda.val) FROM trn_dps_dps_adj AS dda " +
-                    "WHERE dda.id_dps_year = d.id_year AND dda.id_dps_doc = d.id_doc), 0) AS f_tot_net, d.fid_cur " +
-                "FROM fin_rec AS r " +
-                "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND " +
-                "r.id_num = re.id_num AND r.b_del = FALSE AND re.b_del = FALSE AND re.fid_ct_sys_mov_xxx = " + nTpSysMovId[0] + " AND re.fid_tp_sys_mov_xxx =  " + nTpSysMovId[1] + " AND " +
-                "re.fid_dps_year_n = " + nDpsYearId + " AND re.fid_dps_doc_n = " + nDpsDocId + " AND re.fid_bp_nr = " + nBizPartnerId + " " +
-                "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
-                "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + nCtBpId + " " +
-                "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " +
-                "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                    "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
-                    "GROUP BY d.fid_cur ";
-
-            resultSet = statementAux.executeQuery(sSql);
-            
-            if (resultSet.next()) {
-                dDpsBalanceNet = resultSet.getDouble("f_tot_net");
-                dDpsBalanceCurNet = resultSet.getDouble("f_tot_net_cur");
-            }
-            
-            statementAux.close();
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
-
-        return new double[] { dDpsBalanceNet, dDpsBalanceCurNet };
-    }
-
-    private java.lang.Object calculateDpsTaxBalanceNet(java.sql.Connection connection, int nDpsYearId, int nDpsDocId, int[] anSysMoveKey, int nBizPartnerId, int nPkTaxType, int nPkTaxBasicId, int nPkTaxId) {
-        double dTaxBalance = 0.0;
-        double dTaxBalanceCur = 0.0;
-        String sSql = "";
-        String sSqlTax = "";
-        
-        try {
-            String sSumTax = "SELECT " + (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(et1.tax_charged_r) " : "SUM(et1.tax_retained_r) ") + " AS balance_adj ";
-            String sSumTaxCur = "SELECT " + (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(et1.tax_charged_cur_r) " : "SUM(et1.tax_retained_cur_r) ") + " AS balance_cur_adj ";
-        
-            java.sql.Statement statementAux = null;
-            ResultSet resultSet = null;
-
-            sSqlTax = "FROM trn_dps AS d " +
-                "INNER JOIN trn_dps_ety AS et ON et.b_del = FALSE AND d.id_year = et.id_year AND d.id_doc = et.id_doc AND d.id_year = " + nDpsYearId + " AND d.id_doc = " + nDpsDocId + " AND " +
-                "d.b_del = FALSE AND d.fid_bp_r = " + nBizPartnerId + " " +
-                "INNER JOIN trn_dps_dps_adj AS ad ON et.id_year = ad.id_dps_year AND et.id_doc = ad.id_dps_doc AND et.id_ety = ad.id_dps_ety " +
-                "INNER JOIN trn_dps_ety AS et1 ON et1.b_del = FALSE AND ad.id_adj_year = et1.id_year AND ad.id_adj_doc = et1.id_doc AND ad.id_adj_ety = et1.id_ety " +
-                "INNER JOIN trn_dps AS d1 ON d1.b_del = FALSE AND et1.id_year = d1.id_year AND et1.id_doc = d1.id_doc AND d1.fid_ct_dps = " + renderTypeDps(anSysMoveKey, 0) + " AND " +
-                "d1.fid_cl_dps = " + renderTypeDps(anSysMoveKey, 1) + " AND d1.fid_tp_dps =  " + renderTypeDps(anSysMoveKey, 2) + " " +
-                "INNER JOIN trn_dps_ety_tax AS tax ON et.id_year = tax.id_year AND et.id_doc = tax.id_doc AND et.id_ety = tax.id_ety AND et.b_del = FALSE AND " +
-                "tax.id_tax_bas = " + nPkTaxBasicId + " AND tax.id_tax = " + nPkTaxId + " ";
-
-            statementAux = connection.createStatement();
-            sSql = "SELECT SUM(tax.tax) - (COALESCE((" + sSumTax + sSqlTax + "), 0)) AS balance, " +
-                "SUM(tax.tax_cur) - (COALESCE((" + sSumTaxCur + sSqlTax + "), 0)) AS balance_cur " +
-                "FROM trn_dps AS dps " +
-                "INNER JOIN trn_dps_ety AS et ON " +
-                "dps.id_year = et.id_year AND dps.id_doc = et.id_doc " +
-                "INNER JOIN trn_dps_ety_tax AS tax ON et.id_year = tax.id_year AND et.id_doc = tax.id_doc AND et.id_ety = tax.id_ety AND et.b_del = FALSE " +
-                "WHERE dps.b_del = FALSE AND " +
-                "dps.id_year = " + nDpsYearId + " AND dps.id_doc = " + nDpsDocId + " AND " +
-                "dps.fid_bp_r = " + nBizPartnerId + " AND " +
-                "tax.id_tax_bas = " + nPkTaxBasicId + " AND tax.id_tax = " + nPkTaxId + " ";
-
-            //System.out.println("sSql: " + sSql);
-
-            resultSet = statementAux.executeQuery(sSql);
-
-            if (resultSet.next()) {
-                dTaxBalance = resultSet.getDouble("balance");
-                dTaxBalanceCur = resultSet.getDouble("balance_cur");
-            }
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
-
-        return new double[] { dTaxBalance, dTaxBalanceCur };
-    }
-
-    private java.lang.Object calculateCurrentBalanceDps(java.sql.Connection connection, int nDpsYearId, int nDpsDocId, int[] nTpSysMovId) {
-        double dBalance = 0;
-        double dBalanceCur = 0;
-        int nParam = 1;
-        java.sql.CallableStatement callableStatement = null;
-
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
-
-        try {
-            callableStatement = connection.prepareCall("{ CALL trn_dps_bal_get(?, ?, ?, ?, ?, ?, ?) }");
-            callableStatement.setInt(nParam++, nDpsYearId);
-            callableStatement.setInt(nParam++, nDpsDocId);
-            callableStatement.setInt(nParam++, nTpSysMovId[0]);
-            callableStatement.setInt(nParam++, nTpSysMovId[1]);
-            callableStatement.registerOutParameter(nParam, java.sql.Types.DOUBLE); nParam++;
-            callableStatement.registerOutParameter(nParam, java.sql.Types.DOUBLE); nParam++;
-            callableStatement.registerOutParameter(nParam, java.sql.Types.INTEGER); nParam++;
-            callableStatement.execute();
-
-            dBalance = callableStatement.getDouble(nParam - 3);
-            dBalanceCur = callableStatement.getDouble(nParam - 2);
-
-            mnLastDbActionResult = SLibConstants.DB_PROCEDURE_OK;
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_PROCEDURE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
-
-        return new double[] { dBalance, dBalanceCur };
-    }
-
-    private int renderTypeDps(int[] anSysMoveKey, int pos) {
-        int type = 0;
-
-        if (SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP) ||
-                SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR)) {
-            type = SDataConstantsSys.TRNU_TP_DPS_PUR_CN[pos];
-        }
-        else if (SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS) ||
-                SLibUtilities.compareKeys(anSysMoveKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR)) {
-            type = SDataConstantsSys.TRNU_TP_DPS_SAL_CN[pos];
-        }
-
-        return type;
+        return sortPos;
     }
 
     private boolean deleteRecord(java.lang.Object recordKey, boolean deleteEverything, java.sql.Connection connection) throws java.lang.Exception {

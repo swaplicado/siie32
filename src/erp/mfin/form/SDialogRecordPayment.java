@@ -1149,14 +1149,15 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             dTotalBalanceCur = SLibUtils.roundAmount(dTotalBalanceCur + balance.getBalanceCurrency());
         }
         
-        HashMap<String, double[]> taxBalances = new HashMap<>();
         String tax;
         double perc;
         double percCur;
         double amtToPay = 0;
         double amtToPayCur = 0;
-        int[] taxMax = new int[]{ 0, 0 };
-        double amtMaj = 0d;
+        int[] taxMax = new int[] { 0, 0 };
+        double amtMax = 0d;
+        HashMap<String, double[]> taxBalances = new HashMap<>();
+        
         for (SFinBalanceTax balance : balances) {
             tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
             perc = balance.getBalance() / dTotalBalance;
@@ -1167,8 +1168,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             amtToPay += SLibUtilities.round(moFieldDpsValue.getDouble() * perc, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
             amtToPayCur += SLibUtilities.round(moFieldDpsValueCy.getDouble() * percCur, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
             
-            if (balance.getBalanceCurrency() > amtMaj) {
-                amtMaj = balance.getBalanceCurrency();
+            if (balance.getBalanceCurrency() > amtMax) {
+                amtMax = balance.getBalanceCurrency();
                 taxMax = new int[] { balance.getTaxBasicId(), balance.getTaxId() };
             }
         }
@@ -1260,6 +1261,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             case SDataConstantsSys.BPSS_CT_BP_CUS:
                 oDsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_CUS);
                 break;
+            default:
+                // do nothing
         }
 
         idBranch = moParamRecord.getFkCompanyBranchId_n() != SLibConsts.UNDEFINED ? moParamRecord.getFkCompanyBranchId_n() : moParamRecord.getFkCompanyBranchId();
