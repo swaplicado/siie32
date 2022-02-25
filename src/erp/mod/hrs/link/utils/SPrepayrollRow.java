@@ -78,4 +78,13 @@ public class SPrepayrollRow {
         
         return daysOff;
     }
+    
+    public int getHolidays() {
+        int holidays = 0;
+        for (SDay day : days) {
+            holidays += day.getHoliday_id();
+        }
+        
+        return holidays;
+    }
 }

@@ -228,6 +228,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 row.setOvertime(ppRow.getDouble_overtime());
                 row.setSundays(ppRow.getSundays());
                 row.setDaysOff(ppRow.getDaysOff());
+                row.setHolidays(ppRow.getHolidays());
                 
                 rows.add(row);
                 lGridRows.add(row);
