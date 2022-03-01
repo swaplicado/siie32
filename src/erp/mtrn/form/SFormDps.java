@@ -8449,39 +8449,43 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             else if (!moBizPartner.getFiscalId().equals(moComprobante33.getEltEmisor().getAttRfc().getString())) {
                 validation.setMessage(message + "el RFC del emisor, '" + moComprobante33.getEltEmisor().getAttRfc().getString() + "', no corresponde al RFC del asociado de negocios seleccionado, '" + moBizPartner.getFiscalId() + "'.");
             }
-            else if (SCfdUtils.getCfdIdByUuid(miClient, msXmlUuid) != (moDps.getDbmsDataCfd() == null ? 0 : moDps.getDbmsDataCfd().getPkCfdId())) {
-                validation.setMessage(message + "su UUID, '" + msXmlUuid + "', ya existe en la base de datos.");
-            }
             else {
-                if (!moComprobante33.getAttSerie().getString().isEmpty()) {
-                    String xmlSeriesTrimmed = SLibUtils.textLeft(moComprobante33.getAttSerie().getString(), SDataDps.LEN_SERIES).trim();
-                    
-                    if (!xmlSeriesTrimmed.equals(jcbNumberSeries.getSelectedItem().toString())) {
-                        String errorMessage = message + "su serie '" + moComprobante33.getAttSerie().getString() + "'"
-                                + (xmlSeriesTrimmed.length() == moComprobante33.getAttSerie().getString().length() ? "" :
-                                        ",\najustada a " + SDataDps.LEN_SERIES + " caracteres para su comparación, sin espacios iniciales ni finales, como '" + xmlSeriesTrimmed + "',")
-                                + "\nno coincide con el valor de la serie capturada '" + jcbNumberSeries.getSelectedItem().toString() + "'.";
-                        
-                        if (miClient.showMsgBoxConfirm(errorMessage + "\n¿Está seguro que desea dejar así la serie sin corregir esta diferencia?") != JOptionPane.YES_OPTION) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'serie', p. ej., '" + xmlSeriesTrimmed + "'.");
+                int cfdId = SCfdUtils.getCfdIdByUuid(miClient, msXmlUuid);
+                
+                if (cfdId != 0 && moDps.getDbmsDataCfd() != null && cfdId != moDps.getDbmsDataCfd().getPkCfdId()) {
+                    validation.setMessage(message + "su UUID, '" + msXmlUuid + "', ya existe en la base de datos.");
+                }
+                else {
+                    if (!moComprobante33.getAttSerie().getString().isEmpty()) {
+                        String xmlSeriesTrimmed = SLibUtils.textLeft(moComprobante33.getAttSerie().getString(), SDataDps.LEN_SERIES).trim();
+
+                        if (!xmlSeriesTrimmed.equals(jcbNumberSeries.getSelectedItem().toString())) {
+                            String errorMessage = message + "su serie '" + moComprobante33.getAttSerie().getString() + "'"
+                                    + (xmlSeriesTrimmed.length() == moComprobante33.getAttSerie().getString().length() ? "" :
+                                            ",\najustada a " + SDataDps.LEN_SERIES + " caracteres para su comparación, sin espacios iniciales ni finales, como '" + xmlSeriesTrimmed + "',")
+                                    + "\nno coincide con el valor de la serie capturada '" + jcbNumberSeries.getSelectedItem().toString() + "'.";
+
+                            if (miClient.showMsgBoxConfirm(errorMessage + "\n¿Está seguro que desea dejar así la serie sin corregir esta diferencia?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'serie', p. ej., '" + xmlSeriesTrimmed + "'.");
+                            }
                         }
                     }
-                }
-                
-                if (!validation.getIsError()) {
-                    if (!moComprobante33.getAttFolio().getString().isEmpty()) {
-                        String[] dpsFolio = jtfNumber.getText().split("-"); // a hyphen can be used to differentiate the number of another existing document when needed
-                        String xmlFolioTrimmed = SLibUtils.textLeft(moComprobante33.getAttFolio().getString(), SDataDps.LEN_NUMBER).trim();
-                        
-                        if (!xmlFolioTrimmed.equals(dpsFolio[0])) {
-                            String errorMessage = message + "su folio '" + moComprobante33.getAttFolio().getString() + "'"
-                                    + (xmlFolioTrimmed.length() == moComprobante33.getAttFolio().getString().length() ? "" :
-                                            ",\najustado a " + SDataDps.LEN_NUMBER + " caracteres para su comparación, sin espacios iniciales ni finales, como '" + xmlFolioTrimmed + "'" + (dpsFolio.length == 1 ? "," : ""))
-                                    + (dpsFolio.length == 1 ? "" : ",\ndescartando el texto diferenciador '" + dpsFolio[1] + "',")
-                                    + "\nno coincide con el valor del folio capturado '" + dpsFolio[0] + "'.";
-                            
-                            if (miClient.showMsgBoxConfirm(errorMessage + "\n¿Está seguro que desea dejar así el folio sin corregir esta diferencia?") != JOptionPane.YES_OPTION) {
-                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'folio', p. ej., '" + xmlFolioTrimmed + "'.");
+
+                    if (!validation.getIsError()) {
+                        if (!moComprobante33.getAttFolio().getString().isEmpty()) {
+                            String[] dpsFolio = jtfNumber.getText().split("-"); // a hyphen can be used to differentiate the number of another existing document when needed
+                            String xmlFolioTrimmed = SLibUtils.textLeft(moComprobante33.getAttFolio().getString(), SDataDps.LEN_NUMBER).trim();
+
+                            if (!xmlFolioTrimmed.equals(dpsFolio[0])) {
+                                String errorMessage = message + "su folio '" + moComprobante33.getAttFolio().getString() + "'"
+                                        + (xmlFolioTrimmed.length() == moComprobante33.getAttFolio().getString().length() ? "" :
+                                                ",\najustado a " + SDataDps.LEN_NUMBER + " caracteres para su comparación, sin espacios iniciales ni finales, como '" + xmlFolioTrimmed + "'" + (dpsFolio.length == 1 ? "," : ""))
+                                        + (dpsFolio.length == 1 ? "" : ",\ndescartando el texto diferenciador '" + dpsFolio[1] + "',")
+                                        + "\nno coincide con el valor del folio capturado '" + dpsFolio[0] + "'.";
+
+                                if (miClient.showMsgBoxConfirm(errorMessage + "\n¿Está seguro que desea dejar así el folio sin corregir esta diferencia?") != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'folio', p. ej., '" + xmlFolioTrimmed + "'.");
+                                }
                             }
                         }
                     }
@@ -10111,7 +10115,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (readRecordUser(moDps.getDbmsRecordKey())) {
                     moRecordUserKey = moDps.getDbmsRecordKey();
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -10762,7 +10767,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             catch (SQLException se) {
                 SLibUtilities.renderException(this, se);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

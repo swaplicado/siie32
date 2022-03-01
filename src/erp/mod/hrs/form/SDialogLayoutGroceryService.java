@@ -458,32 +458,38 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
     
     @SuppressWarnings("unchecked")
     private void computeReceipts() {
+        if (!moPayroll.isClosed()) {
+            miClient.showMsgBoxWarning("¡La nómina '" + moPayroll.getName() + "' no está cerrada!");
+        }
+        
         moEmployeesMap = new HashMap<>();
         
         HashMap<Integer, GroceryService> groceryServicesMap = new HashMap<>();
         GroceryService groceryServiceGlobal = new GroceryService(0, "");
         
         for (SDbPayrollReceipt payrollReceipt : moPayroll.getChildPayrollReceipts()) {
-            SDbEmployee employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { payrollReceipt.getPkEmployeeId() });
-            
-            // get current grocery service:
-            
-            GroceryService groceryService = groceryServicesMap.get(employee.getFkGroceryServiceId());
-            
-            if (groceryService == null) {
-                groceryService = new GroceryService(employee.getFkGroceryServiceId(), (String) miClient.getSession().readField(SModConsts.HRSS_GROCERY_SRV, new int[] { employee.getFkGroceryServiceId() }, SDbRegistry.FIELD_NAME));
-                groceryServicesMap.put(employee.getFkGroceryServiceId(), groceryService);
+            if (!payrollReceipt.isDeleted()) {
+                SDbEmployee employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { payrollReceipt.getPkEmployeeId() });
+
+                // get current grocery service:
+
+                GroceryService groceryService = groceryServicesMap.get(employee.getFkGroceryServiceId());
+
+                if (groceryService == null) {
+                    groceryService = new GroceryService(employee.getFkGroceryServiceId(), (String) miClient.getSession().readField(SModConsts.HRSS_GROCERY_SRV, new int[] { employee.getFkGroceryServiceId() }, SDbRegistry.FIELD_NAME));
+                    groceryServicesMap.put(employee.getFkGroceryServiceId(), groceryService);
+                }
+
+                // compute current grocery service:
+                groceryService.addReceipt(employee.getGroceryServiceAccount(), payrollReceipt.getPayment_r());
+
+                // compute global grocery service:
+                groceryServiceGlobal.addReceipt(employee.getGroceryServiceAccount(), payrollReceipt.getPayment_r());
+
+                // preserve employees:
+
+                moEmployeesMap.put(employee.getPkEmployeeId(), employee);
             }
-            
-            // compute current grocery service:
-            groceryService.addReceipt(employee.getGroceryServiceAccount(), payrollReceipt.getPayment_r());
-            
-            // compute global grocery service:
-            groceryServiceGlobal.addReceipt(employee.getGroceryServiceAccount(), payrollReceipt.getPayment_r());
-            
-            // preserve employees:
-            
-            moEmployeesMap.put(employee.getPkEmployeeId(), employee);
         }
         
         // populate combo box of grocery services:
@@ -565,12 +571,14 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
             
             if (groceryService.getId() != SModSysConsts.HRSS_GROCERY_SRV_NON) {
                 for (SDbPayrollReceipt payrollReceipt : moPayroll.getChildPayrollReceipts()) {
-                    SDbEmployee employee = moEmployeesMap.get(payrollReceipt.getPkEmployeeId());
-                    if (employee.getFkGroceryServiceId() == groceryService.getId()) {
-                        Receipt receipt = new Receipt(new int[] { employee.getPkEmployeeId() }, employee.getNumber(), employee.getXtaEmployeeName());
-                        receipt.setAccount(employee.getGroceryServiceAccount());
-                        receipt.setAmount(payrollReceipt.getPayment_r());
-                        rows.add(receipt);
+                    if (!payrollReceipt.isDeleted()) {
+                        SDbEmployee employee = moEmployeesMap.get(payrollReceipt.getPkEmployeeId());
+                        if (employee.getFkGroceryServiceId() == groceryService.getId()) {
+                            Receipt receipt = new Receipt(new int[] { employee.getPkEmployeeId() }, employee.getNumber(), employee.getXtaEmployeeName());
+                            receipt.setAccount(employee.getGroceryServiceAccount());
+                            receipt.setAmount(payrollReceipt.getPayment_r());
+                            rows.add(receipt);
+                        }
                     }
                 }
             }
@@ -583,7 +591,7 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
             else {
                 moRadCopyWithAccount.setEnabled(true);
                 moRadCopyAll.setEnabled(true);
-                jbCopyToClipboard.setEnabled(true);
+                jbCopyToClipboard.setEnabled(moPayroll.isClosed());
             }
         }
         

@@ -219,7 +219,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             if (!validation.getIsError()) {
                 cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
                 if (tfd != null) {
-                    if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0){
+                    if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0) {
                         validation.setMessage("El UUID del documento ya existe en la base de datos.");
                     }
                 }
@@ -241,7 +241,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                             }
                         }
                     }
-                    catch (Exception e){
+                    catch (Exception e) {
                         SLibUtils.printException(this, e);
                     }
                     if (moPurchaseOrder.getFkCurrencyId() != idCur) {
@@ -268,7 +268,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
      * Recibe un archivo xml para visualizarlo en PDF.
      * @param xml CFDI del doc.
      */
-    public void showCfdi(String xml){
+    public void showCfdi(String xml) {
         mbShowValidateButton = false;
         msCfdiXml = xml;
         createParamsMap();
@@ -370,7 +370,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             moCfdiViewer.getContentPane().add(jrViewer.getContentPane());
             moCfdiViewer.setVisible(true);
         } 
-        catch (HeadlessException | JRException e){
+        catch (HeadlessException | JRException e) {
             SLibUtilities.renderException(this, e);
         }
     }
@@ -385,7 +385,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                 }
             }
         }
-        catch (Exception ex){
+        catch (Exception ex) {
             SLibUtilities.renderException(this, ex);
         }
     }

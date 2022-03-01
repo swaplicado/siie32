@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 195.10/ 2022-03-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la validación de no duplicidad de CFDI al capturarse vinculados a un documento.
+2) Corrección a la generación de layouts para vales de despensa descartando recibos de nómina eliminados.
+
+================================================================================
 SIIE 3.2 195.9/ 2022-02-25
 Edwin CARMONA
 --------------------------------------------------------------------------------
