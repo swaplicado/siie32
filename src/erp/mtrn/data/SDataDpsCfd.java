@@ -321,11 +321,11 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                 msConfirmation = resultSet.getString("conf");
                 msTaxRegime = resultSet.getString("tax_reg");
                 msCfdiUsage = resultSet.getString("cfd_use");
-                msRelatedType = resultSet.getString("rel_tp");
-                msRelatedUuid = resultSet.getString("rel_uuid");
+                msRelatedType = resultSet.getString("related_tp");
+                msRelatedUuid = resultSet.getString("related_uuid");
                 msXml = resultSet.getString("xml");
-                mnFkRelatedDpsYearId_n = resultSet.getInt("fid_rel_dps_year");
-                mnFkRelatedDpsDocId_n = resultSet.getInt("fid_rel_dps_doc");
+                mnFkRelatedDpsYearId_n = resultSet.getInt("fid_related_dps_year_n");
+                mnFkRelatedDpsDocId_n = resultSet.getInt("fid_related_dps_doc_n");
                 
                 processXml(msXml);
                 
@@ -397,11 +397,11 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                         "conf = '" + msConfirmation + "', " +
                         "tax_reg = '" + msTaxRegime + "', " +
                         "cfd_use = '" + msCfdiUsage + "', " +
-                        "rel_tp = '" + msRelatedType + "', " +
-                        "rel_uuid = '" + msRelatedUuid + "', " +
+                        "related_tp = '" + msRelatedType + "', " +
+                        "related_uuid = '" + msRelatedUuid + "', " +
                         "xml = '" + msXml + "', " +
-                        "fid_rel_dps_year = " + (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
-                        "fid_rel_dps_doc = " + (mnFkRelatedDpsDocId_n == 0 ? "NULL " : mnFkRelatedDpsDocId_n + " ") +
+                        "fid_related_dps_year = " + (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
+                        "fid_related_dps_doc = " + (mnFkRelatedDpsDocId_n == 0 ? "NULL " : mnFkRelatedDpsDocId_n + " ") +
                         "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
             }
 
