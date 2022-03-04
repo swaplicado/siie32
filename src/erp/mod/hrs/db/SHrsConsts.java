@@ -68,6 +68,10 @@ public class SHrsConsts {
     public static final int OVERTIME_ALLWAYS = 1;
     public static final int OVERTIME_SOMETIMES = 2;
     
+    public static final int CHECKER_POLICY_ESTRICT = 1;
+    public static final int CHECKER_POLICY_FREE = 2;
+    public static final int CHECKER_POLICY_EVENT = 3;
+    
     public static final String TXT_OVERTIME_NEVER = "Nunca";
     public static final String TXT_OVERTIME_ALLWAYS = "Siempre";
     public static final String TXT_OVERTIME_SOMETIMES = "Ocasionalmente";

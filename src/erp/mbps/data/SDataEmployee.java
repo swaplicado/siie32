@@ -60,6 +60,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected int mnWorkingHoursDay;
     protected Date mtContractExpiration_n;
     protected int mnOvertimePolicy;
+    protected int mnCheckerPolicy;
     protected String msBankAccount;
     protected String msGroceryServiceAccount;
     protected String msPlaceOfBirth;
@@ -205,6 +206,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
     public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
+    public void setCheckerPolicy(int n) { mnCheckerPolicy = n; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setGroceryServiceAccount(String s) { msGroceryServiceAccount = s; }
     public void setPlaceOfBirth(String s) { msPlaceOfBirth = s; }
@@ -274,6 +276,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public Date getContractExpiration_n() { return mtContractExpiration_n; }
     public int getOvertimePolicy() { return mnOvertimePolicy; }
+    public int getCheckerPolicy() { return mnCheckerPolicy; }
     public String getBankAccount() { return msBankAccount; }
     public String getGroceryServiceAccount() { return msGroceryServiceAccount; }
     public String getPlaceOfBirth() { return msPlaceOfBirth; }
@@ -404,6 +407,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mnWorkingHoursDay = 0;
         mtContractExpiration_n = null;
         mnOvertimePolicy = 0;
+        mnCheckerPolicy = 0;
         msBankAccount = "";
         msGroceryServiceAccount = "";
         msPlaceOfBirth = "";
@@ -492,6 +496,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
                 mtContractExpiration_n = resultSet.getDate("con_exp_n");
                 mnOvertimePolicy = resultSet.getInt("overtime");
+                mnCheckerPolicy = resultSet.getInt("checker_policy");
                 msBankAccount = resultSet.getString("bank_acc");
                 msGroceryServiceAccount = resultSet.getString("grocery_srv_acc");
                 msPlaceOfBirth= resultSet.getString("place_bir");
@@ -640,6 +645,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         mnWorkingHoursDay + ", " +
                         (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
                         mnOvertimePolicy + ", " + 
+                        mnCheckerPolicy + ", " + 
                         "'" + msBankAccount + "', " + 
                         "'" + msGroceryServiceAccount + "', " +
                         "'" + msPlaceOfBirth + "', " +
@@ -700,6 +706,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                         "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
                         "overtime = " + mnOvertimePolicy + ", " +
+                        "checker_policy = " + mnCheckerPolicy + ", " +
                         "bank_acc = '" + msBankAccount + "', " +
                         "grocery_srv_acc = '" + msGroceryServiceAccount + "', " +
                         "place_bir = '" + msPlaceOfBirth + "', " +
