@@ -21,6 +21,7 @@ import sa.lib.gui.SGuiClient;
  */
 public class SPayrollBonusUtils {
     
+    public static final int BONUS_NA = 1;
     public static final int BONUS = 101;
     public static final int PANTRY = 102;
     public static final int SUPER_BONUS = 103;
@@ -127,6 +128,9 @@ public class SPayrollBonusUtils {
             if (resultSet.next()) {
                 nBonus =  resultSet.getInt("n_bonus");
             }
+            
+            // se agrega uno ya que solo entra a esta función si ya se ganó el bono actual
+            nBonus += 1;
             
             if (nBonus >= 2) {
                 return 1d;

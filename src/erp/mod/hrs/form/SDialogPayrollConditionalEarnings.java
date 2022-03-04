@@ -122,6 +122,10 @@ public class SDialogPayrollConditionalEarnings extends SBeanFormDialog implement
         return mlBonusIds;
     }
     
+    public int getCurrentBonus() {
+        return moBonusKey.getSelectedItem().getPrimaryKey()[0];
+    }
+    
     @Override
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moBonusKey, SModConsts.HRSS_BONUS, 0, null);

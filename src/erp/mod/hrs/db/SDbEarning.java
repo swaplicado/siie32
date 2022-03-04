@@ -54,6 +54,7 @@ public class SDbEarning extends SDbRegistryUser {
     protected boolean mbWithholding;
     protected boolean mbAlternativeTaxCalculation;
     protected boolean mbPayrollTax;
+    protected boolean mbPayBonus;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -69,6 +70,7 @@ public class SDbEarning extends SDbRegistryUser {
     protected int mnFkAccountingRecordTypeId;
     protected int mnFkAbsenceClassId_n;
     protected int mnFkAbsenceTypeId_n;
+    protected int mnFkBonusId_n;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -104,6 +106,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setWithholding(boolean b) { mbWithholding = b; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
     public void setPayrollTax(boolean b) { mbPayrollTax = b; }
+    public void setPayBonus(boolean b) { mbPayBonus = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkEarningTypeId(int n) { mnFkEarningTypeId = n; }
@@ -117,6 +120,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setFkAccountingRecordTypeId(int n) { mnFkAccountingRecordTypeId = n; }
     public void setFkAbsenceClassId_n(int n) { mnFkAbsenceClassId_n = n; }
     public void setFkAbsenceTypeId_n(int n) { mnFkAbsenceTypeId_n = n; }
+    public void setFkBonusId_n(int n) { mnFkBonusId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -144,6 +148,7 @@ public class SDbEarning extends SDbRegistryUser {
     public boolean isWithholding() { return mbWithholding; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
     public boolean isPayrollTax() { return mbPayrollTax; }
+    public boolean isPayBonus() { return mbPayBonus; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkEarningTypeId() { return mnFkEarningTypeId; }
@@ -157,6 +162,7 @@ public class SDbEarning extends SDbRegistryUser {
     public int getFkAccountingRecordTypeId() { return mnFkAccountingRecordTypeId; }
     public int getFkAbsenceClassId_n() { return mnFkAbsenceClassId_n; }
     public int getFkAbsenceTypeId_n() { return mnFkAbsenceTypeId_n; }
+    public int getFkBonusId_n() { return mnFkBonusId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -226,6 +232,7 @@ public class SDbEarning extends SDbRegistryUser {
         mbWithholding = false;
         mbAlternativeTaxCalculation = false;
         mbPayrollTax = false;
+        mbPayBonus = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkEarningTypeId = 0;
@@ -239,6 +246,7 @@ public class SDbEarning extends SDbRegistryUser {
         mnFkAccountingRecordTypeId = 0;
         mnFkAbsenceClassId_n = 0;
         mnFkAbsenceTypeId_n = 0;
+        mnFkBonusId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -310,6 +318,7 @@ public class SDbEarning extends SDbRegistryUser {
             mbWithholding = resultSet.getBoolean("b_who");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
             mbPayrollTax = resultSet.getBoolean("b_pay_tax");
+            mbPayBonus = resultSet.getBoolean("b_pay_bonus");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkEarningTypeId = resultSet.getInt("fk_tp_ear");
@@ -323,6 +332,7 @@ public class SDbEarning extends SDbRegistryUser {
             mnFkAccountingRecordTypeId = resultSet.getInt("fk_tp_acc_rec");
             mnFkAbsenceClassId_n = resultSet.getInt("fk_cl_abs_n");
             mnFkAbsenceTypeId_n = resultSet.getInt("fk_tp_abs_n");
+            mnFkBonusId_n = resultSet.getInt("fk_bonus_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -373,6 +383,7 @@ public class SDbEarning extends SDbRegistryUser {
                     (mbWithholding ? 1 : 0) + ", " + 
                     (mbAlternativeTaxCalculation ? 1 : 0) + ", " + 
                     (mbPayrollTax ? 1 : 0) + ", " + 
+                    (mbPayBonus ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkEarningTypeId + ", " + 
@@ -386,6 +397,7 @@ public class SDbEarning extends SDbRegistryUser {
                     mnFkAccountingRecordTypeId + ", " + 
                     (mnFkAbsenceClassId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkAbsenceClassId_n) + ", " +
                     (mnFkAbsenceTypeId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkAbsenceTypeId_n) + ", " +
+                    (mnFkBonusId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkBonusId_n) + ", " +
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -419,6 +431,7 @@ public class SDbEarning extends SDbRegistryUser {
                     "b_who = " + (mbWithholding ? 1 : 0) + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     "b_pay_tax = " + (mbPayrollTax ? 1 : 0) + ", " +
+                    "b_pay_bonus = " + (mbPayBonus ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ear = " + mnFkEarningTypeId + ", " +
@@ -432,6 +445,7 @@ public class SDbEarning extends SDbRegistryUser {
                     "fk_tp_acc_rec = " + mnFkAccountingRecordTypeId + ", " +
                     "fk_cl_abs_n = " + (mnFkAbsenceClassId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkAbsenceClassId_n) + ", " +
                     "fk_tp_abs_n = " + (mnFkAbsenceTypeId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkAbsenceTypeId_n) + ", " +
+                    "fk_bonus_n = " + (mnFkBonusId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkBonusId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -472,6 +486,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setWithholding(this.isWithholding());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setPayrollTax(this.isPayrollTax());
+        registry.setPayBonus(this.isPayBonus());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkEarningTypeId(this.getFkEarningTypeId());
@@ -485,6 +500,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setFkAccountingRecordTypeId(this.getFkAccountingRecordTypeId());
         registry.setFkAbsenceClassId_n(this.getFkAbsenceClassId_n());
         registry.setFkAbsenceTypeId_n(this.getFkAbsenceTypeId_n());
+        registry.setFkBonusId_n(this.getFkBonusId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

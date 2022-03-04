@@ -41,6 +41,7 @@ public class SDialogCalculatedBonus extends SBeanFormDialog {
     private String msEndDate;
     private String msCompanyKey;
     private String msBonus;
+    private int mnBonusId;
 
     /**
      * Creates new form SDialogAbsenceMovesCardex
@@ -198,13 +199,16 @@ public class SDialogCalculatedBonus extends SBeanFormDialog {
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                SGridColumnForm column = null;
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Num", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Percepción", 100));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "T. Bono", 100));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto", 100));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Con bono", 50));
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Con bono", moGridBonusRows.getTable().getDefaultEditor(Boolean.class));
+                column.setEditable(true);
+                gridColumnsForm.add(column);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 200));
 
                 return gridColumnsForm;
@@ -258,6 +262,10 @@ public class SDialogCalculatedBonus extends SBeanFormDialog {
     
     public void initView() {
         showImportations();
+    }
+
+    public ArrayList<SRowBonus> getlGridRows() {
+        return lGridRows;
     }
     
     @Override
@@ -328,6 +336,10 @@ public class SDialogCalculatedBonus extends SBeanFormDialog {
         moTextBonus.setValue(this.msBonus);
     }
     
+    public void setBonusId(int mnBonusId) {
+        this.mnBonusId = mnBonusId;
+    }
+    
     public void setCutOffDay(int day) {
         String sDay = "";
         switch (day) {
@@ -385,16 +397,24 @@ public class SDialogCalculatedBonus extends SBeanFormDialog {
                 }
                 if (save) {
                     List<String> dataLines = new ArrayList<>();
-        
-                    for (SRowBonus lGridRow : lGridRows) {
-                        dataLines.add(lGridRow.getEmployeeId()+ "," +
-                                        lGridRow.getNumEmployee() + "," +
-                                        lGridRow.getEmployee().replaceAll(",", "") + "," +
-                                        lGridRow.getEarning ()+ "," +
-                                        lGridRow.getBonus()+ "," +
-                                        lGridRow.getAmount()+ "," +
-                                        lGridRow.getComments().replaceAll(",", "")
+                    
+                    for (Map.Entry<Integer, ArrayList<SEarnConfiguration>> entry : lBonusConfigRows.entrySet()) {
+                        Integer idEmployee = entry.getKey();
+                        ArrayList<SEarnConfiguration> earnCfgs = entry.getValue();
+                        
+                        for (SEarnConfiguration oEarnCfg : earnCfgs) {
+                            if (oEarnCfg.getIdBonus() == this.mnBonusId) {
+                                dataLines.add(idEmployee + "," +
+                                        oEarnCfg.getNumEmployee() + "," +
+                                        oEarnCfg.getEmployee().replaceAll(",", "") + "," +
+                                        oEarnCfg.getEarning() + "," +
+                                        oEarnCfg.getBonus()+ "," +
+                                        oEarnCfg.getAmount()+ "," +
+                                        oEarnCfg.getComments().replaceAll(",", "")
                                                 );
+                                break;
+                            }
+                        }
                     }
 
                     String fileHeader = "idEmpleado,Num,Empleado,Percepcion,Bono,Monto,Comentarios";

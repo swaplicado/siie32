@@ -18,6 +18,7 @@ public class SEarnConfiguration {
     
     private String numEmployee;
     private String employee;
+    private int checkerPolicy;
     private String bonus;
     private String earning;
     
@@ -75,6 +76,14 @@ public class SEarnConfiguration {
 
     public void setEmployee(String employee) {
         this.employee = employee;
+    }
+
+    public int getCheckerPolicy() {
+        return checkerPolicy;
+    }
+
+    public void setCheckerPolicy(int checkerPolicy) {
+        this.checkerPolicy = checkerPolicy;
     }
 
     public String getBonus() {
