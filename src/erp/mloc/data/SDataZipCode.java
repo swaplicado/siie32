@@ -20,11 +20,14 @@ import java.util.Date;
  */
 public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.Serializable{
 
-    protected java.lang.String msPkZipCode;
-    protected java.lang.String msPkStateCode;
-    protected java.lang.String msFkCountyCode;
-    protected java.lang.String msFkLocalityCode;
-    
+    protected String msPkZipCode;
+    protected String msPkStateCode;
+    protected String msCountyCode;
+    protected String msLocalityCode;
+    protected boolean mbDeleted;
+    protected int mnFkUserId;
+    protected Date mtTsUser;
+
     protected SDataCounty moDbmsCounty;
     protected SDataLocality moDbmsLocality;
 
@@ -33,15 +36,21 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
         reset();
     }
     
-    public void setPkZipCode(java.lang.String s) { msPkZipCode = s; }
-    public void setPkStateCode(java.lang.String s) { msPkStateCode = s; }
-    public void setFkCountyCode(java.lang.String s) { msFkCountyCode = s; }
-    public void setFkLocalityCode(java.lang.String s) { msFkLocalityCode = s; }
+    public void setPkZipCode(String s) { msPkZipCode = s; }
+    public void setPkStateCode(String s) { msPkStateCode = s; }
+    public void setCountyCode(String s) { msCountyCode = s; }
+    public void setLocalityCode(String s) { msLocalityCode = s; }
+    public void setDeleted(boolean b) { mbDeleted = b; }
+    public void setFkUserId(int n) { mnFkUserId = n; }
+    public void setTsUser(Date t) { mtTsUser = t; }
 
-    public java.lang.String getPkZipCode() { return msPkZipCode; }
-    public java.lang.String getPkStateCode() { return msPkStateCode; }
-    public java.lang.String getFkCountyCode() { return msFkCountyCode; }
-    public java.lang.String getFkLocalityCode() { return msFkLocalityCode; }
+    public String getPkZipCode() { return msPkZipCode; }
+    public String getPkStateCode() { return msPkStateCode; }
+    public String getCountyCode() { return msCountyCode; }
+    public String getLocalityCode() { return msLocalityCode; }
+    public boolean isDeleted() { return mbDeleted; }
+    public int getFkUserId() { return mnFkUserId; }
+    public Date getTsUser() { return mtTsUser; }
 
     public void setDbmsCounty(SDataCounty o) { moDbmsCounty = o; }
     public void setDbmsLocality(SDataLocality o) { moDbmsLocality = o; }
@@ -66,9 +75,12 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
         
         msPkZipCode = "";
         msPkStateCode = "";
-        msFkCountyCode = "";
-        msFkLocalityCode = "";
-        
+        msCountyCode = "";
+        msLocalityCode = "";
+        mbDeleted = false;
+        mnFkUserId = 0;
+        mtTsUser = null;
+
         moDbmsCounty = null;
         moDbmsLocality = null;
     }
@@ -77,7 +89,7 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
     public int read(Object pk, Statement statement) {
         String[] key = (String[]) pk;
         String sql;
-        ResultSet resultSet = null;
+        ResultSet resultSet;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -91,8 +103,11 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
             else {
                 msPkZipCode = resultSet.getString("id_zip_code");
                 msPkStateCode = resultSet.getString("id_sta_code");
-                msFkCountyCode = resultSet.getString("county_code");
-                msFkLocalityCode = resultSet.getString("locality_code");
+                msCountyCode = resultSet.getString("county_code");
+                msLocalityCode = resultSet.getString("locality_code");
+                mbDeleted = resultSet.getBoolean("b_del");
+                mnFkUserId = resultSet.getInt("fid_usr");
+                mtTsUser = resultSet.getTimestamp("ts_usr");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -100,16 +115,16 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
             
             // Read county:
             
-            if (!msFkCountyCode.isEmpty()) {
+            if (!msCountyCode.isEmpty()) {
                 moDbmsCounty = new SDataCounty();
-                moDbmsCounty.read(new String[] { msFkCountyCode, msPkStateCode }, statement);
+                moDbmsCounty.read(new String[] { msCountyCode, msPkStateCode }, statement);
             }
             
             // Read locality
             
-            if (!msFkLocalityCode.isEmpty()) {
+            if (!msLocalityCode.isEmpty()) {
                 moDbmsLocality = new SDataLocality();
-                moDbmsLocality.read(new String[] { msFkLocalityCode, msPkStateCode }, statement);
+                moDbmsLocality.read(new String[] { msLocalityCode, msPkStateCode }, statement);
             }
         }
         catch (SQLException e) {
@@ -126,8 +141,8 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
 
     @Override
     public int save(Connection connection) {
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql;
+        ResultSet resultSet;
         
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
@@ -144,10 +159,13 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
             if (mbIsRegistryNew) {
                 
                 sql = "INSERT INTO erp.locs_bol_zip_code VALUES (" +
-                        "'" + msPkZipCode + "', " +
-                        "'" + msPkStateCode + "', " +
-                        "'" + msFkCountyCode + "', " +
-                        "'" + msFkLocalityCode + "' " +
+                        "'" + msPkZipCode + "', " + 
+                        "'" + msPkStateCode + "', " + 
+                        "'" + msCountyCode + "', " + 
+                        "'" + msLocalityCode + "', " + 
+                        (mbDeleted ? 1 : 0) + ", " + 
+                        mnFkUserId + ", " + 
+                        "NOW()" + " " + 
                         ")";
             }
             else {
@@ -155,9 +173,12 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
                 sql = "UPDATE erp.locs_bol_zip_code SET " +
 //                        "id_zip_code='" + msPkZipCode + "', " +
 //                        "id_sta_code='" + msPkStateCode + "', " +
-                        "county_code='" + msFkCountyCode + "', " +
-                        "locality_code='" + msFkLocalityCode + "' " +
-                        "WHERE id_zip_code = " + msPkZipCode + " AND id_sta_code = " + msPkStateCode;
+                        "county_code = '" + msCountyCode + "', " +
+                        "locality_code = '" + msLocalityCode + "', " +
+                        "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                        "fid_usr = " + mnFkUserId + ", " +
+//                        "ts_usr = " + "NOW()" + " " +
+                        msPkZipCode + " AND id_sta_code = " + msPkStateCode;
             }
 
             connection.createStatement().execute(sql);

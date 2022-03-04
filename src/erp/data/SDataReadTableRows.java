@@ -2947,7 +2947,7 @@ public abstract class SDataReadTableRows {
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DATE, "dt");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "distance_tot");
                 
-                sSql = "SELECT id_bol, IF(ser <> '', CONCAT(ser, '-', num), num) AS folio, dt, distance_tot FROM log_bol WHERE YEAR(dt) = " + ((int[]) filterKey)[0] + " AND bol_tp = 'I' ";
+                sSql = "SELECT id_bol, IF(ser <> '', CONCAT(ser, '-', num), num) AS folio, dt, distance_tot FROM log_bol WHERE YEAR(dt) = " + ((int[]) filterKey)[0] + " AND bol_tp = 'I' AND NOT b_del ORDER BY num DESC";
                 break;
 
             default:

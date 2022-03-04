@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores, Isabel Servín
  */
 public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener {
 

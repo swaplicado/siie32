@@ -14,15 +14,13 @@ import java.util.Date;
 
 /**
 * Handling additional information for CFDI entry.
-* @author Sergio Flores
+* @author Sergio Flores, Isabel Servín
  */
 public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkYearId;
     protected int mnPkDocId;
     protected int mnPkEntryId;
-    protected java.lang.String msRelationType;
-    protected java.lang.String msUuid;
     protected String msXml;
     
     public SDataDpsCfdEntry() {
@@ -33,15 +31,11 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkDocId(int n) { mnPkDocId = n; }
     public void setPkEntryId(int n) { mnPkEntryId = n; }
-    public void setRelationType(java.lang.String s) { msRelationType = s; }
-    public void setUuid(java.lang.String s) { msUuid = s; }
     public void setXml(java.lang.String s) { msXml = s; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
     public int getPkEntryId() { return mnPkEntryId; }
-    public java.lang.String getRelationType() { return msRelationType; }
-    public java.lang.String getUuid() { return msUuid; }
     public java.lang.String getXml() { return msXml; }
 
     /**
@@ -60,11 +54,20 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
         
     }
     
+    private void calculatePkEntryId(java.sql.Connection connecion) throws Exception {
+        mnPkEntryId = 1;
+        String sql = "SELECT MAX(id_ety) FROM trn_dps_cfd_ety WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
+        ResultSet resultSet = connecion.createStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            mnPkEntryId = resultSet.getInt(1) + 1;
+        }
+    }
+    
     @Override
     public void setPrimaryKey(Object pk) {
         mnPkYearId = ((int[]) pk)[0];
         mnPkDocId = ((int[]) pk)[1];
-        mnPkEntryId = ((int[]) pk)[1];
+        mnPkEntryId = ((int[]) pk)[2];
     }
 
     @Override
@@ -79,22 +82,20 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
         mnPkYearId = 0;
         mnPkDocId = 0;
         mnPkEntryId = 0;
-        msRelationType = "";
-        msUuid = "";
         msXml = "";
     }
 
     @Override
     public int read(Object pk, Statement statement) {
         int[] key = (int[]) pk;
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql;
+        ResultSet resultSet;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
 
         try {
-            sql = "SELECT * FROM trn_dps_cfd WHERE id_year = " + key[0] + " AND id_doc = " + key[1] + " ";
+            sql = "SELECT * FROM trn_dps_cfd_ety WHERE id_year = " + key[0] + " AND id_doc = " + key[1] + " AND id_ety = " + key[2] + " ";
             
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -104,8 +105,6 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
                 mnPkYearId = resultSet.getInt("id_year");
                 mnPkDocId = resultSet.getInt("id_doc");
                 mnPkEntryId = resultSet.getInt("id_ety");
-                msRelationType = resultSet.getString("rel_tp");
-                msUuid = resultSet.getString("uuid");
                 msXml = resultSet.getString("xml");
                 
                 processXml(msXml);
@@ -128,14 +127,14 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
 
     @Override
     public int save(java.sql.Connection connection) {
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql;
+        ResultSet resultSet;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
             if (mbIsRegistryNew) {
-                sql = "SELECT COUNT(*) FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
+                sql = "SELECT COUNT(*) FROM trn_dps_cfd_ety WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId;
                 resultSet = connection.createStatement().executeQuery(sql);
 
                 if (resultSet.next()) {
@@ -146,20 +145,20 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
             computeXml();
 
             if (mbIsRegistryNew) {
-                sql = "INSERT INTO trn_dps_cfd VALUES (" +
+                calculatePkEntryId(connection);
+                
+                sql = "INSERT INTO trn_dps_cfd_ety VALUES (" +
                         mnPkYearId + ", " +
                         mnPkDocId + ", " +
-                        "'" + msRelationType + "', " +
-                        "'" + msUuid + "', " +
+                        mnPkEntryId + ", " +
                         "'" + msXml + "' " +
                         ")";
             }
             else {
-                sql = "UPDATE trn_dps_cfd SET " +
+                sql = "UPDATE trn_dps_cfd_ety SET " +
                         //"id_year = " + mnPkYearId + ", " +
                         //"id_doc = " + mnPkDocId + ", " +
-                        "rel_tp = '" + msRelationType + "', " +
-                        "uuid = '" + msUuid + "', " +
+                        //"id_ety = " + mnPkEntryId + ", " +
                         "xml = '" + msXml + "' " +
                         "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
             }

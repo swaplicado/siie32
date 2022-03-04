@@ -762,7 +762,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     @Override
     public void actionNew() {
         if (jbNew.isEnabled()) {
-            miClient.getGuiModule(mnModule).setFormComplement(getDpsTypeKey());  // document type key
+            miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
             if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                 miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                 SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
@@ -774,7 +774,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     public void actionEdit() {
        if (jbEdit.isEnabled()) {
            if (isRowSelected()) {
-                miClient.getGuiModule(mnModule).setFormComplement(getDpsTypeKey());  // document type key
+                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
                 miClient.getGuiModule(mnModule).setCurrentUserPrivilegeLevel(mbHasRightEdit ? SUtilConsts.LEV_AUTHOR : SUtilConsts.LEV_READ);
 
                 if (miClient.getGuiModule(mnModule).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
@@ -881,10 +881,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 Object complement = null;
 
                 if (adjustmentSubtypeKey == null) {
-                    complement = new Object[] { getDpsTypeKey(), moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), null, moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL) };
+                    complement = new Object[] { getDpsTypeKey(), false, moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), null, moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL) };
                 }
-                else {
-                    complement = new Object[] { getDpsTypeKey(), moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), adjustmentSubtypeKey, moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL) };
+                else { 
+                    complement = new Object[] { getDpsTypeKey(), true, moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), adjustmentSubtypeKey, moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL) };
                 }
                 
                 miClient.getGuiModule(mnModule).setFormComplement(complement);   // document type key, reference document and adjustment type (optional)
@@ -899,7 +899,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionCopy() {
         if (jbCopy.isEnabled()) {
             if (isRowSelected()) {
-                miClient.getGuiModule(mnModule).setFormComplement(getDpsTypeKey());  // document type key
+                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
                 if (miClient.getGuiModule(mnModule).showFormForCopy(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
                     miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                     SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
@@ -934,7 +934,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SCfdRenderer renderer = new SCfdRenderer(miClient);
                             SDataDps dpsRendered = renderer.renderCfdi(miClient.getFileChooser().getSelectedFile(), purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
                             if (dpsRendered != null){
-                                miClient.getGuiModule(mnModule).setFormComplement(getDpsTypeKey());  // document type key
+                                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
                                 miClient.getGuiModule(mnModule).setAuxRegistry(dpsRendered);
                                 if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                                     miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);

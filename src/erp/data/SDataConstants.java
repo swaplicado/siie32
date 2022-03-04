@@ -140,9 +140,10 @@ public abstract class SDataConstants {
 
     public static final int LOCU_CTY = 203001;
     public static final int LOCU_STA = 203002;
-    public static final int LOCS_BOL_ZIP_CODE = 1032003;
-    public static final int LOCS_BOL_COUNTY = 1032004;
-    public static final int LOCS_BOL_LOCALITY = 1032005;
+    public static final int LOCS_BOL_COUNTY = 203011;
+    public static final int LOCS_BOL_LOCALITY = 203012;
+    public static final int LOCS_BOL_ZIP_CODE = 203013;
+    public static final int LOCS_BOL_NEI_ZIP_CODE = 203014;
 
     public static final int BPSS_CT_BP = 204001;
     public static final int BPSS_TP_BP_IDY = 204002;
@@ -751,6 +752,11 @@ public abstract class SDataConstants {
         TablesMap.put(USRU_USR, "erp.usru_usr");
 
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
+        TablesMap.put(LOCU_STA, "erp.locu_sta");
+        TablesMap.put(LOCS_BOL_COUNTY, "erp.locs_bol_county");
+        TablesMap.put(LOCS_BOL_LOCALITY, "erp.locs_bol_locality");
+        TablesMap.put(LOCS_BOL_ZIP_CODE, "erp.locs_bol_zip_code");
+        TablesMap.put(LOCS_BOL_NEI_ZIP_CODE, "erp.locs_bol_nei_zip_code");
 
         TablesMap.put(BPSS_CT_BP, "erp.bpss_ct_bp");
         TablesMap.put(BPSS_TP_BP_IDY, "erp.bpss_tp_bp_idy");

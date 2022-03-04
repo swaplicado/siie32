@@ -107,17 +107,52 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     private void actionItemStateChangeKeyCustomerBranchAddress() {
         try {
-            String sql = "SELECT distance FROM log_dist_location "
-                    + "WHERE (id_bpb_add_1 = " + moLocationStartKey[0] + " AND id_add_add_1 = " + moLocationStartKey[1] + " "
-                    + "AND id_bpb_add_2 = " + moKeyBizPartnerBranchAddress.getValue()[0] + " AND id_add_add_2 = " + moKeyBizPartnerBranchAddress.getValue()[1] + ") OR ("
-                    + "id_bpb_add_1 = " + moKeyBizPartnerBranchAddress.getValue()[0] + " AND id_add_add_1 = " + moKeyBizPartnerBranchAddress.getValue()[1] + " "
-                    + "AND id_bpb_add_2 = " + moLocationStartKey[0] + " AND id_add_add_2 = " + moLocationStartKey[1] + ")"; 
+            
+            // Calcular la distancia:
+            if (moLocationStartKey != null) {
+                String sql = "SELECT distance FROM log_dist_location "
+                        + "WHERE (id_bpb_add_1 = " + moLocationStartKey[0] + " AND id_add_add_1 = " + moLocationStartKey[1] + " "
+                        + "AND id_bpb_add_2 = " + moKeyBizPartnerBranchAddress.getValue()[0] + " AND id_add_add_2 = " + moKeyBizPartnerBranchAddress.getValue()[1] + ") OR ("
+                        + "id_bpb_add_1 = " + moKeyBizPartnerBranchAddress.getValue()[0] + " AND id_add_add_1 = " + moKeyBizPartnerBranchAddress.getValue()[1] + " "
+                        + "AND id_bpb_add_2 = " + moLocationStartKey[0] + " AND id_add_add_2 = " + moLocationStartKey[1] + ")"; 
+                ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                if (resultSet.next()) {
+                    moDecimalDistance.setValue(resultSet.getDouble(1));
+                }
+            }
+            
+            // Obtener las colonias a partir del CP:
+            
+            populateNeighborhoodComboBox(moKeyBizPartnerBranchAddress.getValue()[0], moKeyBizPartnerBranchAddress.getValue()[1]);
+            
+            // Asignar colonia si es que ya tiene una asignada previamente:
+        
+            String sql = "SELECT fk_nei_zip_code FROM log_bpb_add_nei "
+                    + "WHERE id_bpb_add = " + moKeyBizPartnerBranchAddress.getValue()[0] + " "
+                    + "AND id_add_add = " + moKeyBizPartnerBranchAddress.getValue()[1];
             ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
-                moDecimalDistance.setValue(resultSet.getDouble(1));
+                moKeyBizPartnerBranchNeighborhood.setValue(new int[] { resultSet.getInt(1) });
             }
+            
         }
-        catch(Exception e) {}
+        catch(Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    
+    private void populateNeighborhoodComboBox(int bizPartnerAddress, int addressAddress) throws Exception {
+        
+        // Obtener las colonias a partir del CP:
+        
+        SDataBizPartnerBranchAddress add = new SDataBizPartnerBranchAddress();
+        add.read(new int[] { bizPartnerAddress, addressAddress } , miClient.getSession().getStatement());
+        
+        SGuiParams params = new SGuiParams();
+        int[] key = new int[] { SLibUtils.parseInt(add.getZipCode()) };
+        params.setKey(key);
+        miClient.getSession().populateCatalogue(moKeyBizPartnerBranchNeighborhood, SModConsts.LOCS_BOL_NEI_ZIP_CODE, SLibConsts.UNDEFINED, params);
+            
     }
 
     /**
@@ -155,6 +190,9 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         jPanel29 = new javax.swing.JPanel();
         jlBizPartnerBranchAddress = new javax.swing.JLabel();
         moKeyBizPartnerBranchAddress = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel33 = new javax.swing.JPanel();
+        jlBizPartnerBranchNeighborhood = new javax.swing.JLabel();
+        moKeyBizPartnerBranchNeighborhood = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel32 = new javax.swing.JPanel();
         jlDistance = new javax.swing.JLabel();
         moDecimalDistance = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -233,7 +271,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Ubicación:"));
-        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -267,6 +305,18 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         jPanel29.add(moKeyBizPartnerBranchAddress);
 
         jPanel2.add(jPanel29);
+
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartnerBranchNeighborhood.setText("Colonia:*");
+        jlBizPartnerBranchNeighborhood.setPreferredSize(new java.awt.Dimension(130, 23));
+        jPanel33.add(jlBizPartnerBranchNeighborhood);
+
+        moKeyBizPartnerBranchNeighborhood.setEnabled(false);
+        moKeyBizPartnerBranchNeighborhood.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel33.add(moKeyBizPartnerBranchNeighborhood);
+
+        jPanel2.add(jPanel33);
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -379,6 +429,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
@@ -389,6 +440,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlBizPartnerBranch;
     private javax.swing.JLabel jlBizPartnerBranchAddress;
+    private javax.swing.JLabel jlBizPartnerBranchNeighborhood;
     private javax.swing.JLabel jlDeparture;
     private javax.swing.JLabel jlDistance;
     private javax.swing.JPanel jpCharge;
@@ -402,6 +454,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartner;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartnerBranch;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartnerBranchAddress;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartnerBranchNeighborhood;
     private sa.lib.gui.bean.SBeanFieldRadio moRadioCustomerLocations;
     private sa.lib.gui.bean.SBeanFieldRadio moRadioDestination;
     private sa.lib.gui.bean.SBeanFieldRadio moRadioEnd;
@@ -420,6 +473,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner), true);
         moKeyBizPartnerBranch.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartnerBranch), true);
         moKeyBizPartnerBranchAddress.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartnerBranchAddress), true);
+        moKeyBizPartnerBranchNeighborhood.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartnerBranchNeighborhood), false);
         moDecimalDistance.setDecimalSettings(SGuiUtils.getLabelName(jlDistance), SGuiConsts.GUI_TYPE_DEC_QTY, true);
         moDateArrival.setDateSettings(miClient, SGuiUtils.getLabelName(jlArrival), false);
         moDateDeparture.setDateSettings(miClient, SGuiUtils.getLabelName(jlDeparture), false);
@@ -427,6 +481,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         moFields.addField(moKeyBizPartner);
         moFields.addField(moKeyBizPartnerBranch);
         moFields.addField(moKeyBizPartnerBranchAddress);
+        moFields.addField(moKeyBizPartnerBranchNeighborhood);
         moFields.addField(moDecimalDistance);
         moFields.addField(moDateArrival);
         moFields.addField(moDateDeparture);
@@ -469,6 +524,10 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                 else if (moKeyBizPartnerBranchAddress.getSelectedIndex() <= 0) {
                     miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchAddress) + "'.");
                     moKeyBizPartnerBranchAddress.requestFocus();
+                }
+                else if (moKeyBizPartnerBranchNeighborhood.getComponent().getItemCount() > 1 && moKeyBizPartnerBranchNeighborhood.getSelectedIndex() <= 1) {
+                    miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchNeighborhood) + "'.");
+                    moKeyBizPartnerBranchNeighborhood.requestFocus();
                 }
                 else {
                     params.getParamsMap().put(SModConsts.LOG_BOL_LOCATION, moKeyBizPartnerBranchAddress.getValue() );
@@ -543,6 +602,10 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                 else if (moKeyBizPartnerBranchAddress.getSelectedIndex() <= 0) {
                     miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchAddress) + "'.");
                     moKeyBizPartnerBranchAddress.requestFocus();
+                }
+                else if (moKeyBizPartnerBranchNeighborhood.getComponent().getItemCount() > 1 && moKeyBizPartnerBranchNeighborhood.getSelectedIndex() <= 1) {
+                    miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchNeighborhood) + "'.");
+                    moKeyBizPartnerBranchNeighborhood.requestFocus();
                 }
                 else {
                     params.getParamsMap().put(SModConsts.LOG_BOL_LOCATION, moKeyBizPartnerBranchAddress.getValue() );
@@ -821,7 +884,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             moFieldKeyBizPartnerGroup.addFieldKey(moKeyBizPartnerBranch, SModConsts.BPSU_BPB, SLibConsts.UNDEFINED, null);
             moFieldKeyBizPartnerGroup.addFieldKey(moKeyBizPartnerBranchAddress, SModConsts.BPSU_BPB_ADD, SLibConsts.UNDEFINED, null);
             moFieldKeyBizPartnerGroup.populateCatalogues();
-
+            
             populateCharge();
             populateDischarge();
         } catch (SQLException e) {
@@ -848,9 +911,11 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         }
         
         if (moRegistry.getFkOriginAddressAddress_n() == 0 && moRegistry.getFkOriginBizPartnerAddress_n() == 0) {
+            populateNeighborhoodComboBox(moRegistry.getFkDestinationBizPartnerAddress_n(), moRegistry.getFkDestinationAddressAddress_n());
             moKeyBizPartner.setValue(new int[] { moRegistry.getFkDestinationBizPartner_n() });
             moKeyBizPartnerBranch.setValue(new int[] { moRegistry.getFkDestinationBizPartnerAddress_n() });
             moKeyBizPartnerBranchAddress.setValue(new int[] { moRegistry.getFkDestinationBizPartnerAddress_n(), moRegistry.getFkDestinationAddressAddress_n() });
+            moKeyBizPartnerBranchNeighborhood.setValue(new int[] { moRegistry.getFkDestinationNeighborhoodZipCode_n() });
             moRadioOrigin.setSelected(false);
             moRadioDestination.setSelected(true);
         }
@@ -861,9 +926,11 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             else {
                 moRadioDestination.setSelected(false);
             }
+            populateNeighborhoodComboBox(moRegistry.getFkOriginBizPartnerAddress_n(), moRegistry.getFkOriginAddressAddress_n());
             moKeyBizPartner.setValue(new int[] { moRegistry.getFkOriginBizPartner_n()});
             moKeyBizPartnerBranch.setValue(new int[] { moRegistry.getFkOriginBizPartnerAddress_n()});
             moKeyBizPartnerBranchAddress.setValue(new int[] { moRegistry.getFkOriginBizPartnerAddress_n(), moRegistry.getFkOriginAddressAddress_n() });
+            moKeyBizPartnerBranchNeighborhood.setValue(new int[] { moRegistry.getFkOriginNeighborhoodZipCode_n() });
             moRadioOrigin.setSelected(true);
         }
 
@@ -919,6 +986,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             registry.setFkOriginBizPartner_n(moKeyBizPartner.getValue()[0]);
             registry.setFkOriginBizPartnerAddress_n(moKeyBizPartnerBranch.getValue()[0]);
             registry.setFkOriginAddressAddress_n(moKeyBizPartnerBranchAddress.getValue()[1]);
+            registry.setFkOriginNeighborhoodZipCode_n(moKeyBizPartnerBranchNeighborhood.getValue()[0]);
             registry.setXtaIsOrigin(true);
         }
         else {
@@ -931,6 +999,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             registry.setFkDestinationBizPartner_n(moKeyBizPartner.getValue()[0]);
             registry.setFkDestinationBizPartnerAddress_n(moKeyBizPartnerBranch.getValue()[0]);
             registry.setFkDestinationAddressAddress_n(moKeyBizPartnerBranchAddress.getValue()[1]);
+            registry.setFkDestinationNeighborhoodZipCode_n(moKeyBizPartnerBranchNeighborhood.getValue()[0]);
             registry.setXtaIsDestination(true);
         }
         else {

@@ -124,9 +124,10 @@ public abstract class SModConsts {
 
     public static final int LOCU_CTY = 1032001;
     public static final int LOCU_STA = 1032002;
-    public static final int LOCS_BOL_ZIP_CODE = 1032003;
-    public static final int LOCS_BOL_COUNTY = 1032004;
-    public static final int LOCS_BOL_LOCALITY = 1032005;
+    public static final int LOCS_BOL_COUNTY = 1031011;
+    public static final int LOCS_BOL_LOCALITY = 1031012;
+    public static final int LOCS_BOL_ZIP_CODE = 1031013;
+    public static final int LOCS_BOL_NEI_ZIP_CODE = 1031014;
 
     /*
      * Business partners
@@ -528,6 +529,7 @@ public abstract class SModConsts {
     public static final int LOGS_INC = 2041007;
 
     public static final int LOGU_TP_VEH = 2042001;
+    public static final int LOGU_BPB_ADD_NEI = 2043005;
     public static final int LOGU_SPOT = 2042002;
     public static final int LOGU_SPOT_COB = 2042003;
     public static final int LOGU_SPOT_COB_ENT = 2042004;
@@ -829,9 +831,10 @@ public abstract class SModConsts {
 
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
         TablesMap.put(LOCU_STA, "erp.locu_sta");
-        TablesMap.put(LOCS_BOL_ZIP_CODE, "erp.locs_bol_zip_code");
         TablesMap.put(LOCS_BOL_COUNTY, "erp.locs_bol_county");
         TablesMap.put(LOCS_BOL_LOCALITY, "erp.locs_bol_locality");
+        TablesMap.put(LOCS_BOL_ZIP_CODE, "erp.locs_bol_zip_code");
+        TablesMap.put(LOCS_BOL_NEI_ZIP_CODE, "erp.locs_bol_nei_zip_code");
 
         TablesMap.put(BPSS_CT_BP, "erp.bpss_ct_bp");
         TablesMap.put(BPSS_TP_BP_IDY, "erp.bpss_tp_bp_idy");
@@ -1167,6 +1170,7 @@ public abstract class SModConsts {
         TablesMap.put(LOGS_INC, "erp.logs_inc");
 
         TablesMap.put(LOGU_TP_VEH, "erp.logu_tp_veh");
+        TablesMap.put(LOGU_BPB_ADD_NEI, "erp.logu_bpb_add_nei");
         TablesMap.put(LOGU_SPOT, "erp.logu_spot");
         TablesMap.put(LOGU_SPOT_COB, "erp.logu_spot_cob");
         TablesMap.put(LOGU_SPOT_COB_ENT, "erp.logu_spot_cob_ent");

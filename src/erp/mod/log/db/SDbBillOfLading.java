@@ -944,6 +944,9 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 // Domicilio: 
                 
                 DElementDomicilio domicilio = origen.getEltDomicilio();
+                if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
+                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsNeighborhood().getNeighborhoodCode());
+                }
                 domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
                 domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
                 domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 
@@ -975,6 +978,9 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 // Domicilio: 
                 
                 DElementDomicilio domicilio = destino.getEltDomicilio();
+                if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
+                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsNeighborhood().getNeighborhoodCode());
+                }
                 domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
                 domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
                 domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 

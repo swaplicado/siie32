@@ -40,9 +40,13 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     protected int mnFkOriginBizPartner_n;
     protected int mnFkOriginBizPartnerAddress_n;
     protected int mnFkOriginAddressAddress_n;
+    protected int mnFkOriginNeighborhoodZipCode_n;
     protected int mnFkDestinationBizPartner_n;
     protected int mnFkDestinationBizPartnerAddress_n;
     protected int mnFkDestinationAddressAddress_n;
+    protected int mnFkDestinationNeighborhoodZipCode_n;
+    
+    protected SDbBizPartnerBranchAddressNeighborhood moDbmsBizPartnerBranchNeighborhood;
     
     protected SDataBizPartner moXtaBizParter;
     protected SDataBizPartnerBranch moXtaBizParterBranch;
@@ -145,9 +149,11 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     public void setFkOriginBizPartner_n(int n) { mnFkOriginBizPartner_n = n; }
     public void setFkOriginBizPartnerAddress_n(int n) { mnFkOriginBizPartnerAddress_n = n; }
     public void setFkOriginAddressAddress_n(int n) { mnFkOriginAddressAddress_n = n; }
+    public void setFkOriginNeighborhoodZipCode_n(int n) { mnFkOriginNeighborhoodZipCode_n = n; }
     public void setFkDestinationBizPartner_n(int n) { mnFkDestinationBizPartner_n = n; }
     public void setFkDestinationBizPartnerAddress_n(int n) { mnFkDestinationBizPartnerAddress_n = n; }
     public void setFkDestinationAddressAddress_n(int n) { mnFkDestinationAddressAddress_n = n; }
+    public void setFkDestinationNeighborhoodZipCode_n(int n) { mnFkDestinationNeighborhoodZipCode_n = n; }
 
     public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public int getPkLocationId() { return mnPkLocationId; }
@@ -159,9 +165,15 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     public int getFkOriginBizPartner_n() { return mnFkOriginBizPartner_n; }
     public int getFkOriginBizPartnerAddress_n() { return mnFkOriginBizPartnerAddress_n; }
     public int getFkOriginAddressAddress_n() { return mnFkOriginAddressAddress_n; }
+    public int getFkOriginNeighborhoodZipCode_n() { return mnFkOriginNeighborhoodZipCode_n; }
     public int getFkDestinationBizPartner_n() { return mnFkDestinationBizPartner_n; }
     public int getFkDestinationBizPartnerAddress_n() { return mnFkDestinationBizPartnerAddress_n; }
     public int getFkDestinationAddressAddress_n() { return mnFkDestinationAddressAddress_n; }
+    public int getFkDestinationNeighborhoodZipCode_n() { return mnFkDestinationNeighborhoodZipCode_n; }
+    
+    public void setDbmsBizPartnerBranchNeighborhood(SDbBizPartnerBranchAddressNeighborhood o) { moDbmsBizPartnerBranchNeighborhood = o; }
+    
+    public SDbBizPartnerBranchAddressNeighborhood getDbmsBizPartnerBranchNeighborhood() { return moDbmsBizPartnerBranchNeighborhood; }
     
     public void setXtaBizPartner(SDataBizPartner o) { moXtaBizParter = o; } 
     public void setXtaBizPartnerBranch(SDataBizPartnerBranch o) { moXtaBizParterBranch = o; } 
@@ -214,9 +226,13 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         mnFkOriginBizPartner_n = 0;
         mnFkOriginBizPartnerAddress_n = 0;
         mnFkOriginAddressAddress_n = 0;
+        mnFkOriginNeighborhoodZipCode_n = 0;
         mnFkDestinationBizPartner_n = 0;
         mnFkDestinationBizPartnerAddress_n = 0;
         mnFkDestinationAddressAddress_n = 0;
+        mnFkDestinationNeighborhoodZipCode_n = 0;
+        
+        moDbmsBizPartnerBranchNeighborhood = null;
         
         moXtaBizParter = new SDataBizPartner();
         moXtaBizParterBranch = new SDataBizPartnerBranch();
@@ -290,9 +306,11 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             mnFkOriginBizPartner_n = resultSet.getInt("fk_orig_bp_n");
             mnFkOriginBizPartnerAddress_n = resultSet.getInt("fk_orig_bpb_add_n");
             mnFkOriginAddressAddress_n = resultSet.getInt("fk_orig_add_add_n");
+            mnFkOriginNeighborhoodZipCode_n = resultSet.getInt("fk_orig_nei_zip_code_n");
             mnFkDestinationBizPartner_n = resultSet.getInt("fk_dest_bp_n");
             mnFkDestinationBizPartnerAddress_n = resultSet.getInt("fk_dest_bpb_add_n");
             mnFkDestinationAddressAddress_n = resultSet.getInt("fk_dest_add_add_n");
+            mnFkDestinationNeighborhoodZipCode_n = resultSet.getInt("fk_dest_nei_zip_code_n");
             
             msXtaLocationType = resultSet.getString("_location_tp");
             mbXtaIsOrigin = resultSet.getBoolean("is_origin");
@@ -344,13 +362,25 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             
             moXtaBizParterBranch.read(new int[] { mnFkOriginBizPartnerAddress_n == 0 ? mnFkDestinationBizPartnerAddress_n : mnFkOriginBizPartnerAddress_n } , statement);
             
-            // Read BizPartnerBranch
+            // Read BizPartnerBranchAddress
             
             if (mnFkOriginBizPartnerAddress_n != 0) {
                 moXtaBizPartnerBranchAddress.read(new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n } , statement);
             }
             else {
                 moXtaBizPartnerBranchAddress.read(new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n } , statement);
+            }
+            
+            // Read neighborhood zip code
+            
+            if (mnFkDestinationNeighborhoodZipCode_n != 0 || mnFkOriginNeighborhoodZipCode_n != 0) {
+                moDbmsBizPartnerBranchNeighborhood = new SDbBizPartnerBranchAddressNeighborhood();
+                if (mnFkOriginBizPartnerAddress_n != 0) {
+                    moDbmsBizPartnerBranchNeighborhood.read(session, new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n });
+                }
+                else {
+                    moDbmsBizPartnerBranchNeighborhood.read(session, new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n });
+                }
             }
             
             mbRegistryNew = false;
@@ -385,9 +415,11 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
                 (mnFkOriginBizPartner_n == 0 ? "NULL, " : mnFkOriginBizPartner_n + ", ") + 
                 (mnFkOriginBizPartnerAddress_n == 0 ? "NULL, " : mnFkOriginBizPartnerAddress_n + ", ") + 
                 (mnFkOriginAddressAddress_n == 0 ? "NULL, " : mnFkOriginAddressAddress_n + ", ") + 
+                (mnFkOriginNeighborhoodZipCode_n == 0 ? "NULL, " : mnFkOriginNeighborhoodZipCode_n + ", ") + 
                 (mnFkDestinationBizPartner_n == 0 ? "NULL, " : mnFkDestinationBizPartner_n + ", ") + 
                 (mnFkDestinationBizPartnerAddress_n == 0 ? "NULL, " : mnFkDestinationBizPartnerAddress_n + ", ") + 
-                (mnFkDestinationAddressAddress_n == 0 ? "NULL " : mnFkDestinationAddressAddress_n + " ") + 
+                (mnFkDestinationAddressAddress_n == 0 ? "NULL, " : mnFkDestinationAddressAddress_n + ", ") +
+                (mnFkDestinationNeighborhoodZipCode_n == 0 ? "NULL " : mnFkDestinationNeighborhoodZipCode_n + " ") + 
                 ")";
         }
         else {
@@ -404,12 +436,29 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
                 "fk_orig_bp_n = " + (mnFkOriginBizPartner_n == 0 ? "NULL, " : mnFkOriginBizPartner_n + ", ") +
                 "fk_orig_bpb_add_n = " + (mnFkOriginBizPartnerAddress_n == 0 ? "NULL, " : mnFkOriginBizPartnerAddress_n + ", ") +
                 "fk_orig_add_add_n = " + (mnFkOriginAddressAddress_n == 0 ? "NULL, " : mnFkOriginAddressAddress_n + ", ") +
+                "fk_orig_nei_zip_code_n = " + (mnFkOriginNeighborhoodZipCode_n == 0 ? "NULL, " : mnFkOriginNeighborhoodZipCode_n + ", ") +
                 "fk_dest_bp_n = " + (mnFkDestinationBizPartner_n == 0 ? "NULL, " : mnFkDestinationBizPartner_n + ", ") +
                 "fk_dest_bpb_add_n = " + (mnFkDestinationBizPartnerAddress_n == 0 ? "NULL, " : mnFkDestinationBizPartnerAddress_n + ", ") +
-                "fk_dest_add_add_n = " + (mnFkDestinationAddressAddress_n == 0 ? "NULL " : mnFkDestinationAddressAddress_n + " ") +
+                "fk_dest_add_add_n = " + (mnFkDestinationAddressAddress_n == 0 ? "NULL, " : mnFkDestinationAddressAddress_n + ", ") +
+                "fk_dest_nei_zip_code_n = " + (mnFkDestinationNeighborhoodZipCode_n == 0 ? "NULL " : mnFkDestinationNeighborhoodZipCode_n + " ") +
                 getSqlWhere();
         }
         session.getStatement().execute(msSql);
+        
+        // Guardar la colonia conforme al domicilio
+        
+        moDbmsBizPartnerBranchNeighborhood = new SDbBizPartnerBranchAddressNeighborhood();
+        if (mnFkOriginBizPartnerAddress_n != 0 && mnFkOriginAddressAddress_n != 0 && mnFkOriginNeighborhoodZipCode_n != 0) {
+            moDbmsBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkOriginBizPartnerAddress_n);
+            moDbmsBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkOriginAddressAddress_n);
+            moDbmsBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkOriginNeighborhoodZipCode_n);
+        }
+        else if (mnFkDestinationBizPartnerAddress_n != 0 && mnFkDestinationAddressAddress_n != 0 && mnFkDestinationNeighborhoodZipCode_n != 0) {
+            moDbmsBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkDestinationBizPartnerAddress_n);
+            moDbmsBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkDestinationAddressAddress_n);
+            moDbmsBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkDestinationNeighborhoodZipCode_n);
+        }
+        moDbmsBizPartnerBranchNeighborhood.save(session);
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -429,9 +478,11 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         registry.setFkOriginBizPartner_n(this.getFkOriginBizPartner_n());
         registry.setFkOriginBizPartnerAddress_n(this.getFkOriginBizPartnerAddress_n());
         registry.setFkOriginAddressAddress_n(this.getFkOriginAddressAddress_n());
+        registry.setFkOriginNeighborhoodZipCode_n(this.getFkOriginNeighborhoodZipCode_n());
         registry.setFkDestinationBizPartner_n(this.getFkDestinationBizPartner_n());
         registry.setFkDestinationBizPartnerAddress_n(this.getFkDestinationBizPartnerAddress_n());
         registry.setFkDestinationAddressAddress_n(this.getFkDestinationAddressAddress_n());
+        registry.setFkDestinationNeighborhoodZipCode_n(this.getFkDestinationNeighborhoodZipCode_n());
         
         registry.setXtaBizPartner(this.getXtaBizPartner());
         registry.setXtaBizPartnerBranch(this.getXtaBizPartnerBranch());
@@ -443,6 +494,8 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         registry.setXtaMerchandiseQuantityDischarge(this.getXtaMerchandiseQuantityDischarge());
         registry.setXtaRowsCurrentCharge(this.getXtaRowsCurrentCharge());
         registry.setXtaRowsPrecharged(this.getXtaRowsPrecharged());
+        
+        registry.setDbmsBizPartnerBranchNeighborhood(this.getDbmsBizPartnerBranchNeighborhood());
         
         return registry;
     }
