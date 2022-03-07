@@ -164,7 +164,12 @@ public class SRowBonus implements SGridRow {
     }
 
     @Override
-    public void setRowValueAt(Object o, int i) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setRowValueAt(Object o, int column) {
+        switch(column) {
+            case 5:
+                this.mbHasBonus = (Boolean) o;
+                break;
+            default:
+        }
     }
 }

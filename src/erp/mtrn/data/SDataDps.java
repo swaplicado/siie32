@@ -278,6 +278,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxKeepExchangeRate;
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
+    protected int[] manAuxDpsTime;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.SSrvLock moAuxUserLock;
     */
@@ -2016,6 +2017,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
+    public void setAuxDpsTime (int[] o) { manAuxDpsTime = o; } 
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
     */
@@ -2048,6 +2050,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
+    public int[] getAuxDpsTime() { return manAuxDpsTime; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
     */
@@ -2247,6 +2250,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxKeepExchangeRate = false;
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
+        manAuxDpsTime = null;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         moAuxUserLock = null;
         */
@@ -5561,13 +5565,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             // when modification done the same day as creation, set the former's datetime as document's datetime:
             date = mtUserEditTs;
         }
+        if (manAuxDpsTime == null) {
+            if (SLibUtils.compareKeys(creation, modification)) {
+                // when modification done the same day as creation, set the former's datetime as document's datetime:
+                date = mtUserEditTs;
+            }
+            else {
+                // when modification done other day as creation, mix the former's date and current time as document's datetime:
+                GregorianCalendar calendar = new GregorianCalendar();
+                calendar.setTime(mtUserEditTs);
+                calendar.set(GregorianCalendar.YEAR, creation[0]);
+                calendar.set(GregorianCalendar.MONTH, creation[1] - 1);  // January is month 0
+                calendar.set(GregorianCalendar.DATE, creation[2]);
+                date = calendar.getTime();
+            }
+        }
         else {
-            // when modification done other day as creation, mix the former's date and current time as document's datetime:
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(mtUserEditTs);
             calendar.set(GregorianCalendar.YEAR, creation[0]);
             calendar.set(GregorianCalendar.MONTH, creation[1] - 1);  // January is month 0
             calendar.set(GregorianCalendar.DATE, creation[2]);
+            calendar.set(GregorianCalendar.HOUR_OF_DAY, manAuxDpsTime[0]);
+            calendar.set(GregorianCalendar.MINUTE, manAuxDpsTime[1]);
+            calendar.set(GregorianCalendar.SECOND, manAuxDpsTime[2]);
             date = calendar.getTime();
         }
 

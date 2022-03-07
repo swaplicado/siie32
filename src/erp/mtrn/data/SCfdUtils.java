@@ -1963,7 +1963,7 @@ public abstract class SCfdUtils implements Serializable {
                         
                         /* 2018-08-17, Sergio Flores: Code snippet commented for preventing connection with PAC and subsequent exception due to inactive account:
                         if (isProcessingValidation) {
-                            ReceiptResult receiptResult = port.getReceipt("jbarajas@tron.com.mx", "WSfink_2014", sRfcEmisor, cfd.getUuid(), "C");
+                            ReceiptResult receiptResult = port.getReceipt("jbarajas@tron.com.mx", "WSfink_2014", sRfcEmisor, cfd.getRelatedUuid(), "C");
                             
                             if (receiptResult != null) {
                                 if (receiptResult.getSuccess() == null) {
@@ -1981,12 +1981,12 @@ public abstract class SCfdUtils implements Serializable {
                                 else {
                                     if (!receiptResult.getSuccess().getValue()) {
                                         // Sign & Cancel Log step #4
-                                        createSignCancelLogEntry(client, "El UUID: '" + cfd.getUuid() + "' no ha sido cancelado.", actionCode, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd.getPkCfdId(), pac.getPkPacId());
+                                        createSignCancelLogEntry(client, "El UUID: '" + cfd.getRelatedUuid() + "' no ha sido cancelado.", actionCode, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd.getPkCfdId(), pac.getPkPacId());
 
                                         updateProcessCfd(client, cfd, false);
 
                                         if (pacId == 0) {
-                                            throw new Exception("Error al intentar obtener acuse de cancelación de CFDI.\n" + "El UUID: '" + cfd.getUuid() + "' no ha sido cancelado.");
+                                            throw new Exception("Error al intentar obtener acuse de cancelación de CFDI.\n" + "El UUID: '" + cfd.getRelatedUuid() + "' no ha sido cancelado.");
                                         }
                                         next = false;
                                     }

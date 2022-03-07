@@ -22,9 +22,9 @@ import sa.lib.xml.SXmlElement;
 
 /**
  * Handling additional information for CFDI.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
-public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -37,7 +37,13 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     protected String msConfirmation;
     protected String msTaxRegime;
     protected String msCfdiUsage;
+    protected String msRelatedType;
+    protected String msRelatedUuid;
     protected String msXml;
+    protected int mnFkRelatedDpsYearId_n;
+    protected int mnFkRelatedDpsDocId_n;
+
+    protected ArrayList<SDataDpsCfdEntry> maDbmsDpsCfdEntries;
     
     protected String msCfdiRelacionadosTipoRelacion;
     protected ArrayList<String> maCfdiRelacionados;
@@ -55,6 +61,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     
     public SDataDpsCfd() {
         super(SDataConstants.TRN_DPS_CFD);
+        maDbmsDpsCfdEntries = new ArrayList<>();
         maCfdiRelacionados = new ArrayList<>();
         reset();
     }
@@ -70,6 +77,13 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public void setConfirmation(String s) { msConfirmation = s; }
     public void setTaxRegime(String s) { msTaxRegime = s; }
     public void setCfdiUsage(String s) { msCfdiUsage = s; }
+    public void setRelatedType(java.lang.String s) { msRelatedType = s; }
+    public void setXml(java.lang.String s) { msXml = s; }
+    public void setRelatedUuid(java.lang.String s) { msRelatedUuid = s; }
+    public void setFkRelatedDpsYearId_n(int n) { mnFkRelatedDpsYearId_n = n; }
+    public void setFkRelatedDpsDocId_n(int n) { mnFkRelatedDpsDocId_n = n; }
+
+    public void setDbmsDpsCfdEntries(ArrayList<SDataDpsCfdEntry> o) { maDbmsDpsCfdEntries = o; }
     
     public void setCfdiRelacionadosTipoRelacion(String s) { msCfdiRelacionadosTipoRelacion = s; }
     
@@ -95,7 +109,13 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public String getConfirmation() { return msConfirmation; }
     public String getTaxRegime() { return msTaxRegime; }
     public String getCfdiUsage() { return msCfdiUsage; }
+    public String getRelatedType() { return msRelatedType; }
+    public String getRelatedUuid() { return msRelatedUuid; }
     public String getXml() { return msXml; }
+    public int getFkRelatedDpsYearId_n() { return mnFkRelatedDpsYearId_n; }
+    public int getFkRelatedDpsDocId_n() { return mnFkRelatedDpsDocId_n; }
+    
+    public ArrayList<SDataDpsCfdEntry> getDbmsDpsCfdEntries() { return maDbmsDpsCfdEntries; }
     
     public String getCfdiRelacionadosTipoRelacion() { return msCfdiRelacionadosTipoRelacion; }
     public ArrayList<String> getCfdiRelacionados() { return maCfdiRelacionados; }
@@ -117,6 +137,7 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
      * Adds UUID to array of CFDI Relacionados only if it has not been added yet previously.
      * @param uuid UUID of CFDI to add.
      * @return <code>true</code> if UUID was added, otherwise <code>false</code>.
+     * @throws java.lang.Exception
      */
     public boolean addCfdiRelacionado(String uuid) throws Exception {
         if (uuid == null || uuid.length() != DCfdVer3Consts.LEN_UUID) {
@@ -134,6 +155,11 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         
         if (add) {
             maCfdiRelacionados.add(uuid);
+        }
+        
+        if (msRelatedUuid.isEmpty()) {
+            msRelatedUuid = uuid;
+            msRelatedType = msCfdiRelacionadosTipoRelacion;
         }
         
         return add;
@@ -246,7 +272,11 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msConfirmation = "";
         msTaxRegime = "";
         msCfdiUsage = "";
+        msRelatedType = "";
+        msRelatedUuid = "";
         msXml = "";
+        mnFkRelatedDpsYearId_n = 0;
+        mnFkRelatedDpsDocId_n = 0;
         
         msCfdiRelacionadosTipoRelacion = "";
         maCfdiRelacionados.clear();
@@ -266,9 +296,9 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     @Override
     public int read(Object pk, Statement statement) {
         int[] key = (int[]) pk;
-        String sql = "";
-        ResultSet resultSet = null;
-
+        String sql;
+        ResultSet resultSet;
+        
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
 
@@ -291,7 +321,11 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
                 msConfirmation = resultSet.getString("conf");
                 msTaxRegime = resultSet.getString("tax_reg");
                 msCfdiUsage = resultSet.getString("cfd_use");
+                msRelatedType = resultSet.getString("related_tp");
+                msRelatedUuid = resultSet.getString("related_uuid");
                 msXml = resultSet.getString("xml");
+                mnFkRelatedDpsYearId_n = resultSet.getInt("fid_related_dps_year_n");
+                mnFkRelatedDpsDocId_n = resultSet.getInt("fid_related_dps_doc_n");
                 
                 processXml(msXml);
                 
@@ -313,8 +347,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
     @Override
     public int save(java.sql.Connection connection) {
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql;
+        ResultSet resultSet;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
@@ -343,7 +377,11 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
                         "'" + msConfirmation + "', " +
                         "'" + msTaxRegime + "', " +
                         "'" + msCfdiUsage + "', " +
-                        "'" + msXml + "' " +
+                        "'" + msRelatedType + "', " +
+                        "'" + msRelatedUuid + "', " + 
+                        "'" + msXml + "', " +
+                        (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
+                        (mnFkRelatedDpsDocId_n == 0 ? "NULL " : mnFkRelatedDpsDocId_n + " ") +
                         ")";
             }
             else {
@@ -359,7 +397,11 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
                         "conf = '" + msConfirmation + "', " +
                         "tax_reg = '" + msTaxRegime + "', " +
                         "cfd_use = '" + msCfdiUsage + "', " +
-                        "xml = '" + msXml + "' " +
+                        "related_tp = '" + msRelatedType + "', " +
+                        "related_uuid = '" + msRelatedUuid + "', " +
+                        "xml = '" + msXml + "', " +
+                        "fid_related_dps_year = " + (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
+                        "fid_related_dps_doc = " + (mnFkRelatedDpsDocId_n == 0 ? "NULL " : mnFkRelatedDpsDocId_n + " ") +
                         "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
             }
 

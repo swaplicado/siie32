@@ -21,6 +21,7 @@ public class SEmployee {
     String email;
     int company_id;
     int overtime_policy;
+    int checker_policy;
     int way_pay;
     int dept_rh_id;
     int siie_job_id;
@@ -113,6 +114,14 @@ public class SEmployee {
 
     public void setOvertime_policy(int overtime_policy) {
         this.overtime_policy = overtime_policy;
+    }
+
+    public int getChecker_policy() {
+        return checker_policy;
+    }
+
+    public void setChecker_policy(int checker_policy) {
+        this.checker_policy = checker_policy;
     }
 
     public int getWay_pay() {

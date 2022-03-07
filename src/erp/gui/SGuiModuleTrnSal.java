@@ -1196,22 +1196,25 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             miForm.setValue(SLibConstants.VALUE_TYPE, type);            // document type as int[]
 
                             if (((Object[]) moFormComplement).length >= 2) {
-                                if (((Object[]) moFormComplement)[1] instanceof Boolean) {
-                                    miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[1]);
+                                miForm.setValue(SLibConstants.VALUE_IS_IMPORTED, ((Object[]) moFormComplement)[1]);
+                            }
+                            if (((Object[]) moFormComplement).length >= 3) {
+                                if (((Object[]) moFormComplement)[2] instanceof Boolean) {
+                                    miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[2]);
                                 }
-                                else if (((Object[]) moFormComplement)[1] instanceof SDataDps) {
+                                else if (((Object[]) moFormComplement)[2] instanceof SDataDps) {
                                     if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, SDataConstantsSys.TRNU_TP_DPS_SAL_INV, SDataConstantsSys.TRNU_TP_DPS_SAL_CN })) {
-                                        miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[1]);
+                                        miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[2]);
                                     }
                                 }
                             }
 
-                            if (((Object[]) moFormComplement).length >= 3 && ((Object[]) moFormComplement)[2] != null) {
-                                miForm.setValue(SDataConstants.TRNS_STP_DPS_ADJ, ((Object[]) moFormComplement)[2]);
+                            if (((Object[]) moFormComplement).length >= 4 && ((Object[]) moFormComplement)[3] != null) {
+                                miForm.setValue(SDataConstants.TRNS_STP_DPS_ADJ, ((Object[]) moFormComplement)[3]);
                             }
 
-                            if (((Object[]) moFormComplement).length >= 4) {
-                                miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[3]);
+                            if (((Object[]) moFormComplement).length >= 5) {
+                                miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[4]);
                             }
                         }
                     }
@@ -1237,6 +1240,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, formType, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
                                 dps.setAuxIsNeedCfd(true);
                                 dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
+                                dps.setAuxDpsTime(((SDataDps) moRegistry).getAuxDpsTime());
                                 SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
                             }
                             catch (java.lang.Exception e) {

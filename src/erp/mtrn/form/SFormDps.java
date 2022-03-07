@@ -269,9 +269,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private int mnNumbersApprovalNumber;    // CFD approval number
     private int[] manDpsClassKey;
     private int[] manDpsClassPreviousKey;
+    private int[] manRelatedDpsKey;
     private int[] manParamAdjustmentSubtypeKey;
+    private int[] manDpsTime;
     private boolean mbIsPeriodOpen;
     private boolean mbIsLocalCurrency;
+    private boolean mbIsImported;
     private boolean mbIsNumberEditable;
     private boolean mbPostEmissionEdition;
     private boolean mbFormSettingsOk;
@@ -283,6 +286,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbHasIogSupplies;
     private boolean mbHasCommissions;
     private boolean mbHasShipments;
+    private boolean mbIsDpsTimeReq;
     private int mnSalesAgentId_n;
     private int mnSalesAgentBizPartnerId_n;
     private int mnSalesSupervisorId_n;
@@ -322,6 +326,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mtrn.form.SDialogDpsAdjustment moDialogDpsAdjustment;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mtrn.form.SDialogShowDocumentLinks moDialogShowDocumentLinks;
+    private erp.mtrn.form.SDialogTime moDialogTime;
     private erp.mfin.form.SPanelRecord moPanelRecord;
     private erp.mtrn.form.SFormDpsCom moFormCom;
     private cfd.ver33.DElementComprobante moComprobante33;
@@ -382,8 +387,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlDate = new javax.swing.JLabel();
         jftDate = new javax.swing.JFormattedTextField();
         jbDate = new javax.swing.JButton();
+        jbTime = new javax.swing.JButton();
         jckIsRebill = new javax.swing.JCheckBox();
-        jbBizPartnerBalance = new javax.swing.JButton();
         jPanel16 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         jcbNumberSeries = new javax.swing.JComboBox<SFormComponentItem>();
@@ -411,6 +416,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDateDocLapsing_n = new javax.swing.JButton();
         jPanel67 = new javax.swing.JPanel();
         jckIsCopy = new javax.swing.JCheckBox();
+        jbBizPartnerBalance = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
@@ -963,14 +969,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbDate);
 
+        jbTime.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_clock.gif"))); // NOI18N
+        jbTime.setToolTipText("Seleccionar hora");
+        jbTime.setFocusable(false);
+        jbTime.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbTime);
+
         jckIsRebill.setText("Re-emisión");
         jckIsRebill.setPreferredSize(new java.awt.Dimension(83, 23));
         jPanel11.add(jckIsRebill);
-
-        jbBizPartnerBalance.setText("Saldo AN");
-        jbBizPartnerBalance.setToolTipText("Ver saldo del asociado de negocios");
-        jbBizPartnerBalance.setFocusable(false);
-        jPanel11.add(jbBizPartnerBalance);
 
         jPanel57.add(jPanel11);
 
@@ -1100,6 +1107,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckIsCopy.setMargin(new java.awt.Insets(2, 0, 2, 2));
         jckIsCopy.setPreferredSize(new java.awt.Dimension(105, 23));
         jPanel67.add(jckIsCopy);
+
+        jbBizPartnerBalance.setText("Saldo AN");
+        jbBizPartnerBalance.setToolTipText("Ver saldo del asociado de negocios");
+        jbBizPartnerBalance.setFocusable(false);
+        jPanel67.add(jbBizPartnerBalance);
 
         jPanel57.add(jPanel67);
 
@@ -2681,14 +2693,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlBillOfLading.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel75.add(jlBillOfLading);
 
-        jtfBillOfLading.setEditable(false);
-        jtfBillOfLading.setText("XML");
         jtfBillOfLading.setOpaque(false);
         jtfBillOfLading.setPreferredSize(new java.awt.Dimension(260, 23));
         jPanel75.add(jtfBillOfLading);
 
         jbLoadBillOfLading.setText("...");
-        jbLoadBillOfLading.setToolTipText("Seleccionar archivo XML...");
+        jbLoadBillOfLading.setToolTipText("Seleccionar carta porte...");
         jbLoadBillOfLading.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel75.add(jbLoadBillOfLading);
 
@@ -3288,12 +3298,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         manDpsClassKey = null;
         manDpsClassPreviousKey = null;
+        manRelatedDpsKey = null;
         moDpsType = null;
 
         mnParamCurrentUserPrivilegeLevel = SLibConsts.UNDEFINED;
         mbParamIsReadOnly = false;
         moParamDpsSource = null;
         mbIsLocalCurrency = false;
+        mbIsImported = false;
         mnDeliveryType = SLibConsts.UNDEFINED;
         mnCfdXmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
 
@@ -3349,6 +3361,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDeleteBillOfLading.addActionListener(this);
         jtbEntryFilter.addActionListener(this);
         jtbNotesFilter.addActionListener(this);
+        jbTime.addActionListener(this);
 
         // Focus listeners:
 
@@ -3404,6 +3417,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
         SFormUtilities.putActionMap(moPanelRecord, actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+        
+        mbIsDpsTimeReq = mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL;
     }
     
     public void actionExportCsv() {
@@ -3614,8 +3629,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbCfdiRelationType.setEnabled(enableFields && isCfdiVer33);
         jtfCfdiCfdiRelated.setEnabled(enableFields && isCfdiVer33);
         jbCfdiCfdiRelated.setEnabled(enableFields && isCfdiVer33);
+        
         jtfBillOfLading.setFocusable(true);
-        jbLoadBillOfLading.setEnabled(true);
+        jbLoadBillOfLading.setEnabled(enableFields && isCfdiVer33);
     }
 
     /**
@@ -4449,6 +4465,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDate.setEditable(mbHasRightOrderDelay);
             jftDate.setFocusable(mbHasRightOrderDelay);
             jbDate.setEnabled(mbHasRightOrderDelay);
+            jbTime.setEnabled(mbHasRightOrderDelay && mbIsDpsTimeReq);
         }
     }
     
@@ -5167,6 +5184,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDate.setEditable(false);
             jftDate.setFocusable(false);
             jbDate.setEnabled(false);
+            jbTime.setEnabled(false);
             jcbNumberSeries.setEnabled(false);
             jtfNumber.setEditable(false);
             jtfNumber.setFocusable(false);
@@ -5274,6 +5292,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDate.setEditable(true);
             jftDate.setFocusable(true);
             jbDate.setEnabled(true);
+            jbTime.setEnabled(mbIsDpsTimeReq);
             jcbNumberSeries.setEnabled(moDps.getIsRegistryNew() || !mbIsNumberSeriesRequired);
             jtfNumber.setEditable(mbIsNumberEditable);
             jtfNumber.setFocusable(mbIsNumberEditable);
@@ -7739,6 +7758,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else {
                 String cfdi = moFieldCfdiCfdiRelated.getString();
+                if (cfdi.isEmpty()) {
+                    manRelatedDpsKey = (int[]) dps.getPrimaryKey();
+                }
                 moFieldCfdiCfdiRelated.setString((cfdi.isEmpty() ? "" : cfdi + ",") + dps.getDbmsDataCfd().getUuid());
             }
         }
@@ -7848,6 +7870,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbOk.setEnabled(true);
             
             jcbDriver.requestFocusInWindow();
+        }
+    }
+    
+    private void actionTime() {
+        try {
+            if (moDialogTime == null) {
+                moDialogTime = new SDialogTime(miClient);
+            }
+            moDialogTime.setFormVisible(true);
+            if (moDialogTime.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                manDpsTime = moDialogTime.getValue();
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
     
@@ -8777,6 +8814,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbSalesAgent;
     private javax.swing.JButton jbSalesSupervisor;
     private javax.swing.JButton jbTaxRegionId;
+    private javax.swing.JButton jbTime;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyBranchGln;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyGln;
     private javax.swing.JComboBox<String> jcbAddAmc71SupplierGln;
@@ -9245,6 +9283,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbOldIsDiscountDocApplying = false;
 
         mbResetingForm = false;
+        
+        moDialogTime = null;
+        manDpsTime = null;
     }
 
     @Override
@@ -10174,8 +10215,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFieldCfdiRelationType.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdiRelacionadosTipoRelacion());
                 }
 
-                if (!moDps.getDbmsDataDpsCfd().getCfdiRelacionados().isEmpty()) {
-                    moFieldCfdiCfdiRelated.setFieldValue(SLibUtils.textImplode(moDps.getDbmsDataDpsCfd().getCfdiRelacionados().toArray(new String[moDps.getDbmsDataDpsCfd().getCfdiRelacionados().size()]), ","));
+                if (mbIsImported) {
+                    moFieldCfdiCfdiRelated.setFieldValue(moDps.getDbmsDataCfd().getUuid());
+                }
+                else {
+                    if (!moDps.getDbmsDataDpsCfd().getCfdiRelacionados().isEmpty()) {
+                        moFieldCfdiCfdiRelated.setFieldValue(SLibUtils.textImplode(moDps.getDbmsDataDpsCfd().getCfdiRelacionados().toArray(new String[moDps.getDbmsDataDpsCfd().getCfdiRelacionados().size()]), ","));
+                    }
                 }
 
                 if (isCfdIntCommerceRequired()) {
@@ -10281,6 +10327,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             calculateTotal();
 
             moDps.setDate(moFieldDate.getDate());
+            if (manDpsTime != null) {
+                moDps.setAuxDpsTime(manDpsTime);
+            }
             moDps.setDateDoc(moFieldDateDoc.getDate());
             moDps.setDateStartCredit(moFieldDateStartCredit.getDate());
             moDps.setDateShipment_n(moFieldDateShipment_n.getDate());
@@ -10444,7 +10493,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (isCfdCfdiRelatedRequired() || jcbCfdiRelationType.getSelectedIndex() > 0) {
                     // include CFDI relacionados node data:
                     dpsCfd.setCfdiRelacionadosTipoRelacion((String) moFieldCfdiRelationType.getKey());
-
+                    if (manRelatedDpsKey != null) {
+                        dpsCfd.setFkRelatedDpsYearId_n(manRelatedDpsKey[0]);
+                        dpsCfd.setFkRelatedDpsDocId_n(manRelatedDpsKey[1]);
+                    }
                     for (String uuid : SLibUtils.textExplode(moFieldCfdiCfdiRelated.getString(), ",")) {
                         try {
                             dpsCfd.addCfdiRelacionado(uuid.trim());
@@ -10457,12 +10509,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     for (SDataDpsEntry dpsEntry : moDps.getDbmsDpsEntries()) {
                         for (SDataDpsDpsAdjustment dpsAdjustment : dpsEntry.getDbmsDpsAdjustmentsAsAdjustment()) {
                             SDataDps invoice = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, dpsAdjustment.getDbmsDpsKey(), SLibConstants.EXEC_MODE_VERBOSE);
-                            if (invoice.getDbmsDataCfd() != null && !invoice.getDbmsDataCfd().getUuid().isEmpty() && !dpsCfd.getCfdiRelacionados().contains(invoice.getDbmsDataCfd().getUuid())) {
-                                try {
-                                    dpsCfd.addCfdiRelacionado(invoice.getDbmsDataCfd().getUuid());
+                            if (invoice != null) {
+                                if (dpsCfd.getFkRelatedDpsYearId_n() == 0 && dpsCfd.getFkRelatedDpsDocId_n() == 0) {
+                                    dpsCfd.setFkRelatedDpsYearId_n(invoice.getPkYearId());
+                                    dpsCfd.setFkRelatedDpsDocId_n(invoice.getPkDocId());
                                 }
-                                catch (Exception e) {
-                                    SLibUtils.printException(this, e);
+                                if (invoice.getDbmsDataCfd() != null && !invoice.getDbmsDataCfd().getUuid().isEmpty() && !dpsCfd.getCfdiRelacionados().contains(invoice.getDbmsDataCfd().getUuid())) {
+                                    try {
+                                        dpsCfd.addCfdiRelacionado(invoice.getDbmsDataCfd().getUuid());
+                                    }
+                                    catch (Exception e) {
+                                        SLibUtils.printException(this, e);
+                                    }
                                 }
                             }
                         }
@@ -10584,6 +10642,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         switch (type) {
             case SLibConstants.VALUE_TYPE:
                 setDpsType((int[]) value);
+                break;
+            case SLibConstants.VALUE_IS_IMPORTED:
+                mbIsImported = (Boolean) value;
                 break;
             case SDataConstants.TRN_DPS:
                 moParamDpsSource = (SDataDps) value;
@@ -10763,6 +10824,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbDeleteBillOfLading) {
                     actionDeleteBillOfLading();
+                }
+                else if (button == jbTime) {
+                    actionTime();
                 }
             }
             catch (SQLException se) {

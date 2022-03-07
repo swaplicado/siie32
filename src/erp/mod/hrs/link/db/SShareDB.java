@@ -296,6 +296,7 @@ public class SShareDB {
                 emp.leave_date = res.getString("dt_dis_n");
                 emp.email = res.getString("email_01");
                 emp.overtime_policy = res.getInt("overtime");
+                emp.checker_policy = res.getInt("checker_policy");
                 emp.way_pay = res.getInt("fk_tp_pay");
                 emp.dept_rh_id = res.getInt("fk_dep");
                 emp.siie_job_id = res.getInt("fk_pos");

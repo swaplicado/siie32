@@ -20,21 +20,31 @@ import java.util.Date;
  */
 public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
-    protected java.lang.String msPkLocalityCode;
-    protected java.lang.String msPkStateCode;
-    protected java.lang.String msDescription;
+    protected String msPkLocalityCode;
+    protected String msPkStateCode;
+    protected String msDescription;
+    protected boolean mbDeleted;
+    protected int mnFkUserId;
+    protected Date mtTsUser;
 
     public SDataLocality() {
         super(SDataConstants.LOCS_BOL_LOCALITY);
     }
     
-    public void setPkLocalityCode(java.lang.String s) { msPkLocalityCode = s; }
-    public void setPkStateCode(java.lang.String s) { msPkStateCode = s; }
-    public void setDescription(java.lang.String s) { msDescription = s; }
+    public void setPkLocalityCode(String s) { msPkLocalityCode = s; }
+    public void setPkStateCode(String s) { msPkStateCode = s; }
+    public void setDescription(String s) { msDescription = s; }
+    public void setDeleted(boolean b) { mbDeleted = b; }
+    public void setFkUserId(int n) { mnFkUserId = n; }
+    public void setTsUser(Date t) { mtTsUser = t; }
 
-    public java.lang.String getPkLocalityCode() { return msPkLocalityCode; }
-    public java.lang.String getPkStateCode() { return msPkStateCode; }
-    public java.lang.String getDescription() { return msDescription; }
+   public String getPkLocalityCode() { return msPkLocalityCode; }
+    public String getPkStateCode() { return msPkStateCode; }
+    public String getDescription() { return msDescription; }
+    public boolean isDeleted() { return mbDeleted; }
+    public int getFkUserId() { return mnFkUserId; }
+    public Date getTsUser() { return mtTsUser; }
+
     
     @Override
     public void setPrimaryKey(Object pk) {
@@ -54,6 +64,9 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
         msPkLocalityCode = "";
         msPkStateCode = "";
         msDescription = "";
+        mbDeleted = false;
+        mnFkUserId = 0;
+        mtTsUser = null;
     }
 
     @Override
@@ -75,6 +88,9 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
                 msPkLocalityCode = resultSet.getString("id_locality_code");
                 msPkStateCode = resultSet.getString("id_sta_code");
                 msDescription = resultSet.getString("description");
+                mbDeleted = resultSet.getBoolean("b_del");
+                mnFkUserId = resultSet.getInt("fid_usr");
+                mtTsUser = resultSet.getTimestamp("ts_usr");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -112,9 +128,12 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
             if (mbIsRegistryNew) {
                 
                 sql = "INSERT INTO erp.locs_bol_locality VALUES (" +
-                        "'" + msPkLocalityCode + "', " +
-                        "'" + msPkStateCode + "', " +
-                        "'" + msDescription + "', " +
+                        "'" + msPkLocalityCode + "', " + 
+                        "'" + msPkStateCode + "', " + 
+                        "'" + msDescription + "', " + 
+                        (mbDeleted ? 1 : 0) + ", " + 
+                        mnFkUserId + ", " + 
+                        "NOW()" + " " + 
                         ")";
             }
             else {
@@ -122,7 +141,10 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
                 sql = "UPDATE erp.locs_bol_locality SET " +
 //                        "id_locality_code='" + msPkLocalityCode + "', " +
 //                        "id_sta_code='" + msPkStateCode + "', " +
-                        "description='" + msDescription + "', " +
+                        "description = '" + msDescription + "', " +
+                        "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                        "fid_usr = " + mnFkUserId + ", " +
+//                        "ts_usr = " + "NOW()" + " " +
                         "WHERE id_locality_code = " + msPkLocalityCode + " AND id_sta_code = " + msPkStateCode;
             }
 
