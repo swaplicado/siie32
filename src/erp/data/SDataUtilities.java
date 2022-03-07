@@ -3042,6 +3042,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_PUR_UNIT_COST:
                 name = "reps/trn_pur_unit_cost.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_ADV:
+                name = "reps/trn_adv.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_DPS:
                 name = "reps/trn_dps.jasper";
                 break;
