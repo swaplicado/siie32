@@ -2,11 +2,10 @@
 SIIE 3.2 197.1/ 2022-03-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Creación del reporte de saldos de anticipos.
+1) Creación del reporte de saldos de anticipos facturados.
 
 ================================================================================
 SIIE 3.2 197.0/ 2022-03-04
-SIIE 3.2 197.0/ 2022-03-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Corrección a la consulta de CFDIs directos e indirectos en la vista de notas de crédito.
