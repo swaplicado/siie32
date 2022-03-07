@@ -41,6 +41,7 @@ import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
 import erp.mtrn.data.SDataSign;
+import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SDialogRepCommercialSalesPurchases;
 import erp.mtrn.form.SDialogRepContractStock;
@@ -164,6 +165,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAdjWsPending;
     private javax.swing.JMenuItem jmiDpsAdjWsApproved;
     private javax.swing.JMenuItem jmiDpsAdjWsRejected;
+//    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
+//    private javax.swing.JMenuItem jmiTemporal;
     private javax.swing.JMenu jmDpsDvy;
     private javax.swing.JMenuItem jmiDpsDvyPend;
     private javax.swing.JMenuItem jmiDpsDvyPendEntry;
@@ -223,6 +226,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepAccountStatements;
     private javax.swing.JMenuItem jmiRepBizPartnerAccountingMoves;
     private javax.swing.JMenuItem jmiRepBizPartnerJournal;
+    private javax.swing.JMenuItem jmiRepAdv;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollection;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceCollectionDps;
     private javax.swing.JMenuItem jmiRepDpsList;
@@ -471,6 +475,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsPending = new JMenuItem("Notas de crédito por enviar por web-service");
         jmiDpsAdjWsApproved = new JMenuItem("Notas de crédito aceptadas por web-service");
         jmiDpsAdjWsRejected = new JMenuItem("Notas de crédito rechazadas por web-service");
+//    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
+//        jmiTemporal = new JMenuItem("llenar información");
+                
         jmDpsAdj.add(jmiDpsAdjDoc);
         jmDpsAdj.add(jmiDpsAdjEntry);
         jmDpsAdj.addSeparator();
@@ -482,6 +489,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj.add(jmiDpsAdjWsPending);
         jmDpsAdj.add(jmiDpsAdjWsApproved);
         jmDpsAdj.add(jmiDpsAdjWsRejected);
+//    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
+//        jmDpsAdj.add(jmiTemporal);
 
         jmDpsDvy = new JMenu("Entregas");
         jmiDpsDvyPend = new JMenuItem("Ventas por entregar");
@@ -573,6 +582,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepAccountStatements = new JMenuItem("Estados de cuenta de clientes...");
         jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de clientes por documento...");
         jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de clientes...");
+        jmiRepAdv = new JMenuItem("Saldos de anticipos...");
         jmiRepBizPartnerBalanceCollection = new JMenuItem("Reporte de pagos esperados...");
         jmiRepBizPartnerBalanceCollectionDps = new JMenuItem("Reporte de pagos esperados por documento...");
         jmiRepDpsList = new JMenuItem("Listado de facturas por periodo...");
@@ -637,6 +647,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepAccountStatements);
         jmRep.add(jmiRepBizPartnerAccountingMoves);
         jmRep.add(jmiRepBizPartnerJournal); // XXX needs to be checked prior to launch (sflores, 2016-03-14)
+        jmRep.add(jmiRepAdv);
         jmRep.addSeparator();
         jmRep.add(jmiRepBizPartnerBalanceCollection);
         jmRep.add(jmiRepBizPartnerBalanceCollectionDps);
@@ -753,6 +764,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsPending.addActionListener(this);
         jmiDpsAdjWsApproved.addActionListener(this);
         jmiDpsAdjWsRejected.addActionListener(this);
+        //    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
+//        jmiTemporal.addActionListener(this);
         jmiDpsDvyPend.addActionListener(this);
         jmiDpsDvyDelivered.addActionListener(this);
         jmiDpsDvyPendEntry.addActionListener(this);
@@ -804,6 +817,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalanceCollectionDps.addActionListener(this);
         jmiRepAccountStatements.addActionListener(this);
         jmiRepBizPartnerJournal.addActionListener(this);
+        jmiRepAdv.addActionListener(this);
         jmiRepBizPartnerAccountingMoves.addActionListener(this);
         jmiRepDpsList.addActionListener(this);
         jmiRepDpsBizPartner.addActionListener(this);
@@ -888,6 +902,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsPending.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjWsApproved.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjWsRejected.setEnabled(hasRightDocTransactionAdjust);
+        //    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
+//        jmiTemporal.setEnabled(true);
 
         jmDpsDvy.setEnabled(hasRightInventoryOut);
         jmiDpsDvyPend.setEnabled(hasRightInventoryOut);
@@ -1982,6 +1998,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsAdjWsRejected) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_REJECT, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
+            //    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
+//            else if (item == jmiTemporal) {
+//                new llenarDatos(miClient);
+//            }
             else if (item == jmiDpsDvyPend) {
                 miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.PROC_PEND, new SGuiParams(SUtilConsts.QRY_SUM));
             }
@@ -2134,6 +2154,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiRepBizPartnerJournal) {
                 new SDialogRepBizPartnerJournal(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
+            }
+            else if (item == jmiRepAdv) {
+                new SDialogRepAdv(miClient).setVisible(true);
             }
             else if (item == jmiRepBizPartnerAccountingMoves) {
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
