@@ -214,12 +214,13 @@ public class SDbDepartment extends SDbRegistryUser {
             
             accounting.save();
         }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
     
     private boolean validateCircleDepartment(SGuiSession session, ArrayList<Integer> ids, int idDept) throws Exception {
-        String sql = "SELECT fk_dep_sup_n FROM erp.hrsu_dep WHERE id_dep = " + idDept + ";";
+        String sql = "SELECT fk_dep_sup_n FROM " + getSqlTable() + " WHERE id_dep = " + idDept + ";";
         
         if (idDept == 0) {
             return true;

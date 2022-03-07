@@ -864,7 +864,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         oStatementCfg = miClient.getSession().getStatement().getConnection().createStatement();
         oStatementRec = miClient.getSession().getStatement().getConnection().createStatement();
-        SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, "Errores de configuración de contabilización", "Lista de errores de configuración de contabilización:");
+        SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, "Inconvenientes y omisiones de configuración de contabilización", "Lista de inconvenientes y omisiones de configuración de contabilización:");
         
         if (SHrsFinUtils.validateAccountingSettingsForPayroll(miClient.getSession(), moPayroll.getPkPayrollId())) {
             initPayrollRecords();
@@ -1334,7 +1334,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             }
             else {
                 messages.setVisible(true);
-                throw new Exception("Favor de corregir los errores de configuración de contabilización de nóminas indicados.");
+                throw new Exception("Favor de corregir los inconvenientes y omisiones de configuración de contabilización de nóminas listados.");
             }
         }
         

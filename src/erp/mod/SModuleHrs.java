@@ -23,7 +23,7 @@ import erp.mod.hrs.db.SDbConditionalEarning;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbDepartment;
-import erp.mod.hrs.db.SDbDepartmentCenterCost;
+import erp.mod.hrs.db.SDbDepartmentCostCenter;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeDismissalType;
@@ -72,7 +72,7 @@ import erp.mod.hrs.form.SFormConfig;
 import erp.mod.hrs.form.SFormCutoffCalendar;
 import erp.mod.hrs.form.SFormDeduction;
 import erp.mod.hrs.form.SFormDepartment;
-import erp.mod.hrs.form.SFormDepartmentCenterCost;
+import erp.mod.hrs.form.SFormDepartmentCostCenter;
 import erp.mod.hrs.form.SFormEarning;
 import erp.mod.hrs.form.SFormEmployeeDismissalType;
 import erp.mod.hrs.form.SFormEmployeeType;
@@ -112,7 +112,7 @@ import erp.mod.hrs.view.SViewConditionalEarning;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
-import erp.mod.hrs.view.SViewDepartmentCC;
+import erp.mod.hrs.view.SViewDepartmentCostCenter;
 import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
@@ -184,7 +184,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormWorkerType moFormWorkerType;
     private SFormMwzType moFormMwzType;
     private SFormDepartment moFormDepartment;
-    private SFormDepartmentCenterCost moFormDepartmentCenterCost;;
+    private SFormDepartmentCostCenter moFormDepartmentCenterCost;;
     private SFormPosition moFormPosition;
     private SFormShift moFormShift;
     private SFormConfig moFormConfig;
@@ -427,7 +427,7 @@ public class SModuleHrs extends SGuiModule {
                 registry = new SDbShift();
                 break;
             case SModConsts.HRS_DEP_CC:
-                registry = new SDbDepartmentCenterCost();
+                registry = new SDbDepartmentCostCenter();
                 break;
             case SModConsts.HRSU_EMP:
                 registry = new SDbEmployee();
@@ -876,17 +876,17 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSU_TP_PAY_SHT_CUS:
                 view = new SViewPaysheetCustomType(miClient, "Tipos nómina empresa");
                 break;
-            case SModConsts.HRSU_DEP:
-                view = new SViewDepartment(miClient, "Departamentos");
-                break;
             case SModConsts.HRSU_POS:
                 view = new SViewPosition(miClient, "Puestos");
                 break;
-            case SModConsts.HRSU_SHT:
-                view = new SViewShift(miClient, "Turnos");
+            case SModConsts.HRSU_DEP:
+                view = new SViewDepartment(miClient, "Departamentos");
                 break;
             case SModConsts.HRS_DEP_CC:
-                view = new SViewDepartmentCC(miClient, "Departamentos con centro de costo");
+                view = new SViewDepartmentCostCenter(miClient, "Departamentos y centros costo");
+                break;
+            case SModConsts.HRSU_SHT:
+                view = new SViewShift(miClient, "Turnos");
                 break;
             case SModConsts.HRS_CFG:
                 view = new SViewConfig(miClient, "Configuración módulo");
@@ -1202,7 +1202,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormShift;
                 break;
             case SModConsts.HRS_DEP_CC:
-                if (moFormDepartmentCenterCost == null) moFormDepartmentCenterCost = new SFormDepartmentCenterCost(miClient, "Departamentos con centros costo");
+                if (moFormDepartmentCenterCost == null) moFormDepartmentCenterCost = new SFormDepartmentCostCenter(miClient, "Departamentos con centros costo");
                 form = moFormDepartmentCenterCost;
                 break;
             case SModConsts.HRS_CFG:

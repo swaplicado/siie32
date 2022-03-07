@@ -575,7 +575,7 @@ public abstract class SDataUtilities {
      * @param period Period as an int array (index 0: year; index 1: period).
      */
     public static boolean isPeriodOpen(erp.client.SClientInterface client, int[] period) {
-        Vector<Object> params = new Vector<Object>();
+        Vector<Object> params = new Vector<>();
 
         params.add(period[0]);  // year
         params.add(period[1]);  // period

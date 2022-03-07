@@ -274,54 +274,54 @@ public class SModuleFin extends SGuiModule {
             case SModConsts.FINS_FISCAL_ACC:
                 settings = new SGuiCatalogueSettings("Código agrupador SAT", 1, 0, SLibConsts.DATA_TYPE_BOOL);
                 sql = "SELECT id_fiscal_acc AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name, IF(b_eli, '', ' (!)')) AS " + SDbConsts.FIELD_ITEM + ", b_eli AS " + SDbConsts.FIELD_COMP  + "  "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY id_fiscal_acc ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY id_fiscal_acc ";
                 break;
             case SModConsts.FINS_FISCAL_CUR:
                 settings = new SGuiCatalogueSettings("Moneda SAT", 1);
                 sql = "SELECT id_fiscal_cur AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY id_fiscal_cur ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY id_fiscal_cur ";
                 break;
             case SModConsts.FINS_FISCAL_BANK:
                 settings = new SGuiCatalogueSettings("Banco SAT", 1);
                 sql = "SELECT id_fiscal_bank AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY id_fiscal_bank ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY id_fiscal_bank ";
                 break;
             case SModConsts.FINS_FISCAL_PAY_MET:
                 settings = new SGuiCatalogueSettings("Método pago SAT", 1);
                 sql = "SELECT id_fiscal_pay_met AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY id_fiscal_pay_met ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY id_fiscal_pay_met ";
                 break;
             case SModConsts.FINS_CFD_TAX:
                 settings = new SGuiCatalogueSettings("Impuesto SAT", 1);
                 sql = "SELECT id_cfd_tax AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_cfd_tax ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY name, id_cfd_tax ";
                 break;
             case SModConsts.FIN_YEAR:
                 settings = new SGuiCatalogueSettings("Año contable", 1);
                 sql = "SELECT id_year AS " + SDbConsts.FIELD_ID + "1, id_year AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY id_year ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY id_year ";
                 break;
             case SModConsts.FINU_TAX_REG:
                 settings = new SGuiCatalogueSettings("Región impuesto", 1);
                 sql = "SELECT id_tax_reg AS " + SDbConsts.FIELD_ID + "1, tax_reg AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY tax_reg, id_tax_reg ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY tax_reg, id_tax_reg ";
                 break;
             case SModConsts.FINU_TAX_BAS:
                 settings = new SGuiCatalogueSettings("Impuesto básico", 1);
                 sql = "SELECT id_tax_bas AS " + SDbConsts.FIELD_ID + "1, tax_bas AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY tax_bas, id_tax_bas ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY tax_bas, id_tax_bas ";
                 break;
             case SModConsts.FINU_TAX:
                 settings = new SGuiCatalogueSettings("Impuesto", 2, 1);
                 sql = "SELECT id_tax_bas AS " + SDbConsts.FIELD_ID + "1, id_tax AS " + SDbConsts.FIELD_ID + "2, tax AS " + SDbConsts.FIELD_ITEM + ", id_tax_bas AS " + SDbConsts.FIELD_FK + "1 "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY tax, id_tax_bas, id_tax ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY tax, id_tax_bas, id_tax ";
                 break;
             case SModConsts.FINU_TP_LAY_BANK:
                 settings = new SGuiCatalogueSettings("Tipo layout", 1, 2);
                 sql = "SELECT id_tp_lay_bank AS " + SDbConsts.FIELD_ID + "1, tp_lay_bank AS " + SDbConsts.FIELD_ITEM + ", "
                         + "fid_tp_pay_bank AS " + SDbConsts.FIELD_FK + "1 fid_bank AS " + SDbConsts.FIELD_FK + "2 "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 " + (subtype == SLibConsts.UNDEFINED ? "" : " AND lay_bank = " + subtype) + " "
+                        + "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : " AND lay_bank = " + subtype) + " "
                         + "ORDER BY tp_lay_bank, id_tp_lay_bank ";
                 break;
             case SModConsts.FIN_ABP_ENT:
@@ -331,7 +331,7 @@ public class SModuleFin extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Paq. contab. aut. entidad", 1);
                 sql = "SELECT id_abp_ent AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0" + (subtype == SLibConsts.UNDEFINED ? "" : " AND fk_ct_ent = " + subtype) + " "
+                        + "WHERE NOT b_del" + (subtype == SLibConsts.UNDEFINED ? "" : " AND fk_ct_ent = " + subtype) + " "
                         + "ORDER BY name, id_abp_ent ";
                 break;
             case SModConsts.FIN_ABP_BP:
@@ -341,32 +341,32 @@ public class SModuleFin extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Paq. contab. aut. asociado negocios", 1);
                 sql = "SELECT id_abp_bp AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 " + (subtype == SLibConsts.UNDEFINED ? "" : " AND fk_ct_bp = " + subtype) + " "
+                        + "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : " AND fk_ct_bp = " + subtype) + " "
                         + "ORDER BY name, id_abp_bp ";
                 break;
             case SModConsts.FIN_ABP_ITEM:
                 settings = new SGuiCatalogueSettings("Paq. contab. aut. ítem", 1);
                 sql = "SELECT id_abp_item AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
                         + "ORDER BY name, id_abp_item ";
                 break;
             case SModConsts.FIN_ABP_TAX:
                 settings = new SGuiCatalogueSettings("Paq. contab. aut. impuesto", 1);
                 sql = "SELECT id_abp_tax AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
                         + "ORDER BY name, id_abp_tax ";
                 break;
             case SModConsts.FIN_TAX_GRP:
                 settings = new SGuiCatalogueSettings("Grupo impuesto", 1);
                 sql = "SELECT id_tax_grp AS " + SDbConsts.FIELD_ID + "1, tax_grp AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY tax_grp, id_tax_grp ";
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY tax_grp, id_tax_grp ";
                 break;
             case SModConsts.FIN_CC:
                 settings = new SGuiCatalogueSettings("Centro de costo", 1);
-                sql = "SELECT id_cc AS " + SDbConsts.FIELD_ID + "1, pk_cc AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM fin_cc WHERE b_del = 0 ORDER BY id_cc ";
+                sql = "SELECT pk_cc AS " + SDbConsts.FIELD_ID + "1, CONCAT(id_cc, ' - ', cc) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM fin_cc WHERE NOT b_del ORDER BY id_cc, cc ";
                 break;
             case SModConsts.FIN_ACC_CASH:
                 settings = new SGuiCatalogueSettings("Cuenta de dinero", 2);
@@ -376,7 +376,7 @@ public class SModuleFin extends SGuiModule {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ce ON "
                         + "ac.id_cob = ce.id_cob AND ac.id_acc_cash = ce.id_ent "
                         + (params == null ? "" : (params.getKey().length == 1 ? "" : " INNER JOIN erp.bpsu_bank_acc AS bbc ON ac.fid_bpb_n = bbc.id_bpb AND ac.fid_bank_acc_n = bbc.id_bank_acc "))
-                        + "WHERE ac.b_del = 0 AND ce.b_del = 0 " + (params != null && params.getKey() != null ? " AND ac.fid_cur = " + params.getKey()[0] : "") + " ";
+                        + "WHERE NOT ac.b_del AND NOT ce.b_del " + (params != null && params.getKey() != null ? " AND ac.fid_cur = " + params.getKey()[0] : "") + " ";
                 switch (subtype) {
                     case SModConsts.FINX_ACC_CASH_BANK:
                         sql += "AND ce.fid_ct_ent = " + SDataConstantsSys.CFGS_TP_ENT_CASH_BANK[0] + " AND " +
@@ -513,7 +513,7 @@ public class SModuleFin extends SGuiModule {
             case SModConsts.FIN_EXC_RATE:
                 sql = "SELECT id_dt AS " + SDbConsts.FIELD_PICK + "1, exc_rate AS " + SDbConsts.FIELD_PICK + "2, exc_rate AS " + SDbConsts.FIELD_VALUE + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_EXC_RATE) + " "
-                        + "WHERE b_del = 0 AND id_cur = " + subtype + " AND "
+                        + "WHERE NOT b_del AND id_cur = " + subtype + " AND "
                         + "DATEDIFF('" + SLibUtils.DbmsDateFormatDate.format(miClient.getSession().getCurrentDate()) + "', id_dt) <= 30 "
                         + "ORDER BY id_dt, exc_rate ";
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, SGridConsts.COL_TITLE_DATE));
@@ -552,7 +552,7 @@ public class SModuleFin extends SGuiModule {
                         + "tax AS " + SDbConsts.FIELD_PICK + "1, per AS " + SDbConsts.FIELD_PICK + "2, "
                         + "val_u AS " + SDbConsts.FIELD_PICK + "3, val AS " + SDbConsts.FIELD_PICK + "4 "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.FINU_TAX) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
                         + "ORDER BY tax, id_tax_bas, id_tax ";
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Impuesto"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_2D, "Porcentaje"));

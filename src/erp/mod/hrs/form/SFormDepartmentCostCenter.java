@@ -5,7 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbDepartmentCenterCost;
+import erp.mod.hrs.db.SDbDepartmentCostCenter;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -17,16 +17,16 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
-public class SFormDepartmentCenterCost extends SBeanForm {
+public class SFormDepartmentCostCenter extends SBeanForm {
 
-    private SDbDepartmentCenterCost moRegistry;
+    private SDbDepartmentCostCenter moRegistry;
 
     /**
-     * Creates new form SDbDepartmentCenterCost
+     * Creates new form SFormDepartmentCostCenter
      */
-    public SFormDepartmentCenterCost(SGuiClient client, String title) {
+    public SFormDepartmentCostCenter(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_DEP_CC, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -62,7 +62,7 @@ public class SFormDepartmentCenterCost extends SBeanForm {
         jlDepartment.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlDepartment);
 
-        moKeyDepartment.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyDepartment.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel6.add(moKeyDepartment);
 
         jPanel2.add(jPanel6);
@@ -73,7 +73,7 @@ public class SFormDepartmentCenterCost extends SBeanForm {
         jlCenterCost.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlCenterCost);
 
-        moKeyCenterCost.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyCenterCost.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel7.add(moKeyCenterCost);
 
         jPanel2.add(jPanel7);
@@ -125,7 +125,7 @@ public class SFormDepartmentCenterCost extends SBeanForm {
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbDepartmentCenterCost) registry;
+        moRegistry = (SDbDepartmentCostCenter) registry;
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -142,23 +142,24 @@ public class SFormDepartmentCenterCost extends SBeanForm {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
-        moKeyDepartment.setValue(new int[] { moRegistry.getFkDepartmentId() });
-        moKeyCenterCost.setValue(new int[] { moRegistry.getFkCenterCost() });
-
+        moKeyDepartment.setValue(new int[] { moRegistry.getPkDepartmentId() });
+        moKeyCenterCost.setValue(new int[] { moRegistry.getFkCostCenterId() });
 
         setFormEditable(true);
-
+        
+        moKeyDepartment.setEnabled(false);
+        
         addAllListeners();
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbDepartmentCenterCost registry = moRegistry.clone();
+        SDbDepartmentCostCenter registry = moRegistry.clone();
 
         if (registry.isRegistryNew()) { }
 
-        registry.setFkDepartmentId(moKeyDepartment.getValue()[0]);
-        registry.setFkCenterCost(moKeyCenterCost.getValue()[0]);
+        registry.setPkDepartmentId(moKeyDepartment.getValue()[0]);
+        registry.setFkCostCenterId(moKeyCenterCost.getValue()[0]);
 
 
         return registry;

@@ -91,10 +91,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatEmployeeIdse;
     private javax.swing.JMenuItem jmiCatEarnings;
     private javax.swing.JMenuItem jmiCatDeductions;
-    private javax.swing.JMenuItem jmiCatDeparment;
     private javax.swing.JMenuItem jmiCatPosition;
-    private javax.swing.JMenuItem jmiCatShift;
+    private javax.swing.JMenuItem jmiCatDeparment;
     private javax.swing.JMenuItem jmiCatDeparmentCC;
+    private javax.swing.JMenuItem jmiCatShift;
     private javax.swing.JMenuItem jmiCatEmployeeType;
     private javax.swing.JMenuItem jmiCatWorkerType;
     private javax.swing.JMenuItem jmiCatEmployeeDismissType;
@@ -253,10 +253,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeIdse = new JMenuItem("Empleados para IDSE");
         jmiCatEarnings = new JMenuItem("Percepciones");
         jmiCatDeductions = new JMenuItem("Deducciones");
-        jmiCatDeparment = new JMenuItem("Departamentos");
         jmiCatPosition = new JMenuItem("Puestos");
+        jmiCatDeparment = new JMenuItem("Departamentos");
+        jmiCatDeparmentCC = new JMenuItem("Departamentos y centros de costo");
         jmiCatShift = new JMenuItem("Turnos");
-        jmiCatDeparmentCC = new JMenuItem("Departamentos con centro de costo");
         jmiCatEmployeeType = new JMenuItem("Tipos de empleado");
         jmiCatWorkerType = new JMenuItem("Tipos de obrero");
         jmiCatEmployeeDismissType = new JMenuItem("Tipos de baja");
@@ -284,10 +284,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEarnings);
         jmCat.add(jmiCatDeductions);
         jmCat.addSeparator();
-        jmCat.add(jmiCatDeparment);
         jmCat.add(jmiCatPosition);
-        jmCat.add(jmiCatShift);
+        jmCat.add(jmiCatDeparment);
         jmCat.add(jmiCatDeparmentCC);
+        jmCat.add(jmiCatShift);
         jmCat.addSeparator();
         jmCat.add(jmiCatEmployeeType);
         jmCat.add(jmiCatWorkerType);
@@ -490,10 +490,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeSscBaseUpdate.addActionListener(this);
         jmiCatEarnings.addActionListener(this);
         jmiCatDeductions.addActionListener(this);
-        jmiCatDeparment.addActionListener(this);
         jmiCatPosition.addActionListener(this);
-        jmiCatShift.addActionListener(this);
+        jmiCatDeparment.addActionListener(this);
         jmiCatDeparmentCC.addActionListener(this);
+        jmiCatShift.addActionListener(this);
         jmiCatEmployeeType.addActionListener(this);
         jmiCatWorkerType.addActionListener(this);
         jmiCatEmployeeDismissType.addActionListener(this);
@@ -612,10 +612,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeSscBaseUpdate.setEnabled(isPermissionCatEmpWage);
         jmiCatEarnings.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         jmiCatDeductions.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatDeparment.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         jmiCatPosition.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatShift.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatDeparment.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         jmiCatDeparmentCC.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatShift.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         jmiCatEmployeeType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         jmiCatWorkerType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         jmiCatEmployeeDismissType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
@@ -996,17 +996,17 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatDeductions) {
                 miClient.getSession().showView(SModConsts.HRS_DED, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiCatDeparment) {
-                miClient.getSession().showView(SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
-            }
             else if (item == jmiCatPosition) {
                 miClient.getSession().showView(SModConsts.HRSU_POS, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiCatShift) {
-                miClient.getSession().showView(SModConsts.HRSU_SHT, SLibConsts.UNDEFINED, null);
+            else if (item == jmiCatDeparment) {
+                miClient.getSession().showView(SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatDeparmentCC) {
                 miClient.getSession().showView(SModConsts.HRS_DEP_CC, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCatShift) {
+                miClient.getSession().showView(SModConsts.HRSU_SHT, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatEmployeeType) {
                 miClient.getSession().showView(SModConsts.HRSU_TP_EMP, SLibConsts.UNDEFINED, null);
