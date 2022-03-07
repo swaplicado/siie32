@@ -1,13 +1,15 @@
 ================================================================================
-SIIE 3.2 197.0/ 2022-03-04
+SIIE 3.2 197.0/ 2022-03-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Corrección a la consulta de CFDIs directos e indirectos en la vista de notas de crédito.
-2) Adición de la función para agregar una hora deseada al momento de capturar DPS.
-3) Adición del catálogo y la clase de colonias.
-4) Adición del campo colonia en la forma de captura de las cartas porte, asi como a los XML generados.
+2) Adición de la función para agregar una hora deseada de emisión al capturar un documento.
+3) Adición del catálogo y la clase de Colonias para Carta porte.
+4) Adición del campo Colonia en la forma de captura de Cartas porte, asi como a los XML generados.
 5) Reestructuración de la clase SDataDpsCfd para agregar los campos antes contenidos unicamente en el XML.
-6) Corrección al asignar los UUID relacionados en las notas de crédito.
+6) Corrección al asignar los UUID relacionados en las Notas de crédito.
+
+================================================================================
 SIIE 3.2 195.11/ 2022-03-07
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

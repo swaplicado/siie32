@@ -5,7 +5,7 @@
  */
 package erp.mod.log.db;
 
-import erp.mloc.data.SDataNeighborhood;
+import erp.mloc.data.SDataBolNeighborhood;
 import erp.mod.SModConsts;
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -25,7 +25,7 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
     protected int mnPkAddressAddressId;
     protected int mnFkNeighborhoodZipCode;
     
-    protected SDataNeighborhood moDbmsNeighborhood;
+    protected SDataBolNeighborhood moDbmsBolNeighborhood;
     
     public SDbBizPartnerBranchAddressNeighborhood() {
         super(SModConsts.LOGU_BPB_ADD_NEI);
@@ -39,9 +39,9 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
     public int getPkAddressAddressId() { return mnPkAddressAddressId; }
     public int getFkNeighborhoodZipCode() { return mnFkNeighborhoodZipCode; }
 
-    public void setDbmsNeighborhood(SDataNeighborhood o) { moDbmsNeighborhood = o; }
+    public void setDbmsBolNeighborhood(SDataBolNeighborhood o) { moDbmsBolNeighborhood = o; }
     
-    public SDataNeighborhood getDbmsNeighborhood() { return moDbmsNeighborhood; }
+    public SDataBolNeighborhood getDbmsBolNeighborhood() { return moDbmsBolNeighborhood; }
     
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -62,7 +62,7 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
         mnPkAddressAddressId = 0;
         mnFkNeighborhoodZipCode = 0;
         
-        moDbmsNeighborhood = null;
+        moDbmsBolNeighborhood = null;
     }
 
     @Override
@@ -109,8 +109,8 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
         // Read Neighborhood
         
         if (mnFkNeighborhoodZipCode != 0) {
-            moDbmsNeighborhood = new SDataNeighborhood();
-            moDbmsNeighborhood.read(new int[] { mnFkNeighborhoodZipCode } , session.getStatement());
+            moDbmsBolNeighborhood = new SDataBolNeighborhood();
+            moDbmsBolNeighborhood.read(new int[] { mnFkNeighborhoodZipCode } , session.getStatement());
         }
         
         mnQueryResultId = SDbConsts.READ_OK;
@@ -144,8 +144,8 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
         }
         
         if (mnFkNeighborhoodZipCode != 0) {
-            moDbmsNeighborhood = new SDataNeighborhood();
-            moDbmsNeighborhood.read(new int[] { mnFkNeighborhoodZipCode } , session.getStatement());
+            moDbmsBolNeighborhood = new SDataBolNeighborhood();
+            moDbmsBolNeighborhood.read(new int[] { mnFkNeighborhoodZipCode } , session.getStatement());
         }
         
         session.getStatement().execute(msSql);
@@ -161,7 +161,7 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
         registry.setPkAddressAddressId(this.getPkAddressAddressId());
         registry.setFkNeighborhoodZipCode(this.getFkNeighborhoodZipCode());
         
-        registry.setDbmsNeighborhood(this.getDbmsNeighborhood());
+        registry.setDbmsBolNeighborhood(this.getDbmsBolNeighborhood());
         
         return registry;
     } 

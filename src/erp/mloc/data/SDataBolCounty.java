@@ -18,13 +18,13 @@ import java.util.Date;
  *
  * @author Isabel Servín
  */
-public class SDataCounty extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataBolCounty extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected java.lang.String msPkCountyCode;
     protected java.lang.String msPkStateCode;
     protected java.lang.String msDescription;
 
-    public SDataCounty() {
+    public SDataBolCounty() {
         super(SDataConstants.LOCS_BOL_COUNTY);
         reset();
     }

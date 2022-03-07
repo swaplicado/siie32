@@ -30,7 +30,7 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
-import erp.mloc.data.SDataZipCode;
+import erp.mloc.data.SDataBolZipCode;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataCfd;
 import java.io.Serializable;
@@ -945,18 +945,18 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 
                 DElementDomicilio domicilio = origen.getEltDomicilio();
                 if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
-                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsNeighborhood().getNeighborhoodCode());
+                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsBolNeighborhood().getNeighborhoodCode());
                 }
                 domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
                 domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
                 domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 
-                if (location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode() != null) {
-                    SDataZipCode zipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode();
-                    if (zipCode.getDbmsCounty() != null) {
-                        domicilio.getAttMunicipio().setString(zipCode.getDbmsCounty().getPkCountyCode());
+                if (location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
+                    SDataBolZipCode bolZipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode();
+                    if (bolZipCode.getDbmsBolCounty() != null) {
+                        domicilio.getAttMunicipio().setString(bolZipCode.getDbmsBolCounty().getPkCountyCode());
                     }
-                    if (zipCode.getDbmsLocality() != null) {
-                        domicilio.getAttLocalidad().setString(zipCode.getDbmsLocality().getPkLocalityCode());
+                    if (bolZipCode.getDbmsBolLocality() != null) {
+                        domicilio.getAttLocalidad().setString(bolZipCode.getDbmsBolLocality().getPkLocalityCode());
                     }
                 }
             }
@@ -979,18 +979,18 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 
                 DElementDomicilio domicilio = destino.getEltDomicilio();
                 if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
-                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsNeighborhood().getNeighborhoodCode());
+                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsBolNeighborhood().getNeighborhoodCode());
                 }
                 domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
                 domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
                 domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 
-                if (location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode() != null) {
-                    SDataZipCode zipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataZipCode();
-                    if (zipCode.getDbmsCounty() != null) {
-                        domicilio.getAttMunicipio().setString(zipCode.getDbmsCounty().getPkCountyCode());
+                if (location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
+                    SDataBolZipCode zipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode();
+                    if (zipCode.getDbmsBolCounty() != null) {
+                        domicilio.getAttMunicipio().setString(zipCode.getDbmsBolCounty().getPkCountyCode());
                     }
-                    if (zipCode.getDbmsLocality() != null) {
-                        domicilio.getAttLocalidad().setString(zipCode.getDbmsLocality().getPkLocalityCode());
+                    if (zipCode.getDbmsBolLocality() != null) {
+                        domicilio.getAttLocalidad().setString(zipCode.getDbmsBolLocality().getPkLocalityCode());
                     }
                 }
             }

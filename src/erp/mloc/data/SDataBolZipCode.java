@@ -18,7 +18,7 @@ import java.util.Date;
  *
  * @author Isabel Servín
  */
-public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.Serializable{
+public class SDataBolZipCode extends erp.lib.data.SDataRegistry implements java.io.Serializable{
 
     protected String msPkZipCode;
     protected String msPkStateCode;
@@ -28,10 +28,10 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
     protected int mnFkUserId;
     protected Date mtTsUser;
 
-    protected SDataCounty moDbmsCounty;
-    protected SDataLocality moDbmsLocality;
+    protected SDataBolCounty moDbmsBolCounty;
+    protected SDataBolLocality moDbmsBolLocality;
 
-    public SDataZipCode() {
+    public SDataBolZipCode() {
         super(SDataConstants.LOCS_BOL_ZIP_CODE);
         reset();
     }
@@ -52,11 +52,11 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
     public int getFkUserId() { return mnFkUserId; }
     public Date getTsUser() { return mtTsUser; }
 
-    public void setDbmsCounty(SDataCounty o) { moDbmsCounty = o; }
-    public void setDbmsLocality(SDataLocality o) { moDbmsLocality = o; }
+    public void setDbmsBolCounty(SDataBolCounty o) { moDbmsBolCounty = o; }
+    public void setDbmsBolLocality(SDataBolLocality o) { moDbmsBolLocality = o; }
     
-    public SDataCounty getDbmsCounty() { return moDbmsCounty; }
-    public SDataLocality getDbmsLocality() { return moDbmsLocality; }
+    public SDataBolCounty getDbmsBolCounty() { return moDbmsBolCounty; }
+    public SDataBolLocality getDbmsBolLocality() { return moDbmsBolLocality; }
 
     @Override
     public void setPrimaryKey(Object pk) {
@@ -81,8 +81,8 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
         mnFkUserId = 0;
         mtTsUser = null;
 
-        moDbmsCounty = null;
-        moDbmsLocality = null;
+        moDbmsBolCounty = null;
+        moDbmsBolLocality = null;
     }
 
     @Override
@@ -116,15 +116,15 @@ public class SDataZipCode extends erp.lib.data.SDataRegistry implements java.io.
             // Read county:
             
             if (!msCountyCode.isEmpty()) {
-                moDbmsCounty = new SDataCounty();
-                moDbmsCounty.read(new String[] { msCountyCode, msPkStateCode }, statement);
+                moDbmsBolCounty = new SDataBolCounty();
+                moDbmsBolCounty.read(new String[] { msCountyCode, msPkStateCode }, statement);
             }
             
             // Read locality
             
             if (!msLocalityCode.isEmpty()) {
-                moDbmsLocality = new SDataLocality();
-                moDbmsLocality.read(new String[] { msLocalityCode, msPkStateCode }, statement);
+                moDbmsBolLocality = new SDataBolLocality();
+                moDbmsBolLocality.read(new String[] { msLocalityCode, msPkStateCode }, statement);
             }
         }
         catch (SQLException e) {

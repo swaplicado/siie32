@@ -17,7 +17,7 @@ import java.util.Date;
  *
  * @author Isabel Servín
  */
-public class SDataNeighborhood extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkNeighborhoodZipCode;
     protected String msNeighborhoodCode;
@@ -27,7 +27,7 @@ public class SDataNeighborhood extends erp.lib.data.SDataRegistry implements jav
     protected int mnFkUserId;
     protected Date mtTsUser;
     
-    public SDataNeighborhood() {
+    public SDataBolNeighborhood() {
         super(SDataConstants.LOCS_BOL_NEI_ZIP_CODE);
         reset();
     }

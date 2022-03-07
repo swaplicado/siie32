@@ -326,7 +326,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mtrn.form.SDialogDpsAdjustment moDialogDpsAdjustment;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mtrn.form.SDialogShowDocumentLinks moDialogShowDocumentLinks;
-    private erp.mtrn.form.SDialogTime moDialogTime;
+    private erp.mtrn.form.SDialogDpsTime moDialogDpsTime;
     private erp.mfin.form.SPanelRecord moPanelRecord;
     private erp.mtrn.form.SFormDpsCom moFormCom;
     private cfd.ver33.DElementComprobante moComprobante33;
@@ -7875,12 +7875,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private void actionTime() {
         try {
-            if (moDialogTime == null) {
-                moDialogTime = new SDialogTime(miClient);
+            if (moDialogDpsTime == null) {
+                moDialogDpsTime = new SDialogDpsTime(miClient);
             }
-            moDialogTime.setFormVisible(true);
-            if (moDialogTime.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                manDpsTime = moDialogTime.getValue();
+            moDialogDpsTime.setFormVisible(true);
+            if (moDialogDpsTime.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                manDpsTime = moDialogDpsTime.getValue();
             }
         }
         catch (Exception e) {
@@ -9284,7 +9284,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         mbResetingForm = false;
         
-        moDialogTime = null;
+        moDialogDpsTime = null;
         manDpsTime = null;
     }
 

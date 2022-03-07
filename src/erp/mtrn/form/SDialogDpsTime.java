@@ -18,7 +18,7 @@ import sa.lib.SLibUtils;
  *
  * @author Isabel Servín
  */
-public class SDialogTime extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.FocusListener {
+public class SDialogDpsTime extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.FocusListener {
 
     private final erp.client.SClientInterface miClient;
 
@@ -36,7 +36,7 @@ public class SDialogTime extends javax.swing.JDialog implements java.awt.event.A
      * @throws java.lang.Exception
      */
     
-    public SDialogTime(erp.client.SClientInterface client) throws java.lang.Exception {
+    public SDialogDpsTime(erp.client.SClientInterface client) throws java.lang.Exception {
         super(client.getFrame(), true);
         miClient = client;
         
@@ -91,7 +91,6 @@ public class SDialogTime extends javax.swing.JDialog implements java.awt.event.A
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jbCancel.setPreferredSize(new java.awt.Dimension(75, 23));
         jpControls.add(jbCancel);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);

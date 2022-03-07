@@ -18,7 +18,7 @@ import java.util.Date;
  *
  * @author Isabel Servín
  */
-public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataBolLocality extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected String msPkLocalityCode;
     protected String msPkStateCode;
@@ -27,7 +27,7 @@ public class SDataLocality extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkUserId;
     protected Date mtTsUser;
 
-    public SDataLocality() {
+    public SDataBolLocality() {
         super(SDataConstants.LOCS_BOL_LOCALITY);
     }
     
