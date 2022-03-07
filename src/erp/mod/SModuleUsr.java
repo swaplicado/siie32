@@ -8,7 +8,6 @@ package erp.mod;
 import erp.mod.usr.db.SDbUser;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
-import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiCatalogueSettings;
@@ -52,27 +51,7 @@ public class SModuleUsr extends SGuiModule {
 
     @Override
     public SGuiCatalogueSettings getCatalogueSettings(final int type, final int subtype, final SGuiParams params) {
-        String sql = "";
-        SGuiCatalogueSettings settings = null;
-        
-        switch (type) {
-            case SModConsts.LOCS_BOL_NEI_ZIP_CODE:
-                settings = new SGuiCatalogueSettings("Colonias", 1);
-                settings.setCodeApplying(true);
-                sql = "SELECT id_nei_zip_code AS " + SDbConsts.FIELD_ID + "1, description AS " + SDbConsts.FIELD_ITEM + ", zip_code AS " + SDbConsts.FIELD_CODE + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE zip_code = '" + params.getKey()[0] + "' "
-                        + "ORDER BY description ";
-                break;
-            default:
-                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-        }
-        
-        if (settings != null) {
-            settings.setSql(sql);
-        }
-        
-        return settings;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
