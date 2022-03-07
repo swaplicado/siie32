@@ -62,23 +62,21 @@ public class STrnInventoryValuation {
      * @throws Exception 
      */
     private void validateDefaultWarehouseWip() throws Exception {
-        String sql = "";
-        Statement stProduct = moSession.getStatement().getConnection().createStatement();
-        ResultSet rsProduct = null;
-        
         manDefaultWarehouseWip = null;
         
-        sql = "SELECT id_cob, id_ent "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " "
-                + "WHERE fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[1] + " AND "
-                + "NOT b_del AND b_def ";
+        try (Statement statement = moSession.getStatement().getConnection().createStatement()) {
+            String sql = "SELECT id_cob, id_ent "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " "
+                    + "WHERE fid_ct_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[0] + " AND fid_tp_ent = " + SModSysConsts.CFGS_TP_ENT_WH_MFG_WP[1] + " AND "
+                    + "NOT b_del AND b_def ";
 
-        rsProduct = stProduct.executeQuery(sql);
-        if (!rsProduct.next()) {
-            throw new Exception(ERR_MSG_WIP);
-        }
-        else {
-            manDefaultWarehouseWip = new int[] { rsProduct.getInt(1), rsProduct.getInt(2) };
+            ResultSet resultSet = statement.executeQuery(sql);
+            if (!resultSet.next()) {
+                throw new Exception(ERR_MSG_WIP);
+            }
+            else {
+                manDefaultWarehouseWip = new int[] { resultSet.getInt("id_cob"), resultSet.getInt("id_ent") };
+            }
         }
     }
     
@@ -89,11 +87,9 @@ public class STrnInventoryValuation {
     private void validateConsumptionsMfgOrders() throws Exception {
         int lines = 0;
         String sql = "";
-        String msgJobOrders = "";
+        String message = "";
         Statement stJobOrder = moSession.getStatement().getConnection().createStatement();
         Statement stStockMove = moSession.getStatement().getConnection().createStatement();
-        ResultSet rsJobOrder = null;
-        ResultSet rsStockMove = null;
         
         // Get a list of all manufacturing job orders belonging to current period to check if have had properly consume its assigned materials:
             
@@ -105,37 +101,43 @@ public class STrnInventoryValuation {
                 + "s.id_year = " + mnYear + " AND s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' "
                 + "ORDER BY o.id_year, o.id_ord; ";
 
-        rsJobOrder = stJobOrder.executeQuery(sql);
+        ResultSet rsJobOrder = stJobOrder.executeQuery(sql);
         while (rsJobOrder.next()) {
             // Check if that last stock movement of current manufacturing job order is the consumption one:
             
             sql = "SELECT d.fid_ct_iog, d.fid_cl_iog, d.fid_tp_iog, "
-                    + "d.dt, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), erp.lib_fix_int(d.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS _num "
+                    + "d.dt, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), erp.lib_fix_int(d.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS _num, dt.tp_iog "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d ON s.fid_diog_year = d.id_year AND s.fid_diog_doc = d.id_doc "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_IOG) + " AS dt ON dt.id_ct_iog = d.fid_ct_iog AND dt.id_cl_iog = d.fid_cl_iog AND dt.id_tp_iog = d.fid_tp_iog "
                     + "WHERE NOT s.b_del AND NOT d.b_del AND "
                     + "s.id_year = " + mnYear + " AND s.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodBegin) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
                     + "d.fid_mfg_year_n = " + rsJobOrder.getInt("o.id_year") + " AND d.fid_mfg_ord_n = " + rsJobOrder.getInt("o.id_ord") + " "
                     + "ORDER BY d.dt DESC, d.ts_edit DESC "
                     + "LIMIT 1; ";
             
-            rsStockMove = stStockMove.executeQuery(sql);
+            ResultSet rsStockMove = stStockMove.executeQuery(sql);
             if (rsStockMove.next()) {
                 int[] key = new int[] { rsStockMove.getInt("d.fid_ct_iog") , rsStockMove.getInt("d.fid_cl_iog"), rsStockMove.getInt("d.fid_tp_iog") };
                 if (!SLibUtils.belongsTo(key, new int[][] { SModSysConsts.TRNS_TP_IOG_IN_MFG_CON, SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON })) {
                     if (++lines <= MAX_MSG_LINES) {
-                        msgJobOrders += (msgJobOrders.isEmpty() ? "" : "\n") + "El último movimiento de almacén " + rsStockMove.getString("_num") + ", capturado el " + SLibUtils.DateFormatDate.format(rsStockMove.getDate("d.dt")) + ", para la OP '" + rsJobOrder.getString("_ord") + "' del " + SLibUtils.DateFormatDate.format(rsJobOrder.getDate("o.dt")) + " no es el consumo de MP y P.";
+                        message += (message.isEmpty() ? "" : "\n") + "El último movimiento de almacén de la OP #" + rsJobOrder.getString("_ord") + " (" + SLibUtils.DateFormatDate.format(rsJobOrder.getDate("o.dt")) + "), "
+                                + "#" + rsStockMove.getString("_num") + " (" + SLibUtils.DateFormatDate.format(rsStockMove.getDate("d.dt")) + "), no es de consumo de MP y P, sino de " + rsStockMove.getString("dt.tp_iog").toLowerCase() + ".";
                     }
                     else {
-                        msgJobOrders += "\nEntre otras.";
+                        message += "\nEntre otras.";
                         break;
                     }
                 }
             }
+            
+            rsStockMove.close();
         }
         
-        if (!msgJobOrders.isEmpty()) {
-            throw new Exception(msgJobOrders);
+        rsJobOrder.close();
+        
+        if (!message.isEmpty()) {
+            throw new Exception(message);
         }
     }
     
