@@ -37,7 +37,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     protected String msConfirmation;
     protected String msTaxRegime;
     protected String msCfdiUsage;
-    protected String msRelatedType;
+    protected String msRelationType;
     protected String msRelatedUuid;
     protected String msXml;
     protected int mnFkRelatedDpsYearId_n;
@@ -77,7 +77,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public void setConfirmation(String s) { msConfirmation = s; }
     public void setTaxRegime(String s) { msTaxRegime = s; }
     public void setCfdiUsage(String s) { msCfdiUsage = s; }
-    public void setRelatedType(java.lang.String s) { msRelatedType = s; }
+    public void setRelationType(java.lang.String s) { msRelationType = s; }
     public void setXml(java.lang.String s) { msXml = s; }
     public void setRelatedUuid(java.lang.String s) { msRelatedUuid = s; }
     public void setFkRelatedDpsYearId_n(int n) { mnFkRelatedDpsYearId_n = n; }
@@ -109,7 +109,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public String getConfirmation() { return msConfirmation; }
     public String getTaxRegime() { return msTaxRegime; }
     public String getCfdiUsage() { return msCfdiUsage; }
-    public String getRelatedType() { return msRelatedType; }
+    public String getRelationType() { return msRelationType; }
     public String getRelatedUuid() { return msRelatedUuid; }
     public String getXml() { return msXml; }
     public int getFkRelatedDpsYearId_n() { return mnFkRelatedDpsYearId_n; }
@@ -159,7 +159,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
         
         if (msRelatedUuid.isEmpty()) {
             msRelatedUuid = uuid;
-            msRelatedType = msCfdiRelacionadosTipoRelacion;
+            msRelationType = msCfdiRelacionadosTipoRelacion;
         }
         
         return add;
@@ -272,7 +272,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
         msConfirmation = "";
         msTaxRegime = "";
         msCfdiUsage = "";
-        msRelatedType = "";
+        msRelationType = "";
         msRelatedUuid = "";
         msXml = "";
         mnFkRelatedDpsYearId_n = 0;
@@ -321,7 +321,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                 msConfirmation = resultSet.getString("conf");
                 msTaxRegime = resultSet.getString("tax_reg");
                 msCfdiUsage = resultSet.getString("cfd_use");
-                msRelatedType = resultSet.getString("related_tp");
+                msRelationType = resultSet.getString("relation_tp");
                 msRelatedUuid = resultSet.getString("related_uuid");
                 msXml = resultSet.getString("xml");
                 mnFkRelatedDpsYearId_n = resultSet.getInt("fid_related_dps_year_n");
@@ -377,7 +377,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                         "'" + msConfirmation + "', " +
                         "'" + msTaxRegime + "', " +
                         "'" + msCfdiUsage + "', " +
-                        "'" + msRelatedType + "', " +
+                        "'" + msRelationType + "', " +
                         "'" + msRelatedUuid + "', " + 
                         "'" + msXml + "', " +
                         (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
@@ -397,7 +397,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                         "conf = '" + msConfirmation + "', " +
                         "tax_reg = '" + msTaxRegime + "', " +
                         "cfd_use = '" + msCfdiUsage + "', " +
-                        "related_tp = '" + msRelatedType + "', " +
+                        "relation_tp = '" + msRelationType + "', " +
                         "related_uuid = '" + msRelatedUuid + "', " +
                         "xml = '" + msXml + "', " +
                         "fid_related_dps_year = " + (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
