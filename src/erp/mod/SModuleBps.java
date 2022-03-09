@@ -175,6 +175,14 @@ public class SModuleBps extends SGuiModule {
                         + "WHERE b_del = 0 " 
                         + "ORDER BY sta";
                 break;
+            case SModConsts.LOCS_BOL_NEI_ZIP_CODE:
+                settings = new SGuiCatalogueSettings("Colonias", 1);
+                settings.setCodeApplying(true);
+                sql = "SELECT id_nei_zip_code AS " + SDbConsts.FIELD_ID + "1, description AS " + SDbConsts.FIELD_ITEM + ", zip_code AS " + SDbConsts.FIELD_CODE + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE zip_code = '" + params.getKey()[0] + "' "
+                        + "ORDER BY description ";
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

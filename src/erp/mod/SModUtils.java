@@ -19,6 +19,7 @@ public class SModUtils implements SGuiModuleUtils {
 
     /**
      * @param type Constatns defined in <code>SModConsts</code>.
+     * @return 
      */
     @Override
     public int getModuleTypeByType(final int type) {
@@ -27,7 +28,7 @@ public class SModUtils implements SGuiModuleUtils {
         if (type < SModConsts.USRS_TP_USR || type == SModConsts.LOCU_CTY) {
             moduleType = SModConsts.MOD_CFG_N;
         }
-        else if (type < SModConsts.LOCU_CTY) {
+        else if (type < SModConsts.LOCS_BOL_NEI_ZIP_CODE) {
             moduleType = SModConsts.MOD_USR_N;
         }
         else if (type < SModConsts.ITMS_CT_ITEM) {
