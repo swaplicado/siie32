@@ -397,6 +397,7 @@ public abstract class SFinUtils {
      * Obtiener el saldo de un documento agrupado por impuesto, en caso que el documento haya sido contabilizado así, por impuesto.
      * En caso contrario, sólo se devuelve una entrada en el arreglo con el saldo global del documento, asociado a la clave no asociada a algún impuesto en particular (ID impuesto básico = 0 e ID impuesto = 0).
      * @param connection DB connection.
+     * @param accYear Accounting year.
      * @param dpsYearId Documents primary key's year.
      * @param dpsDocId Document primary key's document.
      * @param sysMoveCategory Category of system movement.
@@ -404,7 +405,7 @@ public abstract class SFinUtils {
      * @param record Accounting record (journal voucher to exclude.)
      * @return ArrayList
      */
-    public static ArrayList<SFinBalanceTax> getBalanceByTax(Connection connection, int dpsYearId, int dpsDocId, int sysMoveCategory, int sysMoveType, SDataRecord record) {
+    public static ArrayList<SFinBalanceTax> getBalanceByTax(final Connection connection, final int accYear, final int dpsYearId, final int dpsDocId, final int sysMoveCategory, final int sysMoveType, final SDataRecord record) {
         ArrayList<SFinBalanceTax> taxBalances = new ArrayList<>();
         String sqlRecordToExclude = "";
         
@@ -419,7 +420,7 @@ public abstract class SFinUtils {
                 + "FROM fin_rec AS r "
                 + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
                 + "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc "
-                + "WHERE NOT r.b_del AND NOT re.b_del AND re.fid_ct_sys_mov_xxx = " + sysMoveCategory + " AND re.fid_tp_sys_mov_xxx = " + sysMoveType + " AND "
+                + "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + accYear + " AND re.fid_ct_sys_mov_xxx = " + sysMoveCategory + " AND re.fid_tp_sys_mov_xxx = " + sysMoveType + " AND "
                 + "re.fid_dps_year_n = " + dpsYearId + " AND re.fid_dps_doc_n = " + dpsDocId + " " + sqlRecordToExclude
                 + "GROUP BY re.fid_tax_bas_n, re.fid_tax_n "
                 + "HAVING f_bal <> 0 OR f_bal_cur <> 0 "

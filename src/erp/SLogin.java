@@ -261,7 +261,7 @@ public class SLogin extends JDialog {
     }
 
     public void setCompanies(ArrayList<SSrvCompany> companies) {
-        Vector<SFormComponentItem> items = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> items = new Vector<>();
 
         for (SSrvCompany c : companies) {
             items.add(new SFormComponentItem(new int[]{c.getCompanyId()}, c.getCompany()));

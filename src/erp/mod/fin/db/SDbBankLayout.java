@@ -56,6 +56,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -694,6 +695,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                             double payment = (new SMoney(session, layoutBankDps.getPaymentCy(), layoutBankDps.getDps().getFkCurrencyId(), exchangeRate)).getLocalAmount();
                             
                             ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
+                                    SLibTimeUtils.digestYear(mtDateLayout)[0], 
                                     layoutBankDps.getDps().getPkYearId(), layoutBankDps.getDps().getPkDocId(), 
                                     SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
                                     SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1], 

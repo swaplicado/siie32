@@ -617,7 +617,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             // delete last CFDI accounting movements in database:
             mnAuxFkUserDeleteId = mnAuxFkUserEditId;
             deleteAccounting(connection);
-/*
+            /*
             // delete last CFDI accounting movements IN MEMORY:
             for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
                 for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
@@ -626,7 +626,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
             }
-*/
+            */
         }
 
         int numberEntry = 0;

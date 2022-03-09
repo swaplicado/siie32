@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiSession;
@@ -553,6 +554,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             // generate DSM entry for the accounting of current payment (to process payment and related taxes):
             
             ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
+                    SLibTimeUtils.digestYear(DataParentPayment.getDbmsDataCfd().getTimestamp())[0], 
                     paymentEntryDoc.ThinDps.getPkYearId(), paymentEntryDoc.ThinDps.getPkDocId(), 
                     SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], 
                     paymentEntryDoc.ParentPaymentEntry.DataRecord);

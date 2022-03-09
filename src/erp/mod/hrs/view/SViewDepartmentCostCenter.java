@@ -152,7 +152,7 @@ public class SViewDepartmentCostCenter extends SGridPaneView {
                             dcc.setPkDepartmentId(gridRow.getRowPrimaryKey()[0]);
                             dcc.setFkCostCenterId(1);
                             dcc.save(miClient.getSession());
-                            miClient.getSession().notifySuscriptors(mnGridType);
+                            miClient.getSession().notifySuscriptors(mnGridType); // el nuevo registro está creado, mostrarlo en la vista; útil por si el usuario opta por cancelar la captura
                         }
                     }
                     catch (Exception e) {
