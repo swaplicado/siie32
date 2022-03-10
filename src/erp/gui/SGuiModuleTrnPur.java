@@ -1034,25 +1034,29 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                             // form complement contains: document type and a source document to import entries:
 
                             type = (int[]) ((Object[]) moFormComplement)[0];
-                            miForm.setValue(SLibConstants.VALUE_TYPE, type);            // document type as int[]
+                            miForm.setValue(SLibConstants.VALUE_TYPE, type); // document type as int[]
 
                             if (((Object[]) moFormComplement).length >= 2) {
-                                if (((Object[]) moFormComplement)[1] instanceof Boolean) {
-                                    miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[1]);
+                                miForm.setValue(SLibConstants.VALUE_IS_IMPORTED, ((Object[]) moFormComplement)[1]);
+                            }
+                            
+                            if (((Object[]) moFormComplement).length >= 3) {
+                                if (((Object[]) moFormComplement)[2] instanceof Boolean) {
+                                    miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[2]);
                                 }
-                                else if (((Object[]) moFormComplement)[1] instanceof SDataDps) {
+                                else if (((Object[]) moFormComplement)[2] instanceof SDataDps) {
                                     if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN })) {
-                                        miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[1]);
+                                        miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[2]);
                                     }
                                 }
                             }
 
-                            if (((Object[]) moFormComplement).length >= 3 && ((Object[]) moFormComplement)[2] != null) {
-                                miForm.setValue(SDataConstants.TRNS_STP_DPS_ADJ, ((Object[]) moFormComplement)[2]);
+                            if (((Object[]) moFormComplement).length >= 4 && ((Object[]) moFormComplement)[3] != null) {
+                                miForm.setValue(SDataConstants.TRNS_STP_DPS_ADJ, ((Object[]) moFormComplement)[3]);
                             }
 
-                            if (((Object[]) moFormComplement).length >= 4) {
-                                miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[3]);
+                            if (((Object[]) moFormComplement).length >= 5) {
+                                miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[4]);
                             }
                         }
                     }

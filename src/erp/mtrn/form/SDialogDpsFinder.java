@@ -142,7 +142,7 @@ public class SDialogDpsFinder extends javax.swing.JDialog implements erp.lib.for
     private void initComponentsExtra() {
         moFieldAdjustmentSubtypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAdjustmentSubtypeId, jlAdjustmentSubtypeId);
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldAdjustmentSubtypeId);
 
         moPanelDpsFinder = new SPanelDpsFinder(miClient, mnFinderType);

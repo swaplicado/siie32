@@ -92,6 +92,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private boolean mbEditingVoucher; // payment voucher, that is, the very header of registry
     private boolean mbEditingPaymentEntry;
     private boolean mbEditingPaymentEntryDoc;
+    private boolean mbDpsValidationFailed;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private final erp.client.SClientInterface miClient;
 
@@ -1813,27 +1814,35 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
     
     private void validateDpsRelated() throws Exception {
-        if (moThinDocDpsRelated == null) {
-            throw new Exception("El documento relacionado no existe.");
+        mbDpsValidationFailed = false;
+        
+        try {
+            if (moThinDocDpsRelated == null) {
+                throw new Exception("El documento relacionado no existe.");
+            }
+            else {
+                String msg = "El documento relacionado " + moThinDocDpsRelated.getDpsNumber() + " ";
+
+                if (moThinDocDpsRelated.getThinCfd() == null) {
+                    throw new Exception(msg + "carece de CFDI.");
+                }
+                else if (moThinDocDpsRelated.getThinCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                    throw new Exception(msg + "debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + ".");
+                }
+                else if (!moThinDocDpsRelated.getThinCfd().isStamped()) {
+                    throw new Exception(msg + "no está timbrado.");
+                }
+                else if (moThinDocDpsRelated.getThinCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                    throw new Exception(msg + "está cancelado.");
+                }
+                else if (moThinDocDpsRelated.getThinCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                    throw new Exception(msg + "no está emitido.");
+                }
+            }
         }
-        else {
-            String msg = "El documento relacionado " + moThinDocDpsRelated.getDpsNumber() + " ";
-            
-            if (moThinDocDpsRelated.getThinCfd() == null) {
-                throw new Exception(msg + "carece de CFDI.");
-            }
-            else if (moThinDocDpsRelated.getThinCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-                throw new Exception(msg + "debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + ".");
-            }
-            else if (!moThinDocDpsRelated.getThinCfd().isStamped()) {
-                throw new Exception(msg + "no está timbrado.");
-            }
-            else if (moThinDocDpsRelated.getThinCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                throw new Exception(msg + "está cancelado.");
-            }
-            else if (moThinDocDpsRelated.getThinCfd().getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                throw new Exception(msg + "no está emitido.");
-            }
+        catch (Exception e) {
+            mbDpsValidationFailed = true;
+            throw e;
         }
     }
 
@@ -2883,6 +2892,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
      * @param mode DPS pending or DPS all.
      */
     private void actionPerformedDocDpsRelatedPick(int mode) {
+        mbDpsValidationFailed = false;
+        moThinDocDpsRelated = null;
+        
         SDialogPickerDps pickerDps;
         Object[] filterKey;
         int year = SLibTimeUtils.digestYear(moFieldVouDate.getDate())[0];
@@ -2938,6 +2950,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                     moThinDocDpsRelated.read(pickerDps.getSelectedPrimaryKey(), miClient.getSession().getStatement());
 
                     renderDocDpsRelated();
+                    
                     balance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moThinDocDpsRelated.getPrimaryKey(), year);
                     if (docPayments != 0) {
                         balance[1] = SLibUtils.roundAmount(balance[1] + docPayments);
@@ -3035,16 +3048,21 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
                 if (adding) {
                     jbDocDpsRelatedPickPend.doClick(); // shortcut to pick doc
-                    if (moDialogDocDpsRelatedPickerPend.getFormResult() != SLibConstants.FORM_RESULT_OK) {
-                        if (miClient.showMsgBoxConfirm("¿Desea buscar entre todos los documentos del deudor?") == JOptionPane.YES_OPTION) {
-                            jbDocDpsRelatedPickAll.doClick(); // shortcut to pick doc
-                            if (moDialogDocDpsRelatedPickerAll.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                    if (!mbDpsValidationFailed) {
+                        if (moDialogDocDpsRelatedPickerPend.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                            if (miClient.showMsgBoxConfirm("¿Desea buscar entre todos los documentos del deudor?") == JOptionPane.YES_OPTION) {
+                                jbDocDpsRelatedPickAll.doClick(); // shortcut to pick doc
+                                if (moDialogDocDpsRelatedPickerAll.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                                    actionPerformedDocPaymentEntryDocCancel();
+                                }
+                            }
+                            else {
                                 actionPerformedDocPaymentEntryDocCancel();
                             }
                         }
-                        else {
-                            actionPerformedDocPaymentEntryDocCancel();
-                        }
+                    }
+                    else {
+                        actionPerformedDocPaymentEntryDocCancel();
                     }
                 }
                 else {
@@ -4012,6 +4030,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         if (!validation.getIsError()) {
             int index = 0;
             SDataCfdPayment dummyPayment = new SDataCfdPayment();
+            dummyPayment.getDbmsDataCfd().setTimestamp(moFieldVouDate.getDate());
             dummyPayment.setAuxCfdDbmsDataReceptor(moDataRecBizPartner);
             
             try {

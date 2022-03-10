@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 197.3/ 2022-03-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la generación de renglones contables de CFDI de pagos, debido a la fecha inexistente aún en el CFDI correspondiente, utilizada para obtener el saldo del documento por cada impuesto.
+2) Corrección a la búsqueda de documentos, de modo que la funcionlidad sea la correcta para cualquier tipo de documento, no sólo facturas.
+3) Corrección al procesamiento de parámetros de formas de captura en el módulo de cuentas por pagar, debido a que no se replicaron los últimos cambios del módulo de cuentas por cobrar.
+
+================================================================================
 SIIE 3.2 197.2/ 2022-03-09
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

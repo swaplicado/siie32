@@ -216,6 +216,27 @@ public class SDbPayroll extends SDbRegistryUser {
     public double getAuxTotalNet() { return mdAuxTotalEarnings - mdAuxTotalDeductions; }
     public String getAuxPaymentType() { return msAuxPaymentType; }
     
+    @Override
+    public String getName() {
+        String name = "";
+        
+        switch (mnFkPaymentTypeId) {
+            case SModSysConsts.HRSS_TP_PAY_WEE:
+                name = "SEM.";
+                break;
+            case SModSysConsts.HRSS_TP_PAY_FOR:
+                name = "QNA.";
+                break;
+            default:
+                name = "XXX.";
+                // do nothing
+        }
+        
+        name += " #" + SLibUtils.DecimalFormatCalendarMonth.format(mnNumber) + " " + SLibUtils.DecimalFormatCalendarMonth.format(mnPeriodYear) + ", " + msNotes;
+        
+        return name;
+    }
+    
     public boolean isPayrollNormal() { return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR; }
     public boolean isPayrollFortnightStandard() { return mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_FOR && mbFortnightStandard; }
 

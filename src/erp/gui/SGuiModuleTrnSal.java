@@ -1209,11 +1209,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             // form complement contains: document type and a source document to import entries:
 
                             type = (int[]) ((Object[]) moFormComplement)[0];
-                            miForm.setValue(SLibConstants.VALUE_TYPE, type);            // document type as int[]
+                            miForm.setValue(SLibConstants.VALUE_TYPE, type); // document type as int[]
 
                             if (((Object[]) moFormComplement).length >= 2) {
                                 miForm.setValue(SLibConstants.VALUE_IS_IMPORTED, ((Object[]) moFormComplement)[1]);
                             }
+                            
                             if (((Object[]) moFormComplement).length >= 3) {
                                 if (((Object[]) moFormComplement)[2] instanceof Boolean) {
                                     miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[2]);
