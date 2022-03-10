@@ -165,8 +165,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAdjWsPending;
     private javax.swing.JMenuItem jmiDpsAdjWsApproved;
     private javax.swing.JMenuItem jmiDpsAdjWsRejected;
-//    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
-//    private javax.swing.JMenuItem jmiTemporal;
     private javax.swing.JMenu jmDpsDvy;
     private javax.swing.JMenuItem jmiDpsDvyPend;
     private javax.swing.JMenuItem jmiDpsDvyPendEntry;
@@ -475,8 +473,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsPending = new JMenuItem("Notas de crédito por enviar por web-service");
         jmiDpsAdjWsApproved = new JMenuItem("Notas de crédito aceptadas por web-service");
         jmiDpsAdjWsRejected = new JMenuItem("Notas de crédito rechazadas por web-service");
-//    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
-//        jmiTemporal = new JMenuItem("llenar información");
                 
         jmDpsAdj.add(jmiDpsAdjDoc);
         jmDpsAdj.add(jmiDpsAdjEntry);
@@ -489,8 +485,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj.add(jmiDpsAdjWsPending);
         jmDpsAdj.add(jmiDpsAdjWsApproved);
         jmDpsAdj.add(jmiDpsAdjWsRejected);
-//    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
-//        jmDpsAdj.add(jmiTemporal);
 
         jmDpsDvy = new JMenu("Entregas");
         jmiDpsDvyPend = new JMenuItem("Ventas por entregar");
@@ -764,8 +758,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsPending.addActionListener(this);
         jmiDpsAdjWsApproved.addActionListener(this);
         jmiDpsAdjWsRejected.addActionListener(this);
-        //    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
-//        jmiTemporal.addActionListener(this);
         jmiDpsDvyPend.addActionListener(this);
         jmiDpsDvyDelivered.addActionListener(this);
         jmiDpsDvyPendEntry.addActionListener(this);
@@ -902,9 +894,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjWsPending.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjWsApproved.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjWsRejected.setEnabled(hasRightDocTransactionAdjust);
-        //    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
-//        jmiTemporal.setEnabled(true);
-
+        
         jmDpsDvy.setEnabled(hasRightInventoryOut);
         jmiDpsDvyPend.setEnabled(hasRightInventoryOut);
         jmiDpsDvyPendEntry.setEnabled(hasRightInventoryOut);
@@ -1998,10 +1988,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsAdjWsRejected) {
                 miClient.getSession().showView(SModConsts.TRN_CFD, SModSysConsts.TRNS_ST_XML_DVY_REJECT, new SGuiParams(SDataConstantsSys.TRNX_TP_DPS_ADJ));
             }
-            //    Clase temporal para llenar lo datos de la tabla trn_dps_cfd, será eliminado posteriormente
-//            else if (item == jmiTemporal) {
-//                new llenarDatos(miClient);
-//            }
             else if (item == jmiDpsDvyPend) {
                 miClient.getSession().showView(SModConsts.TRN_DVY, SUtilConsts.PROC_PEND, new SGuiParams(SUtilConsts.QRY_SUM));
             }
