@@ -29,7 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 /**
@@ -56,8 +55,6 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
     private boolean mbIsBizPartnerRequired;
     private int[] manCurrentBizPartnerKey;
     private String msCurrentDpsNumber;
-    private SFormComponentItem COT = new SFormComponentItem(1, "COT");
-    private SFormComponentItem CON = new SFormComponentItem(2, "CON");
 
     /** Creates new form SPanelDpsFinder
      * @param client ERP Client interface.
@@ -123,7 +120,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jpDpsFinder.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de búsqueda del documento:"));
         jpDpsFinder.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
 
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSearchDpsClass.setText("Clase de documento:");
         jlSearchDpsClass.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -135,7 +132,9 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         jtfSearchDpsClass.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel1.add(jtfSearchDpsClass);
 
+        jlDocType.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlDocType.setText("Tipo de documento:");
+        jlDocType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel1.add(jlDocType);
 
         jcbDocType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -144,7 +143,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
         jpDpsFinder.add(jPanel1);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSearchBizPartnerId.setText("Asociado de negocios:");
         jlSearchBizPartnerId.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -163,7 +162,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
         jpDpsFinder.add(jPanel3);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSearchDpsNumber.setText("Serie y folio documento:");
         jlSearchDpsNumber.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -250,17 +249,23 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         
         moDps = null;
         moPanelDps.setDps(null, null);
+        
+        if (mbIsBizPartnerRequired && jcbSearchBizPartnerId.getSelectedIndex() <= 0) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSearchBizPartnerId.getText() + "'.");
+            jcbSearchBizPartnerId.requestFocusInWindow();
+            return;
+        }
 
-        try {
-            if (!moFieldSearchDpsNumber.getString().isEmpty()) {
+        if (!moFieldSearchDpsNumber.getString().isEmpty()) {
+            try {
                 if (manParamDpsClassKey.length > 1) {
-                    if(manParamDpsClassKey[1] == 1){
-                        SFormComponentItem params = (SFormComponentItem) jcbDocType.getSelectedItem();
-                        int[] docType = {manParamDpsClassKey[0],manParamDpsClassKey[1],(Integer)params.getPrimaryKey()};
+                    if (manParamDpsClassKey[1] == SDataConstantsSys.TRNS_CL_DPS_EST) {
+                        SFormComponentItem componentItem = (SFormComponentItem) jcbDocType.getSelectedItem();
+                        int[] docType = { manParamDpsClassKey[0], manParamDpsClassKey[1], (Integer) componentItem.getPrimaryKey() };
                         manParamDpsClassKey = docType;
                     }
                 }
-                
+
                 asNumberDps = SLibUtilities.textExplode(moFieldSearchDpsNumber.getString(), "-");
 
                 if (asNumberDps.length > 1) {
@@ -275,9 +280,6 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
                     if (jcbSearchBizPartnerId.getSelectedIndex() > 0) {
                         key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, sNumberSeries, sNumber, manParamDpsClassKey, moFieldSearchBizPartnerId.getKeyAsIntArray());
                     }
-                    else if ( !SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
-                        key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
-                    }
                 }
                 else {
                     key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
@@ -285,41 +287,31 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
                 if (key != null) {
                     moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
-
-                    if(moDps.getDbmsDataCfd() != null) {
-                        if (!moDps.getDbmsDataCfd().getUuid().equals("") && moDps.getDbmsDataCfd().isStamped()) {
-
-                            if (mbIsBizPartnerRequired) {
-                                moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
-                            }
-
-                            moPanelDps.setDps(moDps, null);
-
-                            if (moExternalMethod != null) {
-                                moExternalMethod.invoke(moExternalObject);
+                    
+                    if (moDps != null) {
+                        if (moDps.isDocument()) {
+                            if (moDps.getDbmsDataCfd() == null || !moDps.getDbmsDataCfd().isStamped()) {
+                                miClient.showMsgBoxWarning("¡La factura '" + moDps.getDpsNumber() + "'debe estar timbrada!");
                             }
                         }
-                        else {
-                            System.err.println("La factura no esta timbrada.");
-                            JOptionPane.showMessageDialog(this, "La factura seleccionada debe estar timbrada", "Error", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                    }
-                }
-                else {
-                    key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
-                    moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
 
-                    if(moDps.getDbmsDataCfd() == null || moDps.getDbmsDataCfd().getUuid().isEmpty() ) {
-                        System.err.println("La factura no esta timbrada.");
-                        JOptionPane.showMessageDialog(this, "La factura seleccionada debe estar timbrada", "Error", JOptionPane.INFORMATION_MESSAGE);
+                        if (mbIsBizPartnerRequired) {
+                            moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
+                        }
+
+                        moPanelDps.setDps(moDps, null);
+                    }
+
+                    if (moExternalMethod != null) {
+                        moExternalMethod.invoke(moExternalObject);
                     }
                 }
-                
+
                 updateCheckLocalCurrencyStatus();
             }
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
         }
     }
 
@@ -540,11 +532,12 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
 
     public void setDpsClassKey(int[] key) {
         manParamDpsClassKey = key;
+        
         if (manParamDpsClassKey.length > 1) {
-            if (manParamDpsClassKey[1] == 1) {
+            if (manParamDpsClassKey[1] == SDataConstantsSys.TRNS_CL_DPS_EST) {
                 jcbDocType.setEnabled(true);
-                jcbDocType.addItem(COT);
-                jcbDocType.addItem(CON);
+                jcbDocType.addItem(new SFormComponentItem(SDataConstantsSys.TRNU_TP_DPS_PUR_EST[2], "COTIZACIÓN"));
+                jcbDocType.addItem(new SFormComponentItem(SDataConstantsSys.TRNU_TP_DPS_PUR_CON[2], "CONTRATO"));
             }
         }
         

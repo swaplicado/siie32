@@ -142,7 +142,6 @@ public class SServiceSessions extends UnicastRemoteObject {
     }
 
     public synchronized SLoginResponse login(final SLoginRequest request) {
-        int i = 0;
         int userId = 0;
         int responseType = SLibConstants.UNDEFINED;
         boolean access = false;
@@ -150,7 +149,6 @@ public class SServiceSessions extends UnicastRemoteObject {
         String pswd = "";
         ResultSet resultSet = null;
         SSessionXXX session = null;
-//        Vector<SDataRegistry> registries = null;
 
         try {
             moServer.renderMessageLn(msService + "Login attempt for user [" + request.getUserName() + "]");
@@ -233,11 +231,6 @@ public class SServiceSessions extends UnicastRemoteObject {
                     session.getEntityCategories().addAll(mvEntityCategories);
                     session.prepareAccess();
 
-//                    registries = SDataReadRegistries.readRegistries(sessionServer.getStatement(), SDataConstants.CFGU_CERT, null);
-//                    for (i = 0; i < registries.size(); i++) {
-//                        session.getDbmsCertificates().add((SDataCertificate) registries.get(i));
-//                    }
-//
                     responseType = SLibConstants.LOGIN_OK;
 
                     moServer.renderMessageLn(msService + "Login attempt for user [" + request.getUserName() + "] gained!");

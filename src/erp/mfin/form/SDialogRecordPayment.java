@@ -48,6 +48,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 
 /**
@@ -1136,6 +1137,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
         ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), 
+                SLibTimeUtils.digestYear(moParamRecord.getDate())[0], 
                 moDps.getPkYearId(), moDps.getPkDocId(), 
                 mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
                 mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], 

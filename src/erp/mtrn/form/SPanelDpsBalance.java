@@ -11,25 +11,20 @@
 
 package erp.mtrn.form;
 
-import java.awt.BorderLayout;
 import java.text.DecimalFormat;
 import javax.swing.JButton;
 import java.util.Vector;
 
-import erp.mfin.form.*;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataReadDescriptions;
 import erp.data.SProcConstants;
 import erp.data.SDataUtilities;
 import erp.lib.form.SFormField;
-import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
-import erp.mfin.data.SDataExchangeRate;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SFormOptionPickerDpsBalance;
 import erp.mtrn.form.SPanelCurrency;
@@ -550,7 +545,7 @@ public class SPanelDpsBalance extends javax.swing.JPanel implements java.awt.eve
                 renderCurrencySettings();
                 mnParamFkDpsCategoryId = oDps.getFkDpsCategoryId();
                 jtfValueDps.setText(format.format(oDps.getTotalCy_r()));
-                msNumberDps = (oDps.getNumberSeries().toString().length() > 0 ? oDps.getNumberSeries() + "-" + oDps.getNumber() : oDps.getNumber());
+                msNumberDps = (oDps.getDpsNumber());
                 renderGetValueCyPanels(moFieldFkCurrencyId.getKey());
 
                 mvParams.removeAllElements();
