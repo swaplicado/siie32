@@ -1184,7 +1184,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         // consider specialized inputs:
         
         earning.setFkOtherPaymentTypeId(moKeyEarningOtherPaymentType.getValue()[0]);
-        earning.setFkBonusId(moKeyBonusType.getValue()[0] == 0 ? 1 : moKeyBonusType.getValue()[0]);
+        earning.setFkBonusId(!moKeyBonusType.isEnabled() ? 1 : moKeyBonusType.getValue()[0]);
         earning.setAuxiliarValue(!moCompEarningAuxValue.isEnabled() ? 0 : moCompEarningAuxValue.getField().getValue());
         earning.setAuxiliarAmount1(!moCurEarningAuxAmount1.isEnabled() ? 0 : moCurEarningAuxAmount1.getField().getValue());
         earning.setAuxiliarAmount2(!moCurEarningAuxAmount2.isEnabled() ? 0 : moCurEarningAuxAmount2.getField().getValue());
