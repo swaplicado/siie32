@@ -127,7 +127,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             
             // Asignar colonia si es que ya tiene una asignada previamente:
         
-            String sql = "SELECT fk_nei_zip_code FROM log_bpb_add_nei "
+            String sql = "SELECT fk_nei_zip_code FROM erp.logu_bpb_add_nei "
                     + "WHERE id_bpb_add = " + moKeyBizPartnerBranchAddress.getValue()[0] + " "
                     + "AND id_add_add = " + moKeyBizPartnerBranchAddress.getValue()[1];
             ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
@@ -525,7 +525,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                     miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchAddress) + "'.");
                     moKeyBizPartnerBranchAddress.requestFocus();
                 }
-                else if (moKeyBizPartnerBranchNeighborhood.getComponent().getItemCount() > 1 && moKeyBizPartnerBranchNeighborhood.getSelectedIndex() <= 1) {
+                else if (moKeyBizPartnerBranchNeighborhood.getComponent().getItemCount() > 1 && moKeyBizPartnerBranchNeighborhood.getSelectedIndex() <= 0) {
                     miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchNeighborhood) + "'.");
                     moKeyBizPartnerBranchNeighborhood.requestFocus();
                 }
@@ -603,7 +603,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                     miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchAddress) + "'.");
                     moKeyBizPartnerBranchAddress.requestFocus();
                 }
-                else if (moKeyBizPartnerBranchNeighborhood.getComponent().getItemCount() > 1 && moKeyBizPartnerBranchNeighborhood.getSelectedIndex() <= 1) {
+                else if (moKeyBizPartnerBranchNeighborhood.getComponent().getItemCount() > 1 && moKeyBizPartnerBranchNeighborhood.getSelectedIndex() <= 0) {
                     miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBizPartnerBranchNeighborhood) + "'.");
                     moKeyBizPartnerBranchNeighborhood.requestFocus();
                 }

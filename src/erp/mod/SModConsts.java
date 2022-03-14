@@ -529,7 +529,7 @@ public abstract class SModConsts {
     public static final int LOGS_INC = 2041007;
 
     public static final int LOGU_TP_VEH = 2042001;
-    public static final int LOGU_BPB_ADD_NEI = 2043005;
+    public static final int LOGU_BPB_ADD_NEI = 2043021;
     public static final int LOGU_SPOT = 2042002;
     public static final int LOGU_SPOT_COB = 2042003;
     public static final int LOGU_SPOT_COB_ENT = 2042004;
