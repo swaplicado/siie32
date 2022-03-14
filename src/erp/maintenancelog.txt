@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 197.4/ 2022-03-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corrección a la captura de percepciones de nóminas por error derivado de la implementación de bonos en percepciones.
+
+================================================================================
 SIIE 3.2 197.3/ 2022-03-10
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
@@ -44,7 +50,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 
 ================================================================================
 SIIE 3.2 195.9/ 2022-02-25
-Edwin CARMONA
+Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Cambio pendiente días festivos en la importación de la prenómina desde CAP.
 
