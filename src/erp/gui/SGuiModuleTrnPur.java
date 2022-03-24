@@ -64,7 +64,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -78,7 +78,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatSendingDpsLog;
     private javax.swing.JMenuItem jmiCatFunctionalAreaBudgets;
     private javax.swing.JMenu jmEst;
-    private javax.swing.JMenuItem jmiEstimates;
+    private javax.swing.JMenuItem jmiEstimates; 
+    private javax.swing.JMenuItem jmiEstimatesDetail;
     private javax.swing.JMenuItem jmiEstimatesLinkPend;
     private javax.swing.JMenuItem jmiEstimatesLinkPendEntry;
     private javax.swing.JMenuItem jmiEstimatesLinked;
@@ -275,12 +276,14 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de compras");
+        jmiEstimatesDetail = new JMenuItem("Cotizaciones de compras a detalle");
         jmiEstimatesLinkPend = new JMenuItem("Cotizaciones por procesar");
         jmiEstimatesLinkPendEntry = new JMenuItem("Cotizaciones por procesar a detalle");
         jmiEstimatesLinked = new JMenuItem("Cotizaciones procesadas");
         jmiEstimatesLinkedEntry = new JMenuItem("Cotizaciones procesadas a detalle");
         jmiEstimatesLinks = new JMenuItem("Vínculos de cotizaciones como origen");
         jmEst.add(jmiEstimates);
+        jmEst.add(jmiEstimatesDetail);
         jmEst.addSeparator();
         jmEst.add(jmiEstimatesLinkPend);
         jmEst.add(jmiEstimatesLinkPendEntry);
@@ -596,6 +599,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog.addActionListener(this);
         jmiCatFunctionalAreaBudgets.addActionListener(this);
         jmiEstimates.addActionListener(this);
+        jmiEstimatesDetail.addActionListener(this);        
         jmiEstimatesLinkPend.addActionListener(this);
         jmiEstimatesLinked.addActionListener(this);
         jmiEstimatesLinkPendEntry.addActionListener(this);
@@ -982,6 +986,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         moRegistry = new SDataDps();
                     }
                     break;
+                    
                 case SDataConstants.TRNX_DPS_RO:
                     if (moFormDpsRo == null) {
                         moFormDpsRo = new SFormDps(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
@@ -1138,6 +1143,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mtrn.view.SViewDps.class;
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02);
                     break;
+                
+                case SDataConstants.TRNX_DPS_DETAIL:
+                    oViewClass = erp.mtrn.view.SViewDpsDetail.class;
+                    sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " a detalle";
+                    break;    
 
                 case SDataConstants.TRNX_DPS_ETY_REF:
                     oViewClass = erp.mtrn.view.SViewDpsEntryReference.class;
@@ -1448,6 +1458,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_EST);
+            }
+            else if (item == jmiEstimatesDetail) {
+                showView(SDataConstants.TRNX_DPS_DETAIL, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_EST);
             }
             else if (item == jmiEstimatesLinkPend) {
                 showView(SDataConstants.TRNX_DPS_LINK_PEND, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_EST);

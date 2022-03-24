@@ -19,7 +19,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Isabel Servín
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín, Claudio Peña
  */
 public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -48,10 +48,10 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
         STableField[] aoKeyFields = new STableField[2];
 
         if (mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP) {
-            aoTableColumns = new STableColumn[24];
+            aoTableColumns = new STableColumn[25];
         }
         else {
-            aoTableColumns = new STableColumn[26];
+            aoTableColumns = new STableColumn[27];
         }
 
         i = 0;

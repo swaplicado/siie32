@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Claudio Peña, Adrián Avilés
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -455,6 +455,7 @@ public abstract class SDataConstantsSys {
     public static final int BPSS_TP_CFD_ADD_BACHOCO = 4;
     public static final int BPSS_TP_CFD_ADD_MODELO = 5;
     public static final int BPSS_TP_CFD_ADD_ELEKTRA = 6;
+    public static final int BPSS_TP_CFD_ADD_WALDOS = 7;
     public static final int BPSS_TP_CFD_ADD_AMECE71 = 11;
     
     public static final int BPSS_BPB_BANK_ACC_TEL = 10;

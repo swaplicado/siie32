@@ -1119,7 +1119,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel61.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlBirthPlace.setText("Lugar nacimiento:");
+        jlBirthPlace.setText("Estado nacimiento:");
         jlBirthPlace.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel61.add(jlBirthPlace);
 
@@ -1599,7 +1599,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldDateBirth.setTabbedPaneIndex(1, jTabbedPane);
         
         moFieldEntityEmployee = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBirthPlace, jlBirthPlace);
-        moFieldEntityEmployee.setLengthMax(50);
+        moFieldEntityEmployee.setLengthMax(25);
         moFieldEntityEmployee.setTabbedPaneIndex(1, jTabbedPane);
         moFieldUmf =  new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfUmf, jlUmf);
         moFieldUmf.setLengthMax(3);

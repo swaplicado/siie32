@@ -255,7 +255,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usuario", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sa.st_dps_authorn", "Estatus autorizacón", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sa.st_dps_authorn", "Estatus autorización", 100);
         if (isViewDocsPending() || isViewDocsRejected()) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_aut_auth_rej", "No autorización automática", 200);
         }
