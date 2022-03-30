@@ -43,7 +43,7 @@ public class SViewDpsDetail extends erp.lib.table.STableTab implements java.awt.
     private boolean mbHasRightAuthor = false;
 
     /**
-     * View for documents linked or pending to be linked to other documents.
+     * View detailed quote.
      * @param client GUI client interface.
      * @param tabTitle View tab title.
      * @param type Constants defined in SDataConstants (TRNX_DPS_LINK_PEND..., TRNX_DPS_LINKED...).
@@ -298,13 +298,15 @@ public class SViewDpsDetail extends erp.lib.table.STableTab implements java.awt.
             
             sqlDpsType = "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " ";
             
-            
-            msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.comms_ref, dety.id_ety, dety.concept_key, dety.concept, dety.qty, dety.fid_unit, " +
-                    "dety.price_u, dety.stot_prov_r, dety.tax_charged_r, dety.tot_r, dety.fid_item_ref_n, dety.fid_cc_n, " +
-                    "(SELECT it.item FROM erp.itmu_item AS it where it.id_item = dety.fid_item_ref_n) AS ItemRef, (SELECT it.part_num FROM erp.itmu_item AS it where it.id_item = dety.fid_item) AS NoParte, " +
-                    "(SELECT cc.id_cc FROM FIN_CC AS cc WHERE cc.id_cc = dety.fid_cc_n ) AS Cuenta, (SELECT cc.cc FROM FIN_CC AS cc WHERE cc.id_cc = dety.fid_cc_n ) AS NombreCuenta, " +
+            msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.comms_ref, dety.id_ety, dety.concept_key, dety.concept, " +
+                    "dety.qty, dety.fid_unit, dety.price_u, dety.stot_prov_r, dety.tax_charged_r, dety.tot_r, dety.fid_item_ref_n, dety.fid_cc_n, " +
+                    "(SELECT it.item FROM erp.itmu_item AS it where it.id_item = dety.fid_item_ref_n) AS ItemRef, " +
+                    "(SELECT it.part_num FROM erp.itmu_item AS it where it.id_item = dety.fid_item) AS NoParte, " +
+                    "(SELECT cc.id_cc FROM FIN_CC AS cc WHERE cc.id_cc = dety.fid_cc_n ) AS Cuenta, " +
+                    "(SELECT cc.cc FROM FIN_CC AS cc WHERE cc.id_cc = dety.fid_cc_n ) AS NombreCuenta, " +
                     "d.exc_rate, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, d.stot_cur_r, d.tax_charged_cur_r, " +
-                    "d.tax_retained_cur_r, d.tot_cur_r, d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
+                    "d.tax_retained_cur_r, d.tot_cur_r, d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, " +
+                    "d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
                     "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, dety.tax_retained_r, dety.fid_item, " +
                     "(SELECT symbol FROM erp.ITMU_UNIT AS uni WHERE uni.id_unit = dety.fid_unit) AS unit, " +
                     "(SELECT fa.code FROM cfgu_func AS fa WHERE d.fid_func = fa.id_func) AS f_fa_code, " +
@@ -312,25 +314,31 @@ public class SViewDpsDetail extends erp.lib.table.STableTab implements java.awt.
                     "(SELECT CONCAT(dps_src.num_ser, IF(LENGTH(dps_src.num_ser) = 0, '', '-'), dps_src.num) FROM " +
                     "trn_dps AS dps_src INNER JOIN trn_dps_dps_supply AS spl ON dps_src.id_doc = spl.id_src_doc AND dps_src.id_year = spl.id_src_year " +
                     "WHERE spl.id_des_doc = d.id_doc AND dps_src.id_year = d.id_year AND dps_src.b_del = 0 LIMIT 1) AS f_ord_num, " +
-                    "(SELECT de.concept FROM trn_dps_ety AS de WHERE de.id_doc = d.id_doc AND de.id_year = d.id_year AND NOT de.b_del ORDER BY de.id_ety LIMIT 1) AS f_concept, " +
+                    "(SELECT de.concept FROM trn_dps_ety AS de WHERE de.id_doc = d.id_doc AND de.id_year = d.id_year " +
+                    "AND NOT de.b_del ORDER BY de.id_ety LIMIT 1) AS f_concept, " +
                     "(SELECT CONCAT(mo.id_year, '-', mo.num) FROM mfg_ord AS mo " +
-                    "WHERE d.fid_mfg_year_n = mo.id_year AND d.fid_mfg_ord_n = mo.id_ord) AS f_mfg_ord, IF(d.fid_st_dps = 3, 1001, 1000) AS f_ico, IF((x.ts IS NULL OR doc_xml = '') " +
-                    "AND p.doc_pdf_name IS NULL, " +
-                    "1000, IF((x.ts IS NULL OR doc_xml = '') AND p.doc_pdf_name IS NOT NULL, 1104, IF((x.fid_tp_xml = 2 OR x.fid_tp_xml = 1) AND p.doc_pdf_name IS NULL, 1101, " +
-                    "IF((x.fid_tp_xml = 2 OR x.fid_tp_xml = 1) AND p.doc_pdf_name IS NOT NULL, 1105, IF(x.fid_st_xml = 1 OR LENGTH(uuid) = 0, 1102, " +
-                    "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, 1103, IF(LENGTH(xc.ack_can_xml) != 0, 1108, IF(xc.ack_can_pdf_n IS NOT NULL, 1107, 1103)))))))) AS f_ico_xml, " +
+                    "WHERE d.fid_mfg_year_n = mo.id_year AND d.fid_mfg_ord_n = mo.id_ord) AS f_mfg_ord, " +
+                    "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
+                    "IF((x.ts IS NULL OR doc_xml = '') AND p.doc_pdf_name IS NULL, " + STableConstants.ICON_NULL  + ", IF((x.ts IS NULL OR doc_xml = '') " +
+                    "AND p.doc_pdf_name IS NOT NULL, " + STableConstants.ICON_PDF + ", " +
+                    "IF((x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ") AND p.doc_pdf_name IS NULL, " + STableConstants.ICON_XML + ", " +
+                    "IF((x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ") AND p.doc_pdf_name IS NOT NULL, " + STableConstants.ICON_XML_PDF + ", " +
+                    "IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " +
+                    "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " +
+                    "IF(LENGTH(xc.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " +
+                    " " + STableConstants.ICON_XML_SIGN + ")))))))) AS f_ico_xml, " +
                     "x.ts_prc, x.can_st, bp.id_bp, bp.bp, bpc.bp_key, bpb.id_bpb, bpb.bpb, " +
                     "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, 'MXN' AS f_cur_key_local, " +
                     "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr " +
                     "FROM trn_dps AS d " +
-                    "left JOIN trn_dps_ety AS dety ON d.id_year = dety.id_year AND d.id_doc = dety.id_doc " +
-                    "INNER JOIN " +
-                    "erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
+                    "lEFT J"
+                    + "OIN trn_dps_ety AS dety ON d.id_year = dety.id_year AND d.id_doc = dety.id_doc " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
                     "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = 2 " +
                     "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
                     "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps ";
             msSql += sqlDpsType;
-            msSql += " INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " +
+            msSql += "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " +
                     "INNER JOIN erp.usru_usr AS uc ON d.fid_usr_close = uc.id_usr " +
                     "INNER JOIN erp.usru_usr AS un ON d.fid_usr_new = un.id_usr " +
                     "INNER JOIN erp.usru_usr AS ue ON d.fid_usr_edit = ue.id_usr " +
@@ -339,11 +347,10 @@ public class SViewDpsDetail extends erp.lib.table.STableTab implements java.awt.
                     "LEFT OUTER JOIN " + SClientUtils.getComplementaryDbName(miClient.getSession().getStatement().getConnection()) + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
                     "LEFT OUTER JOIN " + SClientUtils.getComplementaryDbName(miClient.getSession().getStatement().getConnection()) + ".trn_pdf AS p ON d.id_year = p.id_year AND d.id_doc = p.id_doc " +
                     "LEFT OUTER JOIN erp.usru_usr AS xu ON x.fid_usr_prc = xu.id_usr " +
-                    "WHERE d.b_del = 0 " + sqlDate +
-//                    " AND " 
-                    sqlBizPartner + sqlItemGeneric +
+                    "WHERE d.b_del = 0 " + sqlDate + sqlBizPartner + sqlItemGeneric +
                     "ORDER BY dt.code , d.num_ser , CAST(d.num AS UNSIGNED INTEGER), " +
                     "d.num , d.dt , bp.bp , bpc.bp_key , bp.id_bp , bpb.bpb , bpb.id_bpb, dety.id_ety";
+            
         } catch (Exception ex) {
             Logger.getLogger(SViewDpsDetail.class.getName()).log(Level.SEVERE, null, ex);
         }
