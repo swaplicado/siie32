@@ -162,7 +162,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Abrir"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[75, 23]"/>
+                      <Dimension value="[90, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -170,7 +170,23 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cerrar"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[75, 23]"/>
+                      <Dimension value="[90, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="jbOpenAllPeriods">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Abrir todo"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[90, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="jbCloseAllPeriods">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cerrar todo"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[90, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
