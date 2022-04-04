@@ -1160,7 +1160,7 @@ public abstract class SHrsUtils {
         String fileName = "";
         String param = "";
         String ssn = "";
-        String inabilityNull = "  000000";
+        String inabilityNull = "        ";
         String daysIncidence = "00";
         String inputV = "00";
         int typeMov = layoutSuaType;
@@ -1184,7 +1184,7 @@ public abstract class SHrsUtils {
                     
                     sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, bp.fiscal_id as RFC , emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
                             + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, "
-                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_hire AS DateApplication, par.reg_ss AS Param "
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_dis_n AS DateApplication, par.reg_ss AS Param "
                             + "FROM erp.HRSU_EMP AS emp "
                             + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
                             + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
@@ -1209,7 +1209,7 @@ public abstract class SHrsUtils {
                         buffer += param.substring(10); // (Digito del registro patronal R.P)
                         buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
                         buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                        buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
+                        buffer += "02";  // (Tipo de movimiento)
                         buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
                         buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inabilityNull : inabilityNull); // (Folio de incapacidad)
                         buffer += daysIncidence; // (Días de incidencia)
@@ -1221,7 +1221,6 @@ public abstract class SHrsUtils {
                         else {
                             buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
                         }
-    //                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
                         buffer += "\r\n";
                         
                     }

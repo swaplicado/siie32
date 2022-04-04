@@ -1541,7 +1541,7 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlBirthPlace">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Lugar nacimiento:"/>
+                            <Property name="text" type="java.lang.String" value="Estado nacimiento:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>

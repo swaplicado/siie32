@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña
  */
 public abstract class SDataConstants {
 
@@ -515,6 +515,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_LINK_PEND_ETY = 207532;
     public static final int TRNX_DPS_LINKED = 207533;
     public static final int TRNX_DPS_LINKED_ETY = 207534;
+    public static final int TRNX_DPS_DETAIL = 207535;
 
     public static final int TRNX_DPS_LINKS = 207536;
     public static final int TRNX_DPS_LINKS_TRACE = 207537;

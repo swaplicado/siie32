@@ -126,7 +126,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Isabel Servín, Claudio Peña, Adrián Avilés
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
     
@@ -3731,6 +3731,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     // this addenda does not have any field as header
                     break;
                     
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
+                    jlAddSorianaPedidoFolio.setEnabled(enableFields);
+                    jtfAddSorianaPedidoFolio.setEnabled(enableFields);
+                    break;
+                    
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
                     jlAddAmc71SupplierGln.setEnabled(enableFields);
                     jcbAddAmc71SupplierGln.setEnabled(enableFields);
@@ -3935,7 +3940,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
                 // this addenda does not have any field as header
                 break;
-                
+            
+            case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
+                // this addenda does not have any field as header
+                break;
+                    
             case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
                 String amc71SupplierGln = "";
                 String amc71SupplierNumber = "";

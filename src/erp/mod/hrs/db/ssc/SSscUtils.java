@@ -36,12 +36,10 @@ public abstract class SSscUtils {
     private static ArrayList<Integer> getExcludedEarningTypes() {
         ArrayList<Integer> excludedEarningTypes = new ArrayList<>();
         
-        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_EAR);
-        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_ANN_BONUS);
-        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_PTU);
-        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_SAVINGS);
-        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_TAX_SUB);
-        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_OTH);
+        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_EAR);    //Sueldos
+        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_SAVINGS);//Caja de ahorro
+        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_TAX_SUB);//Subsidio para el empleado
+        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_OTH);    //Pagos distintos a los listados y que no deben considerarse como ingreso
         
         return excludedEarningTypes;
     }
@@ -127,12 +125,11 @@ public abstract class SSscUtils {
                     + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pr.id_emp "
                     + "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp AND emp.fk_tp_con != " + SModSysConsts.HRSS_TP_REC_SCHE_OTH + " "
                     + "INNER JOIN hrs_emp_member AS men ON men.id_emp = emp.id_emp "
-                    + "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = emp.id_emp "
                     + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
                     + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
-                    + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act AND "
-                    + "emp.dt_sal_ssc <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
-    //                + "and pr.id_emp = 3680 " // xxx Para pruebas de empleados
+                    + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act  "
+                    + "AND emp.dt_sal_ssc <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
+//                    + "and pr.id_emp = 5025 " // Renglón para pruebas por empleados, no remover
                     + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
@@ -265,6 +262,14 @@ public abstract class SSscUtils {
                                 amountExempt = resultSet.getDouble("pre.amt_exem");
                                 break;
                             case SModSysConsts.HRSS_TP_EAR_VAC_BONUS: // Prima vacacional
+                                amountTaxed = resultSet.getDouble("pre.amt_taxa") ;
+                                amountExempt = resultSet.getDouble("pre.amt_exem");
+                                break;
+                            case SModSysConsts.HRSS_TP_EAR_ANN_BONUS: // Aguinaldo
+                                amountTaxed = resultSet.getDouble("pre.amt_taxa") ;
+                                amountExempt = resultSet.getDouble("pre.amt_exem");
+                                break;
+                            case SModSysConsts.HRSS_TP_EAR_PTU: // PTU
                                 amountTaxed = resultSet.getDouble("pre.amt_taxa") ;
                                 amountExempt = resultSet.getDouble("pre.amt_exem");
                                 break;
@@ -472,11 +477,13 @@ public abstract class SSscUtils {
             case 2:
                 if(leapYear(year)) {
                     daysCalendarPeriod = numDaysMonthLeap;
-                } else {
+                } 
+                else {
                     daysCalendarPeriod = numDaysMonthNotLeap;
                 }
                 break;
         }
+        
         return daysCalendarPeriod;
     }
     
