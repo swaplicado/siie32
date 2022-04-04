@@ -36,13 +36,13 @@ import javax.swing.JCheckBox;
  */
 public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
-    private int mnFormType;
+    private final int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
 
     private erp.mfin.data.SDataYear moYear;
     private erp.lib.form.SFormField moFieldPkYearId;
@@ -51,7 +51,9 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.table.STablePane moPanePeriods;
     private java.lang.String[] masPeriodsTxt;
 
-    /** Creates new form DFormCompany */
+    /** Creates new form DFormCompany
+     * @param client 
+     */
     public SFormYear(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -83,6 +85,8 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel6 = new javax.swing.JPanel();
         jbOpenPeriod = new javax.swing.JButton();
         jbClosePeriod = new javax.swing.JButton();
+        jbOpenAllPeriods = new javax.swing.JButton();
+        jbCloseAllPeriods = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -141,12 +145,20 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOpenPeriod.setText("Abrir");
-        jbOpenPeriod.setPreferredSize(new java.awt.Dimension(75, 23));
+        jbOpenPeriod.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel6.add(jbOpenPeriod);
 
         jbClosePeriod.setText("Cerrar");
-        jbClosePeriod.setPreferredSize(new java.awt.Dimension(75, 23));
+        jbClosePeriod.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel6.add(jbClosePeriod);
+
+        jbOpenAllPeriods.setText("Abrir todo");
+        jbOpenAllPeriods.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel6.add(jbOpenAllPeriods);
+
+        jbCloseAllPeriods.setText("Cerrar todo");
+        jbCloseAllPeriods.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel6.add(jbCloseAllPeriods);
 
         jpPeriods.add(jPanel6, java.awt.BorderLayout.NORTH);
 
@@ -167,8 +179,8 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-450)/2, 600, 450);
+        setSize(new java.awt.Dimension(600, 450));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -214,6 +226,8 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
         jbCancel.addActionListener(this);
         jbOpenPeriod.addActionListener(this);
         jbClosePeriod.addActionListener(this);
+        jbOpenAllPeriods.addActionListener(this);
+        jbCloseAllPeriods.addActionListener(this);
         jckIsClosed.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
@@ -233,8 +247,8 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private void setPeriodStatus(boolean close) {
         int index = moPanePeriods.getTable().getSelectedRow();
-        SDataYearPeriod period = null;
-        SDataYearPeriodRow row = null;
+        SDataYearPeriod period;
+        SDataYearPeriodRow row;
 
         if (index == -1) {
             miClient.showMsgBoxWarning("Se debe seleccionar un período.");
@@ -250,6 +264,22 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
             moPanePeriods.setTableRowSelection(index);
         }
     }
+    
+    private void setAllPeriodsStatus(boolean close) {
+        SDataYearPeriod period;
+        SDataYearPeriodRow row;
+
+        for (int i = 0; i < moPanePeriods.getTable().getRowCount(); i++) {
+            period = (SDataYearPeriod) ((SDataYearPeriodRow) moPanePeriods.getTableRow(i)).getData();
+            period.setIsClosed(close);
+            period.setDbmsIsEdited(true);
+            row = new SDataYearPeriodRow(period);
+            row.prepareTableRow();
+            moPanePeriods.setTableRow(row, i);
+            moPanePeriods.renderTableRows();
+        }
+        moPanePeriods.setTableRowSelection(0);
+    }
 
     private void actionOpenPeriod() {
         setPeriodStatus(false);
@@ -258,15 +288,27 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
     private void actionClosePeriod() {
         setPeriodStatus(true);
     }
+    
+    private void actionOpenAllPeriods() {
+        setAllPeriodsStatus(false);
+    }
+
+    private void actionCloseAllPeriods() {
+        setAllPeriodsStatus(true);
+    }
 
     private void itemStateIsClosed() {
         if (jckIsClosed.isSelected()) {
             jbOpenPeriod.setEnabled(false);
             jbClosePeriod.setEnabled(false);
+            jbOpenAllPeriods.setEnabled(false);
+            jbCloseAllPeriods.setEnabled(false);
         }
         else {
             jbOpenPeriod.setEnabled(true);
             jbClosePeriod.setEnabled(true);
+            jbOpenAllPeriods.setEnabled(true);
+            jbCloseAllPeriods.setEnabled(true);
         }
     }
 
@@ -305,8 +347,10 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCloseAllPeriods;
     private javax.swing.JButton jbClosePeriod;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbOpenAllPeriods;
     private javax.swing.JButton jbOpenPeriod;
     private javax.swing.JCheckBox jckIsClosed;
     private javax.swing.JCheckBox jckIsDeleted;
@@ -514,6 +558,12 @@ public class SFormYear extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             else if (button == jbClosePeriod) {
                 actionClosePeriod();
+            }
+            else if (button == jbOpenAllPeriods) {
+                actionOpenAllPeriods();
+            }
+            else if (button == jbCloseAllPeriods) {
+                actionCloseAllPeriods();
             }
         }
     }
