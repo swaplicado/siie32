@@ -73,7 +73,8 @@ import sa.lib.gui.SGuiReport;
 public class SModuleTrn extends SGuiModule {
 
     private SFormItemRequiredDpsConfig moFormItemRequiredDpsConfig;
-    private SFormInventoryValuation moFormInventoryValuation;
+    private SFormInventoryValuation moFormInventoryValuationPrcCalc;
+    private SFormInventoryValuation moFormInventoryValuationUpdCost;
     private SFormMmsConfig moFormMmsConfiguration;
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
@@ -127,6 +128,7 @@ public class SModuleTrn extends SGuiModule {
                 registry = new SDbDpsEntryPrice();
                 break;
             case SModConsts.TRN_INV_VAL:
+            case SModConsts.TRNX_INV_VAL_COST_UPD:
                 registry = new SDbInventoryValuation();
                 break;
             case SModConsts.TRN_INV_MFG_CST:
@@ -293,7 +295,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_STK_COST:
                 view = new SViewInventoryCost(miClient, subtype, "Valor inventarios " + (subtype == SModConsts.CFGU_COB_ENT ? "x almacén" : "x ítem"));
                 break;
-            case SModConsts.TRNX_INV_VAL_COST:
+            case SModConsts.TRNX_INV_VAL_COST_QRY:
                 view = new SViewValCost(miClient, subtype, "Valor valuación vs. valor teórico");
                 break;
             case SModConsts.TRNX_ORD_LIM_MAX:
@@ -371,7 +373,7 @@ public class SModuleTrn extends SGuiModule {
 
     @Override
     public SGuiForm getForm(final int type, final int subtype, final SGuiParams params) {
-         SGuiForm form = null;
+        SGuiForm form = null;
 
         switch (type) {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
@@ -379,8 +381,12 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormItemRequiredDpsConfig;
                 break;
             case SModConsts.TRN_INV_VAL:
-                if (moFormInventoryValuation == null) moFormInventoryValuation = new SFormInventoryValuation(miClient, "Valuación de inventarios");
-                form = moFormInventoryValuation;
+                if (moFormInventoryValuationPrcCalc == null) moFormInventoryValuationPrcCalc = new SFormInventoryValuation(miClient, SModConsts.TRNX_INV_VAL_PRC_CALC, "Valuación de inventarios");
+                form = moFormInventoryValuationPrcCalc;
+                break;
+            case SModConsts.TRNX_INV_VAL_COST_UPD:
+                if (moFormInventoryValuationUpdCost == null) moFormInventoryValuationUpdCost = new SFormInventoryValuation(miClient, SModConsts.TRNX_INV_VAL_UPD_COST, "Actualización de costos de inventarios");
+                form = moFormInventoryValuationUpdCost;
                 break;
             case SModConsts.TRN_MMS_CFG:
                 if (moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por correo-e");

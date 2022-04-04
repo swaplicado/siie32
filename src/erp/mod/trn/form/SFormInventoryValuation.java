@@ -1,15 +1,25 @@
 package erp.mod.trn.form;
 
+import erp.mfin.data.SDataBookkeepingNumber;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbInventoryValuation;
+import erp.mod.trn.db.STrnCostsUpdate;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Calendar;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiFieldCalendar;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
@@ -18,15 +28,20 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Sergio Flores
  */
-public class SFormInventoryValuation extends SBeanForm {
+public class SFormInventoryValuation extends SBeanForm implements ActionListener, ChangeListener {
     
     private SDbInventoryValuation moRegistry;
-
+    private String[] masMonths;
+    private String msFileCostsCsvPath;
+    
     /**
      * Creates new form SFormInventoryValuation
+     * @param client GUI client.
+     * @param subtype Form subtype (SModConsts.TRNX_INV_VAL_PRC_CALC or SModConsts.TRNX_INV_VAL_COST_UPD).
+     * @param title Form title.
      */
-    public SFormInventoryValuation(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_INV_VAL, SLibConsts.UNDEFINED, title);
+    public SFormInventoryValuation(SGuiClient client, int subtype, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_INV_VAL, subtype, title);
         initComponents();
         initComponentsCustom();
     }
@@ -40,6 +55,7 @@ public class SFormInventoryValuation extends SBeanForm {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgCutoff = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -48,11 +64,24 @@ public class SFormInventoryValuation extends SBeanForm {
         jPanel4 = new javax.swing.JPanel();
         jlPeriod = new javax.swing.JLabel();
         moCalPeriod = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
+        jlPeriodMonth = new javax.swing.JLabel();
+        jpFileCostsCsv = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jlFileCostsCsvPath = new javax.swing.JLabel();
+        jtfFileCostsCsvPath = new javax.swing.JTextField();
+        jbFileCostsCsvOpen = new javax.swing.JButton();
+        jlFileCostsCsvPathHelp = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jlFileCostsCsvPathHint = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        jrbCutoffStart = new javax.swing.JRadioButton();
+        jrbCutoffEnd = new javax.swing.JRadioButton();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de la valuación:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del proceso:"));
+        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -70,30 +99,180 @@ public class SFormInventoryValuation extends SBeanForm {
         jPanel4.add(jlPeriod);
         jPanel4.add(moCalPeriod);
 
+        jlPeriodMonth.setText("mes");
+        jlPeriodMonth.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlPeriodMonth);
+
         jPanel2.add(jPanel4);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jpFileCostsCsv.setBorder(javax.swing.BorderFactory.createTitledBorder("Archivo CSV con los costos unitarios requeridos:"));
+        jpFileCostsCsv.setLayout(new java.awt.BorderLayout());
+
+        jPanel12.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFileCostsCsvPath.setText("Archivo CSV:");
+        jlFileCostsCsvPath.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlFileCostsCsvPath);
+
+        jtfFileCostsCsvPath.setEditable(false);
+        jtfFileCostsCsvPath.setText("archivo.csv");
+        jtfFileCostsCsvPath.setPreferredSize(new java.awt.Dimension(355, 23));
+        jPanel6.add(jtfFileCostsCsvPath);
+
+        jbFileCostsCsvOpen.setText("Abrir");
+        jbFileCostsCsvOpen.setMargin(new java.awt.Insets(2, 10, 2, 10));
+        jbFileCostsCsvOpen.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel6.add(jbFileCostsCsvOpen);
+
+        jlFileCostsCsvPathHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_view_info.png"))); // NOI18N
+        jlFileCostsCsvPathHelp.setToolTipText("Formato CSV: código ítem, nombre ítem, símbolo unidad medida, costo unitario");
+        jlFileCostsCsvPathHelp.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel6.add(jlFileCostsCsvPathHelp);
+
+        jPanel12.add(jPanel6);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFileCostsCsvPathHint.setForeground(java.awt.Color.gray);
+        jlFileCostsCsvPathHint.setText("Ruta archivo CSV...");
+        jlFileCostsCsvPathHint.setPreferredSize(new java.awt.Dimension(535, 23));
+        jPanel7.add(jlFileCostsCsvPathHint);
+
+        jPanel12.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgCutoff.add(jrbCutoffStart);
+        jrbCutoffStart.setSelected(true);
+        jrbCutoffStart.setText("Costos iniciales del mes");
+        jrbCutoffStart.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jrbCutoffStart);
+
+        bgCutoff.add(jrbCutoffEnd);
+        jrbCutoffEnd.setText("Costos finales del mes");
+        jrbCutoffEnd.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jrbCutoffEnd);
+
+        jPanel12.add(jPanel8);
+
+        jpFileCostsCsv.add(jPanel12, java.awt.BorderLayout.NORTH);
+
+        jPanel1.add(jpFileCostsCsv, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgCutoff;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JButton jbFileCostsCsvOpen;
+    private javax.swing.JLabel jlFileCostsCsvPath;
+    private javax.swing.JLabel jlFileCostsCsvPathHelp;
+    private javax.swing.JLabel jlFileCostsCsvPathHint;
     private javax.swing.JLabel jlPeriod;
+    private javax.swing.JLabel jlPeriodMonth;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpFileCostsCsv;
+    private javax.swing.JRadioButton jrbCutoffEnd;
+    private javax.swing.JRadioButton jrbCutoffStart;
+    private javax.swing.JTextField jtfFileCostsCsvPath;
     private sa.lib.gui.bean.SBeanFieldCalendarMonth moCalPeriod;
     private sa.lib.gui.bean.SBeanFieldCalendarYear moCalYear;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 560, 350);
+        
         moCalYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear));
         moCalPeriod.setCalendarSettings(SGuiUtils.getLabelName(jlPeriod));
         moFields.addField(moCalYear);
         moFields.addField(moCalPeriod);
         moFields.setFormButton(jbSave);
+        
+        masMonths = SLibTimeUtils.createMonthsOfYearStd(Calendar.LONG);
+        showPeriodMonth(); // member masMonths must be instanciated before invoking this method
+        
+        jbFileCostsCsvOpen.addActionListener(this);
+        moCalYear.addChangeListener(this);
+        moCalPeriod.addChangeListener(this);
+    }
+    
+    /**
+     * Show period's month.
+     * Note that member masMonths must be instanciated before invoking this method.
+     */
+    private void showPeriodMonth() {
+        if (moCalPeriod.getValue() >= SLibTimeConsts.MONTH_MIN && moCalPeriod.getValue() <= SLibTimeConsts.MONTH_MAX) {
+            jlPeriodMonth.setText(masMonths[moCalPeriod.getValue() - 1]);
+        }
+        else {
+            jlPeriodMonth.setText("");
+        }
+    }
+    
+    private void resetFileCostsCsvFields() {
+        msFileCostsCsvPath = "";
+        jtfFileCostsCsvPath.setText("");
+        jlFileCostsCsvPathHint.setText("");
+        bgCutoff.clearSelection();
+        
+        switch (mnFormSubtype) {
+            case SModConsts.TRNX_INV_VAL_PRC_CALC:
+                jpFileCostsCsv.setEnabled(false);
+                jlFileCostsCsvPath.setEnabled(false);
+                jtfFileCostsCsvPath.setEnabled(false);
+                jbFileCostsCsvOpen.setEnabled(false);
+                jlFileCostsCsvPathHelp.setEnabled(false);
+                jlFileCostsCsvPathHint.setEnabled(false);
+                jrbCutoffStart.setEnabled(false);
+                jrbCutoffEnd.setEnabled(false);
+                break;
+            case SModConsts.TRNX_INV_VAL_UPD_COST:
+                jpFileCostsCsv.setEnabled(true);
+                jlFileCostsCsvPath.setEnabled(true);
+                jtfFileCostsCsvPath.setEnabled(true);
+                jbFileCostsCsvOpen.setEnabled(true);
+                jlFileCostsCsvPathHelp.setEnabled(true);
+                jlFileCostsCsvPathHint.setEnabled(true);
+                jrbCutoffStart.setEnabled(true);
+                jrbCutoffEnd.setEnabled(true);
+                jlFileCostsCsvPathHint.setText("(Seleccionar archivo fuente CSV con los costos deseados.)");
+                break;
+            default:
+                jbSave.setEnabled(false);
+                jpFileCostsCsv.setEnabled(false);
+                jlFileCostsCsvPath.setEnabled(false);
+                jtfFileCostsCsvPath.setEnabled(false);
+                jbFileCostsCsvOpen.setEnabled(false);
+                jlFileCostsCsvPathHelp.setEnabled(false);
+                jlFileCostsCsvPathHint.setEnabled(false);
+                jrbCutoffStart.setEnabled(false);
+                jrbCutoffEnd.setEnabled(false);
+        }
+    }
+    
+    private void actionPerformedFileCostsCsvOpen() {
+        if (miClient.getFileChooser().showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            msFileCostsCsvPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+            
+            jtfFileCostsCsvPath.setText(miClient.getFileChooser().getSelectedFile().getName());
+            jtfFileCostsCsvPath.setToolTipText(jtfFileCostsCsvPath.getText());
+            jtfFileCostsCsvPath.setCaretPosition(0);
+            
+            jlFileCostsCsvPathHint.setText(msFileCostsCsvPath);
+            jlFileCostsCsvPathHint.setToolTipText(jlFileCostsCsvPathHint.getText());
+        }
     }
     
     @Override
@@ -137,9 +316,13 @@ public class SFormInventoryValuation extends SBeanForm {
         setFormEditable(true);
         
         if (moRegistry.isRegistryNew()) {
+            
         }
         else {
+            
         }
+        
+        resetFileCostsCsvFields();
         
         addAllListeners();
     }
@@ -162,15 +345,75 @@ public class SFormInventoryValuation extends SBeanForm {
 
     @Override
     public SGuiValidation validateForm() {
-        return moFields.validateFields();
+        SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            if (mnFormSubtype == SModConsts.TRNX_INV_VAL_UPD_COST) {
+                if (msFileCostsCsvPath.isEmpty()) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFileCostsCsvPath) + "'.");
+                    validation.setComponent(jbFileCostsCsvOpen);
+                }
+                else if (bgCutoff.getSelection() == null) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jrbCutoffStart.getText()) + "' o '" + SGuiUtils.getLabelName(jrbCutoffEnd.getText()) + "'.");
+                    validation.setComponent(jrbCutoffStart);
+                }
+            }
+        }
+        
+        return validation;
     }
     
     @Override
     public void actionSave() {
-        String[] months = SLibTimeUtils.createMonthsOfYearStd(Calendar.LONG);
-        
-        if (miClient.showMsgBoxConfirm("Se realizará la valuación de inventarios para " + months[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + ".\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-            super.actionSave();
+        if (SGuiUtils.computeValidation(miClient, validateForm())) {
+            switch (mnFormSubtype) {
+                case SModConsts.TRNX_INV_VAL_PRC_CALC:
+                    if (miClient.showMsgBoxConfirm("Se realizará la valuación de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + ".\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                        super.actionSave();
+                    }
+                    break;
+                    
+                case SModConsts.TRNX_INV_VAL_UPD_COST:
+                    if (miClient.showMsgBoxConfirm("Se realizará la actualización de costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + ".\n"
+                            + "IMPORTANTE:\nFavor de proceder con precaución.\n"
+                            + "La afectación al valor de los inventarios mediante este proceso no se puede revertir.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                        try {
+                            // update costs, then close dialog:
+                            STrnCostsUpdate costsUpdate = new STrnCostsUpdate(miClient.getSession(), moCalYear.getValue(), moCalPeriod.getValue(), jrbCutoffStart.isSelected() ? STrnCostsUpdate.MOMENT_START : STrnCostsUpdate.MOMENT_END, msFileCostsCsvPath);
+                            SDataBookkeepingNumber bookkeepingNumber = costsUpdate.updateCosts();
+                            miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED + "\n"
+                                    + "Favor de conservar este número de procesamiento para cualquier referencia futura: "
+                                    + bookkeepingNumber.getPkYearId() + "-" + bookkeepingNumber.getPkNumberId() + ".");
+                            actionCancel();
+                        }
+                        catch (Exception e) {
+                            SLibUtils.showException(this, e);
+                        }
+                    }
+                    break;
+                    
+                default:
+                    miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbFileCostsCsvOpen) {
+                actionPerformedFileCostsCsvOpen();
+            }
+        }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() instanceof SGuiFieldCalendar) {
+            bgCutoff.clearSelection();
+            showPeriodMonth();
         }
     }
 }

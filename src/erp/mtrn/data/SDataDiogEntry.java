@@ -58,7 +58,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected int mnDbmsBookkeepingNumberId;
     protected java.lang.String msDbmsItem;
     protected java.lang.String msDbmsItemKey;
-//    protected java.lang.String msDbmsPartNum;
     protected java.lang.String msDbmsUnit;
     protected java.lang.String msDbmsUnitSymbol;
     protected java.lang.String msDbmsOriginalUnit;
@@ -148,7 +147,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setDbmsBookkeepingNumberId(int n) { mnDbmsBookkeepingNumberId = n; }
     public void setDbmsItem(java.lang.String s) { msDbmsItem = s; }
     public void setDbmsItemKey(java.lang.String s) { msDbmsItemKey = s; }
-//    public void setDbmsPartNum(java.lang.String s) { msDbmsPartNum = s; }
     public void setDbmsUnit(java.lang.String s) { msDbmsUnit = s; }
     public void setDbmsUnitSymbol(java.lang.String s) { msDbmsUnitSymbol = s; }
     public void setDbmsOriginalUnit(java.lang.String s) { msDbmsOriginalUnit = s; }
@@ -162,7 +160,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public int getDbmsBookkeepingNumberId() { return mnDbmsBookkeepingNumberId; }
     public java.lang.String getDbmsItem() { return msDbmsItem; }
     public java.lang.String getDbmsItemKey() { return msDbmsItemKey; }
-//    public java.lang.String getDbmsPartNum() { return msDbmsPartNum; }
     public java.lang.String getDbmsUnit() { return msDbmsUnit; }
     public java.lang.String getDbmsUnitSymbol() { return msDbmsUnitSymbol; }
     public java.lang.String getDbmsOriginalUnit() { return msDbmsOriginalUnit; }
@@ -251,7 +248,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         mnDbmsBookkeepingNumberId = 0;
         msDbmsItem = "";
         msDbmsItemKey = "";
-//        msDbmsPartNum = "";
         msDbmsUnit = "";
         msDbmsUnitSymbol = "";
         msDbmsOriginalUnit = "";
@@ -333,7 +329,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 msDbmsItem = resultSet.getString("i.item");
                 msDbmsItem = resultSet.getString("i.item");
                 msDbmsItemKey = resultSet.getString("i.item_key");
-//                msDbmsPartNum = resultSet.getString("i.part_num");
                 msDbmsUnit = resultSet.getString("u.unit");
                 msDbmsUnitSymbol = resultSet.getString("u.symbol");
                 msDbmsOriginalUnit = resultSet.getString("uo.unit");
@@ -460,10 +455,10 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     
     public void calculateTotal() {
         if (mdQuantity == 0) {
-            mdValue = SLibUtilities.round(mdValueUnitary, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            mdValue = SLibUtils.roundAmount(mdValueUnitary);
         }
         else {
-            mdValue = SLibUtilities.round(mdQuantity * mdValueUnitary, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            mdValue = SLibUtils.roundAmount(mdQuantity * mdValueUnitary);
         }
     }
 
@@ -525,7 +520,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         if (shouldValidateStockLots()) {
             // Validate when entry is not deleted or have just been deleted:
 
-            if (mvAuxStockMoves.size() == 0) {
+            if (mvAuxStockMoves.isEmpty()) {
                 msg = "No se han especificado movimientos de inventarios del ítem '" + msDbmsItem + "', clave '" + msDbmsItemKey + "'.";
             }
             else {

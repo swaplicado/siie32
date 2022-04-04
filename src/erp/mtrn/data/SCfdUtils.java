@@ -2824,8 +2824,8 @@ public abstract class SCfdUtils implements Serializable {
         else {
             boolean deactivate = true;
             if (isSignedByFinkok(client, cfd)) {
-                if (client.showMsgBoxConfirm("El PAC de timbrado del CFDI permite verificar el timbrado o cancelación.\n"
-                        + "Se sugiere realizar dicha verificación de timbrado o cancelación.\n"
+                if (client.showMsgBoxConfirm("El PAC de timbrado del CFDI permite validar el timbrado o cancelación.\n"
+                        + "Se sugiere realizar dicha validación de timbrado o cancelación.\n"
                         + "¿Está seguro que desea continuar con la limpieza de inconsistencias de timbrado o cancelación del CFDI?") != JOptionPane.YES_OPTION) {
                     deactivate = false;
                 }
@@ -3311,6 +3311,7 @@ public abstract class SCfdUtils implements Serializable {
         packet.setAuxDataDps(dps);
 
         SCfdParams params = createCfdParams(client, dps);
+        
         if (params != null) {
             dps.setAuxCfdParams(params);
 
@@ -3641,7 +3642,7 @@ public abstract class SCfdUtils implements Serializable {
             SDataPac pac = getPacForValidation(client, cfd);
 
             if (pac == null) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo fue posible determinar cuál es el PAC para la verificación del CFDI.");
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se pudo determinar cuál es el PAC para la validación del CFDI.");
             }
 
             if (cfd.getCancellationStatus().isEmpty() && !(cfd.getIsProcessingWebService() || cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf())) {

@@ -98,6 +98,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Vector<erp.mtrn.data.SDataDiogNotes> mvDbmsDiogNotes;
 
     protected boolean mbAuxIsDbmsDataCounterpartDiog;
+    protected boolean mbAuxIsBookkeepingNumberExternallySet;
     protected boolean mbAuxSignDiog;
     protected int moAuxSegregationStockId;
 
@@ -229,7 +230,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
             stockMove.setPkLotId(lotId);
         }
-       else {
+        else {
             if (move.getAuxLotDateExpiration() != null) {
                 sql = "SELECT dt_exp_n FROM trn_lot WHERE " +
                       "id_item = " + move.getPkItemId() + " AND id_unit = " + move.getPkUnitId() + " AND " + 
@@ -361,7 +362,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         boolean bDpsExist = false;
         int nDpsNumberId_n = SLibConstants.UNDEFINED; 
         int nDpsYearId_n = SLibConstants.UNDEFINED;
-        
         
         for (SDataDiogEntry entry : mvDbmsDiogEntries) {
             if (entry.getFkDpsDocId_n() == mnFkDpsDocId_n && entry.getFkDpsYearId_n() == mnFkDpsYearId_n) {
@@ -511,13 +511,21 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Vector<erp.mtrn.data.SDataDiogNotes> getDbmsNotes() { return mvDbmsDiogNotes; }
 
     public void setAuxIsDbmsDataCounterpartDiog(boolean b) { mbAuxIsDbmsDataCounterpartDiog = b; }
+    public void setAuxIsBookkeepingNumberExternallySet(boolean b) { mbAuxIsBookkeepingNumberExternallySet = b; }
     public void setAuxSignDiog(boolean b) { mbAuxSignDiog = b; }
     public void setAuxSegregationStockId(int n) { moAuxSegregationStockId = n; }
 
     public boolean getAuxIsDbmsDataCounterpartDiog() { return mbAuxIsDbmsDataCounterpartDiog; }
+    public boolean getAuxIsBookkeepingNumberExternallySet() { return mbAuxIsBookkeepingNumberExternallySet; }
     public boolean getAuxSignDiog() { return mbAuxSignDiog; }
     public int getAuxSegregationStockId() { return moAuxSegregationStockId; }
 
+    public void setExternalBookkeepingNumber(final int year, final int number) {
+        mnFkBookkeepingYearId_n = year;
+        mnFkBookkeepingNumberId_n = number;
+        mbAuxIsBookkeepingNumberExternallySet = year != 0 && number != 0;
+    }
+    
     public int[] getDiogCategoryKey() { return new int[] { mnFkDiogCategoryId }; }
     public int[] getDiogClassKey() { return new int[] { mnFkDiogCategoryId, mnFkDiogClassId }; }
     public int[] getDiogTypeKey() { return new int[] { mnFkDiogCategoryId, mnFkDiogClassId, mnFkDiogTypeId }; }
@@ -655,6 +663,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mvDbmsDiogNotes.clear();
 
         mbAuxIsDbmsDataCounterpartDiog = false;
+        mbAuxIsBookkeepingNumberExternallySet = false;
         mbAuxSignDiog = false;
         moAuxSegregationStockId = 0;
     }
@@ -819,7 +828,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         int nParam = 1;
         int nSortingPosition = 0;
         CallableStatement callableStatement = null;
-        SDataBookkeepingNumber bookkeepingNumber = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
@@ -829,9 +837,9 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             // Create bookkeeping number:
 
             //System.out.println("SDataDiog: 1a");
-            if (!mbIsDeleted && !mbAuxIsDbmsDataCounterpartDiog) {
+            if (!mbIsDeleted && !mbAuxIsDbmsDataCounterpartDiog && !mbAuxIsBookkeepingNumberExternallySet) {
                 //System.out.println("SDataDiog: 1a.1");
-                bookkeepingNumber = new SDataBookkeepingNumber();
+                SDataBookkeepingNumber bookkeepingNumber = new SDataBookkeepingNumber();
                 bookkeepingNumber.setPkYearId(mnPkYearId);
                 bookkeepingNumber.setFkUserNewId(mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
                 if (bookkeepingNumber.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
@@ -1051,8 +1059,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         for (SDataDiogEntry entry : mvDbmsDiogEntries) {
             if (!entry.getIsDeleted()) {
                 entry.calculateTotal();
-                
-                mdValue_r = SLibUtilities.round(mdValue_r + entry.getValue(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+                mdValue_r = SLibUtils.roundAmount(mdValue_r + entry.getValue());
             }
         }
     }
@@ -1252,6 +1259,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         }
 
         registry.setAuxIsDbmsDataCounterpartDiog(this.getAuxIsDbmsDataCounterpartDiog());
+        registry.setAuxIsBookkeepingNumberExternallySet(this.getAuxIsBookkeepingNumberExternallySet());
         registry.setAuxSignDiog(this.getAuxSignDiog());
         registry.setAuxSegregationStockId(this.getAuxSegregationStockId());
     

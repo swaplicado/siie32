@@ -444,7 +444,8 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_CON_SEND = 2024002;    // document send
     public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
     public static final int TRNX_STK_COST = 2024049;        // stock cost
-    public static final int TRNX_INV_VAL_COST = 2024061;    // inventory valuation vs. cost
+    public static final int TRNX_INV_VAL_COST_UPD = 2024061;    // inventory valuation vs. cost
+    public static final int TRNX_INV_VAL_COST_QRY = 2024066;    // inventory valuation vs. cost
     public static final int TRNX_ORD_LIM_MAX = 2024051;     // operations control
     public static final int TRNX_BP_BAL_CUR = 2024052;      // operations control
     public static final int TRNX_INT_CUS_QRY = 2024053;     // integral query customers
@@ -452,6 +453,8 @@ public abstract class SModConsts {
     public static final int TRNX_ACC_PEND = 2024071;        // accounts pending: receivable accounts & payable accounts
     public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_FUNC_EXPENSES = 2024336;    // massive CRUD of functional area monthly-budgets
+    public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
+    public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;

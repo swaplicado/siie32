@@ -334,7 +334,7 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
             callableStatement.setInt(nParam++, mnFkDiogYearId);
             callableStatement.setInt(nParam++, mnFkDiogDocId);
             callableStatement.setInt(nParam++, mnFkDiogEntryId);
-            if (mnFkDpsYearId_n != SLibConstants.UNDEFINED) {
+            if (mnFkDpsYearId_n != 0) {
                 callableStatement.setInt(nParam++, mnFkDpsYearId_n);
                 callableStatement.setInt(nParam++, mnFkDpsDocId_n);
                 callableStatement.setInt(nParam++, mnFkDpsEntryId_n);
@@ -344,7 +344,7 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 callableStatement.setNull(nParam++, Types.INTEGER);
                 callableStatement.setNull(nParam++, Types.INTEGER);
             }
-            if (mnFkDpsAdjustmentYearId_n != SLibConstants.UNDEFINED) {
+            if (mnFkDpsAdjustmentYearId_n != 0) {
                 callableStatement.setInt(nParam++, mnFkDpsAdjustmentYearId_n);
                 callableStatement.setInt(nParam++, mnFkDpsAdjustmentDocId_n);
                 callableStatement.setInt(nParam++, mnFkDpsAdjustmentEntryId_n);
@@ -354,7 +354,7 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 callableStatement.setNull(nParam++, Types.INTEGER);
                 callableStatement.setNull(nParam++, Types.INTEGER);
             }
-            if (mnFkMfgYearId_n != SLibConstants.UNDEFINED) {
+            if (mnFkMfgYearId_n != 0) {
                 callableStatement.setInt(nParam++, mnFkMfgYearId_n);
                 callableStatement.setInt(nParam++, mnFkMfgOrderId_n);
                 callableStatement.setInt(nParam++, mnFkMfgChargeId_n);
@@ -364,7 +364,7 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 callableStatement.setNull(nParam++, Types.INTEGER);
                 callableStatement.setNull(nParam++, Types.INTEGER);
             }
-            if (mnFkBookkeepingYearId_n != SLibConstants.UNDEFINED) {
+            if (mnFkBookkeepingYearId_n != 0) {
                 callableStatement.setInt(nParam++, mnFkBookkeepingYearId_n);
                 callableStatement.setInt(nParam++, mnFkBookkeepingNumberId_n);
             }
@@ -373,7 +373,12 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 callableStatement.setNull(nParam++, Types.INTEGER);
             }
             callableStatement.setInt(nParam++, mnFkMaintMovementTypeId);
-            if (mnFkMaintUserId_n != 0) callableStatement.setInt(nParam++, mnFkMaintUserId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            if (mnFkMaintUserId_n != 0) {
+                callableStatement.setInt(nParam++, mnFkMaintUserId_n);
+            }
+            else {
+                callableStatement.setNull(nParam++, Types.INTEGER);
+            }
             callableStatement.setInt(nParam++, mnFkMaintUserSupervisorId);
             
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);

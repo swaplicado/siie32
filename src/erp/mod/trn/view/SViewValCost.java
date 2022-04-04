@@ -33,7 +33,7 @@ public class SViewValCost extends SGridPaneView {
     private SGridFilterPanelCompound moFilterWarehouse;
     
     public SViewValCost(SGuiClient client, int subtype, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_INV_VAL_COST, subtype, title, null);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_INV_VAL_COST_QRY, subtype, title, null);
         initComponentsCustom();
     }
     

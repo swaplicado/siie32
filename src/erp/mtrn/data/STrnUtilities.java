@@ -3310,7 +3310,6 @@ public abstract class STrnUtilities {
         Vector<SDataDiogEntry> iogEntries = new Vector<>();
         SDataDiog iog = null;
         
-        iogEntries.clear();
         for (STrnStockMove stockMove : stockMoves) {
             iogEntries.add(processStockEntries(client, stockMove));
         }

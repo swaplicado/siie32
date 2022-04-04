@@ -3879,7 +3879,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
-				// Save PDF of purchases when provided:
+                // Save PDF of purchases when provided:
                 
                 if (moDbmsDataPdf != null && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
                     moDbmsDataPdf.setPkYearId(mnPkYearId);
@@ -3888,7 +3888,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     if (moDbmsDataPdf.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
-                }									   
+                }
+                
                 // Save XML auxiliar from CFDI version 3.3 or International Commerce:
                 
                 sSql = "DELETE FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";

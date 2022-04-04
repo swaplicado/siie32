@@ -10633,6 +10633,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 moDps.setFkBillOfLading_n(moBillOfLading.getPkBillOfLadingId());
                 moDps.setDbmsDataCfdBol(moBillOfLading == null ? null : moBillOfLading.getDbmsDataCfd());
             }
+            
             return moDps;
         }
     }
