@@ -368,22 +368,34 @@ public class SFormInventoryValuation extends SBeanForm implements ActionListener
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
             switch (mnFormSubtype) {
                 case SModConsts.TRNX_INV_VAL_PRC_CALC:
-                    if (miClient.showMsgBoxConfirm("Se realizará la valuación de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + ".\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                    if (miClient.showMsgBoxConfirm(
+                            "Se realizará la valuación de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + "."
+                            + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         super.actionSave();
                     }
                     break;
                     
                 case SModConsts.TRNX_INV_VAL_UPD_COST:
-                    if (miClient.showMsgBoxConfirm("Se realizará la actualización de costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + ".\n"
-                            + "IMPORTANTE:\nFavor de proceder con precaución.\n"
-                            + "La afectación al valor de los inventarios mediante este proceso no se puede revertir.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                    if (miClient.showMsgBoxConfirm(
+                            "Se realizará la actualización de costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + "."
+                            + "\nIMPORTANTE: ¡Favor de proceder con precaución!"
+                            + "\n¡La afectación al valor de los inventarios mediante este proceso no se puede revertir!"
+                            + "\nFavor de conservar el número de procesamiento que se mostrará al final para cualquier referencia futura."
+                            + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         try {
                             // update costs, then close dialog:
                             STrnCostsUpdate costsUpdate = new STrnCostsUpdate(miClient.getSession(), moCalYear.getValue(), moCalPeriod.getValue(), jrbCutoffStart.isSelected() ? STrnCostsUpdate.MOMENT_START : STrnCostsUpdate.MOMENT_END, msFileCostsCsvPath);
                             SDataBookkeepingNumber bookkeepingNumber = costsUpdate.updateCosts();
-                            miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED + "\n"
-                                    + "Favor de conservar este número de procesamiento para cualquier referencia futura: "
-                                    + bookkeepingNumber.getPkYearId() + "-" + bookkeepingNumber.getPkNumberId() + ".");
+                            if (bookkeepingNumber == null) {
+                                miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED
+                                        + "\nNo se realizó ninguna actualización a los costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + "."
+                                        + "\nSi el archivo proporcionado contiene costos para actualizar, los costos actuales ya son iguales a ellos.");
+                            }
+                            else {
+                                miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED
+                                        + "\nFavor de conservar este número de procesamiento para cualquier referencia futura: "
+                                        + bookkeepingNumber.getPkYearId() + "-" + bookkeepingNumber.getPkNumberId() + ".");
+                            }
                             actionCancel();
                         }
                         catch (Exception e) {

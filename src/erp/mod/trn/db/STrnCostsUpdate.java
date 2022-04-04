@@ -90,7 +90,8 @@ public class STrnCostsUpdate {
      *
      * @return <code>SDataBookkeepingNumber</code> con el que se registraron
      * todos los ajustes a los costos, tanto en documentos de almacén como en
-     * los inventarios.
+     * los inventarios. Si no hay costos a actualizar devuelve
+     * <code>null</code>.
      * @throws Exception
      */
     public SDataBookkeepingNumber updateCosts() throws Exception {
@@ -299,7 +300,7 @@ public class STrnCostsUpdate {
                     else {
                         System.out.println(" - diferencia entre costos unitarios: $" + SLibUtils.getDecimalFormatAmountUnitary().format(unitGap) + ", "
                                 + "monto del ajuste $" + SLibUtils.getDecimalFormatAmount().format(adjustment) + " a manera de " + (isIncrement ? "INCREMENTO" : "DECREMENTO") + ".");
-                        
+
                         SDataDiogEntry diogEntry = new SDataDiogEntry();
 
                         diogEntry.setPkYearId(mnYear);
@@ -351,7 +352,7 @@ public class STrnCostsUpdate {
                         diogEntry.getAuxStockMoves().add(stockMove);
 
                         String mapKey = csvLine.getWarehouseKey() + "-" + diogTypeKey[0]; // organize documents by warehouse PK + movement category
-                        SDataDiog diog = diogs.get(mapKey); 
+                        SDataDiog diog = diogs.get(mapKey);
 
                         if (diog == null) {
                             diog = STrnUtilities.createDataDiogSystem((SClientInterface) moSession.getClient(), mnYear, cutOff, csvLine.WarehouseCompanyBranchId, csvLine.WarehouseEntityId, diogTypeKey, SERIES, new Vector<>());
@@ -370,22 +371,26 @@ public class STrnCostsUpdate {
         statementEntityDef.close();
         statementCost.close();
 
-        // guardar documentos de almacén con los ajustes a los costos unitarios:
-        Statement statementSave = moSession.getStatement().getConnection().createStatement();
+        if (!diogs.isEmpty()) {
+            // guardar documentos de almacén con los ajustes a los costos unitarios:
 
-        try {
-            statementSave.execute("START TRANSACTION;");
-            for (SDataDiog diog : diogs.values()) {
-                diog.save(moSession.getStatement().getConnection());
+            Statement statementSave = moSession.getStatement().getConnection().createStatement();
+
+            try {
+                statementSave.execute("START TRANSACTION;");
+                for (SDataDiog diog : diogs.values()) {
+                    diog.save(moSession.getStatement().getConnection());
+                }
+                statementSave.execute("COMMIT;");
             }
-            statementSave.execute("COMMIT;");
+            catch (Exception e) {
+                statementSave.execute("ROLLBACK;");
+                throw e;
+            }
+            statementSave.close();
         }
-        catch (Exception e) {
-            statementSave.execute("ROLLBACK;");
-            throw e;
-        }
-        
-        return bookkeepingNumber;
+
+        return !diogs.isEmpty() ? bookkeepingNumber : null;
     }
 
     protected class CsvLine {
