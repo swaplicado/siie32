@@ -68,6 +68,29 @@ public abstract class SRedisLockUtils {
 
         return flattenPk;
     }
+    
+    /**
+     * Método para obtener la fecha y hora del servidor sql, regresa un Date con la fecha y hora.
+     * @param client
+     * @return
+     * @throws Exception 
+     */
+    private static Date getTimeFromServerSql(SClientInterface client) throws Exception {
+        String fecha = null;
+        Date date = new Date();
+        try (Statement statement = client.getSession().getDatabase().getConnection().createStatement()) {
+            String sql = "SELECT NOW() as fecha";
+            ResultSet resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                fecha = resultSet.getString("fecha");
+                SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                date = f.parse(fecha);
+            }
+            resultSet.close();
+        }
+        
+        return date;
+    }
 
     /**
      * Método para crear un candado en Redis.
@@ -75,12 +98,10 @@ public abstract class SRedisLockUtils {
      * @return Regresa la llave del candado en un string en la forma:
      * "Lock+lockId+companyId+registryType+stringId+jedisClientId+userId"
      */
-    private static SRedisLockKey setLock(final Jedis jedis, final int companyId, final int registryType, final String registryPk, final int userId, final long timeout) {
+    private static SRedisLockKey setLock(SClientInterface client, final Jedis jedis, final int companyId, final int registryType, final String registryPk, final int userId, final long timeout) throws Exception {
         long lockId = jedis.incr(LOCK_COUNT); // incrementa conteo de ID de candado en 1
         SRedisLockKey lockKey = new SRedisLockKey(lockId, companyId, registryType, registryPk, jedis.clientId(), userId);
-
-        jedis.setex(lockKey.getLockKey(), timeout, DateFormatDatetime.format(new Date()) + " : " + timeout); // crea clave Redis con tiempo de expiración en segundos a manera de candado
-
+        jedis.setex(lockKey.getLockKey(), timeout, DateFormatDatetime.format(getTimeFromServerSql(client)) + " : " + timeout); // crea clave Redis con tiempo de expiración en segundos a manera de candado
         return lockKey;
     }
 
@@ -159,12 +180,12 @@ public abstract class SRedisLockUtils {
      * @return
      * @throws SQLException
      */
-    private static SRedisLock gainLockDummy(erp.client.SClientInterface client, int registryType, Object registryPk, long timeout) throws SQLException {
+    private static SRedisLock gainLockDummy(erp.client.SClientInterface client, int registryType, Object registryPk, long timeout) throws SQLException, Exception {
         int companyId = client.getSessionXXX().getCompany().getPkCompanyId();
         int userId = client.getSessionXXX().getUser().getPkUserId();
         String registryPkFlatten = setFlattenPk(registryType, registryPk);
         SRedisLockKey rLockKey = new SRedisLockKey(0, companyId, registryType, registryPkFlatten, 0, userId);
-        SRedisLock rLock = new SRedisLock(registryPk, timeout, rLockKey);
+        SRedisLock rLock = new SRedisLock(registryPk, timeout, rLockKey, getTimeFromServerSql(client));
 
         return rLock;
     }
@@ -205,8 +226,8 @@ public abstract class SRedisLockUtils {
                     }
                 }
             }
-            lockKey = setLock(jedis, companyId, registryType, registryPkFlatten, userId, timeout);     //crea nuevo candado
-            redisLock = new SRedisLock(registryPk, timeout, lockKey);
+            lockKey = setLock(client, jedis, companyId, registryType, registryPkFlatten, userId, timeout);     //crea nuevo candado
+            redisLock = new SRedisLock(registryPk, timeout, lockKey, getTimeFromServerSql(client));
         } 
         else {
             redisLock = gainLockDummy(client, registryType, registryPk, timeout);
@@ -309,7 +330,7 @@ public abstract class SRedisLockUtils {
     public static SRedisLock verifyLockStatus(erp.client.SClientInterface client, SRedisLock rlock) throws Exception {
         Date lastTs = getLastUpdateTs(client, rlock.getLockKey().getRegistryType(), rlock.getRegistryPk());
         if (lastTs != null) {
-            if (!lastTs.after(rlock.getLockTimestamp())) {
+            if (!lastTs.after(rlock.getLockTimestamp())) {  
                 if (SRedisConnectionUtils.getConnectionStatus(client)) {
                     Jedis jedis = client.getJedis();
                     if (!jedis.exists(rlock.getLockKey().getLockKey())) {
@@ -318,9 +339,9 @@ public abstract class SRedisLockUtils {
 
                             Object registryPk = rlock.getRegistryPk();
                             long timeout = rlock.getTimeout();
-                            SRedisLockKey rLockKey = setLock(jedis, rlock.getLockKey().getCompanyId(), rlock.getLockKey().getRegistryType(),
+                            SRedisLockKey rLockKey = setLock(client, jedis, rlock.getLockKey().getCompanyId(), rlock.getLockKey().getRegistryType(),
                                     rlock.getLockKey().getLockKey(), rlock.getLockKey().getUserId(), rlock.getTimeout());
-                            rlock = new SRedisLock(registryPk, timeout, rLockKey);
+                            rlock = new SRedisLock(registryPk, timeout, rLockKey, getTimeFromServerSql(client));
 
                         } 
                         else {
@@ -331,7 +352,9 @@ public abstract class SRedisLockUtils {
                 }
             } 
             else {
-                throw new Exception("El registro ha sido modificado");
+                throw new Exception("No se puede guardar el registro, su versión del registro es anterior a la versión del registro en el servidor.\n"
+                        + "Fecha del registro en el servidor: " + DateFormatDatetime.format(lastTs) + "\nFecha en la que obtuvo el registro: "
+                        + DateFormatDatetime.format(rlock.getLockTimestamp()));
             }
         }
         return rlock;
