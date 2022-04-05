@@ -7,6 +7,7 @@ import erp.mod.trn.db.STrnCostsUpdate;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
+import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -370,33 +371,43 @@ public class SFormInventoryValuation extends SBeanForm implements ActionListener
                 case SModConsts.TRNX_INV_VAL_PRC_CALC:
                     if (miClient.showMsgBoxConfirm(
                             "Se realizará la valuación de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + "."
-                            + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                                    + "\nIMPORTANTE: ¡La valuación depende totalmente de la precisión de los costos actuales de insumos y productos en sistema!"
+                                    + "\nLos costos actuales para el período solicitado debieron ser revisados previamente a todo detalle."
+                                    + "\nSi es necesario, se puede optar por actualizar masivamente los costos de inventarios a partir de un archivo fuente CSV."
+                                    + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         super.actionSave();
                     }
                     break;
                     
                 case SModConsts.TRNX_INV_VAL_UPD_COST:
+                    Date period = SLibTimeUtils.createDate(moCalYear.getValue(), moCalPeriod.getValue());
+                    Date cutOff = jrbCutoffStart.isSelected() ? SLibTimeUtils.getBeginOfMonth(period) : SLibTimeUtils.getEndOfMonth(period);
+                    
                     if (miClient.showMsgBoxConfirm(
-                            "Se realizará la actualización de costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + "."
-                            + "\nIMPORTANTE: ¡Favor de proceder con precaución!"
-                            + "\n¡La afectación al valor de los inventarios mediante este proceso no se puede revertir!"
-                            + "\nFavor de conservar el número de procesamiento que se mostrará al final para cualquier referencia futura."
-                            + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                            "Se realizará la actualización de costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + " con corte al " + SLibUtils.DateFormatDate.format(cutOff) + "."
+                                    + "\nIMPORTANTE: ¡Favor de proceder con precaución!"
+                                    + "\n¡La afectación al valor de los inventarios mediante este proceso no se puede revertir!"
+                                    + "\nFavor de conservar el número de procesamiento que se mostrará al final para cualquier referencia futura."
+                                    + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         try {
                             // update costs, then close dialog:
                             STrnCostsUpdate costsUpdate = new STrnCostsUpdate(miClient.getSession(), moCalYear.getValue(), moCalPeriod.getValue(), jrbCutoffStart.isSelected() ? STrnCostsUpdate.MOMENT_START : STrnCostsUpdate.MOMENT_END, msFileCostsCsvPath);
                             SDataBookkeepingNumber bookkeepingNumber = costsUpdate.updateCosts();
-                            if (bookkeepingNumber == null) {
+                            
+                            if (bookkeepingNumber != null) {
                                 miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED
-                                        + "\nNo se realizó ninguna actualización a los costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + "."
-                                        + "\nSi el archivo proporcionado contiene costos para actualizar, los costos actuales ya son iguales a ellos.");
+                                        + "\nFavor de conservar este número de procesamiento para cualquier referencia futura: "
+                                        + bookkeepingNumber.getPkYearId() + "-" + bookkeepingNumber.getPkNumberId() + "."
+                                        + "\n" + costsUpdate.getUpdateReport());
                             }
                             else {
                                 miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED
-                                        + "\nFavor de conservar este número de procesamiento para cualquier referencia futura: "
-                                        + bookkeepingNumber.getPkYearId() + "-" + bookkeepingNumber.getPkNumberId() + ".");
+                                        + "\nNo se realizó ninguna actualización a los costos de inventarios para " + masMonths[moCalPeriod.getValue() - 1] + " de " + moCalYear.getValue() + "."
+                                        + "\nSi el archivo fuente CSV proporcionado contiene costos para actualizar, los costos actuales ya son iguales a ellos."
+                                        + "\n" + costsUpdate.getUpdateReport());
                             }
-                            actionCancel();
+                            
+                            actionCancel(); // just close this form
                         }
                         catch (Exception e) {
                             SLibUtils.showException(this, e);

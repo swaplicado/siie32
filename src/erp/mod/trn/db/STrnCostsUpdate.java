@@ -39,6 +39,8 @@ public class STrnCostsUpdate {
     protected int mnMonth;
     protected int mnMoment;
     protected String msFileCsvPath;
+    protected int mnCsvLines;
+    protected int mnCostsUpdates;
 
     /**
      * Instancia objeto para la actualización inmediata de costos de ítems en el
@@ -62,6 +64,8 @@ public class STrnCostsUpdate {
         mnMonth = month;
         mnMoment = moment;
         msFileCsvPath = fileCsvPath;
+        mnCsvLines = 0;
+        mnCostsUpdates = 0;
     }
 
     public SGuiSession getSession() {
@@ -142,10 +146,11 @@ public class STrnCostsUpdate {
         //bookkeepingNumber.setUserDeleteTs(...);
         bookkeepingNumber.save(moSession.getStatement().getConnection());
 
-        int lines = 0;
+        mnCsvLines = 0;
+        mnCostsUpdates = 0;
 
         for (CsvLine csvLine : csvLines) {
-            System.out.println(++lines + ". Procesando ítem '" + csvLine.ItemName + " - " + csvLine.ItemCode + "', unidad '" + csvLine.UnitCode + "'...");
+            System.out.println(++mnCsvLines + ". Procesando ítem '" + csvLine.ItemName + " - " + csvLine.ItemCode + "', unidad '" + csvLine.UnitCode + "'...");
 
             int ocurrences = 0;
             boolean found = false;
@@ -361,6 +366,7 @@ public class STrnCostsUpdate {
                         }
 
                         diog.getDbmsEntries().add(diogEntry);
+                        mnCostsUpdates++;
                     }
                 }
             }
@@ -391,6 +397,12 @@ public class STrnCostsUpdate {
         }
 
         return !diogs.isEmpty() ? bookkeepingNumber : null;
+    }
+    
+    public String getUpdateReport() {
+        return "Resumen:"
+                + "\nLíneas CSV procesadas: " + SLibUtils.DecimalFormatInteger.format(mnCsvLines)
+                + "\nCostos actualizados: " + SLibUtils.DecimalFormatInteger.format(mnCostsUpdates);
     }
 
     protected class CsvLine {
