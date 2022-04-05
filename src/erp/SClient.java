@@ -1171,9 +1171,11 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             moJedis = SRedisConnectionUtils.connect(moParamsApp.getRedisHost(), moParamsApp.getRedisPswd());
             SRedisConnectionUtils.setSessionName(moJedis, companyId, userId, userName);
             SRedisConnectionUtils.setSessionsUsers(moJedis, companyId, userId, userName);
-        } catch (Exception e) {
-            showMsgBoxWarning("No se encontró el servidor de acceso exclusivo a registros.\n"
-                                        + "Favor de comunicarlo al administrador del sistema");
+        }
+        catch (Exception e) {
+            showMsgBoxWarning("No se encontró el servidor de acceso exclusivo a registros."
+                    + "\nFavor de comunicarlo al administrador del sistema."
+                    + "\n(" + e.getMessage() + ")");
             moJedis = null;
         }
     }
