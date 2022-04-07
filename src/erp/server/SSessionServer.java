@@ -7,6 +7,7 @@ package erp.server;
 
 import cfd.DCfd;
 import cfd.DCfdConsts;
+import erp.SParamsApp;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadComponentItems;
@@ -102,7 +103,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
         try {
             msSessionServer = "[SessionServer " + mnSessionId + "]: ";
-            createCompanyDatabase();
+            connectDatabase();
         }
         catch (SQLException e) {
             moServer.renderMessageLn(msSessionServer + e);
@@ -661,11 +662,15 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         mbIsTransactionClosed = true;
     }
     
-    private void createCompanyDatabase() throws Exception {
+    private void connectDatabase() throws Exception {
+        closeSession();
+        
+        SParamsApp paramsApp = moServer.getParamsApp(); // convenience variable
+        
         moCompanyDatabase = new SDataDatabase(SLibConstants.DBMS_MY_SQL);
         moCompanyDatabase.setUserSettings(SDataConstantsSys.DB_SETTINGS);
-        if (moCompanyDatabase.connect(moServer.getParamsApp().getDatabaseHostSrv(), moServer.getParamsApp().getDatabasePortSrv(),
-                msCompanyDatabaseName, moServer.getParamsApp().getDatabaseUser(), moServer.getParamsApp().getDatabasePswd()) != SLibConstants.DB_CONNECTION_OK) {
+        
+        if (moCompanyDatabase.connect(paramsApp.getDatabaseHostSrv(), paramsApp.getDatabasePortSrv(), msCompanyDatabaseName, paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd()) != SLibConstants.DB_CONNECTION_OK) {
             throw new Exception(SLibConstants.MSG_ERR_DB_CON); 
         }
         else {
@@ -687,30 +692,42 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
     public int getPkCompanyId() { return mnPkCompanyId; }
     public String getCompanyDatabaseName() { return msCompanyDatabaseName; }
     public Date getTimestamp() { return mtTimestamp; }
+    
     public Statement getStatement() throws Exception { 
-        if (moStatement.isClosed()) {
-            createCompanyDatabase();
-            moStatement = moCompanyDatabase.getConnection().createStatement();
+        if (moStatement == null || moStatement.isClosed()) {
+            connectDatabase();
         }
         
         return moStatement; 
     }
+    
     public DCfd getCfd() { return moCfd; }
-
+    
     public void closeSession() {
+        // close separatelly each object:
+        
         try {
             if (moStatement != null && !moStatement.isClosed()) {
                 moStatement.close();
             }
-            if (moCompanyDatabase != null) {
+        }
+        catch (Exception e) {
+            moServer.renderMessageLn(msSessionServer + e);
+        }
+        
+        try {
+            if (moCompanyDatabase != null && moCompanyDatabase.isConnected()) {
                 moCompanyDatabase.disconnect();
             }
-            if (moConnectionMonitor.isAlive()) {
+        }
+        catch (Exception e) {
+            moServer.renderMessageLn(msSessionServer + e);
+        }
+        
+        try {
+            if (moConnectionMonitor != null && moConnectionMonitor.isAlive()) {
                 moConnectionMonitor.stopMonitor();
             }
-        }
-        catch (SQLException e) {
-            moServer.renderMessageLn(msSessionServer + e);
         }
         catch (Exception e) {
             moServer.renderMessageLn(msSessionServer + e);
@@ -720,8 +737,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
     @Override
     public SSrvResponse request(SSrvRequest request) throws RemoteException {
         SSrvResponse response = new SSrvResponse(SSrvConsts.RESP_TYPE_OK);
-/* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro*/
+        // Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         SSrvLock lock = null;
+        
         try {
             switch (request.getRequestType()) {
                 case SSrvConsts.REQ_LOCK_GAIN:

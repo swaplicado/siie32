@@ -83,25 +83,26 @@ public class SSessionCustom implements SGuiSessionCustom {
 
     /**
      * Creates new SSessionCustom object.
+     * @param session
      */
     public SSessionCustom(SGuiSession session) {
         moSession = session;
-        moUnitsMap = new HashMap<Integer, SSessionUnit>();
-        moItemsMap = new HashMap<Integer, SSessionItem>();
-        moTaxGroupsMap = new HashMap<Integer, SSessionTaxGroup>();
-        moTaxesMap = new HashMap<SLibKey, SSessionTax>();
-        maTaxItemLinksArray = new ArrayList<SSessionTaxItemLink>();
+        moUnitsMap = new HashMap<>();
+        moItemsMap = new HashMap<>();
+        moTaxGroupsMap = new HashMap<>();
+        moTaxesMap = new HashMap<>();
+        maTaxItemLinksArray = new ArrayList<>();
 
-        maAccountLedgers = new ArrayList<SAccountLedger>();
-        maCostCenterLedgers = new ArrayList<SAccountLedger>();
+        maAccountLedgers = new ArrayList<>();
+        maCostCenterLedgers = new ArrayList<>();
 
-        moAbpEntitiesMap = new HashMap<Integer, SDbAbpEntity>();
-        maAbpEntitiesLinksArray = new ArrayList<SDbAbpEntityLink>();
-        moAbpBizPartnersMap = new HashMap<Integer, SDbAbpBizPartner>();
-        maAbpBizPartnersLinksArray = new ArrayList<SDbAbpBizPartnerLink>();
-        moAbpItemsMap = new HashMap<Integer, SDbAbpItem>();
-        maAbpItemsLinksArray = new ArrayList<SDbAbpItemLink>();
-        maAbpTaxesArray = new ArrayList<SDbAbpTax>();
+        moAbpEntitiesMap = new HashMap<>();
+        maAbpEntitiesLinksArray = new ArrayList<>();
+        moAbpBizPartnersMap = new HashMap<>();
+        maAbpBizPartnersLinksArray = new ArrayList<>();
+        moAbpItemsMap = new HashMap<>();
+        maAbpItemsLinksArray = new ArrayList<>();
+        maAbpTaxesArray = new ArrayList<>();
         
         moCfdXmlCatalogs = null;
         mhmCfdTypeXmlTypes = null;
@@ -176,7 +177,7 @@ public class SSessionCustom implements SGuiSessionCustom {
         String table = "";
         ResultSet resultSet = null;
         SAccount account = null;
-        ArrayList<SAccount> children = new ArrayList<SAccount>();
+        ArrayList<SAccount> children = new ArrayList<>();
 
         switch (type) {
             case SAccountConsts.TYPE_ACCOUNT:
