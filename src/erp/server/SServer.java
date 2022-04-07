@@ -32,12 +32,13 @@ import sa.lib.srv.SSrvConsts;
  *
  * @author Sergio Flores
  * To generate stub:
- * ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SServer
+ * 1) build project;
+ * 2) create stub for this class, like this: ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SServer
+ * 3) build project again to add stub to project's JAR.
  * 
- * Generate stubs for:
+ * Do not forget to generate stubs for:
  * erp.server.SServer
  * erp.server.SSessionServer
- * 
  */
 public class SServer extends UnicastRemoteObject implements SServerRemote, Runnable {
 
