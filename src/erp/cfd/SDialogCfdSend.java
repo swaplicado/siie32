@@ -213,7 +213,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         mtfBizPartner.setCaretPosition(0);
         
         if (mnBizPartnerBranch == SLibConsts.UNDEFINED) {
-            moTextEmail.setValue(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+            moTextEmail.setValue(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
         else {
             moTextEmail.setValue(moBizPartner.getDbmsBizPartnerBranch(new int[] { mnBizPartnerBranch }).getDbmsBizPartnerBranchContacts().get(0).getEmail01());

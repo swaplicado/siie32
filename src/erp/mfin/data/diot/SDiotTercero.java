@@ -83,7 +83,7 @@ public class SDiotTercero {
             resetTercero(false, isDomestic, bizPartner.getPkBizPartnerId(), bizPartner.getDiotTipoTercero(client), bizPartner.getDiotTipoOperación(), bizPartner.getFiscalId(), bizPartner.getFiscalFrgId(), "");
             
             if (!isDomestic) {
-                String countryDiotCode = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
+                String countryDiotCode = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
                 
                 ExtNombre = bizPartner.getBizPartner();
                 ExtPaísResidencia = countryDiotCode;

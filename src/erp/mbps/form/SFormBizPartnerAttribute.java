@@ -839,8 +839,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         moFieldFiscalId.setFieldValue(moBizPartner.getFiscalId());
         moFieldAlternativeId.setFieldValue(moBizPartner.getAlternativeId());
 
-        if (!moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().isEmpty()) {
-            moFieldEmail.setFieldValue(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+        if (!moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().isEmpty()) {
+            moFieldEmail.setFieldValue(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
 
         moFieldCodeBankSantander.setFieldValue(moBizPartner.getCodeBankSantander());
@@ -872,7 +872,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
             moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSU_BA_DEFAULT);
 
             moBizPartner.getDbmsBizPartnerBranches().add(createBizPartnerBranch());
-            moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().add(createBizPartnerBranchContact());
+            moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().add(createBizPartnerBranchContact());
         }
         else {
             moBizPartner.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
@@ -961,10 +961,10 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         // Update business partner children data:
 
-        moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setEmail01(moFieldEmail.getString());
+        moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setEmail01(moFieldEmail.getString());
 
         if (!moBizPartner.getIsRegistryNew()) {
-            moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
         if (mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_SAL_AGT) {

@@ -1021,12 +1021,12 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public int getReceptorSucursalId() {
-        return getEffectiveReceptor().getDbmsHqBranch().getPkBizPartnerBranchId();
+        return getEffectiveReceptor().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId();
     }
 
     @Override
     public String getReceptorResidenciaFiscal() {
-        return getEffectiveReceptor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode();
+        return getEffectiveReceptor().getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode();
     }
 
     @Override

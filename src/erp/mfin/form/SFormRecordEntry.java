@@ -2809,7 +2809,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0) {
             moRecordEntry.setFkBizPartnerId_nr(moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]);
-            moRecordEntry.setFkBizPartnerBranchId_n(((SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId_nr.getKey(), SLibConstants.EXEC_MODE_VERBOSE)).getDbmsHqBranch().getPkBizPartnerBranchId());
+            moRecordEntry.setFkBizPartnerBranchId_n(((SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId_nr.getKey(), SLibConstants.EXEC_MODE_VERBOSE)).getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
             moRecordEntry.setDbmsBizPartnerCode(moFieldFkBizPartnerId_nr.getKey().toString());
             moRecordEntry.setDbmsBizPartner(moFieldFkBizPartnerId_nr.getString());
         }

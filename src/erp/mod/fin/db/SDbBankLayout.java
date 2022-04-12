@@ -808,7 +808,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                             dsm.setFkSubsystemCategoryId(SDataConstantsSys.BPSS_CT_BP_SUP);
                             dsm.setFkCompanyBranchId(record.getFkCompanyBranchId_n());
                             dsm.setFkUserNewId(session.getUser().getPkUserId());
-                            dsm.setDbmsFkCompanyBranch(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
+                            dsm.setDbmsFkCompanyBranch(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
                             //dsm.setDbmsCompanyBranchCode(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { record.getFkCompanyBranchId_n() }).getCode()); // 2019-10-09, Sergio Flores: please remove if not really needed!
                             dsm.setDbmsErpDecimalsValue(((SDataParamsErp) session.getConfigSystem()).getDecimalsValue()); // PRESERVE!!!
                             dsm.setDbmsIsRecordSaved(false);

@@ -1197,7 +1197,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
                                 dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
                                 
-                                SDataBizPartnerBranchContact bprBranchContactForPhone = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
+                                SDataBizPartnerBranchContact bprBranchContactForPhone = company.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0);
                                 bprBranchContact = bprBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : bprBranch.getDbmsBizPartnerBranchContacts().get(1);
 
                                 map = miClient.createReportParams();
@@ -1252,8 +1252,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             else {
                                 // national company:
                                 
-                                comBranchContact = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                                        company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+                                comBranchContact = company.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                        company.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(1);
 
                                 map = miClient.createReportParams();
                                 map.put("nIdYear", dps.getPkYearId());
@@ -1294,8 +1294,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         try {
                             setCursor(new Cursor(Cursor.WAIT_CURSOR));
                             
-                            comBranchContact = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                                    company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+                            comBranchContact = company.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                    company.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(1);
 
                             map = miClient.createReportParams();
                             map.put("nIdYear", dps.getPkYearId());

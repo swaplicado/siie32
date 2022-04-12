@@ -5995,7 +5995,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         params.setReceptorBranch(bizPartnerBranch);
         params.setEmisor(miClient.getSessionXXX().getCompany().getDbmsDataCompany());
 
-        if (moDps.getFkCompanyBranchId() == miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId()) {
+        if (moDps.getFkCompanyBranchId() == miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId()) {
             params.setLugarExpedicion(null);
         }
         else {

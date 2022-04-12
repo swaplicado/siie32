@@ -395,7 +395,7 @@ public class SDbBankLayoutDeposits extends SDbRegistryUser {
         entry.setFkTaxId_n(0);
 
         entry.setFkBizPartnerId_nr(deposit.getBizPartner().getPkBizPartnerId());
-        entry.setFkBizPartnerBranchId_n(deposit.getBizPartner().getDbmsHqBranch().getPkBizPartnerBranchId());
+        entry.setFkBizPartnerBranchId_n(deposit.getBizPartner().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
 
         entry.setFkCompanyBranchId_n(accountCash.getPkCompanyBranchId());
         entry.setFkEntityId_n(accountCash.getPkAccountCashId());

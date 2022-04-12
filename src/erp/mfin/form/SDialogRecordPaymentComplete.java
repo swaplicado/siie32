@@ -1681,7 +1681,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         oDsm.setFkSubsystemCategoryId(mnBizPartnerCategoryId);
         oDsm.setFkCompanyBranchId(moParamRecord.getFkCompanyBranchId_n());
         oDsm.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-        oDsm.setDbmsFkCompanyBranch(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
+        oDsm.setDbmsFkCompanyBranch(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
         oDsm.setDbmsCompanyBranchCode(branch.getCode());
         oDsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
         oDsm.setDbmsIsRecordSaved(false);

@@ -3499,7 +3499,7 @@ public abstract class SHrsUtils {
         File pdf = createPayrollReceipt(client, map);
         
         SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { (Integer)map.get("nEmployeeId") }, SLibConstants.EXEC_MODE_SILENT);
-        String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+        String recipient = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
             
         if (pdf != null) {
             String subject = "Envío de recibo de nómina";

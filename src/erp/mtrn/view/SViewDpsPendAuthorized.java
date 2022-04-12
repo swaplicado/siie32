@@ -583,8 +583,8 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
                         try {
                             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                            oContact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                                    miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+                            oContact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                    miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(1);
 
                             map = miClient.createReportParams();
                             map.put("nIdYear", oDps.getPkYearId());

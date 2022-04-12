@@ -668,7 +668,7 @@ public class SDialogMfgClosePeriod extends javax.swing.JDialog implements erp.li
         moCostClosePeriod.setDbmsPeriod(SLibTimeUtilities.digestYearMonth(moFieldWeekStart.getDate()));
         moCostClosePeriod.setDbmsFkAccountPayRoll(mvEntryAccounts.get(0)[0]);
         moCostClosePeriod.setDbmsFkAccountMfgWp(mvEntryAccounts.get(0)[1]);
-        moCostClosePeriod.setDbmsPkBookkepingCenterId(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsDataCompanyBranchBkc().getPkBookkepingCenterId());
+        moCostClosePeriod.setDbmsPkBookkepingCenterId(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getDbmsDataCompanyBranchBkc().getPkBookkepingCenterId());
 
         // Type of object cost:
 

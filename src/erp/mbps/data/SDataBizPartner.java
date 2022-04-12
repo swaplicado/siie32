@@ -188,7 +188,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     }
 
     public boolean isDomestic(SClientInterface client) {
-        int country = getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
+        int country = getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
         
         return country == SLibConstants.UNDEFINED || client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
     }
@@ -615,7 +615,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
      * Get headquarters branch.
      * @return <code>SDataBizPartnerBranch</code>.
      */
-    public erp.mbps.data.SDataBizPartnerBranch getDbmsHqBranch() {
+    public erp.mbps.data.SDataBizPartnerBranch getDbmsBizPartnerBranchHq() {
         SDataBizPartnerBranch hqBranch = null;
 
         for (SDataBizPartnerBranch bpb : mvDbmsBizPartnerBranches) {
@@ -654,14 +654,14 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         int[] anTypesContact = { SDataConstantsSys.BPSS_TP_CON_PAY, SDataConstantsSys.BPSS_TP_CON_PUR, SDataConstantsSys.BPSS_TP_CON_ADM };
 
         if (keyBranch_n == null) {
-            branch = getDbmsHqBranch();
+            branch = getDbmsBizPartnerBranchHq();
         }
         else {
             branch = getDbmsBizPartnerBranch(keyBranch_n);
         }
 
         if (branch != null) {
-            contact = getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
+            contact = getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0);
 
             mails = contact.getEmail01();
 

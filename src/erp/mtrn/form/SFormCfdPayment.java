@@ -2509,7 +2509,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         SFormOptionPickerInterface picker = miClient.getOptionPicker(SDataConstants.BPSU_BANK_ACC);
 
         picker.formReset();
-        picker.setFilterKey(moDataRecBizPartner.getDbmsHqBranch().getPrimaryKey());
+        picker.setFilterKey(moDataRecBizPartner.getDbmsBizPartnerBranchHq().getPrimaryKey());
         picker.formRefreshOptionPane();
         //picker.setSelectedPrimaryKey(...); by now there is no way to set currently selected account cash
         picker.setFormVisible(true);
@@ -2521,7 +2521,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             moFieldPayAccountSrcFiscalId.setString(bank.getFiscalId());
             moFieldPayAccountSrcNumber.setString(!bankAccount.getBankAccountNumberStd().isEmpty() ? bankAccount.getBankAccountNumberStd() : SLibUtils.textTrim(bankAccount.getBankAccountBranchNumber() + " " + bankAccount.getBankAccountNumber()));
             
-            if (miClient.getSession().getSessionCustom().isLocalCountry(new int[] { bank.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getPkCountryId() })) {
+            if (miClient.getSession().getSessionCustom().isLocalCountry(new int[] { bank.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getPkCountryId() })) {
                 moFieldPayAccountSrcEntity.resetField(); // not required for local banks
             }
             else {
@@ -3340,7 +3340,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         else {
             moDataRecBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldRecBizPartner.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
             jtfRecFiscalIdRo.setText(moDataRecBizPartner.getFiscalId());
-            jtfRecCountryRo.setText(moDataRecBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode());
+            jtfRecCountryRo.setText(moDataRecBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode());
             jtfRecForeignFiscalIdRo.setText(moDataRecBizPartner.getFiscalFrgId());
             moFieldRecCfdiUse.setFieldValue(DCfdi33Catalogs.CFDI_USO_POR_DEF); // fixed value in CFDI 3.3!
             moFieldRecCfdRelatedUuid.setFieldValue("");

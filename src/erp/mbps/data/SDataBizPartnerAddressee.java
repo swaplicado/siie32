@@ -386,7 +386,7 @@ public class SDataBizPartnerAddressee extends erp.lib.data.SDataRegistry impleme
             throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n" + SDataBizPartner.class.getName());
         }
         else {
-            int countryId = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
+            int countryId = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
             if (countryId == 0 || countryId == client.getSessionXXX().getParamsErp().getFkCountryId()) {
                 throw new Exception("Solamente los asociados de negocios del extranjero pueden tener destinatarios.\n"
                         + "Se debe seleccionar otro asociado de negocios.");

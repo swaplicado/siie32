@@ -4891,9 +4891,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltAlternatePartyIdentification().getAttType().setString("IA");
         addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltAlternatePartyIdentification().setValue(sReceptorNumber);
         addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltName().setValue(moAuxCfdParams.getEmisor().getProperName().length() > 35 ? moAuxCfdParams.getEmisor().getProperName().substring(0, 34) : moAuxCfdParams.getEmisor().getProperName());
-        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltStreetAddressOne().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet());
-        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltCity().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getState());
-        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltPostalCode().setValue(moAuxCfdParams.getEmisor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltStreetAddressOne().setValue(moAuxCfdParams.getEmisor().getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getStreet());
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltCity().setValue(moAuxCfdParams.getEmisor().getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getState());
+        addendaGrupoModelo.getEltPayment().getEltInvoiceCreator().getEltNameAddress().getEltPostalCode().setValue(moAuxCfdParams.getEmisor().getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
         addendaGrupoModelo.getEltPayment().getEltCurrency().getAttCurrencyISOCode().setOption(nMoneda);
         addendaGrupoModelo.getEltPayment().getEltCurrency().getEltCurrencyFunction().setValue("BILLING_CURRENCY");
         addendaGrupoModelo.getEltPayment().getEltCurrency().getEltCurrencyRate().setValue("" + oDecimalFormat.format(mdExchangeRate));

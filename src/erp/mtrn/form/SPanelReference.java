@@ -449,7 +449,7 @@ public class SPanelReference extends javax.swing.JPanel implements java.awt.even
             mvParams.add(0);
         }
 
-        mvParams.add(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsDataCompanyBranchBkc().getPkBookkepingCenterId());
+        mvParams.add(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getDbmsDataCompanyBranchBkc().getPkBookkepingCenterId());
         mvParams.add(SDataConstantsSys.FINS_TP_ACC_BP_PAY);
         mvParams.add(miClient.getSessionXXX().getWorkingDate());
         mvParams = SDataUtilities.callProcedure(miClient, SProcConstants.FIN_ACC_BP_GET,  mvParams, SLibConstants.EXEC_MODE_SILENT);

@@ -729,12 +729,12 @@ public class SPanelQueryIntegralBizPartner extends javax.swing.JPanel implements
                 moBizPartnerCategory = mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS ? moBizPartner.getDbmsCategorySettingsCus() : moBizPartner.getDbmsCategorySettingsSup();
 
                 jtBizPartnerName.setText(moBizPartner.getBizPartner());
-                jtfBizPartnerAddress.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet()           
-                        + " " + moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberExt()
-                        + " " + moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberInt());
-                jtfBizPartnerLocality.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getLocality());
-                jtfBizPartnerCp.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-                jtfBizPartnerCountry.setText(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountry());
+                jtfBizPartnerAddress.setText(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getStreet()           
+                        + " " + moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberExt()
+                        + " " + moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getStreetNumberInt());
+                jtfBizPartnerLocality.setText(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getLocality());
+                jtfBizPartnerCp.setText(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+                jtfBizPartnerCountry.setText(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountry());
 
                 if (moBizPartnerCategory != null) {
                     jtfCreditStatusBalance.setText(SLibUtils.DecimalFormatValue2D.format(SFinUtilities.getBizPartnerBalance(miClient, moBizPartner.getPkBizPartnerId(), mnBizPartnerCategory, null)));

@@ -2917,8 +2917,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldAlternativeId.setFieldValue(moBizPartner.getAlternativeId());
         moFieldIsDeleted.setFieldValue(moBizPartner.getIsDeleted());
 
-        if (!moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().isEmpty()) {
-            moFieldEmail.setFieldValue(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+        if (!moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().isEmpty()) {
+            moFieldEmail.setFieldValue(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
 
         jtfPkBizPartnerId_Ro.setText("" + moBizPartner.getPkBizPartnerId());
@@ -3026,12 +3026,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             }
         }
         
-        moBizPartnerBranch = moBizPartner.getDbmsHqBranch();
+        moBizPartnerBranch = moBizPartner.getDbmsBizPartnerBranchHq();
         moPanelBizPartnerBranchAddress.setRegistry(moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial());
 
-        if (!moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().isEmpty()) {
-            mnPkContactId = moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getPkContactId();
-            moFieldEmail.setFieldValue(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+        if (!moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().isEmpty()) {
+            mnPkContactId = moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getPkContactId();
+            moFieldEmail.setFieldValue(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
         
         jckIsDeleted.setEnabled((moEmployee != null && !moEmployee.isActive()) || moEmployee == null);
@@ -3160,10 +3160,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         // Update business partner children data:
 
-        moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setEmail01(moFieldEmail.getString());
+        moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setEmail01(moFieldEmail.getString());
 
         if (!moBizPartner.getIsRegistryNew()) {
-            moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
         moEmployee = moBizPartner.getDbmsDataEmployee();

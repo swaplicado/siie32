@@ -372,7 +372,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
 
                 for (SDbPayrollReceipt payrollReceipt : maPayrollReceipts) {
                     SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
-                    String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+                    String recipient = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
                     HashMap<String, Object> map = SHrsUtils.createPayrollReceiptMap((SGuiClient) miClient, payrollReceipt.getPrimaryKey(), SDataConstantsPrint.PRINT_MODE_PDF_FILE);
                     File pdf = SHrsUtils.createPayrollReceipt((SGuiClient) miClient, map);
 

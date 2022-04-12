@@ -740,7 +740,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
                 default:
             }
 
-            mvParams.add(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsDataCompanyBranchBkc().getPkBookkepingCenterId());
+            mvParams.add(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getDbmsDataCompanyBranchBkc().getPkBookkepingCenterId());
             mvParams.add(SDataConstantsSys.FINS_TP_ACC_BP_PAY);
             mvParams.add(moParamRecord.getDate());
             mvParams = SDataUtilities.callProcedure(miClient, SProcConstants.FIN_ACC_BP_GET,  mvParams, SLibConstants.EXEC_MODE_SILENT);
@@ -806,7 +806,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
                 SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[1]);
         oEntry.setFkCurrencyId(moFieldFkBizPartnerCurrencyId.getKeyAsIntArray()[0]);
         oEntry.setFkBizPartnerId_nr(moFieldFkBizPartnerId.getKeyAsIntArray()[0]);
-        oEntry.setFkBizPartnerBranchId_n(moBizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
+        oEntry.setFkBizPartnerBranchId_n(moBizPartner.getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
         
         if (jtfReference.isEnabled()) {
             oEntry.setReference(moFieldReference.getString());

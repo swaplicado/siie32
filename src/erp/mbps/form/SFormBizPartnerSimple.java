@@ -1232,15 +1232,15 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         }
         renderKey();
 
-        moBizPartnerBranch = moBizPartner.getDbmsHqBranch();
+        moBizPartnerBranch = moBizPartner.getDbmsBizPartnerBranchHq();
         moPanelBizPartnerBranchAddress.setRegistry(moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial());
 
-        if (!moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().isEmpty()) {
-            mnPkContactId = moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getPkContactId();
-            moFieldEmail.setFieldValue(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+        if (!moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().isEmpty()) {
+            mnPkContactId = moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getPkContactId();
+            moFieldEmail.setFieldValue(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
 
-        jckCaptureAddress.setSelected(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet().length() > 0);
+        jckCaptureAddress.setSelected(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getStreet().length() > 0);
         itemStateChangedCaptureAddress();
 
         jckIsDeleted.setEnabled(true);

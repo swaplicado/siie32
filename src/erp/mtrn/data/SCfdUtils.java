@@ -2104,7 +2104,7 @@ public abstract class SCfdUtils implements Serializable {
             params.setReceptorBranch(bizPartnerBranch);
             params.setEmisor(miClient.getSessionXXX().getCompany().getDbmsDataCompany());
 
-            if (moDps.getFkCompanyBranchId() == miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId()) {
+            if (moDps.getFkCompanyBranchId() == miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId()) {
                 params.setLugarExpedicion(null);
             }
             else {

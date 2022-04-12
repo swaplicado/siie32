@@ -101,7 +101,7 @@ public class SDbCfdBizPartner {
                         bizPartnerBranchAddress = bizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
                     }
                     else {
-                        bizPartnerBranchAddress = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
+                        bizPartnerBranchAddress = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial();
                     }
                     
                     if (bizPartnerBranchAddress == null) {
@@ -121,7 +121,7 @@ public class SDbCfdBizPartner {
                         cfdBizPartner = new SCfdDataBizPartner();
                         cfdBizPartner.setBizPartnerId(mnBizPartnerId);
                         cfdBizPartner.setBizPartnerBranchId(mnBizPartnerBranchId);
-                        cfdBizPartner.setBizPartnerBranchHqId(bizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
+                        cfdBizPartner.setBizPartnerBranchHqId(bizPartner.getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
                         cfdBizPartner.setBizPartnerRfc(bizPartner.getFiscalId());
                         cfdBizPartner.setBizPartnerCurp(bizPartner.getAlternativeId());
                         cfdBizPartner.setBizPartnerFiscalForeing(bizPartner.getFiscalFrgId());
@@ -169,7 +169,7 @@ public class SDbCfdBizPartner {
                                         expeditionBizPartnerBranchAddress = expeditionBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
                                     }
                                     else {
-                                        expeditionBizPartnerBranchAddress = expeditionBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial();
+                                        expeditionBizPartnerBranchAddress = expeditionBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial();
                                     }
                                     
                                     if (expeditionBizPartnerBranchAddress == null) {

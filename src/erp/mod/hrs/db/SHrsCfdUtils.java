@@ -223,7 +223,7 @@ public abstract class SHrsCfdUtils {
             hrsFormerPayroll.setTotalDeducciones(resultSet.getDouble("pr.ded_r"));
             hrsFormerPayroll.setTotalRetenciones(resultSet.getDouble("_ded_tax"));
             hrsFormerPayroll.setEmpresaId(client.getSession().getConfigCompany().getCompanyId());
-            hrsFormerPayroll.setSucursalEmpresaId(client.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
+            hrsFormerPayroll.setSucursalEmpresaId(client.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
             hrsFormerPayroll.setRegimenFiscal(new String[] { client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
             hrsFormerPayroll.setFkNominaTipoId(resultSet.getInt("p.fk_tp_pay_sht"));
             
