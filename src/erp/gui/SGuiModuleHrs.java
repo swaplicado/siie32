@@ -5,9 +5,9 @@
 
 package erp.gui;
 
+import erp.cfd.SCfdConsts;
 import erp.cfd.utils.SDialogReissueCfdis;
 import erp.cfd.utils.SDialogVerifyCfdis;
-import erp.cfd.SCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.gui.mod.cfg.SCfgMenu;
@@ -16,6 +16,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
+import erp.mcfg.data.SCfgUtils;
 import erp.mhrs.form.SDialogFormerPayrollImport;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -23,11 +24,8 @@ import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.form.SDialogCalculateIncomeTax;
 import erp.mod.hrs.form.SDialogLayoutAF02;
-import erp.mod.hrs.form.SDialogLayoutEmployee;
-import erp.mod.hrs.form.SDialogPayrollReceiptSsc;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
-import erp.mod.hrs.form.SDialogRepHrsEarDed;
 import erp.mod.hrs.form.SDialogRepHrsEarningDeduction;
 import erp.mod.hrs.form.SDialogRepHrsEarningsDeductionsFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPayrollTax;
@@ -49,7 +47,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Isabel Servín
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Claudio Peña, Isabel Servín, Sergio Flores
  */
 public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -86,14 +84,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatEmployeeHireLog;
     private javax.swing.JMenuItem jmiCatEmployeeWageLog;
     private javax.swing.JMenuItem jmiCatEmployeeSscBaseLog;
-    private javax.swing.JMenuItem jmiCatEmployeeSscBaseUpdate;
     private javax.swing.JMenuItem jmiCatEmployeeSua;
     private javax.swing.JMenuItem jmiCatEmployeeIdse;
     private javax.swing.JMenuItem jmiCatEarnings;
     private javax.swing.JMenuItem jmiCatDeductions;
     private javax.swing.JMenuItem jmiCatPosition;
     private javax.swing.JMenuItem jmiCatDeparment;
-    private javax.swing.JMenuItem jmiCatDeparmentCC;
+    private javax.swing.JMenuItem jmiCatDeparmentCc;
     private javax.swing.JMenuItem jmiCatShift;
     private javax.swing.JMenuItem jmiCatEmployeeType;
     private javax.swing.JMenuItem jmiCatWorkerType;
@@ -120,12 +117,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiBenAdvanceSettlement;
     
     private javax.swing.JMenu jmPay;
-    private javax.swing.JMenuItem jmiPayPayrollWeekly;
-    private javax.swing.JMenuItem jmiPayPayrollWeeklyRec;
-    private javax.swing.JMenuItem jmiPayPayrollFortnightly;
-    private javax.swing.JMenuItem jmiPayPayrollFortnightlyRowRec;
-    private javax.swing.JMenuItem jmiPayPayrollRecImportedEarnings;
-    private javax.swing.JMenuItem jmiPayPayrollRecImportedEarningsQ;
+    private javax.swing.JMenuItem jmiPayPayrollWeek;
+    private javax.swing.JMenuItem jmiPayPayrollWeekRec;
+    private javax.swing.JMenuItem jmiPayPayrollFortnight;
+    private javax.swing.JMenuItem jmiPayPayrollFortnightRec;
+    private javax.swing.JMenuItem jmiPayPayrollRecImportedEarWeek;
+    private javax.swing.JMenuItem jmiPayPayrollRecImportedEarFortnight;
     private javax.swing.JMenuItem jmiPayCfdiPayroll;
     private javax.swing.JMenuItem jmiPayCfdiPayrollRec;
     private javax.swing.JMenuItem jmiCfdiMassiveValidation;
@@ -160,10 +157,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiImpCfdiSendingLog;
     
     private javax.swing.JMenu jmRep;
-    private javax.swing.JMenuItem jmiRepPayrollEarnings;
-    private javax.swing.JMenuItem jmiRepPayrollEarningsByEmployee;
-    private javax.swing.JMenuItem jmiRepPayrollDeductions;
-    private javax.swing.JMenuItem jmiRepPayrollDeductionsByEmployee;
     private javax.swing.JMenuItem jmiRepPayrollAux;
     private javax.swing.JMenuItem jmiRepPayrollEarningsDeductions;
     private javax.swing.JMenuItem jmiRepPayrollTax;
@@ -174,8 +167,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepPtu;
     private javax.swing.JMenuItem jmiRepAnnexAF02;
     private javax.swing.JMenuItem jmiRepPos;
-
-    private SDialogLayoutEmployee moDialogLayoutEmployee;
 
     private erp.mhrs.form.SDialogFormerPayrollImport moDialogFormerPayrollImport;
 
@@ -248,14 +239,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeHireLog = new JMenuItem("Bitácora de altas y bajas");
         jmiCatEmployeeWageLog = new JMenuItem("Bitácora de sueldos y salarios");
         jmiCatEmployeeSscBaseLog = new JMenuItem("Bitácora de salarios base de cotización");
-        jmiCatEmployeeSscBaseUpdate = new JMenuItem("Actualización de salarios base de cotización");
         jmiCatEmployeeSua = new JMenuItem("Empleados para SUA");
         jmiCatEmployeeIdse = new JMenuItem("Empleados para IDSE");
         jmiCatEarnings = new JMenuItem("Percepciones");
         jmiCatDeductions = new JMenuItem("Deducciones");
         jmiCatPosition = new JMenuItem("Puestos");
         jmiCatDeparment = new JMenuItem("Departamentos");
-        jmiCatDeparmentCC = new JMenuItem("Departamentos y centros de costo");
+        jmiCatDeparmentCc = new JMenuItem("Departamentos y centros de costo");
         jmiCatShift = new JMenuItem("Turnos");
         jmiCatEmployeeType = new JMenuItem("Tipos de empleado");
         jmiCatWorkerType = new JMenuItem("Tipos de obrero");
@@ -279,14 +269,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeSscBaseLog);
         jmCat.add(jmiCatEmployeeSua);
         jmCat.add(jmiCatEmployeeIdse);
-        //jmCat.add(jmiCatEmployeeSscBaseUpdate); // 2020-10-09 Sergio Flores: this menu option is obsolete!
         jmCat.addSeparator();
         jmCat.add(jmiCatEarnings);
         jmCat.add(jmiCatDeductions);
         jmCat.addSeparator();
         jmCat.add(jmiCatPosition);
         jmCat.add(jmiCatDeparment);
-        jmCat.add(jmiCatDeparmentCC);
+        jmCat.add(jmiCatDeparmentCc);
         jmCat.add(jmiCatShift);
         jmCat.addSeparator();
         jmCat.add(jmiCatEmployeeType);
@@ -331,12 +320,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmBen.add(jmiBenAdvanceSettlement);
 
         jmPay = new JMenu("Nóminas");
-        jmiPayPayrollWeekly = new JMenuItem("Nóminas semanales");
-        jmiPayPayrollWeeklyRec = new JMenuItem("Recibos de nóminas semanales");
-        jmiPayPayrollFortnightly = new JMenuItem("Nóminas quincenales");
-        jmiPayPayrollFortnightlyRowRec = new JMenuItem("Recibos de nóminas quincenales");
-        jmiPayPayrollRecImportedEarnings = new JMenuItem("Percepciones semanales importadas");
-        jmiPayPayrollRecImportedEarningsQ = new JMenuItem("Percepciones quincenales importadas");
+        jmiPayPayrollWeek = new JMenuItem("Nóminas semanales");
+        jmiPayPayrollWeekRec = new JMenuItem("Recibos de nóminas semanales");
+        jmiPayPayrollFortnight = new JMenuItem("Nóminas quincenales");
+        jmiPayPayrollFortnightRec = new JMenuItem("Recibos de nóminas quincenales");
+        jmiPayPayrollRecImportedEarWeek = new JMenuItem("Percepciones semanales importadas");
+        jmiPayPayrollRecImportedEarFortnight = new JMenuItem("Percepciones quincenales importadas");
         jmiPayCfdiPayroll = new JMenuItem("CFDI de nóminas");
         jmiPayCfdiPayrollRec = new JMenuItem("CFDI de recibos de nóminas");
         jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI de recibos de nóminas... ");
@@ -359,14 +348,14 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayReissueCfdis = new JMenuItem("Reexpedición de recibos");
         jmiPayVerifyCfdis = new JMenuItem("Verificar CFDIs");
 
-        jmPay.add(jmiPayPayrollWeekly);
-        jmPay.add(jmiPayPayrollWeeklyRec);
+        jmPay.add(jmiPayPayrollWeek);
+        jmPay.add(jmiPayPayrollWeekRec);
         jmPay.addSeparator();
-        jmPay.add(jmiPayPayrollFortnightly);
-        jmPay.add(jmiPayPayrollFortnightlyRowRec);
+        jmPay.add(jmiPayPayrollFortnight);
+        jmPay.add(jmiPayPayrollFortnightRec);
         jmPay.addSeparator();
-        jmPay.add(jmiPayPayrollRecImportedEarnings);
-        jmPay.add(jmiPayPayrollRecImportedEarningsQ);
+        jmPay.add(jmiPayPayrollRecImportedEarWeek);
+        jmPay.add(jmiPayPayrollRecImportedEarFortnight);
         jmPay.addSeparator();
         jmPay.add(jmiPayCfdiPayroll);
         jmPay.add(jmiPayCfdiPayrollRec);
@@ -392,10 +381,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
         jmPay.add(jmiPayCalculatedEstimateIncomeTax);
-        //jmPay.addSeparator();
-        //jmPay.add(jmiPayReissueCfdis);
-        //jmPay.add(jmiPayVerifyCfdis);
-                
+        /* Funcionalidades temporales que por lo pronto no son requeridas:
+        jmPay.addSeparator();
+        jmPay.add(jmiPayReissueCfdis);
+        jmPay.add(jmiPayVerifyCfdis);
+        */
+        
         jmImp = new JMenu("Importación");
         jmiImpFormerPayroll = new JMenuItem("Nóminas importadas");
         jmiImpFormerPayrollEmp = new JMenuItem("Nóminas importadas vs. pólizas contables");
@@ -421,10 +412,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmImp.add(jmImpCfdi);
 
         jmRep = new JMenu("Reportes");
-        jmiRepPayrollEarnings = new JMenuItem("Percepciones por período...");
-        jmiRepPayrollEarningsByEmployee = new JMenuItem("Percepciones por empleado por período...");
-        jmiRepPayrollDeductions = new JMenuItem("Deducciones por período...");
-        jmiRepPayrollDeductionsByEmployee = new JMenuItem("Deducciones por empleado por período...");
         jmiRepPayrollAux = new JMenuItem("Auxiliares de nóminas...");
         jmiRepPayrollEarningsDeductions = new JMenuItem("Percepciones y deducciones por período...");
         jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas...");
@@ -436,11 +423,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepAnnexAF02 = new JMenuItem("Layout anexo AF02");
         jmiRepPos = new JMenuItem("Reporte de posiciones y vacantes");
         
-        //jmRep.add(jmiRepPayrollEarnings);
-        //jmRep.add(jmiRepPayrollEarningsByEmployee);
-        //jmRep.add(jmiRepPayrollDeductions);
-        //jmRep.add(jmiRepPayrollDeductionsByEmployee);
-        //jmRep.addSeparator();
         jmRep.add(jmiRepPayrollAux);
         jmRep.add(jmiRepPayrollEarningsDeductions);
         jmRep.addSeparator();
@@ -455,6 +437,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmiRepAnnexAF02);
         jmRep.addSeparator();
         jmRep.add(jmiRepPos);
+        
+        // listeners:
 
         jmiCfgTaxTable.addActionListener(this);
         jmiCfgTaxTableRow.addActionListener(this);
@@ -487,12 +471,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeSscBaseLog.addActionListener(this);
         jmiCatEmployeeSua.addActionListener(this);
         jmiCatEmployeeIdse.addActionListener(this);
-        jmiCatEmployeeSscBaseUpdate.addActionListener(this);
         jmiCatEarnings.addActionListener(this);
         jmiCatDeductions.addActionListener(this);
         jmiCatPosition.addActionListener(this);
         jmiCatDeparment.addActionListener(this);
-        jmiCatDeparmentCC.addActionListener(this);
+        jmiCatDeparmentCc.addActionListener(this);
         jmiCatShift.addActionListener(this);
         jmiCatEmployeeType.addActionListener(this);
         jmiCatWorkerType.addActionListener(this);
@@ -517,12 +500,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBenLoanAdjustmentDed.addActionListener(this);
         jmiBenAdvanceSettlement.addActionListener(this);
         
-        jmiPayPayrollWeekly.addActionListener(this);
-        jmiPayPayrollWeeklyRec.addActionListener(this);
-        jmiPayPayrollFortnightly.addActionListener(this);
-        jmiPayPayrollFortnightlyRowRec.addActionListener(this);
-        jmiPayPayrollRecImportedEarnings.addActionListener(this);
-        jmiPayPayrollRecImportedEarningsQ.addActionListener(this);
+        jmiPayPayrollWeek.addActionListener(this);
+        jmiPayPayrollWeekRec.addActionListener(this);
+        jmiPayPayrollFortnight.addActionListener(this);
+        jmiPayPayrollFortnightRec.addActionListener(this);
+        jmiPayPayrollRecImportedEarWeek.addActionListener(this);
+        jmiPayPayrollRecImportedEarFortnight.addActionListener(this);
         jmiPayCfdiPayroll.addActionListener(this);
         jmiPayCfdiPayrollRec.addActionListener(this);
         jmiCfdiMassiveValidation.addActionListener(this);
@@ -551,10 +534,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiImpCfdiStampSignPending.addActionListener(this);
         jmiImpCfdiSendingLog.addActionListener(this);
         
-        jmiRepPayrollEarnings.addActionListener(this);
-        jmiRepPayrollEarningsByEmployee.addActionListener(this);
-        jmiRepPayrollDeductions.addActionListener(this);
-        jmiRepPayrollDeductionsByEmployee.addActionListener(this);
         jmiRepPayrollAux.addActionListener(this);
         jmiRepPayrollEarningsDeductions.addActionListener(this);
         jmiRepPayrollTax.addActionListener(this);
@@ -566,6 +545,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepAnnexAF02.addActionListener(this);
         jmiRepPos.addActionListener(this);
         
+        // display user rights:
+        
+        boolean hasRightConfig = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CFG).HasRight;
+        
+        jmCfg.setEnabled(hasRightConfig);
         jmiCfgTaxTable.setEnabled(true);
         jmiCfgTaxTableRow.setEnabled(true);
         jmiCfgTaxSubsidyTable.setEnabled(true);
@@ -589,89 +573,89 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBkkDeductionEmployee.setEnabled(true);
         jmiCfgUpdtateAccountingConfigs.setEnabled(true);
         jmiCfgConfig.setEnabled(true);
-        jmCfg.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CFG).HasRight);
         
-        boolean isPermissionCat = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT).HasRight;
-        boolean isPermissionCatEmp = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight;
-        boolean isPermissionCatEmpWage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight;
-        boolean isPermissionPerEmpData = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PER_EMP_DATA).HasRight;
-        jmCat.setEnabled(
-                isPermissionCat ||
-                isPermissionCatEmp ||
-                isPermissionCatEmpWage ||
-                isPermissionPerEmpData);
-        jmiCatEmployee.setEnabled(isPermissionCatEmp);
-        jmiCatEmployeeRelatives.setEnabled(isPermissionCatEmp || isPermissionPerEmpData);
-        jmiCatEmployeeIntegral.setEnabled(isPermissionCatEmp);
-        jmiCatEmployeeContractExp.setEnabled(isPermissionCatEmp);
-        jmiCatEmployeeHireLog.setEnabled(isPermissionCatEmpWage);
-        jmiCatEmployeeWageLog.setEnabled(isPermissionCatEmpWage);
-        jmiCatEmployeeSscBaseLog.setEnabled(isPermissionCatEmpWage);
-        jmiCatEmployeeSua.setEnabled(isPermissionCatEmpWage);
-        jmiCatEmployeeIdse.setEnabled(isPermissionCatEmpWage);
-        jmiCatEmployeeSscBaseUpdate.setEnabled(isPermissionCatEmpWage);
-        jmiCatEarnings.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatDeductions.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatPosition.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatDeparment.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatDeparmentCC.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatShift.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatEmployeeType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatWorkerType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatEmployeeDismissType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatMwzType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatMwzTypeWage.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatUma.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatUmi.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatWorkerTypeSalary.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatLoanTypeAdjustment.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatAbsenceType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
-        jmiCatAbsenceClass.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        boolean hasRightCat = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT).HasRight;
+        boolean hasRightEmp = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight;
+        boolean hasRightEmpWage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight;
+        boolean hasRightEmpData = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PER_EMP_DATA).HasRight;
+        boolean hasRightAuxHrs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_AUX_HRS).HasRight;
         
-        boolean isPermissionPay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight;
-        boolean isPermissionPayWee = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_WEE).HasRight;
-        boolean isPermissionPayFor = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_FOR).HasRight;
+        jmCat.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage || hasRightEmpData || hasRightAuxHrs);
+        jmiCatEmployee.setEnabled(hasRightEmp || hasRightAuxHrs || hasRightEmpWage);
+        jmiCatEmployeeRelatives.setEnabled(hasRightEmp || hasRightAuxHrs || hasRightEmpData);
+        jmiCatEmployeeIntegral.setEnabled(hasRightEmp);
+        jmiCatEmployeeContractExp.setEnabled(hasRightEmp || hasRightAuxHrs);
+        jmiCatEmployeeHireLog.setEnabled(hasRightEmp || hasRightAuxHrs);
+        jmiCatEmployeeWageLog.setEnabled(hasRightEmp || hasRightEmpWage);
+        jmiCatEmployeeSscBaseLog.setEnabled(hasRightEmp || hasRightEmpWage);
+        jmiCatEmployeeSua.setEnabled(hasRightEmp || hasRightEmpWage);
+        jmiCatEmployeeIdse.setEnabled(hasRightEmp || hasRightEmpWage);
+        jmiCatEarnings.setEnabled(hasRightConfig || hasRightCat);
+        jmiCatDeductions.setEnabled(hasRightConfig || hasRightCat);
+        jmiCatPosition.setEnabled(hasRightCat || hasRightEmp);
+        jmiCatDeparment.setEnabled(hasRightCat || hasRightEmp);
+        jmiCatDeparmentCc.setEnabled(hasRightCat || hasRightEmp);
+        jmiCatShift.setEnabled(hasRightCat || hasRightEmp);
+        jmiCatEmployeeType.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage);
+        jmiCatWorkerType.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage);
+        jmiCatEmployeeDismissType.setEnabled(hasRightConfig || hasRightCat || hasRightEmp);
+        jmiCatMwzType.setEnabled(hasRightConfig || hasRightCat || hasRightEmpWage);
+        jmiCatMwzTypeWage.setEnabled(hasRightConfig || hasRightCat || hasRightEmpWage);
+        jmiCatUma.setEnabled(hasRightConfig || hasRightCat || hasRightEmpWage);
+        jmiCatUmi.setEnabled(hasRightConfig || hasRightCat || hasRightEmpWage);
+        jmiCatWorkerTypeSalary.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage);
+        jmiCatLoanTypeAdjustment.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage);
+        jmiCatAbsenceType.setEnabled(hasRightConfig || hasRightCat || hasRightEmp);
+        jmiCatAbsenceClass.setEnabled(hasRightConfig || hasRightCat || hasRightEmp);
         
-        jmBen.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight);
-        jmiBenAbsence.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
-        jmiBenBenefitVacPend.setEnabled(true);
-        jmiBenBenefitVac.setEnabled(true);
-        jmiBenBenefitBonVac.setEnabled(true);
-        jmiBenBenefitBonAnn.setEnabled(true);
-        jmiBenBenefitAdjustmentEar.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
-        jmiBenLoan.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
-        jmiBenLoanAdjustmentEar.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
-        jmiBenLoanAdjustmentDed.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
-        jmiBenAdvanceSettlement.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
+        boolean hasRightPay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight;
+        boolean hasRightPayWeek = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_WEE).HasRight;
+        boolean hasRightPayFortnight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_FOR).HasRight;
         
-        jmPay.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
-        jmiPayPayrollWeekly.setEnabled(isPermissionPay || isPermissionPayWee);
-        jmiPayPayrollWeeklyRec.setEnabled(isPermissionPay || isPermissionPayWee);
-        jmiPayPayrollFortnightly.setEnabled(isPermissionPay || isPermissionPayFor);
-        jmiPayPayrollFortnightlyRowRec.setEnabled(isPermissionPay || isPermissionPayFor);
-        jmiPayPayrollRecImportedEarnings.setEnabled(isPermissionPay || isPermissionPayFor);
-        jmiPayPayrollRecImportedEarningsQ.setEnabled(isPermissionPay || isPermissionPayFor);
-        jmiPayCfdiPayroll.setEnabled(isPermissionPay);
-        jmiPayCfdiPayrollRec.setEnabled(isPermissionPay);
-        jmiCfdiMassiveValidation.setEnabled(isPermissionPay);
-        jmPayCfdi.setEnabled(isPermissionPay);
-        jmiPayCfdiStampSign.setEnabled(isPermissionPay);
-        jmiPayCfdiStampSignPending.setEnabled(isPermissionPay);
-        jmiPayCfdiSendingLog.setEnabled(isPermissionPay);
-        jmiPayPayrollBkkRecord.setEnabled(isPermissionPay);
-        jmiPayConditionalEarnings.setEnabled(true);
-        jmiPayAutoEarningsGlobal.setEnabled(isPermissionPay);
-        jmiPayAutoEarningsByEmployee.setEnabled(isPermissionPay);
-        jmiPayAutoEarningsByEmployeeDet.setEnabled(isPermissionPay);
-        jmiPayAutoDeductionsGlobal.setEnabled(isPermissionPay);
-        jmiPayAutoDeductionsByEmployee.setEnabled(isPermissionPay);
-        jmiPayAutoDeductionsByEmployeeDet.setEnabled(isPermissionPay);
-        jmiPayCalculatedAmountMonth.setEnabled(isPermissionPay);
-        jmiPayCalculatedEstimateIncomeTax.setEnabled(isPermissionPay);
-        jmiPayReissueCfdis.setEnabled(isPermissionPay);
-        jmiPayVerifyCfdis.setEnabled(isPermissionPay);
+        jmBen.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
+        jmiBenAbsence.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
+        jmiBenBenefitVacPend.setEnabled(hasRightPay);
+        jmiBenBenefitVac.setEnabled(hasRightPay);
+        jmiBenBenefitBonVac.setEnabled(hasRightPay);
+        jmiBenBenefitBonAnn.setEnabled(hasRightPay);
+        jmiBenBenefitAdjustmentEar.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight);
+        jmiBenLoan.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
+        jmiBenLoanAdjustmentEar.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
+        jmiBenLoanAdjustmentDed.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
+        jmiBenAdvanceSettlement.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight);
         
-        jmImp.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_IMP).HasRight);
+        jmPay.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight);
+        jmiPayPayrollWeek.setEnabled(hasRightPay || hasRightPayWeek);
+        jmiPayPayrollWeekRec.setEnabled(hasRightPay || hasRightPayWeek);
+        jmiPayPayrollFortnight.setEnabled(hasRightPay || hasRightPayFortnight);
+        jmiPayPayrollFortnightRec.setEnabled(hasRightPay || hasRightPayFortnight);
+        jmiPayPayrollRecImportedEarWeek.setEnabled(hasRightPay || hasRightPayWeek);
+        jmiPayPayrollRecImportedEarFortnight.setEnabled(hasRightPay || hasRightPayFortnight);
+        jmiPayCfdiPayroll.setEnabled(hasRightPay);
+        jmiPayCfdiPayrollRec.setEnabled(hasRightPay);
+        jmiCfdiMassiveValidation.setEnabled(hasRightPay);
+        jmPayCfdi.setEnabled(hasRightPay);
+        jmiPayCfdiStampSign.setEnabled(hasRightPay);
+        jmiPayCfdiStampSignPending.setEnabled(hasRightPay);
+        jmiPayCfdiSendingLog.setEnabled(hasRightPay);
+        jmiPayPayrollBkkRecord.setEnabled(hasRightPay);
+        jmiPayConditionalEarnings.setEnabled(hasRightPay);
+        jmPayAutoEarnings.setEnabled(hasRightPay);
+        jmiPayAutoEarningsGlobal.setEnabled(hasRightPay);
+        jmiPayAutoEarningsByEmployee.setEnabled(hasRightPay);
+        jmiPayAutoEarningsByEmployeeDet.setEnabled(hasRightPay);
+        jmPayAutoDeductions.setEnabled(hasRightPay);
+        jmiPayAutoDeductionsGlobal.setEnabled(hasRightPay);
+        jmiPayAutoDeductionsByEmployee.setEnabled(hasRightPay);
+        jmiPayAutoDeductionsByEmployeeDet.setEnabled(hasRightPay);
+        jmiPayCalculatedAmountMonth.setEnabled(hasRightPay);
+        jmiPayCalculatedEstimateIncomeTax.setEnabled(hasRightPay);
+        jmiPayReissueCfdis.setEnabled(hasRightPay);
+        jmiPayVerifyCfdis.setEnabled(hasRightPay);
+
+        boolean hasRightImport = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_IMP).HasRight;
+        
+        jmImp.setEnabled(hasRightImport);
         jmiImpFormerPayroll.setEnabled(true);
         jmiImpFormerPayrollEmp.setEnabled(true);
         jmiImpImport.setEnabled(true);
@@ -682,12 +666,20 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiImpCfdiStampSignPending.setEnabled(true);
         jmiImpCfdiSendingLog.setEnabled(true);
         
-        jmRep.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_REP).HasRight || 
-                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
-        jmiRepPayrollEarnings.setEnabled(true);
-        jmiRepPayrollEarningsByEmployee.setEnabled(true);
-        jmiRepPayrollDeductions.setEnabled(true);
-        jmiRepPayrollDeductionsByEmployee.setEnabled(true);
+        // averiguar si debe activarse el menú para el layout del anexo AF02:
+        
+        boolean isConfiguredAf02 = false;
+        
+        try {
+            isConfiguredAf02 = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_AF02)) == 1;
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+        
+        boolean hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_REP).HasRight;
+        
+        jmRep.setEnabled(hasRightReports || hasRightEmpWage);
         jmiRepPayrollAux.setEnabled(true);
         jmiRepPayrollEarningsDeductions.setEnabled(true);
         jmiRepPayrollTax.setEnabled(true);
@@ -695,8 +687,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollEarDedFileCsv.setEnabled(true);
         jmiRepVacationsFileCsv.setEnabled(true);
         jmiRepEmployeeActiveByPeriod.setEnabled(true);
-        jmiRepPtu.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
-        jmiRepAnnexAF02.setEnabled((miClient.getSession().getConfigCompany().getCompanyId() == 1)); // 1 es idBp de APSA
+        jmiRepPtu.setEnabled(hasRightEmpWage);
+        jmiRepAnnexAF02.setEnabled(isConfiguredAf02);
         jmiRepPos.setEnabled(true);
         
         // GUI configuration:
@@ -987,9 +979,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatEmployeeIdse) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_IDSE, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiCatEmployeeSscBaseUpdate) {
-               new SDialogPayrollReceiptSsc((SGuiClient) miClient, "Actualización de salario base cotización").setVisible(true);
-            }
             else if (item == jmiCatEarnings) {
                 miClient.getSession().showView(SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
             }
@@ -1002,7 +991,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatDeparment) {
                 miClient.getSession().showView(SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiCatDeparmentCC) {
+            else if (item == jmiCatDeparmentCc) {
                 miClient.getSession().showView(SModConsts.HRS_DEP_CC, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatShift) {
@@ -1071,22 +1060,22 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiBenAdvanceSettlement) {
                 miClient.getSession().showView(SModConsts.HRS_ADV_SET, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiPayPayrollWeekly) {
+            else if (item == jmiPayPayrollWeek) {
                 miClient.getSession().showView(SModConsts.HRS_PAY, SModSysConsts.HRSS_TP_PAY_WEE, null);
             }
-            else if (item == jmiPayPayrollWeeklyRec) {
+            else if (item == jmiPayPayrollWeekRec) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP, SModSysConsts.HRSS_TP_PAY_WEE, null);
             }
-            else if (item == jmiPayPayrollFortnightly) {
+            else if (item == jmiPayPayrollFortnight) {
                 miClient.getSession().showView(SModConsts.HRS_PAY, SModSysConsts.HRSS_TP_PAY_FOR, null);
             }
-            else if (item == jmiPayPayrollFortnightlyRowRec) {
+            else if (item == jmiPayPayrollFortnightRec) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP, SModSysConsts.HRSS_TP_PAY_FOR, null);
             }
-            else if (item == jmiPayPayrollRecImportedEarnings) {
+            else if (item == jmiPayPayrollRecImportedEarWeek) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_IMPORT, SModSysConsts.HRSS_TP_PAY_WEE, null);
             }
-            else if (item == jmiPayPayrollRecImportedEarningsQ) {
+            else if (item == jmiPayPayrollRecImportedEarFortnight) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_IMPORT, SModSysConsts.HRSS_TP_PAY_FOR, null);
             }
             else if (item == jmiPayCfdiPayroll) {
@@ -1170,18 +1159,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiImpCfdiSendingLog) {
                 showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFDI_PAYROLL_VER_OLD);
-            }
-            else if (item == jmiRepPayrollEarnings) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR, "Percepciones por período").setFormVisible(true);
-            }
-            else if (item == jmiRepPayrollEarningsByEmployee) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR_EMP, "Percepciones por empleado por período").setFormVisible(true);
-            }
-            else if (item == jmiRepPayrollDeductions) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED, "Deducciones por período").setFormVisible(true);
-            }
-            else if (item == jmiRepPayrollDeductionsByEmployee) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED_EMP, "Deducciones por empleado por período").setFormVisible(true);
             }
             else if (item == jmiRepPayrollAux) {
                new SDialogRepHrsAuxPayroll((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);

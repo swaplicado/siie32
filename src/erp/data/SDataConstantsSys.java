@@ -90,6 +90,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
+    public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
     public static final int USD_XRT_POLICY_BANXICO = 1;
@@ -333,6 +334,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_PAY_OC = 109007;
     public static final int PRV_HRS_PAY_WEE = 109011;
     public static final int PRV_HRS_PAY_FOR = 109012;
+    public static final int PRV_HRS_AUX_HRS = 109021;
     public static final int PRV_HRS_PER_EMP_DATA = 109091;
     public static final int PRV_HRS_REP = 109901;
 

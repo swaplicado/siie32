@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 199.0/ 2022-04-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Archivado de reportes obsoletos del módulo recursos humanos en "reps/reps archive": hrs_pay_ear_aux.jasper y hrs_pay_ded_aux.jasper.
+2) Eliminación de diálogo obsoleto para reportes de percepciones y deducciones erp.mod.hrs.form.SDialogRepHrsEarDed.java.
+3) Eliminación de diálogo obsoleto para actualización de SBC del módulo de recursos humanos erp.mod.hrs.form.SDialogPayrollReceiptSsc.java.
+4) Refactorización de permisos de menús del módulo recursos humanos y en vista de empleados (SViewBizPartner).
+5) Implementación de permiso 'Auxiliar RH'.
+
+================================================================================
 SIIE 3.2 197.10/ 2022-04-07
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

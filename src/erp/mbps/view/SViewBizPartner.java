@@ -70,9 +70,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
     private erp.mbps.form.SDialogBizPartnerExport moDialogBizPartnerExport;
     private erp.mod.hrs.form.SDialogEmployeeHireLog moDialogEmployeeHireLog;
-    private boolean mbHasRightEmpWage;
     private boolean mbIsViewEmployees;
     private boolean mbIsViewBizPartnersSimple;
+    private boolean mbHasRightEmpWage;
     
     private int mnFilterPaymentTypeId;
     private int mnFilterDepartamentId;
@@ -86,14 +86,14 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
     private void initComponents() {
         int i;
-        int levelRightEdit = SDataConstantsSys.UNDEFINED;
-        int levelRightEditCategory = SDataConstantsSys.UNDEFINED;
-        int levelRightCreateCategory = SDataConstantsSys.UNDEFINED;
+        int rightLevelBp = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
+        int rightLevelBpCatCreate = 0;
+        int rightLevelBpCatEdit = 0;
         boolean employeesCrudEnabled = false;
         
-        mbHasRightEmpWage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight;
         mbIsViewEmployees = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstants.BPSX_BP_EMP, SDataConstants.BPSX_BP_EMP_CON_EXP });
         mbIsViewBizPartnersSimple = mbIsViewEmployees || SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstants.BPSU_BP, SDataConstants.BPSX_BP_ATT_SAL_AGT, SDataConstants.BPSX_BP_ATT_BANK, SDataConstants.BPSX_BP_ATT_CARR });
+        mbHasRightEmpWage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight;
         
         moTabFilterDeleted = new STabFilterDeleted(this);
         
@@ -255,7 +255,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_SUP;
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.co_key", "Clave empresa", 100);
 
-                levelRightEditCategory = levelRightCreateCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
+                rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
                 break;
 
             case SDataConstants.BPSX_BP_CUS:
@@ -280,7 +280,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CUS;
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.co_key", "Clave empresa", 100);
 
-                levelRightEditCategory = levelRightCreateCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_CUS).Level;
+                rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_CUS).Level;
                 break;
 
             case SDataConstants.BPSX_BP_CDR:
@@ -296,7 +296,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 }
                 mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CDR;
 
-                levelRightEditCategory = levelRightCreateCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_CDR).Level;
+                rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_CDR).Level;
                 break;
 
             case SDataConstants.BPSX_BP_DBR:
@@ -312,7 +312,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 }
                 mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_DBR;
 
-                levelRightEditCategory = levelRightCreateCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_DBR).Level;
+                rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_DBR).Level;
                 break;
 
             case SDataConstants.BPSU_BP:
@@ -332,9 +332,20 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
                 msOrderKey = "bp.bp, bp.id_bp ";
-
-                levelRightEditCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).Level;
-                levelRightCreateCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).Level;
+                
+                if (miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_HRS_AUX_HRS)) {
+                    rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_AUX_HRS).Level;
+                }
+                else {
+                    rightLevelBpCatCreate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).Level;
+                    
+                    if (mbHasRightEmpWage) {
+                        rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).Level;
+                    }
+                    else {
+                        rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).Level;
+                    }
+                }
                 break;
 
             default:
@@ -495,18 +506,30 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
 
-        levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
-
-        jbNew.setEnabled(((levelRightCreateCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP) && (!mbIsViewEmployees || employeesCrudEnabled));
-        jbEdit.setEnabled(((levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP) && (!mbIsViewEmployees || employeesCrudEnabled));
-        jbDelete.setEnabled(false);
-        jbBizPartnerExport.setEnabled(levelRightEditCategory >= SUtilConsts.LEV_AUTHOR && (!mbIsViewBizPartnersSimple || mbIsViewEmployees));
+        if (mnTabTypeAux01 == SDataConstants.BPSU_BP || (mbIsViewEmployees && !employeesCrudEnabled)) {
+            jbNew.setEnabled(false);
+            jbEdit.setEnabled(false);
+        }
+        else {
+            jbNew.setEnabled(rightLevelBp >= SUtilConsts.LEV_CAPTURE || rightLevelBpCatCreate >= SUtilConsts.LEV_CAPTURE);
+            jbEdit.setEnabled(rightLevelBp >= SUtilConsts.LEV_EDITOR || rightLevelBpCatEdit >= SUtilConsts.LEV_EDITOR);
+        }
+        
+        jbDelete.setEnabled(false); // allways disabled, business partners are disabled only within form
+        
+        if (mbIsViewBizPartnersSimple || (mbIsViewEmployees && !employeesCrudEnabled)) {
+            jbBizPartnerExport.setEnabled(false);
+        }
+        else {
+            jbBizPartnerExport.setEnabled(rightLevelBp >= SUtilConsts.LEV_MANAGER || rightLevelBpCatEdit >= SUtilConsts.LEV_MANAGER);
+        }
+        
         moDialogBizPartnerExport = new SDialogBizPartnerExport(miClient);
         
         if (mbIsViewEmployees) {
-            jbStatusEmployeeChange.setEnabled(employeesCrudEnabled);
-            jbStatusEmployeeModify.setEnabled(employeesCrudEnabled);
-            jbStatusEmployeeDelete.setEnabled(employeesCrudEnabled);
+            jbStatusEmployeeChange.setEnabled(jbEdit.isEnabled());
+            jbStatusEmployeeModify.setEnabled(jbEdit.isEnabled());
+            jbStatusEmployeeDelete.setEnabled(jbEdit.isEnabled());
         }
 
         mvSuscriptors.add(mnTabTypeAux01);

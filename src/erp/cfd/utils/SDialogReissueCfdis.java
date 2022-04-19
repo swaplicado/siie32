@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
- *
+ * Reemisión masiva de CFDI de nóminas.
  * @author Edwin Carmona, Sergio Flores
  */
 public class SDialogReissueCfdis extends SBeanFormDialog implements java.awt.event.ActionListener {

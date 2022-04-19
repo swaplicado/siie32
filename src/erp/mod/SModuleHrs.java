@@ -1418,18 +1418,6 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSR_PRE_PAY:
                 guiReport = new SGuiReport("reps/hrs_pre_pay.jasper", "Prenómina");
                 break;
-            case SModConsts.HRSR_EAR:
-                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por período");
-                break;
-            case SModConsts.HRSR_DED:
-                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por período");
-                break;
-            case SModConsts.HRSR_EAR_EMP:
-                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por empleado por período");
-                break;
-            case SModConsts.HRSR_DED_EMP:
-                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por empleado por período");
-                break;
             case SModConsts.HRSR_PAY_TAX:
                 guiReport = new SGuiReport("reps/hrs_pay_tax.jasper", "Impuesto sobre nóminas");
                 break;
