@@ -317,6 +317,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_MFG_ORD_ST_PROC = 108007;
     public static final int PRV_MFG_ORD_ST_END = 108008;
     public static final int PRV_MFG_ORD_ST_CLS = 108009;
+    public static final int PRV_MFG_ORD_REOPEN = 108021;
     public static final int PRV_MFG_ASG_LOT = 108010;
     public static final int PRV_MFG_EXP = 108011;
     public static final int PRV_MFG_LT = 108012;
@@ -401,6 +402,7 @@ public abstract class SDataConstantsSys {
     public static final int ROL_LOG_ADMOR = 107001;
 
     public static final int ROL_MFG_ADMOR = 108001;
+    public static final int ROL_MFG_AUX = 108002;
 
     public static final int ROL_HRS_ADMOR = 109001;
 

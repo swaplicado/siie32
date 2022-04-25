@@ -226,6 +226,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
     
     private void populateGridRows () {
         moPaneCfdRecordRows.clearTableRows();
+        moPaneCfdRecordRows.getTable().getRowCount();
         for (SDataCfdRecordRow row : maRows) {
             if (!row.getNameXml().isEmpty()) {
                 moPaneCfdRecordRows.addTableRow(row);

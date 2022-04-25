@@ -43,7 +43,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos, Edwin Carmona, Cesar Orozco   
+ * @author Néstor Ávalos, Edwin Carmona, Cesar Orozco, Isabel Servín
  */
 
 public class SViewProductionOrder extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
@@ -91,7 +91,6 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         int nLevelOrderStatusLotAssing = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_LOT_ASG).Level;
         int nLevelOrderStatusLotProcess = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_PROC).Level;
         int nLevelOrderStatusLotEnd = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_END).Level;
-        int nLevelOrderStatusLotClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_CLS).Level;
         int nLevelOrderStatusDelay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.MFGS_ST_ORD_DLY).Level;
         boolean bPrivilegeOrderCreate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_NEW).HasRight;
         boolean bPrivilegeOrderStatusNew = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_ST_NEW).HasRight;
@@ -103,7 +102,8 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
         boolean bPrivilegeOrderStatusDelay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.MFGS_ST_ORD_DLY).HasRight;
         boolean bPrivilegeOrderAssignRework = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ASG_REW).HasRight;
         boolean bPrivilegeOrderAssignDate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ASG_DATE).HasRight;
-        
+        boolean bPrivilegeOrderReopen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ORD_REOPEN).HasRight;
+                
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, mnTabTypeAux01 != SDataConstantsSys.MFGS_ST_ORD_DLY ?
             SLibConstants.GUI_DATE_AS_YEAR_MONTH : SLibConstants.GUI_DATE_AS_DATE);
         moTabFilterDeleted = new STabFilterDeleted(this);
@@ -194,7 +194,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
                 (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG && bPrivilegeOrderStatusLotAssign && nLevelOrderStatusLotAssing >= SUtilConsts.LEV_CAPTURE) ||
                 (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_PROC && bPrivilegeOrderStatusProcess && nLevelOrderStatusLotProcess >= SUtilConsts.LEV_CAPTURE) ||
                 (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_END && bPrivilegeOrderStatusEnd && nLevelOrderStatusLotEnd >= SUtilConsts.LEV_CAPTURE) ||
-                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_CLS && bPrivilegeOrderStatusClose && nLevelOrderStatusLotClose >= SUtilConsts.LEV_CAPTURE) ||
+                (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_CLS && bPrivilegeOrderStatusClose && bPrivilegeOrderReopen) ||
                 (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_DLY && bPrivilegeOrderStatusDelay && nLevelOrderStatusDelay >= SUtilConsts.LEV_CAPTURE));  //XXX VALIDATIONS FOR STATUS WHERE CAN NOT BE BACK      
         jbProductionOrderNextStep.setEnabled(
                 (mnTabTypeAux01 == SDataConstantsSys.MFGS_ST_ORD_NEW && bPrivilegeOrderStatusNew && nLevelOrderStatusNew >= SUtilConsts.LEV_CAPTURE) ||

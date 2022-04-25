@@ -8,6 +8,11 @@ Sergio Abraham FLORES GUTIÉRREZ
 4) Refactorización de permisos de menús del módulo recursos humanos y en vista de empleados (SViewBizPartner).
 5) Implementación de permiso 'Auxiliar RH'.
 
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó un nuevo permiso para reabrir las ordenes de producción.
+2) Se implementó la nueva clase erp.cli.SCliRepInvoicesMultiCompanies para el envío del reporte de ventas de varias compañías.
+
 ================================================================================
 SIIE 3.2 197.10/ 2022-04-07
 Sergio Abraham FLORES GUTIÉRREZ
