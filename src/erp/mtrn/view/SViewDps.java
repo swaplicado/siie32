@@ -40,7 +40,7 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
-import erp.mtrn.data.SDataDpsMinorChanges;
+import erp.mtrn.data.SDataMinorChangesDps;
 import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SCfdRenderer;
@@ -778,13 +778,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 miClient.getGuiModule(mnModule).setCurrentUserPrivilegeLevel(mbHasRightEdit ? SUtilConsts.LEV_AUTHOR : SUtilConsts.LEV_READ);
 
                 if (miClient.getGuiModule(mnModule).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
+                    
                     SDataRegistry registry = miClient.getGuiModule(mnModule).getRegistry();
                     
                     if (registry instanceof SDataDps) {
-                        miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                         SDataUtilities.showDpsRecord(miClient, (SDataDps) registry);
                     }
-                    else if (registry instanceof SDataDpsMinorChanges) {
+                    else if (registry instanceof SDataMinorChangesDps) {
                         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                         
                         if (dps.getDbmsDataCfd() != null) {

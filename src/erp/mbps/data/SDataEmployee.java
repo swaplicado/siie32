@@ -853,8 +853,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 hrsEmployeeHireLog.setIsHire(mbActive);
                 hrsEmployeeHireLog.setDeleted(mbDeleted);
                 hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
-                hrsEmployeeHireLog.setFkUserInsertId(mnFkUserInsertId);
-                hrsEmployeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
+                hrsEmployeeHireLog.setFkUserInsertId(mnFkUserInsertId != 0 ? mnFkUserInsertId : SUtilConsts.USR_NA_ID);
+                hrsEmployeeHireLog.setFkUserUpdateId(mnFkUserUpdateId != 0 ? mnFkUserUpdateId : SUtilConsts.USR_NA_ID);
                 
                 hrsEmployeeHireLog.setIsAuxFirstHiring(mbIsRegistryNew);
                 //employeeHireLog.setIsAuxForceFirstHiring(...);

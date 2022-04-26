@@ -922,6 +922,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
 
         jmRep.setEnabled(hasRightReports);
+        jmiQryBizPartnerLastMove.setEnabled(false); // SQL query in associated view needs refactoring
         
         // GUI configuration:
         

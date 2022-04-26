@@ -7,17 +7,21 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mod.SModConsts;
-import java.awt.event.ItemEvent;
-import java.util.Vector;
 import erp.mtrn.data.SDataDpsEntry;
+import java.util.Vector;
 import javax.swing.JLabel;
 
-public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
+/**
+ * Modificación de información de comercialización.
+ * @author Adrián Avilés
+ */
+public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
+    private boolean mbResetingForm;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldFkVehicleTypeId_n;
@@ -89,7 +93,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Datos Comerciallización");
+        setTitle("Comerciallización");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -120,7 +124,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDriver.setText("Chofer:");
+        jlDriver.setText("Chofer del vehículo:");
         jlDriver.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel8.add(jlDriver);
 
@@ -128,7 +132,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfDriver.setText("DRIVER");
+        jtfDriver.setText("TEXT");
         jtfDriver.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel4.add(jtfDriver);
 
@@ -136,7 +140,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPlate.setText("Placas vehículo:");
+        jlPlate.setText("Placas del vehículo:");
         jlPlate.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel10.add(jlPlate);
 
@@ -144,7 +148,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfPlate.setText("VEHICLE NUMBER");
+        jtfPlate.setText("TEXT");
         jtfPlate.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel5.add(jtfPlate);
 
@@ -160,7 +164,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfContTank.setText("TRAILER CONTAINER TANK");
+        jtfContTank.setText("TEXT");
         jtfContTank.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel6.add(jtfContTank);
 
@@ -180,7 +184,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfSealQuality.setText("SEAL QUALITY");
+        jtfSealQuality.setText("TEXT");
         jtfSealQuality.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel7.add(jtfSealQuality);
 
@@ -196,7 +200,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfSecuritySeal.setText("SEAL SECURITY");
+        jtfSecuritySeal.setText("TEXT");
         jtfSecuritySeal.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel14.add(jtfSecuritySeal);
 
@@ -204,7 +208,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTicket.setText("Boleto(s) báscula:");
+        jlTicket.setText("Boleto(s) de báscula:");
         jlTicket.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel15.add(jlTicket);
 
@@ -212,7 +216,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfTicket.setText("TICKET");
+        jtfTicket.setText("TEXT");
         jtfTicket.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel16.add(jtfTicket);
 
@@ -228,7 +232,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfVgm.setText("VGM");
+        jtfVgm.setText("TEXT");
         jtfVgm.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel18.add(jtfVgm);
 
@@ -263,27 +267,19 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        
         moFieldFkVehicleTypeId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkVehicleTypeId_n, jlFkVehicleTypeId_n);
-        
         moFieldDriver = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfDriver, jlDriver);
         moFieldDriver.setLengthMax(50);
-        
         moFieldPlate = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPlate, jlPlate);
         moFieldPlate.setLengthMax(25);
-        
         moFieldTicket = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfTicket, jlTicket);
         moFieldTicket.setLengthMax(50);
-        
         moFieldContainer = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfContTank, jlContainerTank);
         moFieldContainer.setLengthMax(50);
-        
         moFieldQualitySeal = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSealQuality, jlQualitySeal);
         moFieldQualitySeal.setLengthMax(100);
-        
         moFieldSecuritySeal = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSecuritySeal, jlSecuritySeal);
         moFieldSecuritySeal.setLengthMax(50);
-        
         moFieldVgm = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfVgm, jlVgm);
         moFieldVgm.setLengthMax(15);
 
@@ -309,8 +305,22 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void actionOk() {
-        mnFormResult = SLibConstants.FORM_RESULT_OK;
-        setVisible(false);
+        if (jbOk.isEnabled()) {
+            SFormValidation validation = formValidate();
+
+            if (validation.getIsError()) {
+                if (validation.getComponent() != null) {
+                    validation.getComponent().requestFocus();
+                }
+                if (validation.getMessage().length() > 0) {
+                    miClient.showMsgBoxWarning(validation.getMessage());
+                }
+            }
+            else {
+                 mnFormResult = SLibConstants.FORM_RESULT_OK;
+                 setVisible(false);
+            }
+        }
     }
 
     private void actionCancel() {
@@ -361,6 +371,11 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     // End of variables declaration//GEN-END:variables
 
     @Override
+    public void formClearRegistry() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
@@ -371,6 +386,30 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
+    }
+
+    @Override
+    public void formRefreshCatalogues() {
+        mbResetingForm = true;
+        
+        SFormUtilities.populateComboBox(miClient, jcbFkVehicleTypeId_n, SModConsts.LOGU_TP_VEH);
+        
+        mbResetingForm = false;
+    }
+
+    @Override
+    public SFormValidation formValidate() {
+        SFormValidation validation = new SFormValidation();
+
+        for (int i = 0; i < mvFields.size(); i++) {
+            if (!((SFormField) mvFields.get(i)).validateField()) {
+                validation.setIsError(true);
+                validation.setComponent(mvFields.get(i).getComponent());
+                break;
+            }
+        }
+        
+        return validation;
     }
 
     @Override
@@ -395,6 +434,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
+        mbResetingForm = true;
+        
         moDpsEntry = (SDataDpsEntry) registry;
 
         moFieldFkVehicleTypeId_n.setFieldValue(new int[] { moDpsEntry.getFkVehicleTypeId_n() });
@@ -405,6 +446,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         moFieldQualitySeal.setFieldValue(moDpsEntry.getSealQuality());
         moFieldSecuritySeal.setFieldValue(moDpsEntry.getSealSecurity());
         moFieldVgm.setFieldValue(moDpsEntry.getVgm());
+        
+        mbResetingForm = false;
     }
     
     @Override
@@ -433,36 +476,6 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        if (e.getSource() instanceof javax.swing.JButton) {
-            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
-
-            if (button == jbOk) {
-                actionOk();
-            }
-            else if (button == jbCancel) {
-                actionCancel();
-            }
-        }
-    }
-
-/*************************************************************************************************/
-    @Override
-    public void formClearRegistry() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient, jcbFkVehicleTypeId_n, SModConsts.LOGU_TP_VEH);
-    }
-
-    @Override
-    public SFormValidation formValidate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public void setValue(int type, Object value) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -478,7 +491,16 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+        if (e.getSource() instanceof javax.swing.JButton) {
+            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
+
+            if (button == jbOk) {
+                actionOk();
+            }
+            else if (button == jbCancel) {
+                actionCancel();
+            }
+        }
     }
 }

@@ -8,6 +8,12 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 
+/**
+ * (2022-04-21 Sergio Flores) Esta vista pretende mostrar el movimiento más reciente de asociados de negocios con operaciones de contado.
+ * Sin embargo, la consulta SQL está mal planteada, y tiene varios parámetros con constantes en duro que deben ser removidas.
+ * 
+ * @author Adrián Avilés
+ */
 public class SViewDpsLastMove extends erp.lib.table.STableTab implements java.awt.event.ActionListener{
 
     private erp.lib.table.STabFilterDate moTabFilterDate;

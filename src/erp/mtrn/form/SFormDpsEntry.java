@@ -193,6 +193,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.mtrn.form.SDialogPriceUnitaryWizard moDialogPriceUnitaryWizard;
     private erp.mtrn.form.SDialogItemPriceHistory moDialogItemPriceHistory;
     private erp.mtrn.form.SFormDpsEntryNotes moFormNotes;
+    private erp.mtrn.form.SFormDpsComEntry moFormComEntry;
     private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
 
     private erp.mtrn.data.SDataDps moParamDps;
@@ -223,7 +224,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private SDataDpsEntryPrice moAuxEntryPriceEdited;
     
     private boolean mbPostEmissionEdition;
-    private erp.mtrn.form.SFormDpsComEntry moFormComEntry;
 
     /** Creates new form DFormDpsEntry
      * @param client GUI client.
@@ -1603,7 +1603,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlDriver.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel43.add(jlDriver);
 
-        jtfDriver.setText("DRIVER");
+        jtfDriver.setText("TEXT");
         jtfDriver.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel43.add(jtfDriver);
 
@@ -1615,7 +1615,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlVehicleNumber.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel45.add(jlVehicleNumber);
 
-        jtfVehicleNumber.setText("VEHICLE NUMBER");
+        jtfVehicleNumber.setText("TEXT");
         jtfVehicleNumber.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel45.add(jtfVehicleNumber);
 
@@ -1627,7 +1627,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlContainerTank.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel47.add(jlContainerTank);
 
-        jtfContTank.setText("TRAILER CONTAINER TANK");
+        jtfContTank.setText("TEXT");
         jtfContTank.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel47.add(jtfContTank);
 
@@ -1642,11 +1642,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel55.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlQualitySeal.setText("Sello(s) de calidad:");
+        jlQualitySeal.setText("Sello(s) calidad:");
         jlQualitySeal.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel55.add(jlQualitySeal);
 
-        jtfSealQuality.setText("SEAL QUALITY");
+        jtfSealQuality.setText("TEXT");
         jtfSealQuality.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel55.add(jtfSealQuality);
 
@@ -1661,11 +1661,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel57.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlSecuritySeal.setText("Sello(s) de seguridad:");
+        jlSecuritySeal.setText("Sello(s) seguridad:");
         jlSecuritySeal.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel57.add(jlSecuritySeal);
 
-        jtfSecuritySeal.setText("SEAL SECURITY");
+        jtfSecuritySeal.setText("TEXT");
         jtfSecuritySeal.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel57.add(jtfSecuritySeal);
 
@@ -1684,7 +1684,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlTicket.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel56.add(jlTicket);
 
-        jtfTicket.setText("TICKET");
+        jtfTicket.setText("TEXT");
         jtfTicket.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel56.add(jtfTicket);
 
@@ -1696,7 +1696,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlVgm.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel58.add(jlVgm);
 
-        jtfVgm.setText("VGM");
+        jtfVgm.setText("TEXT");
         jtfVgm.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel58.add(jtfVgm);
 
@@ -4342,7 +4342,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFormComEntry.setVisible(true);
         
         if (moFormComEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            mbPostEmissionEdition = true; // already true, just for consistence with SFormDps
+            
             SDataDpsEntry dpsEntry = (SDataDpsEntry) moFormComEntry.getRegistry();
+            
             moFieldFkVehicleTypeId_n.setFieldValue(dpsEntry.getFkVehicleTypeId_n());
             moFieldDriver.setFieldValue(dpsEntry.getDriver());
             moFieldPlate.setFieldValue(dpsEntry.getPlate());
@@ -4352,9 +4355,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldSealSecurity.setFieldValue(dpsEntry.getSealSecurity());
             moFieldVgm.setFieldValue(dpsEntry.getVgm());
             
-            jbOk.setEnabled(true);
-            
-            jcbFkVehicleTypeId_n.requestFocusInWindow();
+            jbOk.setEnabled(true); // allow post-emission-edition changes to be saved
         }
     }
     
@@ -4365,9 +4366,24 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFormNotes.setFormVisible(true);
 
             if (moFormNotes.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                moPaneGridNotes.addTableRow(new SDataDpsEntryNotesRow(moFormNotes.getRegistry()));
-                moPaneGridNotes.renderTableRows();
-                moPaneGridNotes.setTableRowSelection(moPaneGridNotes.getTableGuiRowCount() - 1);
+                boolean add = true;
+                SDataDpsEntryNotes notes = (SDataDpsEntryNotes) moFormNotes.getRegistry();
+                
+                if (mbPostEmissionEdition && notes.getIsCfd()) {
+                    if (miClient.showMsgBoxConfirm("No se pueden agregar notas que se anexen a la descripción del concepto del CFDI.\n"
+                            + "¿Desea agregarlas como notas ordinarias?, si no, las notas serán desechadas.") != JOptionPane.YES_OPTION) {
+                        add = false;
+                    }
+                    else {
+                        notes.setIsCfd(false);
+                    }
+                }
+                
+                if (add) {
+                    moPaneGridNotes.addTableRow(new SDataDpsEntryNotesRow(notes));
+                    moPaneGridNotes.renderTableRows();
+                    moPaneGridNotes.setTableRowSelection(moPaneGridNotes.getTableGuiRowCount() - 1);
+                }
             }
         }
     }
@@ -4377,15 +4393,22 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             int index = moPaneGridNotes.getTable().getSelectedRow();
 
             if (index != -1) {
-                moFormNotes.formReset();
-                moFormNotes.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, mbPostEmissionEdition);
-                moFormNotes.setRegistry((SDataDpsEntryNotes) moPaneGridNotes.getSelectedTableRow().getData());
-                moFormNotes.setFormVisible(true);
+                SDataDpsEntryNotes notes = (SDataDpsEntryNotes) moPaneGridNotes.getSelectedTableRow().getData();
+                
+                if (mbPostEmissionEdition && notes.getIsCfd()) {
+                    miClient.showMsgBoxWarning("Esta nota no se puede modificar porque forma parte del CFD.");
+                }
+                else {
+                    moFormNotes.formReset();
+                    moFormNotes.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, mbPostEmissionEdition);
+                    moFormNotes.setRegistry(notes);
+                    moFormNotes.setFormVisible(true);
 
-                if (moFormNotes.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    moPaneGridNotes.setTableRow(new SDataDpsEntryNotesRow(moFormNotes.getRegistry()), index);
-                    moPaneGridNotes.renderTableRows();
-                    moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
+                    if (moFormNotes.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        moPaneGridNotes.setTableRow(new SDataDpsEntryNotesRow(moFormNotes.getRegistry()), index);
+                        moPaneGridNotes.renderTableRows();
+                        moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
+                    }
                 }
             }
         }
@@ -4396,33 +4419,48 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             int index = moPaneGridNotes.getTable().getSelectedRow();
 
             if (index != -1) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
-                    SDataDpsEntryNotes notes = (SDataDpsEntryNotes) moPaneGridNotes.getTableRow(index).getData();
-
-                    if (notes.getIsDeleted()) {
-                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_REG_ALREADY_DELETE);
-                    }
-                    else {
-                        if (notes.getIsRegistryNew()) {
-                            moPaneGridNotes.removeTableRow(index);
+                SDataDpsEntryNotes notes = (SDataDpsEntryNotes) moPaneGridNotes.getSelectedTableRow().getData();
+                
+                if (mbPostEmissionEdition && notes.getIsCfd()) {
+                    miClient.showMsgBoxWarning("Esta nota no se puede eliminar porque forma parte del CFD.");
+                }
+                else {
+                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+                        if (notes.getIsDeleted()) {
+                            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_REG_ALREADY_DELETE);
                         }
                         else {
-                            notes.setIsDeleted(true);
-                            notes.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                            notes.setIsRegistryEdited(true);
-                            notes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                            if (notes.getIsRegistryNew()) {
+                                moPaneGridNotes.removeTableRow(index);
+                            }
+                            else {
+                                notes.setIsDeleted(true);
+                                notes.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                                notes.setIsRegistryEdited(true);
+                                notes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
 
-                            moPaneGridNotes.setTableRow(new SDataDpsEntryNotesRow(notes), index);
+                                moPaneGridNotes.setTableRow(new SDataDpsEntryNotesRow(notes), index);
+                            }
+
+                            moPaneGridNotes.renderTableRows();
+                            moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
                         }
-
-                        moPaneGridNotes.renderTableRows();
-                        moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
                     }
                 }
             }
         }
     }
 
+    private void actionNotesFilter() {
+        if (jtbNotesFilter.isEnabled()) {
+            int index = moPaneGridNotes.getTable().getSelectedRow();
+
+            moPaneGridNotes.setGridViewStatus(!jtbNotesFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
+            moPaneGridNotes.renderTableRows();
+            moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
+        }
+    }
+    
     private void actionPickSystemNotes() {
         String option = miClient.pickOption(SDataConstants.TRN_SYS_NTS, new int[] { moParamDps.getFkDpsCategoryId(), moParamDps.getFkDpsClassId(), moParamDps.getFkDpsTypeId(), moParamDps.getFkCurrencyId() });
 
@@ -4443,25 +4481,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private void actionEditNotes(){
-        jbNotesNew.setEnabled(true);
-        jbNotesEdit.setEnabled(true);
-        //jbNotesDelete.setEnabled(true); // by now, notes elimination not supported, because additional validations is needed to preserve CFD data
-        jbPickSystemNotes.setEnabled(true);
+        mbPostEmissionEdition = true; // already true, just for consistence with SFormDps
         
         jbEditNotes.setEnabled(false);
-        jbOk.setEnabled(true);
+        jbOk.setEnabled(true); // allow post-emission-edition changes to be saved
+        
+        jbNotesNew.setEnabled(true);
+        jbNotesEdit.setEnabled(true);
+        jbNotesDelete.setEnabled(true);
+        jbPickSystemNotes.setEnabled(true);
         
         jbNotesNew.requestFocusInWindow();
-    }
-    
-    private void actionNotesFilter() {
-        if (jtbNotesFilter.isEnabled()) {
-            int index = moPaneGridNotes.getTable().getSelectedRow();
-
-            moPaneGridNotes.setGridViewStatus(!jtbNotesFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
-            moPaneGridNotes.renderTableRows();
-            moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
-        }
     }
 
     private void actionPriceNew() {
@@ -5541,6 +5571,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     @Override
     public void formRefreshCatalogues() {
         mbResetingForm = true;
+        
+        moFormNotes.formRefreshCatalogues();
+        moFormComEntry.formRefreshCatalogues();
 
         SFormUtilities.populateComboBox(miClient, jcbFkItemId, SDataConstants.ITMU_ITEM);
         SFormUtilities.populateComboBox(miClient, jcbFkTaxRegionId, SDataConstants.FINU_TAX_REG);

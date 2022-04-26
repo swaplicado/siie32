@@ -451,6 +451,7 @@ public abstract class SGuiModule {
         SRedisLock redisLock = null;
         */
         SLock slock = null;
+        
         try {
             // Attempt to gain data lock:
             /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro            
@@ -551,7 +552,7 @@ public abstract class SGuiModule {
                 SLockUtils.releaseLock(miClient, slock);
             }
 
-            if (msgError.length() > 0) {
+            if (!msgError.isEmpty()) {
                 throw new Exception(msgError);
             }
         }

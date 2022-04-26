@@ -8,25 +8,28 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.Vector;
 
-
-public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
+/**
+ * Cambios menores para partidas de documentos que ya no son modificables.
+ * @author Adrián Avilés, Sergio Flores
+ */
+public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
 
     protected int mnPkYearId;
     protected int mnPkDocId;
     protected int mnPkEntryId;
     protected java.lang.String msSealQuality;
     protected java.lang.String msSealSecurity;
-    protected int mnFkVehicleTypeId_n;
     protected java.lang.String msDriver;
-    protected boolean mbIsEdited;
     protected java.lang.String msPlate;
     protected java.lang.String msTicket;
     protected java.lang.String msContainerTank;
     protected java.lang.String msVgm;
+    protected int mnFkVehicleTypeId_n;
     protected int mnFkUserEditId;
+    
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryNotes> mvDbmsEntryNotes;
     
-    public SDataDpsEntryMinorChanges() {
+    public SDataMinorChangesDpsEntry() {
         super(SDataConstants.TRN_DPS_ETY);
         mvDbmsEntryNotes = new Vector<>();
         reset();
@@ -37,13 +40,12 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setSealQuality(java.lang.String s) { msSealQuality = s; }
     public void setSealSecurity(java.lang.String s) { msSealSecurity = s; }
-    public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
     public void setDriver(java.lang.String s) { msDriver = s; }
-    public void setIsEdited(boolean b) { mbIsEdited = b; }
     public void setPlate(java.lang.String s) { msPlate = s; }
     public void setTicket(java.lang.String s) { msTicket = s; }
     public void setContainerTank(java.lang.String s) { msContainerTank = s; }
     public void setVgm(java.lang.String s) { msVgm = s; }
+    public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     
     public int getPkYearId() { return mnPkYearId; }
@@ -51,13 +53,12 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
     public int getPkEntryId() { return mnPkEntryId; }
     public java.lang.String getSealQuality() { return msSealQuality; }
     public java.lang.String getSealSecurity() { return msSealSecurity; }
-    public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
     public java.lang.String getDriver() { return msDriver; }
-    public boolean getIsEdited() { return mbIsEdited; }
     public java.lang.String getPlate() { return msPlate; }
     public java.lang.String getTicket() { return msTicket; }
     public java.lang.String getContainerTank() { return msContainerTank; }
     public java.lang.String getVgm() { return msVgm; }
+    public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryNotes> getDbmsEntryNotes() { return mvDbmsEntryNotes; }
@@ -83,42 +84,35 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
         mnPkEntryId = 0;
         msSealQuality = "";
         msSealSecurity = "";
-        mnFkVehicleTypeId_n = 0;
         msDriver = "";
-        mbIsEdited = false;
         msPlate = "";
         msTicket = "";
         msContainerTank = "";
         msVgm = "";
+        mnFkVehicleTypeId_n = 0;
         mnFkUserEditId = 0;
+        
         mvDbmsEntryNotes.clear();     
     }
 
-    public void setData(SDataDpsEntry entry){
-        int size = 0;
+    public void setData(final SDataDpsEntry dpsEntry) {
+        mnPkYearId = dpsEntry.getPkYearId();
+        mnPkDocId = dpsEntry.getPkDocId();
+        mnPkEntryId = dpsEntry.getPkEntryId();
+        msSealQuality = dpsEntry.getSealQuality();
+        msSealSecurity = dpsEntry.getSealSecurity();
+        msDriver = dpsEntry.getDriver();
+        msPlate = dpsEntry.getPlate();
+        msTicket = dpsEntry.getTicket();
+        msContainerTank = dpsEntry.getContainerTank();
+        msVgm = dpsEntry.getVgm();
+        mnFkVehicleTypeId_n = dpsEntry.getFkVehicleTypeId_n();
+        mnFkUserEditId = dpsEntry.getFkUserEditId();
         
-        mnPkYearId = entry.getPkYearId();
-        mnPkDocId = entry.getPkDocId();
-        mnPkEntryId = entry.getPkEntryId();
-        mnFkVehicleTypeId_n = entry.getFkVehicleTypeId_n();
-        msDriver = entry.getDriver();
-        msPlate = entry.getPlate();
-        msTicket = entry.getTicket();
-        msContainerTank = entry.getContainerTank();
-        msSealQuality = entry.getSealQuality();
-        msSealSecurity = entry.getSealSecurity();
-        mbIsEdited  = entry.getFlagMinorChangesEdited();
-        mnFkUserEditId = entry.getFkUserEditId();
-        msVgm = entry.getVgm();
+        mvDbmsEntryNotes.addAll(dpsEntry.getDbmsEntryNotes());
         
-        Vector<SDataDpsEntryNotes> notas = entry.getDbmsEntryNotes();
-        size = notas.size();
-        
-        for(int i = 0; i < size; i++){
-            SDataDpsEntryNotes notes = new SDataDpsEntryNotes();
-            mvDbmsEntryNotes.add(notas.get(i));
-        }
-        
+        mbIsRegistryNew = false;
+        mbIsRegistryEdited = dpsEntry.getFlagMinorChangesEdited();
     }
     
     @Override
@@ -129,47 +123,55 @@ public class SDataDpsEntryMinorChanges extends erp.lib.data.SDataRegistry{
     @Override
     public int save(Connection connection) {
         mnLastDbActionResult = SLibConstants.UNDEFINED;
-        Statement oStatement = null;
-        String sSql = "";
-        String veh = "";
-        try{
-            for (SDataDpsEntryNotes notes : mvDbmsEntryNotes) {
-                if (notes.getIsRegistryNew() || notes.getIsRegistryEdited()) {
-                    notes.setPkYearId(mnPkYearId);
-                    notes.setPkDocId(mnPkDocId);
-                    notes.setPkEntryId(mnPkEntryId);
+        
+        try {
+            String sql = "UPDATE trn_dps_ety SET "
+                    + "seal_qlt = '" + msSealQuality + "', "
+                    + "seal_sec = '" + msSealSecurity + "', "
+                    + "driver = '" + msDriver + "', "
+                    + "plate = '" + msPlate + "', "
+                    + "ticket = '" + msTicket + "', "
+                    + "cont_tank = '" + msContainerTank + "', "
+                    + "vgm = '" + msVgm + "', "
+                    + "fid_tp_veh_n = " + (mnFkVehicleTypeId_n != 0 ? mnFkVehicleTypeId_n : "NULL") + ", "
+                    + "fid_usr_edit = " + mnFkUserEditId + ", "
+                    + "ts_edit = NOW() "
+                    + "WHERE id_year = " + mnPkYearId + " "
+                    + "AND id_doc = " + mnPkDocId + " "
+                    + "AND id_ety = " + mnPkEntryId + " "
+                    + "AND ("
+                    + "seal_qlt <> '" + msSealQuality + "' "
+                    + "OR seal_sec <> '" + msSealSecurity + "' "
+                    + "OR driver <> '" + msDriver + "' "
+                    + "OR plate <> '" + msPlate + "' "
+                    + "OR ticket <> '" + msTicket + "' "
+                    + "OR cont_tank <> '" + msContainerTank + "' "
+                    + "OR vgm <> '" + msVgm + "' "
+                    + "OR ((fid_tp_veh_n IS NULL AND " + (mnFkVehicleTypeId_n != 0) + ") OR (fid_tp_veh_n IS NOT NULL AND fid_tp_veh_n <> " + mnFkVehicleTypeId_n + ")));";
+                    
+            try (Statement statement = connection.createStatement()) {
+                statement.execute(sql);
+            }
+            
+            for (SDataDpsEntryNotes entryNotes : mvDbmsEntryNotes) {
+                if (entryNotes.getIsRegistryNew() || entryNotes.getIsRegistryEdited()) {
+                    entryNotes.setPkYearId(mnPkYearId);
+                    entryNotes.setPkDocId(mnPkDocId);
+                    entryNotes.setPkEntryId(mnPkEntryId);
 
-                    if (notes.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    entryNotes.setFkUserNewId(mnFkUserEditId);
+                    entryNotes.setFkUserEditId(mnFkUserEditId);
+                    
+                    if (entryNotes.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
             }
             
-            if(mnFkVehicleTypeId_n != 0){
-                veh = " fid_tp_veh_n = " + mnFkVehicleTypeId_n;
-            }else{
-                veh = " fid_tp_veh_n = NULL";
-            }
-            
-            oStatement = connection.createStatement();
-            sSql = "UPDATE trn_dps_ety SET" +
-                    veh + "," +
-                    " driver = " + '"' + msDriver + '"' + "," +
-                    " plate = " + '"' + msPlate + '"' + "," +
-                    " ticket = " + '"' + msTicket + '"' + "," +
-                    " cont_tank = " + '"' + msContainerTank + '"' + "," +
-                    " seal_qlt = " + '"' + msSealQuality + '"' + "," +
-                    " seal_sec = " + '"' + msSealSecurity + '"' + "," +
-                    " vgm = " + '"' + msVgm + '"' + "," +
-                    "fid_usr_edit = " + mnFkUserEditId + "," +
-                    "ts_edit = NOW()" +
-                    " WHERE id_year = " + mnPkYearId + 
-                    " AND id_doc = " + mnPkDocId + 
-                    " AND id_ety = " + mnPkEntryId + " ";
-                    oStatement.execute(sSql);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             
-        }catch (java.lang.Exception e) {
+        }
+        catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }

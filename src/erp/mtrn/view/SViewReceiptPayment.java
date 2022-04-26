@@ -36,8 +36,10 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.srv.SLock;
 
 /**
@@ -382,6 +384,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                             }
 
                             if (annul) {
+                                SGuiUtils.setCursorWait((SGuiClient) miClient);
                                 if (miClient.getGuiModule(SDataConstants.MOD_SAL).annulRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey(), params) == SLibConstants.DB_ACTION_ANNUL_OK) {
                                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                 }
@@ -405,6 +408,8 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                         for (SLock slock : slocks) {
                             SLockUtils.releaseLock(miClient, slock);
                         }
+                        
+                        SGuiUtils.setCursorDefault((SGuiClient) miClient);
                     }
                 }
             }
@@ -486,10 +491,14 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
             }
             else {
                 try {
+                    SGuiUtils.setCursorWait((SGuiClient) miClient);
                     SCfdPaymentUtils.sign(miClient, ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
+                }
+                finally {
+                    SGuiUtils.setCursorDefault((SGuiClient) miClient);
                 }
             }
         }
@@ -502,6 +511,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
             }
             else {
                 try {
+                    SGuiUtils.setCursorWait((SGuiClient) miClient);
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                     if (SCfdUtils.validateCfdi(miClient, cfd, 0, true)) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -509,6 +519,9 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
+                }
+                finally {
+                    SGuiUtils.setCursorDefault((SGuiClient) miClient);
                 }
             }
         }

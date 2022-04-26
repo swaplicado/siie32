@@ -3632,17 +3632,23 @@ public abstract class SCfdUtils implements Serializable {
     public static boolean validateCfdi(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, final boolean showFinalMessage) throws Exception {
         boolean valid = false;
 
-        if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+        if (cfd == null) {
+            throw new Exception("No se proporcionó un CFD para ser validado.");
+        }
+        else if (cfd.getDocXml().isEmpty()) {
+            throw new Exception("El comprobante no cuenta con archivo XML.");
+        }
+        else if (cfd.getDocXmlName().isEmpty()) {
+            throw new Exception("El comprobante no cuenta con nombre de archivo XML.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante solicitado no es un CFDI.");
+            throw new Exception("El comprobante no es un CFDI.");
         }
         else {
             SDataPac pac = getPacForValidation(client, cfd);
 
             if (pac == null) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se pudo determinar cuál es el PAC para la validación del CFDI.");
+                throw new Exception("No se pudo determinar cuál es el PAC para validar del CFDI.\nNo hay registro de intentos previos de timbrado para el CFDI.");
             }
 
             if (cfd.getCancellationStatus().isEmpty() && !(cfd.getIsProcessingWebService() || cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf())) {
