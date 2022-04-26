@@ -10388,6 +10388,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     public erp.lib.data.SDataRegistry getRegistry() {
         if (mbPostEmissionEdition) {
             moDps.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            
             moDps.getDbmsDpsNotes().clear();
             for (STableRow row : moPaneGridNotes.getGridRows()) {
                 moDps.getDbmsDpsNotes().add((SDataDpsNotes) row.getData());

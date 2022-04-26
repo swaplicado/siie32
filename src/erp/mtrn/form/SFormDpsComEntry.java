@@ -301,6 +301,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
+            jcbFkVehicleTypeId_n.requestFocusInWindow();
         }
     }
 

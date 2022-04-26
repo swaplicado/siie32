@@ -124,6 +124,8 @@ public class SDataMinorChangesDps extends erp.lib.data.SDataRegistry {
             entry.setData(dpsEntry);   
             mvDbmsEntries.add(entry);
         }
+        
+        mbIsRegistryNew = false; // this registry is allways an existing one!
     }
     
     @Override

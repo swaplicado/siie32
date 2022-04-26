@@ -224,6 +224,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private SDataDpsEntryPrice moAuxEntryPriceEdited;
     
     private boolean mbPostEmissionEdition;
+    private boolean mbPostEmissionEditionDone;
 
     /** Creates new form DFormDpsEntry
      * @param client GUI client.
@@ -3951,13 +3952,21 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             enableAccountFields(false);
             
             jcbFkVehicleTypeId_n.setEnabled(false);
-            jtfDriver.setEnabled(false);
+            jtfDriver.setEditable(false);
+            jtfDriver.setFocusable(false);
             jtfVehicleNumber.setEditable(false);
+            jtfVehicleNumber.setFocusable(false);
             jtfContTank.setEditable(false);
+            jtfContTank.setFocusable(false);
             jtfSealQuality.setEditable(false);
+            jtfSealQuality.setFocusable(false);
             jtfSecuritySeal.setEditable(false);
+            jtfSecuritySeal.setFocusable(false);
             jtfTicket.setEditable(false);
+            jtfTicket.setFocusable(false);
             jtfVgm.setEditable(false);
+            jtfVgm.setFocusable(false);
+            jbEditLogistics.setEnabled(mbPostEmissionEdition);
 
             jbNotesNew.setEnabled(false);
             jbNotesEdit.setEnabled(false);
@@ -4018,13 +4027,20 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbEditFkThirdTaxCausingId_n.setEnabled(true);
 
             jcbFkVehicleTypeId_n.setEnabled(true);
-            jtfDriver.setEnabled(true);
+            jtfDriver.setEditable(true);
+            jtfDriver.setFocusable(true);
             jtfVehicleNumber.setEditable(true);
+            jtfVehicleNumber.setFocusable(true);
             jtfContTank.setEditable(true);
+            jtfContTank.setFocusable(true);
             jtfSealQuality.setEditable(true);
+            jtfSealQuality.setFocusable(true);
             jtfSecuritySeal.setEditable(true);
+            jtfSecuritySeal.setFocusable(true);
             jtfTicket.setEditable(true);
+            jtfTicket.setFocusable(true);
             jtfVgm.setEditable(true);
+            jtfVgm.setFocusable(true);
             jbEditLogistics.setEnabled(false);
             
             jbNotesNew.setEnabled(true);
@@ -4346,7 +4362,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             
             SDataDpsEntry dpsEntry = (SDataDpsEntry) moFormComEntry.getRegistry();
             
-            moFieldFkVehicleTypeId_n.setFieldValue(dpsEntry.getFkVehicleTypeId_n());
+            moFieldFkVehicleTypeId_n.setFieldValue(new int[] { dpsEntry.getFkVehicleTypeId_n() });
             moFieldDriver.setFieldValue(dpsEntry.getDriver());
             moFieldPlate.setFieldValue(dpsEntry.getPlate());
             moFieldTicket.setFieldValue(dpsEntry.getTicket());
@@ -4356,6 +4372,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldVgm.setFieldValue(dpsEntry.getVgm());
             
             jbOk.setEnabled(true); // allow post-emission-edition changes to be saved
+            
+            mbPostEmissionEditionDone = true;
         }
     }
     
@@ -4383,6 +4401,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     moPaneGridNotes.addTableRow(new SDataDpsEntryNotesRow(notes));
                     moPaneGridNotes.renderTableRows();
                     moPaneGridNotes.setTableRowSelection(moPaneGridNotes.getTableGuiRowCount() - 1);
+                    
+                    if (mbPostEmissionEdition) {
+                        mbPostEmissionEditionDone = true;
+                    }
                 }
             }
         }
@@ -4408,6 +4430,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                         moPaneGridNotes.setTableRow(new SDataDpsEntryNotesRow(moFormNotes.getRegistry()), index);
                         moPaneGridNotes.renderTableRows();
                         moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
+                        
+                        if (mbPostEmissionEdition) {
+                            mbPostEmissionEditionDone = true;
+                        }
                     }
                 }
             }
@@ -4440,6 +4466,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                                 notes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
 
                                 moPaneGridNotes.setTableRow(new SDataDpsEntryNotesRow(notes), index);
+                                
+                                if (mbPostEmissionEdition) {
+                                    mbPostEmissionEditionDone = true;
+                                }
                             }
 
                             moPaneGridNotes.renderTableRows();
@@ -5566,6 +5596,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         actionPriceClear();
 
         mbPostEmissionEdition = false;
+        mbPostEmissionEditionDone = false;
     }
 
     @Override
@@ -6207,6 +6238,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             
             moDpsEntry.setDbmsComplement(complement);
         }
+        
+        moDpsEntry.setFlagMinorChangesEdited(mbPostEmissionEditionDone);
         
         return moDpsEntry;
     }

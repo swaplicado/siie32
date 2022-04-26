@@ -338,6 +338,7 @@ public class SFormDpsCom extends javax.swing.JDialog implements erp.lib.form.SFo
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
+            jcbFkCarrierTypeId.requestFocusInWindow();
         }
     }
 
