@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 199.1/ 2022-04-26
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de las modificaciones menores de documentos después de ser emitidos.
+
+================================================================================
 SIIE 3.2 199.0/ 2022-04-19
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
@@ -10,7 +16,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Se agregó un nuevo permiso para reabrir las ordenes de producción.
+1) Se agregó un nuevo permiso para reabrir las órdenes de producción.
 2) Se implementó la nueva clase erp.cli.SCliRepInvoicesMultiCompanies para el envío del reporte de ventas de varias compañías.
 
 ================================================================================
