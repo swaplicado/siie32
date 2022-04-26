@@ -1916,8 +1916,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     }
     
     private void actionFileXmlAdd() {
-        SDialogRecordEntryXml recordEntryDps = null;
-        ArrayList<SDataCfdRecordRow> aCfdRecordRows = null;
+        SDialogRecordEntryXml recordEntryDps;
+        ArrayList<SDataCfdRecordRow> aCfdRecordRows;
         
         aCfdRecordRows = new ArrayList<>();
         
