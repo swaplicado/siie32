@@ -36,7 +36,7 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[19];
+        STableColumn[] aoTableColumns = new STableColumn[20];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_cus");
@@ -54,6 +54,7 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Agente ventas", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bps.bp", "Supervisor ventas", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_sign_restrict", "Restringido al timbrar CFDI", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_sign_immex", "IMMEX al timbrar CFDI", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_disc_doc", "S/descuento", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_comms", "S/comisiones", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp1.b_del", "Asoc. negocios eliminado", STableConstants.WIDTH_BOOLEAN);
@@ -121,23 +122,24 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
             }
         }
 
-        msSql = "SELECT bp1.bp, c.id_cus, c.b_sign_restrict, c.b_free_disc_doc, c.b_free_comms, bp1.b_del, ct.b_del, ct.fid_usr_ana_n, " +
-                    "tp.tp_cus, bp.bp, bps.bp, sg.mkt_segm, su.mkt_segm_sub, dis.dist_chan, c.fid_usr_edit, c.ts_new, c.ts_edit, c.ts_del, " +
-                    "un.usr, ue.usr, ud.usr, uan.usr " +
-                    "FROM mkt_cfg_cus AS c " +
-                    "INNER JOIN erp.bpsu_bp AS bp1 ON c.id_cus = bp1.id_bp " +
-                    "INNER JOIN erp.bpsu_bp_ct AS ct ON bp1.id_bp = ct.id_bp AND ct.fid_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " " +
-                    "INNER JOIN mktu_tp_cus AS tp ON c.fid_tp_cus = tp.id_tp_cus " +
-                    "INNER JOIN mktu_mkt_segm AS sg ON c.fid_mkt_segm = sg.id_mkt_segm " +
-                    "INNER JOIN mktu_mkt_segm_sub AS su ON c.fid_mkt_segm = su.id_mkt_segm AND c.fid_mkt_sub = su.id_mkt_sub " +
-                    "INNER JOIN mktu_dist_chan AS dis ON c.fid_dist_chan = dis.id_dist_chan " +
-                    "INNER JOIN erp.usru_usr AS un ON c.fid_usr_new = un.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ue ON c.fid_usr_edit = ue.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ud ON c.fid_usr_del = ud.id_usr " +
-                    "LEFT OUTER JOIN erp.usru_usr AS uan ON ct.fid_usr_ana_n = uan.id_usr " +
-                    "LEFT OUTER JOIN erp.bpsu_bp AS bp ON c.fid_sal_agt_n = bp.id_bp " +
-                    "LEFT OUTER JOIN erp.bpsu_bp AS bps ON c.fid_sal_sup_n = bps.id_bp " +
-                (sqlWhere.length() == 0 ? "" : "WHERE bp1.b_del = 0 AND " + sqlWhere) +
-                "ORDER BY bp1.bp, tp.tp_cus; ";
+        msSql = "SELECT bp1.bp, c.id_cus, c.b_sign_restrict, c.b_sign_immex, c.b_free_disc_doc, c.b_free_comms, "
+                + "bp1.b_del, ct.b_del, ct.fid_usr_ana_n, "
+                + "tp.tp_cus, bp.bp, bps.bp, sg.mkt_segm, su.mkt_segm_sub, dis.dist_chan, "
+                + "c.fid_usr_edit, c.ts_new, c.ts_edit, c.ts_del, un.usr, ue.usr, ud.usr, uan.usr "
+                + "FROM mkt_cfg_cus AS c "
+                + "INNER JOIN erp.bpsu_bp AS bp1 ON c.id_cus = bp1.id_bp "
+                + "INNER JOIN erp.bpsu_bp_ct AS ct ON bp1.id_bp = ct.id_bp AND ct.fid_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " "
+                + "INNER JOIN mktu_tp_cus AS tp ON c.fid_tp_cus = tp.id_tp_cus "
+                + "INNER JOIN mktu_mkt_segm AS sg ON c.fid_mkt_segm = sg.id_mkt_segm "
+                + "INNER JOIN mktu_mkt_segm_sub AS su ON c.fid_mkt_segm = su.id_mkt_segm AND c.fid_mkt_sub = su.id_mkt_sub "
+                + "INNER JOIN mktu_dist_chan AS dis ON c.fid_dist_chan = dis.id_dist_chan "
+                + "INNER JOIN erp.usru_usr AS un ON c.fid_usr_new = un.id_usr "
+                + "INNER JOIN erp.usru_usr AS ue ON c.fid_usr_edit = ue.id_usr "
+                + "INNER JOIN erp.usru_usr AS ud ON c.fid_usr_del = ud.id_usr "
+                + "LEFT OUTER JOIN erp.usru_usr AS uan ON ct.fid_usr_ana_n = uan.id_usr "
+                + "LEFT OUTER JOIN erp.bpsu_bp AS bp ON c.fid_sal_agt_n = bp.id_bp "
+                + "LEFT OUTER JOIN erp.bpsu_bp AS bps ON c.fid_sal_sup_n = bps.id_bp "
+                + (sqlWhere.isEmpty() ? "" : "WHERE bp1.b_del = 0 AND " + sqlWhere)
+                + "ORDER BY bp1.bp, tp.tp_cus;";
     }
 }

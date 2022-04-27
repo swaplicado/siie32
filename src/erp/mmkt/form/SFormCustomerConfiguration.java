@@ -36,7 +36,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SFormCustomerConfiguration extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -61,6 +61,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     private erp.lib.form.SFormField moFieldFkSalesAgentId_n;
     private erp.lib.form.SFormField moFieldIsFreeDiscountDoc;
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
+    private erp.lib.form.SFormField moFieldIsSignRestricted;
+    private erp.lib.form.SFormField moFieldIsSignImmex;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     private erp.lib.table.STablePane moCustomerConfigCobPane;
@@ -68,7 +70,9 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     private int mnParamPkBizPartnerId;
     private java.lang.String msParamBizPartnerDescription;
 
-    /** Creates new form SFormElement */
+    /** Creates new form SFormCustomerConfiguration
+     * @param client
+     */
     public SFormCustomerConfiguration(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -118,9 +122,11 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         jcbFkSalesAgentId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkSalesAgentId_n = new javax.swing.JButton();
         jckIsFreeDiscountDoc = new javax.swing.JCheckBox();
-        jLabel3 = new javax.swing.JLabel();
         jckIsFreeCommissions = new javax.swing.JCheckBox();
-        jLabel4 = new javax.swing.JLabel();
+        jckIsSignRestricted = new javax.swing.JCheckBox();
+        jlIsSignRestrictedHint = new javax.swing.JLabel();
+        jckIsSignImmex = new javax.swing.JCheckBox();
+        jlIsSignImmexHint = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jpCob = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
@@ -157,7 +163,7 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setLayout(new java.awt.GridLayout(9, 2, 5, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(10, 2, 5, 5));
 
         jlPkCustomerId.setForeground(java.awt.Color.blue);
         jlPkCustomerId.setText("Cliente: *");
@@ -252,11 +258,23 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
 
         jckIsFreeDiscountDoc.setText("Sin descuento");
         jPanel4.add(jckIsFreeDiscountDoc);
-        jPanel4.add(jLabel3);
 
         jckIsFreeCommissions.setText("Sin comisiones");
         jPanel4.add(jckIsFreeCommissions);
-        jPanel4.add(jLabel4);
+
+        jckIsSignRestricted.setText("Es restringido al timbrar CFDI");
+        jPanel4.add(jckIsSignRestricted);
+
+        jlIsSignRestrictedHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlIsSignRestrictedHint.setText("(Validar permiso especial al timbrar.)");
+        jPanel4.add(jlIsSignRestrictedHint);
+
+        jckIsSignImmex.setText("Es IMMEX al timbrar CFDI");
+        jPanel4.add(jckIsSignImmex);
+
+        jlIsSignImmexHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlIsSignImmexHint.setText("(Validar permiso especial al timbrar.)");
+        jPanel4.add(jlIsSignImmexHint);
 
         jckIsDeleted.setText("Registro eliminado");
         jPanel4.add(jckIsDeleted);
@@ -302,8 +320,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
 
         getContentPane().add(jpCob, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-655)/2, (screenSize.height-497)/2, 655, 497);
+        setSize(new java.awt.Dimension(736, 489));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -315,7 +333,7 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         erp.lib.table.STableColumnForm tableColumnsCob[];
 
         moComboboxGrpMarketSegment = new SFormComboBoxGroup(miClient);
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         moCustomerConfigCobPane = new STablePane(miClient);
         moCustomerConfigCobPane.setDoubleClickAction(this, "publicActionConfigCobEdit");
         jpCob.add(moCustomerConfigCobPane, BorderLayout.CENTER);
@@ -328,6 +346,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         moFieldFkSalesAgentId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkSalesAgentId_n, jlFkSalesAgentId_n);
         moFieldIsFreeDiscountDoc = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeDiscountDoc);
         moFieldIsFreeCommissions = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeCommissions);
+        moFieldIsSignRestricted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSignRestricted);
+        moFieldIsSignImmex = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSignImmex);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldPkCustomerId);
@@ -338,6 +358,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         mvFields.add(moFieldFkSalesAgentId_n);
         mvFields.add(moFieldIsFreeDiscountDoc);
         mvFields.add(moFieldIsFreeCommissions);
+        mvFields.add(moFieldIsSignRestricted);
+        mvFields.add(moFieldIsSignImmex);
         mvFields.add(moFieldIsDeleted);
 
         jbOK.addActionListener(this);
@@ -585,8 +607,6 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
@@ -618,11 +638,15 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsFreeCommissions;
     private javax.swing.JCheckBox jckIsFreeDiscountDoc;
+    private javax.swing.JCheckBox jckIsSignImmex;
+    private javax.swing.JCheckBox jckIsSignRestricted;
     private javax.swing.JLabel jlFkCustomerTypeId;
     private javax.swing.JLabel jlFkDistributionChannelId;
     private javax.swing.JLabel jlFkMarketSegmentId;
     private javax.swing.JLabel jlFkMarketSubsegmentId;
     private javax.swing.JLabel jlFkSalesAgentId_n;
+    private javax.swing.JLabel jlIsSignImmexHint;
+    private javax.swing.JLabel jlIsSignRestrictedHint;
     private javax.swing.JLabel jlPkCustomerId;
     private javax.swing.JPanel jpCob;
     private javax.swing.JPanel jpNotesAction;
@@ -662,7 +686,6 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
 
     @Override
     public void formRefreshCatalogues() {
-
         moComboboxGrpMarketSegment.clear();
         moComboboxGrpMarketSegment.addComboBox(SDataConstants.MKTU_MKT_SEGM, jcbFkMarketSegmentId, jbFkMarketSegmentId);
         moComboboxGrpMarketSegment.addComboBox(SDataConstants.MKTU_MKT_SEGM_SUB, jcbFkMarketSubsegmentId, jbFkMarketSubsegmentId);
@@ -743,6 +766,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         moFieldFkSalesAgentId_n.setFieldValue(new int[] { moCustomerConfiguration.getFkSalesAgentId_n() });
         moFieldIsFreeDiscountDoc.setFieldValue(moCustomerConfiguration.getIsFreeDiscountDoc());
         moFieldIsFreeCommissions.setFieldValue(moCustomerConfiguration.getIsFreeCommissions());
+        moFieldIsSignRestricted.setFieldValue(moCustomerConfiguration.getIsSignRestricted());
+        moFieldIsSignImmex.setFieldValue(moCustomerConfiguration.getIsSignImmex());
         moFieldIsDeleted.setFieldValue(moCustomerConfiguration.getIsDeleted());
 
         readCustomerBranchConfig();
@@ -779,6 +804,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         moCustomerConfiguration.setFkSalesAgentId_n(moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]);
         moCustomerConfiguration.setIsFreeDiscountDoc(moFieldIsFreeDiscountDoc.getBoolean());
         moCustomerConfiguration.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
+        moCustomerConfiguration.setIsSignRestricted(moFieldIsSignRestricted.getBoolean());
+        moCustomerConfiguration.setIsSignImmex(moFieldIsSignImmex.getBoolean());
         moCustomerConfiguration.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         for (int i = 1; i < moBizPartner.getDbmsBizPartnerBranches().size(); i++) {

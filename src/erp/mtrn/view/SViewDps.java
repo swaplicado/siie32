@@ -1829,6 +1829,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
            if (isRowSelected()) {
                 boolean canEmitCompMonExt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_MON_EXT).HasRight;
                 boolean canEmitCompSignRestricted = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_REST).HasRight;
+                boolean canEmitCompSignImmex = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_REST).HasRight;
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 SDataCustomerConfig customerConfig = (SDataCustomerConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUS, new int[] { dps.getFkBizPartnerId_r() } , SLibConstants.EXEC_MODE_SILENT);
                 
@@ -1849,6 +1850,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (customerConfig != null && customerConfig.getIsSignRestricted() && !canEmitCompSignRestricted) {
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes de clientes restringidos.");
+                }
+                else if (customerConfig != null && customerConfig.getIsSignImmex()&& !canEmitCompSignImmex) {
+                    miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes de clientes IMMEX.");
                 }
                 else {
                     switch(dps.getDbmsDataCfd().getFkXmlTypeId()) {
