@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
@@ -28,6 +27,7 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
 import sa.lib.xml.SXmlUtils;
+import sa.lib.SLibTimeUtils;
 
 /**
  *
@@ -89,7 +89,7 @@ public class SSetExchangeRate {
     public static boolean isNextDayBankBussDay(Date date, ArrayList bankNbDays) {
         boolean isbankBussDay = true;
         Date nextDay = new Date();
-        nextDay.setDate(date.getDate() + 1);
+        nextDay = SLibTimeUtils.addDate(date, 0, 0, 1);
 
         for (Object day : bankNbDays) {
             String bankNbDay = day.toString();
@@ -169,11 +169,11 @@ public class SSetExchangeRate {
             if (isNextDayBankBussDay(date, calendar)) {
 
                 if (usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_INFORMAL) {
-                    date.setDate(date.getDate() + 1);
+                    date = SLibTimeUtils.addDate(date, 0, 0, 1);
                     canSetDay = true;
                 } 
                 else if (usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_BANXICO) {
-                    date.setDate(date.getDate() + 1);
+                    date = SLibTimeUtils.addDate(date, 0, 0, 1);
                     canSetDay = false;
                     usd_xrt_policy = SDataConstantsSys.USD_XRT_POLICY_INFORMAL;
                 } 
@@ -192,7 +192,7 @@ public class SSetExchangeRate {
 
             } 
             else {
-                date.setDate(date.getDate() + 1);
+                date = SLibTimeUtils.addDate(date, 0, 0, 1);
                 if (!exchangeRateDays.isEmpty()) {
                     exchangeRateDays.add(SLibUtils.DbmsDateFormatDate.format(date));
                 }
