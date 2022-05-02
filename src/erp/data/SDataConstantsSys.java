@@ -403,7 +403,8 @@ public abstract class SDataConstantsSys {
     public static final int ROL_LOG_ADMOR = 107001;
 
     public static final int ROL_MFG_ADMOR = 108001;
-    public static final int ROL_MFG_AUX = 108002;
+    public static final int ROL_MFG_ADMOR_BOM = 108002;
+    public static final int ROL_MFG_AUX = 108006;
 
     public static final int ROL_HRS_ADMOR = 109001;
 

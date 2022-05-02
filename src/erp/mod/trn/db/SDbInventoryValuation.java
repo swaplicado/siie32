@@ -15,6 +15,9 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbInventoryValuation extends SDbRegistryUser {
     
+    public static final int COSTS_OPTION_INVENTORY = 1;
+    public static final int COSTS_OPTION_PURCHASE = 2;
+    
     protected int mnPkInventoryValuationId;
     protected boolean mbFinished;
     //protected boolean mbDeleted;
@@ -26,6 +29,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    
+    protected int mnAuxCostsOption;
     
     public SDbInventoryValuation() {
         super(SModConsts.TRN_INV_VAL);
@@ -51,6 +56,10 @@ public class SDbInventoryValuation extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
+    public void setAuxCostsOption(int n) { mnAuxCostsOption = n; }
+    
+    public int getAuxCostsOption() { return mnAuxCostsOption; }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkInventoryValuationId = pk[0];
@@ -74,6 +83,8 @@ public class SDbInventoryValuation extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        mnAuxCostsOption = COSTS_OPTION_INVENTORY;
     }
 
     @Override
