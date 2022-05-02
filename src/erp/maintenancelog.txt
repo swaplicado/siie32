@@ -1,13 +1,15 @@
 ================================================================================
+SIIE 3.2 201.0/ 2022-04-26
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de permiso especial cliente IMMEX para restringir timbrado de CFDI.
+
+================================================================================
 SIIE 3.2 199.2/ 2022-04-27
 Edwin CARMONA
 --------------------------------------------------------------------------------
 1) Cambio pendiente en la sincronización de CAP Link, no afecta al funcionamiento de nada, 
     es solo para la consulta de información externa.
-SIIE 3.2 201.0/ 2022-04-26
-Sergio Abraham FLORES GUTIÉRREZ
---------------------------------------------------------------------------------
-1) Implementación de permiso especial cliente IMMEX para restringir timbrado de CFDI.
 
 ================================================================================
 SIIE 3.2 199.1/ 2022-04-26
