@@ -256,6 +256,7 @@ public class SShareDB {
                 + "    e.dt_hire, "
                 + "    e.dt_dis_n, "
                 + "    e.overtime, "
+                + "    e.checker_policy, "
                 + "    e.fk_tp_pay, "
                 + "    e.fk_dep, "
                 + "    e.fk_pos, "
