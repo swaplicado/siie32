@@ -47,11 +47,13 @@ import sa.lib.SLibUtils;
  */
 public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
+    private static final int MAX_DAYS = 3;
+    private static final double MAX_TOTAL = 1000;
+    
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
-    private final int mnCant = 5000;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private final erp.client.SClientInterface miClient;
 
@@ -225,7 +227,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         bgCancelationType.add(jrbVoucherCancellableWithoutAcceptance);
-        jrbVoucherCancellableWithoutAcceptance.setText("Solo comprobantes cancelables sin aceptación");
+        jrbVoucherCancellableWithoutAcceptance.setText("Sólo comprobantes cancelables sin aceptación");
         jrbVoucherCancellableWithoutAcceptance.setPreferredSize(new java.awt.Dimension(315, 23));
         jPanel14.add(jrbVoucherCancellableWithoutAcceptance);
 
@@ -235,7 +237,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         bgCancelationType.add(jrbVoucherCancellableWithAcceptance);
-        jrbVoucherCancellableWithAcceptance.setText("Solo comprobantes cancelables con aceptación");
+        jrbVoucherCancellableWithAcceptance.setText("Sólo comprobantes cancelables con aceptación");
         jrbVoucherCancellableWithAcceptance.setPreferredSize(new java.awt.Dimension(315, 23));
         jPanel15.add(jrbVoucherCancellableWithAcceptance);
 
@@ -311,7 +313,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         moFieldBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbBizPartnerId, jlBizPartnerId);
         moFieldBizPartnerId.setPickerButton(jbBizPartnerId);
         
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldDateStart);
         mvFields.add(moFieldDateFinal);
         mvFields.add(moFieldCfdType);
@@ -456,11 +458,11 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                 String sqlWhere = "c.ts BETWEEN '" + fechaInicial + "' AND '" + fechaFinal + "'";
 
                 if (jrbVoucherCancellableWithoutAcceptance.isSelected()) {
-                    sqlWhere = "(" + sqlWhere +" AND IF (c.xml_tc = 0.0, c.xml_tot <= " + mnCant + " , (c.xml_tot * c.xml_tc) <= " + mnCant + ")) "
-                            + "OR c.ts BETWEEN (NOW() - INTERVAL 3 DAY) AND NOW() ";    
+                    sqlWhere = "(" + sqlWhere +" AND IF (c.xml_tc = 0.0, c.xml_tot <= " + MAX_TOTAL + " , (c.xml_tot * c.xml_tc) <= " + MAX_TOTAL + ")) "
+                            + "OR c.ts BETWEEN (NOW() - INTERVAL " + MAX_DAYS + " DAY) AND NOW() ";    
                 }
                 else if (jrbVoucherCancellableWithAcceptance.isSelected()) {
-                    sqlWhere += " AND IF (c.xml_tc = 0.0, c.xml_tot > " + mnCant + " , (c.xml_tot * c.xml_tc) > " + mnCant + ")";
+                    sqlWhere += " AND IF (c.xml_tc = 0.0, c.xml_tot > " + MAX_TOTAL + " , (c.xml_tot * c.xml_tc) > " + MAX_TOTAL + ")";
                 }
 
                 String bizPartnerFiscalId = "";
