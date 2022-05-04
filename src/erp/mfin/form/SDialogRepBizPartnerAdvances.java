@@ -41,7 +41,7 @@ import sa.lib.SLibUtils;
  */
 public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     int mnBizPartnerCategoryId;
     boolean mbFirstTime;
 
@@ -54,7 +54,9 @@ public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements
     int[] manSysMoveTypeKey;
     private java.lang.String msBizPartnerCatSng;
 
-    /** Creates new form SDialogRepBizPartnerAdv */
+    /** Creates new form SDialogRepBizPartnerAdv
+     * @param client
+     * @param idBizPartnerCategory */
     public SDialogRepBizPartnerAdvances(erp.client.SClientInterface client, int idBizPartnerCategory) {
         super(client.getFrame(), true);
         miClient = client;
@@ -229,7 +231,7 @@ public class SDialogRepBizPartnerAdvances extends javax.swing.JDialog implements
     private void initComponentsExtra() {
         msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG);
         
-        setTitle("Saldos de anticipos de " + (mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS ? "clientes" : "proveedores"));
+        setTitle("Saldos de anticipos contables de " + (mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS ? "clientes" : "proveedores"));
         jlBizPartner.setText(msBizPartnerCatSng + ":");
         jbPickBizPartner.setToolTipText(SUtilConsts.TXT_SELECT + " " + msBizPartnerCatSng.toLowerCase());
         

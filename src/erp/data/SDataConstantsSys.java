@@ -1171,6 +1171,9 @@ public abstract class SDataConstantsSys {
     public static final String TRNS_CFD_CAT_CFD_USE_P01 = "P01";    // Por definir
     
     public static final int TRNU_DPS_NAT_DEF = 1;
+    
+    public static final int TRNU_CT_DPS_PUR = 1;
+    public static final int TRNU_CT_DPS_SAL = 2;
 
     public static final int[] TRNU_TP_DPS_PUR_EST = { 1, 1, 1 };
     public static final int[] TRNU_TP_DPS_PUR_CON = { 1, 1, 2 };
