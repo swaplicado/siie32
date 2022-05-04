@@ -73,7 +73,7 @@ public class SDialogDpsTime extends javax.swing.JDialog implements java.awt.even
         jtfSecond = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Selección de documento de compras-ventas");
+        setTitle("Fijar hora del documento");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {

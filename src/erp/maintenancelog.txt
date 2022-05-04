@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 201.1/ 2022-05-04
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio de nombre y reacomodo en el menú al reporte de saldos de anticipos facturados.
+2) Cambio de nombre al reporte de "Saldos de anticipos" a "Saldos de anticipos contables".
+
+================================================================================
 SIIE 3.2 201.0/ 2022-04-26
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

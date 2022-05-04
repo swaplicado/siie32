@@ -33,6 +33,7 @@ import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
+import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SDialogRepContractStock;
 import erp.mtrn.form.SDialogRepDpsBizPartner;
@@ -183,6 +184,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceDps;
     private javax.swing.JMenuItem jmiRepBizPartnerBalanceAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAdvSup;
+    private javax.swing.JMenuItem jmiRepAdv;
     private javax.swing.JMenuItem jmiRepAccountStatements;
     private javax.swing.JMenuItem jmiRepBizPartnerAccountingMoves;
     private javax.swing.JMenuItem jmiRepBizPartnerJournal;
@@ -482,7 +484,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
         jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos proveedores por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de proveedores...");
-        jmiRepBizPartnerBalAdvSup = new JMenuItem("Saldos de anticipos de proveedores...");
+        jmiRepBizPartnerBalAdvSup = new JMenuItem("Saldos de anticipos contables de proveedores...");
+        jmiRepAdv = new JMenuItem("Saldos de anticipos facurados de proveedores...");
         jmiRepAccountStatements = new JMenuItem("Estados de cuenta de proveedores...");
         jmiRepBizPartnerAccountingMoves = new JMenuItem("Movimientos contables de proveedores por documento...");
         jmiRepBizPartnerJournal = new JMenuItem("Reporte auxiliar de movimientos contables de proveedores...");
@@ -539,6 +542,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepBal.add(jmiRepBizPartnerBalance);
         jmRepBal.add(jmiRepBizPartnerBalanceDps);
         jmRepBal.add(jmiRepBizPartnerBalAdvSup);
+        jmRepBal.add(jmiRepAdv);
         
         jmRep.add(jmRepStats);
         jmRep.add(jmRepBackorder);
@@ -692,6 +696,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBizPartnerBalanceDps.addActionListener(this);
         jmiRepBizPartnerBalanceAging.addActionListener(this);
         jmiRepBizPartnerBalAdvSup.addActionListener(this);
+        jmiRepAdv.addActionListener(this);
         jmiRepBizPartnerBalanceCollection.addActionListener(this);
         jmiRepBizPartnerBalanceCollectionDps.addActionListener(this);
         jmiRepAccountStatements.addActionListener(this);
@@ -1732,6 +1737,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiRepBizPartnerBalAdvSup) {
                 new SDialogRepBizPartnerAdvances(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
+            }
+            else if (item == jmiRepAdv) {
+                new SDialogRepAdv(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepAccountStatements) {
                 new SDialogRepBizPartnerStatement(miClient, SDataRepConstants.REP_STA + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_SUP, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);

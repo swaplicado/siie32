@@ -35,9 +35,9 @@ import net.sf.jasperreports.view.JasperViewer;
  */
 public final class SDialogRepAdv extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     boolean mbFirstTime;
-
+    int mnBizPartnerCategoryId;
     
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
@@ -46,11 +46,12 @@ public final class SDialogRepAdv extends javax.swing.JDialog implements java.awt
     
     /** Creates new form SDialogRepBizPartnerBalanceDpsCollection
      * @param client
-     
+     * @param idBizPartnerCategory
      */
-    public SDialogRepAdv(erp.client.SClientInterface client) {
+    public SDialogRepAdv(erp.client.SClientInterface client, int idBizPartnerCategory) {
         super(client.getFrame(), true);
         miClient = client;
+        mnBizPartnerCategoryId = idBizPartnerCategory;
         initComponents();
         initComponentsExtra();
         
@@ -76,7 +77,7 @@ public final class SDialogRepAdv extends javax.swing.JDialog implements java.awt
         jpClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Reporte de cobranza");
+        setTitle("Saldos de anticipos facturados");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -92,8 +93,8 @@ public final class SDialogRepAdv extends javax.swing.JDialog implements java.awt
 
         jPanel98.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCurrency.setText("Moneda: *");
-        jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlCurrency.setText("Moneda documenrto: *");
+        jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel98.add(jlCurrency);
 
         jcbCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -150,6 +151,7 @@ public final class SDialogRepAdv extends javax.swing.JDialog implements java.awt
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
+        setTitle("Saldos de anticipos facturados de " + (mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS ? "clientes" : "proveedores"));
         moFieldCurrency = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCurrency, jlCurrency);
         moFieldCurrency.setPickerButton(jbPickCurrency);
 
@@ -180,10 +182,13 @@ public final class SDialogRepAdv extends javax.swing.JDialog implements java.awt
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
+            boolean isCtBpCus = mnBizPartnerCategoryId  == SDataConstantsSys.BPSS_CT_BP_CUS;
             map = miClient.createReportParams();
             
             map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
             map.put("sCurrencyKey", jcbCurrency.getSelectedItem().toString());
+            map.put("sTitle", isCtBpCus ? "CLIENTES" : "PROVEEDORES");
+            map.put("nDpsCategory", isCtBpCus ? SDataConstantsSys.TRNU_CT_DPS_SAL : SDataConstantsSys.TRNU_CT_DPS_PUR);
             map.put("tDate", miClient.getSession().getCurrentDate());
 
             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_ADV, map);
