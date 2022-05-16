@@ -118,6 +118,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldCfdiPaymentWay;
     private erp.lib.form.SFormField moFieldCfdiCfdiUsage;
+    private erp.lib.form.SFormField moFieldTaxRegime;
     private erp.lib.form.SFormField moFieldFkCfdAddendaTypeId;
     private erp.lib.form.SFormField moFieldWeb;
     private erp.lib.form.SFormField moFieldNotes;
@@ -333,13 +334,15 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlCfdiCfdiUsage = new javax.swing.JLabel();
         jcbCfdiCfdiUsage = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel23 = new javax.swing.JPanel();
+        jlTaxRegime = new javax.swing.JLabel();
+        jcbTaxRegime = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel60 = new javax.swing.JPanel();
         jlFkCfdAddendaTypeId = new javax.swing.JLabel();
         jcbFkCfdAddendaTypeId = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel60 = new javax.swing.JPanel();
         jPanel35 = new javax.swing.JPanel();
+        jPanel61 = new javax.swing.JPanel();
         jlFkUserAnalyst = new javax.swing.JLabel();
         jcbFkUserAnalystId = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel61 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlWeb = new javax.swing.JLabel();
         jtfWeb = new javax.swing.JTextField();
@@ -1046,30 +1049,38 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkCfdAddendaTypeId.setText("Tipo addenda para CFDI: *");
-        jlFkCfdAddendaTypeId.setPreferredSize(new java.awt.Dimension(155, 23));
-        jPanel23.add(jlFkCfdAddendaTypeId);
+        jlTaxRegime.setText("Régimen fiscal: *");
+        jlTaxRegime.setPreferredSize(new java.awt.Dimension(155, 23));
+        jPanel23.add(jlTaxRegime);
 
-        jcbFkCfdAddendaTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel23.add(jcbFkCfdAddendaTypeId);
+        jcbTaxRegime.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel23.add(jcbTaxRegime);
 
         jPanel46.add(jPanel23);
 
         jPanel60.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkCfdAddendaTypeId.setText("Tipo addenda para CFDI: *");
+        jlFkCfdAddendaTypeId.setPreferredSize(new java.awt.Dimension(155, 23));
+        jPanel60.add(jlFkCfdAddendaTypeId);
+
+        jcbFkCfdAddendaTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel60.add(jcbFkCfdAddendaTypeId);
+
         jPanel46.add(jPanel60);
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlFkUserAnalyst.setText("Analista del AN:");
-        jlFkUserAnalyst.setPreferredSize(new java.awt.Dimension(155, 23));
-        jPanel35.add(jlFkUserAnalyst);
-
-        jcbFkUserAnalystId.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel35.add(jcbFkUserAnalystId);
-
         jPanel46.add(jPanel35);
 
         jPanel61.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkUserAnalyst.setText("Analista del AN:");
+        jlFkUserAnalyst.setPreferredSize(new java.awt.Dimension(155, 23));
+        jPanel61.add(jlFkUserAnalyst);
+
+        jcbFkUserAnalystId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel61.add(jcbFkUserAnalystId);
+
         jPanel46.add(jPanel61);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1491,6 +1502,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldCfdiPaymentWay.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldCfdiCfdiUsage = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiCfdiUsage, jlCfdiCfdiUsage);
         moFieldCfdiCfdiUsage.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldTaxRegime = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbTaxRegime, jlTaxRegime);
+        moFieldTaxRegime.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldFkCfdAddendaTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCfdAddendaTypeId, jlFkCfdAddendaTypeId);
         moFieldFkCfdAddendaTypeId.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldWeb = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfWeb, jlWeb);
@@ -1559,6 +1572,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCategory.add(moFieldDateEnd);
         mvFieldsCategory.add(moFieldCfdiPaymentWay);
         mvFieldsCategory.add(moFieldCfdiCfdiUsage);
+        mvFieldsCategory.add(moFieldTaxRegime);
         mvFieldsCategory.add(moFieldFkCfdAddendaTypeId);
         mvFieldsCategory.add(moFieldWeb);
         mvFieldsCategory.add(moFieldNotes);
@@ -2312,6 +2326,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalesSupervisorId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxIdentityTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUserAnalystId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbTaxRegime;
     private javax.swing.JCheckBox jckGuarInProcess;
     private javax.swing.JCheckBox jckInsurInProcess;
     private javax.swing.JCheckBox jckIsAttBank;
@@ -2385,6 +2400,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlLastName;
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlNumberExporter;
+    private javax.swing.JLabel jlTaxRegime;
     private javax.swing.JLabel jlWeb;
     private javax.swing.JPanel jpBizPartner;
     private javax.swing.JPanel jpBizPartnerBranch;
@@ -2482,6 +2498,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jcbCfdiPaymentWay.setEnabled(isCustomer);
             jlCfdiCfdiUsage.setEnabled(isCustomer);
             jcbCfdiCfdiUsage.setEnabled(isCustomer);
+            jlTaxRegime.setEnabled(isCustomer);
+            jcbTaxRegime.setEnabled(isCustomer);
             jlFkCfdAddendaTypeId.setEnabled(isCustomer);
             jcbFkCfdAddendaTypeId.setEnabled(isCustomer);
             jcbFkUserAnalystId.setEnabled(isCustomer);
@@ -2506,6 +2524,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jcbCfdiPaymentWay.setEnabled(false);
             jlCfdiCfdiUsage.setEnabled(false);
             jcbCfdiCfdiUsage.setEnabled(false);
+            jcbTaxRegime.setEnabled(false);
             jlFkCfdAddendaTypeId.setEnabled(false);
             jcbFkCfdAddendaTypeId.setEnabled(false);
             jcbFkUserAnalystId.setEnabled(false);
@@ -2843,6 +2862,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
         catalogs.populateComboBox(jcbCfdiPaymentWay, SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdiCfdiUsage, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbTaxRegime, SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, miClient.getSession().getSystemDate());
         
         // marketing settings:
         
@@ -3201,6 +3221,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moFieldDateEnd.setFieldValue(moBizPartnerCategory.getDateEnd_n());
             moFieldCfdiPaymentWay.setFieldValue(moBizPartnerCategory.getCfdiPaymentWay());
             moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
+            moFieldTaxRegime.setFieldValue(moBizPartnerCategory.getTaxRegime());
             moFieldFkCfdAddendaTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkCfdAddendaTypeId() });
             moFieldFkUserAnalystId.setFieldValue(new int[] { moBizPartnerCategory.getFkUserAnalystId_n() });
             moFieldIsCategoryDeleted.setFieldValue(moBizPartnerCategory.getIsDeleted());
@@ -3412,6 +3433,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setDiotOperation(!jcbDiotOperation.isEnabled() ? "" : (String) moFieldDiotOperation.getFieldValue());
             moBizPartnerCategory.setCfdiPaymentWay(jcbCfdiPaymentWay.getSelectedIndex() <= 0 ? "" : moFieldCfdiPaymentWay.getKey().toString());
             moBizPartnerCategory.setCfdiCfdiUsage(jcbCfdiCfdiUsage.getSelectedIndex() <= 0 ? "" : moFieldCfdiCfdiUsage.getKey().toString());
+            moBizPartnerCategory.setTaxRegime(jcbTaxRegime.getSelectedIndex() <= 0 ? "" : moFieldTaxRegime.getKey().toString());
             moBizPartnerCategory.setIsCreditByUser(jckIsCreditByUser.isSelected());
             moBizPartnerCategory.setFkBizPartnerCategoryId(mnParamBizPartnerCategory);
             moBizPartnerCategory.setFkBizPartnerTypeId(moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);

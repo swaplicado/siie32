@@ -47,6 +47,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected java.lang.String msDiotOperation;
     protected java.lang.String msCfdiPaymentWay;
     protected java.lang.String msCfdiCfdiUsage;
+    protected java.lang.String msTaxRegime;
     protected boolean mbIsCreditByUser;
     protected boolean mbIsGuaranteeInProcess;
     protected boolean mbIsInsuranceInProcess;
@@ -107,6 +108,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setDiotOperation(java.lang.String s) { msDiotOperation = s; }
     public void setCfdiPaymentWay(java.lang.String s) { msCfdiPaymentWay = s; }
     public void setCfdiCfdiUsage(java.lang.String s) { msCfdiCfdiUsage = s; }
+    public void setTaxRegime(java.lang.String s) { msTaxRegime = s; }
     public void setIsCreditByUser(boolean b) { mbIsCreditByUser = b; }
     public void setIsGuaranteeInProcess(boolean b) { mbIsGuaranteeInProcess = b; }
     public void setIsInsuranceInProcess(boolean b) { mbIsInsuranceInProcess = b; }
@@ -144,6 +146,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public java.lang.String getDiotOperation() { return msDiotOperation; }
     public java.lang.String getCfdiPaymentWay() { return msCfdiPaymentWay; }
     public java.lang.String getCfdiCfdiUsage() { return msCfdiCfdiUsage; }
+    public java.lang.String getTaxRegime() { return msTaxRegime; }
     public boolean getIsCreditByUser() { return mbIsCreditByUser; }
     public boolean getIsGuaranteeInProcess() { return mbIsGuaranteeInProcess; }
     public boolean getIsInsuranceInProcess() { return mbIsInsuranceInProcess; }
@@ -226,6 +229,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         msDiotOperation = "";
         msCfdiPaymentWay = "";
         msCfdiCfdiUsage = "";
+        msTaxRegime = "";
         mbIsCreditByUser = false;
         mbIsGuaranteeInProcess = false;
         mbIsInsuranceInProcess = false;
@@ -268,8 +272,8 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     @Override
     public int read(java.lang.Object pk, java.sql.Statement statement) {
         int[] key = (int[]) pk;
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql;
+        ResultSet resultSet;
 
         mnLastDbActionResult = SLibConsts.UNDEFINED;
         reset();
@@ -309,6 +313,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 msDiotOperation = resultSet.getString("bp_ct.diot_oper");
                 msCfdiPaymentWay = resultSet.getString("bp_ct.cfdi_pay_way");
                 msCfdiCfdiUsage = resultSet.getString("bp_ct.cfdi_cfd_use");
+                msTaxRegime = resultSet.getString("bp_ct.tax_regime");
                 mbIsCreditByUser = resultSet.getBoolean("bp_ct.b_cred_usr");
                 mbIsGuaranteeInProcess = resultSet.getBoolean("bp_ct.b_garnt_prc");
                 mbIsInsuranceInProcess = resultSet.getBoolean("bp_ct.b_insur_prc");
@@ -378,7 +383,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     @Override
     public int save(java.sql.Connection connection) {
         int nParam = 1;
-        CallableStatement callableStatement = null;
+        CallableStatement callableStatement;
 
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
@@ -388,7 +393,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkBizPartnerCategoryId);
             callableStatement.setString(nParam++, msKey);
@@ -406,6 +411,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setString(nParam++, msDiotOperation);
             callableStatement.setString(nParam++, msCfdiPaymentWay);
             callableStatement.setString(nParam++, msCfdiCfdiUsage);
+            callableStatement.setString(nParam++, msTaxRegime);
             callableStatement.setBoolean(nParam++, mbIsCreditByUser);
             callableStatement.setBoolean(nParam++, mbIsGuaranteeInProcess);
             callableStatement.setBoolean(nParam++, mbIsInsuranceInProcess);

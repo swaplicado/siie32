@@ -1151,6 +1151,10 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason (Int. Commerce)
     public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type (Int. Commerce)
     public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys (Int. Commerce)
+    public static final int TRNS_CFD_CAT_EXP = 24; // exportation
+    public static final int TRNS_CFD_CAT_PER = 25; // periodicity
+    public static final int TRNS_CFD_CAT_MON = 26; // month
+    public static final int TRNS_CFD_CAT_TAX_OBJ = 27; // tax object
     public static final int TRNS_CFD_CAT_BOL_TRA = 31;          // BOL: transportation code
     public static final int TRNS_CFD_CAT_BOL_PER_TP = 32;       // BOL: SCT permisson type
     public static final int TRNS_CFD_CAT_BOL_MOTOR_CFG = 33;    // BOL: motortransport configuration
