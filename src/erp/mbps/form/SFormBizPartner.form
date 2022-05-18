@@ -1478,6 +1478,33 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
+                        <Component class="javax.swing.JLabel" name="jlTaxRegime">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="R&#xe9;gimen fiscal: *"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[155, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jcbTaxRegime">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[400, 23]"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                          </AuxValues>
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jPanel60">
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlFkCfdAddendaTypeId">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Tipo addenda para CFDI: *"/>
@@ -1498,14 +1525,14 @@
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="jPanel60">
+                    <Container class="javax.swing.JPanel" name="jPanel35">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                         <Property name="alignment" type="int" value="0"/>
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="jPanel35">
+                    <Container class="javax.swing.JPanel" name="jPanel61">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                         <Property name="alignment" type="int" value="0"/>
@@ -1531,13 +1558,6 @@
                           </AuxValues>
                         </Component>
                       </SubComponents>
-                    </Container>
-                    <Container class="javax.swing.JPanel" name="jPanel61">
-
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                        <Property name="alignment" type="int" value="0"/>
-                        <Property name="verticalGap" type="int" value="0"/>
-                      </Layout>
                     </Container>
                     <Container class="javax.swing.JPanel" name="jPanel5">
 
