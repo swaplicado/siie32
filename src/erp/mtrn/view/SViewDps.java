@@ -76,8 +76,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
+import sa.lib.gui.SGuiUtils;
 
 /**
  * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Isabel Servín, Claudio Peña, Sergio Flores
@@ -379,7 +381,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query.gif")));
         jbGetCfdiStatus.setPreferredSize(new Dimension(23, 23));
         jbGetCfdiStatus.addActionListener(this);
-        jbGetCfdiStatus.setToolTipText("Checar estatus cancelación del CFDI");
+        jbGetCfdiStatus.setToolTipText("Consultar estatus SAT del CFDI");
 
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
@@ -1926,8 +1928,24 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro CFD del documento '" + dps.getDpsNumber() + "'.");
                 }
                 else {
-                    if (SCfdUtils.validateCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
-                        miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                    Exception exception = null;
+                    
+                    try {
+                        SGuiUtils.setCursorWait((SGuiClient) miClient);
+                        
+                        if (SCfdUtils.validateCfdi(miClient, dps.getDbmsDataCfd(), 0, true)) {
+                            miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                        }
+                    }
+                    catch(Exception e) {
+                        exception = e;
+                    }
+                    finally {
+                        SGuiUtils.setCursorDefault((SGuiClient) miClient);
+                    }
+                    
+                    if (exception != null) {
+                        throw exception;
                     }
                 }
             }
@@ -1953,8 +1971,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         try {
                             miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                             
-                            SCfdUtilsHandler handler = new SCfdUtilsHandler(miClient);
-                            miClient.showMsgBoxInformation(handler.getCfdiSatStatus(dps.getDbmsDataCfd()).getDetailedStatus());
+                            SDataCfd cfd = dps.getDbmsDataCfd();
+                            miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).getDetailedStatus());
                         }
                         catch (Exception e) {
                             SLibUtilities.renderException(this, e);

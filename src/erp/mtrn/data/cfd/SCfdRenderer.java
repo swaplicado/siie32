@@ -101,7 +101,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         return moDpsRendered;
     }
       
-    private void validateCfdi(File cfdiFile) throws Exception{
+    private void validateCfdi(File cfdiFile) throws Exception {
         SFormValidation validation = new SFormValidation();
         // obtener CFDI: 
         
@@ -118,7 +118,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
             
             if (!cfdiStatus.equals(DCfdi33Consts.CFDI_ESTATUS_VIG)) {
-                validation.setMessage("No se puede importar el CFDI ya que su estatus es : " + cfdiStatus + ".");
+                validation.setMessage("No se puede importar el CFDI ya que su estatus SAT es: " + cfdiStatus + ".");
             }
         }
         
@@ -131,8 +131,9 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         // validar receptor del CFDI:
         
         int idEmisor = 0;
-        if(!validation.getIsError()) {
-            String receptor;
+        
+        if (!validation.getIsError()) {
+            String receptor = "";
 
             if (comprobante.getEltReceptor().getAttNombre() == null || comprobante.getEltReceptor().getAttNombre().getString().isEmpty()) {
                 receptor = comprobante.getEltReceptor().getAttRfc().getString();
@@ -147,7 +148,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             else {
                 // validar emisor del CFDI:
 
-                String emisor;
+                String emisor = "";
 
                 if (comprobante.getEltEmisor().getAttNombre() == null || comprobante.getEltEmisor().getAttNombre().getString().isEmpty()) {
                     emisor = comprobante.getEltEmisor().getAttRfc().getString();
@@ -208,8 +209,8 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             
             if (key != null) {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
-                //moDps.poliza contable año-mes sucursal poliz, num de poliza getdbmsregisrtry
                 Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
+                
                 validation.setMessage("El documento ya existe en la siguiente póliza contable:\n" +
                     "Fecha de la póliza: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
                     "Período contable: " + primaryKey[0] + "-" + miClient.getSessionXXX().getFormatters().getMonthFormat().format(primaryKey[1]) + "\n" +
@@ -231,6 +232,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                             + "Fecha OC: " + SLibUtils.DateFormatDate.format(moPurchaseOrder.getDate()) + "\n"
                             + "Fecha CFDI: " + SLibUtils.DateFormatDate.format(comprobante.getAttFecha().getDatetime()));
                 }
+                
                 if (!validation.getIsError()) {
                     int idCur = 0;
                     try {
@@ -352,7 +354,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
     private void showCfdi() {
         try {
             moCfdiViewer = new JDialog(new JFrame(),"CFDI", true);
-            moCfdiViewer.setSize(1000,800);
+            moCfdiViewer.setSize(1000, 800);
             moCfdiViewer.setLocationRelativeTo(null);
             if (mbShowValidateButton) {
                 mjbValidate = new JButton(); 

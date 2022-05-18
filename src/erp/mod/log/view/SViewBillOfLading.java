@@ -36,6 +36,7 @@ import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDate;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
@@ -118,7 +119,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
         jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
         jbGetCfdiStatus.setPreferredSize(new Dimension(23, 23));
         jbGetCfdiStatus.addActionListener(this);
-        jbGetCfdiStatus.setToolTipText("Checar estatus cancelación del CFDI");
+        jbGetCfdiStatus.setToolTipText("Consultar estatus SAT del CFDI");
         
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
@@ -264,14 +265,19 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
             }
             else {
                 try {
+                    SGuiUtils.setCursorWait(miClient);
+                    
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
                     SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
-                    if (SCfdUtils.validateCfdi((SClientInterface)miClient, cfd, 0, true)) {
+                    if (SCfdUtils.validateCfdi((SClientInterface) miClient, cfd, 0, true)) {
                         ((SClientInterface) miClient).getGuiModule(SModConsts.LOG_BOL).refreshCatalogues(mnGridType);
                     }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
+                }
+                finally {
+                    SGuiUtils.setCursorDefault(miClient);
                 }
             }
         }

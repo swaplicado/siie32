@@ -112,7 +112,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
         jbGetCfdiStatus.setPreferredSize(new Dimension(23, 23));
         jbGetCfdiStatus.addActionListener(this);
-        jbGetCfdiStatus.setToolTipText("Checar estatus cancelación del CFDI");
+        jbGetCfdiStatus.setToolTipText("Consultar estatus SAT del CFDI");
         
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
@@ -512,6 +512,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
             else {
                 try {
                     SGuiUtils.setCursorWait((SGuiClient) miClient);
+                    
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                     if (SCfdUtils.validateCfdi(miClient, cfd, 0, true)) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);

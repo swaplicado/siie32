@@ -768,15 +768,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbLoadFileXml = new javax.swing.JButton();
         jbDeleteFileXml = new javax.swing.JButton();
         jlSpace = new javax.swing.JLabel();
-        jlBillOfLading = new javax.swing.JLabel();
-        jtfBillOfLading = new javax.swing.JTextField();
-        jbLoadBillOfLading = new javax.swing.JButton();
-        jbDeleteBillOfLading = new javax.swing.JButton();
+        jckValidateOnSaveFileXml = new javax.swing.JCheckBox();
         jPanel105 = new javax.swing.JPanel();
         jlFilePdf = new javax.swing.JLabel();
         jtfFilePdf = new javax.swing.JTextField();
         jbLoadFilePdf = new javax.swing.JButton();
         jbDeleteFilePdf = new javax.swing.JButton();
+        jlSpace1 = new javax.swing.JLabel();
+        jlBillOfLading = new javax.swing.JLabel();
+        jtfBillOfLading = new javax.swing.JTextField();
+        jbLoadBillOfLading = new javax.swing.JButton();
+        jbDeleteBillOfLading = new javax.swing.JButton();
         jPanel95 = new javax.swing.JPanel();
         jlCfdiTaxRegime = new javax.swing.JLabel();
         jcbCfdiTaxRegime = new javax.swing.JComboBox<SFormComponentItem>();
@@ -2689,26 +2691,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlSpace.setPreferredSize(new java.awt.Dimension(10, 23));
         jPanel75.add(jlSpace);
 
-        jlBillOfLading.setText("Carta porte:");
-        jlBillOfLading.setPreferredSize(new java.awt.Dimension(70, 23));
-        jPanel75.add(jlBillOfLading);
-
-        jtfBillOfLading.setEditable(false);
-        jtfBillOfLading.setText("XML");
-        jtfBillOfLading.setFocusable(false);
-        jtfBillOfLading.setOpaque(false);
-        jtfBillOfLading.setPreferredSize(new java.awt.Dimension(260, 23));
-        jPanel75.add(jtfBillOfLading);
-
-        jbLoadBillOfLading.setText("...");
-        jbLoadBillOfLading.setToolTipText("Seleccionar carta porte...");
-        jbLoadBillOfLading.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel75.add(jbLoadBillOfLading);
-
-        jbDeleteBillOfLading.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbDeleteBillOfLading.setToolTipText("Eliminar archivo XML");
-        jbDeleteBillOfLading.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel75.add(jbDeleteBillOfLading);
+        jckValidateOnSaveFileXml.setText("Validar estatus SAT, serie y folio del CFDI al guardar");
+        jckValidateOnSaveFileXml.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel75.add(jckValidateOnSaveFileXml);
 
         jPanel74.add(jPanel75);
 
@@ -2719,7 +2704,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel105.add(jlFilePdf);
 
         jtfFilePdf.setEditable(false);
-        jtfFilePdf.setText("XML");
+        jtfFilePdf.setText("PDF");
         jtfFilePdf.setOpaque(false);
         jtfFilePdf.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel105.add(jtfFilePdf);
@@ -2733,6 +2718,30 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDeleteFilePdf.setToolTipText("Eliminar archivo XML");
         jbDeleteFilePdf.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel105.add(jbDeleteFilePdf);
+
+        jlSpace1.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel105.add(jlSpace1);
+
+        jlBillOfLading.setText("Carta porte:");
+        jlBillOfLading.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel105.add(jlBillOfLading);
+
+        jtfBillOfLading.setEditable(false);
+        jtfBillOfLading.setText("XML");
+        jtfBillOfLading.setFocusable(false);
+        jtfBillOfLading.setOpaque(false);
+        jtfBillOfLading.setPreferredSize(new java.awt.Dimension(260, 23));
+        jPanel105.add(jtfBillOfLading);
+
+        jbLoadBillOfLading.setText("...");
+        jbLoadBillOfLading.setToolTipText("Seleccionar carta porte...");
+        jbLoadBillOfLading.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel105.add(jbLoadBillOfLading);
+
+        jbDeleteBillOfLading.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbDeleteBillOfLading.setToolTipText("Eliminar archivo XML");
+        jbDeleteBillOfLading.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel105.add(jbDeleteBillOfLading);
 
         jPanel74.add(jPanel105);
 
@@ -3620,6 +3629,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlFileXml.setEnabled(enableXmlFields);
         jbLoadFileXml.setEnabled(enableXmlFields);
         jbDeleteFileXml.setEnabled(enableXmlFields);
+        jckValidateOnSaveFileXml.setEnabled(false);
         jlFilePdf.setEnabled(enableXmlFields);
         jbLoadFilePdf.setEnabled(enableXmlFields);
         jbDeleteFilePdf.setEnabled(enableXmlFields);
@@ -4573,15 +4583,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             cat = SDataConstantsSys.BPSS_CT_BP_CUS;
         }
 
-        in = new Vector<Object>();
+        in = new Vector<>();
         in.add(moBizPartner.getPkBizPartnerId());
         in.add(cat);
         in.add(moDps.getPkYearId());
         in.add(moDps.getPkDocId());
         out = SDataUtilities.callProcedure(miClient, SProcConstants.FIN_GET_BP_BAL, in, SLibConstants.EXEC_MODE_VERBOSE);
         
-        return ((Double) out.get(0)).doubleValue();
+        return (Double) out.get(0);
     }
+    
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     private sa.lib.srv.SSrvLock gainRecordUserLock(java.lang.Object pk, long timeout) {
         SSrvLock lock = null;
@@ -4609,7 +4620,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     */
-    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+    
+    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro:
     private sa.lib.srv.redis.SRedisLock gainRecordUserRedisLock(java.lang.Object pk, long timeout) throws Exception {
         SRedisLock rlock = null;
 
@@ -7721,26 +7733,36 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
                     String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                    
                     if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, absolutePath)) {
                         String cfdi = SXmlUtils.readXml(absolutePath);
                         msXmlUuid = "";
                         moComprobante33 = DCfdUtils.getCfdi33(cfdi);
                         cfd.ver33.DElementTimbreFiscalDigital tfd = moComprobante33.getEltOpcComplementoTimbreFiscalDigital();
+                        
                         if (tfd != null) {
                             msXmlUuid = tfd.getAttUUID().getString();
                         }
-                        if (!moComprobante33.getAttSerie().getString().isEmpty() && jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
-                            jcbNumberSeries.setSelectedItem(moComprobante33.getAttSerie().getString());
+                        
+                        if (jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
+                            if (!moComprobante33.getAttSerie().getString().isEmpty()) {
+                                jcbNumberSeries.setSelectedItem(moComprobante33.getAttSerie().getString());
+                            }
                         }
-                        if (!moComprobante33.getAttFolio().getString().isEmpty() && jtfNumber.getText().isEmpty()) {
-                            jtfNumber.setText(moComprobante33.getAttFolio().getString());
-                        }
-                        else if (moComprobante33.getAttFolio().getString().isEmpty() && jtfNumber.getText().isEmpty()) {
-                            jtfNumber.setText(SLibUtils.textLeft(msXmlUuid, UUID_FIRST_SECC_LENGHT));
+                        
+                        if (jtfNumber.getText().isEmpty()) {
+                            if (!moComprobante33.getAttFolio().getString().isEmpty()) {
+                                jtfNumber.setText(moComprobante33.getAttFolio().getString());
+                            }
+                            else {
+                                jtfNumber.setText(SLibUtils.textLeft(msXmlUuid, UUID_FIRST_SECC_LENGHT));
+                            }
                         }
                         
                         moFieldCfdiXmlFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                         msFileXmlJustLoaded = absolutePath;
+                        jckValidateOnSaveFileXml.setEnabled(true);
+                        jckValidateOnSaveFileXml.setSelected(true);
                     }
                 }
                 else {
@@ -7778,10 +7800,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private void actionDeleteFileXml() {
-        moFieldCfdiXmlFile.setFieldValue("");
-        moComprobante33 = null;
-        msFileXmlJustLoaded = "";
         msXmlUuid = "";
+        moComprobante33 = null;
+        moFieldCfdiXmlFile.setFieldValue("");
+        msFileXmlJustLoaded = "";
+        jckValidateOnSaveFileXml.setEnabled(false);
+        jckValidateOnSaveFileXml.setSelected(false);
     }
     
     private void actionDeleteBillOfLading() {
@@ -8941,6 +8965,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JCheckBox jckIsSystem;
     private javax.swing.JCheckBox jckRecordUser;
     private javax.swing.JCheckBox jckShipments;
+    private javax.swing.JCheckBox jckValidateOnSaveFileXml;
     private javax.swing.JFormattedTextField jftAddSorianaRemisiónFecha;
     private javax.swing.JFormattedTextField jftDate;
     private javax.swing.JFormattedTextField jftDateDelivery_nRo;
@@ -9053,6 +9078,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlSalesSupervisor;
     private javax.swing.JLabel jlSalesSupervisorBizPartner;
     private javax.swing.JLabel jlSpace;
+    private javax.swing.JLabel jlSpace1;
     private javax.swing.JLabel jlSubtotal;
     private javax.swing.JLabel jlSubtotalProvisional;
     private javax.swing.JLabel jlTaxCharged;
@@ -10052,7 +10078,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
 
-                        if (!validation.getIsError() && moComprobante33 != null) {
+                        if (!validation.getIsError() && moComprobante33 != null && jckValidateOnSaveFileXml.isSelected()) {
                             validation = validateCfdi();
                         }
 

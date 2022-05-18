@@ -539,6 +539,8 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                     }
 
                     try {
+                        SGuiUtils.setCursorWait(miClient);
+                        
                         switch (mnFormSubtype) {
                             case SCfdConsts.REQ_STAMP:
                                 SCfdUtils.signCfdi((SClientInterface) miClient, cfd, mnPayrollCfdVersion, false, false);
@@ -602,6 +604,9 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                     catch (Exception e) {
                         detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": " + e.getMessage() + "\n";
                         cfdProcessedWrong++;
+                    }
+                    finally {
+                        SGuiUtils.setCursorDefault(miClient);
                     }
 
                     updateForm(cfdProcessed, cfdProcessedOk, cfdProcessedWrong, detailMessage);

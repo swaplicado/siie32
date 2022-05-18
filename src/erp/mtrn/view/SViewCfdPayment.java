@@ -36,8 +36,10 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.srv.SLock;
 
 /**
@@ -118,7 +120,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
         jbGetCfdiStatus.setPreferredSize(new Dimension(23, 23));
         jbGetCfdiStatus.addActionListener(this);
-        jbGetCfdiStatus.setToolTipText("Checar estatus cancelación del CFDI");
+        jbGetCfdiStatus.setToolTipText("Consultar estatus SAT del CFDI");
         
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
@@ -514,6 +516,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
+                    SGuiUtils.setCursorWait((SGuiClient) miClient);
+                    
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                     if (SCfdUtils.validateCfdi(miClient, cfd, 0, true)) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -521,6 +525,9 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
+                }
+                finally {
+                    SGuiUtils.setCursorDefault((SGuiClient) miClient);
                 }
             }
         }

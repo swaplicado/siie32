@@ -933,7 +933,6 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         SServerResponse oResponse = null;
         SDataRecord oRecord = null;
         SDataFormerPayrollMove oPayrollMove = null;
-        SDataFormerPayroll oFormerPayroll = null;
         SDataAccount oAccount = null;
         SDataAccount oAccountMajor = null;
         SDataCostCenter oCostCenter = null;
@@ -1457,7 +1456,6 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         }
         else {
             try {
-                cursor = miClient.getFrame().getCursor();
                 miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
                 computePayroll();
@@ -1470,7 +1468,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                 SLibUtilities.renderException(this, e);
             }
             finally {
-                miClient.getFrame().setCursor(cursor);
+                miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
     }

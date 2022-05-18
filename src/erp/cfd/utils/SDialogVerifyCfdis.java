@@ -181,10 +181,15 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
                     if (cfd != null) {
                         System.out.print(cfd.getUuid());
                         try {
+                            SGuiUtils.setCursorWait(miClient);
+                            
                             needUpdate = SCfdUtils.validateCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false);
                         }
                         catch (Exception e) {
                             Logger.getLogger(SDialogVerifyCfdis.class.getName()).log(Level.SEVERE, null, e);
+                        }
+                        finally {
+                            SGuiUtils.setCursorDefault(miClient);
                         }
                         System.out.print(needUpdate);
                         System.out.println("");

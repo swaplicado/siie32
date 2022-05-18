@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 201.2/ 2022-05-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de funcionalidad para omitir la validación de un CFDI de proveedor en un DPS.
+2) Refactorización general a la invocación de métodos relacionados con el timbrado, cancelación y validación de CFDI.
+
+================================================================================
 SIIE 3.2 201.1/ 2022-05-04
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

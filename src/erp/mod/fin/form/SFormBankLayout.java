@@ -2490,7 +2490,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private String getCfdiSatStatus() {
         String message = "";
         
-        if (miClient.showMsgBoxConfirm("Hay pagos relacionados con un CFDI.\n¿Desea validar el estatus del SAT de los CFDI?") == JOptionPane.YES_OPTION) {
+        if (miClient.showMsgBoxConfirm("Hay pagos relacionados con un CFDI.\n¿Desea validar el estatus SAT de los CFDI?") == JOptionPane.YES_OPTION) {
             try {
                 for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
                     SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);

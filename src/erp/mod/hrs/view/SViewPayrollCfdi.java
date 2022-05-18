@@ -47,6 +47,7 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDate;
 import sa.lib.gui.SGuiParams;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
@@ -181,6 +182,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         moDialogFormerPayrollDate.setVisible(true);
 
                         if (moDialogFormerPayrollDate.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                            
                             hrsFormerPayroll = erp.mod.hrs.db.SHrsFormerUtils.readHrsFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(),
                                     ((int []) gridRow.getRowPrimaryKey())[0], miClient.getSession().getConfigCompany().getCompanyId(), moDialogFormerPayrollDate.getDateEmission(), moDialogFormerPayrollDate.getDatePayment());
                             SCfdUtils.computeCfdiPayroll((SClientInterface) miClient, hrsFormerPayroll, moDialogFormerPayrollDate.isRegenerateOnlyNonStampedCfdi());
@@ -202,8 +205,10 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         }
                     }
                     catch (Exception e) {
-                        miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         SLibUtils.showException(this, e);
+                    }
+                    finally {
+                        miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                     }
                 }
             }
@@ -578,6 +583,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
+                        SGuiUtils.setCursorWait(miClient);
+                        
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
                             needUpdate = SCfdUtils.verifyCfdi((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey()), getPayrollCfdVersion());
                         }
@@ -592,6 +599,9 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                     catch (Exception e) {
                         miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         SLibUtils.showException(this, e);
+                    }
+                    finally {
+                        SGuiUtils.setCursorDefault(miClient);
                     }
                 }
             }
