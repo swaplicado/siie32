@@ -62,21 +62,20 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected erp.mmkt.data.SDataCustomerConfig moDbmsDataCustomerConfig;
-    protected erp.mmkt.data.SDataConfigurationSalesAgent moDbmsDataConfigurationSalesAgent;
+    protected erp.mbps.data.SDataBizPartnerCategory[] maoDbmsCategorySettings;
     protected java.util.Vector<erp.mbps.data.SDataBizPartnerBranch> mvDbmsBizPartnerBranches;
     protected java.util.Vector<erp.mbps.data.SDataBizPartnerNote> mvDbmsBizPartnerNotes;
     protected java.util.Vector<erp.mitm.data.SDataItemBizPartnerDescription> mvDbmsItemBizPartnerDescription;
-    protected erp.mbps.data.SDataBizPartnerCategory[] maoDbmsCategorySettings;
-
+    protected erp.mmkt.data.SDataCustomerConfig moDbmsDataCustomerConfig;
+    protected erp.mmkt.data.SDataConfigurationSalesAgent moDbmsDataConfigurationSalesAgent;
     protected erp.mbps.data.SDataEmployee moDbmsDataEmployee;
 
     public SDataBizPartner() {
         super(SDataConstants.BPSU_BP);
+        maoDbmsCategorySettings = null;
         mvDbmsBizPartnerBranches = new Vector<>();
         mvDbmsBizPartnerNotes = new Vector<>();
         mvDbmsItemBizPartnerDescription = new Vector<>();
-        maoDbmsCategorySettings = null;
         reset();
     }
     
@@ -172,15 +171,13 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
     public void setDbmsDataCustomerConfig(erp.mmkt.data.SDataCustomerConfig o) { moDbmsDataCustomerConfig = o; }
     public void setDbmsDataConfigurationSalesAgent(erp.mmkt.data.SDataConfigurationSalesAgent o) { moDbmsDataConfigurationSalesAgent = o; }
-
     public void setDbmsDataEmployee(erp.mbps.data.SDataEmployee o) { moDbmsDataEmployee = o; }
 
-    public erp.mmkt.data.SDataCustomerConfig getDbmsDataCustomerConfig() { return moDbmsDataCustomerConfig; }
-    public erp.mmkt.data.SDataConfigurationSalesAgent getDbmsDataConfigurationSalesAgent() { return moDbmsDataConfigurationSalesAgent; }
     public java.util.Vector<SDataBizPartnerBranch> getDbmsBizPartnerBranches() { return mvDbmsBizPartnerBranches; }
     public java.util.Vector<SDataBizPartnerNote> getDbmsBizPartnerNotes() { return mvDbmsBizPartnerNotes; }
     public java.util.Vector<SDataItemBizPartnerDescription> getDbmsItemBizPartnerDescription() { return mvDbmsItemBizPartnerDescription; }
-
+    public erp.mmkt.data.SDataCustomerConfig getDbmsDataCustomerConfig() { return moDbmsDataCustomerConfig; }
+    public erp.mmkt.data.SDataConfigurationSalesAgent getDbmsDataConfigurationSalesAgent() { return moDbmsDataConfigurationSalesAgent; }
     public erp.mbps.data.SDataEmployee getDbmsDataEmployee() { return moDbmsDataEmployee; }
 
     public java.lang.String getProperName() {
@@ -254,13 +251,12 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
-        moDbmsDataCustomerConfig = null;
-        moDbmsDataConfigurationSalesAgent = null;
+        maoDbmsCategorySettings = new SDataBizPartnerCategory[SDataConstantsSys.BPSX_CT_BP_QTY];
         mvDbmsBizPartnerBranches.clear();
         mvDbmsBizPartnerNotes.clear();
         mvDbmsItemBizPartnerDescription.clear();
-        maoDbmsCategorySettings = new SDataBizPartnerCategory[SDataConstantsSys.BPSX_CT_BP_QTY];
-
+        moDbmsDataCustomerConfig = null;
+        moDbmsDataConfigurationSalesAgent = null;
         moDbmsDataEmployee = null;
     }
 
@@ -324,6 +320,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
                 for (i = 0; i < SDataConstantsSys.BPSX_CT_BP_QTY; i++) {
                     category = 0;
+                    
                     switch (i) {
                         case 0:
                             category = SDataConstantsSys.BPSS_CT_BP_CO;
@@ -366,7 +363,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 sql = "SELECT id_bpb, bpb, fid_tp_bpb FROM erp.bpsu_bpb WHERE fid_bp = " + key[0] + " ORDER BY fid_tp_bpb, bpb, id_bpb ";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-                    erp.mbps.data.SDataBizPartnerBranch branch = new SDataBizPartnerBranch();
+                    SDataBizPartnerBranch branch = new SDataBizPartnerBranch();
                     if (branch.read(new int[] { resultSet.getInt("id_bpb") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
@@ -408,7 +405,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     if (resultSet.next()) {
                         if (resultSet.getInt("f_count") == 1) {
                             moDbmsDataCustomerConfig = new SDataCustomerConfig();
-                            if (moDbmsDataCustomerConfig.read(new int[] { mnPkBizPartnerId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                            if (moDbmsDataCustomerConfig.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                             }
                         }
@@ -423,7 +420,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     if (resultSet.next()) {
                         if (resultSet.getInt("f_count") == 1) {
                             moDbmsDataConfigurationSalesAgent = new SDataConfigurationSalesAgent();
-                            if (moDbmsDataConfigurationSalesAgent.read(new int[] { mnPkBizPartnerId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                            if (moDbmsDataConfigurationSalesAgent.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                             }
                         }
@@ -438,7 +435,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     if (resultSet.next()) {
                         if (resultSet.getInt("f_count") == 1) {
                             moDbmsDataEmployee = new SDataEmployee();
-                            if (moDbmsDataEmployee.read(new int[] { mnPkBizPartnerId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                            if (moDbmsDataEmployee.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                             }
                         }
@@ -463,10 +460,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public int save(java.sql.Connection connection) {
-        int i = 0;
         int nParam = 1;
-        String sql = "";
-        Statement statement = null;
         CallableStatement callableStatement = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
@@ -477,6 +471,8 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         }
         
         try {
+            int userId = mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId;
+            
             callableStatement = connection.prepareCall(
                     "{ CALL erp.bpsu_bp_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
@@ -511,7 +507,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
             callableStatement.setInt(nParam++, mnFkTaxIdentityId);
             callableStatement.setInt(nParam++, mnFkFiscalBankId);
             callableStatement.setInt(nParam++, mnFkBizAreaId);
-            callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
+            callableStatement.setInt(nParam++, userId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.CHAR);
@@ -527,24 +523,65 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 throw new Exception(msDbmsError);
             }
             else {
-                statement = connection.createStatement();
-
                 // Save aswell business partner category settings:
 
-                for (i = 0; i < maoDbmsCategorySettings.length; i++) {
-                    if (maoDbmsCategorySettings[i] != null) {
-                        maoDbmsCategorySettings[i].setPkBizPartnerId(mnPkBizPartnerId);
-                        if (maoDbmsCategorySettings[i].save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                for (int i = 0; i < maoDbmsCategorySettings.length; i++) { // note that category settings can have null elements!
+                    // save only existing and new or edited branches:
+                    
+                    SDataBizPartnerCategory category = maoDbmsCategorySettings[i]; // convenience variable
+                    
+                    if (category != null) {
+                        if (category.getIsRegistryNew() || category.getIsRegistryEdited()) {
+                            category.setPkBizPartnerId(mnPkBizPartnerId);
+
+                            if (category.getIsRegistryNew()) {
+                                category.setFkUserNewId(userId);
+                            }
+                            else {
+                                category.setFkUserEditId(userId);
+                            }
+
+                            if (category.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                            }
                         }
                     }
                 }
 
-                // Save aswell business partner branches:
+                // Save aswell branches:
 
-                for (i = 0; i < mvDbmsBizPartnerBranches.size(); i++) {
-                    mvDbmsBizPartnerBranches.get(i).setFkBizPartnerId(mnPkBizPartnerId);
-                    if (mvDbmsBizPartnerBranches.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                for (SDataBizPartnerBranch bpb : mvDbmsBizPartnerBranches) {
+                    // save only new or edited branches:
+                    
+                    if (bpb.getIsRegistryNew() || bpb.getIsRegistryEdited()) {
+                        bpb.setFkBizPartnerId(mnPkBizPartnerId);
+                        
+                        if (bpb.getIsRegistryNew()) {
+                            bpb.setFkUserNewId(userId);
+                        }
+                        else {
+                            bpb.setFkUserEditId(userId);
+                        }
+                        
+                        if (bpb.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                    }
+                }
+                
+                // Save aswell notes:
+
+                String sql = "DELETE FROM erp.bpsu_bp_nts "
+                        + "WHERE id_bp = " + mnPkBizPartnerId + ";"; // first delete all existing notes
+                connection.createStatement().execute(sql);
+
+                for (SDataBizPartnerNote note : mvDbmsBizPartnerNotes) {
+                    // save all notes:
+                    
+                    note.setPkBizPartnerId(mnPkBizPartnerId);
+                    note.setIsRegistryNew(true); // assure all notes are treated as new
+                    
+                    if (note.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
@@ -552,41 +589,67 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 // Save aswell customer configuration, if applies:
 
                 if (moDbmsDataCustomerConfig != null) {
-                    moDbmsDataCustomerConfig.setPkCustomerId(mnPkBizPartnerId);
-                    moDbmsDataCustomerConfig.setIsDeleted(mbIsDeleted);
-                    if (moDbmsDataCustomerConfig.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    // save only new or edited registry:
+                    
+                    if (moDbmsDataCustomerConfig.getIsRegistryNew() || moDbmsDataCustomerConfig.getIsRegistryEdited()) {
+                        moDbmsDataCustomerConfig.setPkCustomerId(mnPkBizPartnerId);
+                        moDbmsDataCustomerConfig.setIsDeleted(mbIsDeleted);
+
+                        if (moDbmsDataCustomerConfig.getIsRegistryNew()) {
+                            moDbmsDataCustomerConfig.setFkUserNewId(userId);
+                        }
+                        else {
+                            moDbmsDataCustomerConfig.setFkUserEditId(userId);
+                        }
+
+                        if (moDbmsDataCustomerConfig.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
                     }
                 }
 
-                // Save aswell sales agent configuration, if applies:
+                // Save aswell sales-agent configuration, if applies:
 
                 if (moDbmsDataConfigurationSalesAgent != null) {
-                    moDbmsDataConfigurationSalesAgent.setPkSalesAgentId(mnPkBizPartnerId);
-                    moDbmsDataConfigurationSalesAgent.setIsDeleted(mbIsDeleted);
-                    if (moDbmsDataConfigurationSalesAgent.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    // save only new or edited registry:
+                    
+                    if (moDbmsDataConfigurationSalesAgent.getIsRegistryNew() || moDbmsDataConfigurationSalesAgent.getIsRegistryEdited()) {
+                        moDbmsDataConfigurationSalesAgent.setPkSalesAgentId(mnPkBizPartnerId);
+                        moDbmsDataConfigurationSalesAgent.setIsDeleted(mbIsDeleted);
+
+                        if (moDbmsDataConfigurationSalesAgent.getIsRegistryNew()) {
+                            moDbmsDataConfigurationSalesAgent.setFkUserNewId(userId);
+                        }
+                        else {
+                            moDbmsDataConfigurationSalesAgent.setFkUserEditId(userId);
+                        }
+
+                        if (moDbmsDataConfigurationSalesAgent.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
                     }
                 }
 
-                // Save information of the employee, of the human resources module, if applies:
+                // Save aswell employee data, if applies:
 
                 if (moDbmsDataEmployee != null) {
-                    moDbmsDataEmployee.setPkEmployeeId(mnPkBizPartnerId);
-                    if (moDbmsDataEmployee.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                    }
-                }
+                    // save only new or edited registry:
+                    
+                    if (moDbmsDataEmployee.getIsRegistryNew() || moDbmsDataEmployee.getIsRegistryEdited()) {
+                        moDbmsDataEmployee.setPkEmployeeId(mnPkBizPartnerId);
 
-                // Save aswell the notes:
+                        if (moDbmsDataEmployee.getIsRegistryNew()) {
+                            moDbmsDataEmployee.setFkUserNewId(userId);
+                            moDbmsDataEmployee.setFkUserInsertId(userId);
+                        }
+                        else {
+                            moDbmsDataEmployee.setFkUserEditId(userId);
+                            moDbmsDataEmployee.setFkUserUpdateId(userId);
+                        }
 
-                sql = "DELETE FROM erp.bpsu_bp_nts WHERE id_bp = " + mnPkBizPartnerId + " ";
-                statement.execute(sql);
-
-                for (i = 0; i < mvDbmsBizPartnerNotes.size(); i++) {
-                    mvDbmsBizPartnerNotes.get(i).setPkBizPartnerId(mnPkBizPartnerId);
-                    if (mvDbmsBizPartnerNotes.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        if (moDbmsDataEmployee.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
                     }
                 }
 
@@ -616,24 +679,24 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
      * @return <code>SDataBizPartnerBranch</code>.
      */
     public erp.mbps.data.SDataBizPartnerBranch getDbmsBizPartnerBranchHq() {
-        SDataBizPartnerBranch hqBranch = null;
+        SDataBizPartnerBranch branchHq = null;
 
         for (SDataBizPartnerBranch bpb : mvDbmsBizPartnerBranches) {
             if (bpb.getFkBizPartnerBranchTypeId() == SDataConstantsSys.BPSS_TP_BPB_HQ) {
-                hqBranch = bpb;
+                branchHq = bpb;
                 break;
             }
         }
 
-        return hqBranch;
+        return branchHq;
     }
     
-    public erp.mbps.data.SDataBizPartnerBranch getDbmsBizPartnerBranch(int[] pk) {
+    public erp.mbps.data.SDataBizPartnerBranch getDbmsBizPartnerBranch(int[] branchKey) {
         SDataBizPartnerBranch branch = null;
 
-        for (int i = 0; i < mvDbmsBizPartnerBranches.size(); i++) {
-            if (SLibUtilities.compareKeys(pk, mvDbmsBizPartnerBranches.get(i).getPrimaryKey())) {
-                branch = mvDbmsBizPartnerBranches.get(i);
+        for (SDataBizPartnerBranch bpb : mvDbmsBizPartnerBranches) {
+            if (SLibUtilities.compareKeys(branchKey, bpb.getPrimaryKey())) {
+                branch = bpb;
                 break;
             }
         }
@@ -722,65 +785,53 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     }
     
     public int[] getSalesAgentKey(int[] branchKey) {
-        int[] pk = null;
-        SDataCustomerBranchConfig oConfig = null;
-        SDataBizPartnerBranch oBizPartnerBranch = null;
-
+        int[] key = null;
+    
         if (moDbmsDataCustomerConfig != null) {
-            for (SDataBizPartnerBranch bizPartnerBranch : mvDbmsBizPartnerBranches) {
-                if (SLibUtilities.compareKeys(bizPartnerBranch.getPrimaryKey(), branchKey)) {
-                    oBizPartnerBranch = bizPartnerBranch;
-                    break;
-                }
-            }
+            SDataBizPartnerBranch branch = getDbmsBizPartnerBranch(branchKey);
+            SDataCustomerBranchConfig branchConfig = null;
 
-            if (oBizPartnerBranch != null) {
-                oConfig =  oBizPartnerBranch.getDbmsCustomerBranchConfig(branchKey);
+            if (branch != null) {
+                branchConfig =  branch.getDbmsDataCustomerBranchConfig();
             }
             else {
-                oConfig =  mvDbmsBizPartnerBranches.get(0).getDbmsCustomerBranchConfig(branchKey);
+                branchConfig =  mvDbmsBizPartnerBranches.get(0).getDbmsDataCustomerBranchConfig();
             }
 
-            if (oConfig != null && oConfig.getFkSalesAgentId_n() > 0 && !oConfig.getIsDeleted()) {
-                pk = new int[] { oConfig.getFkSalesAgentId_n() };
+            if (branchConfig != null && !branchConfig.getIsDeleted() && branchConfig.getFkSalesAgentId_n() != 0) {
+                key = new int[] { branchConfig.getFkSalesAgentId_n() };
             }
-            else if (moDbmsDataCustomerConfig.getFkSalesAgentId_n() > 0) {
-                pk = new int[] { moDbmsDataCustomerConfig.getFkSalesAgentId_n() };
+            else if (moDbmsDataCustomerConfig.getFkSalesAgentId_n() != 0) {
+                key = new int[] { moDbmsDataCustomerConfig.getFkSalesAgentId_n() };
             }
         }
 
-        return pk;
+        return key;
     }
 
     public int[] getSalesSupervisorKey(int[] branchKey) {
-        int[] pk = null;
-        SDataCustomerBranchConfig oConfig = null;
-        SDataBizPartnerBranch oBizPartnerBranch = null;
+        int[] key = null;
 
         if (moDbmsDataCustomerConfig != null) {
-            for (SDataBizPartnerBranch bizPartnerBranch : mvDbmsBizPartnerBranches) {
-                if (SLibUtilities.compareKeys(bizPartnerBranch.getPrimaryKey(), branchKey)) {
-                    oBizPartnerBranch = bizPartnerBranch;
-                    break;
-                }
-            }
+            SDataBizPartnerBranch branch = getDbmsBizPartnerBranch(branchKey);
+            SDataCustomerBranchConfig branchConfig = null;
 
-            if (oBizPartnerBranch != null) {
-                oConfig =  oBizPartnerBranch.getDbmsCustomerBranchConfig(branchKey);
+            if (branch != null) {
+                branchConfig =  branch.getDbmsDataCustomerBranchConfig();
             }
             else {
-                oConfig =  mvDbmsBizPartnerBranches.get(0).getDbmsCustomerBranchConfig(branchKey);
+                branchConfig =  mvDbmsBizPartnerBranches.get(0).getDbmsDataCustomerBranchConfig();
             }
 
-            if (oConfig != null && oConfig.getFkSalesSupervisorId_n() > 0 && !oConfig.getIsDeleted()) {
-                pk = new int[] { oConfig.getFkSalesSupervisorId_n() };
+            if (branchConfig != null && !branchConfig.getIsDeleted() && branchConfig.getFkSalesSupervisorId_n() != 0) {
+                key = new int[] { branchConfig.getFkSalesSupervisorId_n() };
             }
-            else if (moDbmsDataCustomerConfig.getFkSalesSupervisorId_n() > 0) {
-                pk = new int[] { moDbmsDataCustomerConfig.getFkSalesSupervisorId_n() };
+            else if (moDbmsDataCustomerConfig.getFkSalesSupervisorId_n() != 0) {
+                key = new int[] { moDbmsDataCustomerConfig.getFkSalesSupervisorId_n() };
             }
         }
 
-        return pk;
+        return key;
     }
 
     public void openCategory(SClientInterface client, int formType, Object pk) {
