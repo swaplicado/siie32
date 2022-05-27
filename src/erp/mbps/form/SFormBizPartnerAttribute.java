@@ -617,18 +617,6 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         return contact;
     }
 
-    public SDataConfigurationSalesAgent createConfigurationSalesAgent() {
-        SDataConfigurationSalesAgent config = new SDataConfigurationSalesAgent();
-
-        config = new SDataConfigurationSalesAgent();
-        //config.setPkSalesAgentId();
-        config.setIsDeleted(false);
-        config.setFkSalesAgentTypeId(SLibConsts.UNDEFINED);
-        config.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-
-        return config;
-    }
-
     private void actionRecreateBizPartnerCommercial() {
         jtfBizPartnerCommercial.setText("");
 
@@ -968,17 +956,16 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         }
 
         if (mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_SAL_AGT) {
-            if (moBizPartner.getDbmsDataConfigurationSalesAgent() == null) {
-                moBizPartner.setDbmsDataConfigurationSalesAgent(createConfigurationSalesAgent());
+            SDataConfigurationSalesAgent configurationSalesAgent = moBizPartner.getDbmsDataConfigurationSalesAgent();
+            
+            if (configurationSalesAgent == null) {
+                configurationSalesAgent = new SDataConfigurationSalesAgent();
+                moBizPartner.setDbmsDataConfigurationSalesAgent(configurationSalesAgent);
             }
 
-            moBizPartner.getDbmsDataConfigurationSalesAgent().setFkSalesAgentTypeId(moFieldFkSalesAgentTypeId.getKeyAsIntArray()[0]);
-
-            if (!moBizPartner.getIsRegistryNew()) {
-                if (!moBizPartner.getDbmsDataConfigurationSalesAgent().getIsRegistryNew()) {
-                    moBizPartner.getDbmsDataConfigurationSalesAgent().setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-                }
-            }
+            configurationSalesAgent.setFkSalesAgentTypeId(moFieldFkSalesAgentTypeId.getKeyAsIntArray()[0]);
+            
+            configurationSalesAgent.setIsRegistryEdited(true);
         }
 
         return moBizPartner;

@@ -11,21 +11,20 @@
 
 package erp.mbps.form;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mbps.data.SDataBizPartnerBranchBankAccountCard;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 
-import erp.data.SDataConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.mbps.data.SDataBizPartnerBranchBankAccountCard;
-
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormBizPartnerBranchBankAccountCard extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -366,6 +365,8 @@ public class SFormBizPartnerBranchBankAccountCard extends javax.swing.JDialog im
         moBizPartnerBranchBankAccountCard.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         moBizPartnerBranchBankAccountCard.setDbmsCardType(jcbFkCardTypeId.getSelectedItem().toString());
+        
+        moBizPartnerBranchBankAccountCard.setIsRegistryEdited(true);
 
         return moBizPartnerBranchBankAccountCard;
     }

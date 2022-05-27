@@ -28,7 +28,7 @@ import erp.mmkt.form.SDialogRepCommissions;
 import erp.mmkt.form.SFormCommissionsSalesAgent;
 import erp.mmkt.form.SFormCommissionsSalesAgents;
 import erp.mmkt.form.SFormConfigurationSalesAgent;
-import erp.mmkt.form.SFormCustomerConfiguration;
+import erp.mmkt.form.SFormCustomerConfig;
 import erp.mmkt.form.SFormCustomerType;
 import erp.mmkt.form.SFormDistributionChannel;
 import erp.mmkt.form.SFormMarketSegment;
@@ -94,7 +94,7 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mmkt.form.SFormCustomerType moFormCustomerType;
     private erp.mmkt.form.SFormMarketSegment moFormMarketSegment;
     private erp.mmkt.form.SFormMarketSubsegment moFormMarketSubsegment;
-    private erp.mmkt.form.SFormCustomerConfiguration moFormCustomerConfiguration;
+    private erp.mmkt.form.SFormCustomerConfig moFormCustomerConfiguration;
     private erp.mmkt.form.SFormDistributionChannel moFormDistributionChannel;
     private erp.mmkt.form.SFormSalesRoute moFormSalesRoute;
 
@@ -312,7 +312,7 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.MKT_CFG_CUS:
                     if (moFormCustomerConfiguration == null) {
-                        moFormCustomerConfiguration = new SFormCustomerConfiguration(miClient);
+                        moFormCustomerConfiguration = new SFormCustomerConfig(miClient);
                     }
                     if (pk != null) {
                         moRegistry = new SDataCustomerConfig();

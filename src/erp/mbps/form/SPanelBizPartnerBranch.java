@@ -37,8 +37,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Vector;
 import javax.swing.JOptionPane;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 
 /**
@@ -56,6 +58,8 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
     private erp.client.SClientInterface miClient;
 
     private erp.mbps.data.SDataBizPartnerBranch moBizPartnerBranch;
+    private erp.mbps.data.SDataBizPartnerBranchAddress moBizPartnerBranchAddress;
+    private erp.mbps.data.SDataBizPartnerBranchContact moBizPartnerBranchContact;
     private erp.lib.form.SFormField moFieldBizPartnerBranch;
     private erp.lib.form.SFormField moFieldFkTaxRegionId_n;
     private erp.lib.form.SFormField moFieldFkAddressFormatTypeId_n;
@@ -617,8 +621,6 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
             jbModifyBankAccount.setEnabled(true);
         }
     }
-    
-   
 
     private void actionAddAddress() {
         SDataBizPartnerBranchAddress dataBizPartnerBranchAddress = null;
@@ -630,9 +632,15 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
             if (moFormBizPartnerBranchAddress.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
                 dataBizPartnerBranchAddress = (SDataBizPartnerBranchAddress) moFormBizPartnerBranchAddress.getRegistry();
+                dataBizPartnerBranchAddress.setFkUserNewId(miClient.getSessionXXX().getUser().getPkUserId());
+                dataBizPartnerBranchAddress.setFkUserEditId(SUtilConsts.USR_NA_ID);
+                dataBizPartnerBranchAddress.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
                 dataBizPartnerBranchAddress.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
-                dataBizPartnerBranchAddress.setDbmsUserEdit("(n/a)");
-                dataBizPartnerBranchAddress.setDbmsUserDelete("(n/a)");
+                dataBizPartnerBranchAddress.setDbmsUserEdit("");
+                dataBizPartnerBranchAddress.setDbmsUserDelete("");
+                dataBizPartnerBranchAddress.setUserNewTs(new Date());
+                dataBizPartnerBranchAddress.setUserEditTs(null);
+                dataBizPartnerBranchAddress.setUserDeleteTs(null);
 
                 moBizPartnerBranchAddressPane.addTableRow(new SDataBizPartnerBranchAddressRow(dataBizPartnerBranchAddress));
                 moBizPartnerBranchAddressPane.renderTableRows();
@@ -654,7 +662,9 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
                 if (moFormBizPartnerBranchAddress.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
                     dataBizPartnerBranchAddress = (SDataBizPartnerBranchAddress) moFormBizPartnerBranchAddress.getRegistry();
+                    dataBizPartnerBranchAddress.setFkUserEditId(miClient.getSessionXXX().getUser().getPkUserId());
                     dataBizPartnerBranchAddress.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser());
+                    dataBizPartnerBranchAddress.setUserEditTs(new Date());
 
                     moBizPartnerBranchAddressPane.getTableModel().getTableRows().set(index, new SDataBizPartnerBranchAddressRow(dataBizPartnerBranchAddress));
                     moBizPartnerBranchAddressPane.renderTableRows();
@@ -670,7 +680,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         if (jbAddBankAccount.isEnabled()) {
             moFormBizPartnerBranchBankAccount.setParamIsInMainWindow(true);
             moFormBizPartnerBranchBankAccount.setParamBizPartnerDescription(moParamFormBizPartner == null ? msParamBizPartnerDescription :
-                (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER_ID));
+                (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER));
             moFormBizPartnerBranchBankAccount.setParamBizPartnerBranchDescription(jtfBizPartnerBranch.getText());
             moFormBizPartnerBranchBankAccount.formRefreshCatalogues();
             moFormBizPartnerBranchBankAccount.formReset();
@@ -679,9 +689,15 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
             if (moFormBizPartnerBranchBankAccount.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
                 dataBizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) moFormBizPartnerBranchBankAccount.getRegistry();
+                dataBizPartnerBranchBankAccount.setFkUserNewId(miClient.getSessionXXX().getUser().getPkUserId());
+                dataBizPartnerBranchBankAccount.setFkUserEditId(SUtilConsts.USR_NA_ID);
+                dataBizPartnerBranchBankAccount.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
                 dataBizPartnerBranchBankAccount.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
-                dataBizPartnerBranchBankAccount.setDbmsUserEdit("(n/a)");
-                dataBizPartnerBranchBankAccount.setDbmsUserDelete("(n/a)");
+                dataBizPartnerBranchBankAccount.setDbmsUserEdit("");
+                dataBizPartnerBranchBankAccount.setDbmsUserDelete("");
+                dataBizPartnerBranchBankAccount.setUserNewTs(new Date());
+                dataBizPartnerBranchBankAccount.setUserEditTs(null);
+                dataBizPartnerBranchBankAccount.setUserDeleteTs(null);
 
                 moBizPartnerBranchBankAccountPane.addTableRow(new SDataBizPartnerBranchBankAccountRow(dataBizPartnerBranchBankAccount));
                 moBizPartnerBranchBankAccountPane.renderTableRows();
@@ -698,7 +714,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
             if (index != -1) {
                 moFormBizPartnerBranchBankAccount.setParamIsInMainWindow(true);
                 moFormBizPartnerBranchBankAccount.setParamBizPartnerDescription(moParamFormBizPartner == null ? msParamBizPartnerDescription :
-                    (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER_ID));
+                    (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER));
                 moFormBizPartnerBranchBankAccount.setParamBizPartnerBranchDescription(jtfBizPartnerBranch.getText());
                 moFormBizPartnerBranchBankAccount.formRefreshCatalogues();
                 moFormBizPartnerBranchBankAccount.formReset();
@@ -708,7 +724,9 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
                 if (moFormBizPartnerBranchBankAccount.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
                     dataBizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) moFormBizPartnerBranchBankAccount.getRegistry();
+                    dataBizPartnerBranchBankAccount.setFkUserEditId(miClient.getSessionXXX().getUser().getPkUserId());
                     dataBizPartnerBranchBankAccount.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser());
+                    dataBizPartnerBranchBankAccount.setUserEditTs(new Date());
 
                     moBizPartnerBranchBankAccountPane.getTableModel().getTableRows().set(index, new SDataBizPartnerBranchBankAccountRow(dataBizPartnerBranchBankAccount));
                     moBizPartnerBranchBankAccountPane.renderTableRows();
@@ -724,7 +742,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         if (jbAddContact.isEnabled()) {
             moFormBizPartnerBranchContact.setParamIsInMainWindow(true);
             moFormBizPartnerBranchContact.setParamBizPartnerDescription(moParamFormBizPartner == null ? msParamBizPartnerDescription :
-                (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER_ID));
+                (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER));
             moFormBizPartnerBranchContact.setParamBizPartnerBranchDescription(jtfBizPartnerBranch.getText());
             moFormBizPartnerBranchContact.formRefreshCatalogues();
             moFormBizPartnerBranchContact.formReset();
@@ -732,9 +750,15 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
             if (moFormBizPartnerBranchContact.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
                 dataBizPartnerBranchContact = (SDataBizPartnerBranchContact) moFormBizPartnerBranchContact.getRegistry();
+                dataBizPartnerBranchContact.setFkUserNewId(miClient.getSessionXXX().getUser().getPkUserId());
+                dataBizPartnerBranchContact.setFkUserEditId(SUtilConsts.USR_NA_ID);
+                dataBizPartnerBranchContact.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
                 dataBizPartnerBranchContact.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
-                dataBizPartnerBranchContact.setDbmsUserEdit("(n/a)");
-                dataBizPartnerBranchContact.setDbmsUserDelete("(n/a)");
+                dataBizPartnerBranchContact.setDbmsUserEdit("");
+                dataBizPartnerBranchContact.setDbmsUserDelete("");
+                dataBizPartnerBranchContact.setUserNewTs(new Date());
+                dataBizPartnerBranchContact.setUserEditTs(null);
+                dataBizPartnerBranchContact.setUserDeleteTs(null);
 
                 moBizPartnerBranchContactPane.addTableRow(new SDataBizPartnerBranchContactRow(dataBizPartnerBranchContact));
                 moBizPartnerBranchContactPane.renderTableRows();
@@ -751,7 +775,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
             if (index != -1) {
                 moFormBizPartnerBranchContact.setParamIsInMainWindow(true);
                 moFormBizPartnerBranchContact.setParamBizPartnerDescription(moParamFormBizPartner == null ? msParamBizPartnerDescription :
-                    (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER_ID));
+                    (String) moParamFormBizPartner.getValue(SDataConstantsSys.VALUE_BIZ_PARTNER));
                 moFormBizPartnerBranchContact.setParamBizPartnerBranchDescription(jtfBizPartnerBranch.getText());
                 moFormBizPartnerBranchContact.formRefreshCatalogues();
                 moFormBizPartnerBranchContact.formReset();
@@ -760,7 +784,9 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
                 if (moFormBizPartnerBranchContact.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
                     dataBizPartnerBranchContact = (SDataBizPartnerBranchContact) moFormBizPartnerBranchContact.getRegistry();
+                    dataBizPartnerBranchContact.setFkUserEditId(miClient.getSessionXXX().getUser().getPkUserId());
                     dataBizPartnerBranchContact.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser());
+                    dataBizPartnerBranchContact.setUserEditTs(new Date());
 
                     moBizPartnerBranchContactPane.getTableModel().getTableRows().set(index, new SDataBizPartnerBranchContactRow(dataBizPartnerBranchContact));
                     moBizPartnerBranchContactPane.renderTableRows();
@@ -926,6 +952,8 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         mbFirstTime = true;
 
         moBizPartnerBranch = null;
+        moBizPartnerBranchAddress = null;
+        moBizPartnerBranchContact = null;
         mbParamIsInMainWindow = false;
         mbParamIsCompany = false;
 
@@ -1046,11 +1074,11 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
                 if (count == 0) {
                     jTabbedPane.setSelectedIndex(0);
-                    validation.setMessage("No se ha definido el domicilio predeterminado.");
+                    validation.setMessage("No se ha definido el domicilio predeterminado para la sucursal.");
                 }
                 else if (count > 1) {
                     jTabbedPane.setSelectedIndex(0);
-                    validation.setMessage("Solamente se debe definir un domicilio predeterminado.");
+                    validation.setMessage("Solamente se debe definir un domicilio predeterminado para la sucursal.");
                 }
             }
         }
@@ -1103,13 +1131,13 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
         // Read branch addresses:
 
-        moPanelBizPartnerBranchAddress.setRegistry(
-                moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().get(0));  // official address is index 0
+        moBizPartnerBranchAddress = moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().get(0); // official address
+        moPanelBizPartnerBranchAddress.setRegistry(moBizPartnerBranchAddress);
 
         for (i = 1; i < moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().size(); i++) {
-            moBizPartnerBranchAddressPane.addTableRow(
-                    new SDataBizPartnerBranchAddressRow(moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().get(i)));
-            if (moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().get(i).getIsDeleted()) {
+            SDataBizPartnerBranchAddress address = moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().get(i);
+            moBizPartnerBranchAddressPane.addTableRow(new SDataBizPartnerBranchAddressRow(address));
+            if (address.getIsDeleted()) {
                 ((STableModel) moBizPartnerBranchAddressPane.getTable().getModel()).getTableRow(i - 1).setStyle(STableConstants.STYLE_DELETE);
             }
         }
@@ -1118,9 +1146,9 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         // Read branch bank accounts:
 
         for (i = 0; i < moBizPartnerBranch.getDbmsBizPartnerBranchBankAccounts().size(); i++) {
-            moBizPartnerBranchBankAccountPane.addTableRow(
-                    new SDataBizPartnerBranchBankAccountRow(moBizPartnerBranch.getDbmsBizPartnerBranchBankAccounts().get(i)));
-            if (moBizPartnerBranch.getDbmsBizPartnerBranchBankAccounts().get(i).getIsDeleted()) {
+            SDataBizPartnerBranchBankAccount bankAccount = moBizPartnerBranch.getDbmsBizPartnerBranchBankAccounts().get(i);
+            moBizPartnerBranchBankAccountPane.addTableRow(new SDataBizPartnerBranchBankAccountRow(bankAccount));
+            if (bankAccount.getIsDeleted()) {
                 ((STableModel) moBizPartnerBranchBankAccountPane.getTable().getModel()).getTableRow(i).setStyle(STableConstants.STYLE_DELETE);
             }
         }
@@ -1129,26 +1157,28 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         // Read branch contacts:
 
         if (moBizPartnerBranch.getDbmsBizPartnerBranchContacts().size() > 0) {
-            mnPkContactId = moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getPkContactId();
+            moBizPartnerBranchContact = moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0); // convenience variable
+            
+            mnPkContactId = moBizPartnerBranchContact.getPkContactId();
 
-            moFieldTelAreaCode01.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelAreaCode01());
-            moFieldTelNumber01.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelNumber01());
-            moFieldTelExt01.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelExt01());
-            moFieldFkTelephoneType01Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getFkTelephoneType01Id() });
-            moFieldTelAreaCode02.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelAreaCode02());
-            moFieldTelNumber02.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelNumber02());
-            moFieldTelExt02.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelExt02());
-            moFieldFkTelephoneType02Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getFkTelephoneType02Id() });
-            moFieldTelAreaCode03.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelAreaCode03());
-            moFieldTelNumber03.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelNumber03());
-            moFieldTelExt03.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelExt03());
-            moFieldFkTelephoneType03Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getFkTelephoneType03Id() });
-            moFieldEmail.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+            moFieldTelAreaCode01.setFieldValue(moBizPartnerBranchContact.getTelAreaCode01());
+            moFieldTelNumber01.setFieldValue(moBizPartnerBranchContact.getTelNumber01());
+            moFieldTelExt01.setFieldValue(moBizPartnerBranchContact.getTelExt01());
+            moFieldFkTelephoneType01Id.setFieldValue(new int[] { moBizPartnerBranchContact.getFkTelephoneType01Id() });
+            moFieldTelAreaCode02.setFieldValue(moBizPartnerBranchContact.getTelAreaCode02());
+            moFieldTelNumber02.setFieldValue(moBizPartnerBranchContact.getTelNumber02());
+            moFieldTelExt02.setFieldValue(moBizPartnerBranchContact.getTelExt02());
+            moFieldFkTelephoneType02Id.setFieldValue(new int[] { moBizPartnerBranchContact.getFkTelephoneType02Id() });
+            moFieldTelAreaCode03.setFieldValue(moBizPartnerBranchContact.getTelAreaCode03());
+            moFieldTelNumber03.setFieldValue(moBizPartnerBranchContact.getTelNumber03());
+            moFieldTelExt03.setFieldValue(moBizPartnerBranchContact.getTelExt03());
+            moFieldFkTelephoneType03Id.setFieldValue(new int[] { moBizPartnerBranchContact.getFkTelephoneType03Id() });
+            moFieldEmail.setFieldValue(moBizPartnerBranchContact.getEmail01());
 
             for (i = 1; i < moBizPartnerBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
-                moBizPartnerBranchContactPane.addTableRow(
-                        new SDataBizPartnerBranchContactRow(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i)));
-                if (moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                SDataBizPartnerBranchContact contact = moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i);
+                moBizPartnerBranchContactPane.addTableRow(new SDataBizPartnerBranchContactRow(contact));
+                if (contact.getIsDeleted()) {
                     ((STableModel) moBizPartnerBranchContactPane.getTable().getModel()).getTableRow(i - 1).setStyle(STableConstants.STYLE_DELETE);
                 }
             }
@@ -1158,8 +1188,8 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         // Read branch notes:
 
         for (i = 0; i < moBizPartnerBranch.getDbmsBizPartnerBranchNotes().size(); i++) {
-            moBizPartnerBranchNotePane.addTableRow(
-                    new SDataBizPartnerBranchNoteRow(moBizPartnerBranch.getDbmsBizPartnerBranchNotes().get(i)));
+            SDataBizPartnerBranchNote note = moBizPartnerBranch.getDbmsBizPartnerBranchNotes().get(i);
+            moBizPartnerBranchNotePane.addTableRow(new SDataBizPartnerBranchNoteRow(note));
         }
         moBizPartnerBranchNotePane.renderTableRows();
 
@@ -1177,10 +1207,6 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        int i = 0;
-        SDataBizPartnerBranchAddress address = null;
-        SDataBizPartnerBranchContact contact = null;
-
         if (moBizPartnerBranch == null) {
             moBizPartnerBranch = new SDataBizPartnerBranch();
             moBizPartnerBranch.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -1197,67 +1223,74 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         moBizPartnerBranch.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         moBizPartnerBranch.setDbmsTaxRegion(jcbFkTaxRegionId_n.getSelectedItem().toString());
+        
+        // Get official address:
 
         moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().clear();
 
-        address = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
-        address.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF);
-        moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(address);
+        moBizPartnerBranchAddress = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
+        moBizPartnerBranchAddress.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
+        moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(moBizPartnerBranchAddress);
 
-        // Save branch addresses:
+        // Get other addresses:
 
-        for (i = 0; i < moBizPartnerBranchAddressPane.getTable().getRowCount(); i++) {
-            moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(
-                    (SDataBizPartnerBranchAddress) moBizPartnerBranchAddressPane.getTableRow(i).getData());
+        for (int i = 0; i < moBizPartnerBranchAddressPane.getTable().getRowCount(); i++) {
+            moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add((SDataBizPartnerBranchAddress) moBizPartnerBranchAddressPane.getTableRow(i).getData());
         }
 
-        // Save branch bank accounts:
+        // Get bank accounts:
 
         moBizPartnerBranch.getDbmsBizPartnerBranchBankAccounts().clear();
 
-        for (i = 0; i < moBizPartnerBranchBankAccountPane.getTable().getRowCount(); i++) {
-            moBizPartnerBranch.getDbmsBizPartnerBranchBankAccounts().add(
-                    (SDataBizPartnerBranchBankAccount) moBizPartnerBranchBankAccountPane.getTableRow(i).getData());
+        for (int i = 0; i < moBizPartnerBranchBankAccountPane.getTable().getRowCount(); i++) {
+            moBizPartnerBranch.getDbmsBizPartnerBranchBankAccounts().add((SDataBizPartnerBranchBankAccount) moBizPartnerBranchBankAccountPane.getTableRow(i).getData());
         }
 
         // Save branch contacts:
 
         moBizPartnerBranch.getDbmsBizPartnerBranchContacts().clear();
 
-        contact = new SDataBizPartnerBranchContact();
-        contact.setPkContactId(mnPkContactId);
-        contact.setTelAreaCode01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode01.getString());
-        contact.setTelNumber01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber01.getString());
-        contact.setTelExt01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt01.getString());
-        contact.setFkTelephoneType01Id(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType01Id.getKeyAsIntArray()[0]);
-        contact.setTelAreaCode02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode02.getString());
-        contact.setTelNumber02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber02.getString());
-        contact.setTelExt02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt02.getString());
-        contact.setFkTelephoneType02Id(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType02Id.getKeyAsIntArray()[0]);
-        contact.setTelAreaCode03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode03.getString());
-        contact.setTelNumber03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber03.getString());
-        contact.setTelExt03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt03.getString());
-        contact.setFkTelephoneType03Id(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType03Id.getKeyAsIntArray()[0]);
-        contact.setEmail01(moFieldEmail.getString());
-        contact.setFkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
-        contact.setFkUserNewId(moBizPartnerBranch.getFkUserNewId());
-        contact.setFkUserEditId(moBizPartnerBranch.getFkUserEditId());
-        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(contact);
+        if (moBizPartnerBranchContact == null) {
+            moBizPartnerBranchContact = new SDataBizPartnerBranchContact();
+            moBizPartnerBranchContact.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+        }
+        else {
+            moBizPartnerBranchContact.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+        }
+        
+        moBizPartnerBranchContact.setPkBizPartnerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
+        moBizPartnerBranchContact.setPkContactId(mnPkContactId);
+        moBizPartnerBranchContact.setTelAreaCode01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode01.getString());
+        moBizPartnerBranchContact.setTelNumber01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber01.getString());
+        moBizPartnerBranchContact.setTelExt01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt01.getString());
+        moBizPartnerBranchContact.setFkTelephoneType01Id(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType01Id.getKeyAsIntArray()[0]);
+        moBizPartnerBranchContact.setTelAreaCode02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode02.getString());
+        moBizPartnerBranchContact.setTelNumber02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber02.getString());
+        moBizPartnerBranchContact.setTelExt02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt02.getString());
+        moBizPartnerBranchContact.setFkTelephoneType02Id(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType02Id.getKeyAsIntArray()[0]);
+        moBizPartnerBranchContact.setTelAreaCode03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode03.getString());
+        moBizPartnerBranchContact.setTelNumber03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber03.getString());
+        moBizPartnerBranchContact.setTelExt03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt03.getString());
+        moBizPartnerBranchContact.setFkTelephoneType03Id(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType03Id.getKeyAsIntArray()[0]);
+        moBizPartnerBranchContact.setEmail01(moFieldEmail.getString());
+        moBizPartnerBranchContact.setFkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
+        
+        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(moBizPartnerBranchContact);
 
-        for (i = 0; i < moBizPartnerBranchContactPane.getTable().getRowCount(); i++) {
-            moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(
-                    (SDataBizPartnerBranchContact) moBizPartnerBranchContactPane.getTableRow(i).getData());
+        for (int i = 0; i < moBizPartnerBranchContactPane.getTable().getRowCount(); i++) {
+            moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add((SDataBizPartnerBranchContact) moBizPartnerBranchContactPane.getTableRow(i).getData());
         }
 
         // Save branch notes:
 
         moBizPartnerBranch.getDbmsBizPartnerBranchNotes().clear();
 
-        for (i = 0; i < moBizPartnerBranchNotePane.getTable().getRowCount(); i++) {
-            moBizPartnerBranch.getDbmsBizPartnerBranchNotes().add(
-                    (SDataBizPartnerBranchNote) moBizPartnerBranchNotePane.getTableRow(i).getData());
+        for (int i = 0; i < moBizPartnerBranchNotePane.getTable().getRowCount(); i++) {
+            moBizPartnerBranch.getDbmsBizPartnerBranchNotes().add((SDataBizPartnerBranchNote) moBizPartnerBranchNotePane.getTableRow(i).getData());
         }
 
+        moBizPartnerBranch.setIsRegistryEdited(true);
+        
         return moBizPartnerBranch;
     }
 

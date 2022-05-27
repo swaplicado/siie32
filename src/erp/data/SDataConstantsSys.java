@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  * 
  */
 public abstract class SDataConstantsSys {
@@ -1372,6 +1372,8 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_OPS_TYPE_ADJ_PREPAY = 23;          // adjustment of prepayment invoiced
     public static final int TRNX_OPS_TYPE_ADJ_APP_PREPAY = 26;      // application of prepayment invoiced
     
+    public static final int MKTU_SAL_ROUTE_DEFAULT = 1;
+    
     public static final HashMap<Integer, String> OperationsTypesOpsMap = new HashMap<>();
     public static final HashMap<Integer, String> OperationsTypesAdjMap = new HashMap<>();
     
@@ -1584,7 +1586,7 @@ public abstract class SDataConstantsSys {
     public static final int VALUE_COMPANY_BRANCH = 1;
     public static final int VALUE_ACCOUNT_CASH = 2;
     public static final int VALUE_TYPE_DOC = 3;
-    public static final int VALUE_BIZ_PARTNER_ID = 4;
+    public static final int VALUE_BIZ_PARTNER = 4;
     public static final int VALUE_RECORD_ENTRY = 5;
     public static final int VALUE_CHECK = 6;
     public static final int VALUE_IS_PUR = 7;

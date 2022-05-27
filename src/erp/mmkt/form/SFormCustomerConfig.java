@@ -38,7 +38,7 @@ import javax.swing.JOptionPane;
  *
  * @author Néstor Ávalos, Sergio Flores
  */
-public class SFormCustomerConfiguration extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -65,15 +65,15 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     private erp.lib.form.SFormField moFieldIsSignImmex;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
-    private erp.lib.table.STablePane moCustomerConfigCobPane;
+    private erp.lib.table.STablePane moCusBranchConfigPane;
 
     private int mnParamPkBizPartnerId;
     private java.lang.String msParamBizPartnerDescription;
 
-    /** Creates new form SFormCustomerConfiguration
+    /** Creates new form SFormCustomerConfig
      * @param client
      */
-    public SFormCustomerConfiguration(erp.client.SClientInterface client) {
+    public SFormCustomerConfig(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         mnFormType = SDataConstants.MKT_CFG_CUS;
@@ -128,12 +128,12 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         jckIsSignImmex = new javax.swing.JCheckBox();
         jlIsSignImmexHint = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
-        jpCob = new javax.swing.JPanel();
+        jpCusBranchConfig = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
-        jbNew = new javax.swing.JButton();
-        jbEdit = new javax.swing.JButton();
-        jbDel = new javax.swing.JButton();
-        jbAddCob = new javax.swing.JButton();
+        jbNewCusBranchConfig = new javax.swing.JButton();
+        jbModifyCusBranchConfig = new javax.swing.JButton();
+        jbDeleteCusBranchConfig = new javax.swing.JButton();
+        jbAddCusBranchConfig = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Configuración de cliente");
@@ -285,40 +285,40 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
-        jpCob.setBorder(javax.swing.BorderFactory.createTitledBorder("Sucursales de cliente:"));
-        jpCob.setLayout(new java.awt.BorderLayout());
+        jpCusBranchConfig.setBorder(javax.swing.BorderFactory.createTitledBorder("Sucursales de cliente:"));
+        jpCusBranchConfig.setLayout(new java.awt.BorderLayout());
 
         jpNotesAction.setPreferredSize(new java.awt.Dimension(771, 23));
         jpNotesAction.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
-        jbNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
-        jbNew.setToolTipText("Crear");
-        jbNew.setEnabled(false);
-        jbNew.setFocusable(false);
-        jbNew.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpNotesAction.add(jbNew);
+        jbNewCusBranchConfig.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
+        jbNewCusBranchConfig.setToolTipText("Crear");
+        jbNewCusBranchConfig.setEnabled(false);
+        jbNewCusBranchConfig.setFocusable(false);
+        jbNewCusBranchConfig.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpNotesAction.add(jbNewCusBranchConfig);
 
-        jbEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbEdit.setToolTipText("Modificar");
-        jbEdit.setFocusable(false);
-        jbEdit.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpNotesAction.add(jbEdit);
+        jbModifyCusBranchConfig.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbModifyCusBranchConfig.setToolTipText("Modificar");
+        jbModifyCusBranchConfig.setFocusable(false);
+        jbModifyCusBranchConfig.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpNotesAction.add(jbModifyCusBranchConfig);
 
-        jbDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbDel.setToolTipText("Eliminar");
-        jbDel.setFocusable(false);
-        jbDel.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpNotesAction.add(jbDel);
+        jbDeleteCusBranchConfig.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbDeleteCusBranchConfig.setToolTipText("Eliminar");
+        jbDeleteCusBranchConfig.setFocusable(false);
+        jbDeleteCusBranchConfig.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpNotesAction.add(jbDeleteCusBranchConfig);
 
-        jbAddCob.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif"))); // NOI18N
-        jbAddCob.setToolTipText("Agregar sucursales");
-        jbAddCob.setFocusable(false);
-        jbAddCob.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpNotesAction.add(jbAddCob);
+        jbAddCusBranchConfig.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif"))); // NOI18N
+        jbAddCusBranchConfig.setToolTipText("Agregar sucursales");
+        jbAddCusBranchConfig.setFocusable(false);
+        jbAddCusBranchConfig.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpNotesAction.add(jbAddCusBranchConfig);
 
-        jpCob.add(jpNotesAction, java.awt.BorderLayout.PAGE_START);
+        jpCusBranchConfig.add(jpNotesAction, java.awt.BorderLayout.PAGE_START);
 
-        getContentPane().add(jpCob, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpCusBranchConfig, java.awt.BorderLayout.CENTER);
 
         setSize(new java.awt.Dimension(736, 489));
         setLocationRelativeTo(null);
@@ -334,9 +334,9 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
 
         moComboboxGrpMarketSegment = new SFormComboBoxGroup(miClient);
         mvFields = new Vector<>();
-        moCustomerConfigCobPane = new STablePane(miClient);
-        moCustomerConfigCobPane.setDoubleClickAction(this, "publicActionConfigCobEdit");
-        jpCob.add(moCustomerConfigCobPane, BorderLayout.CENTER);
+        moCusBranchConfigPane = new STablePane(miClient);
+        moCusBranchConfigPane.setDoubleClickAction(this, "publicActionConfigCobEdit");
+        jpCusBranchConfig.add(moCusBranchConfigPane, BorderLayout.CENTER);
 
         moFieldPkCustomerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkCustomerId, jlPkCustomerId);
         moFieldFkCustomerTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCustomerTypeId, jlFkCustomerTypeId);
@@ -370,8 +370,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         jbFkMarketSegmentId.addActionListener(this);
         jbFkMarketSubsegmentId.addActionListener(this);
         jbFkDistributionChannelId.addActionListener(this);
-        jbAddCob.addActionListener(this);
-        jbDel.addActionListener(this);
+        jbAddCusBranchConfig.addActionListener(this);
+        jbDeleteCusBranchConfig.addActionListener(this);
 
         i = 0;
         tableColumnsCob = new STableColumnForm[10];
@@ -386,9 +386,9 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         tableColumnsCob[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. eliminación", STableConstants.WIDTH_USER);
         tableColumnsCob[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Eliminación", STableConstants.WIDTH_DATE_TIME);
         for (i = 0; i < tableColumnsCob.length; i++) {
-            moCustomerConfigCobPane.addTableColumn(tableColumnsCob[i]);
+            moCusBranchConfigPane.addTableColumn(tableColumnsCob[i]);
         }
-        moCustomerConfigCobPane.createTable(null);
+        moCusBranchConfigPane.createTable(null);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -458,120 +458,114 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     }
 
     private void actionCustomerConfigCobEdit() {
-        int index = moCustomerConfigCobPane.getTable().getSelectedRow();
-        SFormCustomerConfigurationCob formCustomerConfigCob = new SFormCustomerConfigurationCob(miClient);
-        SDataCustomerBranchConfig dataCustomerConfigCob = null;
-        SDataCustomerBranchConfigRow dataCustomerConfigCobRow = null;
-
-        formCustomerConfigCob.setValue(1, jcbPkCustomerId.isEnabled() ? moFieldPkCustomerId.getKeyAsIntArray()[0] : mnParamPkBizPartnerId);
-        formCustomerConfigCob.formRefreshCatalogues();
-        formCustomerConfigCob.formReset();
-        dataCustomerConfigCob = (SDataCustomerBranchConfig) formCustomerConfigCob.getRegistry();
+        int index = moCusBranchConfigPane.getTable().getSelectedRow();
+        
         if (index != -1) {
-            dataCustomerConfigCob = (SDataCustomerBranchConfig) moCustomerConfigCobPane.getTableRow(index).getData();
-            formCustomerConfigCob.setRegistry(dataCustomerConfigCob);
-            formCustomerConfigCob.setVisible(true);
-            if (formCustomerConfigCob.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                dataCustomerConfigCob = (SDataCustomerBranchConfig) formCustomerConfigCob.getRegistry();
+            SDataCustomerBranchConfig customerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();
+            
+            SFormCustomerBranchConfig formCustomerBranchConfig = new SFormCustomerBranchConfig(miClient);
+            formCustomerBranchConfig.setValue(1, jcbPkCustomerId.isEnabled() ? moFieldPkCustomerId.getKeyAsIntArray()[0] : mnParamPkBizPartnerId);
+            formCustomerBranchConfig.formRefreshCatalogues();
+            formCustomerBranchConfig.formReset();
+            formCustomerBranchConfig.setRegistry(customerBranchConfig);
+            formCustomerBranchConfig.setVisible(true);
+            
+            if (formCustomerBranchConfig.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+                customerBranchConfig = (SDataCustomerBranchConfig) formCustomerBranchConfig.getRegistry();
 
-                moBizPartner.getDbmsBizPartnerBranches().get(index + 1).getDbmsDataCustomerBranchConfig().add(dataCustomerConfigCob);
-                moCustomerConfigCobPane.setTableRow(dataCustomerConfigCobRow = new SDataCustomerBranchConfigRow(dataCustomerConfigCob), index);
-                moCustomerConfigCobPane.renderTableRows();
+                moBizPartner.getDbmsBizPartnerBranches().get(index + 1).setDbmsDataCustomerBranchConfig(customerBranchConfig);
+                moCusBranchConfigPane.setTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig), index);
+                moCusBranchConfigPane.renderTableRows();
             }
         }
     }
 
-    private void actionAddCob() {
-        int i = 0;
-        int j = 0;
-        int index = 0;
-        boolean b = false;
-        SDataBizPartner bizPartner = null;
-        SDataCustomerBranchConfig cusConfigCob = null;
-        SDataCustomerBranchConfigRow cusConfigRow = null;
+    private void actionDeleteCusBranchConfig() {
+        int index = moCusBranchConfigPane.getTable().getSelectedRow();
+
+        if (index != -1) {
+            if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+                SDataCustomerBranchConfig cusBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();
+                
+                if (cusBranchConfig.getDbmsSalesAgent().length() > 0) {
+                    int nPosition = 0;
+                    
+                    for (int i = 0; i<moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
+                        int nPkCustomerVector = moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().getPkCustomerBranchId();
+                        int nPkCustomerGrid = cusBranchConfig.getPkCustomerBranchId();
+                        if (nPkCustomerVector == nPkCustomerGrid) {
+                            nPosition = i;
+                            break;
+                        }
+                    }
+                    moBizPartner.getDbmsBizPartnerBranches().get(nPosition).getDbmsDataCustomerBranchConfig().setIsDeleted(true);
+                }
+                
+                moCusBranchConfigPane.removeTableRow(index);
+                moCusBranchConfigPane.renderTableRows();
+
+                if (moCusBranchConfigPane.getTableGuiRowCount() > 0) {
+                    moCusBranchConfigPane.setTableRowSelection(index < moCusBranchConfigPane.getTableGuiRowCount() ? index : moCusBranchConfigPane.getTableGuiRowCount() - 1);
+                }
+            }
+        }
+    }
+
+    private void actionAddCusBranchConfig() {
+        SDataCustomerBranchConfig customerBranchConfig = null;
 
         if (jcbPkCustomerId.getSelectedIndex() > 0) {
-            bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldPkCustomerId.getKey(), SLibConstants.EXEC_MODE_SILENT);
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldPkCustomerId.getKey(), SLibConstants.EXEC_MODE_SILENT);
 
             if (bizPartner != null) {
-                for (i=1; i < bizPartner.getDbmsBizPartnerBranches().size(); i++) {
+                for (int i = 1; i < bizPartner.getDbmsBizPartnerBranches().size(); i++) {
+                    boolean exists = false;
                     moBizPartnerBranch = bizPartner.getDbmsBizPartnerBranches().get(i);
-                    b = false;
 
-                    for (j=0; j < moCustomerConfigCobPane.getTableGuiRowCount(); j++) {
-                        cusConfigCob = (SDataCustomerBranchConfig) moCustomerConfigCobPane.getTableRow(j).getData();
-                        if (moBizPartnerBranch.getPkBizPartnerBranchId() == cusConfigCob.getPkCustomerBranchId()) {
-                            b = true;
+                    for (int j = 0; j < moCusBranchConfigPane.getTableGuiRowCount(); j++) {
+                        customerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(j).getData();
+                        if (moBizPartnerBranch.getPkBizPartnerBranchId() == customerBranchConfig.getPkCustomerBranchId()) {
+                            exists = true;
                             break;
                         }
                     }
 
-                    if (!b) {
+                    if (!exists) {
                         // Add branch:
 
-                        if (moBizPartnerBranch.getDbmsDataCustomerBranchConfig().size() > 0) {
-                            moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().get(0).setIsDeleted(false);
-                            moCustomerConfigCobPane.addTableRow(cusConfigRow = new SDataCustomerBranchConfigRow(moBizPartnerBranch.getDbmsDataCustomerBranchConfig().get(0)));
+                        if (moBizPartnerBranch.getDbmsDataCustomerBranchConfig() != null) {
+                            moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().setIsDeleted(false);
+                            moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(moBizPartnerBranch.getDbmsDataCustomerBranchConfig()));
                         }
                         else {
-                            cusConfigCob = new SDataCustomerBranchConfig();
-                            cusConfigCob.setPkCustomerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
-                            cusConfigCob.setDbmsCob(moBizPartnerBranch.getBizPartnerBranch());
-                            cusConfigCob.setDbmsSalesRoute("");
-                            cusConfigCob.setDbmsSalesAgent("");
-                            cusConfigCob.setFkSalesRouteId(1);
-                            cusConfigCob.setFkSalesAgentId_n(1);
-                            cusConfigCob.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-                            cusConfigCob.setFkUserEditId(1);
-                            cusConfigCob.setFkUserDeleteId(1);
-                            cusConfigCob.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
-                            cusConfigCob.setDbmsUserEdit("(n/a)");
-                            cusConfigCob.setDbmsUserDelete("(n/a)");
-                            cusConfigCob.setUserNewTs(miClient.getSessionXXX().getWorkingDate());
+                            customerBranchConfig = new SDataCustomerBranchConfig();
+                            customerBranchConfig.setPkCustomerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
+                            customerBranchConfig.setDbmsCob(moBizPartnerBranch.getBizPartnerBranch());
+                            customerBranchConfig.setDbmsSalesRoute("");
+                            customerBranchConfig.setDbmsSalesAgent("");
+                            customerBranchConfig.setFkSalesRouteId(1);
+                            customerBranchConfig.setFkSalesAgentId_n(1);
+                            customerBranchConfig.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+                            customerBranchConfig.setFkUserEditId(1);
+                            customerBranchConfig.setFkUserDeleteId(1);
+                            customerBranchConfig.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
+                            customerBranchConfig.setDbmsUserEdit("(n/a)");
+                            customerBranchConfig.setDbmsUserDelete("(n/a)");
+                            customerBranchConfig.setUserNewTs(miClient.getSessionXXX().getWorkingDate());
 
-                            moCustomerConfigCobPane.addTableRow(cusConfigRow = new SDataCustomerBranchConfigRow(cusConfigCob));
+                            moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
                         }
-                        moCustomerConfigCobPane.renderTableRows();
-                        index = moCustomerConfigCobPane.getTableGuiRowCount() - 1;
-                        moCustomerConfigCobPane.getTable().setRowSelectionInterval(index, index);
-                        moCustomerConfigCobPane.getVerticalScrollBar().setValue((index + 1) * moCustomerConfigCobPane.getTable().getRowHeight());
+                        
+                        moCusBranchConfigPane.renderTableRows();
+                        int index = moCusBranchConfigPane.getTableGuiRowCount() - 1;
+                        moCusBranchConfigPane.getTable().setRowSelectionInterval(index, index);
+                        moCusBranchConfigPane.getVerticalScrollBar().setValue((index + 1) * moCusBranchConfigPane.getTable().getRowHeight());
                     }
                 }
             }
         }
         else {
             miClient.showMsgBoxWarning("No se ha seleccionado un cliente.");
-        }
-    }
-
-    private void actionDelCob() {
-        int nPosition = 0;
-        int nPkCusVector = 0;
-        int nPkCusGrid = 0;
-        SDataCustomerBranchConfig cusConfigCob = null;
-        int index = moCustomerConfigCobPane.getTable().getSelectedRow();
-
-        if (index != -1) {
-            if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
-                cusConfigCob = (SDataCustomerBranchConfig) moCustomerConfigCobPane.getTableRow(index).getData();
-                if (cusConfigCob.getDbmsSalesAgent().length() > 0) {
-                    for (int i = 0; i<moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
-                        nPkCusVector = moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().get(0).getPkCustomerBranchId();
-                        nPkCusGrid = cusConfigCob.getPkCustomerBranchId();
-                        if (nPkCusVector == nPkCusGrid) {
-                            nPosition = i;
-                            break;
-                        }
-                    }
-                    moBizPartner.getDbmsBizPartnerBranches().get(nPosition).getDbmsDataCustomerBranchConfig().get(0).setIsDeleted(true);
-                }
-                moCustomerConfigCobPane.removeTableRow(index);
-                moCustomerConfigCobPane.renderTableRows();
-
-                if (moCustomerConfigCobPane.getTableGuiRowCount() > 0) {
-                    moCustomerConfigCobPane.setTableRowSelection(index < moCustomerConfigCobPane.getTableGuiRowCount() ? index : moCustomerConfigCobPane.getTableGuiRowCount() - 1);
-                }
-            }
         }
     }
 
@@ -617,16 +611,16 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbAddCob;
+    private javax.swing.JButton jbAddCusBranchConfig;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbDel;
-    private javax.swing.JButton jbEdit;
+    private javax.swing.JButton jbDeleteCusBranchConfig;
     private javax.swing.JButton jbFkCustomerTypeId;
     private javax.swing.JButton jbFkDistributionChannelId;
     private javax.swing.JButton jbFkMarketSegmentId;
     private javax.swing.JButton jbFkMarketSubsegmentId;
     private javax.swing.JButton jbFkSalesAgentId_n;
-    private javax.swing.JButton jbNew;
+    private javax.swing.JButton jbModifyCusBranchConfig;
+    private javax.swing.JButton jbNewCusBranchConfig;
     private javax.swing.JButton jbOK;
     private javax.swing.JButton jbPkCustomerId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCustomerTypeId;
@@ -648,7 +642,7 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
     private javax.swing.JLabel jlIsSignImmexHint;
     private javax.swing.JLabel jlIsSignRestrictedHint;
     private javax.swing.JLabel jlPkCustomerId;
-    private javax.swing.JPanel jpCob;
+    private javax.swing.JPanel jpCusBranchConfig;
     private javax.swing.JPanel jpNotesAction;
     // End of variables declaration//GEN-END:variables
 
@@ -669,8 +663,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        moCustomerConfigCobPane.createTable(null);
-        moCustomerConfigCobPane.clearTableRows();
+        moCusBranchConfigPane.createTable(null);
+        moCusBranchConfigPane.clearTableRows();
 
         jcbPkCustomerId.setEnabled(true);
         jcbPkCustomerId.setFocusable(true);
@@ -719,8 +713,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
             }
         }
         if (!validation.getIsError()) {
-            for (int i = 0; i < moCustomerConfigCobPane.getTableGuiRowCount(); i++) {
-                 SDataCustomerBranchConfig oDataCustomerBranchConfig = (SDataCustomerBranchConfig) moCustomerConfigCobPane.getTableRow(i).getData();
+            for (int i = 0; i < moCusBranchConfigPane.getTableGuiRowCount(); i++) {
+                 SDataCustomerBranchConfig oDataCustomerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(i).getData();
                  if (oDataCustomerBranchConfig.getDbmsSalesRoute().length() > 0) {
                  }
                  else {
@@ -771,11 +765,12 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         moFieldIsDeleted.setFieldValue(moCustomerConfiguration.getIsDeleted());
 
         readCustomerBranchConfig();
+        
         for (i = 1; i < moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
-            if (moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().size() > 0) {
-                if (!moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().get(0).getIsDeleted()) {
-                    dataCustomerConfigCobRow = new SDataCustomerBranchConfigRow(moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().get(0));
-                    moCustomerConfigCobPane.addTableRow(dataCustomerConfigCobRow);
+            if (moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig() != null) {
+                if (!moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().getIsDeleted()) {
+                    dataCustomerConfigCobRow = new SDataCustomerBranchConfigRow(moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig());
+                    moCusBranchConfigPane.addTableRow(dataCustomerConfigCobRow);
                 }
             }
         }
@@ -809,8 +804,8 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
         moCustomerConfiguration.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         for (int i = 1; i < moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
-             if (moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().size() > 0) {
-                 moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().add(moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().get(0));
+             if (moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig() != null) {
+                 moBizPartner.getDbmsBizPartnerBranches().get(i).setDbmsDataCustomerBranchConfig(moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig());
              }
         }
 
@@ -868,11 +863,11 @@ public class SFormCustomerConfiguration extends javax.swing.JDialog implements e
             else if (button == jbFkSalesAgentId_n) {
                 actionFkSalesAgentId_n();
             }
-            else if (button == jbAddCob) {
-                actionAddCob();
+            else if (button == jbDeleteCusBranchConfig) {
+                actionDeleteCusBranchConfig();
             }
-            else if (button == jbDel) {
-                actionDelCob();
+            else if (button == jbAddCusBranchConfig) {
+                actionAddCusBranchConfig();
             }
         }
     }

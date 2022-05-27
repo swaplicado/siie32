@@ -306,14 +306,14 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
 
     @Override
     public int save(java.sql.Connection connection) {
-        int i = 0;
         int nParam = 1;
         CallableStatement callableStatement = null;
-        SDataBizPartnerBranchBankAccountLayoutBank layout = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
+            int userId = mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId;
+            
             callableStatement = connection.prepareCall(
                     "{ CALL erp.bpsu_bank_acc_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
@@ -339,7 +339,7 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
             callableStatement.setInt(nParam++, mnFkAccountCashTypeId);
             callableStatement.setInt(nParam++, mnFkCurrencyId);
             callableStatement.setInt(nParam++, mnFkCardIssuerId);
-            callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
+            callableStatement.setInt(nParam++, userId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
@@ -353,31 +353,42 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
                 throw new Exception(msDbmsError);
             }
             else {
-                // Save aswell bank account cards
+                // Save aswell cards:
 
-                for (i = 0; i < mvDbmsBankAccountCards.size(); i++) {
-                    mvDbmsBankAccountCards.get(i).setPkBizPartnerBranchId(mnPkBizPartnerBranchId);
-                    mvDbmsBankAccountCards.get(i).setPkBankAccountId(mnPkBankAccountId);
-                    if (mvDbmsBankAccountCards.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                for (SDataBizPartnerBranchBankAccountCard card : mvDbmsBankAccountCards) {
+                    // save only new or edited cards:
+                    
+                    if (card.getIsRegistryNew() || card.getIsRegistryEdited()) {
+                        card.setPkBizPartnerBranchId(mnPkBizPartnerBranchId);
+                        card.setPkBankAccountId(mnPkBankAccountId);
+                        
+                        if (card.getIsRegistryNew()) {
+                            card.setFkUserNewId(userId);
+                        }
+                        else {
+                            card.setFkUserEditId(userId);
+                        }
+                        
+                        if (card.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
                     }
                 }
                 
-                // Delete aswell bank account layout type
-    
-                layout = new SDataBizPartnerBranchBankAccountLayoutBank();
-                layout.setPkBizPartnerBranchId(mnPkBizPartnerBranchId);
-                layout.setPkBankAccountId(mnPkBankAccountId);
-                if (layout.delete(connection) != SLibConstants.DB_ACTION_DELETE_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                }
+                // Save aswell bank layouts:
                 
-                // Save aswell bank account layout type
+                String sql = "DELETE FROM erp.bpsu_bank_acc_lay_bank "
+                        + "WHERE id_bpb = " + mnPkBizPartnerBranchId + " AND id_bank_acc = " + mnPkBankAccountId + ";"; // first delete all existing bank layouts
+                connection.createStatement().execute(sql);
                 
-                for (i = 0; i < mvDbmsBankAccountLayoutBank.size(); i++) {
-                    mvDbmsBankAccountLayoutBank.get(i).setPkBizPartnerBranchId(mnPkBizPartnerBranchId);
-                    mvDbmsBankAccountLayoutBank.get(i).setPkBankAccountId(mnPkBankAccountId);
-                    if (mvDbmsBankAccountLayoutBank.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                for (SDataBizPartnerBranchBankAccountLayoutBank layoutBank : mvDbmsBankAccountLayoutBank) {
+                    // save all bank layout:
+                    
+                    layoutBank.setPkBizPartnerBranchId(mnPkBizPartnerBranchId);
+                    layoutBank.setPkBankAccountId(mnPkBankAccountId);
+                    layoutBank.setIsRegistryNew(true);
+                    
+                    if (layoutBank.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }

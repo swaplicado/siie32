@@ -15,7 +15,7 @@ import java.util.Date;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataBizPartnerBranchBankAccountLayoutBank extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -105,9 +105,10 @@ public class SDataBizPartnerBranchBankAccountLayoutBank extends erp.lib.data.SDa
         try {
             statement = connection.createStatement();
 
-            sql = "INSERT INTO erp.bpsu_bank_acc_lay_bank (id_bpb, id_bank_acc, " +
-                    "id_tp_lay_bank) " +
-                    "VALUES (" + mnPkBizPartnerBranchId + ", " + mnPkBankAccountId + ", " + mnPkBankLayoutTypeId + ")";
+            sql = "INSERT INTO erp.bpsu_bank_acc_lay_bank ("
+                    + "id_bpb, id_bank_acc, id_tp_lay_bank) " +
+                    "VALUES ("
+                    + mnPkBizPartnerBranchId + ", " + mnPkBankAccountId + ", " + mnPkBankLayoutTypeId + ")";
             statement.execute(sql);
 
             mnDbmsErrorId = 0;
@@ -138,7 +139,8 @@ public class SDataBizPartnerBranchBankAccountLayoutBank extends erp.lib.data.SDa
         try {
             statement = connection.createStatement();
 
-            sql = "DELETE FROM erp.bpsu_bank_acc_lay_bank WHERE id_bpb = " + mnPkBizPartnerBranchId + " AND id_bank_acc = " + mnPkBankAccountId + " ";
+            sql = "DELETE FROM erp.bpsu_bank_acc_lay_bank "
+                    + "WHERE id_bpb = " + mnPkBizPartnerBranchId + " AND id_bank_acc = " + mnPkBankAccountId + " ";
             statement.execute(sql);
 
             mnDbmsErrorId = 0;

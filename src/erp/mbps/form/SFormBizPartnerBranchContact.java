@@ -27,7 +27,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores, Cesar Orozco
+ * @author Alfonso Flores, Cesar Orozco, Sergio Flores
  */
 public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -74,7 +74,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
     private java.lang.String msParamBizPartnerDescription;
     private java.lang.String msParamBizPartnerBranchDescription;
 
-    /** Creates new form SFormBizPartnerBranchBankAccount */
+    /** Creates new form SFormBizPartnerBranchContact */
     public SFormBizPartnerBranchContact(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -988,6 +988,8 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         moBizPartnerBranchContact.setEmail02(moFieldEmail02.getString());
         moBizPartnerBranchContact.setSkype01(moFieldSkype01.getString());
         moBizPartnerBranchContact.setSkype02(moFieldSkype02.getString());
+        
+        moBizPartnerBranchContact.setIsRegistryEdited(true);
 
         return moBizPartnerBranchContact;
     }

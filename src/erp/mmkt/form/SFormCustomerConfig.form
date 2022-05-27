@@ -415,7 +415,7 @@
         </Container>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jpCob">
+    <Container class="javax.swing.JPanel" name="jpCusBranchConfig">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
@@ -449,7 +449,7 @@
             <Property name="verticalGap" type="int" value="0"/>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JButton" name="jbNew">
+            <Component class="javax.swing.JButton" name="jbNewCusBranchConfig">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/erp/img/icon_std_new.gif"/>
@@ -462,7 +462,7 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jbEdit">
+            <Component class="javax.swing.JButton" name="jbModifyCusBranchConfig">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
@@ -474,7 +474,7 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jbDel">
+            <Component class="javax.swing.JButton" name="jbDeleteCusBranchConfig">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/erp/img/icon_std_delete.gif"/>
@@ -486,7 +486,7 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jbAddCob">
+            <Component class="javax.swing.JButton" name="jbAddCusBranchConfig">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/erp/img/icon_std_insert.gif"/>

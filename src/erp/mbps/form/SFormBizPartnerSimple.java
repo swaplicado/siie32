@@ -756,72 +756,6 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         }
     }
 
-    private void setBizPartnerBranch() {
-        SDataBizPartnerBranchAddress address = null;
-        SDataBizPartnerBranchContact contact = null;
-
-        if (moBizPartnerBranch == null) {
-            moBizPartnerBranch = new SDataBizPartnerBranch();
-            moBizPartnerBranch.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-        }
-        else {
-            moBizPartnerBranch.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-        }
-
-        moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().clear();
-
-        moBizPartnerBranch.setFkBizPartnerBranchTypeId(SDataConstantsSys.BPSS_TP_BPB_HQ);
-        moBizPartnerBranch.setBizPartnerBranch(SModSysConsts.TXT_HQ);
-        moBizPartnerBranch.setIsAddressPrintable(true);
-        moBizPartnerBranch.setIsDeleted(false);
-
-        moBizPartnerBranch.setDbmsTaxRegion("");
-
-        address = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
-        address.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF);
-        address.setIsDefault(true);
-
-        moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(address);
-
-        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().clear();
-
-        contact = new SDataBizPartnerBranchContact();
-        //contact.setPkBizPartnerBranchId();
-        contact.setPkContactId(mnPkContactId);
-        contact.setContact("");
-        contact.setContactPrefix("");
-        contact.setContactSuffix("");
-        contact.setLastname("");
-        contact.setFirstname("");
-        contact.setCharge("");
-        contact.setTelAreaCode01("");
-        contact.setTelNumber01("");
-        contact.setTelExt01("");
-        contact.setTelAreaCode02("");
-        contact.setTelNumber02("");
-        contact.setTelExt02("");
-        contact.setTelAreaCode03("");
-        contact.setTelNumber03("");
-        contact.setTelExt03("");
-        contact.setNextelId01("");
-        contact.setNextelId02("");
-        contact.setEmail01(moFieldEmail.getString());
-        contact.setEmail02("");
-        contact.setSkype01("");
-        contact.setSkype02("");
-        contact.setIsDeleted(false);
-        contact.setFkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
-        contact.setFkTelephoneType01Id(SDataConstantsSys.BPSS_TP_TEL_NA);
-        contact.setFkTelephoneType02Id(SDataConstantsSys.BPSS_TP_TEL_NA);
-        contact.setFkTelephoneType03Id(SDataConstantsSys.BPSS_TP_TEL_NA);
-        contact.setFkUserNewId(moBizPartnerBranch.getFkUserNewId());
-        contact.setFkUserEditId(moBizPartnerBranch.getFkUserEditId());
-
-        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(contact);
-
-        moBizPartner.getDbmsBizPartnerBranches().add(moBizPartnerBranch);
-    }
-
     private void actionSupplier() {
         if (jbSupplier.isEnabled()) {
             mnFormTypeExport = SDataConstants.BPSX_BP_SUP;
@@ -1336,9 +1270,65 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
                 moBizPartner.setDbmsCategorySettingsDbr(moBizPartnerCategory);
                 break;
             default:
+                // do nothing
         }
+        
+        moBizPartnerCategory.setIsRegistryEdited(true);
+        
+        // official branch:
 
-        setBizPartnerBranch();
+        if (moBizPartnerBranch == null) {
+            moBizPartnerBranch = new SDataBizPartnerBranch();
+            moBizPartnerBranch.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+        }
+        else {
+            moBizPartnerBranch.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+        }
+        
+        moBizPartnerBranch.setFkBizPartnerBranchTypeId(SDataConstantsSys.BPSS_TP_BPB_HQ);
+        moBizPartnerBranch.setBizPartnerBranch(SModSysConsts.TXT_HQ);
+        moBizPartnerBranch.setIsAddressPrintable(true);
+        moBizPartnerBranch.setIsDeleted(false);
+        moBizPartnerBranch.setDbmsTaxRegion("");
+
+        // official branch address:
+
+        moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().clear();
+
+        SDataBizPartnerBranchAddress address = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
+        address.setPkBizPartnerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
+        address.setPkAddressId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
+        address.setIsDefault(true);
+        address.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
+
+        moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(address);
+        
+        // official branch contact:
+
+        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().clear();
+
+        SDataBizPartnerBranchContact contact = new SDataBizPartnerBranchContact();
+        contact.setPkBizPartnerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
+        contact.setPkContactId(mnPkContactId);
+        contact.setEmail01(moFieldEmail.getString());
+        contact.setIsDeleted(false);
+        contact.setFkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
+        contact.setFkTelephoneType01Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setFkTelephoneType02Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setFkTelephoneType03Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+
+        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(contact);
+        
+        moBizPartnerBranch.setIsRegistryEdited(true);
+
+        if (moBizPartner.getDbmsBizPartnerBranches().size() > 0) {
+            moBizPartner.getDbmsBizPartnerBranches().set(0, moBizPartnerBranch);
+        }
+        else {
+            moBizPartner.getDbmsBizPartnerBranches().add(moBizPartnerBranch);
+        }
+        
+        moBizPartner.setIsRegistryEdited(true);
 
         return moBizPartner;
     }

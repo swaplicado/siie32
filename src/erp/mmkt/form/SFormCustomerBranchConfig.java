@@ -26,9 +26,9 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
-public class SFormCustomerConfigurationCob extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormCustomerBranchConfig extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -38,7 +38,7 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.mmkt.data.SDataCustomerBranchConfig moCustomerConfigCob;
+    private erp.mmkt.data.SDataCustomerBranchConfig moCustomerBranchConfig;
     private erp.lib.form.SFormField moFieldCustomerBranch;
     private erp.lib.form.SFormField moFieldFkSalesRouteId;
     private erp.lib.form.SFormField moFieldFkSalesAgentId_n;
@@ -46,8 +46,8 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
 
     private int mnCustomerId;
 
-    /** Creates new form SFormElement */
-    public SFormCustomerConfigurationCob(erp.client.SClientInterface client) {
+    /** Creates new form SFormCustomerBranchConfig */
+    public SFormCustomerBranchConfig(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         mnFormType = SDataConstants.MKT_CFG_CUSB;
@@ -98,7 +98,7 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
         });
 
         jPanel1.setPreferredSize(new java.awt.Dimension(400, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(2));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOK.setText("Aceptar");
         jbOK.setToolTipText("[Ctrl + Enter]");
@@ -185,8 +185,8 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-546)/2, (screenSize.height-235)/2, 546, 235);
+        setSize(new java.awt.Dimension(546, 235));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -303,7 +303,7 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
         mbFirstTime = true;
         mnCustomerId = 0;
 
-        moCustomerConfigCob = null;
+        moCustomerBranchConfig = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
@@ -369,15 +369,15 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
-        moCustomerConfigCob = (SDataCustomerBranchConfig) registry;
+        moCustomerBranchConfig = (SDataCustomerBranchConfig) registry;
 
-        moFieldCustomerBranch.setFieldValue( moCustomerConfigCob.getDbmsCob());
-        moFieldFkSalesRouteId.setKey(new int[] { moCustomerConfigCob.getFkSalesRouteId() });
+        moFieldCustomerBranch.setFieldValue( moCustomerBranchConfig.getDbmsCob());
+        moFieldFkSalesRouteId.setKey(new int[] { moCustomerBranchConfig.getFkSalesRouteId() });
         if (jcbFkSalesAgentId_n.getItemCount() > 0) {
-            moFieldFkSalesAgentId_n.setKey(new int[] { moCustomerConfigCob.getFkSalesAgentId_n() });
+            moFieldFkSalesAgentId_n.setKey(new int[] { moCustomerBranchConfig.getFkSalesAgentId_n() });
         }
         if (jcbFkSalesSupervisorId_n.getItemCount() > 0) {
-            moFieldFkSalesSupervisorId_n.setKey(new int[] { moCustomerConfigCob.getFkSalesSupervisorId_n() });
+            moFieldFkSalesSupervisorId_n.setKey(new int[] { moCustomerBranchConfig.getFkSalesSupervisorId_n() });
         }
         jtfCustomerBranch.setEnabled(false);
         jtfCustomerBranch.setFocusable(false);
@@ -385,38 +385,38 @@ public class SFormCustomerConfigurationCob extends javax.swing.JDialog implement
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        if (moCustomerConfigCob == null) {
-            moCustomerConfigCob = new SDataCustomerBranchConfig();
-            moCustomerConfigCob.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-            moCustomerConfigCob.setUserNewTs(miClient.getSessionXXX().getWorkingDate());
+        if (moCustomerBranchConfig == null) {
+            moCustomerBranchConfig = new SDataCustomerBranchConfig();
+            moCustomerBranchConfig.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            moCustomerBranchConfig.setUserNewTs(miClient.getSessionXXX().getWorkingDate());
         }
         else {
-            moCustomerConfigCob.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-            moCustomerConfigCob.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser());
-            moCustomerConfigCob.setUserEditTs(miClient.getSessionXXX().getWorkingDate());
+            moCustomerBranchConfig.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            moCustomerBranchConfig.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser());
+            moCustomerBranchConfig.setUserEditTs(miClient.getSessionXXX().getWorkingDate());
         }
 
-        moCustomerConfigCob.setPkCustomerBranchId(moCustomerConfigCob.getPkCustomerBranchId());
-        moCustomerConfigCob.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
-        moCustomerConfigCob.setFkSalesAgentId_n(moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]);
-        moCustomerConfigCob.setFkSalesSupervisorId_n(moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0]);
-        moCustomerConfigCob.setDbmsCob(moFieldCustomerBranch.getString());
-        moCustomerConfigCob.setDbmsSalesRoute(jcbFkSalesRouteId.getSelectedItem().toString());
+        moCustomerBranchConfig.setPkCustomerBranchId(moCustomerBranchConfig.getPkCustomerBranchId());
+        moCustomerBranchConfig.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
+        moCustomerBranchConfig.setFkSalesAgentId_n(moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]);
+        moCustomerBranchConfig.setFkSalesSupervisorId_n(moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0]);
+        moCustomerBranchConfig.setDbmsCob(moFieldCustomerBranch.getString());
+        moCustomerBranchConfig.setDbmsSalesRoute(jcbFkSalesRouteId.getSelectedItem().toString());
         if (jcbFkSalesAgentId_n.getSelectedIndex() > 0) {
-            moCustomerConfigCob.setDbmsSalesAgent(jcbFkSalesAgentId_n.getSelectedItem().toString());
+            moCustomerBranchConfig.setDbmsSalesAgent(jcbFkSalesAgentId_n.getSelectedItem().toString());
         }
         else {
-            moCustomerConfigCob.setDbmsSalesAgent("");
+            moCustomerBranchConfig.setDbmsSalesAgent("");
         }
 
         if (jcbFkSalesSupervisorId_n.getSelectedIndex() > 0) {
-            moCustomerConfigCob.setDbmsSalesSupervisor(jcbFkSalesSupervisorId_n.getSelectedItem().toString());
+            moCustomerBranchConfig.setDbmsSalesSupervisor(jcbFkSalesSupervisorId_n.getSelectedItem().toString());
         }
         else {
-            moCustomerConfigCob.setDbmsSalesSupervisor("");
+            moCustomerBranchConfig.setDbmsSalesSupervisor("");
         }
 
-        return moCustomerConfigCob;
+        return moCustomerBranchConfig;
     }
 
     @Override

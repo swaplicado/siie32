@@ -27,7 +27,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín
+ * @author Alfonso Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -581,6 +581,8 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         moBizPartnerBranchAddress.setFkAddressTypeId(mbParamIsInMainWindow ? SDataConstantsSys.BPSS_TP_ADD_OFF : SDataConstantsSys.BPSS_TP_ADD_OFF_NO);
         moBizPartnerBranchAddress.setFkCountryId_n(!jcbFkCountryId_n.isEnabled() ? 0 : moFieldFkCountryId.getKeyAsIntArray()[0]);
         moBizPartnerBranchAddress.setFkStateId_n(!jcbFkStateId_n.isEnabled() ? 0 : moFieldFkStateId.getKeyAsIntArray()[0]);
+        
+        moBizPartnerBranchAddress.setIsRegistryEdited(true);
 
         return moBizPartnerBranchAddress;
     }

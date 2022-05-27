@@ -11,22 +11,21 @@
 
 package erp.mbps.form;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.BorderLayout;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.Vector;
+import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Edwin Carmona
+ * @author Alfonso Flores, Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -239,7 +238,6 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
     public erp.lib.data.SDataRegistry getRegistry() {
         SDataBizPartnerBranchAddress bizPartnerBranchAddress = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
         bizPartnerBranchAddress.setIsDeleted(moFieldIsDeleted.getBoolean());
-        
         return bizPartnerBranchAddress;
     }
 

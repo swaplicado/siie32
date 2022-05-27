@@ -38,7 +38,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Edwin Carmona
+ * @author Alfonso Flores, Edwin Carmona, Sergio Flores
  */
 public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
     
@@ -1221,7 +1221,6 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        SDataBizPartnerBranchBankAccountLayoutBank layoutBank = null;
         if (moBizPartnerBranchBankAccount == null) {
             moBizPartnerBranchBankAccount = new SDataBizPartnerBranchBankAccount();
             moBizPartnerBranchBankAccount.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -1265,11 +1264,13 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         moBizPartnerBranchBankAccount.getDbmsBankAccountLayoutBank().removeAllElements();
         for (STableRow row : moBankAccountLayoutPane.getTableModel().getTableRows()) {
             if (((Boolean) row.getValues().get(2))) {
-                layoutBank = new SDataBizPartnerBranchBankAccountLayoutBank();
+                SDataBizPartnerBranchBankAccountLayoutBank layoutBank = new SDataBizPartnerBranchBankAccountLayoutBank();
                 layoutBank.setPkBankLayoutTypeId(((SDataBizPartnerBranchBankAccountLayoutRow) row).getPkTypeLayoutBankId());
                 moBizPartnerBranchBankAccount.getDbmsBankAccountLayoutBank().add((erp.mbps.data.SDataBizPartnerBranchBankAccountLayoutBank) layoutBank);
             }
         }
+        
+        moBizPartnerBranchBankAccount.setIsRegistryEdited(true);
 
         return moBizPartnerBranchBankAccount;
     }
