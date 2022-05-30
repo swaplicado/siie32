@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 202.1/ 2022-05-27
+SIIE 3.2 202.1/ 2022-05-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección y refactorización de la preservación de usuarios creadores y modificadores de registros relacionados con asociados de negocios.

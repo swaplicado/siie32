@@ -25,7 +25,6 @@ import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
-import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
@@ -48,6 +47,10 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     private erp.client.SClientInterface miClient;
 
     private erp.mbps.data.SDataBizPartner moBizPartner;
+    private erp.mbps.data.SDataBizPartnerCategory moBizPartnerCategory;
+    private erp.mbps.data.SDataBizPartnerBranch moBizPartnerBranch;
+    private erp.mbps.data.SDataBizPartnerBranchAddress moBizPartnerBranchAddress;
+    private erp.mbps.data.SDataBizPartnerBranchContact moBizPartnerBranchContact;
     private erp.lib.form.SFormField moFieldFkBizPartnerIdentityTypeId;
     private erp.lib.form.SFormField moFieldFirstName;
     private erp.lib.form.SFormField moFieldLastName;
@@ -55,12 +58,13 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     private erp.lib.form.SFormField moFieldBizPartnerCommercial;
     private erp.lib.form.SFormField moFieldFiscalId;
     private erp.lib.form.SFormField moFieldAlternativeId;
+    private erp.lib.form.SFormField moFieldIsDeleted;
+    private erp.lib.form.SFormField moFieldIsAttRelatedParty;
     private erp.lib.form.SFormField moFieldEmail;
     private erp.lib.form.SFormField moFieldCodeBankSantander;
     private erp.lib.form.SFormField moFieldCodeBankBanBajio;
     private erp.lib.form.SFormField moFieldFkFiscalBankId;
     private erp.lib.form.SFormField moFieldFkSalesAgentTypeId;
-    private erp.lib.form.SFormField moFieldIsDeleted;
 
     private int mnParamBizPartnerType;
 
@@ -90,9 +94,13 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel6 = new javax.swing.JPanel();
         jlFkBizPartnerIdentityTypeId = new javax.swing.JLabel();
         jcbFkBizPartnerIdentityTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jLabel1 = new javax.swing.JLabel();
+        jckIsDeleted = new javax.swing.JCheckBox();
         jPanel22 = new javax.swing.JPanel();
         jlFirstName = new javax.swing.JLabel();
         jtfFirstName = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jckIsAttRelatedParty = new javax.swing.JCheckBox();
         jPanel25 = new javax.swing.JPanel();
         jlLastName = new javax.swing.JLabel();
         jtfLastName = new javax.swing.JTextField();
@@ -125,7 +133,6 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jlFkSalesAgentTypeId = new javax.swing.JLabel();
         jcbFkSalesAgentTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkSalesAgentTypeId = new javax.swing.JButton();
-        jckIsDeleted = new javax.swing.JCheckBox();
         jPanel5 = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
         jtfPkBizPartnerId_Ro = new javax.swing.JTextField();
@@ -157,6 +164,14 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jcbFkBizPartnerIdentityTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel6.add(jcbFkBizPartnerIdentityTypeId);
 
+        jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel6.add(jLabel1);
+
+        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setText("Asociado negocios eliminado");
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel6.add(jckIsDeleted);
+
         jPanel19.add(jPanel6);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -168,6 +183,13 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jtfFirstName.setText("NOMBRES");
         jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel22.add(jtfFirstName);
+
+        jLabel2.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel22.add(jLabel2);
+
+        jckIsAttRelatedParty.setText("Es parte relacionada");
+        jckIsAttRelatedParty.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel22.add(jckIsAttRelatedParty);
 
         jPanel19.add(jPanel22);
 
@@ -295,7 +317,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkSalesAgentTypeId.setText("Tipo de agente ventas:");
+        jlFkSalesAgentTypeId.setText("Tipo agente ventas:");
         jlFkSalesAgentTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlFkSalesAgentTypeId);
 
@@ -309,9 +331,6 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel10.add(jbFkSalesAgentTypeId);
 
         jPanel19.add(jPanel10);
-
-        jckIsDeleted.setText("Asociado de negocios eliminado");
-        jPanel19.add(jckIsDeleted);
 
         jPanel2.add(jPanel19, java.awt.BorderLayout.NORTH);
 
@@ -359,7 +378,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     }//GEN-LAST:event_jftAlternativeIdFocusLost
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldFkBizPartnerIdentityTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerIdentityTypeId, jlFkBizPartnerIdentityTypeId);
         moFieldFirstName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstName, jlFirstName);
@@ -376,6 +395,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         moFieldAlternativeId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jftAlternativeId, jlAlternativeId);
         moFieldAlternativeId.setLengthMin(18);
         moFieldAlternativeId.setLengthMax(18);
+        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
+        moFieldIsAttRelatedParty = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAttRelatedParty);
         moFieldEmail = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
         moFieldEmail.setLengthMax(50);
         moFieldEmail.setAutoCaseType(SLibConsts.UNDEFINED);
@@ -389,7 +410,6 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         moFieldFkFiscalBankId.setPickerButton(jbFkFiscalBankId);
         moFieldFkSalesAgentTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSalesAgentTypeId, jlFkSalesAgentTypeId);
         moFieldFkSalesAgentTypeId.setPickerButton(jbFkSalesAgentTypeId);
-        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldFkBizPartnerIdentityTypeId);
         mvFields.add(moFieldFirstName);
@@ -398,12 +418,13 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         mvFields.add(moFieldBizPartnerCommercial);
         mvFields.add(moFieldFiscalId);
         mvFields.add(moFieldAlternativeId);
+        mvFields.add(moFieldIsDeleted);
+        mvFields.add(moFieldIsAttRelatedParty);
         mvFields.add(moFieldEmail);
         mvFields.add(moFieldCodeBankSantander);
         mvFields.add(moFieldCodeBankBanBajio);
         mvFields.add(moFieldFkFiscalBankId);
         mvFields.add(moFieldFkSalesAgentTypeId);
-        mvFields.add(moFieldIsDeleted);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -445,6 +466,25 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
                 jtfBizPartnerCommercial.requestFocus();
             }
         }
+    }
+
+    private String getBizPartnerName() {
+        String name = "";
+
+        if (jcbFkBizPartnerIdentityTypeId.getSelectedIndex() > 0) {
+            switch (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]) {
+                case SDataConstantsSys.BPSS_TP_BP_IDY_PER:
+                    name = moFieldLastName.getString() + (moFieldLastName.getString().length() == 0 ? "" : ", ") + moFieldFirstName.getString();
+                    break;
+                case SDataConstantsSys.BPSS_TP_BP_IDY_ORG:
+                    name = moFieldBizPartner.getString();
+                    break;
+                default:
+                    // do nothing
+            }
+        }
+
+        return name;
     }
 
     private void focusLostAlternativeId() {
@@ -504,8 +544,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         if (categoryId >= SModSysConsts.BPSS_CT_BP_SUP && categoryId <= SModSysConsts.BPSS_CT_BP_DBR) {
             category = new SDataBizPartnerCategory();
-
-            //category.setPkBizPartnerId();
+            //category.setPkBizPartnerId(...);
             category.setPkBizPartnerCategoryId(categoryId);
             category.setKey("");
             category.setCompanyKey("");
@@ -513,11 +552,16 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
             category.setDaysOfCredit(0);
             category.setDaysOfGrace(0);
             category.setGuarantee(0);
+            category.setGuaranteeType("");
             category.setInsurance(0);
             category.setDateStart(SLibTimeUtilities.getBeginOfYear(miClient.getSession().getCurrentDate()));
             category.setDateEnd_n(null);
             category.setPaymentAccount("");
             category.setNumberExporter("");
+            category.setDiotOperation("");
+            category.setCfdiPaymentWay("");
+            category.setCfdiCfdiUsage("");
+            category.setTaxRegime("");
             category.setIsCreditByUser(true);
             category.setIsGuaranteeInProcess(false);
             category.setIsInsuranceInProcess(false);
@@ -531,13 +575,12 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
             category.setFkCurrencyId_n(SLibConsts.UNDEFINED);
             category.setFkPaymentSystemTypeId_n(SLibConsts.UNDEFINED);
             category.setFkUserAnalystId_n(SLibConsts.UNDEFINED);
-            category.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         }
 
         return category;
     }
 
-    private SDataBizPartnerBranch createBizPartnerBranch() {
+    private SDataBizPartnerBranch createBizPartnerBranchAndAddress() {
         SDataBizPartnerBranch branch = null;
         SDataBizPartnerBranchAddress address = null;
 
@@ -653,6 +696,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -677,6 +722,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBizPartnerIdentityTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkFiscalBankId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalesAgentTypeId;
+    private javax.swing.JCheckBox jckIsAttRelatedParty;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JFormattedTextField jftAlternativeId;
     private javax.swing.JLabel jlAlternativeId;
@@ -714,6 +760,10 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         mbFirstTime = true;
 
         moBizPartner = null;
+        moBizPartnerCategory = null;
+        moBizPartnerBranch = null;
+        moBizPartnerBranchAddress = null;
+        moBizPartnerBranchContact = null;
 
         mnFormTypeExport = SLibConsts.UNDEFINED;
 
@@ -726,12 +776,15 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         updateStatusBizPartner();
 
-        jtfCodeBankSantander.setEnabled(mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_BANK);
-        jtfCodeBankBanBajio.setEnabled(mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_BANK);
-        jcbFkFiscalBankId.setEnabled(mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_BANK);
-        jbFkFiscalBankId.setEnabled(mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_BANK);
-        jcbFkSalesAgentTypeId.setEnabled(mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_SAL_AGT);
-        jbFkSalesAgentTypeId.setEnabled(mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_SAL_AGT);
+        boolean isBank = mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_BANK;
+        boolean isSalesAgent = mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_SAL_AGT;
+        
+        jtfCodeBankSantander.setEnabled(isBank);
+        jtfCodeBankBanBajio.setEnabled(isBank);
+        jcbFkFiscalBankId.setEnabled(isBank);
+        jbFkFiscalBankId.setEnabled(isBank);
+        jcbFkSalesAgentTypeId.setEnabled(isSalesAgent);
+        jbFkSalesAgentTypeId.setEnabled(isSalesAgent);
 
         jckIsDeleted.setSelected(false);
 
@@ -826,9 +879,25 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         moFieldBizPartnerCommercial.setFieldValue(moBizPartner.getBizPartner().compareTo(moBizPartner.getBizPartnerCommercial()) == 0 ? "" : moBizPartner.getBizPartnerCommercial());
         moFieldFiscalId.setFieldValue(moBizPartner.getFiscalId());
         moFieldAlternativeId.setFieldValue(moBizPartner.getAlternativeId());
-
-        if (!moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().isEmpty()) {
-            moFieldEmail.setFieldValue(moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
+        moFieldIsDeleted.setFieldValue(moBizPartner.getIsDeleted());
+        moFieldIsAttRelatedParty.setFieldValue(moBizPartner.getIsAttributeRelatedParty());
+        
+        // headquarters:
+        
+        moBizPartnerBranch = moBizPartner.getDbmsBizPartnerBranchHq();
+        
+        if (moBizPartnerBranch != null) {
+            // official address:
+            
+            moBizPartnerBranchAddress = moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
+            
+            // official contact:
+            
+            moBizPartnerBranchContact = moBizPartnerBranch.getDbmsBizPartnerBranchContactOfficial();
+            
+            if (moBizPartnerBranchContact != null) {
+                moFieldEmail.setFieldValue(moBizPartnerBranchContact.getEmail01());
+            }
         }
 
         moFieldCodeBankSantander.setFieldValue(moBizPartner.getCodeBankSantander());
@@ -839,7 +908,6 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
             moFieldFkSalesAgentTypeId.setFieldValue(new int[] { moBizPartner.getDbmsDataConfigurationSalesAgent().getFkSalesAgentTypeId() });
         }
 
-        jckIsDeleted.setSelected(moBizPartner.getIsDeleted());
 
         jtfPkBizPartnerId_Ro.setText("" + moBizPartner.getPkBizPartnerId());
 
@@ -849,82 +917,38 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        HashSet<Integer> requiredCategories = new HashSet<>();
-
         if (moBizPartner == null) {
             moBizPartner = new SDataBizPartner();
             moBizPartner.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-
-            moBizPartner.setFkBizPartnerIdentityTypeId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
-            moBizPartner.setFkTaxIdentityId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
-            moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSU_BA_DEFAULT);
-
-            moBizPartner.getDbmsBizPartnerBranches().add(createBizPartnerBranch());
-            moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().add(createBizPartnerBranchContact());
         }
         else {
             moBizPartner.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
-        //moBizPartner.setPkBizPartnerId();
+        moBizPartner.setFkBizPartnerIdentityTypeId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
+        moBizPartner.setFkTaxIdentityId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]); // same as type of business partner identity
+        moBizPartner.setFkBizAreaId(SDataConstantsSys.BPSU_BA_DEFAULT);
+        moBizPartner.setFkFiscalBankId(moFieldFkFiscalBankId.getKeyAsIntArray()[0]);
 
         if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
-            moBizPartner.setBizPartner(moFieldLastName.getString() + ", " + moFieldFirstName.getString());
-            moBizPartner.setFirstname(moFieldFirstName.getString());
             moBizPartner.setLastname(moFieldLastName.getString());
-            moBizPartner.setAlternativeId(moFieldAlternativeId.getString());
+            moBizPartner.setFirstname(moFieldFirstName.getString());
+            moBizPartner.setAlternativeId(moFieldAlternativeId.getString().toUpperCase()); // CURP
         }
         else {
-            moBizPartner.setBizPartner(moFieldBizPartner.getString());
-            moBizPartner.setFirstname("");
             moBizPartner.setLastname("");
+            moBizPartner.setFirstname("");
             moBizPartner.setAlternativeId("");
         }
 
+        moBizPartner.setBizPartner(getBizPartnerName());
         moBizPartner.setBizPartnerCommercial(moFieldBizPartnerCommercial.getString().isEmpty() ? moBizPartner.getBizPartner() : moFieldBizPartnerCommercial.getString());
 
         moBizPartner.setFiscalId(moFieldFiscalId.getString());
-        //moBizPartner.setFiscalFrgId();
+        //moBizPartner.setFiscalFrgId(...);
         moBizPartner.setCodeBankSantander(moFieldCodeBankSantander.getString());
         moBizPartner.setCodeBankBanBajio(moFieldCodeBankBanBajio.getString());
-        //moBizPartner.setWeb();
-
-        //moBizPartner.setIsCompany();
-
-        if (SLibUtilities.belongsTo(mnParamBizPartnerType, new int[] { SDataConstants.BPSX_BP_ATT_BANK, SDataConstants.BPSX_BP_ATT_CARR, SDataConstants.BPSX_BP_ATT_SAL_AGT })) {
-            requiredCategories.add(SDataConstantsSys.BPSS_CT_BP_SUP);
-            requiredCategories.add(SDataConstantsSys.BPSS_CT_BP_CDR);
-        }
-
-        for (Integer category : requiredCategories) {
-            switch (category) {
-                case SModSysConsts.BPSS_CT_BP_SUP:
-                    if (!moBizPartner.getIsSupplier()) {
-                        moBizPartner.setIsSupplier(true);
-                        moBizPartner.setDbmsCategorySettingsSup(createBizPartnerCategory(category));
-                    }
-                    break;
-                case SModSysConsts.BPSS_CT_BP_CUS:
-                    if (!moBizPartner.getIsCustomer()) {
-                        moBizPartner.setIsCustomer(true);
-                        moBizPartner.setDbmsCategorySettingsCus(createBizPartnerCategory(category));
-                    }
-                    break;
-                case SModSysConsts.BPSS_CT_BP_CDR:
-                    if (!moBizPartner.getIsCreditor()) {
-                        moBizPartner.setIsCreditor(true);
-                        moBizPartner.setDbmsCategorySettingsCdr(createBizPartnerCategory(category));
-                    }
-                    break;
-                case SModSysConsts.BPSS_CT_BP_DBR:
-                    if (!moBizPartner.getIsDebtor()) {
-                        moBizPartner.setIsDebtor(true);
-                        moBizPartner.setDbmsCategorySettingsDbr(createBizPartnerCategory(category));
-                    }
-                    break;
-                default:
-            }
-        }
+        //moBizPartner.setWeb(...);
 
         switch (mnParamBizPartnerType) {
             case SDataConstants.BPSX_BP_ATT_BANK:
@@ -937,36 +961,69 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
                 moBizPartner.setIsAttributeSalesAgent(true);
                 break;
             default:
+                // do nothing
         }
 
-        //moBizPartner.setIsAttributePartnerShareholder();
-        //moBizPartner.setIsAttributeRelatedParty();
+        //moBizPartner.setIsAttributePartnerShareholder(...);
+        moBizPartner.setIsAttributeRelatedParty(moFieldIsAttRelatedParty.getBoolean());
         moBizPartner.setIsDeleted(moFieldIsDeleted.getBoolean());
-        //moBizPartner.setFkBizPartnerIdentityTypeId();
-        //moBizPartner.setFkTaxIdentityId()
-        moBizPartner.setFkFiscalBankId(moFieldFkFiscalBankId.getKeyAsIntArray()[0]);
-        //moBizPartner.setFkBizAreaId()
 
-        // Update business partner children data:
-
-        moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setEmail01(moFieldEmail.getString());
-
-        if (!moBizPartner.getIsRegistryNew()) {
-            moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+        //moBizPartner.setIsCompany(...);
+        //moBizPartner.setIsCustomer(...);
+        //moBizPartner.setIsDebtor(...);
+        
+        if (!moBizPartner.getIsSupplier()) {
+            moBizPartner.setIsSupplier(true);
+            moBizPartner.setDbmsCategorySettingsSup(createBizPartnerCategory(SDataConstantsSys.BPSS_CT_BP_SUP));
         }
+        moBizPartner.getDbmsCategorySettingsSup().setIsRegistryEdited(true);
+        
+        if (!moBizPartner.getIsCreditor()) {
+            moBizPartner.setIsCreditor(true);
+            moBizPartner.setDbmsCategorySettingsCdr(createBizPartnerCategory(SDataConstantsSys.BPSS_CT_BP_CDR));
+        }
+        moBizPartner.getDbmsCategorySettingsCdr().setIsRegistryEdited(true);
+        
+        // headquarters:
+        
+        if (moBizPartnerBranch == null) {
+            moBizPartnerBranch = createBizPartnerBranchAndAddress();
+            moBizPartner.getDbmsBizPartnerBranches().add(moBizPartnerBranch);
+        }
+        moBizPartnerBranch.setIsRegistryEdited(true);
+        
+        // official address:
+        
+        if (moBizPartnerBranchAddress == null) {
+            moBizPartnerBranchAddress = moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
+        }
+        moBizPartnerBranchAddress.setIsRegistryEdited(true);
+        
+        // official contact:
+        
+        if (moBizPartnerBranchContact == null) {
+            moBizPartnerBranchContact = createBizPartnerBranchContact();
+            moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(moBizPartnerBranchContact);
+        }
+        moBizPartnerBranchContact.setEmail01(moFieldEmail.getString());
+        moBizPartnerBranchContact.setIsRegistryEdited(true);
+        
+        // Update business partner children data:
 
         if (mnParamBizPartnerType == SDataConstants.BPSX_BP_ATT_SAL_AGT) {
             SDataConfigurationSalesAgent configurationSalesAgent = moBizPartner.getDbmsDataConfigurationSalesAgent();
             
             if (configurationSalesAgent == null) {
                 configurationSalesAgent = new SDataConfigurationSalesAgent();
-                moBizPartner.setDbmsDataConfigurationSalesAgent(configurationSalesAgent);
             }
 
             configurationSalesAgent.setFkSalesAgentTypeId(moFieldFkSalesAgentTypeId.getKeyAsIntArray()[0]);
             
             configurationSalesAgent.setIsRegistryEdited(true);
+            moBizPartner.setDbmsDataConfigurationSalesAgent(configurationSalesAgent);
         }
+
+        moBizPartner.setIsRegistryEdited(true);
 
         return moBizPartner;
     }
@@ -991,7 +1048,9 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
                         setTitle("Asociado negocios");
                 }
                 break;
+                
             default:
+                // do nothing
         }
     }
 

@@ -297,12 +297,12 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                 sql = "SELECT id_bpb, id_nts FROM erp.bpsu_bpb_nts WHERE id_bpb = " + key[0] + " ORDER BY id_nts;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-                    SDataBizPartnerBranchNote BizPartnerBranchNote = new SDataBizPartnerBranchNote();
-                    if (BizPartnerBranchNote.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    SDataBizPartnerBranchNote bizPartnerBranchNote = new SDataBizPartnerBranchNote();
+                    if (bizPartnerBranchNote.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsBizPartnerBranchNotes.add(BizPartnerBranchNote);
+                        mvDbmsBizPartnerBranchNotes.add(bizPartnerBranchNote);
                     }
                 }
 
@@ -451,6 +451,11 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
 
                 // Save aswell adddresses:
 
+                if (!mvDbmsBizPartnerBranchAddresses.isEmpty() && mvDbmsBizPartnerBranchAddresses.get(0).getIsDeleted() != mbIsDeleted) { // homogenize deletion status of official address
+                    mvDbmsBizPartnerBranchAddresses.get(0).setIsDeleted(mbIsDeleted);
+                    mvDbmsBizPartnerBranchAddresses.get(0).setIsRegistryEdited(true);
+                }
+
                 for (SDataBizPartnerBranchAddress address : mvDbmsBizPartnerBranchAddresses) {
                     // save only new or edited addresses:
                     
@@ -471,6 +476,11 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                 }
 
                 // Save aswell contacts:
+
+                if (!mvDbmsBizPartnerBranchContacts.isEmpty() && mvDbmsBizPartnerBranchContacts.get(0).getIsDeleted() != mbIsDeleted) { // homogenize deletion status of official contact
+                    mvDbmsBizPartnerBranchContacts.get(0).setIsDeleted(mbIsDeleted);
+                    mvDbmsBizPartnerBranchContacts.get(0).setIsRegistryEdited(true);
+                }
 
                 for (SDataBizPartnerBranchContact contact : mvDbmsBizPartnerBranchContacts) {
                     // save only new or edited contacts:
@@ -522,7 +532,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     // save all notes:
                     
                     note.setPkBizPartnerBranchId(mnPkBizPartnerBranchId);
-                    note.setIsRegistryNew(true); // assure all notes are treated as new
+                    note.setPkNotesId(0); // assure all notes are treated as new
                     
                     if (note.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -534,8 +544,9 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                 if (moDbmsDataCustomerBranchConfig != null) {
                     // save only new or edited registry:
                     
-                    if (moDbmsDataCustomerBranchConfig.getIsRegistryNew() || moDbmsDataCustomerBranchConfig.getIsRegistryEdited()) {
+                    if (moDbmsDataCustomerBranchConfig.getIsRegistryNew() || moDbmsDataCustomerBranchConfig.getIsRegistryEdited() || moDbmsDataCustomerBranchConfig.getIsDeleted() != mbIsDeleted) {
                         moDbmsDataCustomerBranchConfig.setPkCustomerBranchId(mnPkBizPartnerBranchId);
+                        moDbmsDataCustomerBranchConfig.setIsDeleted(mbIsDeleted); // homogenize deletion status
                         
                         if (moDbmsDataCustomerBranchConfig.getIsRegistryNew()) {
                             moDbmsDataCustomerBranchConfig.setFkUserNewId(userId);
@@ -619,6 +630,20 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                 contact = bpbc;
                 break;
             }
+        }
+
+        return contact;
+    }
+
+    /**
+     * Get official contact.
+     * @return <code>SDataBizPartnerBranchContact</code>
+     */
+    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContactOfficial() {
+        SDataBizPartnerBranchContact contact = null;
+
+        if (mvDbmsBizPartnerBranchContacts.size() > 0) {
+            contact = mvDbmsBizPartnerBranchContacts.get(0);
         }
 
         return contact;

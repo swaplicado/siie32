@@ -88,14 +88,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldAlternativeId;
     private erp.lib.form.SFormField moFieldFkTaxIdentityTypeId;
     private erp.lib.form.SFormField moFieldIsDeleted;
-    private erp.lib.form.SFormField moFieldIsCategoryDeleted;
+    private erp.lib.form.SFormField moFieldIsAttRelatedParty;
     private erp.lib.form.SFormField moFieldIsAttBank;
     private erp.lib.form.SFormField moFieldIsAttCarrier;
     private erp.lib.form.SFormField moFieldIsAttSalesAgent;
     private erp.lib.form.SFormField moFieldIsAttEmployee;
     private erp.lib.form.SFormField moFieldIsAttPartnerShareholder;
-    private erp.lib.form.SFormField moFieldIsAttRelatedParty;
     private erp.lib.form.SFormField moFieldFkBizArea;
+    private erp.lib.form.SFormField moFieldIsCategoryDeleted;
 
     private erp.lib.form.SFormField moFieldFkBizPartnerCategoryId;
     private erp.lib.form.SFormField moFieldFkBizPartnerTypeId;
@@ -113,8 +113,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldDaysOfGrace;
     private erp.lib.form.SFormField moFieldIsCreditByUser;
     private erp.lib.form.SFormField moFieldDiotOperation;
-    private erp.lib.form.SFormField moFieldFkLanguageId;
-    private erp.lib.form.SFormField moFieldFkCurrencyId;
+    private erp.lib.form.SFormField moFieldFkLanguageId_n;
+    private erp.lib.form.SFormField moFieldFkCurrencyId_n;
     private erp.lib.form.SFormField moFieldFkUserAnalystId;
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
@@ -201,7 +201,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlFkTaxIdentityTypeId = new javax.swing.JLabel();
         jcbFkTaxIdentityTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel2 = new javax.swing.JLabel();
-        jckIsCategoryDeleted = new javax.swing.JCheckBox();
+        jckIsAttRelatedParty = new javax.swing.JCheckBox();
         jPanel28 = new javax.swing.JPanel();
         jlLastName = new javax.swing.JLabel();
         jtfLastName = new javax.swing.JTextField();
@@ -245,11 +245,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel12 = new javax.swing.JPanel();
         jckIsAttEmployee = new javax.swing.JCheckBox();
         jckIsAttPartnerShareholder = new javax.swing.JCheckBox();
-        jckIsAttRelatedParty = new javax.swing.JCheckBox();
+        jPanel3 = new javax.swing.JPanel();
+        jckIsCategoryDeleted = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
         jlBizArea = new javax.swing.JLabel();
         jcbFkBizArea = new javax.swing.JComboBox();
-        jPanel3 = new javax.swing.JPanel();
         jpCategory = new javax.swing.JPanel();
         jPanel44 = new javax.swing.JPanel();
         jPanel45 = new javax.swing.JPanel();
@@ -295,7 +295,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlGuarantee = new javax.swing.JLabel();
         jtfGuarantee = new javax.swing.JTextField();
         jtfCurrencyKeyGuar = new javax.swing.JTextField();
-        jckGuarInProcess = new javax.swing.JCheckBox();
+        jckGuaranteeInProcess = new javax.swing.JCheckBox();
         jPanel62 = new javax.swing.JPanel();
         jlGuaranteeType = new javax.swing.JLabel();
         jrbGuaranteeTypePay = new javax.swing.JRadioButton();
@@ -305,7 +305,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlInsurance = new javax.swing.JLabel();
         jtfInsurance = new javax.swing.JTextField();
         jtfCurrencyKeyInsur = new javax.swing.JTextField();
-        jckInsurInProcess = new javax.swing.JCheckBox();
+        jckInsuranceInProcess = new javax.swing.JCheckBox();
         jPanel46 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jlDiotOperation = new javax.swing.JLabel();
@@ -343,7 +343,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jcbFkCfdAddendaTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel35 = new javax.swing.JPanel();
         jPanel61 = new javax.swing.JPanel();
-        jlFkUserAnalyst = new javax.swing.JLabel();
+        jlFkUserAnalystId = new javax.swing.JLabel();
         jcbFkUserAnalystId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel5 = new javax.swing.JPanel();
         jlWeb = new javax.swing.JLabel();
@@ -443,11 +443,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         });
         jPanel24.add(jcbFkBizPartnerIdentityTypeId);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(50, 23));
+        jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel24.add(jLabel1);
 
-        jckIsDeleted.setText("Asociado de negocios eliminado");
-        jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setText("Asociado negocios eliminado");
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(jckIsDeleted);
 
         jPanel13.add(jPanel24);
@@ -461,12 +462,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jcbFkTaxIdentityTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(jcbFkTaxIdentityTypeId);
 
-        jLabel2.setPreferredSize(new java.awt.Dimension(50, 23));
+        jLabel2.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel18.add(jLabel2);
 
-        jckIsCategoryDeleted.setText("Categoría eliminada");
-        jckIsCategoryDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel18.add(jckIsCategoryDeleted);
+        jckIsAttRelatedParty.setText("Es parte relacionada");
+        jckIsAttRelatedParty.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel18.add(jckIsAttRelatedParty);
 
         jPanel13.add(jPanel18);
 
@@ -559,7 +560,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Categorías:"));
         jPanel4.setMinimumSize(new java.awt.Dimension(355, 220));
-        jPanel4.setPreferredSize(new java.awt.Dimension(397, 210));
+        jPanel4.setPreferredSize(new java.awt.Dimension(1, 210));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         jPanel26.setPreferredSize(new java.awt.Dimension(385, 200));
@@ -652,13 +653,19 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jckIsAttPartnerShareholder.setText("Es socio/accionista");
         jPanel12.add(jckIsAttPartnerShareholder);
 
-        jckIsAttRelatedParty.setText("Es parte relacionada");
-        jckIsAttRelatedParty.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel12.add(jckIsAttRelatedParty);
-
         jPanel26.add(jPanel12);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jckIsCategoryDeleted.setForeground(java.awt.Color.red);
+        jckIsCategoryDeleted.setText("Categoría eliminada");
+        jckIsCategoryDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jckIsCategoryDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel3.add(jckIsCategoryDeleted);
+
+        jPanel26.add(jPanel3);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizArea.setText("Área de negocios: *");
         jlBizArea.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -669,9 +676,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel6.add(jcbFkBizArea);
 
         jPanel26.add(jPanel6);
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanel26.add(jPanel3);
 
         jPanel4.add(jPanel26, java.awt.BorderLayout.NORTH);
 
@@ -875,9 +879,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfCurrencyKeyGuar.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel51.add(jtfCurrencyKeyGuar);
 
-        jckGuarInProcess.setText("En trámite");
-        jckGuarInProcess.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel51.add(jckGuarInProcess);
+        jckGuaranteeInProcess.setText("En trámite");
+        jckGuaranteeInProcess.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel51.add(jckGuaranteeInProcess);
 
         jPanel45.add(jPanel51);
 
@@ -920,9 +924,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfCurrencyKeyInsur.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel52.add(jtfCurrencyKeyInsur);
 
-        jckInsurInProcess.setText("En trámite");
-        jckInsurInProcess.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel52.add(jckInsurInProcess);
+        jckInsuranceInProcess.setText("En trámite");
+        jckInsuranceInProcess.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel52.add(jckInsuranceInProcess);
 
         jPanel45.add(jPanel52);
 
@@ -1076,9 +1080,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel61.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkUserAnalyst.setText("Analista del AN:");
-        jlFkUserAnalyst.setPreferredSize(new java.awt.Dimension(155, 23));
-        jPanel61.add(jlFkUserAnalyst);
+        jlFkUserAnalystId.setText("Analista del AN:");
+        jlFkUserAnalystId.setPreferredSize(new java.awt.Dimension(155, 23));
+        jPanel61.add(jlFkUserAnalystId);
 
         jcbFkUserAnalystId.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel61.add(jcbFkUserAnalystId);
@@ -1432,8 +1436,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldFkTaxIdentityTypeId.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
         moFieldIsDeleted.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldIsCategoryDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsCategoryDeleted);
-        moFieldIsCategoryDeleted.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsAttRelatedParty = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAttRelatedParty);
+        moFieldIsAttRelatedParty.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldIsAttBank = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAttBank);
         moFieldIsAttBank.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldIsAttCarrier = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAttCarrier);
@@ -1444,10 +1448,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldIsAttEmployee.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldIsAttPartnerShareholder = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAttPartnerShareholder);
         moFieldIsAttPartnerShareholder.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldIsAttRelatedParty = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAttRelatedParty);
-        moFieldIsAttRelatedParty.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkBizArea = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizArea, jlBizArea);
         moFieldFkBizArea.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsCategoryDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsCategoryDeleted);
+        moFieldIsCategoryDeleted.setTabbedPaneIndex(0, jTabbedPane1);
 
         moFieldFkBizPartnerCategoryId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerCategoryId, jlFkBizPartnerCategoryId);
         moFieldFkBizPartnerCategoryId.setTabbedPaneIndex(1, jTabbedPane1);
@@ -1469,11 +1473,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldFkRiskTypeId.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldGuaranteeAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfGuarantee, jlGuarantee);
         moFieldGuaranteeAmount.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldIsGuaranteeInProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckGuarInProcess);
+        moFieldIsGuaranteeInProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckGuaranteeInProcess);
         moFieldIsGuaranteeInProcess.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldInsuranceAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInsurance, jlInsurance);
         moFieldInsuranceAmount.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldIsInsuranceInProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckInsurInProcess);
+        moFieldIsInsuranceInProcess = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckInsuranceInProcess);
         moFieldIsInsuranceInProcess.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldCreditLimit = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCreditLimit, jlCreditLimit);
         moFieldCreditLimit.setTabbedPaneIndex(1, jTabbedPane1);
@@ -1485,13 +1489,13 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldIsCreditByUser.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldDiotOperation = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbDiotOperation, jlDiotOperation);
         moFieldDiotOperation.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldFkLanguageId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkLanguageId_n, jlFkLanguageId_n);
-        moFieldFkLanguageId.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldFkLanguageId.setPickerButton(jbFkLanguageId_n);
-        moFieldFkCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCurrencyId_n, jlFkCurrencyId_n);
-        moFieldFkCurrencyId.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldFkCurrencyId.setPickerButton(jbFkCurrencyId_n);
-        moFieldFkUserAnalystId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkUserAnalystId, jlFkUserAnalyst);
+        moFieldFkLanguageId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkLanguageId_n, jlFkLanguageId_n);
+        moFieldFkLanguageId_n.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFkLanguageId_n.setPickerButton(jbFkLanguageId_n);
+        moFieldFkCurrencyId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCurrencyId_n, jlFkCurrencyId_n);
+        moFieldFkCurrencyId_n.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFkCurrencyId_n.setPickerButton(jbFkCurrencyId_n);
+        moFieldFkUserAnalystId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkUserAnalystId, jlFkUserAnalystId);
         moFieldFkUserAnalystId.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldDateStart = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStart, jlDateStart);
         moFieldDateStart.setTabbedPaneIndex(1, jTabbedPane1);
@@ -1542,14 +1546,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFields.add(moFieldFkBizPartnerIdentityTypeId);
         mvFields.add(moFieldBizPartnerCommercial);
         mvFields.add(moFieldIsDeleted);
-        mvFields.add(moFieldIsCategoryDeleted);
+        mvFields.add(moFieldIsAttRelatedParty);
         mvFields.add(moFieldIsAttBank);
         mvFields.add(moFieldIsAttCarrier);
         mvFields.add(moFieldIsAttSalesAgent);
         mvFields.add(moFieldIsAttEmployee);
         mvFields.add(moFieldIsAttPartnerShareholder);
-        mvFields.add(moFieldIsAttRelatedParty);
         mvFields.add(moFieldFkBizArea);
+        mvFields.add(moFieldIsCategoryDeleted);
 
         mvFieldsCategory.add(moFieldFkBizPartnerCategoryId);
         mvFieldsCategory.add(moFieldFkBizPartnerTypeId);
@@ -1567,8 +1571,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCategory.add(moFieldIsInsuranceInProcess);
         mvFieldsCategory.add(moFieldIsCreditByUser);
         mvFieldsCategory.add(moFieldDiotOperation);
-        mvFieldsCategory.add(moFieldFkLanguageId);
-        mvFieldsCategory.add(moFieldFkCurrencyId);
+        mvFieldsCategory.add(moFieldFkLanguageId_n);
+        mvFieldsCategory.add(moFieldFkCurrencyId_n);
         mvFieldsCategory.add(moFieldFkUserAnalystId);
         mvFieldsCategory.add(moFieldDateStart);
         mvFieldsCategory.add(moFieldDateEnd);
@@ -1741,12 +1745,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jtfLastName.setEnabled(false);
             jftAlternativeId.setEnabled(false);
             jtfBizPartner.setEnabled(true);
+            
+            moFieldAlternativeId.setMaskFormatter("");
         }
     }
 
     private void renderBizPartnerCategory() {
         if (mnParamBizPartnerTypeX == SDataConstants.BPSU_BP) {
-            // nothing to do
+            // do nothing
         }
         else if (mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO) {
             setFieldEnableCategory(false);
@@ -1793,33 +1799,32 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
     private void setFieldEnableCategory(boolean enable) {
         jlFkBizPartnerCategoryId.setEnabled(enable);
-        jlFkBizPartnerTypeId.setEnabled(enable);
-        jlCompanyKey.setEnabled(enable);
-        jlKey.setEnabled(enable);
-        jlDiotOperation.setEnabled(enable && mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP);
-        jlFkLanguageId_n.setEnabled(enable);
-        jlFkCurrencyId_n.setEnabled(enable);
-        jlDateStart.setEnabled(enable);
-        jlDateEnd.setEnabled(enable);
-        jlWeb.setEnabled(enable);
-        jlNotes.setEnabled(enable);
-
         jcbFkBizPartnerTypeId.setEnabled(enable);
+        jlFkBizPartnerTypeId.setEnabled(enable);
         jbFkBizPartnerTypeId.setEnabled(enable);
+        jlCompanyKey.setEnabled(enable);
         jtfCompanyKey.setEnabled(enable);
+        jlKey.setEnabled(enable);
         jftKey.setEnabled(enable);
+        jlDiotOperation.setEnabled(enable && mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP);
         jcbDiotOperation.setEnabled(enable && mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP);
+        jlFkLanguageId_n.setEnabled(enable);
         jcbFkLanguageId_n.setEnabled(enable);
         jbFkLanguageId_n.setEnabled(enable);
         jbEditLanguage.setEnabled(enable);
+        jlFkCurrencyId_n.setEnabled(enable);
         jcbFkCurrencyId_n.setEnabled(enable);
         jbFkCurrencyId_n.setEnabled(enable);
         jbEditCurrency.setEnabled(enable);
+        jlDateStart.setEnabled(enable);
         jftDateStart.setEnabled(enable);
         jbSetDateStart.setEnabled(enable);
+        jlDateEnd.setEnabled(enable);
         jftDateEnd.setEnabled(enable);
         jbSetDateEnd.setEnabled(enable);
+        jlWeb.setEnabled(enable);
         jtfWeb.setEnabled(enable);
+        jlNotes.setEnabled(enable);
         jtfNotes.setEnabled(enable);
         
         jckIsCreditByUser.setEnabled(enable && mbCanEditCredit);
@@ -1887,6 +1892,18 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jlDaysOfCredit.setEnabled(true);
             jlDaysOfGrace.setEnabled(true);
             jlFkRiskId.setEnabled(true);
+            
+            jlGuarantee.setEnabled(isCustomer);
+            jtfGuarantee.setEnabled(isCustomer);
+            jckGuaranteeInProcess.setEnabled(isCustomer);
+            jlGuaranteeType.setEnabled(isCustomer);
+            jrbGuaranteeTypePay.setEnabled(isCustomer);
+            jrbGuaranteeTypeProp.setEnabled(isCustomer);
+            jrbGuaranteeTypePayProp.setEnabled(isCustomer);
+            jlInsurance.setEnabled(isCustomer);
+            jtfInsurance.setEnabled(isCustomer);
+            jckInsuranceInProcess.setEnabled(isCustomer);
+            
             jlCfdiPaymentWay.setEnabled(isCustomer);
             jcbCfdiPaymentWay.setEnabled(isCustomer);
             jlCfdiCfdiUsage.setEnabled(isCustomer);
@@ -1895,6 +1912,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jcbTaxRegime.setEnabled(isCustomer);
             jlFkCfdAddendaTypeId.setEnabled(isCustomer);
             jcbFkCfdAddendaTypeId.setEnabled(isCustomer);
+            jlFkUserAnalystId.setEnabled(isCustomer);
             jcbFkUserAnalystId.setEnabled(isCustomer);
             jlDiotOperation.setEnabled(isSupplier);
             jcbDiotOperation.setEnabled(isSupplier);
@@ -1913,13 +1931,27 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jlDaysOfCredit.setEnabled(false);
             jlDaysOfGrace.setEnabled(false);
             jlFkRiskId.setEnabled(false);
+            
+            jlGuarantee.setEnabled(false);
+            jtfGuarantee.setEnabled(false);
+            jckGuaranteeInProcess.setEnabled(false);
+            jlGuaranteeType.setEnabled(false);
+            jrbGuaranteeTypePay.setEnabled(false);
+            jrbGuaranteeTypeProp.setEnabled(false);
+            jrbGuaranteeTypePayProp.setEnabled(false);
+            jlInsurance.setEnabled(false);
+            jtfInsurance.setEnabled(false);
+            jckInsuranceInProcess.setEnabled(false);
+            
             jlCfdiPaymentWay.setEnabled(false);
             jcbCfdiPaymentWay.setEnabled(false);
             jlCfdiCfdiUsage.setEnabled(false);
             jcbCfdiCfdiUsage.setEnabled(false);
+            jlTaxRegime.setEnabled(false);
             jcbTaxRegime.setEnabled(false);
             jlFkCfdAddendaTypeId.setEnabled(false);
             jcbFkCfdAddendaTypeId.setEnabled(false);
+            jlFkUserAnalystId.setEnabled(false);
             jcbFkUserAnalystId.setEnabled(false);
             jlDiotOperation.setEnabled(false);
             jcbDiotOperation.setEnabled(false);
@@ -2241,11 +2273,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void actionFkLanguageId() {
-        miClient.pickOption(SDataConstants.CFGU_LAN, moFieldFkLanguageId, null);
+        miClient.pickOption(SDataConstants.CFGU_LAN, moFieldFkLanguageId_n, null);
     }
 
     private void actionFkCurrencyId() {
-        miClient.pickOption(SDataConstants.CFGU_CUR, moFieldFkCurrencyId, null);
+        miClient.pickOption(SDataConstants.CFGU_CUR, moFieldFkCurrencyId_n, null);
     }
 
     private void actionEditLanguage() {
@@ -2323,7 +2355,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 if (cusBranchConfig.getDbmsSalesAgent().length() > 0) {
                     int nPosition = 0;
                     
-                    for (int i = 0; i<moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
+                    for (int i = 0; i < moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
                         int nPkCustomerVector = moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().getPkCustomerBranchId();
                         int nPkCustomerGrid = cusBranchConfig.getPkCustomerBranchId();
                         if (nPkCustomerVector == nPkCustomerGrid) {
@@ -2336,10 +2368,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 
                 moCusBranchConfigPane.removeTableRow(index);
                 moCusBranchConfigPane.renderTableRows();
-
-                if (moCusBranchConfigPane.getTableGuiRowCount() > 0) {
-                    moCusBranchConfigPane.setTableRowSelection(index < moCusBranchConfigPane.getTableGuiRowCount() ? index : moCusBranchConfigPane.getTableGuiRowCount() - 1);
-                }
+                moCusBranchConfigPane.setTableRowSelection(index < moCusBranchConfigPane.getTableGuiRowCount() ? index : moCusBranchConfigPane.getTableGuiRowCount() - 1);
             }
         }
     }
@@ -2357,27 +2386,24 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                     moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
                 }
                 else {
-//                    if (branch.getPkBizPartnerBranchId() != SDataConstantsSys.UNDEFINED) {
-                        customerBranchConfig = new SDataCustomerBranchConfig();
-                        
-                        customerBranchConfig.setFkSalesRouteId(SDataConstantsSys.MKTU_SAL_ROUTE_DEFAULT);
-                        customerBranchConfig.setFkSalesAgentId_n(0);
-                        customerBranchConfig.setFkSalesSupervisorId_n(0);
-                        customerBranchConfig.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-                        customerBranchConfig.setFkUserEditId(SUtilConsts.USR_NA_ID);
-                        customerBranchConfig.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
-                        customerBranchConfig.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
-                        customerBranchConfig.setDbmsUserEdit("");
-                        customerBranchConfig.setDbmsUserDelete("");
-                        customerBranchConfig.setUserNewTs(new Date());
-                        customerBranchConfig.setUserEditTs(null);
-                        customerBranchConfig.setUserDeleteTs(null);
-                        customerBranchConfig.setDbmsCob(branch.getBizPartnerBranch());
-                        customerBranchConfig.setDbmsSalesRoute("");
-                        customerBranchConfig.setDbmsSalesAgent("");
+                    customerBranchConfig = new SDataCustomerBranchConfig();
+                    customerBranchConfig.setFkSalesRouteId(SDataConstantsSys.MKTU_SAL_ROUTE_DEFAULT);
+                    customerBranchConfig.setFkSalesAgentId_n(0);
+                    customerBranchConfig.setFkSalesSupervisorId_n(0);
+                    customerBranchConfig.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+                    customerBranchConfig.setFkUserEditId(SUtilConsts.USR_NA_ID);
+                    customerBranchConfig.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
+                    customerBranchConfig.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
+                    customerBranchConfig.setDbmsUserEdit("");
+                    customerBranchConfig.setDbmsUserDelete("");
+                    customerBranchConfig.setUserNewTs(new Date());
+                    customerBranchConfig.setUserEditTs(null);
+                    customerBranchConfig.setUserDeleteTs(null);
+                    customerBranchConfig.setDbmsCob(branch.getBizPartnerBranch());
+                    customerBranchConfig.setDbmsSalesRoute("");
+                    customerBranchConfig.setDbmsSalesAgent("");
 
-                        moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
-//                    }
+                    moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
                 }
             }
             
@@ -2631,8 +2657,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxIdentityTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUserAnalystId;
     private javax.swing.JComboBox<SFormComponentItem> jcbTaxRegime;
-    private javax.swing.JCheckBox jckGuarInProcess;
-    private javax.swing.JCheckBox jckInsurInProcess;
+    private javax.swing.JCheckBox jckGuaranteeInProcess;
+    private javax.swing.JCheckBox jckInsuranceInProcess;
     private javax.swing.JCheckBox jckIsAttBank;
     private javax.swing.JCheckBox jckIsAttCarrier;
     private javax.swing.JCheckBox jckIsAttEmployee;
@@ -2690,7 +2716,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlFkSalesRouteId;
     private javax.swing.JLabel jlFkSalesSupervisorId_n;
     private javax.swing.JLabel jlFkTaxIdentityTypeId;
-    private javax.swing.JLabel jlFkUserAnalyst;
+    private javax.swing.JLabel jlFkUserAnalystId;
     private javax.swing.JLabel jlGuarantee;
     private javax.swing.JLabel jlGuaranteeType;
     private javax.swing.JLabel jlIconCreditor;
@@ -3089,23 +3115,23 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         // headquarters:
         
-        if (!moBizPartner.getDbmsBizPartnerBranches().isEmpty()) {
-            moPanelBizPartnerBranch.setRegistry(moBizPartner.getDbmsBizPartnerBranches().get(0));
+        SDataBizPartnerBranch branchHq = moBizPartner.getDbmsBizPartnerBranchHq();
+        if (branchHq != null) {
+            moPanelBizPartnerBranch.setRegistry(branchHq);
         }
 
         // additional branches:
         
-        for (int branch = 1; branch < moBizPartner.getDbmsBizPartnerBranches().size(); branch++) {
-            moBizPartnerBranchPane.addTableRow(new SDataBizPartnerBranchRow(moBizPartner.getDbmsBizPartnerBranches().get(branch)));
-            if (moBizPartner.getDbmsBizPartnerBranches().get(branch).getIsDeleted()) {
-                ((STableModel) moBizPartnerBranchPane.getTable().getModel()).getTableRow(branch - 1).setStyle(STableConstants.STYLE_DELETE);
+        for (int index = 1; index < moBizPartner.getDbmsBizPartnerBranches().size(); index++) { // start from index 1 to skip headquarters
+            SDataBizPartnerBranch branch = moBizPartner.getDbmsBizPartnerBranches().get(index);
+            moBizPartnerBranchPane.addTableRow(new SDataBizPartnerBranchRow(branch));
+            if (branch.getIsDeleted()) {
+                ((STableModel) moBizPartnerBranchPane.getTable().getModel()).getTableRow(index - 1).setStyle(STableConstants.STYLE_DELETE);
             }
         }
 
         moBizPartnerBranchPane.renderTableRows();
-        if (moBizPartnerBranchPane.getTableGuiRowCount() > 0) {
-            moBizPartnerBranchPane.setTableRowSelection(0);
-        }
+        moBizPartnerBranchPane.setTableRowSelection(0);
         
         // business partner categories:
 
@@ -3199,8 +3225,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             }
             
             moFieldDiotOperation.setFieldValue(moBizPartnerCategory.getDiotOperation());
-            moFieldFkLanguageId.setFieldValue(new int[] { moBizPartnerCategory.getFkLanguageId_n() });
-            moFieldFkCurrencyId.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() });
+            moFieldFkLanguageId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkLanguageId_n() });
+            moFieldFkCurrencyId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() });
             moFieldDateStart.setFieldValue(moBizPartnerCategory.getDateStart());
             moFieldDateEnd.setFieldValue(moBizPartnerCategory.getDateEnd_n());
             moFieldCfdiPaymentWay.setFieldValue(moBizPartnerCategory.getCfdiPaymentWay());
@@ -3231,15 +3257,15 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moCustomerConfig = moBizPartner.getDbmsDataCustomerConfig();
 
             if (moCustomerConfig != null) {
-                if (!moBizPartner.getDbmsBizPartnerBranches().isEmpty() && moBizPartner.getDbmsBizPartnerBranches().get(0).getDbmsDataCustomerBranchConfig() != null) {
-                    moCustomerBranchConfig = moBizPartner.getDbmsBizPartnerBranches().get(0).getDbmsDataCustomerBranchConfig();
+                if (branchHq != null) {
+                    moCustomerBranchConfig = branchHq.getDbmsDataCustomerBranchConfig();
                 }
                 
                 moFieldFkCustomerTypeId.setKey(new int[] { moCustomerConfig.getFkCustomerTypeId() });
                 moFieldFkMarketSegmentId.setKey(new int[] { moCustomerConfig.getFkMarketSegmentId() });
                 moFieldFkMarketSubsegmentId.setKey(new int[] { moCustomerConfig.getFkMarketSegmentId(), moCustomerConfig.getFkMarketSubsegmentId() });
                 moFieldFkDistributionChannelId.setKey(new int[] { moCustomerConfig.getFkDistributionChannelId() });
-                moFieldFkSalesRouteId.setKey(new int[] { moCustomerBranchConfig == null ? 0 : moCustomerBranchConfig.getFkSalesRouteId() });
+                moFieldFkSalesRouteId.setKey(new int[] { moCustomerBranchConfig != null ? moCustomerBranchConfig.getFkSalesRouteId() : 0 });
                 moFieldFkSalesAgentId_n.setKey(new int[] { moCustomerConfig.getFkSalesAgentId_n() });
                 moFieldFkSalesSupervisorId_n.setKey(new int[] { moCustomerConfig.getFkSalesSupervisorId_n() });
                 moFieldIsFreeDiscountDoc.setFieldValue(moCustomerConfig.getIsFreeDiscountDoc());
@@ -3275,6 +3301,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         }
 
         moBizPartner.setFkBizPartnerIdentityTypeId(moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0]);
+        moBizPartner.setFkTaxIdentityId(moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0]);
+        moBizPartner.setFkBizAreaId(moFieldFkBizArea.getKeyAsIntArray()[0]);
 
         if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
             moBizPartner.setLastname(moFieldLastName.getString());
@@ -3296,9 +3324,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         //moBizPartner.setCodeBankBanBajio();
         moBizPartner.setWeb(moFieldWeb.getString());
         
-        moBizPartner.setFkTaxIdentityId(moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0]);
-        moBizPartner.setFkBizAreaId(moFieldFkBizArea.getKeyAsIntArray()[0]);
-
         switch (mnParamBizPartnerTypeX) {
             case SDataConstants.BPSX_BP_CO:
                 moBizPartner.setIsCompany(true);
@@ -3320,30 +3345,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartner.setIsAttributeRelatedParty(moFieldIsAttRelatedParty.getBoolean());
         moBizPartner.setIsDeleted(moFieldIsDeleted.getBoolean());
 
-        // Save business partner branches:
-
-        moBizPartner.getDbmsBizPartnerBranches().clear();
-        
-        SDataBizPartnerBranch branchHq = (SDataBizPartnerBranch) moPanelBizPartnerBranch.getRegistry();
-        branchHq.setAuxSaveBkc(mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO && branchHq.getIsRegistryNew());
-        moBizPartner.getDbmsBizPartnerBranches().add(branchHq);
-
-        for (int i = 0; i < moBizPartnerBranchPane.getTable().getRowCount(); i++) {
-            SDataBizPartnerBranch branch = (SDataBizPartnerBranch) moBizPartnerBranchPane.getTableRow(i).getData();
-            branch.setAuxSaveBkc(mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO && branch.getIsRegistryNew());
-            moBizPartner.getDbmsBizPartnerBranches().add(branch);
-        }
-
-        // Save business partner notes:
-
-        moBizPartner.getDbmsBizPartnerNotes().clear();
-        
-        if (moFieldNotes.getString().length() > 0) {
-            SDataBizPartnerNote note = new SDataBizPartnerNote();
-            note.setNotes(moFieldNotes.getString());
-            moBizPartner.getDbmsBizPartnerNotes().add(note);
-        }
-
         // Save business partner category:
 
         if (moBizPartnerCategory == null) {
@@ -3354,111 +3355,80 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerCategory.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
-        if (isCompany()) {
-            moBizPartnerCategory.setPkBizPartnerCategoryId(mnParamBizPartnerCategory);
-            moBizPartnerCategory.setKey(moFieldKey.getString());
-            moBizPartnerCategory.setCompanyKey(moFieldCompanyKey.getString());
-            
+        moBizPartnerCategory.setPkBizPartnerCategoryId(mnParamBizPartnerCategory);
+        moBizPartnerCategory.setKey(moFieldKey.getString());
+        moBizPartnerCategory.setCompanyKey(moFieldCompanyKey.getString());
+        
+        if (isCompany() || !jckIsCreditByUser.isSelected()) {
             moBizPartnerCategory.setCreditLimit(0);
             moBizPartnerCategory.setDaysOfCredit(0);
             moBizPartnerCategory.setDaysOfGrace(0);
             moBizPartnerCategory.setGuarantee(0);
-            moBizPartnerCategory.setGuaranteeType("");
             moBizPartnerCategory.setInsurance(0);
-            moBizPartnerCategory.setDateStart(moFieldDateStart.getDate());
-            moBizPartnerCategory.setDateEnd_n(moFieldDateEnd.getDate());
-            moBizPartnerCategory.setPaymentAccount("");
-            moBizPartnerCategory.setNumberExporter(moFieldNumberExporter.getString());
-            moBizPartnerCategory.setDiotOperation("");
-            moBizPartnerCategory.setCfdiPaymentWay("");
-            moBizPartnerCategory.setCfdiCfdiUsage("");
-            moBizPartnerCategory.setTaxRegime(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
-            
-            moBizPartnerCategory.setIsCreditByUser(false);
             moBizPartnerCategory.setIsGuaranteeInProcess(false);
             moBizPartnerCategory.setIsInsuranceInProcess(false);
-            moBizPartnerCategory.setFkBizPartnerCategoryId(SDataConstantsSys.BPSS_CT_BP_CO);
-            moBizPartnerCategory.setFkBizPartnerTypeId(SDataConstantsSys.BPSU_TP_BP_DEFAULT);
-            moBizPartnerCategory.setFkCreditTypeId_n(SDataConstantsSys.BPSS_TP_CRED_CRED_NO);
-            moBizPartnerCategory.setFkCfdAddendaTypeId(SDataConstantsSys.BPSS_TP_CFD_ADD_NA);
 
-            moBizPartnerCategory.setDbmBizPartnerType("");
-            moBizPartnerCategory.setDbmsCreditType("");
-            moBizPartnerCategory.setDbmsLanguage("");
-            moBizPartnerCategory.setDbmsCurrency("");
+            moBizPartnerCategory.setGuaranteeType("");
         }
         else {
-            moBizPartnerCategory.setPkBizPartnerCategoryId(mnParamBizPartnerCategory);
-            moBizPartnerCategory.setKey(moFieldKey.getString());
-            moBizPartnerCategory.setCompanyKey(moFieldCompanyKey.getString());
-            
-            if (!jckIsCreditByUser.isSelected()) {
-                moBizPartnerCategory.setCreditLimit(0);
-                moBizPartnerCategory.setDaysOfCredit(0);
-                moBizPartnerCategory.setDaysOfGrace(0);
-                moBizPartnerCategory.setGuarantee(0);
-                moBizPartnerCategory.setInsurance(0);
-                moBizPartnerCategory.setIsGuaranteeInProcess(false);
-                moBizPartnerCategory.setIsInsuranceInProcess(false);
-                
-                moBizPartnerCategory.setGuaranteeType("");
+            moBizPartnerCategory.setCreditLimit(moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM ? moFieldCreditLimit.getDouble() : 0);
+            moBizPartnerCategory.setDaysOfCredit(moFieldDaysOfCredit.getInteger());
+            moBizPartnerCategory.setDaysOfGrace(moFieldDaysOfGrace.getInteger());
+            moBizPartnerCategory.setGuarantee(moFieldGuaranteeAmount.getDouble());
+            moBizPartnerCategory.setInsurance(moFieldInsuranceAmount.getDouble());
+            moBizPartnerCategory.setIsGuaranteeInProcess(moFieldIsGuaranteeInProcess.getBoolean());
+            moBizPartnerCategory.setIsInsuranceInProcess(moFieldIsInsuranceInProcess.getBoolean());
+
+            if (moFieldGuaranteeAmount.getDouble() == 0) {
+                moBizPartnerCategory.setGuaranteeType(""); // there is not guarantee, so clear any type of guarantee!
             }
             else {
-                moBizPartnerCategory.setCreditLimit(moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM ? moFieldCreditLimit.getDouble() : 0);
-                moBizPartnerCategory.setDaysOfCredit(moFieldDaysOfCredit.getInteger());
-                moBizPartnerCategory.setDaysOfGrace(moFieldDaysOfGrace.getInteger());
-                moBizPartnerCategory.setGuarantee(moFieldGuaranteeAmount.getDouble());
-                moBizPartnerCategory.setInsurance(moFieldInsuranceAmount.getDouble());
-                moBizPartnerCategory.setIsGuaranteeInProcess(moFieldIsGuaranteeInProcess.getBoolean());
-                moBizPartnerCategory.setIsInsuranceInProcess(moFieldIsInsuranceInProcess.getBoolean());
-
-                if (moFieldGuaranteeAmount.getDouble() == 0) {
-                    moBizPartnerCategory.setGuaranteeType(""); // there is not guarantee, so clear any type of guarantee!
+                if (jrbGuaranteeTypePay.isSelected()) {
+                    moBizPartnerCategory.setGuaranteeType(SDataBizPartnerCategory.GARNT_TP_PAY);
+                }
+                else if (jrbGuaranteeTypeProp.isSelected()) {
+                    moBizPartnerCategory.setGuaranteeType(SDataBizPartnerCategory.GARNT_TP_PROP);
+                }
+                else if (jrbGuaranteeTypePayProp.isSelected()) {
+                    moBizPartnerCategory.setGuaranteeType(SDataBizPartnerCategory.GARNT_TP_PAY_PROP);
                 }
                 else {
-                    if (jrbGuaranteeTypePay.isSelected()) {
-                        moBizPartnerCategory.setGuaranteeType(SDataBizPartnerCategory.GARNT_TP_PAY);
-                    }
-                    else if (jrbGuaranteeTypeProp.isSelected()) {
-                        moBizPartnerCategory.setGuaranteeType(SDataBizPartnerCategory.GARNT_TP_PROP);
-                    }
-                    else if (jrbGuaranteeTypePayProp.isSelected()) {
-                        moBizPartnerCategory.setGuaranteeType(SDataBizPartnerCategory.GARNT_TP_PAY_PROP);
-                    }
-                    else {
-                        moBizPartnerCategory.setGuaranteeType("");
-                    }
+                    moBizPartnerCategory.setGuaranteeType("");
                 }
             }
-            
-            moBizPartnerCategory.setDateStart(moFieldDateStart.getDate());
-            moBizPartnerCategory.setDateEnd_n(moFieldDateEnd.getDate());
-            moBizPartnerCategory.setPaymentAccount(msTempPaymentAccount);
-            moBizPartnerCategory.setNumberExporter(moFieldNumberExporter.getString());
-            moBizPartnerCategory.setDiotOperation(!jcbDiotOperation.isEnabled() ? "" : (String) moFieldDiotOperation.getFieldValue());
-            moBizPartnerCategory.setCfdiPaymentWay(jcbCfdiPaymentWay.getSelectedIndex() <= 0 ? "" : moFieldCfdiPaymentWay.getKey().toString());
-            moBizPartnerCategory.setCfdiCfdiUsage(jcbCfdiCfdiUsage.getSelectedIndex() <= 0 ? "" : moFieldCfdiCfdiUsage.getKey().toString());
-            moBizPartnerCategory.setTaxRegime(jcbTaxRegime.getSelectedIndex() <= 0 ? "" : moFieldTaxRegime.getKey().toString());
-            moBizPartnerCategory.setIsCreditByUser(jckIsCreditByUser.isSelected());
-            moBizPartnerCategory.setFkBizPartnerCategoryId(mnParamBizPartnerCategory);
-            moBizPartnerCategory.setFkBizPartnerTypeId(moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);
-            moBizPartnerCategory.setFkCreditTypeId_n(!jckIsCreditByUser.isSelected() ? SDataConstantsSys.BPSS_TP_CRED_CRED_NO : moFieldFkCreditTypeId_n.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setFkRiskId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C_RSK_H : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setFkPaymentSystemTypeId_n(mnTempFkPaymentSystemTypeId);
-            moBizPartnerCategory.setFkCfdAddendaTypeId(moFieldFkCfdAddendaTypeId.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setFkLanguageId_n(moBizPartnerCategory.getPkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_SUP || moBizPartnerCategory.getPkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_CUS ? moFieldFkLanguageId.getKeyAsIntArray()[0] : -1);
-            moBizPartnerCategory.setFkCurrencyId_n(moFieldFkCurrencyId.getKeyAsIntArray()[0] <= 0 ? -1 : moFieldFkCurrencyId.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setAuxLanguageSysId(miClient.getSessionXXX().getParamsErp().getFkLanguageId());
-            moBizPartnerCategory.setAuxCurrencySysId(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId());
-            moBizPartnerCategory.setFkUserAnalystId_n(moFieldFkUserAnalystId.getKeyAsIntArray()[0]);
-            moBizPartnerCategory.setIsDeleted(moFieldIsCategoryDeleted.getBoolean());
-
-            moBizPartnerCategory.setDbmBizPartnerType(jcbFkBizPartnerTypeId.getSelectedItem().toString());
-            moBizPartnerCategory.setDbmsCreditType(moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == 0 ? "" : jcbFkCreditTypeId_n.getSelectedItem().toString());
-            moBizPartnerCategory.setDbmsLanguage(moFieldFkLanguageId.getKeyAsIntArray()[0] == 0 ? "" : readLanguageKey(moFieldFkLanguageId.getKeyAsIntArray()[0]));
-            moBizPartnerCategory.setDbmsCurrency(moFieldFkCurrencyId.getKeyAsIntArray()[0] == 0 ? "" : readCurrencyKey(moFieldFkCurrencyId.getKeyAsIntArray()[0]));
         }
-        
+
+        moBizPartnerCategory.setDateStart(moFieldDateStart.getDate());
+        moBizPartnerCategory.setDateEnd_n(moFieldDateEnd.getDate());
+        moBizPartnerCategory.setPaymentAccount(msTempPaymentAccount);
+        moBizPartnerCategory.setNumberExporter(moFieldNumberExporter.getString());
+        moBizPartnerCategory.setDiotOperation(!jcbDiotOperation.isEnabled() ? "" : (String) moFieldDiotOperation.getFieldValue());
+        moBizPartnerCategory.setCfdiPaymentWay(jcbCfdiPaymentWay.getSelectedIndex() <= 0 ? "" : moFieldCfdiPaymentWay.getKey().toString());
+        moBizPartnerCategory.setCfdiCfdiUsage(jcbCfdiCfdiUsage.getSelectedIndex() <= 0 ? "" : moFieldCfdiCfdiUsage.getKey().toString());
+        moBizPartnerCategory.setTaxRegime(jcbTaxRegime.getSelectedIndex() <= 0 ? "" : moFieldTaxRegime.getKey().toString());
+
+        moBizPartnerCategory.setIsCreditByUser(jckIsCreditByUser.isSelected());
+        moBizPartnerCategory.setFkBizPartnerCategoryId(mnParamBizPartnerCategory);
+        moBizPartnerCategory.setFkBizPartnerTypeId(jcbFkBizPartnerTypeId.getSelectedIndex() <= 0 ? SDataConstantsSys.BPSU_TP_BP_DEFAULT : moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);
+        moBizPartnerCategory.setFkCreditTypeId_n(!jckIsCreditByUser.isSelected() ? SDataConstantsSys.BPSS_TP_CRED_CRED_NO : moFieldFkCreditTypeId_n.getKeyAsIntArray()[0]);
+        moBizPartnerCategory.setFkRiskId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C_RSK_H : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
+        moBizPartnerCategory.setFkPaymentSystemTypeId_n(mnTempFkPaymentSystemTypeId);
+        moBizPartnerCategory.setFkCfdAddendaTypeId(moFieldFkCfdAddendaTypeId.getKeyAsIntArray()[0]);
+
+        moBizPartnerCategory.setFkLanguageId_n(jcbFkLanguageId_n.getSelectedIndex() <= 0 ? -1 : moFieldFkLanguageId_n.getKeyAsIntArray()[0]);
+        moBizPartnerCategory.setFkCurrencyId_n(jcbFkCurrencyId_n.getSelectedIndex() <= 0 ? -1 : moFieldFkCurrencyId_n.getKeyAsIntArray()[0]);
+        moBizPartnerCategory.setAuxLanguageSysId(miClient.getSessionXXX().getParamsErp().getFkLanguageId());
+        moBizPartnerCategory.setAuxCurrencySysId(miClient.getSessionXXX().getParamsErp().getFkCurrencyId());
+        moBizPartnerCategory.setFkUserAnalystId_n(jcbFkUserAnalystId.getSelectedIndex() <= 0 ? 0 : moFieldFkUserAnalystId.getKeyAsIntArray()[0]);
+        moBizPartnerCategory.setIsDeleted(moFieldIsCategoryDeleted.getBoolean());
+
+        moBizPartnerCategory.setDbmBizPartnerType(jcbFkBizPartnerTypeId.getSelectedItem().toString());
+        moBizPartnerCategory.setDbmsCreditType(jcbFkCreditTypeId_n.getSelectedIndex() <= 0 ? "" : jcbFkCreditTypeId_n.getSelectedItem().toString());
+        moBizPartnerCategory.setDbmsLanguage(jcbFkLanguageId_n.getSelectedIndex() <= 0 ? "" : readLanguageKey(moFieldFkLanguageId_n.getKeyAsIntArray()[0]));
+        moBizPartnerCategory.setDbmsCurrency(jcbFkCurrencyId_n.getSelectedIndex() <= 0 ? "" : readCurrencyKey(moFieldFkCurrencyId_n.getKeyAsIntArray()[0]));
+
+        moBizPartnerCategory.setIsRegistryEdited(true);
+
         switch (mnParamBizPartnerCategory) {
             case SDataConstantsSys.BPSS_CT_BP_CO:
                 moBizPartner.setDbmsCategorySettingsCo(moBizPartnerCategory);
@@ -3472,7 +3442,29 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             default:
         }
 
-        moBizPartnerCategory.setIsRegistryEdited(true);
+        // Save business partner branches:
+
+        moBizPartner.getDbmsBizPartnerBranches().clear();
+        
+        SDataBizPartnerBranch branchHq = (SDataBizPartnerBranch) moPanelBizPartnerBranch.getRegistry();
+        branchHq.setAuxSaveBkc(mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO && branchHq.getIsRegistryNew());
+        moBizPartner.getDbmsBizPartnerBranches().add(branchHq);
+
+        for (int index = 0; index < moBizPartnerBranchPane.getTable().getRowCount(); index++) {
+            SDataBizPartnerBranch branch = (SDataBizPartnerBranch) moBizPartnerBranchPane.getTableRow(index).getData();
+            branch.setAuxSaveBkc(mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO && branch.getIsRegistryNew());
+            moBizPartner.getDbmsBizPartnerBranches().add(branch);
+        }
+
+        // Save business partner notes:
+
+        moBizPartner.getDbmsBizPartnerNotes().clear();
+        
+        if (!moFieldNotes.getString().isEmpty()) {
+            SDataBizPartnerNote note = new SDataBizPartnerNote();
+            note.setNotes(moFieldNotes.getString());
+            moBizPartner.getDbmsBizPartnerNotes().add(note);
+        }
 
         // Save customer configuration:
 
@@ -3497,11 +3489,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moCustomerConfig.setIsSignRestricted(moFieldIsSignRestricted.getBoolean());
             moCustomerConfig.setIsSignImmex(moFieldIsSignImmex.getBoolean());
 
-            SDataCustomerBranchConfig customerBranchConfig = moBizPartner.getDbmsBizPartnerBranches().get(0).getDbmsDataCustomerBranchConfig();
+            SDataCustomerBranchConfig customerBranchConfig = moBizPartner.getDbmsBizPartnerBranchHq().getDbmsDataCustomerBranchConfig();
             
             if (customerBranchConfig == null) {
                 customerBranchConfig = new SDataCustomerBranchConfig();
-                customerBranchConfig.setDbmsCob(moBizPartner.getDbmsBizPartnerBranches().get(0).getBizPartnerBranch());
+                customerBranchConfig.setDbmsCob(moBizPartner.getDbmsBizPartnerBranchHq().getBizPartnerBranch());
                 customerBranchConfig.setDbmsSalesRoute(moFieldFkSalesRouteId.getString());
                 customerBranchConfig.setDbmsSalesAgent("");
                 customerBranchConfig.setDbmsSalesSupervisor("");
@@ -3517,8 +3509,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 customerBranchConfig.setUserNewTs(new Date());
                 customerBranchConfig.setUserEditTs(null);
                 customerBranchConfig.setUserDeleteTs(null);
-
-                moBizPartner.getDbmsBizPartnerBranches().get(0).setDbmsDataCustomerBranchConfig(customerBranchConfig);
             }
             else {
                 customerBranchConfig.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
@@ -3526,9 +3516,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             }
             
             customerBranchConfig.setIsRegistryEdited(true);
+            moBizPartner.getDbmsBizPartnerBranchHq().setDbmsDataCustomerBranchConfig(customerBranchConfig);
 
             moCustomerConfig.setIsRegistryEdited(true);
-
             moBizPartner.setDbmsDataCustomerConfig(moCustomerConfig);
         }
         

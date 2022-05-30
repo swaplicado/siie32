@@ -549,6 +549,11 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 }
 
                 // Save aswell branches:
+                
+                if (!mvDbmsBizPartnerBranches.isEmpty() && mvDbmsBizPartnerBranches.get(0).getIsDeleted() != mbIsDeleted) { // homogenize deletion status of headquarters
+                    mvDbmsBizPartnerBranches.get(0).setIsDeleted(mbIsDeleted);
+                    mvDbmsBizPartnerBranches.get(0).setIsRegistryEdited(true);
+                }
 
                 for (SDataBizPartnerBranch bpb : mvDbmsBizPartnerBranches) {
                     // save only new or edited branches:
@@ -579,7 +584,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     // save all notes:
                     
                     note.setPkBizPartnerId(mnPkBizPartnerId);
-                    note.setIsRegistryNew(true); // assure all notes are treated as new
+                    note.setPkNotesId(0); // assure all notes are treated as new
                     
                     if (note.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -591,9 +596,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 if (moDbmsDataCustomerConfig != null) {
                     // save only new or edited registry:
                     
-                    if (moDbmsDataCustomerConfig.getIsRegistryNew() || moDbmsDataCustomerConfig.getIsRegistryEdited()) {
+                    if (moDbmsDataCustomerConfig.getIsRegistryNew() || moDbmsDataCustomerConfig.getIsRegistryEdited() || moDbmsDataCustomerConfig.getIsDeleted() != mbIsDeleted) {
                         moDbmsDataCustomerConfig.setPkCustomerId(mnPkBizPartnerId);
-                        moDbmsDataCustomerConfig.setIsDeleted(mbIsDeleted);
+                        moDbmsDataCustomerConfig.setIsDeleted(mbIsDeleted); // homogenize deletion status
 
                         if (moDbmsDataCustomerConfig.getIsRegistryNew()) {
                             moDbmsDataCustomerConfig.setFkUserNewId(userId);
@@ -615,7 +620,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     
                     if (moDbmsDataConfigurationSalesAgent.getIsRegistryNew() || moDbmsDataConfigurationSalesAgent.getIsRegistryEdited()) {
                         moDbmsDataConfigurationSalesAgent.setPkSalesAgentId(mnPkBizPartnerId);
-                        moDbmsDataConfigurationSalesAgent.setIsDeleted(mbIsDeleted);
+                        moDbmsDataConfigurationSalesAgent.setIsDeleted(mbIsDeleted); // homogenize deletion status
 
                         if (moDbmsDataConfigurationSalesAgent.getIsRegistryNew()) {
                             moDbmsDataConfigurationSalesAgent.setFkUserNewId(userId);
