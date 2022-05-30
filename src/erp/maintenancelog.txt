@@ -32,7 +32,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 
 ================================================================================
 SIIE 3.2 199.2/ 2022-04-27
-Edwin CARMONA
+Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Cambio pendiente en la sincronización de CAP Link, no afecta al funcionamiento de nada, 
     es solo para la consulta de información externa.
