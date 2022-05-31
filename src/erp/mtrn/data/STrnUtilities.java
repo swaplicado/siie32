@@ -20,6 +20,7 @@ import erp.lib.form.SFormComponentItem;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
+import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mbps.data.SDataEmployee;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mhrs.data.SDataFormerPayroll;
@@ -1476,7 +1477,7 @@ public abstract class STrnUtilities {
         boolean send = false;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
         SSrvLock lock = null;        
-*/        
+        */
         /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
         SRedisLock rlock = null;
         */
@@ -1499,12 +1500,17 @@ public abstract class STrnUtilities {
                 */
                 slock = SLockUtils.gainLock(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
                 
+                SDataBizPartnerBranchContact contact;
+                
                 if (idBizPartnerBranch == SLibConsts.UNDEFINED) {
-                    bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
+                    contact = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContactOfficial();
                 }
                 else {
-                    bizPartner.getDbmsBizPartnerBranch(new int[] { idBizPartnerBranch }).getDbmsBizPartnerBranchContacts().get(0).setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
+                    contact = bizPartner.getDbmsBizPartnerBranch(new int[] { idBizPartnerBranch }).getDbmsBizPartnerBranchContactOfficial();
                 }
+                
+                contact.setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
+                contact.setIsRegistryEdited(true);
                 
                 request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
                 request.setPacket(bizPartner);

@@ -2701,8 +2701,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
-        String msg = "";
-        Object[] paramsValidation = null;
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -2719,186 +2717,187 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         }
         
         if (!validation.getIsError()) {
-            try {
-                paramsValidation = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), composeName() };
-                if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, paramsValidation, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jtfBizPartner_Ro.getToolTipText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
-                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jtfBizPartner_Ro.getToolTipText() + "'.");
-                        validation.setComponent(jtfFirstname);
+            Object[] valParams = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), composeName() };
+            int valCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, valParams, SLibConstants.EXEC_MODE_VERBOSE);
+
+            if (valCount > 0) {
+                if (miClient.showMsgBoxConfirm("El valor del campo '" + jtfBizPartner_Ro.getToolTipText() + "', '" + composeName() + "',"
+                        + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jtfBizPartner_Ro.getToolTipText() + "'.");
+                    validation.setComponent(jtfFirstname);
+                    validation.setTabbedPaneIndex(0);
+                }
+            }
+
+            if (!validation.getIsError()) {
+                valParams = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), moFieldFiscalId.getString() };
+                valCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, valParams, SLibConstants.EXEC_MODE_VERBOSE);
+                
+                if (valCount > 0) {
+                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "', '" + moFieldFiscalId.getString() + "',"
+                            + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlFiscalId.getText() + "'.");
+                        validation.setComponent(jtfFiscalId);
+                        validation.setTabbedPaneIndex(0);
+                    }
+                }
+            }
+        }
+
+        if (!validation.getIsError()) {
+            if (!moFieldBankAccount.getString().isEmpty() && jcbFkBank_n.getSelectedIndex() <= 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkBank_n.getText() + "'.");
+                validation.setComponent(jcbFkBank_n);
+                validation.setTabbedPaneIndex(0);
+            }
+            else if (!moFieldGroceryServiceAccount.getString().isEmpty() && jcbFkGroceryService.getSelectedIndex() <= 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkGroceryService.getText() + "'.");
+                validation.setComponent(jcbFkGroceryService);
+                validation.setTabbedPaneIndex(0);
+            }
+            else {
+                if (!SLibUtils.belongsTo(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0],
+                        new int[] { SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV, SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD, 
+                            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL, SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA, SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH })) {
+                    if (moFieldSocialSecurityNumber.getString().isEmpty()) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlSocialSecurityNumber.getText() + "'.");
+                        validation.setComponent(jtfSocialSecurityNumber);                                
+                        validation.setTabbedPaneIndex(0);
+                    }
+                    else if (moFieldSalarySscBase.getDouble() == 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "'.");
+                        validation.setComponent(jtfSalarySscBase);                                
+                        validation.setTabbedPaneIndex(0);
+                    }
+                    else if (moFieldDateChangeSalarySscBase.getDate() == null) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "' (fecha).");
+                        validation.setComponent(jftDateChangeSalarySscBase);                                
                         validation.setTabbedPaneIndex(0);
                     }
                 }
 
                 if (!validation.getIsError()) {
-                    paramsValidation = new Object[] { moBizPartner == null ? SLibConsts.UNDEFINED : moBizPartner.getPkBizPartnerId(), moFieldFiscalId.getString() };
-                    if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, paramsValidation, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                        if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlFiscalId.getText() + "'.");
-                            validation.setComponent(jtfFiscalId);
+                    if (!moFieldEmail.getString().isEmpty()) {
+                        String message = SLibUtilities.validateEmail(moFieldEmail.getString());
+                        if (!message.isEmpty()) {
+                            validation.setMessage(message);
+                            validation.setComponent(jtfEmail);
                             validation.setTabbedPaneIndex(0);
                         }
                     }
 
                     if (!validation.getIsError()) {
-                        if (!moFieldBankAccount.getString().isEmpty() && jcbFkBank_n.getSelectedIndex() <= 0) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkBank_n.getText() + "'.");
-                            validation.setComponent(jcbFkBank_n);
+                        if (SHrsEmployeeUtils.isContractExpirationRequired(moFieldFkContractType.getKeyAsIntArray()[0]) && moFieldContractExpiration.getDate() == null) {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlContractExpiration.getText() + "'.");
+                            validation.setComponent(jftContractExpiration);
                             validation.setTabbedPaneIndex(0);
                         }
-                        else if (!moFieldGroceryServiceAccount.getString().isEmpty() && jcbFkGroceryService.getSelectedIndex() <= 0) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkGroceryService.getText() + "'.");
-                            validation.setComponent(jcbFkGroceryService);
-                            validation.setTabbedPaneIndex(0);
-                        }
-                        else {
-                            if (!SLibUtils.belongsTo(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0],
-                                    new int[] { SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV, SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD, 
-                                        SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL, SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA, SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH })) {
-                                if (moFieldSocialSecurityNumber.getString().isEmpty()) {
-                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlSocialSecurityNumber.getText() + "'.");
-                                    validation.setComponent(jtfSocialSecurityNumber);                                
-                                    validation.setTabbedPaneIndex(0);
-                                }
-                                else if (moFieldSalarySscBase.getDouble() == 0) {
-                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "'.");
-                                    validation.setComponent(jtfSalarySscBase);                                
-                                    validation.setTabbedPaneIndex(0);
-                                }
-                                else if (moFieldDateChangeSalarySscBase.getDate() == null) {
-                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "' (fecha).");
-                                    validation.setComponent(jftDateChangeSalarySscBase);                                
-                                    validation.setTabbedPaneIndex(0);
-                                }
-                            }
-
-                            if (!validation.getIsError()) {
-                                if (!moFieldEmail.getString().isEmpty()) {
-                                    msg = SLibUtilities.validateEmail(moFieldEmail.getString());
-                                    if (!msg.isEmpty()) {
-                                        validation.setMessage(msg);
-                                        validation.setComponent(jtfEmail);
-                                        validation.setTabbedPaneIndex(0);
-                                    }
-                                }
-
-                                if (!validation.getIsError()) {
-                                    if (SHrsEmployeeUtils.isContractExpirationRequired(moFieldFkContractType.getKeyAsIntArray()[0]) && moFieldContractExpiration.getDate() == null) {
-                                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlContractExpiration.getText() + "'.");
-                                        validation.setComponent(jftContractExpiration);
-                                        validation.setTabbedPaneIndex(0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (!validation.getIsError()) {
-                    validation = moPanelBizPartnerBranchAddress.formValidate();
-                    validation.setTabbedPaneIndex(1);
-                }
-
-                if (!validation.getIsError()) {
-                    // Validate information of employeee's relatives:
-
-                    ArrayList<JLabel> relatives = new ArrayList<>();
-                    relatives.add(jlMate);
-                    relatives.add(jlSon1);
-                    relatives.add(jlSon2);
-                    relatives.add(jlSon3);
-                    relatives.add(jlSon4);
-                    relatives.add(jlSon5);
-
-                    ArrayList<SFormField> entitiesEmployee = new ArrayList<>();
-                    entitiesEmployee.add(moFieldEntityEmployee);
-                    entitiesEmployee.add(moFieldUmf);
-                    
-                    ArrayList<SFormField> names = new ArrayList<>();
-                    names.add(moFieldMateName);
-                    names.add(moFieldSonName1);
-                    names.add(moFieldSonName2);
-                    names.add(moFieldSonName3);
-                    names.add(moFieldSonName4);
-                    names.add(moFieldSonName5);
-
-                    ArrayList<SFormField> dates = new ArrayList<>();
-                    dates.add(moFieldMateDateBirth);
-                    dates.add(moFieldSonDateBirth1);
-                    dates.add(moFieldSonDateBirth2);
-                    dates.add(moFieldSonDateBirth3);
-                    dates.add(moFieldSonDateBirth4);
-                    dates.add(moFieldSonDateBirth5);
-
-                    ArrayList<JComboBox> sexes = new ArrayList<>();
-                    sexes.add(jcbFkMateCatalogueSexTypeId);
-                    sexes.add(jcbFkSonCatalogueSexTypeId1);
-                    sexes.add(jcbFkSonCatalogueSexTypeId2);
-                    sexes.add(jcbFkSonCatalogueSexTypeId3);
-                    sexes.add(jcbFkSonCatalogueSexTypeId4);
-                    sexes.add(jcbFkSonCatalogueSexTypeId5);
-
-                    ArrayList<SFormField> deceaseds = new ArrayList<>();
-                    deceaseds.add(moFieldMateDeceased);
-                    deceaseds.add(moFieldSonDeceased1);
-                    deceaseds.add(moFieldSonDeceased2);
-                    deceaseds.add(moFieldSonDeceased3);
-                    deceaseds.add(moFieldSonDeceased4);
-                    deceaseds.add(moFieldSonDeceased5);
-
-                    for (int field = 0; field < 6; field++) {
-                        if (!names.get(field).getString().isEmpty()) {
-                            if (dates.get(field).getDate() == null) {
-                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeDateBirth) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
-                                validation.setComponent(dates.get(field).getComponent());
-                                validation.setTabbedPaneIndex(1);
-                                break;
-                            }
-                        }
-                        if (dates.get(field).getDate() != null) {
-                            if (names.get(field).getString().isEmpty()) {
-                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
-                                validation.setComponent(names.get(field).getComponent());
-                                validation.setTabbedPaneIndex(1);
-                                break;
-                            }
-                        }
-                        if (sexes.get(field).getSelectedIndex() > 1) {  // option '(N/A)' is index 1
-                            if (names.get(field).getString().isEmpty()) {
-                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
-                                validation.setComponent(names.get(field).getComponent());
-                                validation.setTabbedPaneIndex(1);
-                                break;
-                            }
-                        }
-                        if (deceaseds.get(field).getBoolean()) {
-                            if (names.get(field).getString().isEmpty()) {
-                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
-                                validation.setComponent(names.get(field).getComponent());
-                                validation.setTabbedPaneIndex(1);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (!validation.getIsError()) {
-                    String sDateRfc = moFieldFiscalId.getString().substring(4, 10);
-                    int nYearRfc = Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH > SLibTimeUtilities.digestYear(miClient.getSessionXXX().getSystemDate())[0] ? 
-                            Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MIN_BIRTH : Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH;
-
-                    Date dateRfc = SLibTimeUtilities.createDate(nYearRfc, Integer.parseInt(sDateRfc.substring(2, 4)), Integer.parseInt(sDateRfc.substring(4, 6)));
-
-                    if (!SLibTimeUtils.isSameDate(dateRfc, moFieldDateBirth.getDate())) {
-                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDateBirth) + "':\n"
-                                + "la fecha de este campo, " + SLibUtils.DateFormatDate.format(moFieldDateBirth.getDate()) + ", "
-                                + "no coincide con la fecha implícita del campo '" + SGuiUtils.getLabelName(jlFiscalId).toUpperCase() + "', " + SLibUtils.DateFormatDate.format(dateRfc) + ", correspondiente al valor '" + moFieldFiscalId.getString() + "'.");
-                        validation.setComponent(jftDateBirth);
-                        validation.setTabbedPaneIndex(1);
                     }
                 }
             }
-            catch (Exception e) {
-                SLibUtilities.printOutException(this, e);
+        }
+
+        if (!validation.getIsError()) {
+            validation = moPanelBizPartnerBranchAddress.formValidate();
+            validation.setTabbedPaneIndex(1);
+        }
+
+        if (!validation.getIsError()) {
+            // Validate information of employeee's relatives:
+
+            ArrayList<JLabel> relatives = new ArrayList<>();
+            relatives.add(jlMate);
+            relatives.add(jlSon1);
+            relatives.add(jlSon2);
+            relatives.add(jlSon3);
+            relatives.add(jlSon4);
+            relatives.add(jlSon5);
+
+            ArrayList<SFormField> entitiesEmployee = new ArrayList<>();
+            entitiesEmployee.add(moFieldEntityEmployee);
+            entitiesEmployee.add(moFieldUmf);
+
+            ArrayList<SFormField> names = new ArrayList<>();
+            names.add(moFieldMateName);
+            names.add(moFieldSonName1);
+            names.add(moFieldSonName2);
+            names.add(moFieldSonName3);
+            names.add(moFieldSonName4);
+            names.add(moFieldSonName5);
+
+            ArrayList<SFormField> dates = new ArrayList<>();
+            dates.add(moFieldMateDateBirth);
+            dates.add(moFieldSonDateBirth1);
+            dates.add(moFieldSonDateBirth2);
+            dates.add(moFieldSonDateBirth3);
+            dates.add(moFieldSonDateBirth4);
+            dates.add(moFieldSonDateBirth5);
+
+            ArrayList<JComboBox> sexes = new ArrayList<>();
+            sexes.add(jcbFkMateCatalogueSexTypeId);
+            sexes.add(jcbFkSonCatalogueSexTypeId1);
+            sexes.add(jcbFkSonCatalogueSexTypeId2);
+            sexes.add(jcbFkSonCatalogueSexTypeId3);
+            sexes.add(jcbFkSonCatalogueSexTypeId4);
+            sexes.add(jcbFkSonCatalogueSexTypeId5);
+
+            ArrayList<SFormField> deceaseds = new ArrayList<>();
+            deceaseds.add(moFieldMateDeceased);
+            deceaseds.add(moFieldSonDeceased1);
+            deceaseds.add(moFieldSonDeceased2);
+            deceaseds.add(moFieldSonDeceased3);
+            deceaseds.add(moFieldSonDeceased4);
+            deceaseds.add(moFieldSonDeceased5);
+
+            for (int field = 0; field < 6; field++) {
+                if (!names.get(field).getString().isEmpty()) {
+                    if (dates.get(field).getDate() == null) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeDateBirth) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
+                        validation.setComponent(dates.get(field).getComponent());
+                        validation.setTabbedPaneIndex(1);
+                        break;
+                    }
+                }
+                if (dates.get(field).getDate() != null) {
+                    if (names.get(field).getString().isEmpty()) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
+                        validation.setComponent(names.get(field).getComponent());
+                        validation.setTabbedPaneIndex(1);
+                        break;
+                    }
+                }
+                if (sexes.get(field).getSelectedIndex() > 1) {  // option '(N/A)' is index 1
+                    if (names.get(field).getString().isEmpty()) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
+                        validation.setComponent(names.get(field).getComponent());
+                        validation.setTabbedPaneIndex(1);
+                        break;
+                    }
+                }
+                if (deceaseds.get(field).getBoolean()) {
+                    if (names.get(field).getString().isEmpty()) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
+                        validation.setComponent(names.get(field).getComponent());
+                        validation.setTabbedPaneIndex(1);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!validation.getIsError()) {
+            String sDateRfc = moFieldFiscalId.getString().substring(4, 10);
+            int nYearRfc = Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH > SLibTimeUtilities.digestYear(miClient.getSessionXXX().getSystemDate())[0] ? 
+                    Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MIN_BIRTH : Integer.parseInt(sDateRfc.substring(0, 2)) + SHrsConsts.YEAR_MAX_BIRTH;
+
+            Date dateRfc = SLibTimeUtilities.createDate(nYearRfc, Integer.parseInt(sDateRfc.substring(2, 4)), Integer.parseInt(sDateRfc.substring(4, 6)));
+
+            if (!SLibTimeUtils.isSameDate(dateRfc, moFieldDateBirth.getDate())) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDateBirth) + "':\n"
+                        + "la fecha de este campo, " + SLibUtils.DateFormatDate.format(moFieldDateBirth.getDate()) + ", "
+                        + "no coincide con la fecha implícita del campo '" + SGuiUtils.getLabelName(jlFiscalId).toUpperCase() + "', " + SLibUtils.DateFormatDate.format(dateRfc) + ", correspondiente al valor '" + moFieldFiscalId.getString() + "'.");
+                validation.setComponent(jftDateBirth);
+                validation.setTabbedPaneIndex(1);
             }
         }
 

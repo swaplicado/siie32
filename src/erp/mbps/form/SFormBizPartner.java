@@ -325,9 +325,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jftDateStart = new javax.swing.JFormattedTextField();
         jbSetDateStart = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
-        jlDateEnd = new javax.swing.JLabel();
-        jftDateEnd = new javax.swing.JFormattedTextField();
-        jbSetDateEnd = new javax.swing.JButton();
+        jlDateEnd_n = new javax.swing.JLabel();
+        jftDateEnd_n = new javax.swing.JFormattedTextField();
+        jbSetDateEnd_n = new javax.swing.JButton();
         jPanel17 = new javax.swing.JPanel();
         jPanel47 = new javax.swing.JPanel();
         jlCfdiPaymentWay = new javax.swing.JLabel();
@@ -1012,19 +1012,19 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateEnd.setText("Fin de operaciones:");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(155, 23));
-        jPanel10.add(jlDateEnd);
+        jlDateEnd_n.setText("Fin de operaciones:");
+        jlDateEnd_n.setPreferredSize(new java.awt.Dimension(155, 23));
+        jPanel10.add(jlDateEnd_n);
 
-        jftDateEnd.setText("dd/mm/yyyy");
-        jftDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel10.add(jftDateEnd);
+        jftDateEnd_n.setText("dd/mm/yyyy");
+        jftDateEnd_n.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel10.add(jftDateEnd_n);
 
-        jbSetDateEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
-        jbSetDateEnd.setToolTipText("Seleccionar fecha");
-        jbSetDateEnd.setFocusable(false);
-        jbSetDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel10.add(jbSetDateEnd);
+        jbSetDateEnd_n.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbSetDateEnd_n.setToolTipText("Seleccionar fecha");
+        jbSetDateEnd_n.setFocusable(false);
+        jbSetDateEnd_n.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel10.add(jbSetDateEnd_n);
 
         jPanel46.add(jPanel10);
 
@@ -1500,9 +1500,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldDateStart = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStart, jlDateStart);
         moFieldDateStart.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldDateStart.setPickerButton(jbSetDateStart);
-        moFieldDateEnd = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateEnd, jlDateEnd);
+        moFieldDateEnd = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateEnd_n, jlDateEnd_n);
         moFieldDateEnd.setTabbedPaneIndex(1, jTabbedPane1);
-        moFieldDateEnd.setPickerButton(jbSetDateEnd);
+        moFieldDateEnd.setPickerButton(jbSetDateEnd_n);
 
         moFieldCfdiPaymentWay = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiPaymentWay, jlCfdiPaymentWay);
         moFieldCfdiPaymentWay.setTabbedPaneIndex(1, jTabbedPane1);
@@ -1604,7 +1604,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbRecreateBizPartnerCommercial.addActionListener(this);
 
         jbSetDateStart.addActionListener(this);
-        jbSetDateEnd.addActionListener(this);
+        jbSetDateEnd_n.addActionListener(this);
         jbCancel.addActionListener(this);
         jbFkLanguageId_n.addActionListener(this);
         jbFkCurrencyId_n.addActionListener(this);
@@ -1819,9 +1819,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlDateStart.setEnabled(enable);
         jftDateStart.setEnabled(enable);
         jbSetDateStart.setEnabled(enable);
-        jlDateEnd.setEnabled(enable);
-        jftDateEnd.setEnabled(enable);
-        jbSetDateEnd.setEnabled(enable);
+        jlDateEnd_n.setEnabled(enable);
+        jftDateEnd_n.setEnabled(enable);
+        jbSetDateEnd_n.setEnabled(enable);
         jlWeb.setEnabled(enable);
         jtfWeb.setEnabled(enable);
         jlNotes.setEnabled(enable);
@@ -2261,14 +2261,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         }
     }
 
-    private void actionSetDateEnd() {
+    private void actionSetDateEnd_n() {
         miClient.getGuiDatePickerXXX().formReset();
         miClient.getGuiDatePickerXXX().setDate(moFieldDateEnd.getDate());
         miClient.getGuiDatePickerXXX().setVisible(true);
 
         if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moFieldDateEnd.setFieldValue(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateEnd.requestFocusInWindow();
+            jftDateEnd_n.requestFocusInWindow();
         }
     }
 
@@ -2632,7 +2632,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JButton jbNewCusBranchConfig;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRecreateBizPartnerCommercial;
-    private javax.swing.JButton jbSetDateEnd;
+    private javax.swing.JButton jbSetDateEnd_n;
     private javax.swing.JButton jbSetDateStart;
     private javax.swing.JButton jbSupplier;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiCfdiUsage;
@@ -2673,7 +2673,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JCheckBox jckIsSignImmex;
     private javax.swing.JCheckBox jckIsSignRestricted;
     private javax.swing.JFormattedTextField jftAlternativeId;
-    private javax.swing.JFormattedTextField jftDateEnd;
+    private javax.swing.JFormattedTextField jftDateEnd_n;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JFormattedTextField jftKey;
     private javax.swing.JLabel jlAlternativeId;
@@ -2687,7 +2687,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlCompanyKey2;
     private javax.swing.JLabel jlCompanyKey3;
     private javax.swing.JLabel jlCreditLimit;
-    private javax.swing.JLabel jlDateEnd;
+    private javax.swing.JLabel jlDateEnd_n;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlDaysOfCredit;
     private javax.swing.JLabel jlDaysOfGrace;
@@ -2899,6 +2899,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     public erp.lib.form.SFormValidation formValidate() {
         focusLostAlternativeId();
         focusLostFiscalId();
+        
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -2910,9 +2911,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         }
 
         if (!validation.getIsError()) {
-            Object[] oParamsIn = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), moFieldBizPartner.getString() };
-            Object[] oParamsInFiscal = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), jtfFiscalId.getText().trim()};
-
+            String fiscalId = jtfFiscalId.getText().trim();
+            int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
+            
             if (moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0] == 0) {
                 validation.setTabbedPaneIndex(0);
                 validation.setComponent(jcbFkTaxIdentityTypeId);
@@ -2933,47 +2934,73 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
-            else if (jtfFiscalId.getText().trim().length() > 0 && jtfFiscalId.getText().trim().length() < (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG)) {
+            else if (!fiscalId.isEmpty() && fiscalId.length() != fiscalIdLength) {
                 validation.setTabbedPaneIndex(0);
                 validation.setComponent(jtfFiscalId);
-                validation.setMessage("El valor para el campo '" + jlFiscalId.getText() + "' debe estar completo.");
+                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "' debe tener " + fiscalIdLength + " caracteres.");
             }
             else {
-                try {
-                    if (!validation.getIsError() && jckIsDeleted.isSelected() && SFinUtilities.hasBizPartnerMovesFinance(miClient, miClient.getSessionXXX().getSystemYear(), moBizPartner.getPkBizPartnerId())) {
-                        validation.setMessage("No se puede eliminar el '" + getTitle() + "' debido a que tiene movimientos en el ejercicio actual.");
-                        validation.setComponent(jckIsDeleted);
-                    }
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
-                }
-
-                if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, oParamsIn, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jlBizPartner.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
-                        validation.setTabbedPaneIndex(0);
-                        validation.setComponent(jtfBizPartner);
-                        validation.setIsError(true);
-                    }
-                }
-
-                if (!validation.getIsError()) {
-                    if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, oParamsInFiscal, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                        if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
+                if (jckIsDeleted.isSelected() || jckIsCategoryDeleted.isSelected()) {
+                    try {
+                        if (SFinUtilities.hasBizPartnerMovesFinance(miClient, miClient.getSessionXXX().getSystemYear(), moBizPartner.getPkBizPartnerId())) {
                             validation.setTabbedPaneIndex(0);
-                            validation.setComponent(jtfFiscalId);
-                            validation.setIsError(true);
+                            validation.setComponent(jckIsDeleted);
+                            validation.setMessage("No se puede eliminar al '" + getTitle() + "' o a su categoría debido a que tiene movimientos en el ejercicio actual " + miClient.getSessionXXX().getSystemYear() + ".");
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                    
+                    if (!validation.getIsError()) {
+                        if (jckIsDeleted.isSelected() && miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar al '" + getTitle() + "'?") != JOptionPane.YES_OPTION) {
+                            validation.setTabbedPaneIndex(0);
+                            validation.setComponent(jckIsDeleted);
+                            validation.setMessage("Se debe deseleccionar el campo '" + jckIsDeleted.getText() + "' para no eliminar al '" + getTitle() + "'.");
+                        }
+                        
+                        if (!validation.getIsError()) {
+                            if (jckIsCategoryDeleted.isSelected() && miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar la categoría del '" + getTitle() + "'?") != JOptionPane.YES_OPTION) {
+                                validation.setTabbedPaneIndex(0);
+                                validation.setComponent(jckIsCategoryDeleted);
+                                validation.setMessage("Se debe deseleccionar el campo '" + jckIsCategoryDeleted.getText() + "' para no eliminar la categoría del '" + getTitle() + "'.");
+                            }
                         }
                     }
                 }
 
                 if (!validation.getIsError()) {
+                    Object[] valParams = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), moFieldBizPartner.getString() }; // odd parameters passing
+                    int valCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, valParams, SLibConstants.EXEC_MODE_VERBOSE);
+                    
+                    if (valCount > 0 && miClient.showMsgBoxConfirm("El valor del campo '" + jlBizPartner.getText() + "', '" + moFieldBizPartner.getString() + "',"
+                            + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
+                        validation.setTabbedPaneIndex(0);
+                        validation.setComponent(jtfBizPartner);
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlBizPartner.getText() + "'.");
+                    }
+                    
+                    if (!validation.getIsError()) {
+                        valParams = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), fiscalId }; // odd parameters passing
+                        valCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, valParams, SLibConstants.EXEC_MODE_VERBOSE);
+                        
+                        if (valCount > 0 && miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "',"
+                                + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
+                            validation.setTabbedPaneIndex(0);
+                            validation.setComponent(jtfFiscalId);
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFiscalId.getText() + "'.");
+                        }
+                    }
+                }
+                
+                if (!validation.getIsError()) {
                     validation = moPanelBizPartnerBranch.formValidate();
                     validation.setTabbedPaneIndex(0);
                 }
 
-                if (!validation.getIsError() && mnParamBizPartnerCategory != SDataConstantsSys.BPSS_CT_BP_CO) {
+                if (!validation.getIsError() && !isCompany()) {
                     validation.setTabbedPaneIndex(1);
+                    
                     for (int i = 0; i < mvFieldsCategory.size(); i++) {
                         if (!((erp.lib.form.SFormField) mvFieldsCategory.get(i)).validateField()) {
                             validation.setIsError(true);
@@ -2981,48 +3008,42 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                             break;
                         }
                     }
+                    
                     if (!validation.getIsError()) {
-                        if (moFieldDateEnd.getFieldValue() != null) {
-                            if (moFieldDateStart.getDate().after(moFieldDateEnd.getDate())) {
-                                validation.setMessage("La fecha del campo '" + jlDateStart.getText() + "' no puede ser posterior a la del campo '" + jlDateEnd.getText() + "'.");
-                                validation.setComponent(jftDateEnd);
+                        if (moFieldDateEnd.getFieldValue() != null && moFieldDateStart.getDate().after(moFieldDateEnd.getDate())) {
+                            validation.setComponent(jftDateEnd_n);
+                            validation.setMessage("La fecha del campo '" + jlDateStart.getText() + "' no puede ser posterior a la del campo '" + jlDateEnd_n.getText() + "'.");
+                        }
+                        else if (moFieldKey.getString().isEmpty() && (
+                                isSupplier() && miClient.getSessionXXX().getParamsErp().getIsKeySupplierApplying() || 
+                                isCustomer() && miClient.getSessionXXX().getParamsErp().getIsKeyCustomerApplying())) {
+                            validation.setComponent(jftKey);
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlKey.getText() + "'.");
+                        }
+                        else if (isCustomerOrSupplier()) { // redundant if statement
+                            if (jcbFkCreditTypeId_n.isEnabled() && jcbFkCreditTypeId_n.getSelectedIndex() <= 0) {
+                                validation.setComponent(jcbFkCreditTypeId_n);
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkCreditTypeId_n.getText() + "'.");
                             }
-                        }
-                    }
-                    if (!validation.getIsError()) {
-                        if (isSupplier() && miClient.getSessionXXX().getParamsErp().getIsKeySupplierApplying() && moFieldKey.getString().length() == 0) {
-                            validation.setComponent(jftKey);
-                            validation.setMessage("Se debe ingresar un valor para el campo '" + jlKey.getText() + "'.");
-                        }
-                        else if (isCustomer() && miClient.getSessionXXX().getParamsErp().getIsKeyCustomerApplying() && moFieldKey.getString().length() == 0) {
-                            validation.setComponent(jftKey);
-                            validation.setMessage("Se debe ingresar un valor para el campo '" + jlKey.getText() + "'.");
-                        }
-                        else if (jcbFkCreditTypeId_n.isEnabled() && moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == 0 && (moBizPartnerCategory.getFkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_SUP ||
-                                moBizPartnerCategory.getFkBizPartnerCategoryId() == SDataConstantsSys.BPSS_CT_BP_CUS)) {
-                            validation.setComponent(jcbFkCreditTypeId_n);
-                            validation.setMessage("Se debe seleccionar una opción para el campo '" + jlFkCreditTypeId_n.getText() + "'.");
-                        }
-                        else if (isCustomerOrSupplier()) {
-                            if (jcbFkCreditTypeId_n.isEnabled() && moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM && moFieldCreditLimit.getDouble() == 0) {
+                            else if (jcbFkCreditTypeId_n.isEnabled() && moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_CRED_CRED_LIM && moFieldCreditLimit.getDouble() == 0) {
                                 validation.setComponent(jtfCreditLimit);
-                                validation.setMessage("Se debe ingresar un valor para el campo '" + jlCreditLimit.getText() + "'.");
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCreditLimit.getText() + "'.");
                             }
                             else if (jcbFkCreditTypeId_n.isEnabled() && moFieldFkCreditTypeId_n.getKeyAsIntArray()[0] != SDataConstantsSys.BPSS_TP_CRED_CRED_NO && moFieldDaysOfCredit.getDouble() == 0) {
                                 validation.setComponent(jtfDaysOfCredit);
-                                validation.setMessage("Se debe ingresar un valor para el campo '" + jlDaysOfCredit.getText() + "'.");
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDaysOfCredit.getText() + "'.");
                             }
                             else if (moFieldGuaranteeAmount.getDouble() == 0 && moFieldIsGuaranteeInProcess.getBoolean()) {
                                 validation.setComponent(jtfGuarantee);
-                                validation.setMessage("Se debe ingresar un valor para el campo '" + jlGuarantee.getText() + "'.");
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlGuarantee.getText() + "'.");
                             }
                             else if (moFieldGuaranteeAmount.getDouble() != 0 && bgGuaranteeType.getSelection() == null) {
                                 validation.setComponent(jrbGuaranteeTypePay);
-                                validation.setMessage("Se debe ingresar un valor para el campo '" + jlGuaranteeType.getText() + "'.");
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlGuaranteeType.getText() + "'.");
                             }
                             else if (moFieldInsuranceAmount.getDouble() == 0 && moFieldIsInsuranceInProcess.getBoolean()) {
                                 validation.setComponent(jtfInsurance);
-                                validation.setMessage("Se debe ingresar un valor para el campo '" + jlInsurance.getText() + "'.");
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlInsurance.getText() + "'.");
                             }
                         }
                     }
@@ -3030,6 +3051,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
                 if (!validation.getIsError() && isCustomer()) {
                     validation.setTabbedPaneIndex(2);
+                    
                     for (int i = 0; i < mvFieldsCusConfig.size(); i++) {
                         if (!((erp.lib.form.SFormField) mvFieldsCusConfig.get(i)).validateField()) {
                             validation.setIsError(true);
@@ -3037,30 +3059,31 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                             break;
                         }
                     }
+                    
                     if (!validation.getIsError()) {
                         for (int i = 0; i < moCusBranchConfigPane.getTableGuiRowCount(); i++) {
                             SDataCustomerBranchConfig oDataCustomerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(i).getData();
-                            if (oDataCustomerBranchConfig.getDbmsSalesRoute().length() > 0) {
+                            if (oDataCustomerBranchConfig.getDbmsSalesRoute().isEmpty()) {
+                                validation.setMessage("No se ha capturado la configuración de comercialización para la sucursal del cliente del renglón " + (i + 1) + ".");
+                                break;
                             }
-                            else {
-                                validation.setMessage("No se ha especificado la configuración de comercialización para algunas sucursales del cliente.");
+                        }
+                        
+                        if (!validation.getIsError()) {
+                            if (moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] != 0 && moFieldFkSalesAgentId_n.getKeyAsIntArray()[0] == 0) {
+                                validation.setComponent(jcbFkSalesAgentId_n);
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSalesAgentId_n.getText() + "'.");
+                            }
+                            
+                            if (!validation.getIsError()) {
+                                if (moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] != 0 && moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] == moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]) {
+                                    validation.setComponent(jcbFkSalesSupervisorId_n);
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkSalesSupervisorId_n.getText() + "'.");
+                                }
                             }
                         }
                     }
                 }
-
-                if (!validation.getIsError() && moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] != 0 && moFieldFkSalesAgentId_n.getKeyAsIntArray()[0] == 0) {
-                    validation.setMessage("Se debe ingresar un valor para el campo '" + jlFkSalesAgentId_n.getText() + "'.");
-                    validation.setTabbedPaneIndex(2);
-                    validation.setComponent(jcbFkSalesAgentId_n);
-                }
-
-                if (!validation.getIsError() && moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] != 0 && moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] == moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]) {
-                    validation.setMessage("Se debe ingresar un valor diferente para el campo '" + jlFkSalesAgentId_n.getText() + "'.");
-                    validation.setTabbedPaneIndex(2);
-                    validation.setComponent(jcbFkSalesAgentId_n);
-                }
-
             }
         }
 
@@ -3605,8 +3628,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             if (button == jbSetDateStart) {
                 actionSetDateStart();
             }
-            else if (button == jbSetDateEnd) {
-                actionSetDateEnd();
+            else if (button == jbSetDateEnd_n) {
+                actionSetDateEnd_n();
             }
             else if (button == jbFkLanguageId_n) {
                 actionFkLanguageId();

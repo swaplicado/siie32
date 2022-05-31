@@ -4,6 +4,7 @@
  */
 package erp.mbps.form;
 
+import cfd.DCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -687,6 +688,14 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         }
     }
 
+    private boolean isCreditor() {
+        return mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CDR;
+    }
+    
+    private boolean isDebtor() {
+        return mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_DBR;
+    }
+    
     private String getBizPartnerName() {
         String name = "";
 
@@ -1046,7 +1055,6 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
-        String email = "";
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -1058,72 +1066,99 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         }
 
         if (!validation.getIsError()) {
-            Object[] oParamsIn = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), moFieldBizPartner.getString() };
-            Object[] oParamsInFiscal = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), jtfFiscalId.getText().trim()};
+            String fiscalId = jtfFiscalId.getText().trim();
+            int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
 
-            if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER && jtfFirstName.getText().length() == 0) {
+            if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER && jtfLastName.getText().isEmpty()) {
+                validation.setComponent(jtfLastName);
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlLastName.getText() + "'.");
+            }
+            else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER && jtfFirstName.getText().isEmpty()) {
                 validation.setComponent(jtfFirstName);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFirstName.getText() + "'.");
             }
-            else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_ORG && jtfBizPartner.getText().length() == 0) {
+            else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_ORG && jtfBizPartner.getText().isEmpty()) {
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
-            else if (jtfFiscalId.getText().trim().length() > 0 && jtfFiscalId.getText().trim().length() < (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? 13 : 12)) {
+            else if (!fiscalId.isEmpty() && fiscalId.length() != fiscalIdLength) {
                 validation.setComponent(jtfFiscalId);
-                validation.setMessage("El valor para el campo '" + jlFiscalId.getText() + "' debe estar completo.");
+                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "' debe tener " + fiscalIdLength + " caracteres.");
             }
             else {
-                try {
-                    if (!validation.getIsError() && jckIsDeleted.isSelected() && SFinUtilities.hasBizPartnerMovesFinance(miClient, miClient.getSessionXXX().getSystemYear(), moBizPartner.getPkBizPartnerId())) {
-                        validation.setMessage("No se puede eliminar el '" + getTitle() + "' debido a que tiene movimientos en el ejercicio actual.");
-                        validation.setComponent(jckIsDeleted);
-                    }
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
-                }
-
-                if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, oParamsIn, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jlBizPartner.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
-                        validation.setTabbedPaneIndex(0);
-                        validation.setComponent(jtfBizPartner);
-                        validation.setIsError(true);
-                    }
-                }
-
-                if (!validation.getIsError()) {
-                    if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, oParamsInFiscal, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                        if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
+                if (jckIsDeleted.isSelected() || jckIsCategoryDeleted.isSelected()) {
+                    try {
+                        if (SFinUtilities.hasBizPartnerMovesFinance(miClient, miClient.getSessionXXX().getSystemYear(), moBizPartner.getPkBizPartnerId())) {
                             validation.setTabbedPaneIndex(0);
-                            validation.setComponent(jtfFiscalId);
-                            validation.setIsError(true);
+                            validation.setComponent(jckIsDeleted);
+                            validation.setMessage("No se puede eliminar al '" + getTitle() + "' o su categoría debido a que tiene movimientos en el ejercicio actual " + miClient.getSessionXXX().getSystemYear() + ".");
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                    
+                    if (!validation.getIsError()) {
+                        if (jckIsDeleted.isSelected() && miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar al '" + getTitle() + "'?") != JOptionPane.YES_OPTION) {
+                            validation.setTabbedPaneIndex(0);
+                            validation.setComponent(jckIsDeleted);
+                            validation.setMessage("Se debe deseleccionar el campo '" + jckIsDeleted.getText() + "' para no eliminar al '" + getTitle() + "'.");
+                        }
+                        
+                        if (!validation.getIsError()) {
+                            if (jckIsCategoryDeleted.isSelected() && miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar la categoría del '" + getTitle() + "'?") != JOptionPane.YES_OPTION) {
+                                validation.setTabbedPaneIndex(0);
+                                validation.setComponent(jckIsCategoryDeleted);
+                                validation.setMessage("Se debe deseleccionar el campo '" + jckIsCategoryDeleted.getText() + "' para no eliminar la categoría del '" + getTitle() + "'.");
+                            }
                         }
                     }
                 }
 
                 if (!validation.getIsError()) {
-                    if (mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CDR && miClient.getSessionXXX().getParamsErp().getIsKeyCreditorApplying() && moFieldKey.getString().length() == 0) {
-                        validation.setComponent(jftKey);
-                        validation.setMessage("Se debe ingresar un valor para el campo '" + jlKey.getText() + "'.");
+                    Object[] valParams = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), moFieldBizPartner.getString() }; // odd parameters passing
+                    int valCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, valParams, SLibConstants.EXEC_MODE_VERBOSE);
+                    
+                    if (valCount > 0 && miClient.showMsgBoxConfirm("El valor del campo '" + jlBizPartner.getText() + "', '" + moFieldBizPartner.getString() + "',"
+                            + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
+                        validation.setTabbedPaneIndex(0);
+                        validation.setComponent(jtfBizPartner);
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlBizPartner.getText() + "'.");
                     }
-                    else if (mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_DBR && miClient.getSessionXXX().getParamsErp().getIsKeyDebtorApplying() && moFieldKey.getString().length() == 0) {
-                        validation.setComponent(jftKey);
-                        validation.setMessage("Se debe ingresar un valor para el campo '" + jlKey.getText() + "'.");
+                    
+                    if (!validation.getIsError()) {
+                        valParams = new Object[] { moBizPartner == null ? 0 : moBizPartner.getPkBizPartnerId(), fiscalId }; // odd parameters passing
+                        valCount = SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP_FISCAL_ID, valParams, SLibConstants.EXEC_MODE_VERBOSE);
+                        
+                        if (valCount > 0 && miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "',"
+                                + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
+                            validation.setTabbedPaneIndex(0);
+                            validation.setComponent(jtfFiscalId);
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFiscalId.getText() + "'.");
+                        }
                     }
                 }
-            }
-        }
 
-        if (!validation.getIsError() && jckCaptureAddress.isSelected()) {
-            validation = moPanelBizPartnerBranchAddress.formValidate();
-        }
-
-        if (!validation.getIsError() && moFieldEmail.getString().length() > 0) {
-            email = SLibUtilities.validateEmail(moFieldEmail.getString());
-            if (email.length() > 0) {
-                validation.setComponent(jtfEmail);
-                validation.setMessage(email);
+                if (!validation.getIsError()) {
+                    if (moFieldKey.getString().isEmpty() && (
+                            isCreditor() && miClient.getSessionXXX().getParamsErp().getIsKeyCreditorApplying() ||
+                            isDebtor() && miClient.getSessionXXX().getParamsErp().getIsKeyDebtorApplying())) {
+                        validation.setComponent(jftKey);
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlKey.getText() + "'.");
+                    }
+                }
+                
+                if (!validation.getIsError() && !moFieldEmail.getString().isEmpty()) {
+                    String message = SLibUtilities.validateEmail(moFieldEmail.getString());
+                    if (!message.isEmpty()) {
+                        validation.setComponent(jtfEmail);
+                        validation.setMessage(message);
+                    }
+                }
+                
+                if (!validation.getIsError() && jckCaptureAddress.isSelected()) {
+                    validation = moPanelBizPartnerBranchAddress.formValidate();
+                }
             }
         }
 
@@ -1179,10 +1214,10 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         maoDbmsCategorySettings[0] = moBizPartner.getDbmsCategorySettingsCdr();
         maoDbmsCategorySettings[1] = moBizPartner.getDbmsCategorySettingsDbr();
 
-        if (mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CDR) {
+        if (isCreditor()) {
             moBizPartnerCategory = maoDbmsCategorySettings[0];
         }
-        else if (mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_DBR) {
+        else if (isDebtor()) {
             moBizPartnerCategory = maoDbmsCategorySettings[1];
         }
 

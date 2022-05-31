@@ -1392,7 +1392,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlDateEnd">
+                        <Component class="javax.swing.JLabel" name="jlDateEnd_n">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Fin de operaciones:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -1400,7 +1400,7 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JFormattedTextField" name="jftDateEnd">
+                        <Component class="javax.swing.JFormattedTextField" name="jftDateEnd_n">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="dd/mm/yyyy"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -1408,7 +1408,7 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JButton" name="jbSetDateEnd">
+                        <Component class="javax.swing.JButton" name="jbSetDateEnd_n">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/cal_date_day.gif"/>

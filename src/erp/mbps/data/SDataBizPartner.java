@@ -644,12 +644,12 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                         moDbmsDataEmployee.setPkEmployeeId(mnPkBizPartnerId);
 
                         if (moDbmsDataEmployee.getIsRegistryNew()) {
-                            moDbmsDataEmployee.setFkUserNewId(userId);
-                            moDbmsDataEmployee.setFkUserInsertId(userId);
+                            //moDbmsDataEmployee.setFkUserNewId(userId); // not implemented, because class is aligned to framework SA 1.0
+                            moDbmsDataEmployee.setFkUserInsertId(userId); // aligned to framework SA 1.0
                         }
                         else {
-                            moDbmsDataEmployee.setFkUserEditId(userId);
-                            moDbmsDataEmployee.setFkUserUpdateId(userId);
+                            //moDbmsDataEmployee.setFkUserEditId(userId); // not implemented, because class is aligned to framework SA 1.0
+                            moDbmsDataEmployee.setFkUserUpdateId(userId); // aligned to framework SA 1.0
                         }
 
                         if (moDbmsDataEmployee.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
