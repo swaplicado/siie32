@@ -23,6 +23,7 @@ import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataAccountItem;
 import erp.mfin.data.SDataAccountTax;
 import erp.mfin.data.SDataAdministrativeConceptType;
+import erp.mfin.data.SDataBankNbDay;
 import erp.mfin.data.SDataCardIssuer;
 import erp.mfin.data.SDataCheck;
 import erp.mfin.data.SDataCheckPrintingFormat;
@@ -30,7 +31,6 @@ import erp.mfin.data.SDataCheckWallet;
 import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.data.SDataExchangeRate;
-import erp.mfin.data.SDataBankNbDay;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataTaxBasic;
 import erp.mfin.data.SDataTaxGroup;
@@ -221,8 +221,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinLayoutBankPendingAdvances;
     private javax.swing.JMenuItem jmiFinLayoutBankDoneAdvances;
     private javax.swing.JMenuItem jmiFinItemCost;
-    private javax.swing.JMenuItem jmiFinCfdPayment;
-    private javax.swing.JMenuItem jmiFinCfdPaymentExtended;
     private javax.swing.JMenuItem jmiFinReceiptPayment;
     private javax.swing.JMenuItem jmiFinMassDownloadCfdi;
     private javax.swing.JMenuItem jmiFinMassInvoices;
@@ -576,8 +574,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances = new JMenuItem("Layouts de anticipos por pagar");
         jmiFinLayoutBankDoneAdvances = new JMenuItem("Layouts de anticipos pagados");
         jmiFinItemCost = new JMenuItem("Costos de ítems");
-        jmiFinCfdPayment = new JMenuItem("CFDI recepción de pagos");
-        jmiFinCfdPaymentExtended = new JMenuItem("CFDI recepción de pagos extendida");
         jmiFinReceiptPayment = new JMenuItem("Registros CFDI recepción de pagos");
         jmiFinMassDownloadCfdi = new JMenuItem("Descarga masiva de CFDI...");
         jmiFinMassInvoices = new JMenuItem("Envío masivo de facturas...");
@@ -909,8 +905,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances.addActionListener(this);
         jmiFinLayoutBankDoneAdvances.addActionListener(this);
         jmiFinItemCost.addActionListener(this);
-        jmiFinCfdPayment.addActionListener(this);
-        jmiFinCfdPaymentExtended.addActionListener(this);
         jmiFinReceiptPayment.addActionListener(this);
         jmiFinMassDownloadCfdi.addActionListener(this);
         jmiFinMassInvoices.addActionListener(this);
@@ -1119,8 +1113,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankDoneAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinItemCost.setEnabled(hasRightMoveAccCash);
-        jmiFinCfdPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
-        jmiFinCfdPaymentExtended.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinReceiptPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
         jmiFinMassInvoices.setEnabled(hasRightMoveAccCash);
@@ -2118,12 +2110,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinItemCost) {
                 miClient.getSession().showView(SModConsts.TRN_ITEM_COST, SLibConstants.UNDEFINED, null);
-            }
-            else if (item == jmiFinCfdPayment) {
-                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC, SDataConstants.TRNX_CFD_PAY_REC);
-            }
-            else if (item == jmiFinCfdPaymentExtended) {
-                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC, SDataConstants.TRNX_CFD_PAY_REC_EXT);
             }
             else if (item == jmiFinReceiptPayment) {
                 miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRN_PAY);

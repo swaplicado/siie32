@@ -65,12 +65,12 @@ public abstract class SCfdPaymentUtils {
                     try {
                         if (((SClientInterface) client).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
                             if (SCfdUtils.signAndSendCfdi(client, cfd, SLibConstants.UNDEFINED, true, true)) {
-                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRNX_CFD_PAY_REC);
+                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_PAY);
                             }
                         }
                         else {
                             if (SCfdUtils.signCfdi(client, cfd, SLibConstants.UNDEFINED)) {
-                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRNX_CFD_PAY_REC);
+                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_PAY);
                             }
                         }
                     }

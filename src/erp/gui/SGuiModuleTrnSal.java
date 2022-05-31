@@ -1573,18 +1573,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "Registros CFDI pagos";
                     break;
                     
-                case SDataConstants.TRNX_CFD_PAY_REC:
-                    oViewClass = erp.mtrn.view.SViewCfdPayment.class;
-                    switch(auxType01) {
-                        case SDataConstants.TRNX_CFD_PAY_REC:
-                            sViewTitle = "CFDI pagos";
-                            break;
-                        case SDataConstants.TRNX_CFD_PAY_REC_EXT:
-                            sViewTitle = "CFDI pagos ext";
-                            break;
-                    }
-                    break;
-
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
             }
@@ -1662,7 +1650,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                                         (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true,
                                                         (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
                                                         (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID),
+                                                        (boolean) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL));
                                             }
                                             else {
                                                 SCfdUtils.cancelCfdi(miClient, cfd, 0, 
@@ -1670,7 +1659,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                                         (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
                                                         (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
                                                         (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                        (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID),
+                                                        (boolean) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL));
                                             }
                                             
                                             result = SLibConstants.DB_ACTION_ANNUL_OK;
@@ -1717,7 +1707,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                                     (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
                                                     (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
                                                     (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID),
+                                                    (boolean) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL));
                                         }
                                         else {
                                             SCfdUtils.cancelCfdi(miClient, cfd, 0, 
@@ -1725,7 +1716,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                                     (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
                                                     (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN),
                                                     (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_REASON),
-                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID));
+                                                    (String) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RELATED_UUID),
+                                                    (boolean) params.getParamsMap().get(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL));
                                         }
                                         
                                         result = SLibConstants.DB_ACTION_ANNUL_OK;

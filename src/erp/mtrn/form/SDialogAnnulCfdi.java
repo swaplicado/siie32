@@ -43,7 +43,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     private erp.lib.form.SFormField moFieldAnnulSat;
     private erp.lib.form.SFormField moFieldAnnulReason;
     private erp.lib.form.SFormField moFieldAnnulRelatedUuid;
-    private erp.lib.form.SFormField moFieldForceAnnul;
+    private erp.lib.form.SFormField moFieldRetryCancel;
     private DecimalFormat moAnnulReasonFormat;
     
     private Date mtDateDps;
@@ -86,7 +86,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         jlAnnulRelatedUuid = new javax.swing.JLabel();
         jtfAnnulRelatedUuid = new javax.swing.JTextField();
         jPanel9 = new javax.swing.JPanel();
-        jckForceAnnul = new javax.swing.JCheckBox();
+        jckRetryCancel = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -172,9 +172,9 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckForceAnnul.setText("Intentar aunque el comprobante sea no cancelable");
-        jckForceAnnul.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel9.add(jckForceAnnul);
+        jckRetryCancel.setText("Reintentar cancelar nuevamente aún si el receptor rechazó la solicitud de cancelación anterior");
+        jckRetryCancel.setPreferredSize(new java.awt.Dimension(500, 23));
+        jPanel9.add(jckRetryCancel);
 
         jPanel1.add(jPanel9);
 
@@ -198,7 +198,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(496, 339));
+        setSize(new java.awt.Dimension(536, 339));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -218,7 +218,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         moFieldAnnulReason = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyAnnulReason, jlAnnulReason);
         moKeyAnnulReason.setKeySettings((SGuiClient) miClient, jlAnnulReason.getName(), true);
         moFieldAnnulRelatedUuid = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAnnulRelatedUuid, jlAnnulRelatedUuid);
-        moFieldForceAnnul = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckForceAnnul, jckForceAnnul);
+        moFieldRetryCancel = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckRetryCancel, jckRetryCancel);
         
         mvFields = new Vector<>();
         mvFields.add(moFieldAnnulDate);
@@ -226,7 +226,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldAnnulSat);
         mvFields.add(moFieldAnnulReason);
         mvFields.add(moFieldAnnulRelatedUuid);
-        mvFields.add(moFieldForceAnnul);
+        mvFields.add(moFieldRetryCancel);
 
         jbCancel.addActionListener(this);
         jbOk.addActionListener(this);
@@ -277,17 +277,17 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     private void itemStateChangedAnnulSat() {
         moFieldAnnulReason.resetField();
         moFieldAnnulRelatedUuid.resetField();
-        moFieldForceAnnul.resetField();
+        moFieldRetryCancel.resetField();
         
         if (jckAnnulSat.isSelected()) {
             moKeyAnnulReason.setEnabled(true);
             jtfAnnulRelatedUuid.setEnabled(true);
-            jckForceAnnul.setEnabled(false);
+            jckRetryCancel.setEnabled(true);
         }
         else {
             moKeyAnnulReason.setEnabled(false);
             jtfAnnulRelatedUuid.setEnabled(false);
-            jckForceAnnul.setEnabled(false);
+            jckRetryCancel.setEnabled(false);
         }
     }
     
@@ -346,7 +346,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JCheckBox jckAnnulSat;
-    private javax.swing.JCheckBox jckForceAnnul;
+    private javax.swing.JCheckBox jckRetryCancel;
     private javax.swing.JLabel jlAnnulDate;
     private javax.swing.JLabel jlAnnulReason;
     private javax.swing.JLabel jlAnnulRelatedUuid;
@@ -376,6 +376,10 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     
     public String getAnnulRelatedUuid() {
         return jtfAnnulRelatedUuid.getText();
+    }
+    
+    public boolean isRetryCancelSelected() {
+        return jckRetryCancel.isSelected();
     }
     
     @Override

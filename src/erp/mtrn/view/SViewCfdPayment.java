@@ -46,6 +46,7 @@ import sa.lib.srv.SLock;
  * User view for management of database registries of CFDI of Payments.
  * @author Sergio Flores, Isabel Servín, Claudio Peña
  */
+@Deprecated
 public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private javax.swing.JButton jbAnnul;
@@ -74,11 +75,6 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         super(client, tabTitle, SDataConstants.TRNX_CFD_PAY_REC, auxType01);
         mnAuxType = auxType01;
         initComponents();
-        miClient.showMsgBoxInformation("ACLARACIÓN:\n"
-                + "Esta vista está próxima a ser obsoleta.\n"
-                + "Favor de confirmar con soporte técnico SIIE si ya debe dejar de usarse.\n"
-                + "Tel. 443 204-1032 ext. 105\n"
-                + "Mail: claudio.pena@swaplicado.com.mx");
     }
 
     private void initComponents() {
@@ -380,6 +376,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                                         
                                         params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, moDialogAnnulCfdi.getAnnulReason());
                                         params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, moDialogAnnulCfdi.getAnnulRelatedUuid());
+                                        params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL, moDialogAnnulCfdi.isRetryCancelSelected());
                                     }
                                 }
                                 else {
@@ -392,6 +389,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                                     
                                     params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, "");
                                     params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, "");
+                                    params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL, false);
                                 }
                             }
 

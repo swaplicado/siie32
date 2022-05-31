@@ -740,6 +740,7 @@ public abstract class SDataUtilities {
             case SDataConstants.TRN_CFD_SIGN_LOG:
                 registry = new SDataCfdSignLog();
                 break;
+            case SDataConstants.TRN_PAY:
             case SDataConstants.TRNX_CFD_PAY_REC:
                 registry = new SDataCfdPayment();
                 break;

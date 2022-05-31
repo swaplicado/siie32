@@ -25,8 +25,9 @@ public class SLogBillOfLadingAnnul {
     protected int mnDpsAnnulType;
     protected String msAnnulReason;
     protected String msAnnulRelatedUuid;
+    protected boolean mbRetryCancel;
     
-    public SLogBillOfLadingAnnul(SClientInterface client, SDataCfd cfd, Date dateAnnul, boolean annulSat, int dpsAnnulType, String annulReason, String annulRelatedUuid) {
+    public SLogBillOfLadingAnnul(SClientInterface client, SDataCfd cfd, Date dateAnnul, boolean annulSat, int dpsAnnulType, String annulReason, String annulRelatedUuid, boolean retryCancel) {
         miClient = client;
         moCfd = cfd;
         mtDateAnnul = dateAnnul;
@@ -34,6 +35,7 @@ public class SLogBillOfLadingAnnul {
         mnDpsAnnulType = dpsAnnulType;
         msAnnulReason = annulReason;
         msAnnulRelatedUuid = annulRelatedUuid;
+        mbRetryCancel = retryCancel;
     }
 
     
@@ -42,10 +44,10 @@ public class SLogBillOfLadingAnnul {
         
         if (mbAnnulSat) {
             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                cancel = SCfdUtils.cancelAndSendCfdi(miClient, moCfd, 0, mtDateAnnul, mbAnnulSat, true, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid);
+                cancel = SCfdUtils.cancelAndSendCfdi(miClient, moCfd, 0, mtDateAnnul, mbAnnulSat, true, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid, mbRetryCancel);
             }
             else {
-                cancel = SCfdUtils.cancelCfdi(miClient, moCfd, 0, mtDateAnnul, mbAnnulSat, true, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid);
+                cancel = SCfdUtils.cancelCfdi(miClient, moCfd, 0, mtDateAnnul, mbAnnulSat, true, mnDpsAnnulType, msAnnulReason, msAnnulRelatedUuid, mbRetryCancel);
             }
         }
         else {

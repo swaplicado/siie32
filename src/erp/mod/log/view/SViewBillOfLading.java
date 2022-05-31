@@ -383,9 +383,6 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     }
     
     private void actionAnnul() {
-        boolean needUpdate = false;
-        SLogBillOfLadingAnnul bolAnnul;
-        
         if (jbAnnul.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -404,6 +401,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
+                        boolean annulled = false;
                         SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
 
                         moDialogAnnulCfdi.formReset();
@@ -413,11 +411,21 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                         moDialogAnnulCfdi.setVisible(true);
 
                         if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            bolAnnul = new SLogBillOfLadingAnnul((SClientInterface) miClient, cfd, moDialogAnnulCfdi.getAnnulDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulType(), moDialogAnnulCfdi.getAnnulReason(), moDialogAnnulCfdi.getAnnulRelatedUuid());
-                            bolAnnul.annulBillOfLading();
+                            SLogBillOfLadingAnnul bolAnnul = new SLogBillOfLadingAnnul(
+                                    (SClientInterface) miClient, 
+                                    cfd, 
+                                    moDialogAnnulCfdi.getAnnulDate(), 
+                                    moDialogAnnulCfdi.getAnnulSat(), 
+                                    moDialogAnnulCfdi.getDpsAnnulType(), 
+                                    moDialogAnnulCfdi.getAnnulReason(), 
+                                    moDialogAnnulCfdi.getAnnulRelatedUuid(), 
+                                    moDialogAnnulCfdi.isRetryCancelSelected()
+                            );
+                            
+                            annulled = bolAnnul.annulBillOfLading();
                         }
 
-                        if (needUpdate) {
+                        if (annulled) {
                             miClient.getSession().notifySuscriptors(mnGridType);
                         }
                     }

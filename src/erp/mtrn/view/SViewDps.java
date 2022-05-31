@@ -848,6 +848,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 
                                 params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, moDialogAnnulCfdi.getAnnulReason());
                                 params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, moDialogAnnulCfdi.getAnnulRelatedUuid());
+                                params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL, moDialogAnnulCfdi.isRetryCancelSelected());
                             }
                         }
                         else {
@@ -860,6 +861,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             
                             params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, "");
                             params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, "");
+                            params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL, false);
                         }
                     }
 

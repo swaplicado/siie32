@@ -288,13 +288,6 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
     }
 
     private void actionAnnulCfdi() {
-        boolean needUpdate = false;
-        SDataCfd cfd = null;
-        ArrayList<SDataCfd> cfds = null;
-        SHrsPayrollAnnul payrollAnnul = null;
-        ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
-        SDataPayrollReceiptIssue receiptIssue = null;
-
         if (jbAnnulCfdi.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -313,7 +306,9 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        receiptIssues = new ArrayList<>();
+                        SDataCfd cfd = null;
+                        ArrayList<SDataCfd> cfds = null;
+                        ArrayList<SDataPayrollReceiptIssue> receiptIssues = new ArrayList<>();
                         
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
                             cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, getPayrollCfdVersion(), gridRow.getRowPrimaryKey());
@@ -331,7 +326,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                             }
             
                             if (!isPayrollCfdVersionOld()) {
-                                receiptIssue = new SDataPayrollReceiptIssue();
+                                SDataPayrollReceiptIssue receiptIssue = new SDataPayrollReceiptIssue();
                                 
                                 if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
                                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
@@ -340,6 +335,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                             }
                         }
                         
+                        boolean annulled = false;
+                        
                         moDialogAnnulCfdi.formReset();
                         moDialogAnnulCfdi.formRefreshCatalogues();
                         moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds == null || cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
@@ -347,16 +344,24 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         moDialogAnnulCfdi.setVisible(true);
 
                         if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                            payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, getPayrollCfdVersion(), mnGridSubtype == SModConsts.VIEW_SC_SUM, 
+                            SHrsPayrollAnnul payrollAnnul = new SHrsPayrollAnnul(
+                                    (SClientInterface) miClient, 
+                                    cfds, 
+                                    receiptIssues, 
+                                    getPayrollCfdVersion(), 
+                                    mnGridSubtype == SModConsts.VIEW_SC_SUM, 
                                     moDialogAnnulCfdi.getAnnulDate(), 
                                     moDialogAnnulCfdi.getAnnulSat(), 
                                     moDialogAnnulCfdi.getDpsAnnulType(), 
                                     moDialogAnnulCfdi.getAnnulReason(), 
-                                    moDialogAnnulCfdi.getAnnulRelatedUuid());
-                            needUpdate = payrollAnnul.annulPayroll();
+                                    moDialogAnnulCfdi.getAnnulRelatedUuid(),
+                                    moDialogAnnulCfdi.isRetryCancelSelected()
+                            );
+                            
+                            annulled = payrollAnnul.annulPayroll();
                         }
 
-                        if (needUpdate) {
+                        if (annulled) {
                             miClient.getSession().notifySuscriptors(mnGridType);
                         }
                     }

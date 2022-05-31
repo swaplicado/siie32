@@ -293,10 +293,10 @@ public class SReceiptsR {
         try {
             boolean cancel;
             if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA, DCfdi4Consts.CAN_MOTIVO_ERROR_SIN_REL, "");
+                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA, DCfdi4Consts.CAN_MOTIVO_ERROR_SIN_REL, "", false);
             }
             else {
-                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA, DCfdi4Consts.CAN_MOTIVO_ERROR_SIN_REL, "");
+                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA, DCfdi4Consts.CAN_MOTIVO_ERROR_SIN_REL, "", false);
             }
             
             if (cancel) {

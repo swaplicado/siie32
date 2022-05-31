@@ -196,7 +196,6 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         setIsSummaryApplying(true);
 
         mvSuscriptors.add(mnTabType);
-        mvSuscriptors.add(SDataConstants.TRNX_CFD_PAY_REC);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
         mvSuscriptors.add(SDataConstants.USRU_USR);
@@ -368,6 +367,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
                                         
                                         params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, moDialogAnnulCfdi.getAnnulReason());
                                         params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, moDialogAnnulCfdi.getAnnulRelatedUuid());
+                                        params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL, moDialogAnnulCfdi.isRetryCancelSelected());
                                     }
                                 }
                                 else {
@@ -380,6 +380,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
 
                                     params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_REASON, "");
                                     params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RELATED_UUID, "");
+                                    params.getParamsMap().put(SGuiConsts.PARAM_ANNUL_RETRY_CANCEL, false);
                                 }
                             }
 
