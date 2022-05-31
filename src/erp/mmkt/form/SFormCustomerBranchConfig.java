@@ -4,7 +4,7 @@
  */
 
 /*
- * SFormElement.java
+ * SFormCustomerBranchConfig.java
  *
  * Created on 10/11/2009
  */
@@ -194,7 +194,7 @@ public class SFormCustomerBranchConfig extends javax.swing.JDialog implements er
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldCustomerBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfCustomerBranch, jlCustomerBranch);
         moFieldFkSalesRouteId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSalesRouteId, jlFkSalesRouteId);
@@ -415,6 +415,8 @@ public class SFormCustomerBranchConfig extends javax.swing.JDialog implements er
         else {
             moCustomerBranchConfig.setDbmsSalesSupervisor("");
         }
+        
+        moCustomerBranchConfig.setIsRegistryEdited(true);
 
         return moCustomerBranchConfig;
     }

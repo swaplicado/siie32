@@ -564,6 +564,8 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
             moBizPartnerBranchAddress.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
+        //moBizPartnerBranchAddress.setPkBizPartnerBranchId(...);
+        //moBizPartnerBranchAddress.setPkAddressId(...);
         moBizPartnerBranchAddress.setAddress(mbParamIsInMainWindow ? SModSysConsts.TXT_OFFICIAL : moFieldAddress.getString());
         moBizPartnerBranchAddress.setAddressCode(jtfAddressCodeRo.getText());
         moBizPartnerBranchAddress.setStreet(moFieldStreet.getString());

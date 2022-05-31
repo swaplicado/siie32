@@ -4,7 +4,7 @@
  */
 
 /*
- * SFormElement.java
+ * SFormCustomerConfig.java
  *
  * Created on 10/11/2009
  */
@@ -809,6 +809,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
              }
         }
 
+        moCustomerConfiguration.setIsRegistryEdited(true);
         moBizPartner.setDbmsDataCustomerConfig(moCustomerConfiguration);
 
         return moBizPartner;

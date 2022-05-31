@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 202.2/ 2022-05-31
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Ajustes para asegurar la modificación de registros relacionados con asociados de negocios, p. ej., 1) deudores y acreedores, 2) bancos, transportistas y 3) agentes de ventas y empleados.
+
+================================================================================
 SIIE 3.2 202.1/ 2022-05-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

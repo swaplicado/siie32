@@ -1382,8 +1382,8 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().clear();
 
         moBizPartnerBranchAddress = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
-        moBizPartnerBranchAddress.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
         moBizPartnerBranchAddress.setIsDefault(true);
+        moBizPartnerBranchAddress.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
         
         moBizPartnerBranchAddress.setIsRegistryEdited(true);
         moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(moBizPartnerBranchAddress);

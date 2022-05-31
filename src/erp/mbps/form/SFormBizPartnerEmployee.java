@@ -1907,34 +1907,40 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moBizPartnerBranch.setIsDeleted(false);
         moBizPartnerBranch.setDbmsTaxRegion("");
 
-        // official branch address:
+        // official address:
         
         moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().clear();
 
         SDataBizPartnerBranchAddress address = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
-        address.setPkBizPartnerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
-        address.setPkAddressId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
         address.setIsDefault(true);
         address.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
 
+        address.setIsRegistryEdited(true);
         moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().add(address);
         
-        // official branch contact:
+        // official contact:
         
         moBizPartnerBranch.getDbmsBizPartnerBranchContacts().clear();
         
-        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(createBizPartnerBranchContact());
+        SDataBizPartnerBranchContact contact = moBizPartnerBranch.getDbmsBizPartnerBranchContactOfficial();
         
-        moBizPartnerBranch.setIsRegistryEdited(true);
-        
-        if (moBizPartner.getDbmsBizPartnerBranches().size() > 0) {
-            moBizPartner.getDbmsBizPartnerBranches().set(0, moBizPartnerBranch);
+        if (contact == null) {
+            contact = createBizPartnerBranchContact();
         }
-        else {
+        
+        contact.setEmail01(moFieldEmail.getString());
+        
+        contact.setIsRegistryEdited(true);
+        moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(contact);
+        
+        if (moBizPartner.getDbmsBizPartnerBranches().isEmpty()) {
             moBizPartner.getDbmsBizPartnerBranches().add(moBizPartnerBranch);
         }
+        else {
+            moBizPartner.getDbmsBizPartnerBranches().set(0, moBizPartnerBranch);
+        }
         
-        moBizPartner.setIsRegistryEdited(true);
+        moBizPartnerBranch.setIsRegistryEdited(true);
     }
     
     private void updateEmployeeNextNumber() {
@@ -1985,9 +1991,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     }
 
     public SDataBizPartnerBranchContact createBizPartnerBranchContact() {
-        SDataBizPartnerBranchContact contact = null;
-
-        contact = new SDataBizPartnerBranchContact();
+        SDataBizPartnerBranchContact contact = new SDataBizPartnerBranchContact();
         //contact.setPkBizPartnerBranchId();
         contact.setPkContactId(mnPkContactId);
         contact.setContact("");
@@ -3119,10 +3123,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moBizPartner.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
-        updateBizPartnerBranch();
-
         //moBizPartner.setPkBizPartnerId(...);
-
         moBizPartner.setFiscalId(moFieldFiscalId.getString());
         //moBizPartner.setFiscalFrgId(...);
         moBizPartner.setAlternativeId(moFieldAlternativeId.getString());
@@ -3131,6 +3132,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         //moBizPartner.setWeb(...);
 
         //moBizPartner.setIsCompany(...);
+        //moBizPartner.setIsSupplier(...);
+        //moBizPartner.setIsCustomer(...);
 
         requiredCategories.add(SDataConstantsSys.BPSS_CT_BP_CDR);
         requiredCategories.add(SDataConstantsSys.BPSS_CT_BP_DBR);
@@ -3144,8 +3147,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     }
                     else {
                         moBizPartner.getDbmsCategorySettingsCdr().setIsDeleted(false);
+                        moBizPartner.getDbmsCategorySettingsCdr().setIsRegistryEdited(true);
                     }
                     break;
+                    
                 case SModSysConsts.BPSS_CT_BP_DBR:
                     if (!moBizPartner.getIsDebtor()) {
                         moBizPartner.setIsDebtor(true);
@@ -3153,9 +3158,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     }
                     else {
                         moBizPartner.getDbmsCategorySettingsDbr().setIsDeleted(false);
+                        moBizPartner.getDbmsCategorySettingsDbr().setIsRegistryEdited(true);
                     }
                     break;
+                    
                 default:
+                    // do nothing
             }
         }
 
@@ -3168,18 +3176,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         if (!jckIsDeleted.isSelected()) {
             moBizPartner.setIsDeleted(false);
         }
-        //moBizPartner.setFkBizPartnerIdentityTypeId(...);  already set above!
-        //moBizPartner.setFkTaxIdentityId(...)              already set above!
-        //moBizPartner.setFkFiscalBankId(...);              already set above!
-        //moBizPartner.setFkBizAreaId(...)                  already set above!
 
         // Update business partner children data:
 
-        moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setEmail01(moFieldEmail.getString());
-
-        if (!moBizPartner.getIsRegistryNew()) {
-            moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0).setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-        }
+        updateBizPartnerBranch();
+        
+        // Update employee:
 
         moEmployee = moBizPartner.getDbmsDataEmployee();
 
@@ -3354,7 +3356,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         relatives.setFkCatSexClassIdSon5(moFieldSonSex5.getKeyAsIntArray()[0]);
         relatives.setFkCatSexTypeIdSon5(moFieldSonSex5.getKeyAsIntArray()[1]);
         moEmployee.setChildRelatives(relatives);
-
+        
+        moEmployee.setIsRegistryEdited(true);
+        
+        moBizPartner.setIsRegistryEdited(true);
+        
         return moBizPartner;
     }
 

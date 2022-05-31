@@ -1235,6 +1235,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         moBizPartnerBranch.getDbmsBizPartnerBranchAddresses().clear();
 
         moBizPartnerBranchAddress = (SDataBizPartnerBranchAddress) moPanelBizPartnerBranchAddress.getRegistry();
+        //moBizPartnerBranchAddress.setIsDefault(...);
         moBizPartnerBranchAddress.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF); // official address
         
         moBizPartnerBranchAddress.setIsRegistryEdited(true);

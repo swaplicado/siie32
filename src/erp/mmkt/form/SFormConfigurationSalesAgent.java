@@ -4,29 +4,28 @@
  */
 
 /*
- * SFormElement.java
+ * SFormConfigurationSalesAgent.java
  *
  * Created on 11/10/2010
  */
 
 package erp.mmkt.form;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mmkt.data.SDataConfigurationSalesAgent;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 
-import erp.data.SDataConstants;
-import erp.lib.form.SFormComponentItem;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.mmkt.data.SDataConfigurationSalesAgent;
-
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SFormConfigurationSalesAgent extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -157,7 +156,7 @@ public class SFormConfigurationSalesAgent extends javax.swing.JDialog implements
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldPkSalesAgentId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkSalesAgentId, jlPkSalesAgentId);
         moFieldPkSalesAgentId.setPickerButton(jbPkSalesAgentId);
@@ -332,6 +331,8 @@ public class SFormConfigurationSalesAgent extends javax.swing.JDialog implements
         moConfigurationSalesAgent.setPkSalesAgentId(moFieldPkSalesAgentId.getKeyAsIntArray()[0]);
         moConfigurationSalesAgent.setFkSalesAgentTypeId(moFieldFkSalesAgentTypeId.getKeyAsIntArray()[0]);
         moConfigurationSalesAgent.setIsDeleted(moFieldIsDeleted.getBoolean());
+        
+        moConfigurationSalesAgent.setIsRegistryEdited(true);
 
         return moConfigurationSalesAgent;
     }
