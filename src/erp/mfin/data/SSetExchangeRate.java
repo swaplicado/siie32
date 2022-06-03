@@ -8,6 +8,10 @@ package erp.mfin.data;
 import erp.SParamsApp;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModSysConsts;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -248,6 +252,15 @@ public class SSetExchangeRate {
                 exchangeRate.setPkDateId(newDate);
                 exchangeRate.save(connection);
                 System.out.println("Saved value: " + valueExchangeRate + " at " + exchangeRateDay);
+                try(FileWriter fw = new FileWriter("exchangeRateLog.txt", true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    PrintWriter out = new PrintWriter(bw))
+                    {
+                        Date date = new Date();
+                        out.println("/**" + date + " " + "Saved value: " + valueExchangeRate + " at " + exchangeRateDay + "**/");
+                } catch (IOException ex) {
+                    System.err.println(ex);
+                }
             }
         }
     }
@@ -303,6 +316,15 @@ public class SSetExchangeRate {
 
         } 
         catch (Exception e) {
+            try(FileWriter fw = new FileWriter("exchangeRateLog.txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw))
+                {
+                    Date date = new Date();
+                    out.println("/**" + date + " " + e + "**/");
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
             System.err.println(e);
         }
     }
