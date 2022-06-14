@@ -31,7 +31,7 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
     private SFormMassiveUpdateSsc moFormMassiveUpdateSsc;
             
     /**
-     * Creates new form SDialogEmployeesSscPeriod
+    * Creates new dialog SDialogMassiveUpdateSscPeriod
      */
     public SDialogMassiveUpdateSscPeriod(SGuiClient client, String title) {
         setFormSettings(client, SModConsts.HRSX_EMP_MASSIVE_UPD_SSC, 0, 0, title);
@@ -175,23 +175,6 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
-        
-        /*
-        if (moIntPeriodYear.getValue() == null ) {
-            validation.setMessage("Debe poner un año"); 
-            validation.setComponent(moIntPeriodYear);
-        }
-        else if (moIntBimester.getValue() == null ) {
-            validation.setMessage("Debe poner periodo valido"); 
-            validation.setComponent(moIntBimester); 
-            
-        }
-        else if (moIntBimester.getValue() > 6 ) {
-            validation.setMessage("Los bimestres validos son del 1 al 6"); 
-            validation.setComponent(moIntBimester);           
-        }
-        */
-        
         return validation;
     }
     

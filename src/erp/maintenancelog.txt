@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 202.4/ 2022-06-14
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Inclusión de busquedor de item´s de manera avanzada.
+2) Inlcusión de vista de historial item´s.
+3) Corrección RFC personas fisicas - Moral.
+4) Correción PTU sbc.
+
+================================================================================
 SIIE 3.2 202.3/ 2022-05-31
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
