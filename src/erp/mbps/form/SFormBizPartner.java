@@ -62,7 +62,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Isabel Servín, Sergio Flores
+ * @author Alfonso Flores, Isabel Servín, Sergio Flores, Claudio Peña
  */
 public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormExtendedInterface, java.awt.event.ActionListener {
     
@@ -2909,10 +2909,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 break;
             }
         }
-
+        
         if (!validation.getIsError()) {
             String fiscalId = jtfFiscalId.getText().trim();
-            int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
+            int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_ORG : DCfdConsts.LEN_RFC_PER;
             
             if (moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0] == 0) {
                 validation.setTabbedPaneIndex(0);

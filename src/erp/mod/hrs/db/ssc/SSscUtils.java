@@ -40,6 +40,7 @@ public abstract class SSscUtils {
         excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_SAVINGS);//Caja de ahorro
         excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_TAX_SUB);//Subsidio para el empleado
         excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_OTH);    //Pagos distintos a los listados y que no deben considerarse como ingreso
+        excludedEarningTypes.add(SModSysConsts.HRSS_TP_EAR_PTU);    //PTU
         
         return excludedEarningTypes;
     }

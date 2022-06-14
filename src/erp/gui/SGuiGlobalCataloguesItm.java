@@ -17,10 +17,12 @@ import erp.mitm.form.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import redis.clients.jedis.Jedis;
+import erp.form.SFormOptionPickerItems;
+import erp.lib.form.SFormField;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -52,6 +54,8 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiItemBarcode;
     private javax.swing.JMenuItem jmiBizAreaItemGeneric;
     private javax.swing.JMenuItem jmiItemBizPartnerDescription;
+    private javax.swing.JMenuItem jmiItemAdvancedSearch;
+    private erp.lib.form.SFormOptionPickerInterface miPicker;
 
     private erp.mitm.form.SFormItem moFormItem;
     private erp.mitm.form.SFormItemSimplified moFormItemSimplified;
@@ -133,6 +137,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiItemBarcode = new JMenuItem("Códigos de barras de ítems");
         jmiBizAreaItemGeneric = new JMenuItem("Áreas de negocios de ítems genéricos");
         jmiItemBizPartnerDescription = new JMenuItem("Descripciones de ítems para asociados de negocios");
+        jmiItemAdvancedSearch = new JMenuItem("Busqueda avanzada de ítems");
 
         jmMenuItem.add(jmiItem);
         jmMenuItem.add(jmiItemLine);
@@ -165,6 +170,8 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmMenuItem.add(jmiItemBarcode);
         jmMenuItem.add(jmiBizAreaItemGeneric);
         jmMenuItem.add(jmiItemBizPartnerDescription);
+        jmMenuItem.addSeparator();
+        jmMenuItem.add(jmiItemAdvancedSearch);
 
         jmiItem.addActionListener(this);
         jmiItemLine.addActionListener(this);
@@ -193,6 +200,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiItemBarcode.addActionListener(this);
         jmiBizAreaItemGeneric.addActionListener(this);
         jmiItemBizPartnerDescription.addActionListener(this);
+        jmiItemAdvancedSearch.addActionListener(this);
 
         moFormItem = null;
         moFormItemLine = null;
@@ -811,6 +819,12 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
             }
             else if (item == jmiItemBizPartnerDescription) {
                 showView(SDataConstants.ITMU_CFG_ITEM_BP);
+            }
+            else if (item == jmiItemAdvancedSearch) {
+                miPicker = miClient.getOptionPicker(SDataConstants.ITMX_ITEM_IOG);
+                miPicker.formReset();
+                miPicker.formRefreshOptionPane();
+                miPicker.setFormVisible(true);
             }
         }
     }

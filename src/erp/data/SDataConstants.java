@@ -519,6 +519,7 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DPS_LINKS = 207536;
     public static final int TRNX_DPS_LINKS_TRACE = 207537;
+    public static final int TRNX_DPS_SUPPLY = 207538;
 
     public static final int TRNX_DPS_SUPPLY_PEND = 207541;
     public static final int TRNX_DPS_SUPPLY_PEND_ETY = 207542;
@@ -562,6 +563,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DIOG_MFG_MOVE_RET = 207597;
     public static final int TRNX_STK_PERIOD = 207598;
     public static final int TRNX_STK_ITEM = 207601;
+    public static final int TRNX_STK_ITEM_HIS = 207602;
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
