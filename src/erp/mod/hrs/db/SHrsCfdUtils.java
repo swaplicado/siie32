@@ -321,7 +321,7 @@ public abstract class SHrsCfdUtils {
                     hrsFormerReceipt.setAuxSueldoMensual(dAmountMonth);
                     
                     if (!resultSet.getString("pri.uuid_rel").isEmpty()) {
-                        hrsFormerReceipt.setCfdiRelacionadosTipoRelacion(DCfdi33Catalogs.REL_TP_SUSTITUCION);
+                        hrsFormerReceipt.setCfdiRelacionadosTipoRelacion(DCfdi33Catalogs.ClaveTipoRelaciónSustitución);
                         hrsFormerReceipt.getCfdiRelacionados().add(resultSet.getString("pri.uuid_rel"));
                     }
 

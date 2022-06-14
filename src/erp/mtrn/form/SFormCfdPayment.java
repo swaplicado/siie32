@@ -1973,7 +1973,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfRecRelationTypeRo.setText("");
         }
         else {
-            msXmlRelationType = DCfdi33Catalogs.REL_TP_SUSTITUCION; // fixed value in CFDI 3.3!
+            msXmlRelationType = DCfdi33Catalogs.ClaveTipoRelaciónSustitución; // fixed value in CFDI 3.3!
             jtfRecRelationTypeRo.setText(((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs().composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, msXmlRelationType));
             
             jtfRecRelationTypeRo.setCaretPosition(0);

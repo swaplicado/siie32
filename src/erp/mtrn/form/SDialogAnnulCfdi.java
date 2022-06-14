@@ -1,6 +1,6 @@
 package erp.mtrn.form;
 
-import cfd.ver4.DCfdi4Consts;
+import cfd.ver4.DCfdVer4Consts;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
@@ -238,8 +238,8 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         
         moKeyAnnulReason.removeAllItems();
         moKeyAnnulReason.addItem(new SGuiItem("- " + SGuiUtils.getLabelName(jlAnnulReason) + " -"));
-        for (String code : DCfdi4Consts.CancelaciónMotivos.keySet()) {
-            moKeyAnnulReason.addItem(new SGuiItem(new int[] { SLibUtils.parseInt(code) }, code + " - " + DCfdi4Consts.CancelaciónMotivos.get(code)));
+        for (String code : DCfdVer4Consts.CancelaciónMotivos.keySet()) {
+            moKeyAnnulReason.addItem(new SGuiItem(new int[] { SLibUtils.parseInt(code) }, code + " - " + DCfdVer4Consts.CancelaciónMotivos.get(code)));
         }
         
         moAnnulReasonFormat = new DecimalFormat("00");
