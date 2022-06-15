@@ -280,6 +280,7 @@ public class SFormBizPartnerAddressee extends javax.swing.JDialog implements erp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbBizPartner, mnBizPartnerType);
         

@@ -431,6 +431,7 @@ public class SFormAccountTax extends javax.swing.JDialog implements erp.lib.form
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         moComboBoxGroup.clear();
         moComboBoxGroup.addComboBox(SDataConstants.FINU_TAX_BAS, jcbPkTaxBasicId, jbPkTaxBasicId);

@@ -600,6 +600,7 @@ public class SFormAccountCashBank extends javax.swing.JDialog implements erp.lib
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkAccountCashTypeId, SDataConstants.FINS_TP_ACC_CASH, new int[] { SDataConstantsSys.FINS_CT_ACC_CASH_BANK });
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);

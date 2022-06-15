@@ -1111,6 +1111,7 @@ public class SDialogRepGlobalStatement extends javax.swing.JDialog implements ja
         return numFila;
     }
     
+    @SuppressWarnings("unchecked")
     private void generalPage() throws Exception {
         int year = SLibTimeUtilities.digestYear(moFieldDateCutoff.getDate())[0];
         int lastYear = year - 1;

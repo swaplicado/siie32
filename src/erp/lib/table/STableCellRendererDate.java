@@ -34,6 +34,7 @@ public class STableCellRendererDate extends javax.swing.table.DefaultTableCellRe
     public javax.swing.JLabel getLabel() { return moLabel; }
     
     @Override
+    @SuppressWarnings("unchecked")
     public java.awt.Component getTableCellRendererComponent(javax.swing.JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
         int style = ((STableModel) table.getModel()).getTableRow(row).getStyle();
         java.util.Date tDate = null;

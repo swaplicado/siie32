@@ -324,6 +324,7 @@ public class SDialogRepSalesPurchasesDetailByBizPartner extends javax.swing.JDia
         renderFunctionalArea();
     }
 
+    @SuppressWarnings("unchecked")
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;

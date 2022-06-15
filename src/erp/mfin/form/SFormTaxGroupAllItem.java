@@ -315,6 +315,7 @@ public class SFormTaxGroupAllItem extends javax.swing.JDialog implements erp.lib
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         moFormTaxGroupItem.formRefreshCatalogues();
         SFormUtilities.populateComboBox(miClient, jcbPkItemId, SDataConstants.ITMU_ITEM);

@@ -266,6 +266,7 @@ public class SFormManufacturer extends javax.swing.JDialog implements erp.lib.fo
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkManufacturerTypeId, SDataConstants.ITMU_TP_MFR);
     }

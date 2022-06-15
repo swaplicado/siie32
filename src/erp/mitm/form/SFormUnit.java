@@ -440,6 +440,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkUnitTypeId, SDataConstants.ITMU_TP_UNIT);

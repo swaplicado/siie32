@@ -666,6 +666,7 @@ public class SFormItemLine extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkItemGenericId, SDataConstants.ITMX_IGEN_LINE);
         SFormUtilities.populateComboBox(miClient, jcbFkBrandId, SDataConstants.ITMU_BRD);

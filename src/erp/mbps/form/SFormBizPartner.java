@@ -1750,6 +1750,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void renderBizPartnerCategory() {
         if (mnParamBizPartnerTypeX == SDataConstants.BPSU_BP) {
             // do nothing
@@ -2848,6 +2849,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerIdentityTypeId, SDataConstants.BPSS_TP_BP_IDY);
         

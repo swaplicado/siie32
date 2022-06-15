@@ -526,7 +526,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
                         return;
                     }
                     
-                    ArrayList<Integer> lWhs = new ArrayList();
+                    ArrayList<Integer> lWhs = new ArrayList<>();
                     if (fkEntityId.size() > 0) {
                         for (int[] whs : fkEntityId) {
                            lWhs.add(whs[1]);

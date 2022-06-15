@@ -532,6 +532,7 @@ public class SFormAccount extends javax.swing.JDialog implements erp.lib.form.SF
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkAccountEbitdaTypeId, SDataConstants.FINU_TP_ACC_EBITDA);
         SFormUtilities.populateComboBox(miClient, jcbFkAdministrativeConceptTypeId, SDataConstants.FINU_TP_ADM_CPT);

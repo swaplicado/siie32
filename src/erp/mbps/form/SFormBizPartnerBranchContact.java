@@ -830,6 +830,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         moComboBoxBizPartnerBranch.clear();
         moComboBoxBizPartnerBranch.addComboBox(mnParamBizPartnerType, jcbDbmsFkBizPartnerId, jbDbmsFkBizPartnerId);

@@ -315,6 +315,7 @@ public class SFormTaxGroupAllItemGeneric extends javax.swing.JDialog implements 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         moFormTaxGroupItemGeneric.formRefreshCatalogues();
         SFormUtilities.populateComboBox(miClient, jcbPkItemGenericId, SDataConstants.ITMU_IGEN);

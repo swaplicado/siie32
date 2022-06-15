@@ -342,6 +342,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         actionFindKeyReleased();
     }//GEN-LAST:event_jckFindExactMatchItemStateChanged
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         mbResetingForm = true;
 

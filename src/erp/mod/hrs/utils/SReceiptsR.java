@@ -465,6 +465,7 @@ public class SReceiptsR {
      * @return
      * @throws Exception 
      */
+    @SuppressWarnings("unchecked")
     private SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerReceipt receipt, final int receiptIssue, final boolean cfdiPendingSigned, double causedSubsidy, double payedSubsidy, String relationedUuid) throws Exception {
         boolean add = true;
         int cfdId = SLibConsts.UNDEFINED;

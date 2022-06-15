@@ -266,6 +266,7 @@ public class SFormBrand extends javax.swing.JDialog implements erp.lib.form.SFor
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkBrandTypeId, SDataConstants.ITMU_TP_BRD);
     }

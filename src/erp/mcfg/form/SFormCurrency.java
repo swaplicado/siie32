@@ -318,6 +318,7 @@ public class SFormCurrency extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkFiscalCurrencyId, SDataConstants.FINS_FISCAL_CUR);

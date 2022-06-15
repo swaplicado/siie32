@@ -788,6 +788,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         jlIconDebtor.setIcon(moBizPartner == null ? mnParamBizPartnerType == SDataConstants.BPSX_BP_DBR ? moIconHasCategoryDbr : moIconHasNotCategory : moBizPartner.getIsDebtor() || mnParamBizPartnerType == SDataConstants.BPSX_BP_DBR ? moIconHasCategoryDbr : moIconHasNotCategory);
     }
 
+    @SuppressWarnings("unchecked")
     private void setBizPartnerCategory() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerCategoryId, SDataConstants.BPSS_CT_BP);
         if (mnParamBizPartnerType == SDataConstants.BPSX_BP_CDR) {

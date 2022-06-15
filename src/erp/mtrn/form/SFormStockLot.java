@@ -398,6 +398,7 @@ public class SFormStockLot extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbPkItemId, SDataConstants.ITMU_ITEM);
         SFormUtilities.populateComboBox(miClient, jcbPkUnitId, SDataConstants.ITMU_UNIT);

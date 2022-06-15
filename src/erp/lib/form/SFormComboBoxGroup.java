@@ -8,7 +8,6 @@ package erp.lib.form;
 import erp.lib.SLibUtilities;
 import java.awt.event.ItemEvent;
 import java.util.Vector;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 
 /**
@@ -26,13 +25,14 @@ public class SFormComboBoxGroup implements java.awt.event.ItemListener {
 
     public SFormComboBoxGroup(erp.client.SClientInterface client) {
         miClient = client;
-        mvComboBoxes = new Vector<JComboBox>();
-        mvButtons = new Vector<JButton>();
-        mvDataTypes = new Vector<Integer>();
-        mvComponentItemVectors = new Vector<Vector<SFormComponentItem>>();
+        mvComboBoxes = new Vector<>();
+        mvButtons = new Vector<>();
+        mvDataTypes = new Vector<>();
+        mvComponentItemVectors = new Vector<>();
         clear();
     }
 
+    @SuppressWarnings("unchecked")
     private void adjustComboBoxes(java.awt.event.ItemEvent event) {
         int i = 0;
         int j = 0;

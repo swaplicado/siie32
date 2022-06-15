@@ -469,6 +469,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbPkBizPartnerCategoryId, SDataConstants.BPSS_CT_BP);
         SFormUtilities.populateComboBox(miClient, jcbFkCreditTypeId, SDataConstants.BPSS_TP_CRED);

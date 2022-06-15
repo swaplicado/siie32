@@ -185,6 +185,7 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
         return read;
     }
 
+    @SuppressWarnings("unchecked")
     private boolean launchRmiRegistry() {
         boolean error = false;
 

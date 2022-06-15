@@ -1028,6 +1028,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         moComboBoxGroupBizPartnerBranch.clear();
         moComboBoxGroupBizPartnerBranch.addComboBox(mnParamBizPartnerType, jcbDbmsFkBizPartnerId, jbDbmsFkBizPartnerId);

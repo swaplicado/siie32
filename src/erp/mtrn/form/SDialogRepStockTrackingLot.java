@@ -19,9 +19,6 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -308,6 +305,7 @@ public class SDialogRepStockTrackingLot extends javax.swing.JDialog implements e
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbPkItemId, SDataConstants.ITMU_ITEM);

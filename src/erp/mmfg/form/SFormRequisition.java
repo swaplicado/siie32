@@ -915,6 +915,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId, SDataConstants.BPSX_BP_SUP);
         SFormUtilities.populateComboBox(miClient, jcbFkStatusId, SDataConstants.MFGS_ST_ORD);

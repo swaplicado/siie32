@@ -709,6 +709,7 @@ public class SFormCtr extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId, SDataConstants.BPSX_BP_SUP);

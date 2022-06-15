@@ -305,6 +305,7 @@ public class SFormStamp extends javax.swing.JDialog implements erp.lib.form.SFor
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbPkPacId, SDataConstants.TRN_PAC);
     }

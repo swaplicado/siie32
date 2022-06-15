@@ -3046,6 +3046,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         

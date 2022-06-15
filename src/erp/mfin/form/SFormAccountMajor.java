@@ -1131,6 +1131,7 @@ public class SFormAccountMajor extends javax.swing.JDialog implements erp.lib.fo
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
 

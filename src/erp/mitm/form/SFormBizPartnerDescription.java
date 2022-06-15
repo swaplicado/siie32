@@ -335,6 +335,7 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbPkBizPartnerId, SDataConstants.BPSU_BP);
     }

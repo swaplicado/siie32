@@ -28,6 +28,7 @@ public class STableCellRendererDefault extends javax.swing.table.DefaultTableCel
     public javax.swing.JLabel getLabel() { return moLabel; }
     
     @Override
+    @SuppressWarnings("unchecked")
     public java.awt.Component getTableCellRendererComponent(javax.swing.JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
         int style = ((STableModel) table.getModel()).getTableRow(row).getStyle();
         moLabel.setText(value != null ? value.toString() : "");

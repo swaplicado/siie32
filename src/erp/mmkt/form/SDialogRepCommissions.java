@@ -26,8 +26,8 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 import sa.lib.SLibUtils;
 
 /**
@@ -387,6 +387,7 @@ public class SDialogRepCommissions extends javax.swing.JDialog implements erp.li
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCompanyBranchId, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });
         SFormUtilities.populateComboBox(miClient, jcbFkSalesAgentId_n, SDataConstants.BPSX_BP_ATT_SAL_AGT);

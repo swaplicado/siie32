@@ -3403,6 +3403,7 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static void computeCfdiPayroll(final SClientInterface client, final SHrsFormerPayroll hrsFormerPayroll, final boolean isRegenerateOnlyNonStampedCfdi) throws Exception {
         ArrayList<SDataCfd> formerPayrollCfds = null;
         ArrayList<SDataCfd> formerPayrollCfdsEmited = null;

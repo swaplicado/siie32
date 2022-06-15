@@ -11,19 +11,18 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
+import erp.data.SProcConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mfin.data.SDataTaxIdentity;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.mfin.data.SDataTaxIdentity;
 
 /**
  *
@@ -244,6 +243,7 @@ public class SFormTaxIdentity extends javax.swing.JDialog implements erp.lib.for
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerIdentityTypeId, SDataConstants.BPSS_TP_BP_IDY);
     }
