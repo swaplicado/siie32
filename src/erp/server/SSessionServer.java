@@ -130,6 +130,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private JasperPrint requestFillReport(int reportType, Map<String, Object> map) throws JRException, Exception {
         String name = "";
         File file = null;

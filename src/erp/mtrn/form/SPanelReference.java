@@ -780,6 +780,7 @@ public class SPanelReference extends javax.swing.JPanel implements java.awt.even
         renderCurrencySettings();
     }
 
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
     }

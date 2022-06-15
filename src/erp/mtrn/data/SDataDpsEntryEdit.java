@@ -28,8 +28,9 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
     public ArrayList<SDataDps> getDocuments() { return moDocuments; }
     
     @Override
+    @SuppressWarnings("unchecked")
     public java.util.Vector<java.lang.Object> getRegistryComplements(){
-        java.util.Vector<java.lang.Object> locks = new java.util.Vector();
+        java.util.Vector<java.lang.Object> locks = new java.util.Vector<>();
         moDocuments.stream().forEach((document) -> {
             locks.add(document.getAuxUserSLock());
         });

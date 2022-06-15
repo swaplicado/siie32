@@ -141,6 +141,7 @@ public class SServiceSessions extends UnicastRemoteObject {
         return session;
     }
 
+    @SuppressWarnings("deprecation")
     public synchronized SLoginResponse login(final SLoginRequest request) {
         int userId = 0;
         int responseType = SLibConstants.UNDEFINED;

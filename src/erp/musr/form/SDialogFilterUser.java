@@ -12,12 +12,11 @@
 package erp.musr.form;
 
 import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
-
-import erp.lib.form.SFormField;
-import erp.lib.SLibConstants;
-import erp.lib.form.SFormUtilities;
 
 /**
  *
@@ -254,6 +253,7 @@ public class SDialogFilterUser extends javax.swing.JDialog implements erp.lib.fo
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbUser, SDataConstants.USRU_USR);
     }
