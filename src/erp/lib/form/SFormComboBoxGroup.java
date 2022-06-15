@@ -115,9 +115,12 @@ public class SFormComboBoxGroup implements java.awt.event.ItemListener {
     /**
      * @param comboBox Combo box control.
      * @param dataType Constant defined in erp.data.SDataConstants.
+     * @param button
+     * @param filterPk
      */
+    @SuppressWarnings("unchecked")
     public void addComboBox(int dataType, javax.swing.JComboBox comboBox, javax.swing.JButton button, java.lang.Object filterPk) {
-        Vector<SFormComponentItem> vector = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vector = new Vector<>();
 
         SFormUtilities.populateComboBox(miClient, comboBox, dataType, filterPk);
 

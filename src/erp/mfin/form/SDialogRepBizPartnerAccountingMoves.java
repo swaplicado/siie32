@@ -23,8 +23,8 @@ import erp.lib.form.SFormUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerCategory;
 import erp.mod.bps.db.SBpsUtils;
-import erp.mtrn.form.SDialogFilterFunctionalArea;
 import erp.mtrn.data.STrnFunctionalAreaUtils;
+import erp.mtrn.form.SDialogFilterFunctionalArea;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -247,6 +247,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
+    @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         mnBizPartnerId = 0;
         msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG);

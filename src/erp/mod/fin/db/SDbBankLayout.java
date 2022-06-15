@@ -594,6 +594,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         return recordEntry;
     }
 
+    @SuppressWarnings("unchecked")
     private SDataRecord createRecord(final SGuiSession session, final SLayoutBankRecord layoutBankRecord) throws Exception {
         SDataDsm dsm = new SDataDsm();
         Vector<SDataRecordEntry> recordEntries = new Vector<>();

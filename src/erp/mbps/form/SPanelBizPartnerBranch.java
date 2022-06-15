@@ -983,6 +983,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         moPanelBizPartnerBranchAddress.formRefreshCatalogues();
         SFormUtilities.populateComboBox(miClient, jcbFkTaxRegionId_n, SDataConstants.FINU_TAX_REG);

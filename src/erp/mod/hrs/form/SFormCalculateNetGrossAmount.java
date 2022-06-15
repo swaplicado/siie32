@@ -556,8 +556,9 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void populateCalculateType() {
-        Vector<SGuiItem> type = new Vector<SGuiItem>();
+        Vector<SGuiItem> type = new Vector<>();
 
         type.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "(" + SUtilConsts.TXT_SELECT + " tipo cálculo)"));
         type.add(new SGuiItem(new int[] { SHrsConsts.CAL_NET_AMT_TYPE }, SHrsConsts.TXT_CAL_NET_AMT_TYPE));

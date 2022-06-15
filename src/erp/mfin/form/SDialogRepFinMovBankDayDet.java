@@ -6,7 +6,6 @@
 
 package erp.mfin.form;
 
-import erp.SClient;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -21,7 +20,6 @@ import erp.mfin.data.SDataAccountCash;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -146,7 +144,6 @@ public class SDialogRepFinMovBankDayDet extends javax.swing.JDialog implements e
         jlFkCobId.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel15.add(jlFkCobId);
 
-        jcbFkCobId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(Seleccionar sucursal)" }));
         jcbFkCobId.setPreferredSize(new java.awt.Dimension(315, 23));
         jcbFkCobId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -217,8 +214,8 @@ public class SDialogRepFinMovBankDayDet extends javax.swing.JDialog implements e
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-508)/2, (screenSize.height-334)/2, 508, 334);
+        setSize(new java.awt.Dimension(508, 334));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -273,6 +270,7 @@ public class SDialogRepFinMovBankDayDet extends javax.swing.JDialog implements e
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void itemStateChangedFkCobId() {
         if (jcbFkCobId.getSelectedIndex() > 0) {
             if (SLibUtilities.compareKeys(mnParamTpSysMov, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
@@ -488,6 +486,7 @@ public class SDialogRepFinMovBankDayDet extends javax.swing.JDialog implements e
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCobId, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });
     }

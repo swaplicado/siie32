@@ -283,6 +283,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
     }

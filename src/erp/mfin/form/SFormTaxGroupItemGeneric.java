@@ -11,20 +11,19 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataReadDescriptions;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mfin.data.SDataTaxGroupItemGeneric;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.data.SDataReadDescriptions;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.form.SFormComponentItem;
-import erp.mfin.data.SDataTaxGroupItemGeneric;
 
 /**
  *
@@ -347,6 +346,7 @@ public class SFormTaxGroupItemGeneric extends javax.swing.JDialog implements erp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbPkTaxRegionId, SDataConstants.FINU_TAX_REG);
         SFormUtilities.populateComboBox(miClient, jcbFkTaxGroupId, SDataConstants.FIN_TAX_GRP);

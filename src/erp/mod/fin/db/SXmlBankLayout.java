@@ -130,7 +130,7 @@ public class SXmlBankLayout extends SXmlDocument {
         // Payments:
 
         Vector<Node> paymentNodes = SXmlUtils.extractChildElements(nodeList.item(0), SXmlBankLayoutPayment.NAME);
-        Vector <SXmlBankLayoutPayment> xmlPaymentsAux = new Vector(); 
+        Vector <SXmlBankLayoutPayment> xmlPaymentsAux = new Vector<>(); 
         
         for (Node paymentNode : paymentNodes) {
             SXmlBankLayoutPayment xmlPayment = new SXmlBankLayoutPayment();

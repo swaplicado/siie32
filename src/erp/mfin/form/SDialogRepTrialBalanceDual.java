@@ -414,6 +414,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
         actionItem();
     }//GEN-LAST:event_jbItemActionPerformed
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         mbFirstTime = true;
 

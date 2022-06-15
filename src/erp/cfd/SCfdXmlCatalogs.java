@@ -124,6 +124,7 @@ public class SCfdXmlCatalogs {
      * @param catalog Desired catalog (SDataConstantsSys.TRNS_CFD_CAT_...).
      * @param date Date to check validity of catalog entries.
      */
+    @SuppressWarnings("unchecked")
     public void populateComboBox(final JComboBox comboBox, final int catalog, final Date date) {
         Vector<SFormComponentItem> items = getComponentItems(catalog, date);
         
@@ -133,6 +134,7 @@ public class SCfdXmlCatalogs {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public void populateComboBox(final SBeanFieldKey fieldKey, final int catalog, final Date date) {
         ArrayList<SGuiItem> items = getGuiItems(catalog, date);
         

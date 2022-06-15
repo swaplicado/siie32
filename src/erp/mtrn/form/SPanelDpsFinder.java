@@ -530,6 +530,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         return validation;
     }
 
+    @SuppressWarnings("unchecked")
     public void setDpsClassKey(int[] key) {
         manParamDpsClassKey = key;
         

@@ -21,7 +21,7 @@ public class SFinAccountConfig {
     }
     
     public SFinAccountConfig(Collection<SFinAccountConfigEntry> accountConfigEntries, int[] taxKey) {
-        maAccountConfigEntries = new ArrayList(accountConfigEntries);
+        maAccountConfigEntries = new ArrayList<>(accountConfigEntries);
         
         madPercentages = new double[maAccountConfigEntries.size()];
         for (int i = 0; i < madPercentages.length; i++) {

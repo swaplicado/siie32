@@ -905,6 +905,7 @@ public final class SDialogRepRecords extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbBookKeepingCenter, SDataConstants.FIN_BKC);
         SFormUtilities.populateComboBox(miClient, jcbRecordType, SDataConstants.FINX_TP_REC_ALL);

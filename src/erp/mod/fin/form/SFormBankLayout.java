@@ -2487,6 +2487,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
      * Validar opcionalmente el estatus en el SAT de los CFDI del layout.
      * @return Cadena vacía si no hay errores, de lo contrario el mensaje conteniendo los errores encontrados.
      */
+    @SuppressWarnings("deprecation")
     private String getCfdiSatStatus() {
         String message = "";
         

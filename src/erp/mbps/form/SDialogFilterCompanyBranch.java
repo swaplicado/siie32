@@ -273,6 +273,7 @@ public class SDialogFilterCompanyBranch extends javax.swing.JDialog implements e
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         Vector<SFormComponentItem> items = null;
 

@@ -330,6 +330,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         // TODO add your handling code here:
     }//GEN-LAST:event_jbDateEndActionPerformed
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         moFieldDateBegin = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateBegin, jlDateBegin);
         moFieldDateBegin.setPickerButton(jbDateBegin);

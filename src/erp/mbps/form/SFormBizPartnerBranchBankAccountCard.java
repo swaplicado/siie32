@@ -298,6 +298,7 @@ public class SFormBizPartnerBranchBankAccountCard extends javax.swing.JDialog im
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCardTypeId, SDataConstants.FINS_TP_CARD);
     }

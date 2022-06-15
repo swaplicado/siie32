@@ -24,8 +24,8 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.mtrn.form.SDialogFilterFunctionalArea;
 import erp.mtrn.data.STrnFunctionalAreaUtils;
+import erp.mtrn.form.SDialogFilterFunctionalArea;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -383,6 +383,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG);
         msBizPartnerCatPlr = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_PLR);

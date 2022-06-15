@@ -260,6 +260,7 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
     }//GEN-LAST:event_jbDateActionPerformed
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         moFieldDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDate, jlDate);
         moFieldDate.setPickerButton(jbDate);

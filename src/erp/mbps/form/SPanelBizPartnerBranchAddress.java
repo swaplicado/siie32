@@ -463,6 +463,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCountryId_n, SDataConstants.LOCU_CTY);
         SFormUtilities.populateComboBox(miClient, jcbFkStateId_n, SDataConstants.LOCU_STA);

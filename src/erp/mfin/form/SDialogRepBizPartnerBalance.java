@@ -458,6 +458,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG);
         msBizPartnerCatPlr = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_PLR);

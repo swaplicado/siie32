@@ -89,6 +89,7 @@ public class SHrsFormerPayroll {
 
     public ArrayList<SHrsFormerReceipt> getChildReceipts() { return moChildReceipts; }
 
+    @SuppressWarnings("deprecation")
     public void renderPayroll(ArrayList<SDataCfd> cfds) throws java.lang.Exception {
         cfd.ver32.DElementComprobante comprobante;
 

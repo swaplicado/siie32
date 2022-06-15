@@ -419,7 +419,7 @@
                     </Component>
                     <Component class="javax.swing.JCheckBox" name="jckShowFiscalId">
                       <Properties>
-                        <Property name="label" type="java.lang.String" value="Mostrar RFC caja y bancos"/>
+                        <Property name="text" type="java.lang.String" value="Mostrar RFC caja y bancos"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[160, 23]"/>
                         </Property>
@@ -624,7 +624,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JCheckBox" name="jckStrechWithOverflow">
                       <Properties>
-                        <Property name="label" type="java.lang.String" value="Ampliar altura del rengl&#xf3;n del detalle para conceptos contables largos"/>
+                        <Property name="text" type="java.lang.String" value="Ampliar altura del rengl&#xf3;n del detalle para conceptos contables largos"/>
                         <Property name="opaque" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[450, 23]"/>

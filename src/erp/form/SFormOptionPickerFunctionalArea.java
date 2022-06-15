@@ -275,6 +275,7 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshOptionPane() {
         SFormUtilities.populateComboBox(miClient, jcbFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
     }

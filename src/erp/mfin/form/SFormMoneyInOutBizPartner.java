@@ -1128,6 +1128,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId, mnParamBizPartnerCategory);

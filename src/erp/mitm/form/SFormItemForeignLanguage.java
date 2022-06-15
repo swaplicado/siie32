@@ -11,17 +11,16 @@
 
 package erp.mitm.form;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mitm.data.SDataItemForeignLanguage;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.mitm.data.SDataItemForeignLanguage;
 
 /**
  *
@@ -289,6 +288,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbPkLanguageId, SDataConstants.CFGU_LAN);
     }

@@ -11,11 +11,6 @@
 
 package erp.mfin.form;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormComboBoxGroup;
@@ -23,6 +18,10 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mfin.data.SDataTaxGroupEntry;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 import sa.lib.SLibTimeUtils;
 
 /**
@@ -438,6 +437,7 @@ public class SFormTaxGroupEntry extends javax.swing.JDialog implements erp.lib.f
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         moComboBoxGroup.clear();
         moComboBoxGroup.addComboBox(SDataConstants.FINU_TAX_BAS, jcbFkTaxBasicId, jbFkTaxBasicId);

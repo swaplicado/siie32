@@ -11,20 +11,19 @@
 
 package erp.mtrn.form;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.ItemEvent;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
 import erp.mtrn.data.SDataCtrEntry;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 
 /**
  *
@@ -541,6 +540,7 @@ public class SFormCtrEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkDpsTypeId, SDataConstants.TRNU_TP_DPS);

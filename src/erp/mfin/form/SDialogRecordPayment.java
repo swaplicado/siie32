@@ -1131,7 +1131,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         int idBranch = SLibConsts.UNDEFINED;
-        ArrayList<SDataDsmEntry> entries = new ArrayList();
+        ArrayList<SDataDsmEntry> entries = new ArrayList<>();
         
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;

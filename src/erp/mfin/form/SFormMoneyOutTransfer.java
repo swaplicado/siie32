@@ -872,6 +872,7 @@ public class SFormMoneyOutTransfer extends javax.swing.JDialog implements erp.li
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void populateComboBoxAccountCashDestiny() {
         if (moFieldFkCompanyBranchId.getKeyAsIntArray()[0] > 0) {
             SFormUtilities.populateComboBox(miClient, jcbFkAccountCashDestinyId, SDataConstants.FIN_ACC_CASH, moFieldFkCompanyBranchId.getKeyAsIntArray());
@@ -1260,6 +1261,7 @@ public class SFormMoneyOutTransfer extends javax.swing.JDialog implements erp.li
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbFkCompanyBranchId, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });

@@ -519,6 +519,7 @@ public abstract class SHrsCfdUtils {
         return hrsFormerPayroll;
     }
     
+    @SuppressWarnings("deprecation")
     private static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerReceipt hrsFormerReceipt, final int receiptIssueId, final boolean cfdiPendingSigned) throws Exception {
         boolean add = true;
         int cfdId = 0;

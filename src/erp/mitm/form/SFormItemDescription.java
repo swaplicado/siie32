@@ -440,6 +440,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         miClient.pickOption(SDataConstants.ITMU_UNIT, moFieldFkUnitId, new int[] { moItem.getDbmsDataItemGeneric().getFkUnitTypeId() });
     }
 
+    @SuppressWarnings("unchecked")
     private void renderItemSettings() {
         String key = "";
         String item = "";
@@ -582,6 +583,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         

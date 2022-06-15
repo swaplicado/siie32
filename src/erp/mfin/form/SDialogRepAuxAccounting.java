@@ -303,7 +303,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jbClearEntity.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel18.add(jbClearEntity);
 
-        jckShowFiscalId.setLabel("Mostrar RFC caja y bancos");
+        jckShowFiscalId.setText("Mostrar RFC caja y bancos");
         jckShowFiscalId.setPreferredSize(new java.awt.Dimension(160, 23));
         jPanel18.add(jckShowFiscalId);
 
@@ -405,7 +405,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckStrechWithOverflow.setLabel("Ampliar altura del renglón del detalle para conceptos contables largos");
+        jckStrechWithOverflow.setText("Ampliar altura del renglón del detalle para conceptos contables largos");
         jckStrechWithOverflow.setOpaque(false);
         jckStrechWithOverflow.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel19.add(jckStrechWithOverflow);
@@ -462,6 +462,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
      * Private methods
      */
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         mbFirstTime = true;
 

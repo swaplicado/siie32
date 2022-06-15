@@ -203,8 +203,9 @@ public class SDialogFilterItemGeneric extends javax.swing.JDialog implements erp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
-        Vector<SFormComponentItem> items = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> items = new Vector<>();
 
         SFormUtilities.populateList(miClient, jltOptions, SDataConstants.ITMU_IGEN);
 

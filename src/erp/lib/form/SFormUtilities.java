@@ -417,6 +417,7 @@ public abstract class SFormUtilities {
      * @param list Visual control (javax.swing.JList object).
      * @param dataType Constant defined in erp.data.SDataConstants.
      */
+    @SuppressWarnings("unchecked")
     public static void populateList(erp.client.SClientInterface client, javax.swing.JList list, int dataType) {
         populateList(client, list, dataType, null);
     }
@@ -543,22 +544,24 @@ public abstract class SFormUtilities {
         return vRemovedItems;
     }
 
+    @SuppressWarnings("unchecked")
     public static erp.lib.form.SFormComponentItem removeListSelectedItem(javax.swing.JList list) {
-        Vector<SFormComponentItem> vRemovedItems = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vRemovedItems = new Vector<>();
 
         if (list.getSelectedIndex() != -1) {
             vRemovedItems = removeListItems(list, list.getSelectedIndex(), list.getSelectedIndex());
         }
 
-        return vRemovedItems.size() == 0 ? null : vRemovedItems.get(0);
+        return vRemovedItems.isEmpty() ? null : vRemovedItems.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.lib.form.SFormComponentItem> removeListAllItems(javax.swing.JList list) {
         return removeListItems(list, 0, list.getModel().getSize() - 1);
     }
 
     public static void addListItem(javax.swing.JList<SFormComponentItem> list, erp.lib.form.SFormComponentItem item) {
-        Vector<SFormComponentItem> listItems = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> listItems = new Vector<>();
 
         for (int i = 0; i < list.getModel().getSize(); i++) {
             listItems.add((SFormComponentItem) list.getModel().getElementAt(i));

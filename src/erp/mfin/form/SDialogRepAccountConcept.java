@@ -437,6 +437,7 @@ public class SDialogRepAccountConcept extends javax.swing.JDialog implements erp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbConcept, mnConcept);
     }

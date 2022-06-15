@@ -67,20 +67,22 @@ public class STabFilterStatus extends javax.swing.JPanel {
     private javax.swing.JButton jbClearFilter;
     private javax.swing.JComboBox moKeyFilter;
     // End of variables declaration//GEN-END:variables
-private void initComponentsExtra() {
-         SFormUtilities.populateComboBox(miClient, moKeyFilter, SDataConstants.ITMS_ST_ITEM);
-          moSetting = new STableSetting(STableConstants.SETTING_FILTER_STATUS, STableConstants.STATUS_ON);
-          moSetting.setSetting(" ");
-          miTableTab.addSetting(moSetting);
-          moKeyFilter.addActionListener(new java.awt.event.ActionListener() {
+    
+    @SuppressWarnings("unchecked")
+    private void initComponentsExtra() {
+        SFormUtilities.populateComboBox(miClient, moKeyFilter, SDataConstants.ITMS_ST_ITEM);
+        moSetting = new STableSetting(STableConstants.SETTING_FILTER_STATUS, STableConstants.STATUS_ON);
+        moSetting.setSetting(" ");
+        miTableTab.addSetting(moSetting);
+        moKeyFilter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 moKeyFilterActionPerformed(evt);
             }
         });
     }
- private void moKeyFilterActionPerformed(java.awt.event.ActionEvent evt){
-          contenido = moKeyFilter.getSelectedItem().toString();
-          moSetting.setSetting(contenido);
-          miTableTab.updateSetting(moSetting);          
+    private void moKeyFilterActionPerformed(java.awt.event.ActionEvent evt){
+         contenido = moKeyFilter.getSelectedItem().toString();
+         moSetting.setSetting(contenido);
+         miTableTab.updateSetting(moSetting);          
     }
 }

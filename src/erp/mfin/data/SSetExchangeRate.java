@@ -27,11 +27,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
 import sa.lib.xml.SXmlUtils;
-import sa.lib.SLibTimeUtils;
 
 /**
  *
@@ -70,7 +70,7 @@ public class SSetExchangeRate {
      * @throws SQLException
      */
     public static ArrayList readBankNbDay(Connection connection) throws SQLException {
-        ArrayList bankNbDays = new ArrayList();
+        ArrayList<String> bankNbDays = new ArrayList<>();
         Date date = new Date();
         
         Statement statement = connection.createStatement();
@@ -79,6 +79,7 @@ public class SSetExchangeRate {
         while (resultSet.next()) {
             bankNbDays.add(resultSet.getString(1));
         }
+        
         return bankNbDays;
     }
 
@@ -116,7 +117,6 @@ public class SSetExchangeRate {
      */
     public static boolean isActualDayBankBussDay(ArrayList bankNbDays) {
         boolean bankBussDay = true;
-
         Date date = new Date();
 
         for (Object day : bankNbDays) {
@@ -129,6 +129,7 @@ public class SSetExchangeRate {
                 break;
             }
         }
+        
         return bankBussDay;
     }
 
@@ -202,6 +203,7 @@ public class SSetExchangeRate {
                 }
             }
         }
+        
         return exchangeRateDays;
     }
 

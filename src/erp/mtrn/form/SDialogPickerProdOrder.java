@@ -378,6 +378,7 @@ public class SDialogPickerProdOrder extends javax.swing.JDialog implements Actio
         mbResetingForm = false;
     }
 
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
 

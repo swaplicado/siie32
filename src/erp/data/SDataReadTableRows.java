@@ -31,6 +31,7 @@ import sa.lib.srv.SSrvConsts;
  */
 public abstract class SDataReadTableRows {
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatCfg(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -151,6 +152,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatUsr(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -197,6 +199,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatLoc(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -251,6 +254,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatBps(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         int category = 0;
@@ -579,6 +583,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatItm(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -1209,6 +1214,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatFin(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -1770,6 +1776,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatTrn(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -2723,6 +2730,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatMkt(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -2868,6 +2876,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatLog(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;
@@ -2971,6 +2980,7 @@ public abstract class SDataReadTableRows {
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
 
+    @SuppressWarnings("unchecked")
     private static SQueryRequest getSettingsCatMfg(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
         int i = 0;
         STableField[] aoPkFields = null;

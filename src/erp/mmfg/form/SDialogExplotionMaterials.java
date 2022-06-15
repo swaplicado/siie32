@@ -170,11 +170,6 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         jlFkEntityId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel1.add(jlFkEntityId, java.awt.BorderLayout.WEST);
 
-        jliFkEntityId.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane1.setViewportView(jliFkEntityId);
 
         jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
@@ -430,9 +425,8 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     }
 
     private void itemStateChangedFkCobId() {
-
         if (jcbFkCobId.getSelectedIndex() <= 0) {
-            mvItemsEntities = new Vector<SFormComponentItem>();
+            mvItemsEntities = new Vector<>();
         }
         else {
             if (isUniversalCompanyBranch()) {

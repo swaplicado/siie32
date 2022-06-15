@@ -144,7 +144,7 @@ public class SDialogPayrollConditionalEarnings extends SBeanFormDialog implement
     public void actionSave() {
        if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
-                mlBonusIds = new ArrayList();
+                mlBonusIds = new ArrayList<>();
                 mlBonusIds.add(moBonusKey.getSelectedItem().getPrimaryKey()[0]);
                 
                 mnFormResult = SGuiConsts.FORM_RESULT_OK;

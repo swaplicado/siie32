@@ -5,7 +5,6 @@
  */
 package erp.mmfg.data;
 
-import erp.mmfg.data.SDataExplotionMaterialsEntry;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -112,7 +111,7 @@ public class SMfgCsvFileManager {
     }
     
     public static ArrayList<SMfgInputData> readFile(String fileName) {
-        ArrayList<SMfgInputData> lRows = new ArrayList();
+        ArrayList<SMfgInputData> lRows = new ArrayList<>();
         BufferedReader fileReader = null;
         
         try {

@@ -12,11 +12,10 @@
 package erp.form;
 
 import erp.data.SDataConstants;
-import java.awt.event.KeyEvent;
-
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormUtilities;
+import java.awt.event.KeyEvent;
 
 /**
  *
@@ -193,6 +192,7 @@ public class SFormComponentItemPicker extends javax.swing.JDialog implements erp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbOption, mnComponentItemType, moFilterKey);
     }

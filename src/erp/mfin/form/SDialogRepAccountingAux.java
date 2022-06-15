@@ -22,9 +22,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JFormattedTextField;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -498,6 +495,7 @@ public class SDialogRepAccountingAux extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbCompanyBranch, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() });
     }

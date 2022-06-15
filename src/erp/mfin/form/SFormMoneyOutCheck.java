@@ -942,15 +942,18 @@ public class SFormMoneyOutCheck extends javax.swing.JDialog implements erp.lib.f
         miClient.pickOption(SDataConstants.BPSU_BP, moFieldBeneficiary, null);
     }
 
+    @SuppressWarnings("unchecked")
     private void populateComboBoxCheckWallet() {
         SFormUtilities.populateComboBox(miClient, jcbPkCheckWalletId, SDataConstants.FIN_CHECK_WAL, new int[]
         { moParamRecord.getDbmsDataAccountCash().getPkCompanyBranchId(), moParamRecord.getDbmsDataAccountCash().getPkAccountCashId() });
     }
 
+    @SuppressWarnings("unchecked")
     private void populateComboBoxBizPartnerBranch() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerBranchId, SDataConstants.BPSU_BPB, moFieldBeneficiary.getKeyAsIntArray());
     }
 
+    @SuppressWarnings("unchecked")
     private void populateComboBoxBizPartnerBankAccount() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerBankAccountId, SDataConstants.BPSU_BANK_ACC, moFieldFkBizPartnerBranchId.getKeyAsIntArray());
     }
@@ -1124,6 +1127,7 @@ public class SFormMoneyOutCheck extends javax.swing.JDialog implements erp.lib.f
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         mbResetingForm = true;
         SFormUtilities.populateComboBox(miClient, jcbBeneficiary, SDataConstants.BPSU_BP);

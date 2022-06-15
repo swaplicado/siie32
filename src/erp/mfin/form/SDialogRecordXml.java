@@ -49,6 +49,7 @@ public class SDialogRecordXml extends javax.swing.JDialog implements ActionListe
      * @param entries
      * @param cfdRows
      */
+    @SuppressWarnings("unchecked")
     public SDialogRecordXml(erp.client.SClientInterface client, Vector<SDataRecordEntry> entries, ArrayList<SDataCfdRecordRow> cfdRows) {
         super(client.getFrame(), true);
         miClient = client;

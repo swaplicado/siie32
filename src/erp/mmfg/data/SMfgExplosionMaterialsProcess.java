@@ -11,8 +11,6 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
-import erp.mmfg.data.SDataBom;
-import erp.mmfg.data.SDataExplotionMaterialsEntry;
 import erp.mmfg.form.SDialogExplotionMaterialsRawMaterial;
 import erp.mod.SModConsts;
 import erp.mtrn.data.STrnStock;
@@ -54,7 +52,7 @@ public class SMfgExplosionMaterialsProcess {
 
         try {
             ArrayList<SMfgInputData> lFile = SMfgCsvFileManager.readFile(sFileName);
-            HashMap<Integer, SDataExplotionMaterialsEntry> lIngredients = new HashMap();
+            HashMap<Integer, SDataExplotionMaterialsEntry> lIngredients = new HashMap<>();
 
             for (SMfgInputData oData : lFile) {
                 SDataBom oBom = this.getBomByItemKey(miClient, oData.getMsItemKey());

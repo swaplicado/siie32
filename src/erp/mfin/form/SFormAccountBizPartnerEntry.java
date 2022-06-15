@@ -94,7 +94,7 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
         jbPkTaxId = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jlFkBookkeepingRegistryTypeId = new javax.swing.JLabel();
-        jcbFkBookkeepingRegistryTypeId = new javax.swing.JComboBox<>();
+        jcbFkBookkeepingRegistryTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel8 = new javax.swing.JPanel();
         jlPercentage = new javax.swing.JLabel();
         jtfPercentage = new javax.swing.JTextField();
@@ -176,7 +176,6 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
         jlPkTaxBasicId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel21.add(jlPkTaxBasicId);
 
-        jcbPkTaxBasicId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbPkTaxBasicId.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel21.add(jcbPkTaxBasicId);
 
@@ -195,7 +194,6 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
         jlPkTaxId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel22.add(jlPkTaxId);
 
-        jcbPkTaxId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbPkTaxId.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel22.add(jcbPkTaxId);
 

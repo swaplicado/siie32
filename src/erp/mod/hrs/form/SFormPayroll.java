@@ -31,8 +31,8 @@ import erp.mod.hrs.db.SHrsReceiptDeduction;
 import erp.mod.hrs.db.SHrsReceiptEarning;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.db.SRowBonus;
-import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.db.SRowPayrollEmployee;
+import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.hrs.link.utils.SPrepayroll;
 import erp.mod.hrs.link.utils.SPrepayrollRow;
@@ -1965,7 +1965,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             return;
         }
         
-        ArrayList<Integer> list = new ArrayList();
+        ArrayList<Integer> list = new ArrayList<>();
         list.addAll(selectedEmployeesIds.keySet());
         
         Date dates[] = null;

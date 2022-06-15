@@ -6,49 +6,27 @@
 
 package erp.mfin.form;
 
-import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.lang.Long;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
-import erp.lib.form.SFormComponentItem;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormOptionPickerInterface;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
 import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormOptionPickerInterface;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
-import erp.mtrn.data.SDataDps;
-import erp.SClient;
-import erp.server.SServerRequest;
-import erp.server.SServerResponse;
-import erp.server.SServerConstants;
-
-import javax.swing.JDialog;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
-
-import net.sf.jasperreports.view.JasperViewer;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Date;
+import java.util.Map;
+import java.util.Vector;
+import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -214,7 +192,6 @@ public class SDialogRepFinMovBankCon extends javax.swing.JDialog implements erp.
 
         jPanel99.setLayout(new java.awt.BorderLayout(2, 5));
 
-        jcbFkCobId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(Seleccionar sucursal)" }));
         jcbFkCobId.setPreferredSize(new java.awt.Dimension(325, 23));
         jcbFkCobId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -284,8 +261,8 @@ public class SDialogRepFinMovBankCon extends javax.swing.JDialog implements erp.
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-522)/2, (screenSize.height-259)/2, 522, 259);
+        setSize(new java.awt.Dimension(522, 259));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -297,7 +274,7 @@ public class SDialogRepFinMovBankCon extends javax.swing.JDialog implements erp.
     }//GEN-LAST:event_jcbFkCobIdItemStateChanged
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldFkEntityId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkEntityId, jlFkEntityId);
         moFieldFkCobId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCobId, jlFkCobId);
@@ -340,6 +317,7 @@ public class SDialogRepFinMovBankCon extends javax.swing.JDialog implements erp.
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void itemStateChangedFkCobId() {
         if (jcbFkCobId.getSelectedIndex() > 0) {
             switch (mnParamTypeAccSys) {
@@ -622,6 +600,7 @@ public class SDialogRepFinMovBankCon extends javax.swing.JDialog implements erp.
         moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { nBizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
     }
 
+    @SuppressWarnings("unchecked")
     private void populateComboBoxEntity() {
         int i = 0;
         int j = 0;
@@ -735,6 +714,7 @@ public class SDialogRepFinMovBankCon extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCobId, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });
     }
@@ -786,6 +766,7 @@ public class SDialogRepFinMovBankCon extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
             case 1:

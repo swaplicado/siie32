@@ -37,6 +37,7 @@ public class SShareDB {
      * @throws ClassNotFoundException
      * @throws SConfigException
      */
+    @SuppressWarnings("unchecked")
     private ArrayList<SCompany> getDatabasesWithPayroll() throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");

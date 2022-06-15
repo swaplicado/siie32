@@ -329,7 +329,7 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
         formRefreshOptionPane();
     }
     
-    public void setParams(HashMap hashMap) {
+    public void setParams(HashMap<Integer, Object> hashMap) {
         moParamsMap = hashMap;
     }
 

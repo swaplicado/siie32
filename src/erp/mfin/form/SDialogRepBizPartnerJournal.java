@@ -234,8 +234,9 @@ public class SDialogRepBizPartnerJournal extends javax.swing.JDialog implements 
         }
     }//GEN-LAST:event_jcbBizPartnerItemStateChanged
 
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         try {
             moPanelFkAccountId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, false, false);

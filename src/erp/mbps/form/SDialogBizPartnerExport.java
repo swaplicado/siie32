@@ -217,6 +217,7 @@ public class SDialogBizPartnerExport extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerCategoryId, SDataConstants.BPSS_CT_BP);
     }

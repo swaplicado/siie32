@@ -673,6 +673,7 @@ public class SDialogCommissionsCalculate extends javax.swing.JDialog implements 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
