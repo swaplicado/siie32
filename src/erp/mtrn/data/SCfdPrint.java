@@ -674,6 +674,8 @@ public class SCfdPrint {
      * @throws java.lang.Exception
      * XXX 2018-01-12 (Sergio Flores): normalize these parameters because CFD is contained in DPS! WTF!
      */
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public void printCfdi33(final erp.mtrn.data.SDataCfd cfd, final int printMode, final erp.mtrn.data.SDataDps dps) throws java.lang.Exception {
         // CFDI's header:
         
@@ -1102,6 +1104,7 @@ public class SCfdPrint {
      * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
      * @throws java.lang.Exception
      */
+    @SuppressWarnings("deprecation")
     public void printCfdi33_Crp10(final SClientInterface client, final erp.mtrn.data.SDataCfd cfd, final int printMode) throws java.lang.Exception {
         Map<String, Object> paramsMap = miClient.createReportParams();
         
@@ -1193,6 +1196,7 @@ public class SCfdPrint {
      * @throws java.lang.Exception 
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public void printPayrollReceipt32_11(final SDataCfd cfd, final int printMode, final int numCopies, final int cfdSubtype) throws java.lang.Exception {
         int i = 0;
         int nTotalTiempoExtra = 0;
@@ -1486,6 +1490,7 @@ public class SCfdPrint {
      * @throws java.lang.Exception 
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public void printPayrollReceipt32_12(final SDataCfd cfd, final int printMode, final int numCopies, final int cfdSubtype) throws java.lang.Exception {
         int i = 0;
         int overTime = 0;
@@ -1815,6 +1820,8 @@ public class SCfdPrint {
      * @param payrollCfdVersion Supported constants: SCfdConsts.CFDI_PAYROLL_VER_OLD or SCfdConsts.CFDI_PAYROLL_VER_CUR.
      * @throws java.lang.Exception 
      */
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public void printPayrollReceipt33_12(final SDataCfd cfd, final int printMode, final int numCopies, final int payrollCfdVersion) throws java.lang.Exception {
         String sql = "";
         SDataFormerPayroll formerPayroll = null;
@@ -2218,6 +2225,8 @@ public class SCfdPrint {
      * @param bol
      * @throws java.lang.Exception 
      */
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public void printBolReceip33_20(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
         Map<String, Object> paramsMap = miClient.createReportParams();
         

@@ -264,6 +264,7 @@ public class SDialogFilterDocumentNature extends javax.swing.JDialog implements 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbDocumentNature, mnDataType, null);
     }

@@ -66,7 +66,7 @@ public class SEmployeesUtils {
             
             ResultSet res = st.executeQuery(query);
             
-            lEmps = new ArrayList();
+            lEmps = new ArrayList<>();
             while (res.next()) {
                 lEmps.add(res.getInt("id_emp"));
             }
@@ -77,7 +77,7 @@ public class SEmployeesUtils {
         }
         catch (SQLException ex) {
             Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList();
+            return new ArrayList<>();
         }
 
         return lEmps;
@@ -110,7 +110,7 @@ public class SEmployeesUtils {
             
             ResultSet res = st.executeQuery(query);
             
-            lDepts = new ArrayList();
+            lDepts = new ArrayList<>();
             while (res.next()) {
                 lDepts.add(res.getInt("id_dep"));
             }
@@ -121,10 +121,10 @@ public class SEmployeesUtils {
         }
         catch (SQLException ex) {
             Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList();
+            return new ArrayList<>();
         }
         
-        ArrayList<Integer> lAllDepts = new ArrayList();
+        ArrayList<Integer> lAllDepts = new ArrayList<>();
         for (Integer dept : lDepts) {
             lAllDepts.addAll(this.getDeptsOfDept(dept));
         }
@@ -164,7 +164,7 @@ public class SEmployeesUtils {
             
             ResultSet res = st.executeQuery(query);
             
-            lDepts = new ArrayList();
+            lDepts = new ArrayList<>();
             while (res.next()) {
                 lDepts.add(res.getInt("id_dep"));
             }
@@ -175,7 +175,7 @@ public class SEmployeesUtils {
         }
         catch (SQLException ex) {
             Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList();
+            return new ArrayList<>();
         }
         
         ArrayList<Integer> depts = new ArrayList<>();

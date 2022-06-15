@@ -217,7 +217,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         bgCancelationType.add(jrbAllVouchers);
-        jrbAllVouchers.setLabel("Todos los comprobantes");
+        jrbAllVouchers.setText("Todos los comprobantes");
         jrbAllVouchers.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel13.add(jrbAllVouchers);
 
@@ -385,6 +385,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
         miClient.pickOption(SDataConstants.BPSX_BP_SUP, moFieldBizPartnerId, null);
     }
 
+    @SuppressWarnings("deprecation")
     private void actionValidateButton() {
         if (miClient.showMsgBoxConfirm("Esta operación puede tardar varios minutos.\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
             SFormValidation validation = formValidate();
@@ -630,6 +631,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
@@ -648,6 +650,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         if (((int[]) moFieldCfdType.getKey())[0] == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
             SFormUtilities.populateComboBox(miClient, jcbBizPartnerId, SDataConstants.BPSX_BP_EMP);

@@ -11,25 +11,20 @@
 
 package erp.mtrn.form;
 
-import java.text.DecimalFormat;
-import javax.swing.JButton;
-import java.util.Vector;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.data.SProcConstants;
 import erp.data.SDataUtilities;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
+import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mtrn.data.SDataDps;
-import erp.mtrn.form.SFormOptionPickerDpsBalance;
-import erp.mtrn.form.SPanelCurrency;
-import erp.mtrn.form.SPanelDpsBalance;
-import erp.mtrn.form.SPanelReference;
+import java.text.DecimalFormat;
+import java.util.Vector;
+import javax.swing.JButton;
 
 /**
  *
@@ -928,6 +923,7 @@ public class SPanelDpsBalance extends javax.swing.JPanel implements java.awt.eve
         renderCurrencySettings();
     }
 
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkDpsId, SDataConstants.TRNX_DPS_BAL, (mnParamFkBizPartnerId == 0 ? null : new Object[] { mnParamTpSysMovId, mnParamFkBizPartnerId, SDataConstantsSys.TRNX_DPS_BAL_PAY_PEND }));
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);

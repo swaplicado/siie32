@@ -78,7 +78,7 @@ public class SPayrollUtils {
         
         // Obtener empleados configurados para bono, despensa en especie y superbono.
         HashMap<Integer, ArrayList<SEarnConfiguration>> configuredEmployees = SPayrollUtils.getConfiguration(client, employeesIds, bonus, dtDate);
-        ArrayList<Integer> configuredEmployeesIds = new ArrayList();
+        ArrayList<Integer> configuredEmployeesIds = new ArrayList<>();
         configuredEmployeesIds.addAll(configuredEmployees.keySet());
         
         Date[] dates = SPayrollUtils.getCutOffDates(client, payType, dtDate, yearPeriod, payrollNumber, cutOffDay, weekLag);
@@ -87,8 +87,8 @@ public class SPayrollUtils {
         }
         
         HashMap<Integer, Integer> empPolicies = SPayrollUtils.getEmployeesCheckerPolicy(client, employeesIds);
-        ArrayList<Integer> employeesToRequest = new ArrayList();
-        ArrayList<Integer> directEmployees = new ArrayList();
+        ArrayList<Integer> employeesToRequest = new ArrayList<>();
+        ArrayList<Integer> directEmployees = new ArrayList<>();
         for (Map.Entry<Integer, Integer> entry : empPolicies.entrySet()) {
             if (entry.getValue() != SHrsConsts.CHECKER_POLICY_FREE) {
                 employeesToRequest.add(entry.getKey());
@@ -342,7 +342,7 @@ public class SPayrollUtils {
                         "        AND e.b_act = TRUE " +
                         "        AND e.b_del = FALSE;";
         
-        HashMap<Integer, ArrayList<SEarnConfiguration>> confDept = new HashMap();
+        HashMap<Integer, ArrayList<SEarnConfiguration>> confDept = new HashMap<>();
         for (Integer bonu : bonus) {
             ArrayList<Integer> earnings = new ArrayList<>();
             ResultSet resultSetEarByBonus = null;

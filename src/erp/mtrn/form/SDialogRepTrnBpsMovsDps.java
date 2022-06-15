@@ -9,7 +9,6 @@ package erp.mtrn.form;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -24,13 +23,9 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.mbps.data.SDataBizPartner;
-import erp.SClient;
 import erp.lib.SLibUtilities;
 
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.view.save.JRPdfSaveContributor.*;
-import net.sf.jasperreports.view.JRViewer.*;
-import net.sf.jasperreports.view.save.JRMultipleSheetsXlsSaveContributor.*;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
@@ -173,7 +168,6 @@ public class SDialogRepTrnBpsMovsDps extends javax.swing.JDialog implements erp.
 
         jPanel99.setLayout(new java.awt.BorderLayout(2, 5));
 
-        jcbFkCobId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(Seleccionar sucursal)" }));
         jcbFkCobId.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel99.add(jcbFkCobId, java.awt.BorderLayout.WEST);
 
@@ -244,8 +238,8 @@ public class SDialogRepTrnBpsMovsDps extends javax.swing.JDialog implements erp.
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-522)/2, (screenSize.height-344)/2, 522, 344);
+        setSize(new java.awt.Dimension(522, 344));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -464,6 +458,7 @@ public class SDialogRepTrnBpsMovsDps extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCobId, SDataConstants.BPSU_BPB, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });
 

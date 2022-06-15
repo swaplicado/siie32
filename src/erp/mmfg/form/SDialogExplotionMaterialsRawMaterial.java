@@ -2105,6 +2105,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
             case 1:

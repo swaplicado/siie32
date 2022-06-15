@@ -11,13 +11,6 @@
 
 package erp.mtrn.form;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
@@ -28,6 +21,12 @@ import erp.lib.form.SFormValidation;
 import erp.lib.table.STableRow;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 
 /**
  *
@@ -207,6 +206,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         setVisible(false);
     }
     
+    @SuppressWarnings("unchecked")
     private void populateElements() {
         int [] primaryKey = null;
         int idBranch = moDps.getFkBizPartnerBranchId();

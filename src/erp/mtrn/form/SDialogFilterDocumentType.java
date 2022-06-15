@@ -11,12 +11,11 @@
 
 package erp.mtrn.form;
 
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
-
-import erp.lib.form.SFormField;
-import erp.lib.SLibConstants;
-import erp.lib.form.SFormUtilities;
 
 /**
  *
@@ -271,6 +270,7 @@ public class SDialogFilterDocumentType extends javax.swing.JDialog implements er
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbDocumentType, mnDataType, manDataFilterKey);
     }

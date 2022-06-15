@@ -695,6 +695,7 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
      * @param value The supplied value.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(int type, Object value) {
         switch (type) {
             case SDataConstants.TRN_DPS:

@@ -127,13 +127,14 @@ public abstract class STrnStockSegregationUtils {
      * @return the segregation object with de production order values
      * @throws Exception 
      */
+    @SuppressWarnings("unchecked")
     private static SDataStockSegregation populateSegregationFromProdOrder(final SClientInterface client, final int [] reference) throws Exception {
         SDataStockSegregation segregation = new SDataStockSegregation();
         SDataStockSegregationWarehouse warehouse = null;
         SDataStockSegregationWarehouseEntry warehouseEntry = null;
         
         SDataProductionOrder productionOrder = null;
-        Vector<Object> items = new Vector<Object>();
+        Vector<Object> items = new Vector<>();
         SDataItem item = null;
         Object[] itemAux = null;
         Object[] itemObject = null;

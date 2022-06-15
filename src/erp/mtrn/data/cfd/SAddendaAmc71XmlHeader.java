@@ -47,6 +47,7 @@ public class SAddendaAmc71XmlHeader implements SAddenda {
     }
     
     @Override
+    @SuppressWarnings("unchecked")
     public String encodeJson() {
         JSONObject root = new JSONObject();
         root.put(SAddendaConsts.ADDENDA, AMECE_71);

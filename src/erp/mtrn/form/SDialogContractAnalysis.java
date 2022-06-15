@@ -873,9 +873,10 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void renderDpsSourceEntries() {
         String sEntry = "";
-        Vector<SFormComponentItem> vVector = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vVector = new Vector<>();
 
         jltEntries.removeAll();
         moTablePane.clearTableRows();

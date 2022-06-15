@@ -148,6 +148,7 @@ public abstract class SCfdUtils implements Serializable {
      * Private static methods:
      */
     
+    @SuppressWarnings("deprecation")
     private static boolean canCfdiCancelWebService(final SClientInterface client, final SDataCfd cfd, final int pacId) throws Exception {
         SDataCfdPacType cfdPacType = null;
         SDataPac pac = null;
@@ -2692,6 +2693,7 @@ public abstract class SCfdUtils implements Serializable {
      * @param cfd CFD registry.
      * @return true if is correct.
      */
+    @SuppressWarnings("deprecation")
     private static boolean doesXmlBelongsToCfd(final String xml, final SDataCfd cfd) throws Exception {
         cfd.ver32.DElementComprobante comprobanteXml = null;
         cfd.ver32.DElementComprobante comprobanteCfd = null;
@@ -2966,6 +2968,7 @@ public abstract class SCfdUtils implements Serializable {
      * @param numberCopies
      * @throws Exception 
      */
+    @SuppressWarnings("deprecation")
     private static void computePrintCfd(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, int printMode, int numberCopies) throws Exception {
         SDataDps dps = null;
         SDbBillOfLading bol = null;
@@ -3403,7 +3406,7 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "deprecation" })
     public static void computeCfdiPayroll(final SClientInterface client, final SHrsFormerPayroll hrsFormerPayroll, final boolean isRegenerateOnlyNonStampedCfdi) throws Exception {
         ArrayList<SDataCfd> formerPayrollCfds = null;
         ArrayList<SDataCfd> formerPayrollCfdsEmited = null;
@@ -4262,6 +4265,7 @@ public abstract class SCfdUtils implements Serializable {
         return comprobante;
     }
     
+    @Deprecated
     public static cfd.DElement createCfdi33RootElement(final SClientInterface client, final SCfdXmlCfdi33 xmlCfdi) throws Exception {
         // Comprobante:
         

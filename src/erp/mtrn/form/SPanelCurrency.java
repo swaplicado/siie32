@@ -14,17 +14,12 @@ package erp.mtrn.form;
 import java.util.Vector;
 import javax.swing.JButton;
 
-import erp.mfin.form.*;
 import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SProcConstants;
 import erp.data.SDataUtilities;
 import erp.lib.form.SFormField;
-import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.mfin.data.SDataExchangeRate;
 import erp.mtrn.form.SPanelCurrency;
 import erp.mtrn.form.SPanelDpsBalance;
 import erp.mtrn.form.SPanelReference;
@@ -630,6 +625,7 @@ public class SPanelCurrency extends javax.swing.JPanel implements java.awt.event
         renderCurrencySettings();
     }
 
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
     }

@@ -11,17 +11,16 @@
 
 package erp.mtrn.form;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-
-import erp.data.SDataConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.SLibConstants;
-import erp.lib.form.SFormUtilities;
 
 /**
  *
@@ -224,6 +223,7 @@ public class SDialogFilterFiscalYear extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFiscalYear, SDataConstants.FIN_YEAR);
     }

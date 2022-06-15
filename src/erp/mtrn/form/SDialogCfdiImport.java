@@ -692,6 +692,7 @@ public class SDialogCfdiImport extends javax.swing.JDialog implements java.awt.e
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         // Tabla general (conceptos):
         int i = 0;

@@ -93,6 +93,8 @@ public abstract class SCfdPaymentUtils {
      * @param xml
      * @throws Exception 
      */
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public static void createTemporaryDataCfdi33_Crp10(final Connection connection, final int sessionId, final String xml) throws Exception {
         cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(xml);
         

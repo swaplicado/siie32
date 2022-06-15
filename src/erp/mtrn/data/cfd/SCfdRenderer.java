@@ -101,6 +101,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         return moDpsRendered;
     }
       
+    @SuppressWarnings("deprecation")
     private void validateCfdi(File cfdiFile) throws Exception {
         SFormValidation validation = new SFormValidation();
         // obtener CFDI: 
@@ -277,6 +278,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         showCfdi();
     }
     
+    @SuppressWarnings("deprecation")
     private void createParamsMap() {
         try {
             moParamsMap = new HashMap<>();

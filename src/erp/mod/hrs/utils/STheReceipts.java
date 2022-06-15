@@ -47,7 +47,7 @@ public class STheReceipts {
     
     public boolean start(String path, int nYear, int nPer) {
          ResultSet resulPayroll;
-         List<String[]> dataList = new ArrayList();
+         List<String[]> dataList = new ArrayList<>();
          dataList.add(new String[]
                             { 
                                 "UUID XML",

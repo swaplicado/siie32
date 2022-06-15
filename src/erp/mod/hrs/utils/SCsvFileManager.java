@@ -39,7 +39,7 @@ public class SCsvFileManager {
      * @return list values from file
      */
     public static ArrayList<SInputData> readFile(String fileName) {
-        ArrayList<SInputData> lRows = new ArrayList();
+        ArrayList<SInputData> lRows = new ArrayList<>();
         BufferedReader fileReader = null;
         
         try {

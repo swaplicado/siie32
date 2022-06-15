@@ -183,6 +183,7 @@ public class SDialogDpsFinder extends javax.swing.JDialog implements erp.lib.for
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void updateFormAdjustmentSubtype(boolean enable) {
         if (!enable) {
             jlAdjustmentSubtypeId.setEnabled(false);

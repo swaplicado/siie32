@@ -164,7 +164,7 @@ public class SPrepayrollUtils {
      * @return 
      */
     public static ArrayList<SDbAbsence> getAbsencesFromNoWorkedDays(SGuiClient client, SPrepayrollRow row, Date captureDt, int payrollId) {
-        ArrayList<SDbAbsence> absences = new ArrayList();
+        ArrayList<SDbAbsence> absences = new ArrayList<>();
 
         for (SDay day : row.getDays()) {
             for (int i = 0; i < day.getNum_absences(); i++) {
@@ -231,7 +231,7 @@ public class SPrepayrollUtils {
      * @return 
      */
     public static ArrayList<SDbAbsenceConsumption> getConsumptionsFromAbs(ArrayList<SDbAbsence> abss) {
-        ArrayList<SDbAbsenceConsumption> consms = new ArrayList();
+        ArrayList<SDbAbsenceConsumption> consms = new ArrayList<>();
         for (SDbAbsence abs : abss) {
             SDbAbsenceConsumption cons = new SDbAbsenceConsumption();
             
@@ -278,7 +278,7 @@ public class SPrepayrollUtils {
                     getConnection().createStatement().
                     executeQuery(sqlIds);
             
-            ArrayList<String> ids = new ArrayList();
+            ArrayList<String> ids = new ArrayList<>();
             while (resultIds.next()) {
                 ids.add(resultIds.getString("id_abs"));
             }

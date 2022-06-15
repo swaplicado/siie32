@@ -304,6 +304,7 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         return idCc.size() > SLibConsts.UNDEFINED ? idCc.get(idCc.size()-1) : SLibConsts.UNDEFINED;
     }
 
+    @SuppressWarnings("unchecked")
     private void allocateMfgExpenses(final SGuiSession session) throws Exception {
         boolean ban = false;
         double dValue = 0;
@@ -317,10 +318,10 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         SDataDiog diog = null;
 
         int idCc = 0;
-        ArrayList<Integer> anIdCc = new ArrayList<Integer>();
-        ArrayList<SDataDiog> apportionDiogs = new ArrayList<SDataDiog>();
-        ArrayList<SDataDiog> apportionDiogsAux = new ArrayList<SDataDiog>();
-        ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<SDataProductionOrder>();
+        ArrayList<Integer> anIdCc = new ArrayList<>();
+        ArrayList<SDataDiog> apportionDiogs = new ArrayList<>();
+        ArrayList<SDataDiog> apportionDiogsAux = new ArrayList<>();
+        ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<>();
 
         Statement statementCenterCostAmount = session.getDatabase().getConnection().createStatement();
         Statement statementCenterCostProduction = session.getDatabase().getConnection().createStatement();
@@ -576,6 +577,7 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
                 "ss.id_item, ss.id_unit ");
     }
 
+    @SuppressWarnings("unchecked")
     private void computeInventoryValuation(final SGuiSession session) throws Exception {
         boolean bInventoryMovesPending = false;
         boolean simpleDiog = false;
@@ -593,8 +595,8 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         Statement statement = session.getDatabase().getConnection().createStatement();
         ResultSet resultSet = null;
 
-        ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<SDataProductionOrder>();
-        ArrayList<SDataDiog> aDiogs = new ArrayList<SDataDiog>();
+        ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<>();
+        ArrayList<SDataDiog> aDiogs = new ArrayList<>();
 
         // 1. Define current calculation msAuxPeriodQuery (year/month):
 
@@ -2794,12 +2796,13 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void validateMfgExpensesInventory(SGuiSession session) throws Exception {
         mbAuxExistInventoryMfgExpenses = false;
         mbAuxExistMfgExpenses = false;
 
         String sProductionOrders = "";
-        ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<SDataProductionOrder>();
+        ArrayList<SDataProductionOrder> aProductionOrders = new ArrayList<>();
 
         Statement statement = session.getDatabase().getConnection().createStatement();
         ResultSet resultSet = null;
@@ -3037,6 +3040,7 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean canSave(SGuiSession session) throws SQLException, Exception {
         boolean can = super.canSave(session);
         int[] prevPeriodKey = null;
@@ -3050,8 +3054,8 @@ public class SDbInventoryValuationXXX extends SDbRegistryUser {
             msAuxMfgCostUnitTypeSql = "";
             manAuxRawMaterialWarehouseKey = null;
             
-            diogs = new ArrayList<SDataDiog>();
-            productionOrders = new ArrayList<SDataProductionOrder>();
+            diogs = new ArrayList<>();
+            productionOrders = new ArrayList<>();
 
             // 3. Validate whether it is possible to compute inventory valuation:
 

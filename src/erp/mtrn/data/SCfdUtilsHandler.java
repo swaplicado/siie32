@@ -175,6 +175,7 @@ public class SCfdUtilsHandler {
      * @return CfdiAckQuery
      * @throws java.lang.Exception 
     */
+    @SuppressWarnings("deprecation")
     public CfdiAckQuery getCfdiSatStatus(final SDataCfd cfd) throws Exception {
         return getCfdiSatStatus(cfd.getFkCfdTypeId(), DCfdUtils.getCfdi33(cfd.getDocXml()));
     }
