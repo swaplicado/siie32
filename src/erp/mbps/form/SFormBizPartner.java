@@ -2914,7 +2914,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         
         if (!validation.getIsError()) {
             String fiscalId = jtfFiscalId.getText().trim();
-            int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_ORG : DCfdConsts.LEN_RFC_PER;
+            int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
             
             if (moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0] == 0) {
                 validation.setTabbedPaneIndex(0);
@@ -2936,10 +2936,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
-            else if (!fiscalId.isEmpty() && fiscalId.length() != fiscalIdLength) {
-                validation.setTabbedPaneIndex(0);
-                validation.setComponent(jtfFiscalId);
-                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "' debe tener " + fiscalIdLength + " caracteres.");
+            else if (fiscalId == DCfdConsts.RFC_GEN_NAC || fiscalId == DCfdConsts.RFC_GEN_INT) {
+                if (!fiscalId.isEmpty() && fiscalId.length() != fiscalIdLength) {
+                    validation.setTabbedPaneIndex(0);
+                    validation.setComponent(jtfFiscalId);
+                    validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "' debe tener " + fiscalIdLength + " caracteres.");
+                }
             }
             else {
                 if (jckIsDeleted.isSelected() || jckIsCategoryDeleted.isSelected()) {
