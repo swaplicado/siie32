@@ -391,8 +391,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         moFieldBizPartnerCommercial = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBizPartnerCommercial, jlBizPartnerCommercial);
         moFieldBizPartnerCommercial.setLengthMax(202);
         moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
-        moFieldFiscalId.setLengthMin(12);
-        moFieldFiscalId.setLengthMax(13);
+        moFieldFiscalId.setLengthMin(DCfdConsts.LEN_RFC_ORG);
+        moFieldFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
         moFieldAlternativeId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jftAlternativeId, jlAlternativeId);
         moFieldAlternativeId.setLengthMin(18);
         moFieldAlternativeId.setLengthMax(18);
@@ -828,9 +828,13 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
-            else if (!fiscalId.isEmpty() && fiscalId.length() != fiscalIdLength) {
+            else if (fiscalId.isEmpty()) {
                 validation.setComponent(jtfFiscalId);
-                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "' debe tener " + fiscalIdLength + " caracteres.");
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFiscalId.getText() + "'.");
+            }
+            else if (!fiscalId.equals(DCfdConsts.RFC_GEN_NAC) && !fiscalId.equals(DCfdConsts.RFC_GEN_INT) && fiscalId.length() != fiscalIdLength) {
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "', debe tener " + fiscalIdLength + " caracteres.");
             }
             else {
                 if (jckIsDeleted.isSelected()) {

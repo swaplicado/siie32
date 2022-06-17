@@ -616,8 +616,9 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         moFieldBizPartner.setLengthMax(202);
         moFieldBizPartnerCommercial = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBizPartnerCommercial, jlBizPartnerCommercial);
         moFieldBizPartnerCommercial.setLengthMax(202);
-        moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFiscalId, jlFiscalId);
-        moFieldFiscalId.setLengthMax(25);
+        moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
+        moFieldFiscalId.setLengthMin(DCfdConsts.LEN_RFC_ORG);
+        moFieldFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
         moFieldFiscalId.setAutoCaseType(SLibConstants.CASE_UPPER);
         moFieldAlternativeId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jftAlternativeId, jlAlternativeId);
         moFieldAlternativeId.setLengthMax(25);
@@ -1082,9 +1083,13 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
-            else if (!fiscalId.isEmpty() && fiscalId.length() != fiscalIdLength) {
+            else if (fiscalId.isEmpty()) {
                 validation.setComponent(jtfFiscalId);
-                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "' debe tener " + fiscalIdLength + " caracteres.");
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFiscalId.getText() + "'.");
+            }
+            else if (!fiscalId.equals(DCfdConsts.RFC_GEN_NAC) && !fiscalId.equals(DCfdConsts.RFC_GEN_INT) && fiscalId.length() != fiscalIdLength) {
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "', debe tener " + fiscalIdLength + " caracteres.");
             }
             else {
                 if (jckIsDeleted.isSelected() || jckIsCategoryDeleted.isSelected()) {

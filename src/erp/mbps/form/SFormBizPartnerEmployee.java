@@ -2745,6 +2745,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         }
 
         if (!validation.getIsError()) {
+            String fiscalId = jtfFiscalId.getText().trim();
+            
             if (!moFieldBankAccount.getString().isEmpty() && jcbFkBank_n.getSelectedIndex() <= 0) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkBank_n.getText() + "'.");
                 validation.setComponent(jcbFkBank_n);
@@ -2753,6 +2755,21 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             else if (!moFieldGroceryServiceAccount.getString().isEmpty() && jcbFkGroceryService.getSelectedIndex() <= 0) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkGroceryService.getText() + "'.");
                 validation.setComponent(jcbFkGroceryService);
+                validation.setTabbedPaneIndex(0);
+            }
+            else if (fiscalId.isEmpty()) {
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFiscalId.getText() + "'.");
+                validation.setTabbedPaneIndex(0);
+            }
+            else if (fiscalId.equals(DCfdConsts.RFC_GEN_NAC) || fiscalId.equals(DCfdConsts.RFC_GEN_INT)) {
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFiscalId.getText() + "'.");
+                validation.setTabbedPaneIndex(0);
+            }
+            else if (fiscalId.length() != DCfdConsts.LEN_RFC_PER) {
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "', debe tener " + DCfdConsts.LEN_RFC_PER + " caracteres.");
                 validation.setTabbedPaneIndex(0);
             }
             else {

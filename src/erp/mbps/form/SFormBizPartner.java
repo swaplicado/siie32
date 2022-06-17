@@ -544,6 +544,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         });
         jPanel33.add(jftAlternativeId);
 
+        jlFiscalFrgId.setForeground(new java.awt.Color(0, 102, 102));
         jlFiscalFrgId.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlFiscalFrgId.setText("ID fiscal:");
         jlFiscalFrgId.setPreferredSize(new java.awt.Dimension(60, 23));
@@ -1420,18 +1421,17 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldBizPartnerCommercial = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBizPartnerCommercial, jlBizPartnerCommercial);
         moFieldBizPartnerCommercial.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldBizPartnerCommercial.setLengthMax(202);
-        moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFiscalId, jlFiscalId);
+        moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
         moFieldFiscalId.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldFiscalId.setLengthMax(25);
-        moFieldFiscalId.setAutoCaseType(SLibConstants.CASE_UPPER);
+        moFieldFiscalId.setLengthMin(DCfdConsts.LEN_RFC_ORG);
+        moFieldFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
         moFieldFiscalFrgId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFiscalFrgId, jlFiscalFrgId);
         moFieldFiscalFrgId.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFiscalFrgId.setLengthMax(25);
-        moFieldFiscalFrgId.setAutoCaseType(SLibConstants.CASE_UPPER);
+        moFieldFiscalFrgId.setAutoCaseType(SLibConstants.UNDEFINED);
         moFieldAlternativeId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jftAlternativeId, jlAlternativeId);
         moFieldAlternativeId.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldAlternativeId.setLengthMax(25);
-        moFieldAlternativeId.setAutoCaseType(SLibConstants.CASE_UPPER);
         moFieldFkTaxIdentityTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxIdentityTypeId, jlFkTaxIdentityTypeId);
         moFieldFkTaxIdentityTypeId.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
@@ -2484,7 +2484,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void focusLostFiscalId() {
-        if (jtfFiscalId.getText().trim().length() > 0) {
+        if (!jtfFiscalId.getText().trim().isEmpty()) {
             jtfFiscalId.setText(jtfFiscalId.getText().toUpperCase());
         }
         else {
@@ -2493,7 +2493,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void focusLostAlternativeId() {
-        if (jftAlternativeId.getText().trim().length() > 0) {
+        if (!jftAlternativeId.getText().trim().isEmpty()) {
             jftAlternativeId.setText(jftAlternativeId.getText().toUpperCase());
         }
         else {
@@ -2914,6 +2914,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         
         if (!validation.getIsError()) {
             String fiscalId = jtfFiscalId.getText().trim();
+            String alternativeId = jftAlternativeId.getText().trim();
             int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
             
             if (moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0] == 0) {
@@ -2936,12 +2937,20 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
-            else if (fiscalId == DCfdConsts.RFC_GEN_NAC || fiscalId == DCfdConsts.RFC_GEN_INT) {
-                if (!fiscalId.isEmpty() && fiscalId.length() != fiscalIdLength) {
-                    validation.setTabbedPaneIndex(0);
-                    validation.setComponent(jtfFiscalId);
-                    validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "' debe tener " + fiscalIdLength + " caracteres.");
-                }
+            else if (fiscalId.isEmpty()) {
+                validation.setTabbedPaneIndex(0);
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFiscalId.getText() + "'.");
+            }
+            else if (!fiscalId.equals(DCfdConsts.RFC_GEN_NAC) && !fiscalId.equals(DCfdConsts.RFC_GEN_INT) && fiscalId.length() != fiscalIdLength) {
+                validation.setTabbedPaneIndex(0);
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "', debe tener " + fiscalIdLength + " caracteres.");
+            }
+            else if (!alternativeId.isEmpty() && alternativeId.length() != DCfdConsts.LEN_CURP) {
+                validation.setTabbedPaneIndex(0);
+                validation.setComponent(jftAlternativeId);
+                validation.setMessage("El valor del campo '" + jlAlternativeId.getText() + "', '" + alternativeId + "', debe tener " + DCfdConsts.LEN_CURP + " caracteres.");
             }
             else {
                 if (jckIsDeleted.isSelected() || jckIsCategoryDeleted.isSelected()) {
