@@ -20,7 +20,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -93,12 +95,15 @@ public class SSetExchangeRate {
      */
     public static boolean isNextDayBankBussDay(Date date, ArrayList bankNbDays) {
         boolean isbankBussDay = true;
-        Date nextDay = new Date();
-        nextDay = SLibTimeUtils.addDate(date, 0, 0, 1);
+        Date nextDay = SLibTimeUtils.addDate(date, 0, 0, 1);
+        
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(nextDay);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
         for (Object day : bankNbDays) {
             String bankNbDay = day.toString();
-            if (!SLibUtils.DbmsDateFormatDate.format(nextDay).equals(bankNbDay) && nextDay.getDay() != 6 && nextDay.getDay() != 0) {
+            if (!SLibUtils.DbmsDateFormatDate.format(nextDay).equals(bankNbDay) && dayOfWeek != 7 && dayOfWeek != 1) {
                 isbankBussDay = true;
             } 
             else {
@@ -118,10 +123,14 @@ public class SSetExchangeRate {
     public static boolean isActualDayBankBussDay(ArrayList bankNbDays) {
         boolean bankBussDay = true;
         Date date = new Date();
+        
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
         for (Object day : bankNbDays) {
             String bankNbDay = day.toString();
-            if (!SLibUtils.DbmsDateFormatDate.format(date).equals(bankNbDay) && date.getDay() != 6 && date.getDay() != 0) {
+            if (!SLibUtils.DbmsDateFormatDate.format(date).equals(bankNbDay) && dayOfWeek != 7 && dayOfWeek != 1) {
                 bankBussDay = true;
             } 
             else {
@@ -164,9 +173,9 @@ public class SSetExchangeRate {
      * @return
      * @throws Exception
      */
-    public static ArrayList setExchangeRateDays(int usd_xrt_policy, ArrayList calendar) throws Exception {
+    public static ArrayList<String> setExchangeRateDays(int usd_xrt_policy, ArrayList calendar) throws Exception {
         Date date = new Date();
-        ArrayList exchangeRateDays = new ArrayList();
+        ArrayList<String> exchangeRateDays = new ArrayList<>();
         boolean bankBussDay = false;
         boolean canSetDay = false;
 
@@ -289,7 +298,7 @@ public class SSetExchangeRate {
             if (isActualDayBankBussDay(bankNbDays)) {
                 // total databases:
 
-                ArrayList companiesDb = new ArrayList();
+                ArrayList<String> companiesDb = new ArrayList<>();
 
                 String sql = "SELECT bd "
                         + "FROM erp.cfgu_co ;";
@@ -310,7 +319,7 @@ public class SSetExchangeRate {
                     result = dbCompany.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(), companiesDb1.toString(), paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
                     if (result == SDbConsts.CONNECTION_OK) {
                         int exchangeRatePolicy = getExchangeRatePolicy(dbCompany.getConnection());
-                        ArrayList exchangeRateDays = setExchangeRateDays(exchangeRatePolicy, bankNbDays);
+                        ArrayList<String> exchangeRateDays = setExchangeRateDays(exchangeRatePolicy, bankNbDays);
                         saveExchangeRate(dbCompany.getConnection(), valueExchangeRate, exchangeRateDays);
                     }
                 }
