@@ -1058,7 +1058,8 @@ public class SCliRepInvoicesMultiCompanies {
     public void sendMail() throws Exception {
         String subject = composeMailSubject();
         
-        SMailSender sender = new SMailSender("mail.swaplicado.com.mx", "26", "smtp", false, true, "siie@swaplicado.com.mx", "s11E2020!+", "siie@swaplicado.com.mx");
+        SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "facturacion@aeth.mx", "NGkeu-wR9z*D", "facturacion@aeth.mx");
+        //SMailSender sender = new SMailSender("mail.swaplicado.com.mx", "26", "smtp", false, true, "siie@swaplicado.com.mx", "s11E2020!+", "siie@swaplicado.com.mx");
         //SMailSender sender = new SMailSender("mail.swaplicado.com.mx", "26", "smtp", false, true, "cap@swaplicado.com.mx", "C492020*&", "cap@swaplicado.com.mx");
         //SMailSender sender = new SMailSender("mail.swaplicado.com.mx", "26", "smtp", false, true, "sflores@swaplicado.com.mx", "Ch3c0m4n", "sflores@swaplicado.com.mx");
         //SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "som@aeth.mx", "AETHSOM", "som@aeth.mx");
