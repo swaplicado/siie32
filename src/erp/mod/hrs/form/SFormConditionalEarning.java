@@ -337,7 +337,7 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlAmount) + "' o '" + SGuiUtils.getLabelName(jlPercentage) + "', pero no para ambos simultáneamente.");
                 validation.setComponent(moDecAmount);
             }
-            else if (moKeyScope.getValue()[0] == SModSysConsts.HRSS_TP_ACC_DEP && moKeyReference.getValue()[0] == SModSysConsts.HRSU_DEP_NON){
+            else if (moKeyScope.getValue()[0] == SModSysConsts.HRSS_TP_ACC_DEP && moKeyReference.getValue()[0] == SModSysConsts.HRSU_DEP_NA){
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlReference) + "'.");
                 validation.setComponent(moKeyReference);
             }

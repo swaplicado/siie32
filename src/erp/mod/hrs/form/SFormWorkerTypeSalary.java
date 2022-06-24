@@ -196,7 +196,7 @@ public class SFormWorkerTypeSalary extends SBeanForm {
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            if (moKeyWorkerType.getValue()[0] == SModSysConsts.HRSU_TP_WRK_NON) {
+            if (moKeyWorkerType.getValue()[0] == SModSysConsts.HRSU_TP_WRK_NA) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlWorkerType) + "'.");
                 validation.setComponent(moKeyWorkerType);
             }

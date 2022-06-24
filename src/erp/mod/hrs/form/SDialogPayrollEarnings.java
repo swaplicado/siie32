@@ -517,7 +517,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         int otherPaymentType;
         
         if (moKeyOtherPayment.getSelectedIndex() <= 0) {
-            otherPaymentType = SModSysConsts.HRSS_TP_OTH_PAY_NON;
+            otherPaymentType = SModSysConsts.HRSS_TP_OTH_PAY_NA;
         }
         else {
             otherPaymentType = moKeyOtherPayment.getValue()[0];
@@ -642,7 +642,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(moKeyOtherPayment.getToolTipText()) + "'.");
                 validation.setComponent(moKeyOtherPayment);
             }
-            else if (moKeyOtherPayment.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
+            else if (moKeyOtherPayment.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NA) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moKeyOtherPayment.getToolTipText()) + "'.");
                 validation.setComponent(moKeyOtherPayment);
             }

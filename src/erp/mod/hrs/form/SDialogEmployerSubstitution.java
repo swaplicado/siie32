@@ -376,7 +376,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
                     
                     moEmployee.setAuxHireLogDate(moDateDate.getValue());
                     moEmployee.setAuxHireLogNotes(getTitle().toUpperCase());
-                    moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NON);
+                    moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
                     moEmployee.setAuxHrsEmployeeHireLog(hrsEmployeeHireLog);
 
                     value = moEmployee;

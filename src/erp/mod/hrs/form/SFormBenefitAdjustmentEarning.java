@@ -332,7 +332,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         registry.setBenefitYear(moIntBenefitYear.getValue());
         registry.setFkEarningTypeId(earning.getFkEarningTypeId());
         registry.setFkEarningId(earning.getPkEarningId());
-        registry.setFkBonusId(SModSysConsts.HRSS_BONUS_NON);
+        registry.setFkBonusId(SModSysConsts.HRSS_BONUS_NA);
         registry.setFkBenefitTypeId(earning.getFkBenefitTypeId());
         registry.setFkLoanTypeId_n(SLibConsts.UNDEFINED);
         registry.setFkLoanEmployeeId_n(SLibConsts.UNDEFINED);

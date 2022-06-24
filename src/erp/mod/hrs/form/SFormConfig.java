@@ -59,6 +59,7 @@ public class SFormConfig extends SBeanForm {
         jPanel10 = new javax.swing.JPanel();
         jlLimitMwzReference = new javax.swing.JLabel();
         moIntLimitMwzReference = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlFirstDayWeekHelp1 = new javax.swing.JLabel();
         jPanel30 = new javax.swing.JPanel();
         jlPayrollTaxRate = new javax.swing.JLabel();
         moDecPayrollTaxRate = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -130,6 +131,7 @@ public class SFormConfig extends SBeanForm {
         jPanel34 = new javax.swing.JPanel();
         jlSsSubbranch = new javax.swing.JLabel();
         moTextSsSubbranch = new sa.lib.gui.bean.SBeanFieldText();
+        jlBajioAffinityGroupHelp1 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
@@ -187,8 +189,8 @@ public class SFormConfig extends SBeanForm {
         jPanel9.add(moIntFirstDayWeek);
 
         jlFirstDayWeekHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlFirstDayWeekHelp.setText("1=Do, 2=Lun, ..., 7=Sá");
-        jlFirstDayWeekHelp.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlFirstDayWeekHelp.setText("1=Do, 2=Lu, ... 7=Sá");
+        jlFirstDayWeekHelp.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel9.add(jlFirstDayWeekHelp);
 
         jPanel6.add(jPanel9);
@@ -201,6 +203,11 @@ public class SFormConfig extends SBeanForm {
 
         moIntLimitMwzReference.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel10.add(moIntLimitMwzReference);
+
+        jlFirstDayWeekHelp1.setForeground(new java.awt.Color(109, 109, 109));
+        jlFirstDayWeekHelp1.setText("SBC máx. en veces SMAR");
+        jlFirstDayWeekHelp1.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel10.add(jlFirstDayWeekHelp1);
 
         jPanel6.add(jPanel10);
 
@@ -260,12 +267,12 @@ public class SFormConfig extends SBeanForm {
         jPanel37.add(moIntPrePayrollWeeklyCutoffDayWeek);
 
         jlPrePayrollWeeklyCutoffDayWeekHint.setForeground(new java.awt.Color(109, 109, 109));
-        jlPrePayrollWeeklyCutoffDayWeekHint.setText("1=Do, 2=Lun, ..., 7=Sá");
-        jlPrePayrollWeeklyCutoffDayWeekHint.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlPrePayrollWeeklyCutoffDayWeekHint.setText("1=Do, 2=Lu, ... 7=Sá");
+        jlPrePayrollWeeklyCutoffDayWeekHint.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel37.add(jlPrePayrollWeeklyCutoffDayWeekHint);
 
         jlPrePayrollWeeklyWeeksLag.setText("Semanas desfase percep. normal:*");
-        jlPrePayrollWeeklyWeeksLag.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlPrePayrollWeeklyWeeksLag.setPreferredSize(new java.awt.Dimension(190, 23));
         jPanel37.add(jlPrePayrollWeeklyWeeksLag);
 
         moIntPrePayrollWeeklyWeeksLag.setPreferredSize(new java.awt.Dimension(50, 23));
@@ -283,12 +290,12 @@ public class SFormConfig extends SBeanForm {
         jPanel43.add(moIntPrePayrollWeeklyVarCutoffDayWeek);
 
         jlPrePayrollWeeklyVarCutoffDayWeekHint.setForeground(new java.awt.Color(109, 109, 109));
-        jlPrePayrollWeeklyVarCutoffDayWeekHint.setText("1=Do, 2=Lun, ..., 7=Sá");
-        jlPrePayrollWeeklyVarCutoffDayWeekHint.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlPrePayrollWeeklyVarCutoffDayWeekHint.setText("1=Do, 2=Lu, ... 7=Sá");
+        jlPrePayrollWeeklyVarCutoffDayWeekHint.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel43.add(jlPrePayrollWeeklyVarCutoffDayWeekHint);
 
         jlPrePayrollWeeklyVarWeeksLag.setText("Semanas desfase percep. variables:*");
-        jlPrePayrollWeeklyVarWeeksLag.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlPrePayrollWeeklyVarWeeksLag.setPreferredSize(new java.awt.Dimension(190, 23));
         jPanel43.add(jlPrePayrollWeeklyVarWeeksLag);
 
         moIntPrePayrollWeeklyVarWeeksLag.setPreferredSize(new java.awt.Dimension(50, 23));
@@ -307,7 +314,7 @@ public class SFormConfig extends SBeanForm {
 
         jlTimeClockPolHint.setForeground(new java.awt.Color(109, 109, 109));
         jlTimeClockPolHint.setText("1=Todo, 2=Oficial, 3=No-oficial");
-        jlTimeClockPolHint.setPreferredSize(new java.awt.Dimension(250, 23));
+        jlTimeClockPolHint.setPreferredSize(new java.awt.Dimension(245, 23));
         jPanel44.add(jlTimeClockPolHint);
 
         jPanel8.add(jPanel44);
@@ -382,8 +389,8 @@ public class SFormConfig extends SBeanForm {
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        moBoolAutoVacationBonus.setText("Pago automático prima vacacional en aniversario");
-        moBoolAutoVacationBonus.setPreferredSize(new java.awt.Dimension(300, 23));
+        moBoolAutoVacationBonus.setText("Pagar automáticamente prima vacacional en aniversarios");
+        moBoolAutoVacationBonus.setPreferredSize(new java.awt.Dimension(355, 23));
         jPanel36.add(moBoolAutoVacationBonus);
 
         jPanel15.add(jPanel36);
@@ -434,7 +441,7 @@ public class SFormConfig extends SBeanForm {
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBajioAffinityGroup.setText("Grupo afinidad:");
+        jlBajioAffinityGroup.setText("Grupo afinidad BanBajío:");
         jlBajioAffinityGroup.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(jlBajioAffinityGroup);
 
@@ -442,8 +449,8 @@ public class SFormConfig extends SBeanForm {
         jPanel29.add(moTextBajioAffinityGroup);
 
         jlBajioAffinityGroupHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlBajioAffinityGroupHelp.setText("(BanBajío)");
-        jlBajioAffinityGroupHelp.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlBajioAffinityGroupHelp.setText("(Dato definido por BanBajío)");
+        jlBajioAffinityGroupHelp.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel29.add(jlBajioAffinityGroupHelp);
 
         jPanel15.add(jPanel29);
@@ -467,6 +474,11 @@ public class SFormConfig extends SBeanForm {
 
         moTextSsSubbranch.setText("TEXT");
         jPanel34.add(moTextSsSubbranch);
+
+        jlBajioAffinityGroupHelp1.setForeground(new java.awt.Color(109, 109, 109));
+        jlBajioAffinityGroupHelp1.setText("(Dato definido por IMSS)");
+        jlBajioAffinityGroupHelp1.setPreferredSize(new java.awt.Dimension(165, 23));
+        jPanel34.add(jlBajioAffinityGroupHelp1);
 
         jPanel15.add(jPanel34);
 
@@ -634,6 +646,7 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel jlBajioAffinityGroup;
     private javax.swing.JLabel jlBajioAffinityGroupHelp;
+    private javax.swing.JLabel jlBajioAffinityGroupHelp1;
     private javax.swing.JLabel jlBank;
     private javax.swing.JLabel jlCfdiNumberSeries;
     private javax.swing.JLabel jlDateOperations;
@@ -653,6 +666,7 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JLabel jlEarningVacations_n;
     private javax.swing.JLabel jlFirstDayWeek;
     private javax.swing.JLabel jlFirstDayWeekHelp;
+    private javax.swing.JLabel jlFirstDayWeekHelp1;
     private javax.swing.JLabel jlLimitMwzReference;
     private javax.swing.JLabel jlMwzReferenceType;
     private javax.swing.JLabel jlMwzType;

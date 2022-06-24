@@ -568,7 +568,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         receptor.getAttTipoContrato().setString(msTipoContrato);
         receptor.getAttSindicalizado().setString(msSindicalizado);
         
-        if (Integer.parseInt(msTipoJornada) != SModSysConsts.HRSS_TP_WORK_DAY_NON) {
+        if (Integer.parseInt(msTipoJornada) != SModSysConsts.HRSS_TP_WORK_DAY_NA) {
             receptor.getAttTipoJornada().setString(msTipoJornada);
         }
         

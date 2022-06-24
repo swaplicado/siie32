@@ -453,7 +453,7 @@ public class SFormDeduction extends SBeanForm implements ItemListener {
         boolean enable = moBoolLoan.getValue();
         moKeyLoanType.setEnabled(enable);
         if (!enable) {
-            moKeyLoanType.setValue(new int[] { SModSysConsts.HRSS_TP_LOAN_NON });
+            moKeyLoanType.setValue(new int[] { SModSysConsts.HRSS_TP_LOAN_NA });
         }
     }
 
@@ -514,8 +514,8 @@ public class SFormDeduction extends SBeanForm implements ItemListener {
                 moRegistry.setOldAccountingConfigurationTypeId(0); // to trigger creation of proper accounting settings on save
             }
             else {
-                moRegistry.setFkLoanTypeId(SModSysConsts.HRSS_TP_LOAN_NON);
-                moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NON);
+                moRegistry.setFkLoanTypeId(SModSysConsts.HRSS_TP_LOAN_NA);
+                moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NA);
                 
                 moRegistry.setFkDeductionComputationTypeId(SModSysConsts.HRSS_TP_DED_COMP_AMT); // the only one option, by now
             }
@@ -582,7 +582,7 @@ public class SFormDeduction extends SBeanForm implements ItemListener {
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NON) { // should not be less, just in case
+            if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NA) { // should not be less, just in case
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlLoanType) + "'.");
                 validation.setComponent(moKeyLoanType);
             }

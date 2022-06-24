@@ -191,8 +191,8 @@ public class SDbEarning extends SDbRegistryUser {
     public int[] getAbsenceClassKey() { return new int[] { mnFkAbsenceClassId_n }; }
     public int[] getAbsenceTypeKey() { return new int[] { mnFkAbsenceClassId_n, mnFkAbsenceTypeId_n }; }
     
-    public boolean isLoan() { return mnFkLoanTypeId != 0 && mnFkLoanTypeId != SModSysConsts.HRSS_TP_LOAN_NON; }
-    public boolean isBenefit() { return mnFkBenefitTypeId != 0 && mnFkBenefitTypeId != SModSysConsts.HRSS_TP_BEN_NON; }
+    public boolean isLoan() { return mnFkLoanTypeId != 0 && mnFkLoanTypeId != SModSysConsts.HRSS_TP_LOAN_NA; }
+    public boolean isBenefit() { return mnFkBenefitTypeId != 0 && mnFkBenefitTypeId != SModSysConsts.HRSS_TP_BEN_NA; }
     public boolean isAbsence() { return mnFkAbsenceClassId_n != 0 && mnFkAbsenceTypeId_n != 0; }
     
     public boolean isMassAsignable() { return !isLoan() && !isBenefit() && !isAbsence(); }

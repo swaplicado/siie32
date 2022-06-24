@@ -93,7 +93,7 @@ public class SViewPayrollBenefitEarningComplement extends SGridPaneView {
                 + "v.fk_usr_upd = uu.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_BEN) + " AS b ON "
                 + "ve.fk_tp_ben = b.id_tp_ben "
-                + "WHERE ve.fk_tp_ben <> " + SModSysConsts.HRSS_TP_BEN_NON + " " + (sql.isEmpty() ? "" : "AND " + sql)
+                + "WHERE ve.fk_tp_ben <> " + SModSysConsts.HRSS_TP_BEN_NA + " " + (sql.isEmpty() ? "" : "AND " + sql)
                 + "ORDER BY ear.name, f_name_emp, ve.id_pay , ve.id_emp, ve.id_mov ";
     }
 

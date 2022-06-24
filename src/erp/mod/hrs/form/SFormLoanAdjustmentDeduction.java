@@ -284,7 +284,7 @@ public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListe
         registry.setAutomatic(true);
         registry.setFkDeductionTypeId(deduction.getFkDeductionTypeId());
         registry.setFkDeductionId(deduction.getPkDeductionId());
-        registry.setFkBonusId(SModSysConsts.HRSS_BONUS_NON);
+        registry.setFkBonusId(SModSysConsts.HRSS_BONUS_NA);
         registry.setFkBenefitTypeId(deduction.getFkBenefitTypeId());
         registry.setFkLoanTypeId_n(moKeyLoanType.getValue()[0]);
         registry.setFkLoanEmployeeId_n(moKeyLoan.getValue()[0]);

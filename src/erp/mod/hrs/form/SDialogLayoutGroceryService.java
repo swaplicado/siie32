@@ -569,7 +569,7 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
             jtfAmountWithAccount.setText(SLibUtils.getDecimalFormatAmount().format(groceryService.getAmountWithAccount()));
             jtfAmountWithoutAccount.setText(SLibUtils.getDecimalFormatAmount().format(groceryService.getAmountWithoutAccount()));
             
-            if (groceryService.getId() != SModSysConsts.HRSS_GROCERY_SRV_NON) {
+            if (groceryService.getId() != SModSysConsts.HRSS_GROCERY_SRV_NA) {
                 for (SDbPayrollReceipt payrollReceipt : moPayroll.getChildPayrollReceipts()) {
                     if (!payrollReceipt.isDeleted()) {
                         SDbEmployee employee = moEmployeesMap.get(payrollReceipt.getPkEmployeeId());
@@ -583,7 +583,7 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
                 }
             }
             
-            if (moKeyGroceryService.getSelectedIndex() <= 0 || groceryService.getId() == SModSysConsts.HRSS_GROCERY_SRV_NON) {
+            if (moKeyGroceryService.getSelectedIndex() <= 0 || groceryService.getId() == SModSysConsts.HRSS_GROCERY_SRV_NA) {
                 moRadCopyWithAccount.setEnabled(false);
                 moRadCopyAll.setEnabled(false);
                 jbCopyToClipboard.setEnabled(false);

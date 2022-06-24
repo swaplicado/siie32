@@ -1779,7 +1779,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                         return;
                     }
 
-                    if (moKeyEarningOtherPaymentType.isEnabled() && moKeyEarningOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
+                    if (moKeyEarningOtherPaymentType.isEnabled() && moKeyEarningOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NA) {
                         miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moKeyEarningOtherPaymentType.getToolTipText()) + "'. ");
                         moKeyEarningOtherPaymentType.requestFocusInWindow();
                         return;

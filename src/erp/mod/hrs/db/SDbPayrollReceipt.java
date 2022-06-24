@@ -1034,12 +1034,12 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             dummyPayrollReceipt.setDateLastHire(SLibTimeUtils.createDate(2000, 1, 1));
             dummyPayrollReceipt.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
             dummyPayrollReceipt.setFkSalaryTypeId(SModSysConsts.HRSS_TP_SAL_FIX);
-            dummyPayrollReceipt.setFkEmployeeTypeId(SModSysConsts.HRSU_TP_EMP_NON);
-            dummyPayrollReceipt.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NON);
+            dummyPayrollReceipt.setFkEmployeeTypeId(SModSysConsts.HRSU_TP_EMP_NA);
+            dummyPayrollReceipt.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NA);
             dummyPayrollReceipt.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
-            dummyPayrollReceipt.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
-            dummyPayrollReceipt.setFkPositionId(SModSysConsts.HRSU_POS_NON);
-            dummyPayrollReceipt.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
+            dummyPayrollReceipt.setFkDepartmentId(SModSysConsts.HRSU_DEP_NA);
+            dummyPayrollReceipt.setFkPositionId(SModSysConsts.HRSU_POS_NA);
+            dummyPayrollReceipt.setFkShiftId(SModSysConsts.HRSU_SHT_NA);
             dummyPayrollReceipt.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
             dummyPayrollReceipt.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
             dummyPayrollReceipt.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);

@@ -529,7 +529,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlUnits) + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_GREAT_EQUAL + "'" + SGuiUtils.getLabelName(jlUnitsAlleged) + "'.");
                 validation.setComponent(moCompUnits.getField().getComponent());
             }
-            else if (moKeyOtherPaymentType.isEnabled() && moKeyOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
+            else if (moKeyOtherPaymentType.isEnabled() && moKeyOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NA) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlOtherPaymentType) + "'.");
                 validation.setComponent(moKeyOtherPaymentType);
             }

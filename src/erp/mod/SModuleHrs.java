@@ -610,7 +610,7 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_tp_ear_exem AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE b_del = 0 "
-                        + (params != null && params.getKey() != null ? " AND id_tp_ear_exem IN( " + SModSysConsts.HRSS_TP_EAR_EXEM_NON + ", " + params.getKey()[0] + ")" : "") + " " 
+                        + (params != null && params.getKey() != null ? " AND id_tp_ear_exem IN ( " + SModSysConsts.HRSS_TP_EAR_EXEM_NA + ", " + params.getKey()[0] + ")" : "") + " " 
                         + "ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_EAR:
@@ -638,7 +638,7 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_tp_ben AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE b_del = 0 "
-                        + (subtype == SModConsts.HRS_BEN ? " AND id_tp_ben > " + SModSysConsts.HRSS_TP_BEN_NON : "") + " "
+                        + (subtype == SModConsts.HRS_BEN ? " AND id_tp_ben > " + SModSysConsts.HRSS_TP_BEN_NA : "") + " "
                         + "ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_LOAN:
@@ -646,7 +646,7 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_tp_loan AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE b_del = 0 "
-                        + (subtype == SModConsts.HRS_LOAN ? " AND id_tp_loan > " + SModSysConsts.HRSS_TP_LOAN_NON : "") + " "
+                        + (subtype == SModConsts.HRS_LOAN ? " AND id_tp_loan > " + SModSysConsts.HRSS_TP_LOAN_NA : "") + " "
                         + "ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_LOAN_PAY:

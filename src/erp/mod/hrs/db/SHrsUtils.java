@@ -3863,7 +3863,7 @@ public abstract class SHrsUtils {
             else {
                 hrsEmployeeHireLog.setLastDismissalDate_n(null);
                 hrsEmployeeHireLog.setLastDismissalNotes("");
-                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NON); 
+                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NA); 
             }
             
             hrsEmployeeHireLog.save();

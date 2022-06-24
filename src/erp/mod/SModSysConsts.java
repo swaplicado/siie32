@@ -674,7 +674,7 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_LINK_MFR = 10;
     public static final int TRNS_TP_LINK_ITEM = 11;
     
-    public static final int TRNS_TP_MAINT_MOV_NA = 1;   // non applicable
+    public static final int TRNS_TP_MAINT_MOV_NA = 1; // not applicable
     public static final int TRNS_TP_MAINT_MOV_IN_CONS_PART = 111;   // in consumption of parts
     public static final int TRNS_TP_MAINT_MOV_IN_CONS_TOOL = 121;   // in consumption of tools
     public static final int TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT = 151;      // in status of tools lent
@@ -699,9 +699,9 @@ public abstract class SModSysConsts {
 
     public static final int TRN_MAINT_CFG_COM = 1; // company's maintenance configuration
 
-    public static final int TRN_MAINT_AREA_NA = 1; // non applicable
+    public static final int TRN_MAINT_AREA_NA = 1; // not applicable
     
-    public static final int TRN_MAINT_USER_SUPV_NA = 1; // non applicable
+    public static final int TRN_MAINT_USER_SUPV_NA = 1; // not applicable
     
     public static final int TRNX_DIOG_CST_ASIG_NA = 0;
     public static final int TRNX_DIOG_CST_ASIG_NO = 1;
@@ -868,7 +868,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_COMP_PCT_HR = 13;       // % of Hour
     public static final int HRSS_TP_EAR_COMP_PCT_INCOME = 16;   // % of Income
 
-    public static final int HRSS_TP_EAR_EXEM_NON = 1;       // Non applicable
+    public static final int HRSS_TP_EAR_EXEM_NA = 1;        // Not applicable
     public static final int HRSS_TP_EAR_EXEM_PER = 11;      // Percentage
     public static final int HRSS_TP_EAR_EXEM_MWZ_GBL = 21;  // Minimum Wage Global
     public static final int HRSS_TP_EAR_EXEM_MWZ_EVT = 22;  // Minimum Wage Event
@@ -901,7 +901,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_REWARD_ATTEND = 49; // Reward for attendance
     public static final int HRSS_TP_EAR_OTH = 999;          // Other payments that are not income
 
-    public static final int HRSS_TP_OTH_PAY_NON = 0;                // Tax Refund of Overpayed Tax
+    public static final int HRSS_TP_OTH_PAY_NA = 0;                 // Not applicable
     public static final int HRSS_TP_OTH_PAY_TAX_REF_OPT = 1;        // Tax Refund of Overpayed Tax
     public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;            // Tax Subsidy
     public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;            // Travel Expenses
@@ -929,12 +929,12 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DED_ABS = 20;           // Absenteeism
     public static final int HRSS_TP_DED_TAX_SUB_ADJ = 107;  // Tax Subsidy Adjustent
 
-    public static final int HRSS_TP_BEN_NON = 1;        // Non applicable
+    public static final int HRSS_TP_BEN_NA = 1;         // Not applicable
     public static final int HRSS_TP_BEN_ANN_BON = 11;   // Annual bonus
     public static final int HRSS_TP_BEN_VAC = 21;       // Loan
     public static final int HRSS_TP_BEN_VAC_BON = 22;   // Home credit
 
-    public static final int HRSS_TP_LOAN_NON = 1;           // Non applicable
+    public static final int HRSS_TP_LOAN_NA = 1;            // Not applicable
     public static final int HRSS_TP_LOAN_LOAN_COM = 2;      // Company loans
     public static final int HRSS_TP_LOAN_LOAN_UNI = 3;      // Union loans
     public static final int HRSS_TP_LOAN_LOAN_3RD = 4;      // Third parties loans
@@ -974,9 +974,9 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_POS_RISK_CL3 = 3;   // Class III
     public static final int HRSS_TP_POS_RISK_CL4 = 4;   // Class IV
     public static final int HRSS_TP_POS_RISK_CL5 = 5;   // Class V
-    public static final int HRSS_TP_POS_RISK_NA = 99;   // Non applicable
+    public static final int HRSS_TP_POS_RISK_NA = 99;   // Not applicable
 
-    public static final int HRSS_TP_WORK_DAY_NON = 0;   // Non applicable
+    public static final int HRSS_TP_WORK_DAY_NA = 0;    // Not applicable
     public static final int HRSS_TP_WORK_DAY_DIU = 1;   // Diurnal
     
     public static final int HRSS_TP_DIS_RSK = 1;    // Risk
@@ -984,7 +984,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DIS_MAT = 3;    // Maternity
     public static final int HRSS_TP_DIS_CCC = 4;    // Cancer Child Care
 
-    public static final int HRSS_TP_DAY_NON = 1;    // Non applicable
+    public static final int HRSS_TP_DAY_NA = 1;     // Not applicable
     public static final int HRSS_TP_DAY_WRK = 2;    // Workday
     public static final int HRSS_TP_DAY_OFF = 3;    // Day off
     public static final int HRSS_TP_DAY_HOL = 4;    // Holiday
@@ -995,12 +995,12 @@ public abstract class SModSysConsts {
     public static final int HRSS_BANK_SANT = 14;    // Santander
     public static final int HRSS_BANK_HSBC = 21;    // HSBC
     public static final int HRSS_BANK_BBAJ = 30;    // BanBajío
-    public static final int HRSS_BANK_NON = 999;    // Non applicable
+    public static final int HRSS_BANK_NA = 999;     // Not applicable
 
-    public static final int HRSS_GROCERY_SRV_NON = 1;       // Non applicable
+    public static final int HRSS_GROCERY_SRV_NA = 1;        // Not applicable
     public static final int HRSS_GROCERY_SRV_SI_VALE = 2;   // Sí Vale
 
-    public static final int HRSS_BONUS_NON = 1;                 // Non applicable
+    public static final int HRSS_BONUS_NA = 1;                  // Not applicable
     public static final int HRSS_BONUS_AETH_FOOD = 101;         // AETH/ Food
     public static final int HRSS_BONUS_AETH_FOOD_KIND = 102;    // AETH/ Food In Kind
     public static final int HRSS_BONUS_AETH_SUPER_BONUS = 103;  // AETH/ Super Bonus
@@ -1015,26 +1015,26 @@ public abstract class SModSysConsts {
     public static final int[] HRSU_TP_ABS_DIS_MAT = new int[] { 2, 3 }; // Disease, maternity
     public static final int[] HRSU_TP_ABS_VAC = new int[] { 3, 1 };     // Vacation
 
-    public static final int HRSU_TP_EMP_DIS_NON = 1;    // Non applicable
+    public static final int HRSU_TP_EMP_DIS_NA = 1; // Not applicable
 
-    public static final int HRSU_TP_EMP_NON = 1;    // Non applicable
+    public static final int HRSU_TP_EMP_NA = 1; // Not applicable
 
-    public static final int HRSU_TP_WRK_NON = 1;    // Non applicable
+    public static final int HRSU_TP_WRK_NA = 1; // Not applicable
 
-    public static final int HRSU_TP_MWZ_DEF = 1;    // Default
+    public static final int HRSU_TP_MWZ_DEF = 1; // Default
 
-    public static final int HRSU_TP_PAY_SHT_CUS_DEF = 1;    // Default
+    public static final int HRSU_TP_PAY_SHT_CUS_DEF = 1; // Default
     
-    public static final int HRSU_DEP_NON = 1;   // Non applicable
+    public static final int HRSU_DEP_NA = 1; // Not applicable
 
-    public static final int HRSU_POS_NON = 1;   // Non applicable
+    public static final int HRSU_POS_NA = 1; // Not applicable
 
-    public static final int HRSU_SHT_NON = 1;   // Non applicable
+    public static final int HRSU_SHT_NA = 1; // Not applicable
 
     public static final int HRS_AUT_GBL = 1;
     public static final int HRS_AUT_EMP = 2;
     
-    public static final int HRS_CFG_TIME_CLOCK_POL_ALL = 1;
-    public static final int HRS_CFG_TIME_CLOCK_POL_OFF = 2;
-    public static final int HRS_CFG_TIME_CLOCK_POL_NON_OFF = 3;
+    public static final int HRS_CFG_TIME_CLOCK_POL_ALL = 1; // all movements: official and non-official
+    public static final int HRS_CFG_TIME_CLOCK_POL_OFF = 2; // only official movements
+    public static final int HRS_CFG_TIME_CLOCK_POL_NON_OFF = 3; // only non-official movements
 }

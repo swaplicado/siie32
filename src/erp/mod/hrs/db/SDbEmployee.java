@@ -680,7 +680,7 @@ public class SDbEmployee extends SDbRegistryUser {
                 hrsEmployeeHireLog.setIsHire(true);
                 hrsEmployeeHireLog.setLastHireDate(mtAuxHireLogDate);
                 hrsEmployeeHireLog.setLastHireNotes(msAuxHireLogNotes);
-                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
+                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NA);
             }
             else {
                 hrsEmployeeHireLog.setIsHire(false);

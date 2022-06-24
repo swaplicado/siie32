@@ -76,14 +76,14 @@ public class SHrsReceipt {
         EARNING EXEMPTION TYPES IN CONFIGURATION OF EARNINGS:
         
         Earning exemption types for SDbEarning.getFkEarningExemptionTypeId() can be:
-            a) NON: not applicable (note that 'NON' is misspelled!)
+            a) NA: Not applicable
             b) PER: Minimum Wage Percentage
             c) MWZ_GBL: Minimum Wage Global (that means "for the whole year"
             d) MWZ_EVT: Minimum Wage Event
             e) MWZ_SEN: Minimum Wage Seniority
         
         Earning exemption types for SDbEarning.getFkEarningExemptionTypeYearId(), identified in GUI as "optional", can be:
-            a) NON: not applicable (note that 'NON' is misspelled!)
+            a) NA: Not applicable
             b) MWZ_GBL: Minimum Wage Global (that means "for the whole year")
         */
         
@@ -91,7 +91,7 @@ public class SHrsReceipt {
         SDbEarning earning = hrsReceiptEarnings.get(0).getEarning(); // convenience variable
         
         // check if exemption apply (standard and optional settings):
-        boolean applyExemptionStd = earning.getFkEarningExemptionTypeId() != SModSysConsts.HRSS_TP_EAR_EXEM_NON; // variable improves readability!
+        boolean applyExemptionStd = earning.getFkEarningExemptionTypeId() != SModSysConsts.HRSS_TP_EAR_EXEM_NA; // variable improves readability!
         boolean applyExemptionStdGlobal = earning.getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL; // variable improves readability!
         boolean applyExemptionYearGlobal = earning.getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL; // variable improves readability!
         double exemptionPayroll = 0; // preserve exemption granted in current payroll

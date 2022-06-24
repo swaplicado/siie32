@@ -869,7 +869,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moKeyOtherPaymentType.setEnabled(false);
         
         if (moKeyEarningType.getSelectedIndex() <= 0) {
-            moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NON });
+            moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NA });
         }
         else {
             switch (moKeyEarningType.getValue()[0]) {
@@ -883,7 +883,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
                     }
                     break;
                 default:
-                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NON });
+                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NA });
             }
         }
     }
@@ -893,7 +893,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moKeyLoanType.setEnabled(enable);
         
         if (!enable) {
-            moKeyLoanType.setValue(new int[] { SModSysConsts.HRSS_TP_LOAN_NON });
+            moKeyLoanType.setValue(new int[] { SModSysConsts.HRSS_TP_LOAN_NA });
         }
     }
     
@@ -964,8 +964,8 @@ public class SFormEarning extends SBeanForm implements ItemListener {
                 moRegistry.setOldAccountingConfigurationTypeId(0); // to trigger creation of proper accounting settings on save
             }
             else {
-                moRegistry.setFkLoanTypeId(SModSysConsts.HRSS_TP_LOAN_NON);
-                moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NON);
+                moRegistry.setFkLoanTypeId(SModSysConsts.HRSS_TP_LOAN_NA);
+                moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NA);
                 
                 moRegistry.setUnitsFactor(1);
             }
@@ -1076,15 +1076,15 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            if (moKeyEarningType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_OTH && moKeyOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
+            if (moKeyEarningType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_OTH && moKeyOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NA) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlOtherPaymentType) + "'.");
                 validation.setComponent(moKeyOtherPaymentType);
             }
-            else if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NON) { // should not be less, just in case
+            else if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NA) { // should not be less, just in case
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlLoanType) + "'.");
                 validation.setComponent(moKeyLoanType);
             }
-            else if (moKeyLoanType.getValue()[0] > SModSysConsts.HRSS_TP_LOAN_NON && moKeyEarningComputationType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+            else if (moKeyLoanType.getValue()[0] > SModSysConsts.HRSS_TP_LOAN_NA && moKeyEarningComputationType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEarningComputationType.getText()) + "'.");
                 validation.setComponent(moKeyEarningComputationType);
             }

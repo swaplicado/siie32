@@ -239,7 +239,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            if (moKeyEmployeeDismissalType.isEnabled() && moKeyEmployeeDismissalType.getValue()[0] == SModSysConsts.HRSU_TP_EMP_DIS_NON) {
+            if (moKeyEmployeeDismissalType.isEnabled() && moKeyEmployeeDismissalType.getValue()[0] == SModSysConsts.HRSU_TP_EMP_DIS_NA) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEmployeeDismissalType) + "'.");
                 validation.setComponent(moKeyEmployeeDismissalType);
             }
@@ -304,7 +304,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         switch (type) {
             case SModConsts.HRSU_EMP:
                 if (!moKeyEmployeeDismissalType.isEnabled()) {
-                    moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NON);
+                    moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
                     moEmployee.setDateLastHire(moDateDate.getValue());
                 }
                 else {
@@ -321,7 +321,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                 
             case SModConsts.HRS_EMP_LOG_HIRE:
                 if (!moKeyEmployeeDismissalType.isEnabled()) {
-                    moEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NON);
+                    moEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
                     moEmployeeHireLog.setDateHire(moDateDate.getValue());
                     moEmployeeHireLog.setNotesHire(moTextNotes.getValue());                    
                 }
