@@ -26,6 +26,11 @@ import sa.lib.grid.SGridConsts;
 /**
  *
  * @author Juan Barajas, Isabel Servín, Sergio Flores
+ * IMPORTANTE:
+ * Esta vista requiere refactorizar la consulta SQL porque:
+ * 1) además de que sólo funciona para CFDI factura y CFDI nómina (debería servir para CFDI recepción de pagos y CFDI carta porte);
+ * 2) invariablemente del caso de uso de la vista, se incluye en la consulta a ambos tipos de CFDI, aunque, dependiendo del caso de uso,
+ * el conjunto de resultados sólo arroje uno u otro tipo de CFDI.
  */
 public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -105,9 +110,9 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
     @Override
     public void createSqlQuery() {
         java.util.Date[] range = null;
-        String sqlDatePeriod = "";
-        java.lang.String sqlFunctAreas = "";
-        String sqlDatePeriodPayroll = "";
+        String sqlDatePeriodDps = "";
+        String sqlDatePeriodCfd = "";
+        String sqlFunctAreas = "";
         String dateInit = "";
         String dateEnd = "";
         STableSetting setting = null;
@@ -119,17 +124,17 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                     range = (java.util.Date[])setting.getSetting();
                     dateInit = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]);
                     dateEnd = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]);
-                    sqlDatePeriod += " AND d.dt BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
-                    sqlDatePeriodPayroll += " AND dx.ts BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
+                    sqlDatePeriodDps += " AND d.dt BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
+                    sqlDatePeriodCfd += " AND dx.ts BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
                 }
                 else {
-                    sqlDatePeriod = setting.getSetting() == null ? "" : " AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
-                    sqlDatePeriodPayroll = setting.getSetting() == null ? "" : " AND dx.ts <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
+                    sqlDatePeriodDps = setting.getSetting() == null ? "" : " AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
+                    sqlDatePeriodCfd = setting.getSetting() == null ? "" : " AND dx.ts <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlFunctAreas += (sqlFunctAreas.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }
@@ -169,7 +174,8 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                  "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                  "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                  "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAYROLL : SDataConstantsSys.TRNS_TP_CFD_INV) + " AND dx.fid_tp_xml IN (" + SDataConstantsSys.TRNS_TP_XML_CFDI_32 + ", " + SDataConstantsSys.TRNS_TP_XML_CFDI_33 + ") AND d.b_del = 0 " + 
-                 "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + sqlDatePeriod + " " +
+                 "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + 
+                sqlDatePeriodDps + " " + (sqlFunctAreas.isEmpty() ? "" : "AND " + sqlFunctAreas) +
                  
                  "UNION " +
                  
@@ -192,14 +198,15 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
              msSql += "INNER JOIN trn_sign AS xs ON dx.id_cfd = xs.fid_cfd_n " +
                         "INNER JOIN trn_pac AS vt ON xs.id_pac = vt.id_pac ";
          }
-                         
-        msSql += (isCfdiPayrollVersionOld() ? "INNER JOIN hrs_sie_pay_emp AS hr ON dx.fid_pay_pay_n = hr.id_pay AND dx.fid_pay_emp_n = hr.id_emp AND dx.fid_pay_bpr_n = hr.fid_bpr_n AND hr.b_del = FALSE " : 
+
+         msSql += (isCfdiPayrollVersionOld() ? "INNER JOIN hrs_sie_pay_emp AS hr ON dx.fid_pay_pay_n = hr.id_pay AND dx.fid_pay_emp_n = hr.id_emp AND dx.fid_pay_bpr_n = hr.fid_bpr_n AND hr.b_del = FALSE " : 
                  "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS r ON dx.fid_pay_rcp_pay_n = r.id_pay AND dx.fid_pay_rcp_emp_n = r.id_emp " +
                  "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS hr ON " +
                  "r.id_pay = hr.id_pay AND r.id_emp = hr.id_emp AND hr.b_del = 0 AND hr.id_iss = dx.fid_pay_rcp_iss_n ") +
                  "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                  "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAYROLL : SDataConstantsSys.TRNS_TP_CFD_INV)+ " AND dx.fid_tp_xml IN (" + SDataConstantsSys.TRNS_TP_XML_CFDI_32 + ", " + SDataConstantsSys.TRNS_TP_XML_CFDI_33 + ") AND hr.b_del = 0 " + 
-                 "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + sqlDatePeriodPayroll + " " + sqlFunctAreas +
+                 "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + 
+                sqlDatePeriodCfd +
                  "ORDER BY tp_cfd, f_tp_doc, f_dt, f_num, f_cob, uuid, f_ico, f_ico_xml";
     }
 
