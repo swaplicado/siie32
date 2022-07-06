@@ -915,18 +915,18 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#", 20));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Percepción", 125));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad", 55);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cant.", 55);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unitario $", 80);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unid.", 35));
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unit. $", 80);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 80));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad ajustada", 55));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Parte exenta $", 80));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Parte gravada $", 80));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cant. ajustada", 55));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unid.", 35));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Exento $", 80));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Gravado $", 80));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/préstamo"));
                 
                 return gridColumnsForm;
@@ -1003,11 +1003,11 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#", 20));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Deducción", 125));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad", 55);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cant.", 55);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unitario $", 80);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unid.", 35));
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unit. $", 80);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 80));

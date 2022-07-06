@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SViewBillOfLading extends SGridPaneView implements ActionListener {
 
@@ -83,7 +83,6 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
     }
 
     private void initComponetsCustom() {
-        
         moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient);
         
         jbPrint = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
@@ -308,9 +307,8 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
             }
             else {
                 try {
-                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-                    SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
-                    SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, cfd, 0, true, false, true);
+                    SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, getSelectedGridRow().getRowPrimaryKey()); 
+                    SCfdUtils.sendCfd((SClientInterface) miClient, cfd, 0, true);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -407,6 +405,8 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                         moDialogAnnulCfdi.formReset();
                         moDialogAnnulCfdi.formRefreshCatalogues();
                         moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
+                        moDialogAnnulCfdi.setValue(SDialogAnnulCfdi.PARAM_NUMBER, cfd.getCfdNumber());
+                        moDialogAnnulCfdi.setValue(SDialogAnnulCfdi.PARAM_UUID, cfd.getUuid());
                         moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, SDataConstantsSys.TRNS_TP_CFD_BOL);
                         moDialogAnnulCfdi.setVisible(true);
 

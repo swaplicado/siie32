@@ -175,10 +175,10 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             else {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-                    int payroll = gridRow.getRowPrimaryKey()[0];
+                    int payrollId = gridRow.getRowPrimaryKey()[0];
                     
-                    if (SHrsCfdUtils.canGenetareCfdReceipts(miClient.getSession(), payroll)) {
-                        SDialogPayrollCfdi payrollCfdi = new SDialogPayrollCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payroll));
+                    if (SHrsCfdUtils.canGenetareCfdReceipts(miClient.getSession(), payrollId)) {
+                        SDialogPayrollCfdi payrollCfdi = new SDialogPayrollCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payrollId));
                         payrollCfdi.resetForm();
                         payrollCfdi.setVisible(true);
 

@@ -6,7 +6,7 @@ package erp.mtrn.data;
 
 import erp.SClient;
 import erp.cfd.SCfdConsts;
-import erp.cfd.SDialogCfdSend;
+import erp.cfd.SDialogCfdSending;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -34,7 +34,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
-import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
@@ -45,6 +45,7 @@ import erp.server.SServerResponse;
 import java.awt.Cursor;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.rmi.RemoteException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,13 +68,14 @@ import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
 import sa.lib.mail.SMail;
 import sa.lib.mail.SMailConsts;
+import sa.lib.mail.SMailException;
 import sa.lib.mail.SMailSender;
 import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores
  */
 public abstract class STrnUtilities {
 
@@ -1484,14 +1486,14 @@ public abstract class STrnUtilities {
         SLock slock = null;
         SServerRequest request = null;
         SServerResponse response = null;
-        SDialogCfdSend dlgCfdSend = null;
+        SDialogCfdSending dlgCfdSending = null;
         SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, SLibConstants.EXEC_MODE_SILENT);
         
-        dlgCfdSend = new SDialogCfdSend((SGuiClient) client, title, cfd, dps, bizPartner, idBizPartnerBranch);
-        dlgCfdSend.setVisible(true);
+        dlgCfdSending = new SDialogCfdSending((SGuiClient) client, title, cfd, dps, bizPartner, idBizPartnerBranch);
+        dlgCfdSending.setVisible(true);
 
-        if (dlgCfdSend.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            if ((boolean) dlgCfdSend.getValue(SDialogCfdSend.VAL_IS_EMAIL_EDITED)) {
+        if (dlgCfdSending.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            if ((boolean) dlgCfdSending.getValue(SDialogCfdSending.VAL_IS_EMAIL_EDITED)) {
                 /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
                 lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
                 */
@@ -1509,7 +1511,7 @@ public abstract class STrnUtilities {
                     contact = bizPartner.getDbmsBizPartnerBranch(new int[] { idBizPartnerBranch }).getDbmsBizPartnerBranchContactOfficial();
                 }
                 
-                contact.setEmail01(((String) dlgCfdSend.getValue(SDialogCfdSend.VAL_EMAIL)));
+                contact.setEmail01(((String) dlgCfdSending.getValue(SDialogCfdSending.VAL_EMAIL)));
                 contact.setIsRegistryEdited(true);
                 
                 request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
@@ -1534,41 +1536,34 @@ public abstract class STrnUtilities {
         return send;
     }
    
-       /**
-     * Sends a DPS
+    /**
+     * Sends a DPS by mail.
      * @param client ERP Client interface.
-     * @param typeDps Type DPS .
-     * @param dpsKey DPS key.
-     * @param confirmSending It is true when the confirmation will be done.
-     * @param catchExceptions When true all exceptions are handled internally, otherwise are shown into dialog messages.
-     * @throws javax.mail.MessagingException, java.sql.SQLException
+     * @param dpsCategory DPS category. Supported options: SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL.
+     * @param dpsKey DPS primary Key.
+     * @param confirmSending Confirm sending required.
+     * @throws java.lang.Exception
      */
-    public static void sendDps(final SClientInterface client, final int typeDps, final int[] dpsKey,boolean confirmSending, boolean catchExceptions) throws MessagingException, SQLException, Exception {
+    public static void sendDps(final SClientInterface client, final int dpsCategory, final int[] dpsKey, boolean confirmSending) throws Exception {
         boolean send = true;
-        int idBizPartner = SLibConsts.UNDEFINED;
-        int idBizPartnerBranch = SLibConsts.UNDEFINED;
-        SDataDps dps = null;
-        
-        dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
-        idBizPartner = dps.getFkBizPartnerId_r();
-        idBizPartnerBranch = dps.getFkBizPartnerBranchId();
             
         if (confirmSending) {
-            send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, idBizPartner, idBizPartnerBranch);
+            SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
+            send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
         }
 
         if (send) {
-            sendMailOrder(client, dpsKey, typeDps);
+            sendMailOrder(client, dpsCategory, dpsKey);
         }
     }
     
     /**
      * Send mail with information of contracts specificated.
      * @param client ERP Client interface.
-     * @param keyDoc DPS primary Key.
-     * @param typeDoc type the DPS SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL
+     * @param dpsCategory DPS category. Supported options: SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL.
+     * @param dpsKey DPS primary Key.
      */
-    public static void sendMailOrder(final SClientInterface client, final int[] keyDoc, final int typeDoc) {
+    private static void sendMailOrder(final SClientInterface client, final int dpsCategory, final int[] dpsKey) {
         String addressee = "";
         String msg = "";
         String userMail = "";
@@ -1584,10 +1579,10 @@ public abstract class STrnUtilities {
 
         try {
             client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            mms = getMms(client, typeDoc == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
-            oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
+            mms = getMms(client, dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
+            oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
             
-            bizPartnerMail = getMailToSendForOrder(client,keyDoc);
+            bizPartnerMail = getMailToSendForOrder(client, dpsKey);
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
                 client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de pedidos.");
             }
@@ -1598,7 +1593,7 @@ public abstract class STrnUtilities {
                 }
                 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
-                toRecipients = new ArrayList<String>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
+                toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
 
                 if (toRecipients.isEmpty()) {
                     client.showMsgBoxWarning("No existe ningún correo-e destinatario configurado.");
@@ -1830,7 +1825,7 @@ public abstract class STrnUtilities {
      * @throws javax.mail.MessagingException
      * @throws java.sql.SQLException
      */
-    public static boolean sendMailCfd(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int contactType, final int bizPartnerId, final int bizPartnerBranchId, boolean catchExceptions) throws MessagingException, SQLException, Exception {
+    public static boolean sendMailCfd(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int contactType, final int bizPartnerId, final int bizPartnerBranchId, boolean catchExceptions) throws MessagingException, SQLException, SMailException, Exception {
         boolean send = false;
         
         try {
@@ -1855,13 +1850,13 @@ public abstract class STrnUtilities {
             }
 
             if (mms == null || mms.getQueryResultId() != SDbConsts.READ_OK) {
-                throw new Exception("No existe una configuración de correo-e para el envío de este tipo de documento o comprobante.");
+                throw new SMailException("No existe una configuración de correo-e para el envío de este tipo de documento o comprobante.");
             }
             else {
                 String mails = getMailToSendForCfd(client, bizPartnerId, bizPartnerBranchId, contactType);
 
                 if (mails.isEmpty()) {
-                    throw new Exception("El receptor no cuenta con correo-e para la recepción de documentos o comprobantes.");
+                    throw new SMailException("El receptor no cuenta con correo-e para la recepción de documentos o comprobantes.");
                 }
                 else {
                     String docNumber = "";
@@ -1903,21 +1898,21 @@ public abstract class STrnUtilities {
                                     break;
 
                                 case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                                    SDbPayrollReceipt payrollReceipt = (SDbPayrollReceipt) client.getSession().readRegistry(SModConsts.HRS_PAY_RCP, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                                    SDbPayrollReceiptIssue payrollReceiptIssue = (SDbPayrollReceiptIssue) client.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() });
                                     docNumber = SDbPayroll.composePayrollYearAndNumber(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n());
-                                    docNumber += " " + payrollReceipt.getPayrollReceiptIssueNumber();
-                                    isCancelled = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED : payrollReceipt.getChildPayrollReceiptIssue().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
-                                    cancelledDate = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getTimestamp() : payrollReceipt.getChildPayrollReceiptIssue().getTsUserUpdate();
+                                    docNumber += " " + payrollReceiptIssue.getIssueNumber();
+                                    isCancelled = cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                                    cancelledDate = payrollReceiptIssue.getTsUserUpdate();
                                     docType = "Recibo de nomina";
                                     break;
 
                                 default:
-                                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                                    throw new SMailException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                             }
                             break;
                             
                         default:
-                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                            throw new SMailException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                     }
 
                     // send mail:
@@ -1943,20 +1938,45 @@ public abstract class STrnUtilities {
                     SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
                     SMail mail = new SMail(sender, mailSubject, SLibUtils.textToHtml(mailBody), new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mails, ";"))));
 
-                    if (!isCancelled) {
-                        File pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
-                        if (!pdfFile.exists()) {
-                            throw new Exception("El archivo PDF no existe.");
-                        }
-
-                        File xmlFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
-                        if (!xmlFile.exists()) {
-                            throw new Exception("El archivo XML no existe.");
-                        }
-
-                        mail.getAttachments().add(xmlFile);
-                        mail.getAttachments().add(pdfFile);
+                    // PDF of CFDI:
+                    
+                    File pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
+                    
+                    if (!pdfFile.exists()) {
+                        throw new SMailException("El archivo PDF no existe.");
                     }
+                    
+                    mail.getAttachments().add(pdfFile);
+                    
+                    // XML or cancellation acknowledgment of CFDI:
+                    
+                    File xmlFile = null;
+                    
+                    if (!isCancelled) {
+                        xmlFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
+                        if (!xmlFile.exists()) {
+                            throw new SMailException("El archivo XML no existe.");
+                        }
+                    }
+                    else {
+                        String content = "";
+                        String fileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().indexOf(".xml")) + "_ACUSE_";
+                        
+                        if (!cfd.getAcknowledgmentCancellationXml().isEmpty()) {
+                            xmlFile = File.createTempFile(fileName, ".xml");
+                            content = cfd.getAcknowledgmentCancellationXml();
+                        }
+                        else {
+                            xmlFile = File.createTempFile(fileName, ".txt");
+                            content = "El acuse de cancelación del CFDI no está disponible.";
+                        }
+                        
+                        FileWriter fw = new FileWriter(xmlFile);
+                        fw.write(content);
+                        fw.close();
+                    }
+                    
+                    mail.getAttachments().add(xmlFile);
 
                     mail.send();
                     send = true;
@@ -1965,7 +1985,10 @@ public abstract class STrnUtilities {
             }
         }
         catch (Exception e) {
-            if (!catchExceptions) {
+            if (catchExceptions) {
+                SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+            }
+            else {
                 throw e;
             }
         }

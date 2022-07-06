@@ -14,7 +14,7 @@ import erp.mod.SModConsts;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SCfdBolUtils {
     public static void sign(final SClientInterface client, final int[] idCfd) throws Exception {
@@ -38,12 +38,12 @@ public class SCfdBolUtils {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                     try {
                         if (((SClientInterface) client).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticBol()) {
-                            if (SCfdUtils.signAndSendCfdi(client, cfd, SLibConstants.UNDEFINED, true, true)) {
+                            if (SCfdUtils.signAndSendCfdi(client, cfd, 0, true, true)) {
                                 client.getGuiModule(SDataConstants.MOD_LOG).refreshCatalogues(SModConsts.LOG_BOL);
                             }
                         }
                         else {
-                            if (SCfdUtils.signCfdi(client, cfd, SLibConstants.UNDEFINED)) {
+                            if (SCfdUtils.signCfdi(client, cfd, 0)) {
                                 client.getGuiModule(SDataConstants.MOD_LOG).refreshCatalogues(SModConsts.LOG_BOL);
                             }
                         }

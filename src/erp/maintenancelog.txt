@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 202.7/ 2022-07-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a determinación de parte exenta en varias percepciones del mismo tipo en un mismo recibo de nómina.
+2) Implementación de funcionalidad de reexpedición de CFDI sustituto al cancelar CFDI de nómina.
+3) Refactorización general a clases y métodos de cancelación y envío vía mail de CFDI.
+
+================================================================================
 SIIE 3.2 202.6/ 2022-06-20
 Isabel Danae GARCÍA SERVÍN/ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

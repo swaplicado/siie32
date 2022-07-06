@@ -44,7 +44,7 @@ import sa.lib.srv.SLock;
 
 /**
  * User view for management of database registries of CFDI of Payments.
- * @author Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Claudio Peña, Sergio Flores
  */
 @Deprecated
 public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
@@ -363,6 +363,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                                     moDialogAnnulCfdi.formReset();
                                     moDialogAnnulCfdi.formRefreshCatalogues();
                                     moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
+                                    moDialogAnnulCfdi.setValue(SDialogAnnulCfdi.PARAM_NUMBER, cfd.getCfdNumber());
+                                    moDialogAnnulCfdi.setValue(SDialogAnnulCfdi.PARAM_UUID, cfd.getUuid());
                                     moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, SDataConstantsSys.TRNS_TP_CFD_PAY_REC);
                                     moDialogAnnulCfdi.setVisible(true);
 
@@ -560,8 +562,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
-                    SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    SCfdUtils.sendCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, cfd, 0, true, false, true);
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SCfdUtils.sendCfd(miClient, cfd, 0, true);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);

@@ -125,11 +125,11 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         jPanel8 = new javax.swing.JPanel();
         jpAccountingRecord = new javax.swing.JPanel();
         jlDateIssue = new javax.swing.JLabel();
-        jtfDateIssue = new javax.swing.JFormattedTextField();
+        jftDateIssue = new javax.swing.JFormattedTextField();
         jbDateIssue = new javax.swing.JButton();
         jpPaymentType = new javax.swing.JPanel();
         jlDatePayment = new javax.swing.JLabel();
-        jtfDatePayment = new javax.swing.JFormattedTextField();
+        jftDatePayment = new javax.swing.JFormattedTextField();
         jbDatePayment = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
@@ -307,9 +307,9 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         jlDateIssue.setPreferredSize(new java.awt.Dimension(100, 23));
         jpAccountingRecord.add(jlDateIssue);
 
-        jtfDateIssue.setText("dd/mm/yyyy");
-        jtfDateIssue.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpAccountingRecord.add(jtfDateIssue);
+        jftDateIssue.setText("dd/mm/yyyy");
+        jftDateIssue.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpAccountingRecord.add(jftDateIssue);
 
         jbDateIssue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDateIssue.setToolTipText("Seleccionar fecha");
@@ -325,9 +325,9 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         jlDatePayment.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPaymentType.add(jlDatePayment);
 
-        jtfDatePayment.setText("dd/mm/yyyy");
-        jtfDatePayment.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpPaymentType.add(jtfDatePayment);
+        jftDatePayment.setText("dd/mm/yyyy");
+        jftDatePayment.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpPaymentType.add(jftDatePayment);
 
         jbDatePayment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDatePayment.setToolTipText("Seleccionar fecha");
@@ -403,9 +403,9 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         mvFields = new Vector<>();
         moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
 
-        moFieldDateIssue = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateIssue, jlDateIssue);
+        moFieldDateIssue = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateIssue, jlDateIssue);
         moFieldDateIssue.setPickerButton(jbDateIssue);
-        moFieldDatePayment = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jtfDatePayment, jlDatePayment);
+        moFieldDatePayment = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDatePayment, jlDatePayment);
         moFieldDatePayment.setPickerButton(jbDatePayment);
         moFieldCfdiRelatedUuid = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdiRelatedUuid, jlCfdiRelatedUuid);
 
@@ -655,11 +655,11 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
 
         if (moFieldDateIssue.getDate() == null) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateIssue.getText() + "'.");
-            jtfDateIssue.requestFocusInWindow();
+            jftDateIssue.requestFocusInWindow();
         }
         else if (moFieldDatePayment.getDate() == null) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDatePayment.getText() + "'.");
-            jtfDatePayment.requestFocusInWindow();
+            jftDatePayment.requestFocusInWindow();
         }
         else if (!moFieldCfdiRelatedUuid.getString().isEmpty() && moFieldCfdiRelatedUuid.getString().length() != DCfdVer3Consts.LEN_UUID) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiRelatedUuid.getText() + "':\n"
@@ -855,6 +855,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     private javax.swing.JButton jbRemove;
     private javax.swing.JButton jbRemoveAll;
     private javax.swing.JComboBox jcbFilterDepartment;
+    private javax.swing.JFormattedTextField jftDateIssue;
+    private javax.swing.JFormattedTextField jftDatePayment;
     private javax.swing.JLabel jlCfdNotRequired;
     private javax.swing.JLabel jlCfdiRelatedHint;
     private javax.swing.JLabel jlCfdiRelatedUuid;
@@ -875,8 +877,6 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     private javax.swing.JPanel jpGrid;
     private javax.swing.JPanel jpPaymentType;
     private javax.swing.JTextField jtfCfdiRelatedUuid;
-    private javax.swing.JFormattedTextField jtfDateIssue;
-    private javax.swing.JFormattedTextField jtfDatePayment;
     private javax.swing.JTextField jtfPayrollDates;
     private javax.swing.JTextField jtfPayrollNotes;
     private javax.swing.JTextField jtfPayrollNumber;

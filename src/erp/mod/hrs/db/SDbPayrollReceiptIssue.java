@@ -21,6 +21,11 @@ import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mhrs.data.SDataPayrollReceiptIssue
+ */
+
 /**
  *
  * @author Juan Barajas, Sergio Flores
@@ -127,7 +132,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         return !isCfdStamped() || isCfdAnnulled();
     }
     
-    public java.lang.String getPayrollReceiptIssueNumber() {
+    public java.lang.String getIssueNumber() {
         return STrnUtils.formatDocNumber(msNumberSeries, "" + mnNumber);
     }
 
@@ -257,10 +262,6 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
-
-        if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
 
         if (mbRegistryNew) {
             computePrimaryKey(session);

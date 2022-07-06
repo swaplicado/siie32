@@ -179,8 +179,7 @@ public abstract class SHrsFormerUtils {
             "WHERE m.id_nomina = ne.id_nomina AND m.id_empleado = ne.id_empleado) - " +
             "(SELECT COALESCE(sum(m.monto), 0) " +
             "FROM nom_nominas_emp_movs_d AS m " +
-            "WHERE m.id_nomina = ne.id_nomina AND m.id_empleado = ne.id_empleado)) AS f_emp_tot_net, " +
-            "GETDATE() AS f_emp_date_edit " +
+            "WHERE m.id_nomina = ne.id_nomina AND m.id_empleado = ne.id_empleado)) AS f_emp_tot_net " +
             "FROM nom_nominas AS n " +
             "INNER JOIN nom_nominas_emp AS ne ON " +
             "n.id_nomina = ne.id_nomina " +
@@ -242,7 +241,6 @@ public abstract class SHrsFormerUtils {
             hrsFormerReceipt.setTotalDeducciones(resultSet.getDouble("f_emp_tot_ded"));
             hrsFormerReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
             hrsFormerReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
-            hrsFormerReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
 
             // Obtain 'num_ser', 'num', 'fid_tp_pay_sys' from 'hrs_sie_pay_emp' table:
 

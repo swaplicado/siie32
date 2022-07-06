@@ -64,12 +64,12 @@ public abstract class SCfdPaymentUtils {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                     try {
                         if (((SClientInterface) client).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
-                            if (SCfdUtils.signAndSendCfdi(client, cfd, SLibConstants.UNDEFINED, true, true)) {
+                            if (SCfdUtils.signAndSendCfdi(client, cfd, 0, true, true)) {
                                 client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_PAY);
                             }
                         }
                         else {
-                            if (SCfdUtils.signCfdi(client, cfd, SLibConstants.UNDEFINED)) {
+                            if (SCfdUtils.signCfdi(client, cfd, 0)) {
                                 client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_PAY);
                             }
                         }

@@ -75,7 +75,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel29 = new javax.swing.JPanel();
         jlDummy1 = new javax.swing.JLabel();
         jlSettingsBase = new javax.swing.JLabel();
-        jlSettingsOptional = new javax.swing.JLabel();
+        jlSettingsAditional = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jlEarningExemptionType = new javax.swing.JLabel();
         moKeyEarningExemptionType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -83,8 +83,9 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel8 = new javax.swing.JPanel();
         jlExemptionMwz = new javax.swing.JLabel();
         moDecExemptionMwz = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jlDummy = new javax.swing.JLabel();
+        moDecExemptionMwzHint = new javax.swing.JLabel();
         moDecExemptionMwzYear = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moDecExemptionMwzYearHint = new javax.swing.JLabel();
         jlExemptionMwzHelp = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         jlExemptionSalaryEqualsMwzPercentage = new javax.swing.JLabel();
@@ -112,8 +113,8 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jlUnitsMaximumWeekHelp = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         moBoolDaysAdjustment = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moBoolDaysWorked = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysAbsence = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolDaysWorked = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysWorkedBased = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolLoan = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolWelfare = new sa.lib.gui.bean.SBeanFieldBoolean();
@@ -183,7 +184,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel4.add(jlName);
 
         moTextName.setText("sBeanFieldText1");
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(405, 23));
         jPanel4.add(moTextName);
 
         jPanel2.add(jPanel4);
@@ -200,7 +201,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlNameAbbreviatedHelp.setForeground(java.awt.Color.gray);
         jlNameAbbreviatedHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlNameAbbreviatedHelp.setText("para contabilización y para concepto del CFDI (XML)");
+        jlNameAbbreviatedHelp.setText("aplica para contabilización, emisión del recibo de nómina y CFDI");
         jlNameAbbreviatedHelp.setToolTipText("");
         jlNameAbbreviatedHelp.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel22.add(jlNameAbbreviatedHelp);
@@ -220,7 +221,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jlEarningComputationTypeHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlEarningComputationTypeHelp.setText("ayuda...");
         jlEarningComputationTypeHelp.setToolTipText("");
-        jlEarningComputationTypeHelp.setPreferredSize(new java.awt.Dimension(350, 23));
+        jlEarningComputationTypeHelp.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel7.add(jlEarningComputationTypeHelp);
 
         jlUnitsFactor.setText("Factor cálculo:*");
@@ -230,7 +231,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlUnitsFactor1.setForeground(java.awt.Color.gray);
         jlUnitsFactor1.setText("1x, 2x, ...");
-        jlUnitsFactor1.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlUnitsFactor1.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel7.add(jlUnitsFactor1);
 
         jPanel2.add(jPanel7);
@@ -240,13 +241,13 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jlDummy1.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(jlDummy1);
 
-        jlSettingsBase.setText("Configuración base:");
+        jlSettingsBase.setText("Exención base:");
         jlSettingsBase.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel29.add(jlSettingsBase);
 
-        jlSettingsOptional.setText("Configuración opcional:");
-        jlSettingsOptional.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel29.add(jlSettingsOptional);
+        jlSettingsAditional.setText("Exención adicional:");
+        jlSettingsAditional.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel29.add(jlSettingsAditional);
 
         jPanel2.add(jPanel29);
 
@@ -266,20 +267,27 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionMwz.setText("UMA exentas (antes SM):");
+        jlExemptionMwz.setText("UMA exentas:");
         jlExemptionMwz.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel8.add(jlExemptionMwz);
         jPanel8.add(moDecExemptionMwz);
 
-        jlDummy.setPreferredSize(new java.awt.Dimension(95, 23));
-        jPanel8.add(jlDummy);
+        moDecExemptionMwzHint.setForeground(java.awt.Color.gray);
+        moDecExemptionMwzHint.setText("exención base");
+        moDecExemptionMwzHint.setPreferredSize(new java.awt.Dimension(95, 23));
+        jPanel8.add(moDecExemptionMwzHint);
         jPanel8.add(moDecExemptionMwzYear);
+
+        moDecExemptionMwzYearHint.setForeground(java.awt.Color.gray);
+        moDecExemptionMwzYearHint.setText("exención adicional");
+        moDecExemptionMwzYearHint.setPreferredSize(new java.awt.Dimension(95, 23));
+        jPanel8.add(moDecExemptionMwzYearHint);
 
         jlExemptionMwzHelp.setForeground(java.awt.Color.gray);
         jlExemptionMwzHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionMwzHelp.setText("(Monto exento en número de UMA, antes salarios mínimos del área geográfica)");
+        jlExemptionMwzHelp.setText("Exenciones en número de UMA (antes en salarios mínimos del área geográfica)");
         jlExemptionMwzHelp.setToolTipText("");
-        jlExemptionMwzHelp.setPreferredSize(new java.awt.Dimension(500, 23));
+        jlExemptionMwzHelp.setPreferredSize(new java.awt.Dimension(395, 23));
         jPanel8.add(jlExemptionMwzHelp);
 
         jPanel2.add(jPanel8);
@@ -293,9 +301,9 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlExemptionSalaryEqualsMwzPercentageHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryEqualsMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryEqualsMwzPercentageHelp.setText("(Porcentaje de exención si el empleado gana el salario mínimo)");
+        jlExemptionSalaryEqualsMwzPercentageHelp.setText("Porcentaje de exención si el empleado gana IGUAL al salario mínimo aplicable");
         jlExemptionSalaryEqualsMwzPercentageHelp.setToolTipText("");
-        jlExemptionSalaryEqualsMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jlExemptionSalaryEqualsMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel9.add(jlExemptionSalaryEqualsMwzPercentageHelp);
 
         jPanel2.add(jPanel9);
@@ -309,9 +317,9 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlExemptionSalaryEqualsMwzLimitHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryEqualsMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryEqualsMwzLimitHelp.setText("(Tope exención en número de UMA, antes salarios mínimos del área geográfica, si el empleado gana el salario mínimo)");
+        jlExemptionSalaryEqualsMwzLimitHelp.setText("Tope exención en número de UMA (antes en salarios mínimos del área geográfica) si el empleado gana IGUAL al salario mínimo aplicable");
         jlExemptionSalaryEqualsMwzLimitHelp.setToolTipText("");
-        jlExemptionSalaryEqualsMwzLimitHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jlExemptionSalaryEqualsMwzLimitHelp.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel10.add(jlExemptionSalaryEqualsMwzLimitHelp);
 
         jPanel2.add(jPanel10);
@@ -325,9 +333,9 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlExemptionSalaryGreaterMwzPercentageHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryGreaterMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryGreaterMwzPercentageHelp.setText("(Porcentaje de exención si el empleado gana más del salario mínimo)");
+        jlExemptionSalaryGreaterMwzPercentageHelp.setText("Porcentaje de exención si el empleado gana MÁS del salario mínimo aplicable");
         jlExemptionSalaryGreaterMwzPercentageHelp.setToolTipText("");
-        jlExemptionSalaryGreaterMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jlExemptionSalaryGreaterMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel11.add(jlExemptionSalaryGreaterMwzPercentageHelp);
 
         jPanel2.add(jPanel11);
@@ -341,41 +349,41 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlExemptionSalaryGreaterMwzLimitHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryGreaterMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryGreaterMwzLimitHelp.setText("(Tope exención en número de UMA, antes salarios mínimos del área geográfica, si el empleado gana más del salario mínimo)");
+        jlExemptionSalaryGreaterMwzLimitHelp.setText("Tope exención en número de UMA (antes en salarios mínimos del área geográfica) si el empleado gana MÁS del salario mínimo aplicable");
         jlExemptionSalaryGreaterMwzLimitHelp.setToolTipText("Exención límite expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo");
-        jlExemptionSalaryGreaterMwzLimitHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jlExemptionSalaryGreaterMwzLimitHelp.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel12.add(jlExemptionSalaryGreaterMwzLimitHelp);
 
         jPanel2.add(jPanel12);
 
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPayPercentage.setText("Porcentaje pago:");
+        jlPayPercentage.setText("Porcentaje percepción:");
         jlPayPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel23.add(jlPayPercentage);
         jPanel23.add(moDecPayPercentage);
 
         jlPayPercentageHelp.setForeground(java.awt.Color.gray);
         jlPayPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlPayPercentageHelp.setText("(Porcentaje del pago en función del tipo de cálculo de percepción elegido)");
+        jlPayPercentageHelp.setText("Porcentaje para determinar el monto de la percepción en base al tipo de cálculo de percepción elegido");
         jlPayPercentageHelp.setToolTipText("");
-        jlPayPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jlPayPercentageHelp.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel23.add(jlPayPercentageHelp);
 
         jPanel2.add(jPanel23);
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlUnitsMaximumWeek.setText("No. unidades máximas:");
+        jlUnitsMaximumWeek.setText("Unidades máximas semana:");
         jlUnitsMaximumWeek.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel13.add(jlUnitsMaximumWeek);
         jPanel13.add(moDecUnitsMaximumWeek);
 
         jlUnitsMaximumWeekHelp.setForeground(java.awt.Color.gray);
         jlUnitsMaximumWeekHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlUnitsMaximumWeekHelp.setText("(Número máximo de unidades permitido por semana, por quincena = 2x)");
+        jlUnitsMaximumWeekHelp.setText("Número máximo de unidades permitido por semana (en quincena aplica 2x)");
         jlUnitsMaximumWeekHelp.setToolTipText("");
-        jlUnitsMaximumWeekHelp.setPreferredSize(new java.awt.Dimension(650, 23));
+        jlUnitsMaximumWeekHelp.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel13.add(jlUnitsMaximumWeekHelp);
 
         jPanel2.add(jPanel13);
@@ -386,28 +394,28 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moBoolDaysAdjustment.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel3.add(moBoolDaysAdjustment);
 
-        moBoolDaysWorked.setText("Cuenta como días trabajados");
-        moBoolDaysWorked.setPreferredSize(new java.awt.Dimension(185, 23));
-        jPanel3.add(moBoolDaysWorked);
-
         moBoolDaysAbsence.setText("Aplica días incidencia");
         moBoolDaysAbsence.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel3.add(moBoolDaysAbsence);
 
-        moBoolDaysWorkedBased.setText("En base a días pagados");
-        moBoolDaysWorkedBased.setPreferredSize(new java.awt.Dimension(150, 23));
+        moBoolDaysWorked.setText("Cuenta como días trabajados");
+        moBoolDaysWorked.setPreferredSize(new java.awt.Dimension(180, 23));
+        jPanel3.add(moBoolDaysWorked);
+
+        moBoolDaysWorkedBased.setText("En base a días trabajados");
+        moBoolDaysWorkedBased.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel3.add(moBoolDaysWorkedBased);
 
         moBoolLoan.setText("Es crédito/préstamo");
-        moBoolLoan.setPreferredSize(new java.awt.Dimension(125, 23));
+        moBoolLoan.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel3.add(moBoolLoan);
 
         moBoolWelfare.setText("Es previsión social");
-        moBoolWelfare.setPreferredSize(new java.awt.Dimension(120, 23));
+        moBoolWelfare.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel3.add(moBoolWelfare);
 
         moBoolPayBonus.setText("Paga bono");
-        moBoolPayBonus.setPreferredSize(new java.awt.Dimension(120, 23));
+        moBoolPayBonus.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel3.add(moBoolPayBonus);
 
         jPanel2.add(jPanel3);
@@ -545,7 +553,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolPayrollTax.setText("Aplica para impto. sobre nóminas");
+        moBoolPayrollTax.setText("Aplica para impuesto sobre nóminas");
         moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel31.add(moBoolPayrollTax);
 
@@ -553,7 +561,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolAlternativeTaxCalculation.setText("Usar cálculo alterno impto. (Art. 174 RLISR)");
+        moBoolAlternativeTaxCalculation.setText("Aplica cálculo alterno Art. 174 RLISR");
         moBoolAlternativeTaxCalculation.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel32.add(moBoolAlternativeTaxCalculation);
 
@@ -610,7 +618,6 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     private javax.swing.JLabel jlAccountingRecordTypeHelp;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlCode;
-    private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlEarningComputationType;
     private javax.swing.JLabel jlEarningComputationTypeHelp;
@@ -634,8 +641,8 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     private javax.swing.JLabel jlPayBonus;
     private javax.swing.JLabel jlPayPercentage;
     private javax.swing.JLabel jlPayPercentageHelp;
+    private javax.swing.JLabel jlSettingsAditional;
     private javax.swing.JLabel jlSettingsBase;
-    private javax.swing.JLabel jlSettingsOptional;
     private javax.swing.JLabel jlUnitsFactor;
     private javax.swing.JLabel jlUnitsFactor1;
     private javax.swing.JLabel jlUnitsMaximumWeek;
@@ -651,7 +658,9 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWelfare;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWithholding;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionMwz;
+    private javax.swing.JLabel moDecExemptionMwzHint;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionMwzYear;
+    private javax.swing.JLabel moDecExemptionMwzYearHint;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryEqualsMwzLimit;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryEqualsMwzPercentage;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionSalaryGreaterMwzLimit;
@@ -699,8 +708,8 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moDecPayPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPayPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
         moDecUnitsMaximumWeek.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsMaximumWeek), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
         moBoolDaysAdjustment.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAdjustment.getText()), false);
-        moBoolDaysWorked.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorked.getText()), false);
         moBoolDaysAbsence.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAbsence.getText()), false);
+        moBoolDaysWorked.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorked.getText()), false);
         moBoolDaysWorkedBased.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorkedBased.getText()), false);
         moBoolLoan.setBooleanSettings(SGuiUtils.getLabelName(moBoolLoan.getText()), false);
         moBoolWelfare.setBooleanSettings(SGuiUtils.getLabelName(moBoolWelfare.getText()), false);
@@ -734,8 +743,8 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moFields.addField(moDecPayPercentage);
         moFields.addField(moDecUnitsMaximumWeek);
         moFields.addField(moBoolDaysAdjustment);
-        moFields.addField(moBoolDaysWorked);
         moFields.addField(moBoolDaysAbsence);
+        moFields.addField(moBoolDaysWorked);
         moFields.addField(moBoolDaysWorkedBased);
         moFields.addField(moBoolLoan);
         moFields.addField(moBoolWelfare);
@@ -763,22 +772,22 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         else {
             switch (moKeyEarningComputationType.getValue()[0]) {
                 case SModSysConsts.HRSS_TP_EAR_COMP_AMT:
-                    jlEarningComputationTypeHelp.setText("Monto directo.");
+                    jlEarningComputationTypeHelp.setText("Percepción = Monto directo.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_DAYS:
-                    jlEarningComputationTypeHelp.setText("En función de un número de días de salario base.");
+                    jlEarningComputationTypeHelp.setText("Percepción = número de días de salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_HRS:
-                    jlEarningComputationTypeHelp.setText("En función de un número de horas de hora de salario base.");
+                    jlEarningComputationTypeHelp.setText("Percepción = número de horas de hora de salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY:
-                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de un salario base.");
+                    jlEarningComputationTypeHelp.setText("Percepción = porcentaje de un salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR:
-                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de una hora de salario base.");
+                    jlEarningComputationTypeHelp.setText("Percepción = porcentaje de una hora de salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME:
-                    jlEarningComputationTypeHelp.setText("En función de un porcentaje sobre el monto de sueldos y salarios.");
+                    jlEarningComputationTypeHelp.setText("Percepción = porcentaje del total de sueldos y salarios.");
                     break;
                 default:
                     jlEarningComputationTypeHelp.setText("?");
@@ -1106,7 +1115,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
                 
                 if (validation.isValid()) {
                     if (moKeyEarningExemptionType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL && moKeyEarningExemptionTypeYear.getValue()[0] == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL) {
-                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEarningExemptionType.getText()) + "'.");
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEarningExemptionType.getText()) + "' (" + SGuiUtils.getLabelName(jlSettingsAditional.getText()) + ").");
                         validation.setComponent(moKeyEarningExemptionTypeYear);
                     }
                     else if (moKeyEarningComputationType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_COMP_DAYS && moBoolDaysAdjustment.getValue()) {

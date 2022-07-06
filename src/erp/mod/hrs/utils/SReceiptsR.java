@@ -52,7 +52,7 @@ import sa.lib.srv.SSrvConsts;
 /**
  * Esta clase es para usarse una sola vez.
  * Objetivo: corregir la información relacionada con Subsidio para el empleo indebidamente registrado en CFDI previos.
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SReceiptsR {
     
@@ -410,41 +410,40 @@ public class SReceiptsR {
     }
     
     /**
-     * process the cfd and make the new cfd object and registry
-     * sign and send the cfdi based in the configuration of system
+     * Process CFD and make the new cfd object and registry,
+     * sign and send CFDI based in the configuration of system.
      * 
      * @param session
-     * @param keyReceipt
+     * @param keyPayrollReceiptIssue
      * @param causedSubsidy
      * @param payedSubsidy
      * @param relationedUuid UUID of the cfdi annuled previously
      * 
-     * @return true if the process is successful
+     * @return <code>true</code> if the process is successful.
      * @throws Exception 
      */
-    private boolean computeSignCfdi(final SGuiSession session, int[] keyReceipt, double causedSubsidy, double payedSubsidy, String relationedUuid) throws Exception {
-        SDataCfd cfd = null;
-        SHrsFormerPayroll hrsFormerPayroll = SHrsCfdUtils.readHrsFormerPayrollAndReceipt((SClientInterface) session.getClient(), keyReceipt);
+    private boolean computeSignCfdi(final SGuiSession session, int[] keyPayrollReceiptIssue, double causedSubsidy, double payedSubsidy, String relationedUuid) throws Exception {
+        SHrsFormerPayroll hrsFormerPayroll = SHrsCfdUtils.readHrsFormerPayrollAndReceipt((SClientInterface) session.getClient(), keyPayrollReceiptIssue);
         SHrsFormerReceipt hrsFormerReceipt = hrsFormerPayroll.getChildReceipts().get(0); // there is allways only one receipt
         
         hrsFormerReceipt.setParentPayroll(hrsFormerPayroll);
-        hrsFormerReceipt.setFechaEdicion(session.getCurrentDate());
         hrsFormerReceipt.setMoneda(session.getSessionCustom().getLocalCurrencyCode()); 
         hrsFormerReceipt.setLugarExpedicion(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
         hrsFormerReceipt.setRegimenFiscal(((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
         
-        cfd = this.computeCfdi(session, hrsFormerReceipt, keyReceipt[2], true, causedSubsidy, payedSubsidy, relationedUuid);
+        SDataCfd cfd = this.computeCfdi(session, hrsFormerReceipt, keyPayrollReceiptIssue[2], true, causedSubsidy, payedSubsidy, relationedUuid);
+        
         if (cfd == null) {
             throw new Exception("Error al leer el CFD, no se encontró el registro.");
         }
 
         if (((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
             SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
-            System.out.println("Timbrar y enviar");
+            System.out.println("Timbrar y enviar.");
         }
         else {
             SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
-            System.out.println("solo timbrar");
+            System.out.println("Sólo timbrar.");
         }
         
         writeXml("REEXP" + relationedUuid, cfd.getDocXml());

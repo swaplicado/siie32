@@ -5,8 +5,6 @@
 
 package erp.mtrn.view;
 
-import erp.cfd.SCfdConsts;
-import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -22,6 +20,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
@@ -460,14 +459,18 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                     switch (mnTabTypeAux02) {
                         case SDataConstantsSys.TRNX_TP_DPS_DOC:
                         case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD, true, false, false);
+                            SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                            SCfdUtils.sendCfd(miClient, cfd, 0, true);
                             send = true;
                             break;
+                            
                         case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                            STrnUtilities.sendMailOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), mnTabTypeAux01);
+                            STrnUtilities.sendDps(miClient, mnTabTypeAux01, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true);
                             send = true;
                             break;
+                            
                         default:
+                            // do nothing
                     }
                     
                     if (send) {

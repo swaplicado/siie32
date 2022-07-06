@@ -87,18 +87,18 @@ public class SHrsReceipt {
             b) MWZ_GBL: Minimum Wage Global (that means "for the whole year")
         */
         
-        // get earning related to given group of receipt earnings:
+        // get earning related to given group of receipt earnings, consider that all earnings in array are the same:
         SDbEarning earning = hrsReceiptEarnings.get(0).getEarning(); // convenience variable
         
         // check if exemption apply (standard and optional settings):
-        boolean applyExemptionStd = earning.getFkEarningExemptionTypeId() != SModSysConsts.HRSS_TP_EAR_EXEM_NA; // variable improves readability!
-        boolean applyExemptionStdGlobal = earning.getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL; // variable improves readability!
-        boolean applyExemptionYearGlobal = earning.getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL; // variable improves readability!
-        double exemptionPayroll = 0; // preserve exemption granted in current payroll
-        double exemptionGlobal = 0; // preserve exemption granted in other payrolls in current year
+        boolean applyExemption = earning.getFkEarningExemptionTypeId() != SModSysConsts.HRSS_TP_EAR_EXEM_NA; // variable improves readability!
+        boolean applyExemptionMwzGlobal = earning.getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL; // variable improves readability!
+        boolean applyExemptionMwzGlobalYear = earning.getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL; // variable improves readability!
+        double exemptionGlobal = 0; // exemption granted in other payrolls in current year
+        double exemptionPayroll = 0; // exemption granted in current payroll
 
         // get accumulated exemption granted in current year if necessary:
-        if (applyExemptionStdGlobal || applyExemptionYearGlobal) {
+        if (applyExemptionMwzGlobal || applyExemptionMwzGlobalYear) {
             SHrsAccumulatedEarning hrsAccumEarning = moHrsEmployee.getHrsAccumulatedEarning(earning.getPkEarningId());
             if (hrsAccumEarning != null) {
                 exemptionGlobal = hrsAccumEarning.getExemption();
@@ -113,19 +113,18 @@ public class SHrsReceipt {
             SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarning.getPayrollReceiptEarning();
 
             // compute exemption:
-            if (applyExemptionStd) {
-                double exemptionProposed = 0;
+            if (applyExemption) {
                 double exemptionLimit = 0;
                 
                 switch (earning.getFkEarningExemptionTypeId()) {
                     case SModSysConsts.HRSS_TP_EAR_EXEM_PER: // Percentage
                         // estimate exemption proposed and exemption limit:
                         if (moPayrollReceipt.getEffectiveSalary(payroll.isFortnightStandard()) <= payroll.getMwzWage()) { // salary cannot never be less than minimum wage, but just in case
-                            exemptionProposed = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzPercentage() * payrollReceiptEarning.getAmount_r());
+                            exemption = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzPercentage() * payrollReceiptEarning.getAmount_r());
                             exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzLimit() * payroll.getUmaAmount()); // formerly minimum wage was used
                         }
                         else {
-                            exemptionProposed = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzPercentage() * payrollReceiptEarning.getAmount_r());
+                            exemption = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzPercentage() * payrollReceiptEarning.getAmount_r());
                             exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzLimit() * payroll.getUmaAmount()); // formerly minimum wage was used
                         }
                         break;
@@ -133,8 +132,8 @@ public class SHrsReceipt {
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL: // Minimum Wage Global
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_EVT: // Minimum Wage Event
                         // estimate exemption proposed and exemption limit:
-                        exemptionProposed = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount()); // formerly minimum wage was used
-                        exemptionLimit = exemptionProposed;
+                        exemption = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount()); // formerly minimum wage was used
+                        exemptionLimit = exemption;
                         break;
 
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_SEN: // Minimum Wage Seniority
@@ -144,8 +143,8 @@ public class SHrsReceipt {
                         double seniority = (double) years + ((double) yearDays / SHrsConsts.YEAR_DAYS);
 
                         // estimate exemption proposed and exemption limit:
-                        exemptionProposed = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount() * seniority); // formerly minimum wage was used
-                        exemptionLimit = exemptionProposed;
+                        exemption = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount() * seniority); // formerly minimum wage was used
+                        exemptionLimit = exemption;
                         break;
 
                     default:
@@ -153,14 +152,11 @@ public class SHrsReceipt {
                 }
 
                 // adjust exemption:
-
-                exemption = SLibUtils.roundAmount(exemptionProposed - exemptionPayroll - exemptionGlobal);
-
-                if (exemption < 0) {
+                if (exemption <= 0) {
                     exemption = 0;
                 }
-                else if (exemption > 0) {
-                    if (exemptionLimit > 0 && exemption > exemptionLimit) {
+                else {
+                    if (exemptionLimit > 0 && (exemptionGlobal + exemptionPayroll + exemption) >= exemptionLimit) {
                         exemption = exemptionLimit;
                     }
 
@@ -169,9 +165,8 @@ public class SHrsReceipt {
                     }
                 }
 
-                // accumulate payroll and global exemption:
+                // accumulate payroll exemption:
                 exemptionPayroll = SLibUtils.roundAmount(exemptionPayroll + exemption);
-                exemptionGlobal = SLibUtils.roundAmount(exemptionGlobal + exemption);
             }
 
             // set earning exemption:

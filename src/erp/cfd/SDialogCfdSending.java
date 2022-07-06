@@ -23,9 +23,9 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
-public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
+public class SDialogCfdSending extends SBeanFormDialog implements ActionListener {
     
     public static final int VAL_IS_EMAIL_EDITED = 1;
     public static final int VAL_EMAIL = 2;
@@ -36,9 +36,9 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
     private int mnBizPartnerBranch;
     
     /**
-     * Creates new form SFormCfdSend
+     * Creates new form SFormCfdSending
      */
-    public SDialogCfdSend(SGuiClient client, String title, SDataCfd cfd, SDataDps dps, SDataBizPartner bizPartner, int bizPartnerBranch) {
+    public SDialogCfdSending(SGuiClient client, String title, SDataCfd cfd, SDataDps dps, SDataBizPartner bizPartner, int bizPartnerBranch) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_CFD, SLibConsts.UNDEFINED, title);
         moCfd = cfd;
         moDps = dps;
@@ -93,7 +93,7 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCfdNumber.setText("Folio del documento:");
+        jlCfdNumber.setText("Folio documento:");
         jlCfdNumber.setMaximumSize(new java.awt.Dimension(200, 23));
         jlCfdNumber.setMinimumSize(new java.awt.Dimension(200, 23));
         jlCfdNumber.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -205,8 +205,8 @@ public class SDialogCfdSend extends SBeanFormDialog implements ActionListener {
         moFields.addField(moTextEmail);
         
         moFields.setFormButton(jbSave);
-
-        mtfCfdNumber.setText(moCfd != null ? moCfd.getCfdNumber() : moDps.getDpsNumber());
+        
+        mtfCfdNumber.setText(moDps != null ? moDps.getDpsNumber() : moCfd != null ? moCfd.getCfdNumber() : "?");
         mtfBizPartner.setText(moBizPartner.getBizPartner());
         
         mtfCfdNumber.setCaretPosition(0);

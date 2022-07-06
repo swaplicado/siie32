@@ -130,7 +130,10 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxIsSign;
     protected boolean mbAuxIsProcessingValidation;
     
-    protected byte[] mayExtraPrivateDocXml_ns;
+    /** To inform number series chosen for CFDI when processing CFDI payroll. */
+    protected java.lang.String msExtraSeries;
+    /** To inform number chosen for CFDI when processing CFDI payroll. */
+    protected int mnExtraNumber;
 
     public SDataCfd() {
         super(SModConsts.TRN_CFD);
@@ -268,6 +271,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxIsSign(boolean b) { mbAuxIsSign = b; }
     public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }    
 
+    /** To inform number series chosen for CFDI when processing CFDI payroll. */
+    public void setExtraSeries(java.lang.String s) { msExtraSeries = s; }
+    /** To inform number chosen for CFDI when processing CFDI payroll. */
+    public void setExtraNumber(int n) { mnExtraNumber = n; }
+    
     public int getPkCfdId() { return mnPkCfdId; }
     public java.lang.String getSeries() { return msSeries; }
     public int getNumber() { return mnNumber; }
@@ -333,6 +341,11 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public double getAuxTotalCy() { return mdAuxTotalCy; }
     public boolean getAuxIsSign() { return mbAuxIsSign; }
     public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
+    
+    /** To inform number series chosen for CFDI when processing CFDI payroll. */
+    public java.lang.String getExtraSeries() { return msExtraSeries; }
+    /** To inform number chosen for CFDI when processing CFDI payroll. */
+    public int getExtraNumber() { return mnExtraNumber; }
     
     public boolean testDeletion(java.lang.String msg, int action) throws java.lang.Exception {
         String sMsg = msg;
@@ -409,7 +422,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             cfdNumber = STrnUtils.formatDocNumber(msSeries, "" + mnNumber);
         }
         else {
-            String numberSer = "";
+            String series = "";
             String number = "";
 
             try {
@@ -420,14 +433,21 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 node = SXmlUtils.extractElements(doc, mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFD ? "Comprobante" : "cfdi:Comprobante").item(0);
                 namedNodeMap = node.getAttributes();
 
-                numberSer = SXmlUtils.extractAttributeValue(namedNodeMap, "serie", false);
+                series = SXmlUtils.extractAttributeValue(namedNodeMap, "serie", false);
+                if (series.isEmpty()) {
+                    series = SXmlUtils.extractAttributeValue(namedNodeMap, "Serie", false);
+                }
+                
                 number = SXmlUtils.extractAttributeValue(namedNodeMap, "folio", false);
+                if (number.isEmpty()) {
+                    number = SXmlUtils.extractAttributeValue(namedNodeMap, "Folio", false);
+                }
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
             }
 
-            cfdNumber = STrnUtils.formatDocNumber(numberSer, number);
+            cfdNumber = STrnUtils.formatDocNumber(series, number);
         }
         
         return cfdNumber;
@@ -517,7 +537,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxIsSign = false;
         mbAuxIsProcessingValidation = false;
         
-        mayExtraPrivateDocXml_ns = null;
+        msExtraSeries = "";
+        mnExtraNumber = 0;
     }
 
     @Override

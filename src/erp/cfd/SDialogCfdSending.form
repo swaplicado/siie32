@@ -78,7 +78,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlCfdNumber">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Folio del documento:"/>
+                    <Property name="text" type="java.lang.String" value="Folio documento:"/>
                     <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[200, 23]"/>
                     </Property>

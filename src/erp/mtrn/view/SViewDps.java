@@ -7,7 +7,6 @@ package erp.mtrn.view;
 
 import cfd.DCfdConsts;
 import erp.SClientUtils;
-import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -835,6 +834,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
                             moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, dps.getDate());
+                            moDialogAnnulCfdi.setValue(SDialogAnnulCfdi.PARAM_NUMBER, dps.getDpsNumber());
+                            moDialogAnnulCfdi.setValue(SDialogAnnulCfdi.PARAM_UUID, dps.getDbmsDataCfd().getUuid());
                             moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, SDataConstantsSys.TRNS_TP_CFD_INV);
                             moDialogAnnulCfdi.setVisible(true);
 
@@ -1896,12 +1897,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                             try {
                                 if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
-                                    if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true, true)) {
+                                    if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), 0, true, true)) {
                                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                     }
                                 }
                                 else {
-                                    if (SCfdUtils.signCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED)) {
+                                    if (SCfdUtils.signCfdi(miClient, dps.getDbmsDataCfd(), 0)) {
                                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                     }
                                 }
@@ -1995,12 +1996,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     switch (mnTabTypeAux02) {
                         case SDataConstantsSys.TRNX_TP_DPS_DOC:
                         case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                            SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_OLD, true, false, false);
+                            SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                            SCfdUtils.sendCfd(miClient, cfd, 0, true);
                             break;
+                            
                         case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                            STrnUtilities.sendDps((SClientInterface) miClient, mnTabTypeAux01, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true, false);
+                            STrnUtilities.sendDps(miClient, mnTabTypeAux01, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true);
                             break;
+                            
                         default:
+                            // do nothing
                     }
                 }
                 catch (Exception e) {

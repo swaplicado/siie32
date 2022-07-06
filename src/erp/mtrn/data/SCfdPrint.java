@@ -78,7 +78,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Alfredo Pérez, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Alfredo Pérez, Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SCfdPrint {
 
@@ -2446,7 +2446,7 @@ public class SCfdPrint {
                         
                     case SCfdConsts.CFDI_PAYROLL_VER_CUR:
                         SDbPayrollReceipt payrollReceipt = (SDbPayrollReceipt) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
-                        map.put("sCfdiFolio", payrollReceipt.getChildPayrollReceiptIssue().getPayrollReceiptIssueNumber());
+                        map.put("sCfdiFolio", payrollReceipt.getChildPayrollReceiptIssue().getIssueNumber());
                         break;
                         
                     default:

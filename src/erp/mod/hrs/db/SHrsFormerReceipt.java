@@ -80,7 +80,6 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected String msMetodoPagoAux;
     protected String msSerie;
     protected int mnFolio;
-    protected Date mtFechaEdicion;
     protected String msMoneda;
     protected String msLugarExpedicion;
     protected String msConfirmacion;
@@ -133,7 +132,6 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         msMetodoPagoAux = "";
         msSerie = "";
         mnFolio = 0;
-        mtFechaEdicion = null;
         msMoneda = "";
         msLugarExpedicion = "";
         msConfirmacion = "";
@@ -185,7 +183,6 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public void setMetodoPagoAux(String s) { msMetodoPagoAux = s; }
     public void setSerie(String s) { msSerie = s; }
     public void setFolio(int n) { mnFolio = n; }
-    public void setFechaEdicion(Date t) { mtFechaEdicion = t; }
     public void setMoneda(String s) { msMoneda = s; }
     public void setLugarExpedicion(String s) { msLugarExpedicion = s; }
     public void setConfirmacion(String s) { msConfirmacion = s; }
@@ -233,7 +230,6 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public String getMetodoPagoAux() { return msMetodoPagoAux; }
     public String getSerie() { return msSerie; }
     public int getFolio() { return mnFolio; }
-    public Date getFechaEdicion() { return mtFechaEdicion; }
     public String getMoneda() { return msMoneda; }
     public String getLugarExpedicion() { return msLugarExpedicion; }
     public String getConfirmacion() { return msConfirmacion; }

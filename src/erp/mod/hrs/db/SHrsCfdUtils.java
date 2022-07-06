@@ -8,7 +8,9 @@ import cfd.DCfdUtils;
 import cfd.ver33.DCfdi33Catalogs;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -48,6 +50,10 @@ public abstract class SHrsCfdUtils {
     }
     
     public static boolean canGenetareCfdReceipts(final SGuiSession session, final int payrollId) throws Exception {
+        if (((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranchId() == 0) {
+            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);
+        }
+            
         String sql = "SELECT b_clo, b_del FROM hrs_pay WHERE id_pay = " + payrollId + "; ";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
@@ -72,8 +78,8 @@ public abstract class SHrsCfdUtils {
                 + "pri.id_iss, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON "
-                + "pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp AND pri.b_del = 0 AND pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp AND "
+                + "pri.b_del = 0 AND pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND "
                 + "pri.id_iss = (SELECT pri1.id_iss "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri1 "
                 + " WHERE pri1.id_pay = pri.id_pay AND pri1.id_emp = pri.id_emp AND pri1.b_del = 0 "
@@ -91,9 +97,10 @@ public abstract class SHrsCfdUtils {
                 + "pri.id_iss, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON "
-                + "pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp AND pri.b_del = 0 " + /*AND pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_ANNULED + "*/ " AND "
-                + "pri.id_iss = (SELECT pri1.id_iss FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri1 "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp AND "
+                + "pri.b_del = 0 " + /*AND pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_ANNULED + "*/ " AND "
+                + "pri.id_iss = (SELECT pri1.id_iss "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri1 "
                 + " WHERE pri1.id_pay = pri.id_pay AND pri1.id_emp = pri.id_emp AND pri1.b_del = 0 "
                 + " ORDER BY pri1.id_iss DESC LIMIT 1) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
@@ -139,7 +146,133 @@ public abstract class SHrsCfdUtils {
         return receipts;
     }
     
-    public static SHrsFormerPayroll readHrsFormerPayrollAndReceipt(final SClientInterface client, final int[] receiptKey) throws SQLException, Exception {
+    /**
+     * Create CFDI payroll.
+     * @param session
+     * @param hrsFormerReceipt
+     * @param receiptIssueId
+     * @param cfdiPendingSigned
+     * @return
+     * @throws Exception 
+     */
+    @SuppressWarnings("deprecation")
+    private static SDataCfd createCfdi(final SGuiSession session, final SHrsFormerReceipt hrsFormerReceipt, final int receiptIssueId, final boolean cfdiPendingSigned) throws Exception {
+        boolean add = true;
+        int cfdId = 0;
+        String docXmlUuid = "";
+        
+        String sql = "SELECT id_cfd, doc_xml_uuid, fid_st_xml " 
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
+                + "WHERE fid_pay_rcp_pay_n = " + hrsFormerReceipt.getParentPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + hrsFormerReceipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssueId + " "
+                + "ORDER BY id_cfd ";
+
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            if (resultSet.getInt("fid_st_xml") != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                if (resultSet.getInt("fid_st_xml") == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                    add = !cfdiPendingSigned;
+                }
+                else {
+                    cfdId = resultSet.getInt("id_cfd");
+                    docXmlUuid = resultSet.getString("doc_xml_uuid");
+                }
+            }
+        }
+                            
+        if (add) {
+            // generate CFDI:
+
+            cfd.ver32.DElementComprobante comprobanteCfdi32 = null;
+            cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
+            
+            SCfdPacket packet = new SCfdPacket();
+            packet.setCfdId(cfdId);
+            packet.setIsCfdConsistent(cfdId == 0);
+        
+            int xmlType = ((SSessionCustom) session.getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
+            float cfdVersion = 0f;
+            
+            switch (xmlType) {
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                        comprobanteCfdi32 = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface) session.getClient(), hrsFormerReceipt);
+                        cfdVersion = comprobanteCfdi32.getVersion();
+                        
+                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi32));
+                        packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                        comprobanteCfdi33 = (cfd.ver33.DElementComprobante) SCfdUtils.createCfdi33RootElement((SClientInterface) session.getClient(), hrsFormerReceipt);
+                        cfdVersion = comprobanteCfdi33.getVersion();
+                        
+                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
+                        packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            }
+            
+            packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
+            packet.setFkXmlTypeId(xmlType);
+            packet.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
+            packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
+            packet.setFkUserDeliveryId(session.getUser().getPkUserId());
+            packet.setPayrollReceiptPayrollId(hrsFormerReceipt.getParentPayroll().getPkNominaId());
+            packet.setPayrollReceiptEmployeeId(hrsFormerReceipt.getAuxEmpleadoId());
+            packet.setPayrollReceiptIssueId(receiptIssueId);
+            
+            packet.setCfdCertNumber(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertNumber());
+            packet.setCfdSignature(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(hrsFormerReceipt.getParentPayroll().getFecha())[0]));
+            packet.setBaseXUuid(docXmlUuid);
+            
+            switch (xmlType) {
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                    comprobanteCfdi32.getAttSello().setString(packet.getCfdSignature());
+                    packet.setAuxCfdRootElement(comprobanteCfdi32);
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                    comprobanteCfdi33.getAttSello().setString(packet.getCfdSignature());
+                    packet.setAuxCfdRootElement(comprobanteCfdi33);
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            }
+
+            ArrayList<SCfdPacket> cfdPackets = new ArrayList<>();
+            cfdPackets.add(packet);
+
+            // end of generating CFDI:
+            
+            SDbFormerPayrollImport payrollImport = new SDbFormerPayrollImport();
+            payrollImport.setPayrollId(hrsFormerReceipt.getParentPayroll().getPkNominaId());
+            payrollImport.setRegenerateNonStampedCfdi(cfdiPendingSigned);
+            payrollImport.getCfdPackets().addAll(cfdPackets);
+            
+            SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
+            request.setPacket(payrollImport);
+            SServerResponse response = ((SClientInterface)session.getClient()).getSessionXXX().request(request);
+
+            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                throw new Exception(response.getMessage());
+            }
+            else {
+                if (response.getResultType() != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception("Código de error al emitir el CFD: " + SLibConstants.MSG_ERR_DB_REG_SAVE + ".");
+                }
+            }
+        }
+        
+        return SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { hrsFormerReceipt.getParentPayroll().getPkNominaId(), hrsFormerReceipt.getPkEmpleadoId(), receiptIssueId });
+    }
+    
+    /**
+     * Read payroll and receipt in former format.
+     * @param client
+     * @param keyPayrollReceiptIssue
+     * @return
+     * @throws SQLException
+     * @throws Exception 
+     */
+    public static SHrsFormerPayroll readHrsFormerPayrollAndReceipt(final SClientInterface client, final int[] keyPayrollReceiptIssue) throws SQLException, Exception {
         int nPaymentType = 0;
         int nBankDefaultId = 0;
         int nEarningTaxSubsidyCompId = 0;
@@ -207,7 +340,7 @@ public abstract class SHrsCfdUtils {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp "
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND "
-                + "pri.id_pay = " + receiptKey[0] + " AND pri.id_emp = " + receiptKey[1] + " AND pri.id_iss = " + receiptKey[2] + ";";
+                + "pri.id_pay = " + keyPayrollReceiptIssue[0] + " AND pri.id_emp = " + keyPayrollReceiptIssue[1] + " AND pri.id_iss = " + keyPayrollReceiptIssue[2] + ";";
         
         resultSet = statement.executeQuery(sql);
         if (!resultSet.next()) {
@@ -215,7 +348,7 @@ public abstract class SHrsCfdUtils {
         }
         else {
             hrsFormerPayroll = new SHrsFormerPayroll(client);
-            hrsFormerPayroll.setPkNominaId(receiptKey[0]);
+            hrsFormerPayroll.setPkNominaId(keyPayrollReceiptIssue[0]);
             hrsFormerPayroll.setFecha(resultSet.getDate("pri.dt_iss"));
             hrsFormerPayroll.setFechaInicial(resultSet.getDate("p.dt_sta"));
             hrsFormerPayroll.setFechaFinal(resultSet.getDate("p.dt_end"));
@@ -223,7 +356,7 @@ public abstract class SHrsCfdUtils {
             hrsFormerPayroll.setTotalDeducciones(resultSet.getDouble("pr.ded_r"));
             hrsFormerPayroll.setTotalRetenciones(resultSet.getDouble("_ded_tax"));
             hrsFormerPayroll.setEmpresaId(client.getSession().getConfigCompany().getCompanyId());
-            hrsFormerPayroll.setSucursalEmpresaId(client.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
+            hrsFormerPayroll.setSucursalEmpresaId(client.getSessionXXX().getCurrentCompanyBranchId());
             hrsFormerPayroll.setRegimenFiscal(new String[] { client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
             hrsFormerPayroll.setFkNominaTipoId(resultSet.getInt("p.fk_tp_pay_sht"));
             
@@ -240,8 +373,7 @@ public abstract class SHrsCfdUtils {
                     "pri.dt_pay, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, " +
                     "TIMESTAMPDIFF(DAY, pr.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                     "tcon.code AS f_emp_cont_tp, twkd.code AS f_emp_jorn_tp, tpay.code AS f_emp_pay, pr.sal_ssc AS f_emp_sal_bc, trsk.code AS f_emp_risk, " +
-                    "IF(emp.b_uni, '" + DCfdi33Catalogs.TxtSí + "', '" + DCfdi33Catalogs.TxtNo + "') AS f_emp_union, " +
-                    "NOW() AS f_emp_date_edit " +
+                    "IF(emp.b_uni, '" + DCfdi33Catalogs.TxtSí + "', '" + DCfdi33Catalogs.TxtNo + "') AS f_emp_union " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " +
@@ -255,7 +387,7 @@ public abstract class SHrsCfdUtils {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_POS_RISK) + " AS trsk ON trsk.id_tp_pos_risk = pr.fk_tp_pos_risk " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_WORK_DAY) + " AS twkd ON pr.fk_tp_work_day = twkd.id_tp_work_day " +
                     "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND " +
-                    "pri.id_pay = " + receiptKey[0] + " AND pri.id_emp = " + receiptKey[1] + " AND pri.id_iss = " + receiptKey[2] + ";";
+                    "pri.id_pay = " + keyPayrollReceiptIssue[0] + " AND pri.id_emp = " + keyPayrollReceiptIssue[1] + " AND pri.id_iss = " + keyPayrollReceiptIssue[2] + ";";
             resultSet = statement.executeQuery(sql);
 
             if (!resultSet.next()) {
@@ -273,16 +405,16 @@ public abstract class SHrsCfdUtils {
                     "FROM erp.bpsu_bpb AS bpb " +
                     "INNER JOIN erp.bpsu_bpb_add AS bpb_add ON bpb.id_bpb = bpb_add.id_bpb AND bpb_add.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
                     "LEFT OUTER JOIN erp.locu_sta AS sta ON bpb_add.fid_sta_n = sta.id_sta " +
-                    "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + receiptKey[1] + ";";
+                    "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + keyPayrollReceiptIssue[1] + ";";
                 resultSetClient = statementClient.executeQuery(sql);
 
                 if (!resultSetClient.next()) {
-                    throw new Exception("No se encontró la sucursal del empleado con ID = " + receiptKey[1] + ".");
+                    throw new Exception("No se encontró la sucursal del empleado con ID = " + keyPayrollReceiptIssue[1] + ".");
                 }
                 else {
                     hrsFormerReceipt = new SHrsFormerReceipt(client, hrsFormerPayroll);
-                    hrsFormerReceipt.setPkEmpleadoId(receiptKey[1]);
-                    hrsFormerReceipt.setAuxEmpleadoId(receiptKey[1]);
+                    hrsFormerReceipt.setPkEmpleadoId(keyPayrollReceiptIssue[1]);
+                    hrsFormerReceipt.setAuxEmpleadoId(keyPayrollReceiptIssue[1]);
                     hrsFormerReceipt.setPkSucursalEmpleadoId(resultSetClient.getInt("bpb.id_bpb"));
                     hrsFormerReceipt.setRegistroPatronal(client.getSessionXXX().getParamsCompany().getRegistrySs());
                     hrsFormerReceipt.setEmpleadoNum(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
@@ -311,7 +443,6 @@ public abstract class SHrsCfdUtils {
                     hrsFormerReceipt.setMetodoPago(resultSet.getInt("pri.fk_tp_pay_sys"));
                     hrsFormerReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("pri.num_ser")));
                     hrsFormerReceipt.setFolio(resultSet.getInt("pri.num"));
-                    hrsFormerReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
                     hrsFormerReceipt.setMoneda(client.getSession().getSessionCustom().getLocalCurrencyCode());
                     hrsFormerReceipt.setLugarExpedicion(client.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
                     //hrsFormerReceipt.setConfirmacion(...);
@@ -348,7 +479,7 @@ public abstract class SHrsCfdUtils {
                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e ON e.id_ear = pre.fk_ear " +
                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_OTH_PAY) + " AS top ON pre.fk_tp_oth_pay = top.id_tp_oth_pay " +
                             "INNER JOIN erp.hrss_tp_ear_comp AS ec ON ec.id_tp_ear_comp = e.fk_tp_ear_comp " +
-                            "WHERE p.id_pay = " + receiptKey[0] + " AND pr.id_emp = " + receiptKey[1] + ";";
+                            "WHERE p.id_pay = " + keyPayrollReceiptIssue[0] + " AND pr.id_emp = " + keyPayrollReceiptIssue[1] + ";";
 
                     resultSetAux = statementAux.executeQuery(sql);
                     while (resultSetAux.next()) {
@@ -475,7 +606,7 @@ public abstract class SHrsCfdUtils {
                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS d ON d.id_ded = prd.fk_ded " +
                             "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_LOAN) + " AS l ON l.id_emp = prd.fk_loan_emp_n AND l.id_loan = prd.fk_loan_loan_n " +
                             "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " AS tl ON tl.id_tp_loan = prd.fk_tp_loan_n " +
-                            "WHERE p.id_pay = " + receiptKey[0] + " AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + receiptKey[1] + ";";
+                            "WHERE p.id_pay = " + keyPayrollReceiptIssue[0] + " AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + keyPayrollReceiptIssue[1] + ";";
 
                     resultSetAux = statementAux.executeQuery(sql);
                     while (resultSetAux.next()) {
@@ -519,139 +650,87 @@ public abstract class SHrsCfdUtils {
         return hrsFormerPayroll;
     }
     
-    @SuppressWarnings("deprecation")
-    private static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerReceipt hrsFormerReceipt, final int receiptIssueId, final boolean cfdiPendingSigned) throws Exception {
-        boolean add = true;
-        int cfdId = 0;
-        String docXmlUuid = "";
-        
-        String sql = "SELECT id_cfd, doc_xml_uuid, fid_st_xml " 
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
-                + "WHERE fid_pay_rcp_pay_n = " + hrsFormerReceipt.getParentPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + hrsFormerReceipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssueId + " "
-                + "ORDER BY id_cfd ";
-
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            if (resultSet.getInt("fid_st_xml") != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                if (resultSet.getInt("fid_st_xml") == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                    add = !cfdiPendingSigned;
-                }
-                else {
-                    cfdId = resultSet.getInt("id_cfd");
-                    docXmlUuid = resultSet.getString("doc_xml_uuid");
-                }
-            }
-        }
-                            
-        if (add) {
-            // generate CFDI:
-
-            cfd.ver32.DElementComprobante comprobanteCfdi32 = null;
-            cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
-            
-            SCfdPacket packet = new SCfdPacket();
-            packet.setCfdId(cfdId);
-            packet.setIsCfdConsistent(cfdId == 0);
-        
-            int xmlType = ((SSessionCustom) session.getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
-            float cfdVersion = 0f;
-            
-            switch (xmlType) {
-                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                        comprobanteCfdi32 = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface) session.getClient(), hrsFormerReceipt);
-                        cfdVersion = comprobanteCfdi32.getVersion();
-                        
-                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi32));
-                        packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
-                    break;
-                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                        comprobanteCfdi33 = (cfd.ver33.DElementComprobante) SCfdUtils.createCfdi33RootElement((SClientInterface) session.getClient(), hrsFormerReceipt);
-                        cfdVersion = comprobanteCfdi33.getVersion();
-                        
-                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
-                        packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
-                    break;
-                default:
-                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-            }
-            
-            packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
-            packet.setFkXmlTypeId(xmlType);
-            packet.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
-            packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
-            packet.setFkUserDeliveryId(session.getUser().getPkUserId());
-            packet.setPayrollReceiptPayrollId(hrsFormerReceipt.getParentPayroll().getPkNominaId());
-            packet.setPayrollReceiptEmployeeId(hrsFormerReceipt.getAuxEmpleadoId());
-            packet.setPayrollReceiptIssueId(receiptIssueId);
-            
-            packet.setCfdCertNumber(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertNumber());
-            packet.setCfdSignature(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(hrsFormerReceipt.getParentPayroll().getFecha())[0]));
-            packet.setBaseXUuid(docXmlUuid);
-            
-            switch (xmlType) {
-                case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                    comprobanteCfdi32.getAttSello().setString(packet.getCfdSignature());
-                    packet.setAuxCfdRootElement(comprobanteCfdi32);
-                    break;
-                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                    comprobanteCfdi33.getAttSello().setString(packet.getCfdSignature());
-                    packet.setAuxCfdRootElement(comprobanteCfdi33);
-                    break;
-                default:
-                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-            }
-
-            ArrayList<SCfdPacket> cfdPackets = new ArrayList<>();
-            cfdPackets.add(packet);
-
-            // end of generating CFDI:
-            
-            SDbFormerPayrollImport payrollImport = new SDbFormerPayrollImport();
-            payrollImport.setPayrollId(hrsFormerReceipt.getParentPayroll().getPkNominaId());
-            payrollImport.setRegenerateNonStampedCfdi(cfdiPendingSigned);
-            payrollImport.getCfdPackets().addAll(cfdPackets);
-            
-            SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
-            request.setPacket(payrollImport);
-            SServerResponse response = ((SClientInterface)session.getClient()).getSessionXXX().request(request);
-
-            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                throw new Exception(response.getMessage());
-            }
-            else {
-                if (response.getResultType() != SLibConstants.DB_ACTION_SAVE_OK) {
-                    throw new Exception("Código de error al emitir el CFD: " + SLibConstants.MSG_ERR_DB_REG_SAVE + ".");
-                }
-            }
-        }
-        
-        return SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { hrsFormerReceipt.getParentPayroll().getPkNominaId(), hrsFormerReceipt.getPkEmpleadoId(), receiptIssueId });
-    }
-        
-    public static void computeSignCfdi(final SGuiSession session, int[] keyReceipt) throws Exception {
-        SHrsFormerPayroll hrsFormerPayroll = readHrsFormerPayrollAndReceipt((SClientInterface) session.getClient(), keyReceipt);
-        
+    /**
+     * Compute CFDI payroll.
+     * @param session
+     * @param keyPayrollReceiptIssue
+     * @return
+     * @throws Exception 
+     */
+    private static SDataCfd computeCfdi(final SGuiSession session, final int[] keyPayrollReceiptIssue, final boolean isSingle) throws Exception {
+        SHrsFormerPayroll hrsFormerPayroll = readHrsFormerPayrollAndReceipt((SClientInterface) session.getClient(), keyPayrollReceiptIssue);
         SHrsFormerReceipt hrsFormerReceipt = hrsFormerPayroll.getChildReceipts().get(0); // there is allways only one receipt
         
         hrsFormerReceipt.setParentPayroll(hrsFormerPayroll);
-        hrsFormerReceipt.setFechaEdicion(session.getCurrentDate());
         hrsFormerReceipt.setMoneda(session.getSessionCustom().getLocalCurrencyCode()); 
         hrsFormerReceipt.setLugarExpedicion(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
         hrsFormerReceipt.setRegimenFiscal(((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
         
-        SDataCfd cfd = computeCfdi(session, hrsFormerReceipt, keyReceipt[2], true);
+        SDataCfd cfd = createCfdi(session, hrsFormerReceipt, keyPayrollReceiptIssue[2], true);
+        
         if (cfd == null) {
             throw new Exception("Error al leer el CFD, no se encontró el registro.");
         }
 
         if (((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-            SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
+            SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, isSingle, false);
         }
         else {
-            SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
+            SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, isSingle, false);
         }
+        
+        return (SDataCfd) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT); // read again just signed CFDI
     }
 
+    /**
+     * Compute CFDI for payroll receipt issue.
+     * @param session GUI user session.
+     * @param keyPayrollReceiptIssue Primary key of receipt issue.
+     * @param isSingle Is processing only one CFDI, otherwise all CFDI in payroll.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static SDataCfd computeCfdiPayrollReceiptIssue(final SGuiSession session, final int[] keyPayrollReceiptIssue, final boolean isSingle) throws Exception {
+        // discard other non-emitted receipt issues:
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String sql = "SELECT pri.id_pay, pri.id_emp, pri.id_iss, pri.fk_st_rcp, c.id_cfd, c.fid_st_xml "
+                    + "FROM hrs_pay_rcp_iss AS pri "
+                    + "LEFT OUTER JOIN trn_cfd AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                    + "WHERE pri.id_pay = " + keyPayrollReceiptIssue[0] + " AND pri.id_emp = " + keyPayrollReceiptIssue[1] + " AND pri.id_iss <> " + keyPayrollReceiptIssue[2] + " AND "
+                    + "NOT pri.b_del AND c.id_cfd IS NULL;";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SDbPayrollReceiptIssue receiptIssue = (SDbPayrollReceiptIssue) session.readRegistry(SModConsts.HRS_PAY_RCP_ISS, new int[] { resultSet.getInt("pri.id_pay"), resultSet.getInt("pri.id_emp"), resultSet.getInt("pri.id_iss") });
+                receiptIssue.setDeleted(true);
+                receiptIssue.save(session);
+            }
+        }
+        
+        // compute requested CFDI:
+        
+        SDbPayrollReceiptIssue receiptIssue = (SDbPayrollReceiptIssue) session.readRegistry(SModConsts.HRS_PAY_RCP_ISS, keyPayrollReceiptIssue);
+        String series = receiptIssue.getNumberSeries();
+        int number = 0;
+
+        if (receiptIssue.getNumber() != 0) {
+            // preserve already defined number:
+            number = receiptIssue.getNumber();
+        }
+        else {
+            // generate a new number:
+            number = SHrsUtils.getPayrollReceiptNextNumber(session, receiptIssue.getNumberSeries());
+            receiptIssue.setNumber(number); // update memory
+            receiptIssue.saveField(session.getStatement(), receiptIssue.getPrimaryKey(), SDbPayrollReceiptIssue.FIELD_NUMBER, number); // update persistent storage as well
+        }
+        
+        SDataCfd cfd = computeCfdi(session, keyPayrollReceiptIssue, isSingle);
+        cfd.setExtraSeries(series);
+        cfd.setExtraNumber(number);
+        
+        return cfd;
+    }
+    
     /**
      * Get the number of CFD of receipts in payroll by department.
      * @param session

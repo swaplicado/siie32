@@ -13,7 +13,6 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
@@ -46,7 +45,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 public class SDialogCfdProcessing extends SBeanFormDialog {
     
     protected ArrayList<SDataCfd> maCfds;
-    protected ArrayList<int[]> maPayrollReceiptKeys;
+    protected ArrayList<int[]> maPayrollReceiptIssueKeys;
     protected ArrayList<SDbPayrollReceipt> maPayrollReceipts;
     protected int mnStampsAvailable;
     protected Date mtAnnulmentDate;
@@ -340,7 +339,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
             sendPayrollReceipts();
         }
         else { 
-            if (maPayrollReceiptKeys != null) {
+            if (maPayrollReceiptIssueKeys != null) {
                 processPayrollReceipts();
             }
             else if (maCfds != null) {
@@ -411,46 +410,38 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
     }
     
     private void processPayrollReceipts() {
-        if (maPayrollReceiptKeys != null) {
+        if (maPayrollReceiptIssueKeys != null) {
             int cfdProcessed = 0;
             int cfdProcessedOk = 0;
             int cfdProcessedWrong = 0;
             String detailMessage = "";
-            String series = ((SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { 1 })).getNumberSeries();
 
-            moIntCfdToProcess.setValue(maPayrollReceiptKeys.size());
+            moIntCfdToProcess.setValue(maPayrollReceiptIssueKeys.size());
             jtfWarningMessage.setText(SCfdUtils.verifyCertificateExpiration((SClientInterface) miClient));
             jtfWarningMessage.setCaretPosition(0);
             
             try {
                 SCfdUtils.initDataSetForPayroll(mnFormSubtype);
 
-                for (int[] key : maPayrollReceiptKeys) {
+                for (int[] keyPayrollReceiptIssue : maPayrollReceiptIssueKeys) {
+                    String series = "";
                     int number = 0;
+                    
                     cfdProcessed++;
 
                     try {
                         switch (mnFormSubtype) {
                             case SCfdConsts.REQ_STAMP:
-                                SDbPayrollReceiptIssue receiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, key);
-
-                                if (receiptIssue.getNumber() != 0) {
-                                    // preserve already defined number:
-                                    number = receiptIssue.getNumber();
-                                }
-                                else {
-                                    // generate a new number:
-                                    number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
-                                    receiptIssue.setNumber(number); // update memory
-                                    receiptIssue.saveField(miClient.getSession().getStatement(), receiptIssue.getPrimaryKey(), SDbPayrollReceiptIssue.FIELD_NUMBER, number); // update persistent storage as well
-                                }
-
-                                SHrsCfdUtils.computeSignCfdi(miClient.getSession(), key);
-                                detailMessage += receiptIssue.getPayrollReceiptIssueNumber() + ": Timbrado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
+                                SDataCfd cfd = SHrsCfdUtils.computeCfdiPayrollReceiptIssue(miClient.getSession(), keyPayrollReceiptIssue, false);
+                                series = cfd.getExtraSeries();
+                                number = cfd.getExtraNumber();
+                                
+                                detailMessage += STrnUtils.formatDocNumber(series, "" + number) + ": Timbrado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
                                 cfdProcessedOk++;
                                 break;
 
                             default:
+                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                         }
                     }
                     catch (Exception e) {
@@ -564,7 +555,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                                 break;
 
                             case SCfdConsts.REQ_SEND_DOC:
-                                SCfdUtils.sendCfd((SClientInterface) miClient, cfd.getFkCfdTypeId(), cfd, mnPayrollCfdVersion, false, false, true);
+                                SCfdUtils.sendCfd((SClientInterface) miClient, cfd, mnPayrollCfdVersion, false);
                                 detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Enviado.\n";
                                 break;
 
@@ -675,7 +666,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
         mbFirstTime = true;
         
         maCfds = cfds;
-        maPayrollReceiptKeys = payrollReceiptKeys;
+        maPayrollReceiptIssueKeys = payrollReceiptKeys;
         mnStampsAvailable = stampsAvailable;
         mtAnnulmentDate = annulmentDate;
         mbValidateStamp = validateStamp;

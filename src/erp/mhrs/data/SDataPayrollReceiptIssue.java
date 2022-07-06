@@ -9,6 +9,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.mod.SModConsts;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataCfd;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -18,9 +19,14 @@ import java.sql.Statement;
 import java.util.Date;
 import sa.lib.db.SDbConsts;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.hrs.db.SDbPayrollReceiptIssue
+ */
+
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializable {
     
@@ -29,9 +35,10 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
     protected int mnPkIssueId;
     protected String msNumberSeries;
     protected int mnNumber;
-    protected Date mtDateIssue;
-    protected Date mtDatePayment;
+    protected Date mtDateOfIssue;
+    protected Date mtDateOfPayment;
     protected String msBankAccount;
+    protected String msUuidRelated;
     protected double mdEarnings_r;
     protected double mdDeductions_r;
     protected double mdPayment_r;
@@ -61,7 +68,7 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
     }
     
     public java.lang.String getIssueNumber() {
-        return (msNumberSeries.isEmpty() ? "" : msNumberSeries + "-") + mnNumber;
+        return STrnUtils.formatDocNumber(msNumberSeries, "" + mnNumber);
     }
     
     @Override
@@ -109,9 +116,10 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
     public void setPkIssueId(int n) { mnPkIssueId = n; }
     public void setNumberSeries(String s) { msNumberSeries = s; }
     public void setNumber(int n) { mnNumber = n; }
-    public void setDateIssue(Date t) { mtDateIssue = t; }
-    public void setDatePayment(Date t) { mtDatePayment = t; }
+    public void setDateOfIssue(Date t) { mtDateOfIssue = t; }
+    public void setDateOfPayment(Date t) { mtDateOfPayment = t; }
     public void setBankAccount(String s) { msBankAccount = s; }
+    public void setUuidRelated(String s) { msUuidRelated = s; }
     public void setEarnings_r(double d) { mdEarnings_r = d; }
     public void setDeductions_r(double d) { mdDeductions_r = d; }
     public void setPayment_r(double d) { mdPayment_r = d; }
@@ -131,9 +139,10 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
     public int getPkIssueId() { return mnPkIssueId; }
     public String getNumberSeries() { return msNumberSeries; }
     public int getNumber() { return mnNumber; }
-    public Date getDateIssue() { return mtDateIssue; }
-    public Date getDatePayment() { return mtDatePayment; }
+    public Date getDateOfIssue() { return mtDateOfIssue; }
+    public Date getDateOfPayment() { return mtDateOfPayment; }
     public String getBankAccount() { return msBankAccount; }
+    public String getUuidRelated() { return msUuidRelated; }
     public double getEarnings_r() { return mdEarnings_r; }
     public double getDeductions_r() { return mdDeductions_r; }
     public double getPayment_r() { return mdPayment_r; }
@@ -156,7 +165,7 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
     }
 
     @Override
-    public int[] getPrimaryKey() {
+    public java.lang.Object getPrimaryKey() {
         return new int[] { mnPkPayrollId, mnPkEmployeeId, mnPkIssueId };
     }
 
@@ -169,9 +178,10 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
         mnPkIssueId = 0;
         msNumberSeries = "";
         mnNumber = 0;
-        mtDateIssue = null;
-        mtDatePayment = null;
+        mtDateOfIssue = null;
+        mtDateOfPayment = null;
         msBankAccount = "";
+        msUuidRelated = "";
         mdEarnings_r = 0;
         mdDeductions_r = 0;
         mdPayment_r = 0;
@@ -207,9 +217,10 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
                 mnPkIssueId = resultSet.getInt("id_iss");
                 msNumberSeries = resultSet.getString("num_ser");
                 mnNumber = resultSet.getInt("num");
-                mtDateIssue = resultSet.getDate("dt_iss");
-                mtDatePayment = resultSet.getDate("dt_pay");
+                mtDateOfIssue = resultSet.getDate("dt_iss");
+                mtDateOfPayment = resultSet.getDate("dt_pay");
                 msBankAccount = resultSet.getString("bank_acc");
+                msUuidRelated = resultSet.getString("uuid_rel");
                 mdEarnings_r = resultSet.getDouble("ear_r");
                 mdDeductions_r = resultSet.getDouble("ded_r");
                 mdPayment_r = resultSet.getDouble("pay_r");

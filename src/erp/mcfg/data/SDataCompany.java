@@ -15,7 +15,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores
  */
 public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -46,7 +46,7 @@ public class SDataCompany extends erp.lib.data.SDataRegistry implements java.io.
 
     public SDataCompany() {
         super(SDataConstants.CFGU_CO);
-        mvDbmsCompanyBranchEntities = new Vector<SDataCompanyBranchEntity>();
+        mvDbmsCompanyBranchEntities = new Vector<>();
         reset();
     }
 

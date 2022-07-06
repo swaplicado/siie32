@@ -5,7 +5,6 @@
 package erp.mod.fin.form;
 
 import erp.SClientUtils;
-import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -14,6 +13,7 @@ import erp.lib.form.SFormField;
 import erp.lib.table.STableRow;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SDataCfd;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.sql.ResultSet;
@@ -35,7 +35,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SDialogMassInvoices extends SBeanFormDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener, erp.lib.form.SFormOptionPickerInterface {
       
@@ -47,8 +47,6 @@ public class SDialogMassInvoices extends SBeanFormDialog implements java.awt.eve
    private int mnAnnuledCfdi = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
    private int mnBizPartnerCategory;
    private int mnTypesCdfi;
-   private int[] mnPrimaryKeyInvo;
-   
    
    private erp.lib.form.SFormField moFieldSearchBizPartnerId;
     /**
@@ -286,11 +284,11 @@ public class SDialogMassInvoices extends SBeanFormDialog implements java.awt.eve
             SFormUtilities.locateComboBoxItem(jcbBizPartner, picker.getSelectedPrimaryKey());
             jcbBizPartner.requestFocus();
         }
-                */
+        */
     }
     
-   @SuppressWarnings("empty-statement")
-    private void createParamsInvoinces() throws SQLException {
+    @SuppressWarnings("empty-statement")
+    private void createParamsInvoices() throws SQLException {
         String mySql = "";
         int countInvoinces = 0;
         ResultSet resultSet = null;
@@ -384,11 +382,12 @@ public class SDialogMassInvoices extends SBeanFormDialog implements java.awt.eve
             resultSet = statement.executeQuery(mySql);
             while (resultSet.next()) {
                 countInvoinces = countInvoinces + 1;
-                mnPrimaryKeyInvo = new int[2];
-                mnPrimaryKeyInvo[0] = resultSet.getInt("d.id_year");
-                mnPrimaryKeyInvo[1] = resultSet.getInt("d.id_doc");
+                int[] primaryKey = new int[2];
+                primaryKey[0] = resultSet.getInt("d.id_year");
+                primaryKey[1] = resultSet.getInt("d.id_doc");
 
-                SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) mnPrimaryKeyInvo), SCfdConsts.CFDI_PAYROLL_VER_OLD, true, false, false);
+                SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, primaryKey);
+                SCfdUtils.sendCfd((SClientInterface) miClient, cfd, 0, false);
             }
             
             if(countInvoinces == 1) {
@@ -466,7 +465,7 @@ public class SDialogMassInvoices extends SBeanFormDialog implements java.awt.eve
             else {
                 if (jbSave.isEnabled()) {
                     try {
-                        createParamsInvoinces();
+                        createParamsInvoices();
                     } catch (SQLException ex) {
                         Logger.getLogger(SDialogMassDownloadCfdi.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -476,7 +475,7 @@ public class SDialogMassInvoices extends SBeanFormDialog implements java.awt.eve
         }
         else if (jbSave.isEnabled()) {
             try {
-                createParamsInvoinces();
+                createParamsInvoices();
             } catch (SQLException ex) {
                 Logger.getLogger(SDialogMassDownloadCfdi.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -526,6 +526,7 @@ public class SFormField implements SFormFieldInterface {
         setFieldValue(date);    // corrects any wrong date
 
         if (date == null && mjComponent.isEnabled()) {
+            /* this message is very annoying
             if (mbIsMandatory) {
                 switch (mnDataType) {
                     case SLibConstants.DATA_TYPE_DATE:
@@ -540,6 +541,7 @@ public class SFormField implements SFormFieldInterface {
                     default:
                 }
             }
+            */
         }
     }
 

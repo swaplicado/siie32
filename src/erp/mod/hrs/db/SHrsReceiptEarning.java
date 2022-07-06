@@ -289,7 +289,9 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
                     case 5: // amount
                     case 6: // value (units)
                     case 7: // unit of measure
-                    case 8: // loan description
+                    case 8: // amount exempt
+                    case 9: // amount taxable
+                    case 10: // loan description
                         break;
                         
                     default:
@@ -321,7 +323,9 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
                         updateApplying((boolean) value);
                         break;
                         
-                    case 8: // loan description
+                    case 8: // amount exempt
+                    case 9: // amount taxable
+                    case 10: // loan description
                         break;
                         
                     default:
