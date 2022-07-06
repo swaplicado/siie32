@@ -268,6 +268,7 @@ public abstract class SDataConstants {
     public static final int ITMX_ITEM_BY_NAME = 205502;
     public static final int ITMX_ITEM_BY_BRAND = 205503;
     public static final int ITMX_ITEM_BY_MANUFACTURER = 205504;
+    public static final int ITMX_ITEM_BY_PART_NUM = 205505;
     public static final int ITMX_ITEM_PACK = 205507;
     public static final int ITMX_ITEM_IOG = 205508;
     public static final int ITMX_IGEN_LINE = 205509;
@@ -487,6 +488,7 @@ public abstract class SDataConstants {
     public static final int TRN_DNC_DIOG = 207088;
     public static final int TRN_DNC_DIOG_DNS = 207089;
 
+    public static final int TRNX_DPS_RO_STK = 207504;
     public static final int TRNX_DPS_RO = 207505;
     public static final int TRNX_DPS_QRY = 207506;
     public static final int TRNX_DPS_EDIT = 207507;

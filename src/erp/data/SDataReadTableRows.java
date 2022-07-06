@@ -1048,7 +1048,7 @@ public abstract class SDataReadTableRows {
                     tDate = (Date) ((Object[]) filterKey)[1];
                 }
                 
-                sSql = "SELECT i.id_item, i.item, i.item_key, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item, " +
+                sSql = "SELECT i.id_item, i.item, i.item_key, i.part_num, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item, " +
                         ((filterKey == null || filterKey instanceof int[]) ? "0.0" : 
                         ("trn_stk_get(" +
                         ((Integer) ((Object[]) filterKey)[0]) + ", " +
@@ -1074,6 +1074,7 @@ public abstract class SDataReadTableRows {
             case SDataConstants.ITMX_ITEM_BY_KEY:
             case SDataConstants.ITMX_ITEM_BY_NAME:
             case SDataConstants.ITMX_ITEM_BY_BRAND:
+            case SDataConstants.ITMX_ITEM_BY_PART_NUM:
             case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
                 aoPkFields = new STableField[1];
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -1116,7 +1117,11 @@ public abstract class SDataReadTableRows {
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.part_num");
-
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_PART_NUM:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.part_num");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                         break;
                     case SDataConstants.ITMX_ITEM_BY_BRAND:
                     case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
@@ -1143,6 +1148,10 @@ public abstract class SDataReadTableRows {
                 switch (pnDataType) {
                     case SDataConstants.ITMX_ITEM_BY_KEY:
                     case SDataConstants.ITMX_ITEM_BY_NAME:
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_PART_NUM:
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
                         break;
@@ -1178,16 +1187,19 @@ public abstract class SDataReadTableRows {
                 
                 switch (pnDataType) {
                     case SDataConstants.ITMX_ITEM_BY_KEY:
-                        sSql += "ORDER BY i.item_key, i.item, i.id_item ";
+                        sSql += "ORDER BY i.item_key, i.item, i.id_item, i.part_num";
                         break;
                     case SDataConstants.ITMX_ITEM_BY_NAME:
-                        sSql += "ORDER BY i.item, i.item_key, i.id_item ";
+                        sSql += "ORDER BY i.item, i.item_key, i.id_item, i.part_num ";
                         break;
                     case SDataConstants.ITMX_ITEM_BY_BRAND:
-                        sSql += "ORDER BY b.brd, b.id_brd, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item ";
+                        sSql += "ORDER BY b.brd, b.id_brd, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item, i.part_num ";
                         break;
                     case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
-                        sSql += "ORDER BY m.mfr, m.id_mfr, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item ";
+                        sSql += "ORDER BY m.mfr, m.id_mfr, " + (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "i.id_item, i.part_num ";
+                        break;
+                    case SDataConstants.ITMX_ITEM_BY_PART_NUM:
+                        sSql += "ORDER BY i.part_num, i.item_key, i.item, i.id_item";
                         break;
                 }
                 
