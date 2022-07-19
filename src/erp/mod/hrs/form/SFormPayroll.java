@@ -198,6 +198,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRadSpecial = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel45 = new javax.swing.JPanel();
         moRadExtraordinary = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel47 = new javax.swing.JPanel();
+        jlRecruitmentSchemaType = new javax.swing.JLabel();
+        moKeyRecruitmentSchemaType = new sa.lib.gui.bean.SBeanFieldKey();
+        jbEditRecruitmentSchemaType = new javax.swing.JButton();
         jPanel16 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
@@ -301,7 +305,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel7.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
 
-        jPanel6.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
 
         jPanel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -449,7 +453,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlPaysheetCustomType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel31.add(jlPaysheetCustomType);
 
-        moKeyPaysheetCustomType.setPreferredSize(new java.awt.Dimension(225, 23));
+        moKeyPaysheetCustomType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel31.add(moKeyPaysheetCustomType);
 
         jPanel6.add(jPanel31);
@@ -481,6 +485,22 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel6.add(jPanel45);
 
+        jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecruitmentSchemaType.setText("Tipo régimen nómina:*");
+        jlRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel47.add(jlRecruitmentSchemaType);
+
+        moKeyRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(272, 23));
+        jPanel47.add(moKeyRecruitmentSchemaType);
+
+        jbEditRecruitmentSchemaType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditRecruitmentSchemaType.setToolTipText("Modificar");
+        jbEditRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel47.add(jbEditRecruitmentSchemaType);
+
+        jPanel6.add(jPanel47);
+
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNotes.setText("Notas:");
@@ -494,7 +514,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel7.add(jPanel6);
 
-        jPanel21.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
+        jPanel21.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -655,7 +675,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jlTotalEarnings.setText("Total percepciones:");
+        jlTotalEarnings.setText("Percepciones:");
         jlTotalEarnings.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel28.add(jlTotalEarnings);
 
@@ -666,7 +686,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jlTotalDeductions.setText("Total deducciones:");
+        jlTotalDeductions.setText("Deducciones:");
         jlTotalDeductions.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel29.add(jlTotalDeductions);
 
@@ -896,6 +916,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
+    private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -908,6 +929,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JButton jbEditNumber;
     private javax.swing.JButton jbEditPeriod;
     private javax.swing.JButton jbEditPeriodYear;
+    private javax.swing.JButton jbEditRecruitmentSchemaType;
     private javax.swing.JButton jbGetNextNumber;
     private javax.swing.JButton jbGoTabReceipts;
     private javax.swing.JButton jbLoadPrepayroll;
@@ -933,6 +955,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlPaysheetCustomType;
     private javax.swing.JLabel jlPeriod;
     private javax.swing.JLabel jlReceiptDays;
+    private javax.swing.JLabel jlRecruitmentSchemaType;
     private javax.swing.JLabel jlSsContribution;
     private javax.swing.JLabel jlTax;
     private javax.swing.JLabel jlTaxComputationType;
@@ -984,6 +1007,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldKey moKeyMwzReferenceType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMwzType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaysheetCustomType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyRecruitmentSchemaType;
     private sa.lib.gui.bean.SBeanFieldKey moKeySsContribution;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxComputationType;
@@ -1023,6 +1047,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntReceiptDays.setIntegerSettings(SGuiUtils.getLabelName(jlReceiptDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntWorkingDays.setIntegerSettings(SGuiUtils.getLabelName(jlWorkingDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moKeyPaysheetCustomType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaysheetCustomType.getText()), true);
+        moKeyRecruitmentSchemaType.setKeySettings(miClient, SGuiUtils.getLabelName(jlRecruitmentSchemaType.getText()), true);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes.getText()), 255, 0);
         moRadNormal.setBooleanSettings(SGuiUtils.getLabelName(moRadNormal.getText()), false);
         moRadSpecial.setBooleanSettings(SGuiUtils.getLabelName(moRadSpecial.getText()), false);
@@ -1065,6 +1090,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moIntReceiptDays); // is read-only
         moFields.addField(moIntWorkingDays); // is read-only
         moFields.addField(moKeyPaysheetCustomType);
+        moFields.addField(moKeyRecruitmentSchemaType);
         moFields.addField(moTextNotes);
         moFields.addField(moRadNormal);
         moFields.addField(moRadSpecial);
@@ -1143,7 +1169,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         SRowPayrollEmployee rowPayrollEmployee = (SRowPayrollEmployee) moGridPanePayrollReceipts.getSelectedGridRow();
                         SHrsReceipt hrsReceipt = rowPayrollEmployee.getHrsReceipt().clone();
                         
-                        SDbPayrollReceiptIssue payrollReceiptIssue = rowPayrollEmployee.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue(); // convenience variable
+                        SDbPayrollReceiptIssue payrollReceiptIssue = hrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue(); // convenience variable
                         boolean isReceiptEditable = !mbIsReadOnly && (payrollReceiptIssue == null || payrollReceiptIssue.isCfdEditable());
                         
                         if (isReceiptEditable) {
@@ -1151,7 +1177,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         }
 
                         SDialogPayrollReceipt dlgPayrollReceipt = new SDialogPayrollReceipt(miClient, "Recibo de nómina");
-                        dlgPayrollReceipt.setValue(SGuiConsts.PARAM_REQ_PAY, isReceiptEditable);
+                        dlgPayrollReceipt.setValue(SDialogPayrollReceipt.PARAM_IS_EDITABLE, isReceiptEditable);
                         dlgPayrollReceipt.setValue(SModConsts.HRS_PAY_RCP, hrsReceipt);
                         dlgPayrollReceipt.setValue(SModConsts.HRS_EAR, moHrsPayroll.getEarnings());
                         dlgPayrollReceipt.setValue(SModConsts.HRS_DED, moHrsPayroll.getDeductions());
@@ -1254,6 +1280,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDateDateStart.setEditable(false);
         moDateDateEnd.setEditable(false);
         moIntPeriod.setEditable(false);
+        moKeyRecruitmentSchemaType.setEnabled(false);
 
         if (moGridPanePayrollReceipts.getTable().getRowCount() == 0) {
             jbEditPeriodYear.setEnabled(true);
@@ -1262,6 +1289,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbGetNextNumber.setEnabled(true);
             jbEditDates.setEnabled(true);
             jbEditPeriod.setEnabled(true);
+            jbEditRecruitmentSchemaType.setEnabled(true);
             moKeyPaysheetCustomType.setEnabled(true);
             moRadNormal.setEnabled(true);
             moRadSpecial.setEnabled(true);
@@ -1274,6 +1302,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbGetNextNumber.setEnabled(mbIsCopyingPayroll);
             jbEditDates.setEnabled(mbIsCopyingPayroll);
             jbEditPeriod.setEnabled(mbIsCopyingPayroll);
+            jbEditRecruitmentSchemaType.setEnabled(mbIsCopyingPayroll);
             moKeyPaysheetCustomType.setEnabled(mbIsCopyingPayroll);
             moRadNormal.setEnabled(mbIsCopyingPayroll);
             moRadSpecial.setEnabled(mbIsCopyingPayroll);
@@ -1356,6 +1385,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         if (moKeyPaysheetCustomType.getSelectedIndex() > 0) {
             payroll.setFkPaysheetCustomTypeId(moKeyPaysheetCustomType.getValue()[0]);
+        }
+        
+        if (moKeyRecruitmentSchemaType.getSelectedIndex() > 0) {
+            payroll.setFkRecruitmentSchemaTypeId(moKeyRecruitmentSchemaType.getValue()[0]);
         }
         
         if (moKeyMwzType.getSelectedIndex() > 0) {
@@ -1526,19 +1559,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private void actionEditPeriodYear() {
         jbEditPeriodYear.setEnabled(false);
         moIntPeriodYear.setEditable(true);
-        moIntPeriodYear.requestFocus();
+        moIntPeriodYear.requestFocusInWindow();
     }
     
     private void actionEditFiscalYear() {
         jbEditFiscalYear.setEnabled(false);
         moIntFiscalYear.setEditable(true);
-        moIntFiscalYear.requestFocus();
+        moIntFiscalYear.requestFocusInWindow();
     }
     
     private void actionEditNumber() {
         jbEditNumber.setEnabled(false);
         moIntNumber.setEditable(true);
-        moIntNumber.requestFocus();
+        moIntNumber.requestFocusInWindow();
     }
 
     private void actionApplyPeriodYear() throws Exception {
@@ -1551,20 +1584,26 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
     private void actionGetNextNumber() throws Exception {
         setDefaultPeriodYear(moIntPeriodYear.getValue(), true);
-        moIntNumber.requestFocus();
+        moIntNumber.requestFocusInWindow();
     }
 
     private void actionEditDates() {
         jbEditDates.setEnabled(false);
         moDateDateStart.setEditable(true);
         moDateDateEnd.setEditable(true);
-        moDateDateStart.requestFocus();
+        moDateDateStart.requestFocusInWindow();
     }
 
     private void actionEditPeriod() {
         jbEditPeriod.setEnabled(false);
         moIntPeriod.setEditable(true);
-        moIntPeriod.requestFocus();
+        moIntPeriod.requestFocusInWindow();
+    }
+    
+    private void actionEditRecruitmentSchemaType() {
+        jbEditRecruitmentSchemaType.setEnabled(false);
+        moKeyRecruitmentSchemaType.setEnabled(true);
+        moKeyRecruitmentSchemaType.requestFocusInWindow();
     }
 
     private void actionTaxSubsidyChange() {
@@ -1630,40 +1669,40 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
 
-    private HashSet<Integer> createRecruitmentSchemesTypesSet() {
-        HashSet<Integer> recruitmentSchemesTypesSet = new HashSet<>();
+    private HashSet<Integer> createRecruitmentSchemaTypesSet() {
+        HashSet<Integer> recruitmentSchemaTypesSet = new HashSet<>();
 
         if (moBoolFilterWages.isSelected()) {
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
         }
         if (moBoolFilterAssimilated.isSelected()) {
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH);
         }
         if (moBoolFilterRetirees.isSelected()) {
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_PEN);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_PEN);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN);
         }
         if (moBoolFilterOthers.isSelected()) {
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_COMP);
-            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_OTH);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_COMP);
+            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_OTH);
         }
         
-        return recruitmentSchemesTypesSet;
+        return recruitmentSchemaTypesSet;
     }
 
     /**
      * Add receipt.
-     * @param recruitmentSchemesTypesSet Set of types of recruitment schemes. Can be <code>null</code>.
+     * @param recruitmentSchemaTypesSet Set of types of recruitment schemas. Can be <code>null</code>.
      * @return <code>true</code> if receipt added, otherwise <code>false</code>.
      */
-    private boolean actionReceiptAdd(final HashSet<Integer> recruitmentSchemesTypesSet) {
+    private boolean actionReceiptAdd(final HashSet<Integer> recruitmentSchemaTypesSet) {
         boolean added = true;
 
         if (mbIsReadOnly) {
@@ -1673,11 +1712,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
             moGridPaneEmployeesAvailable.getTable().requestFocusInWindow();
         }
-        else if (recruitmentSchemesTypesSet != null && recruitmentSchemesTypesSet.isEmpty()) {
+        else if (recruitmentSchemaTypesSet != null && recruitmentSchemaTypesSet.isEmpty()) {
             miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + "'.");
             moBoolFilterWages.requestFocusInWindow();
         }
-        else if (recruitmentSchemesTypesSet != null && !recruitmentSchemesTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemeTypeId())) {
+        else if (recruitmentSchemaTypesSet != null && !recruitmentSchemaTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemaTypeId())) {
             miClient.showMsgBoxInformation("¡No se agregó el empleado, no cumple con los filtros seleccionados!");
             moBoolFilterWages.requestFocusInWindow();
         }
@@ -1685,7 +1724,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             try {
                 int index = moGridPaneEmployeesAvailable.getTable().getSelectedRow();
                 SRowPayrollEmployee rowEmployee = (SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow();
-                SHrsReceipt hrsReceipt = moHrsPayroll.createHrsReceipt(rowEmployee.getPkEmployeeId(), moIntPeriodYear.getValue(), moIntPeriod.getValue(), moIntFiscalYear.getValue(), moDateDateStart.getValue(), moDateDateEnd.getValue(), moKeyTaxComputationType.getValue()[0]);
+                SHrsReceipt hrsReceipt = moHrsPayroll.createHrsReceipt(
+                        rowEmployee.getPkEmployeeId(), moIntPeriodYear.getValue(), moIntPeriod.getValue(), moIntFiscalYear.getValue(), moDateDateStart.getValue(), moDateDateEnd.getValue(), moKeyRecruitmentSchemaType.getValue()[0]);
 
                 // recover receipt if it was already deleted:
                 
@@ -1732,11 +1772,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         int rows = moGridPaneEmployeesAvailable.getTable().getRowCount();
         
         if (rows > 0) {
-            // prepare filters of recruitment scheme types:
+            // prepare filters of types of recruitment schemas:
             
-            HashSet<Integer> recruitmentSchemesTypesSet = createRecruitmentSchemesTypesSet();
+            HashSet<Integer> recruitmentSchemaTypesSet = createRecruitmentSchemaTypesSet();
 
-            if (recruitmentSchemesTypesSet.isEmpty()) {
+            if (recruitmentSchemaTypesSet.isEmpty()) {
                 miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + "'.");
                 moBoolFilterWages.requestFocusInWindow();
             }
@@ -1754,7 +1794,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         // select top row:
                         moGridPaneEmployeesAvailable.setSelectedGridRow(index);
 
-                        if (!recruitmentSchemesTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemeTypeId())) {
+                        if (!recruitmentSchemaTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemaTypeId())) {
                             index++; // skip current row and go next
                         }
                         else {
@@ -2493,7 +2533,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
     
     private void addToRigth(int employeeId, ArrayList<SEarnConfiguration> configs) {
-        actionReceiptAdd(createRecruitmentSchemesTypesSet());
+        actionReceiptAdd(createRecruitmentSchemaTypesSet());
         
         addEarning(employeeId, configs);
     }
@@ -2612,6 +2652,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbGetNextNumber.addActionListener(this);
         jbEditDates.addActionListener(this);
         jbEditPeriod.addActionListener(this);
+        jbEditRecruitmentSchemaType.addActionListener(this);
         jbGoTabReceipts.addActionListener(this);
         jbReceiptAdd.addActionListener(this);
         jbReceiptAddAll.addActionListener(this);
@@ -2656,6 +2697,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbGetNextNumber.removeActionListener(this);
         jbEditDates.removeActionListener(this);
         jbEditPeriod.removeActionListener(this);
+        jbEditRecruitmentSchemaType.removeActionListener(this);
         jbGoTabReceipts.removeActionListener(this);
         jbReceiptAdd.removeActionListener(this);
         jbReceiptAddAll.removeActionListener(this);
@@ -2695,6 +2737,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     @Override
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyPaysheetCustomType, SModConsts.HRSU_TP_PAY_SHT_CUS, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyRecruitmentSchemaType, SModConsts.HRSS_TP_REC_SCHE, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyMwzType, SModConsts.HRSU_TP_MWZ, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyMwzReferenceType, SModConsts.HRSU_TP_MWZ, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyTaxComputationType, SModConsts.HRSS_TP_TAX_COMP, SLibConsts.UNDEFINED, null);
@@ -2730,6 +2773,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 moRegistry.setFkPaymentTypeId(mnFormSubtype);
                 moRegistry.setFkPaysheetTypeId(SModSysConsts.HRSS_TP_PAY_SHT_NOR);
+                moRegistry.setFkPaysheetCustomTypeId(0);
+                moRegistry.setFkRecruitmentSchemaTypeId(SModSysConsts.HRSS_TP_REC_SCHE_NA);
                 moRegistry.setClosed(false);
                 moRegistry.setSsContribution(true);
                 moRegistry.setTaxSubsidy(mbIsWithTaxSubsidy);
@@ -2749,6 +2794,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             // Set payroll settings:
 
             moKeyPaysheetCustomType.setValue(new int[] { moRegistry.getFkPaysheetCustomTypeId() });
+            moKeyRecruitmentSchemaType.setValue(new int[] { moRegistry.getFkRecruitmentSchemaTypeId()});
             moKeyTaxComputationType.setValue(new int[] { moRegistry.getFkTaxComputationTypeId() });
             moKeyMwzType.setValue(new int[] { moRegistry.getFkMwzTypeId() });
             moKeyMwzReferenceType.setValue(new int[] { moRegistry.getFkMwzReferenceTypeId() });
@@ -3002,6 +3048,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 else if (button == jbEditPeriod) {
                     actionEditPeriod();
                 }
+                else if (button == jbEditRecruitmentSchemaType) {
+                    actionEditRecruitmentSchemaType();
+                }
                 else if (button == jbTaxSubsidyOptionChange) {
                     actionTaxSubsidyChange();
                 }
@@ -3009,7 +3058,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     actionGoTabReceipts();
                 }
                 else if (button == jbReceiptAdd) {
-                    actionReceiptAdd(createRecruitmentSchemesTypesSet());
+                    actionReceiptAdd(createRecruitmentSchemaTypesSet());
                 }
                 else if (button == jbReceiptAddAll) {
                     actionReceiptAddAll();

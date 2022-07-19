@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 204.0/ 2022-07-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de funcionalidad de definición de tipo de régimen de contratación predeterminado de nóminas.
+2) Refactorización de vistas de nóminas, recibos de nóminas y CFDI de nóminas y de recibos de nóminas para clarificar número de recibos, número de CFDI y su estatus.
+3) Refactorización del panel filtro de estatus empleados, periodicidades de pago de nóminas y departamentos de empleados.
+
+================================================================================
 SIIE 3.2 202.7/ 2022-07-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

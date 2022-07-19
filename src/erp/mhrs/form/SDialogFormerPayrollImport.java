@@ -194,7 +194,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         jPanel5.add(jtfPayrollDates);
 
         jlPayrollNet.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlPayrollNet.setText("Alcance neto:");
+        jlPayrollNet.setText("Total neto:");
         jlPayrollNet.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlPayrollNet);
 
@@ -451,7 +451,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Deducciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Alcance neto $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
 
         for (i = 0; i < aoTableColumns.length; i++) {
@@ -468,7 +468,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Deducciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Alcance neto $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro contable", STableConstants.WIDTH_CODE_COB);

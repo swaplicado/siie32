@@ -22,8 +22,8 @@ public class SRowPayrollEmployee implements SGridRow {
     protected String msNumber;
     protected String msName;
     protected boolean mbActive;
-    protected int mnRecruitmentSchemeTypeId;
-    protected String msRecruitmentSchemeType;
+    protected int mnRecruitmentSchemaTypeId;
+    protected String msRecruitmentSchemaType;
     protected double mdTotalEarnings;
     protected double mdTotalDeductions;
     protected int mnBankId;
@@ -42,8 +42,8 @@ public class SRowPayrollEmployee implements SGridRow {
         msNumber = "";
         msName = "";
         mbActive = false;
-        mnRecruitmentSchemeTypeId = 0;
-        msRecruitmentSchemeType = "";
+        mnRecruitmentSchemaTypeId = 0;
+        msRecruitmentSchemaType = "";
         mdTotalEarnings = 0;
         mdTotalDeductions = 0;
         mnBankId = 0;
@@ -63,8 +63,8 @@ public class SRowPayrollEmployee implements SGridRow {
         msNumber = row.getNumber();
         msName = row.getName();
         mbActive = row.isActive();
-        mnRecruitmentSchemeTypeId = row.getRecruitmentSchemeTypeId();
-        msRecruitmentSchemeType = row.getRecruitmentSchemeType();
+        mnRecruitmentSchemaTypeId = row.getRecruitmentSchemaTypeId();
+        msRecruitmentSchemaType = row.getRecruitmentSchemaType();
         mdTotalEarnings = row.getTotalEarnings();
         mdTotalDeductions = row.getTotalDeductions();
         mnBankId = row.getBankId();
@@ -79,8 +79,8 @@ public class SRowPayrollEmployee implements SGridRow {
     public void setNumber(String s) { msNumber = s; }
     public void setName(String s) { msName = s; }
     public void setActive(boolean b) { mbActive = b; }
-    public void setRecruitmentSchemeTypeId(int n) { mnRecruitmentSchemeTypeId = n; }
-    public void setRecruitmentSchemeType(String s) { msRecruitmentSchemeType = s; }
+    public void setRecruitmentSchemaTypeId(int n) { mnRecruitmentSchemaTypeId = n; }
+    public void setRecruitmentSchemaType(String s) { msRecruitmentSchemaType = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
     public void setTotalDeductions(double d) { mdTotalDeductions = d; }
     public void setBankId(int n) { mnBankId = n; }
@@ -94,8 +94,8 @@ public class SRowPayrollEmployee implements SGridRow {
     public String getNumber() { return msNumber; }
     public String getName() { return msName; }
     public boolean isActive() { return mbActive; }
-    public int getRecruitmentSchemeTypeId() { return mnRecruitmentSchemeTypeId; }
-    public String getRecruitmentSchemeType() { return msRecruitmentSchemeType; }
+    public int getRecruitmentSchemaTypeId() { return mnRecruitmentSchemaTypeId; }
+    public String getRecruitmentSchemaType() { return msRecruitmentSchemaType; }
     public double getTotalEarnings() { return mdTotalEarnings; }
     public double getTotalDeductions() { return mdTotalDeductions; }
     public int getBankId() { return mnBankId; }
@@ -165,7 +165,7 @@ public class SRowPayrollEmployee implements SGridRow {
                         value = mbActive;
                         break;
                     case 3:
-                        value = msRecruitmentSchemeType;
+                        value = msRecruitmentSchemaType;
                         break;
                     default:
                 }

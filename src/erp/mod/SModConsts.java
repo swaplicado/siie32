@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores, Isabel Servín, Sergio Flores
  */
 public abstract class SModConsts {
 
@@ -684,7 +684,6 @@ public abstract class SModConsts {
     public static final int HRS_UMA = 2063073;
     public static final int HRS_UMI = 2063074;
     public static final int HRS_TP_LOAN_ADJ = 2063076;
-//    public static final int HRS_DEP_CC = 2063079;
     public static final int HRS_EMP_MEMBER = 2063080;
     public static final int HRS_EMP_LOG_HIRE = 2063081;
     public static final int HRS_EMP_LOG_WAGE = 2063082;

@@ -123,7 +123,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldWorkingHoursDay;
     private erp.lib.form.SFormField moFieldFkContractType;
     private erp.lib.form.SFormField moFieldContractExpiration;
-    private erp.lib.form.SFormField moFieldFkRecruitmentSchemeType;
+    private erp.lib.form.SFormField moFieldFkRecruitmentSchemaType;
     private erp.lib.form.SFormField moFieldFkPositionRiskType;
     private erp.lib.form.SFormField moFieldFkCatalogueSexType;
     private erp.lib.form.SFormField moFieldFkCatalogueBloodTypeType;
@@ -330,8 +330,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jbContractExpiration = new javax.swing.JButton();
         jlContractExpirationHint = new javax.swing.JLabel();
         jPanel33 = new javax.swing.JPanel();
-        jlFkRecruitmentSchemeType = new javax.swing.JLabel();
-        jcbFkRecruitmentSchemeType = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkRecruitmentSchemaType = new javax.swing.JLabel();
+        jcbFkRecruitmentSchemaType = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel23 = new javax.swing.JPanel();
         jlFkPositionRiskType = new javax.swing.JLabel();
         jcbFkPositionRiskType = new javax.swing.JComboBox<SFormComponentItem>();
@@ -1057,12 +1057,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlFkRecruitmentSchemeType.setText("Régimen contratación:*");
-        jlFkRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel33.add(jlFkRecruitmentSchemeType);
+        jlFkRecruitmentSchemaType.setText("Tipo régimen:*");
+        jlFkRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel33.add(jlFkRecruitmentSchemaType);
 
-        jcbFkRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel33.add(jcbFkRecruitmentSchemeType);
+        jcbFkRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel33.add(jcbFkRecruitmentSchemaType);
 
         jPanel4.add(jPanel33);
 
@@ -1590,8 +1590,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldFkContractType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldContractExpiration = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftContractExpiration, jlContractExpiration);
         moFieldContractExpiration.setPickerButton(jbContractExpiration);
-        moFieldFkRecruitmentSchemeType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRecruitmentSchemeType, jlFkRecruitmentSchemeType);
-        moFieldFkRecruitmentSchemeType.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldFkRecruitmentSchemaType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRecruitmentSchemaType, jlFkRecruitmentSchemaType);
+        moFieldFkRecruitmentSchemaType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkPositionRiskType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPositionRiskType, jlFkPositionRiskType);
         moFieldFkPositionRiskType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldDateBirth = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateBirth, jlDateBirth);
@@ -1718,7 +1718,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldWorkingHoursDay);
         mvFields.add(moFieldFkContractType);
         mvFields.add(moFieldContractExpiration);
-        mvFields.add(moFieldFkRecruitmentSchemeType);
+        mvFields.add(moFieldFkRecruitmentSchemaType);
         mvFields.add(moFieldFkPositionRiskType);
         mvFields.add(moFieldDateBirth);
         mvFields.add(moFieldEntityEmployee);
@@ -2452,7 +2452,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPaymentType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPosition;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPositionRiskType;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkRecruitmentSchemeType;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkRecruitmentSchemaType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalaryType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkShift;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatalogueSexTypeId1;
@@ -2517,7 +2517,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlFkPaymentType;
     private javax.swing.JLabel jlFkPosition;
     private javax.swing.JLabel jlFkPositionRiskType;
-    private javax.swing.JLabel jlFkRecruitmentSchemeType;
+    private javax.swing.JLabel jlFkRecruitmentSchemaType;
     private javax.swing.JLabel jlFkSalaryType;
     private javax.swing.JLabel jlFkShift;
     private javax.swing.JLabel jlFkWorkerType;
@@ -2683,7 +2683,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         SFormUtilities.populateComboBox(miClient, jcbFkShift, SModConsts.HRSU_SHT);
         SFormUtilities.populateComboBox(miClient, jcbFkWorkingDayType, SModConsts.HRSS_TP_WORK_DAY);
         SFormUtilities.populateComboBox(miClient, jcbFkContractType, SModConsts.HRSS_TP_CON);
-        SFormUtilities.populateComboBox(miClient, jcbFkRecruitmentSchemeType, SModConsts.HRSS_TP_REC_SCHE);
+        SFormUtilities.populateComboBox(miClient, jcbFkRecruitmentSchemaType, SModConsts.HRSS_TP_REC_SCHE);
         SFormUtilities.populateComboBox(miClient, jcbFkPositionRiskType, SModConsts.HRSS_TP_POS_RISK);
         SFormUtilities.populateComboBox(miClient, jcbFkMwzType, SModConsts.HRSU_TP_MWZ);
         SFormUtilities.populateComboBox(miClient, jcbFkCatalogueSexTypeId, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
@@ -2758,22 +2758,27 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 validation.setTabbedPaneIndex(0);
             }
             else if (fiscalId.isEmpty()) {
-                validation.setComponent(jtfFiscalId);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFiscalId.getText() + "'.");
+                validation.setComponent(jtfFiscalId);
                 validation.setTabbedPaneIndex(0);
             }
             else if (fiscalId.equals(DCfdConsts.RFC_GEN_NAC) || fiscalId.equals(DCfdConsts.RFC_GEN_INT)) {
-                validation.setComponent(jtfFiscalId);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFiscalId.getText() + "'.");
+                validation.setComponent(jtfFiscalId);
                 validation.setTabbedPaneIndex(0);
             }
             else if (fiscalId.length() != DCfdConsts.LEN_RFC_PER) {
-                validation.setComponent(jtfFiscalId);
                 validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "', debe tener " + DCfdConsts.LEN_RFC_PER + " caracteres.");
+                validation.setComponent(jtfFiscalId);
+                validation.setTabbedPaneIndex(0);
+            }
+            else if (moFieldFkRecruitmentSchemaType.getKeyAsIntArray()[0] == SModSysConsts.HRSS_TP_REC_SCHE_NA) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkRecruitmentSchemaType.getText() + "'.");
+                validation.setComponent(jcbFkRecruitmentSchemaType);
                 validation.setTabbedPaneIndex(0);
             }
             else {
-                if (!SLibUtils.belongsTo(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0],
+                if (!SLibUtils.belongsTo(moFieldFkRecruitmentSchemaType.getKeyAsIntArray()[0],
                         new int[] { SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV, SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD, 
                             SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL, SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA, SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH })) {
                     if (moFieldSocialSecurityNumber.getString().isEmpty()) {
@@ -3039,7 +3044,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldFkContractType.setFieldValue(new int[] { moEmployee.getFkContractTypeId() });
             itemStateChangedContractType();
             moFieldContractExpiration.setFieldValue(moEmployee.getContractExpiration_n());
-            moFieldFkRecruitmentSchemeType.setFieldValue(new int[] { moEmployee.getFkRecruitmentSchemeTypeId() });
+            moFieldFkRecruitmentSchemaType.setFieldValue(new int[] { moEmployee.getFkRecruitmentSchemaTypeId() });
             moFieldFkPositionRiskType.setFieldValue(new int[] { moEmployee.getFkPositionRiskTypeId() });
             
             if (moEmployee.getXtaImageIconPhoto_n() != null) {
@@ -3308,7 +3313,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setFkShiftId(moFieldFkShift.getKeyAsIntArray()[0]);
         moEmployee.setFkWorkingDayTypeId(moFieldFkWorkingDayType.getKeyAsIntArray()[0]);
         moEmployee.setFkContractTypeId(moFieldFkContractType.getKeyAsIntArray()[0]);
-        moEmployee.setFkRecruitmentSchemeTypeId(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0]);
+        moEmployee.setFkRecruitmentSchemaTypeId(moFieldFkRecruitmentSchemaType.getKeyAsIntArray()[0]);
         moEmployee.setFkPositionRiskTypeId(moFieldFkPositionRiskType.getKeyAsIntArray()[0]);
         moEmployee.setFkCatalogueSexClassId(moFieldFkCatalogueSexType.getKeyAsIntArray()[0]);
         moEmployee.setFkCatalogueSexTypeId(moFieldFkCatalogueSexType.getKeyAsIntArray()[1]);

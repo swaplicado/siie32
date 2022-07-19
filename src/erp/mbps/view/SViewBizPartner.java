@@ -402,7 +402,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.name", "Tipo contrato", 200);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.con_exp_n", "Terminación contrato", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_con_val", "Días terminación contrato", 75);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "rshe.name", "Régimen contratación", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "rshe.name", "Tipo régimen", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "risk.name", "Riesgo trabajo", 100);
         }
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {

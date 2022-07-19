@@ -33,8 +33,8 @@ public class SViewEmployeeWageLog extends SGridPaneView {
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
     }

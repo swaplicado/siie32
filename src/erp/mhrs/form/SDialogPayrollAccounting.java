@@ -203,7 +203,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jPanel5.add(jtfPayrollDates);
 
         jlPayrollNet.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlPayrollNet.setText("Alcance neto:");
+        jlPayrollNet.setText("Total neto:");
         jlPayrollNet.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlPayrollNet);
 
@@ -432,7 +432,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Deducciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Alcance neto $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Banco", 100);
 
@@ -451,7 +451,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Deducciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Alcance neto $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Banco", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
@@ -1344,7 +1344,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         // Validate that fully accounted payroll
         
         if (SLibUtils.roundAmount(totalDebit - totalCredit) != SLibUtils.roundAmount(moPayroll.getAuxTotalNet())) {
-            throw new Exception("¡Hay una diferencia entre el alcance neto de la nómina, $" + SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()) +", y "
+            throw new Exception("¡Hay una diferencia entre el total neto de la nómina, $" + SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()) +", y "
                     + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(totalDebit - totalCredit) +"!");
         }
         

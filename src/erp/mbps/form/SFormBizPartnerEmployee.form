@@ -1389,15 +1389,15 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlFkRecruitmentSchemeType">
+                            <Component class="javax.swing.JLabel" name="jlFkRecruitmentSchemaType">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="R&#xe9;gimen contrataci&#xf3;n:*"/>
+                                <Property name="text" type="java.lang.String" value="Tipo r&#xe9;gimen:*"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JComboBox" name="jcbFkRecruitmentSchemeType">
+                            <Component class="javax.swing.JComboBox" name="jcbFkRecruitmentSchemaType">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[400, 23]"/>

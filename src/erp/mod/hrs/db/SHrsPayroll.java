@@ -857,7 +857,7 @@ public class SHrsPayroll {
         return employee;
     }
 
-    private SDbPayrollReceipt createPayrollReceipt(final SHrsEmployee hrsEmployee) {
+    private SDbPayrollReceipt createPayrollReceipt(final SHrsEmployee hrsEmployee, final int recruitmentSchemaType) {
         SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
         
         //payrollReceipt.setPkPayrollId();
@@ -922,7 +922,7 @@ public class SHrsPayroll {
         payrollReceipt.setFkPositionId(hrsEmployee.getEmployee().getFkPositionId());
         payrollReceipt.setFkShiftId(hrsEmployee.getEmployee().getFkShiftId());
         payrollReceipt.setFkContractTypeId(hrsEmployee.getEmployee().getFkContractTypeId());
-        payrollReceipt.setFkRecruitmentSchemeTypeId(hrsEmployee.getEmployee().getFkRecruitmentSchemeTypeId());
+        payrollReceipt.setFkRecruitmentSchemaTypeId(recruitmentSchemaType != SModSysConsts.HRSS_TP_REC_SCHE_NA ? recruitmentSchemaType : hrsEmployee.getEmployee().getFkRecruitmentSchemaTypeId());
         payrollReceipt.setFkPositionRiskTypeId(hrsEmployee.getEmployee().getFkPositionRiskTypeId());
         payrollReceipt.setFkWorkingDayTypeId(hrsEmployee.getEmployee().getFkWorkingDayTypeId());
         //payrollReceipt.setFkUserInsertId();
@@ -1125,16 +1125,28 @@ public class SHrsPayroll {
         return absenceConsumptions;
     }
 
-    public SHrsReceipt createHrsReceipt(final int employeeId, int payrollYear, int payrollYearPeriod, int fiscalYear, Date dateStart, Date dateEnd, final int taxComputationType) throws Exception {
+    /**
+     * Create receipt.
+     * @param employeeId
+     * @param payrollYear
+     * @param payrollYearPeriod
+     * @param fiscalYear
+     * @param dateStart
+     * @param dateEnd
+     * @param recruitmentSchemaType
+     * @return
+     * @throws Exception 
+     */
+    public SHrsReceipt createHrsReceipt(final int employeeId, int payrollYear, int payrollYearPeriod, int fiscalYear, Date dateStart, Date dateEnd, final int recruitmentSchemaType) throws Exception {
         SHrsReceipt hrsReceipt = new SHrsReceipt();
         hrsReceipt.setHrsPayroll(this);
         
-        SHrsEmployee hrsEmployee = moHrsPayrollDataProvider.createHrsEmployee(this, moPayroll.getPkPayrollId(), employeeId, 
-                payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd);
+        SHrsEmployee hrsEmployee = moHrsPayrollDataProvider.createHrsEmployee(
+                this, moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd);
         hrsEmployee.setHrsReceipt(hrsReceipt);
         hrsReceipt.setHrsEmployee(hrsEmployee);
         
-        SDbPayrollReceipt payrollReceipt = createPayrollReceipt(hrsEmployee);
+        SDbPayrollReceipt payrollReceipt = createPayrollReceipt(hrsEmployee, recruitmentSchemaType);
         hrsReceipt.setPayrollReceipt(payrollReceipt);
 
         if (moPayroll.isPayrollNormal()) {

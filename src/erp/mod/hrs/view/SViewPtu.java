@@ -45,10 +45,11 @@ public class SViewPtu extends SGridPaneView {
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getCurrentDate().getTime()));
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP, SGridFilterPanelEmployee.EMP_STATUS_ALL);
-        moFilterEmployee.initFilter(null);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ALL);
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
     }
 

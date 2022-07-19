@@ -46,8 +46,8 @@ public abstract class SHrsPayrollUtils {
                 row.setNumber(resultSet.getString("e.num"));
                 row.setName(resultSet.getString("b.bp"));
                 row.setActive(resultSet.getBoolean("e.b_act"));
-                row.setRecruitmentSchemeTypeId(resultSet.getInt("e.fk_tp_rec_sche"));
-                row.setRecruitmentSchemeType(resultSet.getString("trs.code") + " - " + resultSet.getString("trs.name"));
+                row.setRecruitmentSchemaTypeId(resultSet.getInt("e.fk_tp_rec_sche"));
+                row.setRecruitmentSchemaType(resultSet.getString("trs.code") + " - " + resultSet.getString("trs.name"));
                 rows.add(row);
             }
         }
@@ -78,8 +78,8 @@ public abstract class SHrsPayrollUtils {
                 row.setNumber(resultSet.getString("e.num"));
                 row.setName(resultSet.getString("b.bp"));
                 row.setActive(resultSet.getBoolean("e.b_act"));
-                row.setRecruitmentSchemeTypeId(resultSet.getInt("e.fk_tp_rec_sche"));
-                row.setRecruitmentSchemeType(resultSet.getString("trs.code") + " - " + resultSet.getString("trs.name"));
+                row.setRecruitmentSchemaTypeId(resultSet.getInt("e.fk_tp_rec_sche"));
+                row.setRecruitmentSchemaType(resultSet.getString("trs.code") + " - " + resultSet.getString("trs.name"));
                 row.setTotalEarnings(resultSet.getDouble("pr.ear_r"));
                 row.setTotalDeductions(resultSet.getDouble("pr.ded_r"));
                 row.setBankId(resultSet.getInt("_bank_id"));
@@ -95,15 +95,15 @@ public abstract class SHrsPayrollUtils {
     
     public static ArrayList<SRowPayrollEmployee> createRowPayrollEmployees(SGuiSession session, ArrayList<SHrsReceipt> hrsReceipts) {
         ArrayList<SRowPayrollEmployee> rows = new ArrayList<>();
-        HashMap<Integer, String> recruitmentSchemesMap = new HashMap<>();
+        HashMap<Integer, String> recruitmentSchemasMap = new HashMap<>();
         
         for (SHrsReceipt hrsReceipt : hrsReceipts) {
-            int recruitmentSchemeTypeId = hrsReceipt.getPayrollReceipt().getFkRecruitmentSchemeTypeId(); // convenience variable
-            String recruitmentScheme = recruitmentSchemesMap.get(recruitmentSchemeTypeId);
+            int recruitmentSchemaTypeId = hrsReceipt.getPayrollReceipt().getFkRecruitmentSchemaTypeId(); // convenience variable
+            String recruitmentSchema = recruitmentSchemasMap.get(recruitmentSchemaTypeId);
             
-            if (recruitmentScheme == null) {
-                recruitmentScheme = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemeTypeId }, SDbRegistry.FIELD_NAME);
-                recruitmentSchemesMap.put(recruitmentSchemeTypeId, recruitmentScheme);
+            if (recruitmentSchema == null) {
+                recruitmentSchema = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaTypeId }, SDbRegistry.FIELD_NAME);
+                recruitmentSchemasMap.put(recruitmentSchemaTypeId, recruitmentSchema);
             }
             
             SRowPayrollEmployee row = new SRowPayrollEmployee(SRowPayrollEmployee.CASE_RECEIPT);
@@ -112,8 +112,8 @@ public abstract class SHrsPayrollUtils {
             row.setNumber(hrsReceipt.getHrsEmployee().getEmployee().getNumber());
             row.setName(hrsReceipt.getHrsEmployee().getEmployee().getXtaEmployeeName());
             row.setActive(hrsReceipt.getPayrollReceipt().isActive());
-            row.setRecruitmentSchemeTypeId(recruitmentSchemeTypeId);
-            row.setRecruitmentSchemeType(recruitmentScheme);
+            row.setRecruitmentSchemaTypeId(recruitmentSchemaTypeId);
+            row.setRecruitmentSchemaType(recruitmentSchema);
             row.setTotalEarnings(hrsReceipt.getTotalEarnings());
             row.setTotalDeductions(hrsReceipt.getTotalDeductions());
             row.setHrsReceipt(hrsReceipt);

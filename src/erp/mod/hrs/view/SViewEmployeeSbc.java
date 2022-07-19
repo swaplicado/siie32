@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 
 public class SViewEmployeeSbc extends SGridPaneView implements ActionListener{
@@ -35,10 +35,10 @@ public class SViewEmployeeSbc extends SGridPaneView implements ActionListener{
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
-        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
     }
     
     @Override

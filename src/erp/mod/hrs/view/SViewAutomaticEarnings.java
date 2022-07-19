@@ -61,10 +61,10 @@ public class SViewAutomaticEarnings extends SGridPaneView implements ActionListe
     private void initComponentsCustom() {
         setRowButtonsEnabled(true, false, true, false, false);
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
-        
         if (mnGridSubtype == SModSysConsts.HRS_AUT_EMP) {
+            moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+            moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
+            
             getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         }
     }

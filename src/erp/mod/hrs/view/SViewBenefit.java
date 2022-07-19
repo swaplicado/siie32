@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SViewBenefit extends SGridPaneView implements ActionListener {
 
@@ -70,8 +70,8 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
             moFilterDate.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getSystemDate().getTime()));
         }
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
         jbShowCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         

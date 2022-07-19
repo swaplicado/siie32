@@ -115,17 +115,11 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     
     public boolean isCfdStamped() {
-        if (moDbmsDataCfd != null) {
-            return moDbmsDataCfd.isStamped() && moDbmsDataCfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED;
-        }
-        return false;
+        return moDbmsDataCfd != null && moDbmsDataCfd.isStamped() && moDbmsDataCfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED;
     }
     
     public boolean isCfdAnnulled() {
-        if (moDbmsDataCfd != null) {
-            return moDbmsDataCfd.isStamped() && moDbmsDataCfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
-        }
-        return false;
+        return moDbmsDataCfd != null && moDbmsDataCfd.isStamped() && moDbmsDataCfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
     }
     
     public boolean isCfdEditable() {
@@ -350,6 +344,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        registry.setDbmsDataCfd(this.getDbmsDataCfd()); // CFD is not cloned
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

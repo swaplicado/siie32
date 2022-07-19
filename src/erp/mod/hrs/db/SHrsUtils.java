@@ -66,9 +66,26 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public abstract class SHrsUtils {
+    
+    /**
+     * Check if given type of recuitment schema is for assimilated.
+     * @param recruitmentSchemaType
+     * @return 
+     */
+    public static boolean isAssimilable(final int recruitmentSchemaType) {
+        return SLibUtils.belongsTo(recruitmentSchemaType, new int[] {
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH
+        });
+    }
     
     /**
      * Compose file name for bank layout.
@@ -1667,6 +1684,7 @@ public abstract class SHrsUtils {
             }
         }
     }
+    
     /**
      * Report worker credit
      * @param client
@@ -2101,12 +2119,14 @@ public abstract class SHrsUtils {
         }
     }
     
-    /*
+    /**
     *
     * @param session
     * @param year
     * @param period
     * Determina los empleados pagados en el periodo
+     * @return 
+     * @throws java.lang.Exception
     */
     public static ArrayList<SDbEmployee> getEmployeesPaidInPeriodAF02(final SGuiSession session, final int year, final int period) throws Exception {
         ArrayList<SDbEmployee> employees = new ArrayList<>();
@@ -2131,7 +2151,7 @@ public abstract class SHrsUtils {
         return employees;
     }
     
-    /*
+    /**
     *
     * @param client
     * @param typeLayout
@@ -2170,7 +2190,7 @@ public abstract class SHrsUtils {
     
     }
  
-    /*
+    /**
     *
     * @param client
     * @param year
@@ -2220,13 +2240,14 @@ public abstract class SHrsUtils {
         
     }
     
-    /*
+    /**
     *
     * @param client
     * @param typeLayout
     * @param year
     * @param period
     * Crea la primera linea del archivo AF02
+     * @throws java.sql.SQLException
     */
     public static void createLayoutAnnexed02(SGuiClient client, int typeLayout, int year, int period) throws SQLException, Exception {
         ResultSet resultSetHeader = null;
@@ -2389,6 +2410,7 @@ public abstract class SHrsUtils {
      * @param periodStart
      * @param periodEnd
      * @return 
+     * @throws java.lang.Exception 
      */
     public static boolean isAnniversaryBelongingToPeriod(final Date anniversary, final Date periodStart, final Date periodEnd) throws Exception {
         SLibTimeUtils.validatePeriod(periodStart, periodEnd);

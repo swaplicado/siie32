@@ -1957,7 +1957,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     
     private void actionGetCfdiStatus() throws Exception {
         if (jbGetCfdiStatus.isEnabled()) {
-           if (isRowSelected()) {
+            if (isRowSelected()) {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                 if (dps.getIsDeleted()) {

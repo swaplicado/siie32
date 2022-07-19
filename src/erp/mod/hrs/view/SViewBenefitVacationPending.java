@@ -68,14 +68,15 @@ public class SViewBenefitVacationPending extends SGridPaneView implements Action
             moFilterDate.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getSystemDate().getTime()));
         }
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
-        
         jbShowCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDate);
-        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
+        
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
+        
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         
         moDialogBenefitCardex = new SDialogBenefitCardex(miClient, SModSysConsts.HRSS_TP_BEN_VAC, "Control de la prestación");
     }

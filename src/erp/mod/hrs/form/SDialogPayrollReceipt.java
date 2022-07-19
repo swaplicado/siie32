@@ -23,6 +23,7 @@ import erp.mod.hrs.db.SHrsReceiptDeduction;
 import erp.mod.hrs.db.SHrsReceiptEarning;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.utils.SPayrollBonusUtils;
+import erp.mtrn.data.SDataCfd;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,7 +66,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
     private static final int COL_VAL = 2;
     private static final int COL_AMT_UNT = 4;
-    
+
+    public final static int PARAM_IS_EDITABLE = 1001; // arbitrary constant to avoid collisions
     public static final String LABEL_AUX_AMT = "Monto auxiliar";
     public static final String LABEL_AUX_VAL = "Valor auxiliar";
 
@@ -111,49 +113,54 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
         moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
         moTextId = new sa.lib.gui.bean.SBeanFieldText();
+        jbUpdateEmployeeData = new javax.swing.JButton();
+        jtfCfdiNumber = new javax.swing.JTextField();
+        jtfCfdiDate = new javax.swing.JTextField();
+        jtfCfdiUuid = new javax.swing.JTextField();
         jPanel17 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moTextPaymentType = new sa.lib.gui.bean.SBeanFieldText();
         jlDateBirth = new javax.swing.JLabel();
         moTextDateBirth = new sa.lib.gui.bean.SBeanFieldText();
-        jlDepartament = new javax.swing.JLabel();
-        moTextDepartament = new sa.lib.gui.bean.SBeanFieldText();
-        jlSalaryType = new javax.swing.JLabel();
-        moTextSalaryType = new sa.lib.gui.bean.SBeanFieldText();
+        jlAlternativeId = new javax.swing.JLabel();
+        moTextAlternativeId = new sa.lib.gui.bean.SBeanFieldText();
         jlFiscalId = new javax.swing.JLabel();
         moTextFiscalId = new sa.lib.gui.bean.SBeanFieldText();
+        jlSocialSecurityNumber = new javax.swing.JLabel();
+        moTextSocialSecurityNumber = new sa.lib.gui.bean.SBeanFieldText();
+        jlSalaryType = new javax.swing.JLabel();
+        moTextSalaryType = new sa.lib.gui.bean.SBeanFieldText();
         jPanel29 = new javax.swing.JPanel();
         jlSalary = new javax.swing.JLabel();
         moDecSalary = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlDateBenefits = new javax.swing.JLabel();
         moTextDateBenefits = new sa.lib.gui.bean.SBeanFieldText();
-        jlPosition = new javax.swing.JLabel();
-        moTextPosition = new sa.lib.gui.bean.SBeanFieldText();
+        jlDepartament = new javax.swing.JLabel();
+        moTextDepartament = new sa.lib.gui.bean.SBeanFieldText();
         jlEmployeeType = new javax.swing.JLabel();
         moTextEmployeeType = new sa.lib.gui.bean.SBeanFieldText();
-        jlAlternativeId = new javax.swing.JLabel();
-        moTextAlternativeId = new sa.lib.gui.bean.SBeanFieldText();
+        jlWorkerType = new javax.swing.JLabel();
+        moTextWorkerType = new sa.lib.gui.bean.SBeanFieldText();
         jPanel18 = new javax.swing.JPanel();
         jlWage = new javax.swing.JLabel();
         moDecWage = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlDateLastHire = new javax.swing.JLabel();
         moTextDateLastHire = new sa.lib.gui.bean.SBeanFieldText();
-        jlShift = new javax.swing.JLabel();
-        moTextShift = new sa.lib.gui.bean.SBeanFieldText();
-        jlWorkerType = new javax.swing.JLabel();
-        moTextWorkerType = new sa.lib.gui.bean.SBeanFieldText();
-        jlSocialSecurityNumber = new javax.swing.JLabel();
-        moTextSocialSecurityNumber = new sa.lib.gui.bean.SBeanFieldText();
+        jlPosition = new javax.swing.JLabel();
+        moTextPosition = new sa.lib.gui.bean.SBeanFieldText();
+        jlRecruitmentSchemaType = new javax.swing.JLabel();
+        moTextRecruitmentSchemaType = new sa.lib.gui.bean.SBeanFieldText();
+        jlRecruitmentSchemaTypeHelp = new javax.swing.JLabel();
         jPanel19 = new javax.swing.JPanel();
         jlSalarySscBase = new javax.swing.JLabel();
         moDecSalarySscBase = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlDateLastDismissal_n = new javax.swing.JLabel();
         moTextDateLastDismissal_n = new sa.lib.gui.bean.SBeanFieldText();
-        jlWorkingHoursDay = new javax.swing.JLabel();
-        moIntWorkingHoursDay = new sa.lib.gui.bean.SBeanFieldInteger();
-        jLabel1 = new javax.swing.JLabel();
-        jlRecruitmentSchemeType = new javax.swing.JLabel();
-        moTextRecruitmentSchemeType = new sa.lib.gui.bean.SBeanFieldText();
+        jlShift = new javax.swing.JLabel();
+        moTextShift = new sa.lib.gui.bean.SBeanFieldText();
+        jlRecruitmentSchemaTypeReceipt = new javax.swing.JLabel();
+        moTextRecruitmentSchemaTypeReceipt = new sa.lib.gui.bean.SBeanFieldText();
+        jlRecruitmentSchemaTypeReceiptHelp = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jpEarnings = new javax.swing.JPanel();
@@ -173,7 +180,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel25 = new javax.swing.JPanel();
         jlEarningValue = new javax.swing.JLabel();
         moCompEarningValue = new sa.lib.gui.bean.SBeanCompoundField();
-        jLabel2 = new javax.swing.JLabel();
+        jlEarningValueGap = new javax.swing.JLabel();
         jlEarningAuxAmount1 = new javax.swing.JLabel();
         moCurEarningAuxAmount1 = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jlEarningAuxAmount1Hint = new javax.swing.JLabel();
@@ -229,36 +236,61 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlName.setText("Nombre:");
-        jlName.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlName.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel16.add(jlName);
 
         moTextName.setEditable(false);
         moTextName.setText("TEXT");
         moTextName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        moTextName.setPreferredSize(new java.awt.Dimension(385, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel16.add(moTextName);
 
         moTextNumber.setEditable(false);
         moTextNumber.setText("TEXT");
-        moTextNumber.setToolTipText("Clave");
+        moTextNumber.setToolTipText("Clave empleado");
         moTextNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(moTextNumber);
 
         moTextId.setEditable(false);
-        moTextId.setForeground(java.awt.SystemColor.textInactiveText);
-        moTextId.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        moTextId.setForeground(java.awt.Color.gray);
         moTextId.setText("TEXT");
-        moTextId.setToolTipText("ID");
+        moTextId.setToolTipText("ID empleado");
         moTextId.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel16.add(moTextId);
+
+        jbUpdateEmployeeData.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
+        jbUpdateEmployeeData.setToolTipText("Modificar");
+        jbUpdateEmployeeData.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel16.add(jbUpdateEmployeeData);
+
+        jtfCfdiNumber.setEditable(false);
+        jtfCfdiNumber.setText("A-000001");
+        jtfCfdiNumber.setToolTipText("Serie y folio CFDI");
+        jtfCfdiNumber.setFocusable(false);
+        jtfCfdiNumber.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel16.add(jtfCfdiNumber);
+
+        jtfCfdiDate.setEditable(false);
+        jtfCfdiDate.setText("01/01/2000");
+        jtfCfdiDate.setToolTipText("Serie y folio CFDI");
+        jtfCfdiDate.setFocusable(false);
+        jtfCfdiDate.setPreferredSize(new java.awt.Dimension(70, 23));
+        jPanel16.add(jtfCfdiDate);
+
+        jtfCfdiUuid.setEditable(false);
+        jtfCfdiUuid.setText("D65AA99D-6BC7-4002-8087-B6EE81ED516C");
+        jtfCfdiUuid.setToolTipText("UUID CFDI");
+        jtfCfdiUuid.setFocusable(false);
+        jtfCfdiUuid.setPreferredSize(new java.awt.Dimension(232, 23));
+        jPanel16.add(jtfCfdiUuid);
 
         jPanel15.add(jPanel16);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlPaymentType.setText("Período pago:");
-        jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPaymentType.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel17.add(jlPaymentType);
 
         moTextPaymentType.setEditable(false);
@@ -271,18 +303,36 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel17.add(jlDateBirth);
 
         moTextDateBirth.setEditable(false);
-        moTextDateBirth.setText("TEXT");
-        moTextDateBirth.setPreferredSize(new java.awt.Dimension(75, 23));
+        moTextDateBirth.setText("01/01/2000");
+        moTextDateBirth.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel17.add(moTextDateBirth);
 
-        jlDepartament.setText("Departamento:");
-        jlDepartament.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel17.add(jlDepartament);
+        jlAlternativeId.setText("CURP:");
+        jlAlternativeId.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel17.add(jlAlternativeId);
 
-        moTextDepartament.setEditable(false);
-        moTextDepartament.setText("TEXT");
-        moTextDepartament.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel17.add(moTextDepartament);
+        moTextAlternativeId.setEditable(false);
+        moTextAlternativeId.setText("XAXX010101XXXXXX00");
+        moTextAlternativeId.setPreferredSize(new java.awt.Dimension(130, 23));
+        jPanel17.add(moTextAlternativeId);
+
+        jlFiscalId.setText("RFC:");
+        jlFiscalId.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel17.add(jlFiscalId);
+
+        moTextFiscalId.setEditable(false);
+        moTextFiscalId.setText("XAXX010101000");
+        moTextFiscalId.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel17.add(moTextFiscalId);
+
+        jlSocialSecurityNumber.setText("NSS:");
+        jlSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel17.add(jlSocialSecurityNumber);
+
+        moTextSocialSecurityNumber.setEditable(false);
+        moTextSocialSecurityNumber.setText("00000000000");
+        moTextSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel17.add(moTextSocialSecurityNumber);
 
         jlSalaryType.setText("Tipo salario:");
         jlSalaryType.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -292,21 +342,12 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextSalaryType.setText("TEXT");
         jPanel17.add(moTextSalaryType);
 
-        jlFiscalId.setText("RFC:");
-        jlFiscalId.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel17.add(jlFiscalId);
-
-        moTextFiscalId.setEditable(false);
-        moTextFiscalId.setText("XAXX010101000");
-        moTextFiscalId.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel17.add(moTextFiscalId);
-
         jPanel15.add(jPanel17);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSalary.setText("Salario diario:");
-        jlSalary.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSalary.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel29.add(jlSalary);
 
         moDecSalary.setEditable(false);
@@ -318,43 +359,43 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel29.add(jlDateBenefits);
 
         moTextDateBenefits.setEditable(false);
-        moTextDateBenefits.setText("TEXT");
+        moTextDateBenefits.setText("01/01/2000");
         moTextDateBenefits.setToolTipText("");
-        moTextDateBenefits.setPreferredSize(new java.awt.Dimension(75, 23));
+        moTextDateBenefits.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel29.add(moTextDateBenefits);
 
-        jlPosition.setText("Puesto:");
-        jlPosition.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel29.add(jlPosition);
+        jlDepartament.setText("Depto.:");
+        jlDepartament.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel29.add(jlDepartament);
 
-        moTextPosition.setEditable(false);
-        moTextPosition.setText("TEXT");
-        moTextPosition.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel29.add(moTextPosition);
+        moTextDepartament.setEditable(false);
+        moTextDepartament.setText("TEXT");
+        moTextDepartament.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel29.add(moTextDepartament);
 
         jlEmployeeType.setText("Tipo empleado:");
-        jlEmployeeType.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlEmployeeType.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel29.add(jlEmployeeType);
 
         moTextEmployeeType.setEditable(false);
         moTextEmployeeType.setText("TEXT");
+        moTextEmployeeType.setPreferredSize(new java.awt.Dimension(130, 23));
         jPanel29.add(moTextEmployeeType);
 
-        jlAlternativeId.setText("CURP:");
-        jlAlternativeId.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel29.add(jlAlternativeId);
+        jlWorkerType.setText("Tipo obrero:");
+        jlWorkerType.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel29.add(jlWorkerType);
 
-        moTextAlternativeId.setEditable(false);
-        moTextAlternativeId.setText("XAXX010101XXXXXX00");
-        moTextAlternativeId.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel29.add(moTextAlternativeId);
+        moTextWorkerType.setEditable(false);
+        moTextWorkerType.setText("TEXT");
+        jPanel29.add(moTextWorkerType);
 
         jPanel15.add(jPanel29);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlWage.setText("Sueldo mensual:");
-        jlWage.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlWage.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel18.add(jlWage);
 
         moDecWage.setEditable(false);
@@ -367,42 +408,39 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel18.add(jlDateLastHire);
 
         moTextDateLastHire.setEditable(false);
-        moTextDateLastHire.setText("TEXT");
-        moTextDateLastHire.setPreferredSize(new java.awt.Dimension(75, 23));
+        moTextDateLastHire.setText("01/01/2000");
+        moTextDateLastHire.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel18.add(moTextDateLastHire);
 
-        jlShift.setText("Turno:");
-        jlShift.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel18.add(jlShift);
+        jlPosition.setText("Puesto:");
+        jlPosition.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel18.add(jlPosition);
 
-        moTextShift.setEditable(false);
-        moTextShift.setText("TEXT");
-        moTextShift.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel18.add(moTextShift);
+        moTextPosition.setEditable(false);
+        moTextPosition.setText("TEXT");
+        moTextPosition.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel18.add(moTextPosition);
 
-        jlWorkerType.setText("Tipo obrero:");
-        jlWorkerType.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel18.add(jlWorkerType);
+        jlRecruitmentSchemaType.setText("Tipo régimen:");
+        jlRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel18.add(jlRecruitmentSchemaType);
 
-        moTextWorkerType.setEditable(false);
-        moTextWorkerType.setText("TEXT");
-        jPanel18.add(moTextWorkerType);
+        moTextRecruitmentSchemaType.setEditable(false);
+        moTextRecruitmentSchemaType.setText("TEXT");
+        moTextRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel18.add(moTextRecruitmentSchemaType);
 
-        jlSocialSecurityNumber.setText("NSS:");
-        jlSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel18.add(jlSocialSecurityNumber);
-
-        moTextSocialSecurityNumber.setEditable(false);
-        moTextSocialSecurityNumber.setText("00000000000");
-        moTextSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(85, 23));
-        jPanel18.add(moTextSocialSecurityNumber);
+        jlRecruitmentSchemaTypeHelp.setForeground(java.awt.Color.gray);
+        jlRecruitmentSchemaTypeHelp.setText("(empleado)");
+        jlRecruitmentSchemaTypeHelp.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel18.add(jlRecruitmentSchemaTypeHelp);
 
         jPanel15.add(jPanel18);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlSalarySscBase.setText("SBC:");
-        jlSalarySscBase.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSalarySscBase.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel19.add(jlSalarySscBase);
 
         moDecSalarySscBase.setEditable(false);
@@ -414,29 +452,32 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel19.add(jlDateLastDismissal_n);
 
         moTextDateLastDismissal_n.setEditable(false);
-        moTextDateLastDismissal_n.setText("TEXT");
-        moTextDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(75, 23));
+        moTextDateLastDismissal_n.setText("01/01/2000");
+        moTextDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel19.add(moTextDateLastDismissal_n);
 
-        jlWorkingHoursDay.setText("Horas jornada:");
-        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel19.add(jlWorkingHoursDay);
+        jlShift.setText("Turno:");
+        jlShift.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel19.add(jlShift);
 
-        moIntWorkingHoursDay.setEditable(false);
-        moIntWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel19.add(moIntWorkingHoursDay);
+        moTextShift.setEditable(false);
+        moTextShift.setText("TEXT");
+        moTextShift.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel19.add(moTextShift);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel19.add(jLabel1);
+        jlRecruitmentSchemaTypeReceipt.setText("Tipo régimen:");
+        jlRecruitmentSchemaTypeReceipt.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel19.add(jlRecruitmentSchemaTypeReceipt);
 
-        jlRecruitmentSchemeType.setText("Régimen:");
-        jlRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel19.add(jlRecruitmentSchemeType);
+        moTextRecruitmentSchemaTypeReceipt.setEditable(false);
+        moTextRecruitmentSchemaTypeReceipt.setText("TEXT");
+        moTextRecruitmentSchemaTypeReceipt.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel19.add(moTextRecruitmentSchemaTypeReceipt);
 
-        moTextRecruitmentSchemeType.setEditable(false);
-        moTextRecruitmentSchemeType.setText("TEXT");
-        moTextRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(275, 23));
-        jPanel19.add(moTextRecruitmentSchemeType);
+        jlRecruitmentSchemaTypeReceiptHelp.setForeground(java.awt.Color.gray);
+        jlRecruitmentSchemaTypeReceiptHelp.setText("(recibo)");
+        jlRecruitmentSchemaTypeReceiptHelp.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel19.add(jlRecruitmentSchemaTypeReceiptHelp);
 
         jPanel15.add(jPanel19);
 
@@ -515,8 +556,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moCompEarningValue.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel25.add(moCompEarningValue);
 
-        jLabel2.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel25.add(jLabel2);
+        jlEarningValueGap.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel25.add(jlEarningValueGap);
 
         jlEarningAuxAmount1.setText("Monto auxiliar:");
         jlEarningAuxAmount1.setToolTipText("");
@@ -661,7 +702,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING, 5, 0));
 
-        jlEarningsTotal.setText("Total percepciones:");
+        jlEarningsTotal.setText("Percepciones:");
         jlEarningsTotal.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlEarningsTotal);
 
@@ -672,7 +713,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING, 5, 0));
 
-        jlDeductionsTotal.setText("Total deducciones:");
+        jlDeductionsTotal.setText("Deducciones:");
         jlDeductionsTotal.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel23.add(jlDeductionsTotal);
 
@@ -706,8 +747,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -742,6 +781,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private javax.swing.JButton jbAddEarning;
     private javax.swing.JButton jbPickDeduction;
     private javax.swing.JButton jbPickEarning;
+    private javax.swing.JButton jbUpdateEmployeeData;
     private javax.swing.JLabel jlAlternativeId;
     private javax.swing.JLabel jlBonus;
     private javax.swing.JLabel jlDateBenefits;
@@ -761,6 +801,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private javax.swing.JLabel jlEarningLoan_n;
     private javax.swing.JLabel jlEarningLoan_n1;
     private javax.swing.JLabel jlEarningValue;
+    private javax.swing.JLabel jlEarningValueGap;
     private javax.swing.JLabel jlEarningsTotal;
     private javax.swing.JLabel jlEmployeeType;
     private javax.swing.JLabel jlFiscalId;
@@ -768,7 +809,10 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private javax.swing.JLabel jlNetTotal;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPosition;
-    private javax.swing.JLabel jlRecruitmentSchemeType;
+    private javax.swing.JLabel jlRecruitmentSchemaType;
+    private javax.swing.JLabel jlRecruitmentSchemaTypeHelp;
+    private javax.swing.JLabel jlRecruitmentSchemaTypeReceipt;
+    private javax.swing.JLabel jlRecruitmentSchemaTypeReceiptHelp;
     private javax.swing.JLabel jlSalary;
     private javax.swing.JLabel jlSalarySscBase;
     private javax.swing.JLabel jlSalaryType;
@@ -776,10 +820,12 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private javax.swing.JLabel jlSocialSecurityNumber;
     private javax.swing.JLabel jlWage;
     private javax.swing.JLabel jlWorkerType;
-    private javax.swing.JLabel jlWorkingHoursDay;
     private javax.swing.JPanel jpAbsenceConsumption;
     private javax.swing.JPanel jpDeductions;
     private javax.swing.JPanel jpEarnings;
+    private javax.swing.JTextField jtfCfdiDate;
+    private javax.swing.JTextField jtfCfdiNumber;
+    private javax.swing.JTextField jtfCfdiUuid;
     private sa.lib.gui.bean.SBeanCompoundField moCompDeductionValue;
     private sa.lib.gui.bean.SBeanCompoundField moCompEarningAuxValue;
     private sa.lib.gui.bean.SBeanCompoundField moCompEarningValue;
@@ -791,7 +837,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private sa.lib.gui.bean.SBeanFieldDecimal moDecSalary;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecSalarySscBase;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecWage;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntWorkingHoursDay;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBonusType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeductionLoan_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningLoan_n;
@@ -813,7 +858,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private sa.lib.gui.bean.SBeanFieldText moTextNumber;
     private sa.lib.gui.bean.SBeanFieldText moTextPaymentType;
     private sa.lib.gui.bean.SBeanFieldText moTextPosition;
-    private sa.lib.gui.bean.SBeanFieldText moTextRecruitmentSchemeType;
+    private sa.lib.gui.bean.SBeanFieldText moTextRecruitmentSchemaType;
+    private sa.lib.gui.bean.SBeanFieldText moTextRecruitmentSchemaTypeReceipt;
     private sa.lib.gui.bean.SBeanFieldText moTextSalaryType;
     private sa.lib.gui.bean.SBeanFieldText moTextShift;
     private sa.lib.gui.bean.SBeanFieldText moTextSocialSecurityNumber;
@@ -825,28 +871,32 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         jbSave.setText("Aceptar");
 
+        // read-only up section:
+        
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 202);
         moTextNumber.setTextSettings(SGuiUtils.getLabelName(jlName), 10);
         moTextId.setTextSettings(SGuiUtils.getLabelName(jlName), 10);
-        moTextPaymentType.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
+        moTextPaymentType.setTextSettings(SGuiUtils.getLabelName(jlPaymentType), 50);
         moDecSalary.setDecimalSettings(SGuiUtils.getLabelName(jlSalary), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecWage.setDecimalSettings(SGuiUtils.getLabelName(jlWage), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecSalarySscBase.setDecimalSettings(SGuiUtils.getLabelName(jlSalarySscBase), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moTextDateBirth.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextDateBenefits.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextDateLastHire.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextDateLastDismissal_n.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextDepartament.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextPosition.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextShift.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moIntWorkingHoursDay.setIntegerSettings(SGuiUtils.getLabelName(jlName), SGuiConsts.GUI_TYPE_INT, false);
-        moTextSalaryType.setTextSettings(SGuiUtils.getLabelName(jlName), 100);
-        moTextEmployeeType.setTextSettings(SGuiUtils.getLabelName(jlName), 100);
-        moTextWorkerType.setTextSettings(SGuiUtils.getLabelName(jlName), 100);
-        moTextRecruitmentSchemeType.setTextSettings(SGuiUtils.getLabelName(jlName), 100);
-        moTextFiscalId.setTextSettings(SGuiUtils.getLabelName(jlName), 25);
-        moTextAlternativeId.setTextSettings(SGuiUtils.getLabelName(jlName), 25);
-        moTextSocialSecurityNumber.setTextSettings(SGuiUtils.getLabelName(jlName), 25);
+        moTextDateBirth.setTextSettings(SGuiUtils.getLabelName(jlDateBirth), 50);
+        moTextDateBenefits.setTextSettings(SGuiUtils.getLabelName(jlDateBenefits), 50);
+        moTextDateLastHire.setTextSettings(SGuiUtils.getLabelName(jlDateLastHire), 50);
+        moTextDateLastDismissal_n.setTextSettings(SGuiUtils.getLabelName(jlDateLastDismissal_n), 50);
+        moTextAlternativeId.setTextSettings(SGuiUtils.getLabelName(jlAlternativeId), 25);
+        moTextFiscalId.setTextSettings(SGuiUtils.getLabelName(jlFiscalId), 25);
+        moTextSocialSecurityNumber.setTextSettings(SGuiUtils.getLabelName(jlSocialSecurityNumber), 15);
+        moTextDepartament.setTextSettings(SGuiUtils.getLabelName(jlDepartament), 50);
+        moTextPosition.setTextSettings(SGuiUtils.getLabelName(jlPosition), 50);
+        moTextShift.setTextSettings(SGuiUtils.getLabelName(jlShift), 50);
+        moTextEmployeeType.setTextSettings(SGuiUtils.getLabelName(jlEmployeeType), 50);
+        moTextWorkerType.setTextSettings(SGuiUtils.getLabelName(jlWorkerType), 50);
+        moTextRecruitmentSchemaType.setTextSettings(SGuiUtils.getLabelName(jlRecruitmentSchemaType), 100);
+        moTextRecruitmentSchemaTypeReceipt.setTextSettings(SGuiUtils.getLabelName(jlRecruitmentSchemaTypeReceipt), 100);
+        moTextSalaryType.setTextSettings(SGuiUtils.getLabelName(jlSalaryType), 50);
+        
+        // editable section:
 
         moTextEarningCode.setTextSettings(SGuiUtils.getLabelName(moTextEarningCode.getToolTipText()), 10, 0);
         moTextEarningCode.setFieldButton(jbPickEarning);
@@ -870,6 +920,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moCompDeductionValue.setCompoundFieldSettings(miClient);
         moCompDeductionValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlDeductionValue), SGuiConsts.GUI_TYPE_DEC_QTY, false); // yes!, is NOT mandatory!
 
+        // read-only bottom section:
+        
         moCurEarningsTotal.setCompoundFieldSettings(miClient);
         moCurEarningsTotal.getField().setDecimalSettings(SGuiUtils.getLabelName(jlEarningsTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moCurDeductionsTotal.setCompoundFieldSettings(miClient);
@@ -1123,15 +1175,35 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         addAllListeners();
     }
     
+    private void renderReceipt() {
+        SDataCfd cfd = null;
+        
+        if (moHrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue() != null &&
+                moHrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue().getDbmsDataCfd() != null &&
+                moHrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue().getDbmsDataCfd().isStamped()) {
+            cfd = moHrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue().getDbmsDataCfd();
+        }
+        
+        if (cfd == null) {
+            jtfCfdiNumber.setText("");
+            jtfCfdiDate.setText("");
+            jtfCfdiUuid.setText("");
+        }
+        else {
+            jtfCfdiNumber.setText(cfd.getCfdNumber());
+            jtfCfdiDate.setText(SLibUtils.DateFormatDate.format(cfd.getTimestamp()));
+            jtfCfdiUuid.setText(cfd.getUuid());
+        }
+        
+        moTextRecruitmentSchemaTypeReceipt.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moHrsReceipt.getPayrollReceipt().getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME));
+    }
+    
     private void renderEmployee() {
-        SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee();
+        SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee(); // convenience variable
         
         moTextName.setValue(employee.getXtaEmployeeName());
         moTextNumber.setValue(employee.getNumber());
         moTextId.setValue("" + employee.getPkEmployeeId());
-        moTextFiscalId.setValue(employee.getXtaEmployeeRfc());
-        moTextAlternativeId.setValue(employee.getXtaEmployeeCurp());
-        moTextSocialSecurityNumber.setValue(employee.getSocialSecurityNumber());
         moTextPaymentType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { employee.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
         moDecSalary.setValue(employee.getSalary());
         moDecWage.setValue(employee.getWage());
@@ -1140,14 +1212,16 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextDateBenefits.setValue(SLibUtils.DateFormatDate.format(employee.getDateBenefits()));
         moTextDateLastHire.setValue(SLibUtils.DateFormatDate.format(employee.getDateLastHire()));
         moTextDateLastDismissal_n.setValue(employee.getDateLastDismissal_n() != null ? SLibUtils.DateFormatDate.format(employee.getDateLastDismissal_n()) : "");
-        moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { employee.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
-        moTextEmployeeType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { employee.getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
-        moTextWorkerType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { employee.getFkWorkerTypeId() }, SDbRegistry.FIELD_NAME));
+        moTextAlternativeId.setValue(employee.getXtaEmployeeCurp());
+        moTextFiscalId.setValue(employee.getXtaEmployeeRfc());
+        moTextSocialSecurityNumber.setValue(employee.getSocialSecurityNumber());
         moTextDepartament.setValue(miClient.getSession().readField(SModConsts.HRSU_DEP, new int[] { employee.getFkDepartmentId() }, SDbRegistry.FIELD_NAME));
         moTextPosition.setValue(miClient.getSession().readField(SModConsts.HRSU_POS, new int[] { employee.getFkPositionId() }, SDbRegistry.FIELD_NAME));
         moTextShift.setValue(miClient.getSession().readField(SModConsts.HRSU_SHT, new int[] { employee.getFkShiftId() }, SDbRegistry.FIELD_NAME));
-        moTextRecruitmentSchemeType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId()}, SDbRegistry.FIELD_NAME));
-        moIntWorkingHoursDay.setValue(employee.getWorkingHoursDay());
+        moTextEmployeeType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { employee.getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
+        moTextWorkerType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { employee.getFkWorkerTypeId() }, SDbRegistry.FIELD_NAME));
+        moTextRecruitmentSchemaType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME));
+        moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { employee.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
     }
 
     private SDbPayrollReceiptEarning createPayrollReceipEarning(SHrsReceipt hrsReceipt, SHrsEmployeeDays hrsEmployeeDays) {
@@ -1300,6 +1374,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
 
     private void setEnableFields(boolean enable) {
+        jbUpdateEmployeeData.setEnabled(false);
+        
         moTextEarningCode.setEnabled(enable);
         jbPickEarning.setEnabled(enable);
         moCompEarningValue.setEditable(enable);
@@ -1799,24 +1875,23 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                         return;
                     }
 
-                    // validate assimilated employees:
-
-                    SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee(); // convenience variable
-
-                    if (employee.isAssimilable() && moEarning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
-                        // this message is duplicated as is in method validateForm(), please synchronize any change!
-                        miClient.showMsgBoxWarning(employee.getXtaEmployeeName() + ", "
-                        + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
-                        + "no puede tener percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
-                        moTextEarningCode.requestFocusInWindow();
-                        return;
+                    // validate assimilable receipts:
+                    if (moHrsReceipt.getPayrollReceipt().isAssimilable()) {
+                        if (moEarning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
+                            // SOURCE CODE WARNING: this code snipet is duplicated as is in method validateForm(), please synchronize any change!
+                            miClient.showMsgBoxWarning("El tipo de régimen de contratación de este recibo, "
+                                    + "'" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moHrsReceipt.getPayrollReceipt().getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                                    + "no admite percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
+                            moTextEarningCode.requestFocusInWindow();
+                            return;
+                        }
                     }
 
                     // confirm multiple earnings of the same type:
                     for (SHrsReceiptEarning hrsReceiptEarning : moHrsReceipt.getHrsReceiptEarnings()) {
                         if (hrsReceiptEarning.getEarning().getPkEarningId() == moEarning.getPkEarningId() && !moEarning.isLoan() && 
-                                    miClient.showMsgBoxConfirm("La percepción '" + moEarning.getName() + "' ya existe en el recibo.\n"
-                                            + "¿Está seguro que desea agregarla otra vez?") != JOptionPane.YES_OPTION) {
+                                miClient.showMsgBoxConfirm("La percepción '" + moEarning.getName() + "' ya existe en el recibo.\n"
+                                        + "¿Está seguro que desea agregarla otra vez?") != JOptionPane.YES_OPTION) {
                             moTextEarningCode.requestFocusInWindow();
                             return;
                         }
@@ -1879,17 +1954,16 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                         }
                     }
 
-                    // validate assimilated employees:
-
-                    SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee(); // convenience variable
-
-                    if (employee.isAssimilable() && moDeduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
-                        // this message is duplicated as is in method validateForm(), please synchronize any change!
-                        miClient.showMsgBoxWarning(employee.getXtaEmployeeName() + ", "
-                            + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
-                            + "no puede tener deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
-                        moTextDeductionCode.requestFocusInWindow();
-                        return;
+                    // validate assimilable receipts:
+                    if (moHrsReceipt.getPayrollReceipt().isAssimilable()) {
+                        if (moDeduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
+                            // SOURCE CODE WARNING: this code snipet is duplicated as is in method validateForm(), please synchronize any change!
+                            miClient.showMsgBoxWarning("El tipo de régimen de contratación de este recibo, "
+                                    + "'" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moHrsReceipt.getPayrollReceipt().getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                                    + "no admite deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
+                            moTextDeductionCode.requestFocusInWindow();
+                            return;
+                        }
                     }
 
                     // confirm multiple deductions of the same type:
@@ -2151,15 +2225,14 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             }
         }
         
-        SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee(); // convenience variable
-        
-        if (employee.isAssimilable()) {
+        // validate assimilable receipts:
+        if (moHrsReceipt.getPayrollReceipt().isAssimilable()) {
             for (SHrsReceiptEarning hrsReceiptEarning : moHrsReceipt.getHrsReceiptEarnings()) {
                 if (hrsReceiptEarning.getEarning().getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
-                    // this message is duplicated as is in method actionAddEarning(), please synchronize any change!
-                    validation.setMessage(employee.getXtaEmployeeName() + ", "
-                    + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
-                    + "no puede tener percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
+                    // SOURCE CODE WARNING: this code snippet is duplicated as is in method actionAddEarning(), please synchronize any change!
+                    validation.setMessage("El tipo de régimen de contratación de este recibo, "
+                            + "'" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moHrsReceipt.getPayrollReceipt().getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                            + "no admite percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
                     validation.setComponent(moTextEarningCode);
                     break;
                 }
@@ -2168,10 +2241,10 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             if (validation.isValid()) {
                 for (SHrsReceiptDeduction hrsReceiptDeduction : moHrsReceipt.getHrsReceiptDeductions()) {
                     if (hrsReceiptDeduction.getDeduction().getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
-                        // this message is duplicated as is in method actionAddDeduction(), please synchronize any change!
-                        validation.setMessage(employee.getXtaEmployeeName() + ", "
-                        + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
-                        + "no puede tener deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
+                        // SOURCE CODE WARNING: this code snippet is duplicated as is in method actionAddDeduction(), please synchronize any change!
+                        validation.setMessage("El tipo de régimen de contratación de este recibo, "
+                                + "'" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moHrsReceipt.getPayrollReceipt().getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                                + "no admite deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
                         validation.setComponent(moTextEarningCode);
                         break;
                     }
@@ -2186,13 +2259,14 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     @SuppressWarnings("unchecked")
     public void setValue(final int type, final Object value) {
         switch (type) {
-            case SGuiConsts.PARAM_REQ_PAY:
+            case PARAM_IS_EDITABLE:
                 mbEditable = (boolean) value;
                 setEnableFields(mbEditable);
                 break;
                 
             case SModConsts.HRS_PAY_RCP:
                 moHrsReceipt = (SHrsReceipt) value;
+                renderReceipt();
                 renderEmployee();
                 refreshReceiptMovements();
                 populateAbsenceConsumption();

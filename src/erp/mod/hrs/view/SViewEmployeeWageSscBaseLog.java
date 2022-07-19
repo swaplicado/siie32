@@ -27,7 +27,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña
+ * @author Juan Barajas, Claudio Peña, Sergio Flores
  */
 public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements ActionListener{
 
@@ -46,17 +46,16 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
-        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
         jbLayoutEmployeeSbc = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout modificación SBC de empleados", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSbc);
-        
         jbLayoutEmployeeSbcIdse = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout modificación SBC de empleados IDSE", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSbcIdse);
-        
         jbEmployeesSscPeriod = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif")), "Actualización de SBC de empleados", this);
+        
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSbc);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSbcIdse);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbEmployeesSscPeriod);
 
     }

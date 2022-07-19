@@ -366,7 +366,7 @@ public class SHrsReceipt {
         SDbEarning earningSubsidyOtherPayment = null;
         SDbPayroll payroll = moHrsPayroll.getPayroll();
         boolean computeTax = SLibUtils.belongsTo(payroll.getFkTaxComputationTypeId(), new int[] { SModSysConsts.HRSS_TP_TAX_COMP_PAY, SModSysConsts.HRSS_TP_TAX_COMP_ANN });
-        boolean computeSubsidy = computeTax && payroll.isTaxSubsidy() && !moHrsEmployee.getEmployee().isAssimilable(); // assimilables are not elegible for subsidy
+        boolean computeSubsidy = computeTax && payroll.isTaxSubsidy() && !moPayrollReceipt.isAssimilable(); // assimilables are not elegible for subsidy
 
         if (computeTax) {
             // Validate configuration of deduction for tax:
@@ -828,7 +828,7 @@ public class SHrsReceipt {
         SHrsReceiptDeduction hrsReceiptDeductionSscNew = null;
         SDbPayroll payroll = moHrsPayroll.getPayroll(); // convenience variable
         
-        if (payroll.isSsContribution() && !moHrsEmployee.getEmployee().isAssimilable()) {  // assimilables are not elegible for SS contribution
+        if (payroll.isSsContribution() && !moPayrollReceipt.isAssimilable()) {  // assimilables are not elegible for SS contribution
             // Validate configuration of SS contribution:
 
             if (moHrsPayroll.getConfig().getFkDeductionSsContributionId_n() == 0) {

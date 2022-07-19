@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
@@ -112,51 +113,54 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             }
             else {
                 try {
+                    int action = 0;
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
                     SDbPayroll payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
-                    if (miClient.showMsgBoxConfirm("Está por " + (!payroll.isClosed() ? "cerrar" : "abrir") + " la nómina '" + payroll.getAuxPaymentType() + " - " + payroll.getNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                        boolean close = false;
-                        boolean canClose = false;
-                        
-                        if (payroll.isClosed() && SHrsFinUtils.canOpenPayroll(miClient.getSession(), payroll.getPkPayrollId())) {
-                            SHrsFinUtils.deletePayrollRecordEntries(miClient.getSession(), payroll.getPkPayrollId());
-                            close = false; // Open payroll
-                            canClose = true;
+                    
+                    if (payroll.isClosed()) {
+                        // open payroll:
+                        if (SHrsFinUtils.canOpenPayroll(miClient.getSession(), payroll.getPkPayrollId())) {
+                            if (miClient.showMsgBoxConfirm("Está por abrir la nómina '" + payroll.composePayrollYearAndNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                                action = SUtilConsts.ACTION_OPEN;
+                            }
                         }
-                        else {
+                    }
+                    else {
+                        // close payroll:
+                        if (miClient.showMsgBoxConfirm("Está por cerrar la nómina '" + payroll.composePayrollYearAndNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                             if (miClient.showMsgBoxConfirm("¿Desea contabilizar la nómina?") == JOptionPane.YES_OPTION) {
                                 SDialogPayrollAccounting dialog = new SDialogPayrollAccounting((SClientInterface) miClient, payroll);
                                 dialog.resetForm();
                                 dialog.setVisible(true);
 
                                 if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                    close = true; // Close payroll
-                                    canClose = true;
+                                    action = SUtilConsts.ACTION_CLOSE;
                                 }
                             }
                             else {
-                                close = true; // Close payroll
-                                canClose = true;
+                                action = SUtilConsts.ACTION_CLOSE;
                             }
                         }
+                    }
+                    
+                    switch (action) {
+                        case SUtilConsts.ACTION_OPEN:
+                            SHrsFinUtils.deletePayrollRecordEntries(miClient.getSession(), payroll.getPkPayrollId());
+                            payroll.updatePayrollReceiptIssuesOnOpen(miClient.getSession());
+                            break;
+                            
+                        case SUtilConsts.ACTION_CLOSE:
+                            payroll.updatePayrollReceiptIssuesOnClose(miClient.getSession());
+                            break;
+                            
+                        default:
+                            // do nothing
+                    }
+                    
+                    if (action != 0) {
+                        payroll.setAuxFkUserCloseId(miClient.getSession().getUser().getPkUserId());
+                        payroll.saveField(miClient.getSession().getStatement(), gridRow.getRowPrimaryKey(), SDbPayroll.FIELD_CLOSE, action == SUtilConsts.ACTION_CLOSE);
                         
-                        if (close) {
-                            // payroll is being closed:
-                            payroll.updatePayrollReceiptIssues(miClient.getSession());
-                            canClose = true;
-                        }
-                        else {
-                            // payroll is being opened:
-                            payroll.updatePayrollReceiptIssuesAsNewOnes(miClient.getSession());
-                            canClose = true;
-                        }
-                        
-                        if (canClose) {
-                            payroll.setAuxFkUserCloseId(miClient.getSession().getUser().getPkUserId());
-                            payroll.saveField(miClient.getSession().getStatement(), gridRow.getRowPrimaryKey(), SDbPayroll.FIELD_CLOSE, close); // close payroll
-                        }
-
                         miClient.getSession().notifySuscriptors(mnGridType);
                     }
                 }
@@ -346,6 +350,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + "v.nts, "
                 + "tpsc.code, "
                 + "tps.name, "
+                + "trs.name, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.b_clo, "
                 + "v.fk_usr_clo, "
@@ -358,44 +363,70 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
                 + "COALESCE((SELECT SUM(pre.amt_r) "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
-                + " WHERE p.id_pay = v.id_pay AND NOT pr.b_del AND NOT pre.b_del), 0.0) AS _sum_ears, "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
+                + "WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pre.b_del), 0.0) AS _sum_ear, "
                 + "COALESCE((SELECT SUM(prd.amt_r) "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp "
-                + " WHERE p.id_pay = v.id_pay AND NOT pr.b_del AND NOT prd.b_del), 0.0) AS _sum_deds, "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp "
+                + "WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT prd.b_del), 0.0) AS _sum_ded, "
                 + "(SELECT COUNT(*) "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
-                + " WHERE NOT pr.b_del AND pr.id_pay = v.id_pay) AS _count_rcps, "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del) AS _count_rcp, "
                 + "(SELECT COUNT(*) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pr.b_cfd_req) AS _count_rcp_cfd_not_req, "
+                + "(SELECT COUNT(DISTINCT pr.id_emp) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND pr.b_cfd_req AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_NEW + ") AS _count_rcp_cfd_new, "
+                + "(SELECT COUNT(DISTINCT pr.id_emp) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND pr.b_cfd_req AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS _count_rcp_cfd_emited, "
+                + "IF((SELECT COUNT(DISTINCT pr.id_emp) > 0 "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr " 
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " 
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss " 
-                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS _count_cfds, "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND pr.b_cfd_req AND NOT pri.b_del AND (NOT c.b_con OR c.b_prc_ws OR c.b_prc_sto_xml OR c.b_prc_sto_pdf)), " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_NULL + ") AS _are_rcp_cfd_inc_prc, "
+                + "(SELECT COUNT(DISTINCT pr.id_emp) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND pr.b_cfd_req AND "
+                + " NOT EXISTS (SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + " WHERE pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp AND NOT pri.b_del AND "
+                + " c.fid_st_xml IN (" + SModSysConsts.TRNS_ST_DPS_NEW + ", " + SModSysConsts.TRNS_ST_DPS_EMITED + "))) AS _count_rcp_cfd_pending, "
                 + "(SELECT COUNT(*) "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr " 
-                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pr.b_cfd_req) AS _count_cfds_not_req, "
-                + "IF((SELECT COUNT(*) > 0 "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr " 
-                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " 
-                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss " 
-                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND (c.b_prc_ws OR c.b_prc_sto_xml OR c.b_prc_sto_pdf)), " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_NULL + ") AS _count_cfds_prc, "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND pr.b_cfd_req AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_NEW + ") AS _count_tot_cfd_new, "
+                + "(SELECT COUNT(*) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND pr.b_cfd_req AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS _count_tot_cfd_emited, "
+                + "(SELECT COUNT(*) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND pr.b_cfd_req AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_ANNULED + ") AS _count_tot_cfd_annuled, "
                 + "(SELECT COUNT(*) > 0 "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON "
                 + " r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-                + " WHERE re.fid_pay_n = v.id_pay AND NOT r.b_del AND NOT re.b_del) AS _posted "
+                + " WHERE re.fid_pay_n = v.id_pay AND NOT r.b_del AND NOT re.b_del) AS _accounted "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_PAY_SHT_CUS) + " AS tpsc ON v.fk_tp_pay_sht_cus = tpsc.id_tp_pay_sht_cus "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tps ON v.fk_tp_pay_sht = tps.id_tp_pay_sht "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON v.fk_tp_rec_sche = trs.id_tp_rec_sche "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON v.fk_usr_clo = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.per_year, v.num, tpsc.code, tps.name, v.id_pay ";
+                + "ORDER BY v.per_year, v.per, v.num, tpsc.code, tps.name, v.id_pay ";
     }
 
     @Override
@@ -403,38 +434,49 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         SGridColumnView column = null;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.num", "Número nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.num", "Núm nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "F inicial nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_end", "F final nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "tpsc.code", "Tipo nómina empresa"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tps.name", "Tipo nómina"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_ears", "Percepciones $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_deds", "Deducciones $"));
         
-        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "", "Alcance neto $");
-        column.getRpnArguments().add(new SLibRpnArgument("_sum_ears", SLibRpnArgumentType.OPERAND));
-        column.getRpnArguments().add(new SLibRpnArgument("_sum_deds", SLibRpnArgumentType.OPERAND));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_ear", "Percepciones $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_ded", "Deducciones $"));
+        
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "", "Total neto $");
+        column.getRpnArguments().add(new SLibRpnArgument("_sum_ear", SLibRpnArgumentType.OPERAND));
+        column.getRpnArguments().add(new SLibRpnArgument("_sum_ded", SLibRpnArgumentType.OPERAND));
         column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
         gridColumnsViews.add(column);
         
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "trs.name", "Tipo régimen nómina", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas nómina", 200));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_rcps", "Recibos nómina", 65));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_cfds", "CFDI emitidos", 65));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_cfds_not_req", "CFDI no requeridos", 65));
         
-        column = new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "", "CFDI x emitir", 65);
-        column.getRpnArguments().add(new SLibRpnArgument("_count_rcps", SLibRpnArgumentType.OPERAND));
-        column.getRpnArguments().add(new SLibRpnArgument("_count_cfds", SLibRpnArgumentType.OPERAND));
-        column.getRpnArguments().add(new SLibRpnArgument("_count_cfds_not_req", SLibRpnArgumentType.OPERAND));
-        column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.ADDITION, SLibRpnArgumentType.OPERATOR));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_clo", "Cerrada"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "_accounted", "Contabilizada"));
+        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp", "Recibos"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_not_req", "CFDI no requeridos"));
+        
+        column = new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "", "CFDI requeridos");
+        column.getRpnArguments().add(new SLibRpnArgument("_count_rcp", SLibRpnArgumentType.OPERAND));
+        column.getRpnArguments().add(new SLibRpnArgument("_count_rcp_cfd_not_req", SLibRpnArgumentType.OPERAND));
         column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
         gridColumnsViews.add(column);
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_count_cfds_prc", "CFDI emitidos con inconsistencias"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrada"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_posted", "Contabilizada"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_close", "Usr cierre"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "v.ts_usr_clo", "Usr TS cierre"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_pending", "CFDI pendientes (recibos)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_new", "CFDI nuevos (recibos)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_emited", "CFDI timbrados (recibos)"));
+        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_are_rcp_cfd_inc_prc", "CFDI inconsistentes o errores (recibos)"));
+        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_tot_cfd_new", "CFDI nuevos (nómina)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_tot_cfd_emited", "CFDI timbrados (nómina)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_tot_cfd_annuled", "CFDI anulados (nómina)"));
+        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_close", "Usr cierre nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "v.ts_usr_clo", "Usr TS cierre nómina"));
+        
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

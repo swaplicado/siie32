@@ -251,7 +251,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return msTipoContrato.compareTo(DCfdi33Catalogs.ClaveTipoContratoModalidadTrabajoComision) <= 0;
     }
     
-    private boolean isRecruitmentSchemeForEmployment() {
+    private boolean isRecruitmentSchemaForEmployment() {
         return msTipoRegimenCode.equals(DCfdi33Catalogs.ClaveTipoRegimenSueldos) || 
                 msTipoRegimenCode.equals(DCfdi33Catalogs.ClaveTipoRegimenJubilados) || 
                 msTipoRegimenCode.equals(DCfdi33Catalogs.ClaveTipoRegimenPensionados) || 
@@ -573,13 +573,13 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         receptor.getAttPuesto().setString(SLibUtils.textToXml(msPuesto));
         receptor.getAttPeriodicidadPago().setString(msPeriodicidadPago);
         
-        // Validate recruitment scheme:
+        // Validate recruitment schema:
         
-        if (isTypeContractForEmployment() && !isRecruitmentSchemeForEmployment()) {
+        if (isTypeContractForEmployment() && !isRecruitmentSchemaForEmployment()) {
             throw new Exception("El régimen de contratación del empleado en el CFDI (clave: '" + msTipoRegimenCode + "') no corresponde a una relación laboral subordinada (clave tipo contrato: '" + msTipoContrato + "').");
         }
         
-        if (!isTypeContractForEmployment() && isRecruitmentSchemeForEmployment()) {
+        if (!isTypeContractForEmployment() && isRecruitmentSchemaForEmployment()) {
             throw new Exception("El régimen de contratación del empleado en el CFDI (clave: '" + msTipoRegimenCode + "') no corresponde a un esquema insubordinado (clave tipo contrato: '" + msTipoContrato + "').");
         }
         

@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SViewAbsence extends SGridPaneView implements ActionListener {
 
@@ -71,8 +71,15 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         jbShowInabilityMov = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col_cash.gif")), "Importación de movimientos de datos de incapacidades", this);
         jbShowAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_pay_cash.gif")), "Importación de datos de ausentismo", this);
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseAbsence);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowInability);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowInabilityMov);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowAbsence);
+        
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
         moFilterAbsenceClass = new SGridFilterPanel(miClient, this, SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED);
         moFilterAbsenceClass.initFilter(null);
@@ -80,17 +87,11 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         moFilterBusinessPartner = new SGridFilterPanel(miClient, this, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, 250);
         moFilterBusinessPartner.initFilter(null);
         
-        moDialogAbsenceMovesCardex = new SDialogAbsenceMovesCardex(miClient, "Movimientos de la incidencia");
-        
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseAbsence);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowInability);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowInabilityMov);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowAbsence);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterAbsenceClass);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterBusinessPartner);
+        
+        moDialogAbsenceMovesCardex = new SDialogAbsenceMovesCardex(miClient, "Movimientos de la incidencia");
     }
 
     /*

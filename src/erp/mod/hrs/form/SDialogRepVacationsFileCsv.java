@@ -174,7 +174,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
                 bw.write("\n\n");
                 
                 bw.write("\n");
-                buffer = "\"EMPLEADO\",\"FECHA BENEFICIOS\",\"FECHA BASE\",\"ANTIGÜEDAD AÑOS\",\"ANTIGÜEDAD DÍAS\",\"ANIVERSARIO\",\"ANIVERSARIO AÑO\",\"DÍAS\",\"PAGADOS\",\"POR PAGAR\",\"ADELANTADOS\",\"UNIDAD\"";
+                buffer = "\"EMPLEADO\",\"INICIO BENEFICIOS\",\"FECHA BASE\",\"ANTIGÜEDAD AÑOS\",\"ANTIGÜEDAD DÍAS\",\"ANIVERSARIO\",\"ANIVERSARIO AÑO\",\"DÍAS\",\"PAGADOS\",\"POR PAGAR\",\"ADELANTADOS\",\"UNIDAD\"";
 
                 bw.write(SLibUtilities.textToAscii(buffer));
                 

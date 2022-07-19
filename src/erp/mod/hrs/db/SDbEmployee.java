@@ -28,7 +28,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  * Used mainly in re-hiring and dismissal operations.
- * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SDbEmployee extends SDbRegistryUser {
     
@@ -77,7 +77,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected int mnFkPositionId;
     protected int mnFkShiftId;
     protected int mnFkContractTypeId;
-    protected int mnFkRecruitmentSchemeTypeId;
+    protected int mnFkRecruitmentSchemaTypeId;
     protected int mnFkPositionRiskTypeId;
     protected int mnFkWorkingDayTypeId;
     protected int mnFkCatalogueSexClassId;
@@ -104,7 +104,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected String msXtaEmployeeProperName;
     protected String msXtaEmployeeRfc;
     protected String msXtaEmployeeCurp;
-    protected int mnXtaRecruitmentSchemeCat;
+    protected int mnXtaRecruitmentSchemaCat;
     
     protected Date mtAuxHireLogDate;
     protected String msAuxHireLogNotes;
@@ -154,7 +154,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setFkPositionId(int n) { mnFkPositionId = n; }
     public void setFkShiftId(int n) { mnFkShiftId = n; }
     public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
-    public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
+    public void setFkRecruitmentSchemaTypeId(int n) { mnFkRecruitmentSchemaTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
     public void setFkWorkingDayTypeId(int n) { mnFkWorkingDayTypeId = n; }
     public void setFkCatalogueSexClassId(int n) { mnFkCatalogueSexClassId = n; }
@@ -212,7 +212,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getFkPositionId() { return mnFkPositionId; }
     public int getFkShiftId() { return mnFkShiftId; }
     public int getFkContractTypeId() { return mnFkContractTypeId; }
-    public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
+    public int getFkRecruitmentSchemaTypeId() { return mnFkRecruitmentSchemaTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
     public int getFkWorkingDayTypeId() { return mnFkWorkingDayTypeId; }
     public int getFkCatalogueSexClassId() { return mnFkCatalogueSexClassId; }
@@ -235,13 +235,13 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setXtaEmployeePropername(String s) { msXtaEmployeeProperName = s; }
     public void setXtaEmployeeRfc(String s) { msXtaEmployeeRfc = s; }
     public void setXtaEmployeeCurp(String s) { msXtaEmployeeCurp = s; }
-    public void setXtaRecruitmentSchemeCat(int n) { mnXtaRecruitmentSchemeCat = n; }
+    public void setXtaRecruitmentSchemaCat(int n) { mnXtaRecruitmentSchemaCat = n; }
     
     public String getXtaEmployeeName() { return msXtaEmployeeName; }
     public String getXtaEmployeeProperName() { return msXtaEmployeeProperName; }
     public String getXtaEmployeeRfc() { return msXtaEmployeeRfc; }
     public String getXtaEmployeeCurp() { return msXtaEmployeeCurp; }
-    public int getXtaRecruitmentSchemeCat() { return mnXtaRecruitmentSchemeCat; }
+    public int getXtaRecruitmentSchemaCat() { return mnXtaRecruitmentSchemaCat; }
     
     public void setAuxHireLogDate(Date t) { mtAuxHireLogDate = t; }
     public void setAuxHireLogNotes(String s) { msAuxHireLogNotes = s; }
@@ -253,18 +253,6 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getAuxEmployeeDismissalTypeId() { return mnAuxEmployeeDismissalTypeId; }
     public SHrsEmployeeHireLog getAuxHrsEmployeeHireLog() { return moAuxHrsEmployeeHireLog; }
     
-    public boolean isAssimilable() {
-        return SLibUtils.belongsTo(mnFkRecruitmentSchemeTypeId, new int[] { 
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH
-        });
-    }
-
     /**
      * Gets effective salary.
      * Mirrored in erp.mbps.data.SDataEmployee.
@@ -365,7 +353,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mnFkPositionId = 0;
         mnFkShiftId = 0;
         mnFkContractTypeId = 0;
-        mnFkRecruitmentSchemeTypeId = 0;
+        mnFkRecruitmentSchemaTypeId = 0;
         mnFkPositionRiskTypeId = 0;
         mnFkWorkingDayTypeId = 0;
         mnFkCatalogueSexClassId = 0;
@@ -390,7 +378,7 @@ public class SDbEmployee extends SDbRegistryUser {
         msXtaEmployeeProperName = "";
         msXtaEmployeeRfc = "";
         msXtaEmployeeCurp = "";
-        mnXtaRecruitmentSchemeCat = 0;
+        mnXtaRecruitmentSchemaCat = 0;
         
         mtAuxHireLogDate = null;
         msAuxHireLogNotes = "";
@@ -477,7 +465,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnFkPositionId = resultSet.getInt("fk_pos");
             mnFkShiftId = resultSet.getInt("fk_sht");
             mnFkContractTypeId = resultSet.getInt("fk_tp_con");
-            mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
+            mnFkRecruitmentSchemaTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
             mnFkWorkingDayTypeId = resultSet.getInt("fk_tp_work_day");
             mnFkCatalogueSexClassId = resultSet.getInt("fk_cl_cat_sex");
@@ -510,13 +498,13 @@ public class SDbEmployee extends SDbRegistryUser {
                 msXtaEmployeeCurp = resultSet.getString("alt_id");
             }
             
-            msSql = "SELECT rec_sche_cat FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " WHERE id_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId+ ";";
+            msSql = "SELECT rec_sche_cat FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " WHERE id_tp_rec_sche = " + mnFkRecruitmentSchemaTypeId+ ";";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
             else {
-                mnXtaRecruitmentSchemeCat = resultSet.getInt("rec_sche_cat");
+                mnXtaRecruitmentSchemaCat = resultSet.getInt("rec_sche_cat");
             }
             
             mbRegistryNew = false;
@@ -581,7 +569,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     mnFkPositionId + ", " + 
                     mnFkShiftId + ", " + 
                     mnFkContractTypeId + ", " + 
-                    mnFkRecruitmentSchemeTypeId + ", " + 
+                    mnFkRecruitmentSchemaTypeId + ", " + 
                     mnFkPositionRiskTypeId + ", " + 
                     mnFkWorkingDayTypeId + ", " + 
                     mnFkCatalogueSexClassId + ", " + 
@@ -648,7 +636,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "fk_pos = " + mnFkPositionId + ", " +
                     "fk_sht = " + mnFkShiftId + ", " +
                     "fk_tp_con = " + mnFkContractTypeId + ", " +
-                    "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
+                    "fk_tp_rec_sche = " + mnFkRecruitmentSchemaTypeId + ", " +
                     "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
                     "fk_tp_work_day = " + mnFkWorkingDayTypeId + ", " +
                     "fk_cl_cat_sex = " + mnFkCatalogueSexClassId + ", " +
@@ -758,7 +746,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setFkPositionId(this.getFkPositionId());
         registry.setFkShiftId(this.getFkShiftId());
         registry.setFkContractTypeId(this.getFkContractTypeId());
-        registry.setFkRecruitmentSchemeTypeId(this.getFkRecruitmentSchemeTypeId());
+        registry.setFkRecruitmentSchemaTypeId(this.getFkRecruitmentSchemaTypeId());
         registry.setFkPositionRiskTypeId(this.getFkPositionRiskTypeId());
         registry.setFkWorkingDayTypeId(this.getFkWorkingDayTypeId());
         registry.setFkCatalogueSexClassId(this.getFkCatalogueSexClassId());
@@ -783,7 +771,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());
         registry.setXtaEmployeeRfc(this.getXtaEmployeeRfc());
         registry.setXtaEmployeeCurp(this.getXtaEmployeeCurp());
-        registry.setXtaRecruitmentSchemeCat(this.getXtaRecruitmentSchemeCat());
+        registry.setXtaRecruitmentSchemaCat(this.getXtaRecruitmentSchemaCat());
 
         registry.setAuxHireLogDate(this.getAuxHireLogDate());
         registry.setAuxHireLogNotes(this.getAuxHireLogNotes());

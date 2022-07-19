@@ -5,6 +5,7 @@
 package erp.mod.hrs.view;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.print.SDataConstantsPrint;
 import java.awt.event.ActionEvent;
@@ -13,9 +14,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import sa.lib.SLibRpnArgument;
-import sa.lib.SLibRpnArgumentType;
-import sa.lib.SLibRpnOperator;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -143,55 +141,72 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
                 + "tps.name, "
                 + "pr.ear_r, "
                 + "pr.ded_r, "
+                + "pr.pay_r, "
+                + "pr.b_cfd_req, "
                 + "pr.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "p.b_clo, "
-                + "p.fk_usr_clo, "
-                + "p.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                + "p.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
-                + "p.ts_usr_clo, "
-                + "p.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
-                + "p.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
-                + "uc.usr AS _usr_close, "
+                + "trs.name, "
+                + "pr.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                + "pr.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
+                + "pr.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                + "pr.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
+                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
+                + "(SELECT COUNT(*) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + "WHERE pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_NEW + ") AS _count_rcp_cfd_new, "
+                + "(SELECT COUNT(*) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + "WHERE pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS _count_rcp_cfd_emited, "
+                + "(SELECT COUNT(*) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + "WHERE pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_ANNULED + ") AS _count_rcp_cfd_annuled, "
+                + "IF((SELECT COUNT(*) > 0 "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
+                + "WHERE pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp AND NOT pri.b_del AND (NOT c.b_con OR c.b_prc_ws OR c.b_prc_sto_xml OR c.b_prc_sto_pdf)), " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_NULL + ") AS _are_rcp_cfd_inc_prc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_PAY_SHT_CUS) + " AS tpsc ON p.fk_tp_pay_sht_cus = tpsc.id_tp_pay_sht_cus "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tps ON p.fk_tp_pay_sht = tps.id_tp_pay_sht "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON pr.id_emp = bp.id_bp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON p.fk_usr_clo = uc.id_usr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON p.fk_usr_ins = ui.id_usr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON p.fk_usr_upd = uu.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON pr.fk_usr_ins = ui.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON pr.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE NOT p.b_del AND NOT pr.b_del AND " + sql)
-                + "ORDER BY p.per_year, p.num, tpsc.code, tps.name, bp.bp, pr.id_pay, pr.id_emp ";
+                + "ORDER BY p.per_year, p.per, p.num, tpsc.code, tps.name, bp.bp, pr.id_pay, pr.id_emp ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        SGridColumnView column = null;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "p.num", "Número nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "p.num", "Núm nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "p.dt_sta", "F inicial nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "p.dt_end", "F final nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "tpsc.code", "Tipo nómina empresa"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tps.name", "Tipo nómina"));
+        
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, "Clave"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pr.ear_r", "Percepciones $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pr.ded_r", "Deducciones $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pr.pay_r", "Total neto $"));
         
-        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "", "Alcance neto $");
-        column.getRpnArguments().add(new SLibRpnArgument("pr.ear_r", SLibRpnArgumentType.OPERAND));
-        column.getRpnArguments().add(new SLibRpnArgument("pr.ded_r", SLibRpnArgumentType.OPERAND));
-        column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
-        gridColumnsViews.add(column);
-        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "trs.name", "Tipo régimen recibo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.nts", "Notas nómina", 200));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "p.b_clo", "Cerrada"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_close", "Usr cierre"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "p.ts_usr_clo", "Usr TS cierre"));
+        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "pr.b_cfd_req", "CFDI requerido"));
+        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_are_rcp_cfd_inc_prc", "CFDI inconsistentes o errores (recibo)"));
+        
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_new", "CFDI nuevos (recibo)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_emited", "CFDI timbrados (recibo)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_annuled", "CFDI anulados (recibo)"));
+        
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

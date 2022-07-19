@@ -46,18 +46,19 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
         
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
-        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
-        jbLayoutEmployeeHire = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout alta empleados", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeHire);
-        jbLayoutEmployeeEntry = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout re-ingreso empleados", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeEntry);
-        jbLayoutEmployeeDismiss = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout baja empleados", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeDismiss);
-        jbLayoutEmployeeAfi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout movimientos afiliatorios empleados", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeAfi);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
+        jbLayoutEmployeeHire = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout alta empleados", this);
+        jbLayoutEmployeeEntry = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout re-ingreso empleados", this);
+        jbLayoutEmployeeDismiss = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout baja empleados", this);
+        jbLayoutEmployeeAfi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout movimientos afiliatorios empleados", this);
+        
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeHire);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeEntry);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeDismiss);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeAfi);
     }
     
     private void actionLayoutEmployeeHire() {

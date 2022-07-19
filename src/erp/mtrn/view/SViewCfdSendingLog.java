@@ -103,7 +103,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Empleado", 200);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Percepciones $", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_credit", "Deducciones $", 100);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Alcance neto $", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Total neto $", 100);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "snd.dt", "Fecha envío", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "snd.snd_to", "Receptor", 150);

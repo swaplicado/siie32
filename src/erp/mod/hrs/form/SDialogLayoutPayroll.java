@@ -327,7 +327,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total neto $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria"));
 
@@ -353,7 +353,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total neto $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria"));
 
@@ -747,7 +747,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
                 
                 if (employeesSelected.isEmpty()) {
                     SGuiValidation validation = new SGuiValidation();
-                    validation.setMessage("No hay empleados seleccionados con alcance neto mayor a cero.");
+                    validation.setMessage("No hay empleados seleccionados con total neto mayor a cero.");
                     validation.setComponent(moGridPaneEmployeesSelected.getTable());
                     SGuiUtils.computeValidation(miClient, validation);
                 }

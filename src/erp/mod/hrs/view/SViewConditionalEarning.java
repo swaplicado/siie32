@@ -39,7 +39,7 @@ public class SViewConditionalEarning extends SGridPaneView implements ActionList
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
         }
         
         msSql = "SELECT "

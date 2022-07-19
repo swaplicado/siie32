@@ -153,7 +153,7 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
         jPanel5.add(jtfPayrollDates);
 
         jlPayrollNet.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlPayrollNet.setText("Alcance neto:");
+        jlPayrollNet.setText("Total neto:");
         jlPayrollNet.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlPayrollNet);
 

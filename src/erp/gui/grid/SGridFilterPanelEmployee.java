@@ -5,6 +5,7 @@
  */
 package erp.gui.grid;
 
+import erp.mod.SModConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -13,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import sa.lib.SLibConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilter;
@@ -22,7 +22,6 @@ import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiParams;
-import sa.lib.gui.SGuiUtils;
 
 /**
  *
@@ -30,45 +29,25 @@ import sa.lib.gui.SGuiUtils;
  */
 public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, ActionListener, ItemListener {
 
-    public static final int EMP_STATUS = 200;
-    public static final int EMP_STATUS_ACT = 2;
-    public static final int EMP_STATUS_INA = 3;
-    public static final int EMP_STATUS_ALL = 4;
+    public static final int EMP_STATUS = 200; // to set and get filter in UI
+    public static final int EMP_STATUS_ACT = 2; // active
+    public static final int EMP_STATUS_INA = 3; // inactive
+    public static final int EMP_STATUS_ALL = 4; // all
     
     private final SGuiClient miClient;
     private final SGridPaneView moPaneView;
-    private final int mnFilterType1;
-    private final int mnFilterType2;
-    private final int mnStatusDefault;
+    private boolean mbInitializing;
     
     /**
-     * Creates new form SGridFilterPanelEmployee
+     * Creates new form SGridFilterPanelEmployee.
      * 
      * @param client
      * @param paneView
-     * @param type1
-     * @param type2
      */
-    public SGridFilterPanelEmployee(SGuiClient client, SGridPaneView paneView, int type1, int type2) {
-        this(client, paneView, type1, type2, EMP_STATUS_ACT);
-    }
-
-    /**
-     * Creates new form SGridFilterPanelEmployee
-     * 
-     * @param client
-     * @param paneView
-     * @param type1
-     * @param type2
-     * @param statusDefault Constants available in this class: EMP_STATUS_ACT, EMP_STATUS_INA, EMP_STATUS_ALL
-
-     */
-    public SGridFilterPanelEmployee(SGuiClient client, SGridPaneView paneView, int type1, int type2, int statusDefault) {
+    public SGridFilterPanelEmployee(SGuiClient client, SGridPaneView paneView) {
         miClient = client;
         moPaneView = paneView;
-        mnFilterType1 = type1;
-        mnFilterType2 = type2;
-        mnStatusDefault = statusDefault;
+        
         initComponents();
         initComponentsCustom();
     }
@@ -82,192 +61,184 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        bgFilter = new javax.swing.ButtonGroup();
-        jtbActive = new javax.swing.JToggleButton();
-        jtbInactive = new javax.swing.JToggleButton();
-        jtbAll = new javax.swing.JToggleButton();
-        moKeyFilter1 = new sa.lib.gui.bean.SBeanFieldKey();
-        jbClearFilter1 = new javax.swing.JButton();
-        moKeyFilter2 = new sa.lib.gui.bean.SBeanFieldKey();
-        jbClearFilter2 = new javax.swing.JButton();
+        bgStatus = new javax.swing.ButtonGroup();
+        jtbStatusActive = new javax.swing.JToggleButton();
+        jtbStatusInactive = new javax.swing.JToggleButton();
+        jtbStatusAll = new javax.swing.JToggleButton();
+        moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
+        jbClearPaymentType = new javax.swing.JButton();
+        moKeyDepartment = new sa.lib.gui.bean.SBeanFieldKey();
+        jbClearDepartment = new javax.swing.JButton();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        bgFilter.add(jtbActive);
-        jtbActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif"))); // NOI18N
-        jtbActive.setSelected(true);
-        jtbActive.setToolTipText("Ver activos");
-        jtbActive.setPreferredSize(new java.awt.Dimension(23, 23));
-        jtbActive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
-        add(jtbActive);
+        bgStatus.add(jtbStatusActive);
+        jtbStatusActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif"))); // NOI18N
+        jtbStatusActive.setSelected(true);
+        jtbStatusActive.setToolTipText("Ver activos");
+        jtbStatusActive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbStatusActive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
+        add(jtbStatusActive);
 
-        bgFilter.add(jtbInactive);
-        jtbInactive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif"))); // NOI18N
-        jtbInactive.setToolTipText("Ver inactivos");
-        jtbInactive.setPreferredSize(new java.awt.Dimension(23, 23));
-        jtbInactive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
-        add(jtbInactive);
+        bgStatus.add(jtbStatusInactive);
+        jtbStatusInactive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif"))); // NOI18N
+        jtbStatusInactive.setToolTipText("Ver inactivos");
+        jtbStatusInactive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbStatusInactive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
+        add(jtbStatusInactive);
 
-        bgFilter.add(jtbAll);
-        jtbAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
-        jtbAll.setToolTipText("Ver todos");
-        jtbAll.setPreferredSize(new java.awt.Dimension(23, 23));
-        jtbAll.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
-        add(jtbAll);
+        bgStatus.add(jtbStatusAll);
+        jtbStatusAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
+        jtbStatusAll.setToolTipText("Ver todos");
+        jtbStatusAll.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbStatusAll.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
+        add(jtbStatusAll);
 
-        moKeyFilter1.setPreferredSize(new java.awt.Dimension(125, 23));
-        add(moKeyFilter1);
+        moKeyPaymentType.setPreferredSize(new java.awt.Dimension(125, 23));
+        add(moKeyPaymentType);
 
-        jbClearFilter1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
-        jbClearFilter1.setToolTipText("Quitar filtro");
-        jbClearFilter1.setPreferredSize(new java.awt.Dimension(23, 23));
-        add(jbClearFilter1);
+        jbClearPaymentType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
+        jbClearPaymentType.setToolTipText("Quitar filtro");
+        jbClearPaymentType.setPreferredSize(new java.awt.Dimension(23, 23));
+        add(jbClearPaymentType);
 
-        moKeyFilter2.setPreferredSize(new java.awt.Dimension(250, 23));
-        add(moKeyFilter2);
+        moKeyDepartment.setPreferredSize(new java.awt.Dimension(250, 23));
+        add(moKeyDepartment);
 
-        jbClearFilter2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
-        jbClearFilter2.setToolTipText("Quitar filtro");
-        jbClearFilter2.setPreferredSize(new java.awt.Dimension(23, 23));
-        add(jbClearFilter2);
+        jbClearDepartment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
+        jbClearDepartment.setToolTipText("Quitar filtro");
+        jbClearDepartment.setPreferredSize(new java.awt.Dimension(23, 23));
+        add(jbClearDepartment);
     }// </editor-fold>//GEN-END:initComponents
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgFilter;
-    private javax.swing.JButton jbClearFilter1;
-    private javax.swing.JButton jbClearFilter2;
-    private javax.swing.JToggleButton jtbActive;
-    private javax.swing.JToggleButton jtbAll;
-    private javax.swing.JToggleButton jtbInactive;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyFilter1;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyFilter2;
+    private javax.swing.ButtonGroup bgStatus;
+    private javax.swing.JButton jbClearDepartment;
+    private javax.swing.JButton jbClearPaymentType;
+    private javax.swing.JToggleButton jtbStatusActive;
+    private javax.swing.JToggleButton jtbStatusAll;
+    private javax.swing.JToggleButton jtbStatusInactive;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDepartment;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     // End of variables declaration//GEN-END:variables
 
     /*
      * Private methods
      */
     
-    private void actionEmpStatusStateChange() {
-        int nFilterEmpStatus = SLibConsts.UNDEFINED;
-        
-        if (jtbActive.isSelected()) {
-            nFilterEmpStatus = EMP_STATUS_ACT;
-        }
-        else if (jtbInactive.isSelected()) {
-            nFilterEmpStatus = EMP_STATUS_INA;
-        }
-        else if (jtbAll.isSelected()) {
-            nFilterEmpStatus = EMP_STATUS_ALL;
-        }
-        moPaneView.putFilter(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, nFilterEmpStatus));
-        jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
-    }
-    
     private void initComponentsCustom() {
-        jbClearFilter1.addActionListener(this);
-        jbClearFilter2.addActionListener(this);
-        updateOptions();
+        miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, 0, new SGuiParams(SDbRegistry.FIELD_CODE));
+        miClient.getSession().populateCatalogue(moKeyDepartment, SModConsts.HRSU_DEP, 0, new SGuiParams(SDbRegistry.FIELD_CODE));
+        
+        bgStatus.clearSelection();
+        actionClearPaymentType();
+        actionClearDepartment();
+        
+        jbClearPaymentType.addActionListener(this);
+        jbClearDepartment.addActionListener(this);
+        moKeyPaymentType.addItemListener(this);
+        moKeyDepartment.addItemListener(this);
+        jtbStatusActive.addItemListener(this);
+        jtbStatusInactive.addItemListener(this);
+        jtbStatusAll.addItemListener(this);
     }
     
-    private void actionClearFilter1() {
-        jbClearFilter1.setEnabled(false);
+    private void itemStateChangedStatus() {
+        int filter = 0;
         
-        if (moKeyFilter1.getSelectedIndex() > 0) {
-            moKeyFilter1.setSelectedIndex(0);
-            moKeyFilter1.requestFocus();
+        if (jtbStatusActive.isSelected()) {
+            filter = EMP_STATUS_ACT;
+        }
+        else if (jtbStatusInactive.isSelected()) {
+            filter = EMP_STATUS_INA;
+        }
+        else if (jtbStatusAll.isSelected()) {
+            filter = EMP_STATUS_ALL;
+        }
+        
+        moPaneView.putFilter(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, filter));
+    }
+    
+    private void actionClearPaymentType() {
+        jbClearPaymentType.setEnabled(false);
+        
+        if (moKeyPaymentType.getSelectedIndex() > 0) {
+            moKeyPaymentType.setSelectedIndex(0); // triggers an item state changed event
+            moKeyPaymentType.requestFocusInWindow();
         }
     }
     
-    private void actionClearFilter2() {
-        jbClearFilter2.setEnabled(false);
+    private void actionClearDepartment() {
+        jbClearDepartment.setEnabled(false);
         
-        if (moKeyFilter2.getSelectedIndex() > 0) {
-            moKeyFilter2.setSelectedIndex(0);
-            moKeyFilter2.requestFocus();
+        if (moKeyDepartment.getSelectedIndex() > 0) {
+            moKeyDepartment.setSelectedIndex(0); // triggers an item state changed event
+            moKeyDepartment.requestFocusInWindow();
         }
     }
     
-    private void itemStateChangedFilter1() {
-        moPaneView.putFilter(mnFilterType1, new SGridFilterValue(mnFilterType1, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, ((SGuiItem) moKeyFilter1.getSelectedItem()).getPrimaryKey()));
-        jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
+    private void itemStateChangedPaymentType() {
+        moPaneView.putFilter(SModConsts.HRSS_TP_PAY, new SGridFilterValue(SModConsts.HRSS_TP_PAY, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, ((SGuiItem) moKeyPaymentType.getSelectedItem()).getPrimaryKey()));
+        jbClearPaymentType.setEnabled(moKeyPaymentType.getSelectedIndex() > 0);
     }
     
-    private void itemStateChangedFilter2() {
-        moPaneView.putFilter(mnFilterType2, new SGridFilterValue(mnFilterType2, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, ((SGuiItem) moKeyFilter2.getSelectedItem()).getPrimaryKey()));
-        jbClearFilter2.setEnabled(moKeyFilter2.getSelectedIndex() > 0);
+    private void itemStateChangedDepartment() {
+        moPaneView.putFilter(SModConsts.HRSU_DEP, new SGridFilterValue(SModConsts.HRSU_DEP, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, ((SGuiItem) moKeyDepartment.getSelectedItem()).getPrimaryKey()));
+        jbClearDepartment.setEnabled(moKeyDepartment.getSelectedIndex() > 0);
     }
     
     /*
      * Public methods
      */
     
-    public void updateOptions() {
-        moKeyFilter1.removeItemListener(this);
-        moKeyFilter2.removeItemListener(this);
-        jtbActive.removeItemListener(this);
-        jtbInactive.removeItemListener(this);
-        jtbAll.removeItemListener(this);
-        
-        miClient.getSession().populateCatalogue(moKeyFilter1, mnFilterType1, SLibConsts.UNDEFINED, new SGuiParams(SDbRegistry.FIELD_CODE));
-        miClient.getSession().populateCatalogue(moKeyFilter2, mnFilterType2, SLibConsts.UNDEFINED, new SGuiParams(SDbRegistry.FIELD_CODE));
-        
-        actionClearFilter1();
-        actionClearFilter2();
-        
-        moKeyFilter1.addItemListener(this);
-        moKeyFilter2.addItemListener(this);
-        jtbActive.addItemListener(this);
-        jtbInactive.addItemListener(this);
-        jtbAll.addItemListener(this);
-    }
-    
     /*
      * Protected methods
      */
     
+    /**
+     * Initialize filter.
+     * 
+     * @param value Initial value for status filter. Constants available in this class: EMP_STATUS_ACT, EMP_STATUS_INA, EMP_STATUS_ALL. Any other value disables estatus filter.
+     */
     @Override
     public void initFilter(Object value) {
-        int[] key = null;
+        mbInitializing = true;
         
-        moKeyFilter1.removeItemListener(this);
-        moKeyFilter2.removeItemListener(this);
-        jtbActive.removeItemListener(this);
-        jtbInactive.removeItemListener(this);
-        jtbAll.removeItemListener(this);
+        int status = (int) value;
         
-        key = value == null ? null : new int[] { ((int[]) value)[0] };
-        SGuiUtils.locateItem(moKeyFilter1, key);
-        jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
-        moPaneView.getFiltersMap().put(mnFilterType1, new SGridFilterValue(mnFilterType1, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, moKeyFilter1.getSelectedIndex() <= 0 ? null : key));
-        
-        key = value == null ? null : new int[] { ((int[]) value)[0], ((int[]) value)[1] };
-        SGuiUtils.locateItem(moKeyFilter2, key);
-        jbClearFilter2.setEnabled(moKeyFilter2.getSelectedIndex() > 0);
-        moPaneView.getFiltersMap().put(mnFilterType2, new SGridFilterValue(mnFilterType2, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, moKeyFilter2.getSelectedIndex() <= 0 ? null : key));
-        
-        int statusDefault = mnStatusDefault;
-        switch (statusDefault) {
+        switch (status) {
             case EMP_STATUS_ACT:
-                jtbActive.setSelected(true);
+                jtbStatusActive.setSelected(true);
                 break;
             case EMP_STATUS_INA:
-                jtbInactive.setSelected(true);
+                jtbStatusInactive.setSelected(true);
                 break;
             case EMP_STATUS_ALL:
-                jtbAll.setSelected(true);
+                jtbStatusAll.setSelected(true);
                 break;
             default:
-                statusDefault = EMP_STATUS_ACT;
-                jtbActive.setSelected(true); // by default, allways show first active registries
+                bgStatus.clearSelection();
         }
-        moPaneView.getFiltersMap().put(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, statusDefault));
         
-        moKeyFilter1.addItemListener(this);
-        moKeyFilter2.addItemListener(this);
-        jtbActive.addItemListener(this);
-        jtbInactive.addItemListener(this);
-        jtbAll.addItemListener(this);
+        if (bgStatus.getSelection() == null) {
+            moPaneView.getFiltersMap().remove(EMP_STATUS);
+            
+            jtbStatusActive.setEnabled(false);
+            jtbStatusInactive.setEnabled(false);
+            jtbStatusAll.setEnabled(false);
+        }
+        else {
+            moPaneView.getFiltersMap().put(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, status));
+            
+            jtbStatusActive.setEnabled(true);
+            jtbStatusInactive.setEnabled(true);
+            jtbStatusAll.setEnabled(true);
+        }
+        
+        moPaneView.getFiltersMap().put(SModConsts.HRSS_TP_PAY, new SGridFilterValue(SModConsts.HRSS_TP_PAY, SGridConsts.FILTER_DATA_TYPE_INT, null)); // no filter actually
+        moPaneView.getFiltersMap().put(SModConsts.HRSU_DEP, new SGridFilterValue(SModConsts.HRSU_DEP, SGridConsts.FILTER_DATA_TYPE_INT, null)); // no filter actually
+        
+        mbInitializing = false;
     }
 
     @Override
@@ -275,35 +246,33 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbClearFilter1) {
-                actionClearFilter1();
+            if (button == jbClearPaymentType) {
+                actionClearPaymentType();
             }
-            else if (button == jbClearFilter2) {
-                actionClearFilter2();
+            else if (button == jbClearDepartment) {
+                actionClearDepartment();
             }
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof JComboBox) {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
+        if (!mbInitializing && e.getStateChange() == ItemEvent.SELECTED) {
+            if (e.getSource() instanceof JComboBox) {
                 JComboBox comboBox = (JComboBox) e.getSource();
 
-                if (comboBox == moKeyFilter1) {
-                    itemStateChangedFilter1();
+                if (comboBox == moKeyPaymentType) {
+                    itemStateChangedPaymentType();
                 }
-                else if (comboBox == moKeyFilter2) {
-                    itemStateChangedFilter2();
+                else if (comboBox == moKeyDepartment) {
+                    itemStateChangedDepartment();
                 }
             }
-        }
-        else if (e.getSource() instanceof JToggleButton) {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
+            else if (e.getSource() instanceof JToggleButton) {
                 JToggleButton toggleButton = (JToggleButton) e.getSource();
 
-                if (toggleButton == jtbActive || toggleButton == jtbInactive || toggleButton == jtbAll) {
-                    actionEmpStatusStateChange();
+                if (toggleButton == jtbStatusActive || toggleButton == jtbStatusInactive || toggleButton == jtbStatusAll) {
+                    itemStateChangedStatus();
                 }
             }
         }

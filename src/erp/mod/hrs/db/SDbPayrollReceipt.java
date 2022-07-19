@@ -87,7 +87,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected int mnFkPositionId;
     protected int mnFkShiftId;
     protected int mnFkContractTypeId;
-    protected int mnFkRecruitmentSchemeTypeId;
+    protected int mnFkRecruitmentSchemaTypeId;
     protected int mnFkPositionRiskTypeId;
     protected int mnFkWorkingDayTypeId;
     /*
@@ -242,7 +242,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setFkPositionId(int n) { mnFkPositionId = n; }
     public void setFkShiftId(int n) { mnFkShiftId = n; }
     public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
-    public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
+    public void setFkRecruitmentSchemaTypeId(int n) { mnFkRecruitmentSchemaTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
     public void setFkWorkingDayTypeId(int n) { mnFkWorkingDayTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -317,7 +317,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public int getFkPositionId() { return mnFkPositionId; }
     public int getFkShiftId() { return mnFkShiftId; }
     public int getFkContractTypeId() { return mnFkContractTypeId; }
-    public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
+    public int getFkRecruitmentSchemaTypeId() { return mnFkRecruitmentSchemaTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
     public int getFkWorkingDayTypeId() { return mnFkWorkingDayTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -340,7 +340,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setAuxForceReissue(boolean b) { mbAuxForceReissue = b; }
 
     public Date getAuxIssueDateOfPayment() { return mtAuxIssueDateOfPayment; }
-    public String msAuxIssueUuidRelated() { return msAuxIssueUuidRelated; }
+    public String getAuxIssueUuidRelated() { return msAuxIssueUuidRelated; }
     /**
      * Get receipt reissue flag to force a receipt reissue when invoking method updatePayrollReceiptIssue().
      * @return Receipt reissue flag.
@@ -348,48 +348,51 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public boolean isAuxForceReissue() { return mbAuxForceReissue; }
     
     /**
-     * Create and update payroll receipt issue.
+     * Create and/or update payroll receipt issue.
      * @param session GUI session.
      * @param dateOfIssue Date of issue.
      * @throws Exception 
      */
     public void updatePayrollReceiptIssue(final SGuiSession session, final Date dateOfIssue) throws Exception {
-        String series = "";
-        int paymentSystemType = 0;
-        Date dateOfPayment = mtAuxIssueDateOfPayment;
+        boolean issueFromScratch = moChildPayrollReceiptIssue == null || moChildPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_ANNULED;
+        boolean issueReactivation = moChildPayrollReceiptIssue != null && moChildPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_NEW;
         
-        if (moChildPayrollReceiptIssue == null || moChildPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_ANNULED) {
-            // set basic data:
-            series = ((SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID })).getNumberSeries();
-            paymentSystemType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
-            if (dateOfPayment == null) {
-                dateOfPayment = dateOfIssue;
+        if (mbAuxForceReissue || issueFromScratch || issueReactivation) {
+            String numberSeries = "";
+            int paymentSystemType = 0;
+            Date dateOfPayment = mtAuxIssueDateOfPayment;
+
+            if (issueFromScratch) {
+                // set basic data:
+                numberSeries = ((SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID })).getNumberSeries();
+                paymentSystemType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
+                if (dateOfPayment == null) {
+                    dateOfPayment = dateOfIssue;
+                }
             }
-        }
-        else {
-            // preserve basic data:
-            series = moChildPayrollReceiptIssue.getNumberSeries();
-            paymentSystemType = moChildPayrollReceiptIssue.getFkPaymentSystemTypeId();
-            if (dateOfPayment == null) {
-                dateOfPayment = moChildPayrollReceiptIssue.getDateOfPayment();
+            else {
+                // preserve basic data from existing issue:
+                numberSeries = moChildPayrollReceiptIssue.getNumberSeries();
+                paymentSystemType = moChildPayrollReceiptIssue.getFkPaymentSystemTypeId();
+                if (dateOfPayment == null) {
+                    dateOfPayment = moChildPayrollReceiptIssue.getDateOfPayment();
+                }
             }
-        }
-        
-        if (mbAuxForceReissue || moChildPayrollReceiptIssue == null || moChildPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_EMITED) {
-            if (mbAuxForceReissue || moChildPayrollReceiptIssue == null || moChildPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_ANNULED) {
-                moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue(); // creating receipt issue
+
+            if (mbAuxForceReissue || issueFromScratch) {
+                moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue();
                 
                 moChildPayrollReceiptIssue.setPkPayrollId(mnPkPayrollId);
                 moChildPayrollReceiptIssue.setPkEmployeeId(mnPkEmployeeId);
                 //moChildPayrollReceiptIssue.setPkIssueId(...); // set when saved
-                moChildPayrollReceiptIssue.setNumberSeries(series); // updated when CFDI generated
+                moChildPayrollReceiptIssue.setNumberSeries(numberSeries); // updated when CFDI generated
                 moChildPayrollReceiptIssue.setNumber(0); // updated when CFDI generated
             }
-            
+
             moChildPayrollReceiptIssue.setDateOfIssue(dateOfIssue); // updated when CFDI generated
             moChildPayrollReceiptIssue.setDateOfPayment(dateOfPayment); // updated when CFDI generated
             moChildPayrollReceiptIssue.setBankAccount(""); // updated when CFDI generated
-            moChildPayrollReceiptIssue.setUuidRelated(msAuxIssueUuidRelated);
+            moChildPayrollReceiptIssue.setUuidRelated(msAuxIssueUuidRelated); // updated when CFDI generated
             moChildPayrollReceiptIssue.setEarnings_r(mdEarnings_r);
             moChildPayrollReceiptIssue.setDeductions_r(mdDeductions_r);
             moChildPayrollReceiptIssue.setPayment_r(mdPayment_r);
@@ -404,14 +407,19 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             payrollReceiptIssues.setTsUserUpdate(null);
             */
             moChildPayrollReceiptIssue.save(session);
-            
+
             mtAuxIssueDateOfPayment = null;
             msAuxIssueUuidRelated = "";
             mbAuxForceReissue = false;
         }
     }
     
-    public void updatePayrollReceiptIssueAsNewOne(final SGuiSession session) throws Exception {
+    /**
+     * Reset payroll receipt issue, if already issued an CFD is editable.
+     * @param session GUI session.
+     * @throws Exception 
+     */
+    public void updatePayrollReceiptIssueReset(final SGuiSession session) throws Exception {
         if (moChildPayrollReceiptIssue != null && moChildPayrollReceiptIssue.isCfdEditable()) {
             moChildPayrollReceiptIssue.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_NEW);
             moChildPayrollReceiptIssue.save(session);
@@ -456,6 +464,14 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         }
         
         return paymentMonthly;
+    }
+    
+    /**
+     * Check if receipt's type of recuitment schema is for assimilated.
+     * @return 
+     */
+    public boolean isAssimilable() {
+        return SHrsUtils.isAssimilable(mnFkRecruitmentSchemaTypeId);
     }
     
     @Override
@@ -537,7 +553,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mnFkPositionId = 0;
         mnFkShiftId = 0;
         mnFkContractTypeId = 0;
-        mnFkRecruitmentSchemeTypeId = 0;
+        mnFkRecruitmentSchemaTypeId = 0;
         mnFkPositionRiskTypeId = 0;
         mnFkWorkingDayTypeId = 0;
         mnFkUserInsertId = 0;
@@ -651,7 +667,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mnFkPositionId = resultSet.getInt("fk_pos");
             mnFkShiftId = resultSet.getInt("fk_sht");
             mnFkContractTypeId = resultSet.getInt("fk_tp_con");
-            mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
+            mnFkRecruitmentSchemaTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
             mnFkWorkingDayTypeId = resultSet.getInt("fk_tp_work_day");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -801,7 +817,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mnFkPositionId + ", " + 
                     mnFkShiftId + ", " + 
                     mnFkContractTypeId + ", " + 
-                    mnFkRecruitmentSchemeTypeId + ", " + 
+                    mnFkRecruitmentSchemaTypeId + ", " + 
                     mnFkPositionRiskTypeId + ", " +
                     mnFkWorkingDayTypeId + ", " + 
                     mnFkUserInsertId + ", " +
@@ -880,7 +896,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "fk_pos = " + mnFkPositionId + ", " +
                     "fk_sht = " + mnFkShiftId + ", " +
                     "fk_tp_con = " + mnFkContractTypeId + ", " +
-                    "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
+                    "fk_tp_rec_sche = " + mnFkRecruitmentSchemaTypeId + ", " +
                     "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
                     "fk_tp_work_day = " + mnFkWorkingDayTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -992,7 +1008,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setFkPositionId(this.getFkPositionId());
         registry.setFkShiftId(this.getFkShiftId());
         registry.setFkContractTypeId(this.getFkContractTypeId());
-        registry.setFkRecruitmentSchemeTypeId(this.getFkRecruitmentSchemeTypeId());
+        registry.setFkRecruitmentSchemaTypeId(this.getFkRecruitmentSchemaTypeId());
         registry.setFkPositionRiskTypeId(this.getFkPositionRiskTypeId());
         registry.setFkWorkingDayTypeId(this.getFkWorkingDayTypeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
@@ -1014,6 +1030,8 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         
         registry.setChildPayrollReceiptIssue(this.getChildPayrollReceiptIssue() == null ? null : this.getChildPayrollReceiptIssue().clone());
         
+        registry.setAuxIssueDateOfPayment(this.getAuxIssueDateOfPayment());
+        registry.setAuxIssueUuidRelated(this.getAuxIssueUuidRelated());
         registry.setAuxForceReissue(this.isAuxForceReissue());
 
         registry.setRegistryNew(this.isRegistryNew());
@@ -1080,7 +1098,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             dummyPayrollReceipt.setFkPositionId(SModSysConsts.HRSU_POS_NA);
             dummyPayrollReceipt.setFkShiftId(SModSysConsts.HRSU_SHT_NA);
             dummyPayrollReceipt.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
-            dummyPayrollReceipt.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
+            dummyPayrollReceipt.setFkRecruitmentSchemaTypeId(SModSysConsts.HRSS_TP_REC_SCHE_NA);
             dummyPayrollReceipt.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
             dummyPayrollReceipt.setFkWorkingDayTypeId(SModSysConsts.HRSS_TP_WORK_DAY_DIU);
 

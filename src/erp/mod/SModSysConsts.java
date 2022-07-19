@@ -948,13 +948,14 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_PAY_FACT_UMA = 4;  // Factor UMA
     public static final int HRSS_TP_LOAN_PAY_FACT_UMI = 5;  // Factor UMI
 
-    public static final int HRSS_TP_CON_INDEFINITE = 1;   // Indefinitely
+    public static final int HRSS_TP_CON_INDEFINITE = 1;     // Indefinitely
     public static final int HRSS_TP_CON_WORKING_TIME = 7;   // Working time
     public static final int HRSS_TP_CON_COMMISSION = 8;     // Labor commission
     public static final int HRSS_TP_CON_INSUBORDIN = 9;     // Insubordinate
     public static final int HRSS_TP_CON_RETIREMENT = 10;    // Retirement
     public static final int HRSS_TP_CON_OTH = 99;           // Other contract
     
+    public static final int HRSS_TP_REC_SCHE_NA = 0;        // Not applicable
     public static final int HRSS_TP_REC_SCHE_WAG = 2;       // Wages & salaries
     public static final int HRSS_TP_REC_SCHE_RET = 3;       // Retirees
     public static final int HRSS_TP_REC_SCHE_PEN = 4;       // Pensioners

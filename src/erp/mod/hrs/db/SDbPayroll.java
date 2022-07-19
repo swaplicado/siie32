@@ -51,6 +51,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected int mnFkPaymentTypeId;
     protected int mnFkPaysheetTypeId;
     protected int mnFkPaysheetCustomTypeId;
+    protected int mnFkRecruitmentSchemaTypeId;
     protected int mnFkMwzTypeId;
     protected int mnFkMwzReferenceTypeId;
     protected int mnFkTaxComputationTypeId;
@@ -153,6 +154,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
     public void setFkPaysheetTypeId(int n) { mnFkPaysheetTypeId = n; }
     public void setFkPaysheetCustomTypeId(int n) { mnFkPaysheetCustomTypeId = n; }
+    public void setFkRecruitmentSchemaTypeId(int n) { mnFkRecruitmentSchemaTypeId = n; }
     public void setFkMwzTypeId(int n) { mnFkMwzTypeId = n; }
     public void setFkMwzReferenceTypeId(int n) { mnFkMwzReferenceTypeId = n; }
     public void setFkTaxComputationTypeId(int n) { mnFkTaxComputationTypeId = n; }
@@ -190,6 +192,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
     public int getFkPaysheetTypeId() { return mnFkPaysheetTypeId; }
     public int getFkPaysheetCustomTypeId() { return mnFkPaysheetCustomTypeId; }
+    public int getFkRecruitmentSchemaTypeId() { return mnFkRecruitmentSchemaTypeId; }
     public int getFkMwzTypeId() { return mnFkMwzTypeId; }
     public int getFkMwzReferenceTypeId() { return mnFkMwzReferenceTypeId; }
     public int getFkTaxComputationTypeId() { return mnFkTaxComputationTypeId; }
@@ -259,7 +262,7 @@ public class SDbPayroll extends SDbRegistryUser {
      * @param session
      * @throws Exception 
      */
-    public void updatePayrollReceiptIssues(final SGuiSession session) throws Exception {
+    public void updatePayrollReceiptIssuesOnClose(final SGuiSession session) throws Exception {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
             payrollReceipt.updatePayrollReceiptIssue(session, mtDateEnd);
         }
@@ -270,20 +273,12 @@ public class SDbPayroll extends SDbRegistryUser {
      * @param session
      * @throws Exception 
      */
-    public void updatePayrollReceiptIssuesAsNewOnes(final SGuiSession session) throws Exception {
+    public void updatePayrollReceiptIssuesOnOpen(final SGuiSession session) throws Exception {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
-            payrollReceipt.updatePayrollReceiptIssueAsNewOne(session);
+            payrollReceipt.updatePayrollReceiptIssueReset(session);
         }
     }
     
-    public String composePayrollPeriod() {
-        return SLibUtils.DecimalFormatCalendarYear.format(mnPeriodYear) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnPeriod);
-    }
-
-    public String composePayrollNumber() {
-        return getPaymentTypeAbbr(mnFkPaymentTypeId) + " " + mnNumber;
-    }
-
     public String getPaymentTypeAbbr() {
         return getPaymentTypeAbbr(mnFkPaymentTypeId);
     }
@@ -304,17 +299,27 @@ public class SDbPayroll extends SDbRegistryUser {
         return abbr;
     }
 
-    // XXX replace sentences for email subject with payroll receipt number data:
+    public String composePayrollPeriod() {
+        return SLibUtils.DecimalFormatCalendarYear.format(mnPeriodYear) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnPeriod);
+    }
+
+    public String composePayrollNumber() {
+        return getPaymentTypeAbbr(mnFkPaymentTypeId) + " " + mnNumber;
+    }
+
+    public String composePayrollYearAndNumber() {
+        return mnPeriodYear + " " + composePayrollNumber();
+    }
+
     public static String composePayrollYearAndNumber(final SGuiSession session, final int payrollId) throws Exception {
         String payrollNumber = "";
         
-        String sql = "SELECT per_year, per, num, fk_tp_pay "
+        String sql = "SELECT per_year, num, fk_tp_pay "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
                 + "WHERE id_pay = " + payrollId + ";";
         ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
-            payrollNumber = SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("per_year")) + " " + 
-                    getPaymentTypeAbbr(resultSet.getInt("fk_tp_pay")) + " " + resultSet.getInt("num");
+            payrollNumber = resultSet.getInt("per_year") + " " + getPaymentTypeAbbr(resultSet.getInt("fk_tp_pay")) + " " + resultSet.getInt("num");
         }
         
         return payrollNumber;
@@ -360,6 +365,7 @@ public class SDbPayroll extends SDbRegistryUser {
         mnFkPaymentTypeId = 0;
         mnFkPaysheetTypeId = 0;
         mnFkPaysheetCustomTypeId = 0;
+        mnFkRecruitmentSchemaTypeId = 0;
         mnFkMwzTypeId = 0;
         mnFkMwzReferenceTypeId = 0;
         mnFkTaxComputationTypeId = 0;
@@ -455,6 +461,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mnFkPaymentTypeId = resultSet.getInt("p.fk_tp_pay");
             mnFkPaysheetTypeId = resultSet.getInt("fk_tp_pay_sht");
             mnFkPaysheetCustomTypeId = resultSet.getInt("fk_tp_pay_sht_cus");
+            mnFkRecruitmentSchemaTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkMwzTypeId = resultSet.getInt("p.fk_tp_mwz");
             mnFkMwzReferenceTypeId = resultSet.getInt("p.fk_tp_mwz_ref");
             mnFkTaxComputationTypeId = resultSet.getInt("p.fk_tp_tax_comp");
@@ -482,7 +489,6 @@ public class SDbPayroll extends SDbRegistryUser {
                     "WHERE pr.id_pay = " + mnPkPayrollId + "; ";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
-
                 payrollReceipt = new SDbPayrollReceipt();
                 payrollReceipt.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
                 maChildPayrollReceipts.add(payrollReceipt);
@@ -539,6 +545,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     mnFkPaymentTypeId + ", " +
                     mnFkPaysheetTypeId + ", " +
                     mnFkPaysheetCustomTypeId + ", " +
+                    mnFkRecruitmentSchemaTypeId + ", " + 
                     mnFkMwzTypeId + ", " +
                     mnFkMwzReferenceTypeId + ", " +
                     mnFkTaxComputationTypeId + ", " +
@@ -581,6 +588,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "fk_tp_pay = " + mnFkPaymentTypeId + ", " +
                     "fk_tp_pay_sht = " + mnFkPaysheetTypeId + ", " +
                     "fk_tp_pay_sht_cus = " + mnFkPaysheetCustomTypeId + ", " +
+                    "fk_tp_rec_sche = " + mnFkRecruitmentSchemaTypeId + ", " +
                     "fk_tp_mwz = " + mnFkMwzTypeId + ", " +
                     "fk_tp_mwz_ref = " + mnFkMwzReferenceTypeId + ", " +
                     "fk_tp_tax_comp = " + mnFkTaxComputationTypeId + ", " +
@@ -646,6 +654,7 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setFkPaymentTypeId(this.getFkPaymentTypeId());
         registry.setFkPaysheetTypeId(this.getFkPaysheetTypeId());
         registry.setFkPaysheetCustomTypeId(this.getFkPaysheetCustomTypeId());
+        registry.setFkRecruitmentSchemaTypeId(this.getFkRecruitmentSchemaTypeId());
         registry.setFkMwzTypeId(this.getFkMwzTypeId());
         registry.setFkMwzReferenceTypeId(this.getFkMwzReferenceTypeId());
         registry.setFkTaxComputationTypeId(this.getFkTaxComputationTypeId());
@@ -770,6 +779,7 @@ public class SDbPayroll extends SDbRegistryUser {
             dummyPayroll.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
             dummyPayroll.setFkPaysheetTypeId(SModSysConsts.HRSS_TP_PAY_SHT_NOR);
             dummyPayroll.setFkPaysheetCustomTypeId(SModSysConsts.HRSU_TP_PAY_SHT_CUS_DEF);
+            dummyPayroll.setFkRecruitmentSchemaTypeId(SModSysConsts.HRSS_TP_REC_SCHE_NA);
             dummyPayroll.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
             dummyPayroll.setFkMwzReferenceTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
             dummyPayroll.setFkTaxComputationTypeId(SModSysConsts.HRSS_TP_TAX_COMP_WOT);

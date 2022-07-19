@@ -61,8 +61,8 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         moFilterDateCutOff = new SGridFilterDateCutOff(miClient, this);
         moFilterDateCutOff.initFilter((Date) null);
 
-        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
-        moFilterEmployee.initFilter(null);
+        moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
         moFilterLoan = new SGridFilterPanelLoan(miClient, this, SModConsts.HRSS_TP_LOAN);
         moFilterLoan.initFilter(null);

@@ -66,7 +66,7 @@ public class SViewFormerPayroll extends erp.lib.table.STableTab {
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "p.credit_r", "Deducciones $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Alcance neto $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_balance", "Total neto $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "p.b_reg", "Es normal", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "p.b_cls", "Cerrada", STableConstants.WIDTH_BOOLEAN);
