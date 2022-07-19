@@ -670,7 +670,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         
         SParamsApp paramsApp = moServer.getParamsApp(); // convenience variable
         
-        moCompanyDatabase = new SDataDatabase(SLibConstants.DBMS_MY_SQL);
+        moCompanyDatabase = new SDataDatabase(SLibConstants.DBMS_MY_SQL, mnSessionId, mtTimestamp, msUserName, msCompanyDatabaseName);
         moCompanyDatabase.setUserSettings(SDataConstantsSys.DB_SETTINGS);
         
         if (moCompanyDatabase.connect(paramsApp.getDatabaseHostSrv(), paramsApp.getDatabasePortSrv(), msCompanyDatabaseName, paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd()) != SLibConstants.DB_CONNECTION_OK) {

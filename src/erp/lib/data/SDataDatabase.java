@@ -9,7 +9,19 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *
@@ -30,11 +42,29 @@ public final class SDataDatabase implements java.io.Serializable {
     private boolean mbIsConnectionStablished;
     private java.lang.String[] masSystemSettings;
 
+    
+    private String msUserName;
+    private String msCompanyDatabaseName;
+    private Integer mnSessionId;
+    private Date mtTimestamp;
     /**
      * @param type Constants defined in erp.lib.SLibConstants.
      */
     public SDataDatabase(int type) {
         mnType = type;
+        msUserName = "Server";
+        msCompanyDatabaseName = "";
+        mnSessionId = 0;
+        mtTimestamp = null;
+        reset();
+    }
+    
+    public SDataDatabase(int type, int sessionId, Date timestamp, String userName, String companyDatabaseName) {
+        mnType = type;
+        msUserName = userName;
+        msCompanyDatabaseName = companyDatabaseName;
+        mnSessionId = sessionId;
+        mtTimestamp = timestamp;
         reset();
     }
 
@@ -186,7 +216,43 @@ public final class SDataDatabase implements java.io.Serializable {
                 connected = true;
             }
             catch (SQLException e) {
-                SLibUtilities.printOutException(this, e);
+                try {
+                    Logger logger = Logger.getLogger("Logs/logs_");
+                    logger.setUseParentHandlers(false);
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy_MM");
+                    GregorianCalendar calendar = new GregorianCalendar();
+                    calendar.setTime(mtTimestamp);
+                    FileHandler fh;
+                    fh = new FileHandler("Logs/logs_" + format.format(Calendar.getInstance().getTime()) + ".log", true);
+                    logger.addHandler(fh);
+                    SimpleFormatter formatter = new SimpleFormatter() {
+                            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                            public String format(LogRecord record) {
+                                    String thrown;
+                                    if (record.getThrown() == null) {
+                                            thrown = "";
+                                    } else {
+                                            StringWriter sw = new StringWriter();
+                                            PrintWriter pw = new PrintWriter(sw);
+                                            pw.println();
+                                            record.getThrown().printStackTrace(pw);
+                                            thrown = sw.toString();
+                                    }
+                                    return String.format("%s %s \n %s %s%n", dateFormat.format(record.getMillis()),
+                                                    record.getSourceClassName() + " " + record.getSourceMethodName(), record.getLevel(), record.getMessage(), thrown);
+                            }
+                    };
+                    fh.setFormatter(formatter);
+                    int[] timeStamp ={ calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND) };
+                    String message = "Connection lost with DB /" + mnSessionId + " /" + msUserName + " /" + timeStamp[0] + "-" + timeStamp[1] + "-" + timeStamp[2] + " " + timeStamp[3] + ":" + timeStamp[4] + ":" + timeStamp[5] + " /" + msDatabase;
+                    logger.info(message);
+                    fh.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(SDataDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(SDataDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);

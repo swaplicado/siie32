@@ -1061,7 +1061,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     private void createSession() {
         SSessionCustom sessionCustom = null;
-
+        
         // XXX Improve this!: Session 2.1 must be removed completely.
 
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
@@ -1299,8 +1299,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                             createSession();
                             SCfdUtils.resetDataSetForPayroll();
 
-                            actionFileSession(true);
-                            if (!moParamsApp.getWithServer()) {
+                            boolean actionOk = actionFileSession(true);
+                            
+                            if (!moParamsApp.getWithServer() && actionOk) {
                                 createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
                                         response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
                             }
@@ -1434,10 +1435,11 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
     }
 
-    private void actionFileSession(boolean onLogin) {
+    private boolean actionFileSession(boolean onLogin) {
         moLoginSession = new SLoginSession(this);   // login session dialog needs an established connection
         moLoginSession.reset();
         moLoginSession.setVisible(true);
+        boolean response = false;
 
         if (moLoginSession.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             if (onLogin || moSessionXXX.getCurrentCompanyBranchId() != moLoginSession.getCurrentCompanyBranchId()) {   // when default company branch is defined, it is allready set in user session on login
@@ -1491,10 +1493,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             moSession.setCurrentDate(moLoginSession.getWorkingDate());
             moSessionXXX.setWorkingDate(moLoginSession.getWorkingDate());
             jtfCurrentDate.setText(moSessionXXX.getFormatters().getDateFormat().format(moSession.getCurrentDate()));
+            response = true;
         }
         else if (onLogin) {
             actionFileCloseSession();
         }
+            return response;
     }
 
     private void actionFilePassword() {

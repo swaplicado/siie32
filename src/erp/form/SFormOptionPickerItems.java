@@ -33,7 +33,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña
  */
 public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface {
 
@@ -97,6 +97,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jrbFindByItemName = new javax.swing.JRadioButton();
         jrbFindByBrand = new javax.swing.JRadioButton();
         jrbFindByManufacturer = new javax.swing.JRadioButton();
+        jrbFindByPartNum = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
         jlSearchText = new javax.swing.JLabel();
         jtfSearchText = new javax.swing.JTextField();
@@ -183,7 +184,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jPanel1.setLayout(new java.awt.GridLayout(1, 1));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda:"));
-        jPanel3.setLayout(new java.awt.GridLayout(5, 1, 5, 5));
+        jPanel3.setLayout(new java.awt.GridLayout(6, 1, 5, 5));
 
         bgFind.add(jrbFindByItemKey);
         jrbFindByItemKey.setText("Por clave");
@@ -220,6 +221,15 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             }
         });
         jPanel3.add(jrbFindByManufacturer);
+
+        bgFind.add(jrbFindByPartNum);
+        jrbFindByPartNum.setText("Por número de parte");
+        jrbFindByPartNum.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jrbFindByPartNumItemStateChanged(evt);
+            }
+        });
+        jPanel3.add(jrbFindByPartNum);
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
@@ -342,6 +352,12 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         actionFindKeyReleased();
     }//GEN-LAST:event_jckFindExactMatchItemStateChanged
 
+    private void jrbFindByPartNumItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbFindByPartNumItemStateChanged
+        if (!mbResetingForm && evt.getStateChange() == ItemEvent.SELECTED) {
+            populateTable();
+        }
+    }//GEN-LAST:event_jrbFindByPartNumItemStateChanged
+
     @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
         mbResetingForm = true;
@@ -447,18 +463,23 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         aoTableColumns = new STableColumnForm[showStock() ? 11 : 10];
 
-        if (jrbFindByItemKey.isSelected() || jrbFindByItemName.isSelected()) {
-            dataType = jrbFindByItemKey.isSelected() ? SDataConstants.ITMX_ITEM_BY_KEY : SDataConstants.ITMX_ITEM_BY_NAME;
+        if (jrbFindByItemKey.isSelected() || jrbFindByItemName.isSelected() || jrbFindByPartNum.isSelected()) {
+            dataType = jrbFindByItemKey.isSelected() ? SDataConstants.ITMX_ITEM_BY_KEY : (jrbFindByItemName.isSelected() ? SDataConstants.ITMX_ITEM_BY_NAME : SDataConstants.ITMX_ITEM_BY_PART_NUM);
 
             if (jrbFindByItemKey.isSelected()) {
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
-                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 250);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 200);
             }
-            else {
+            else if (jrbFindByItemName.isSelected()){
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
-                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 250);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 200);
+            }
+            else {
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 200);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             }
             
             if (showStock()) {
@@ -534,7 +555,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         moOptionPane.setTableRowSelection(0);
     }
-
+    
     private void actionFindKeyReleased() {
         int length = jtfSearchText.getText().length();
         int itemClassIndex = 0;
@@ -671,6 +692,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private javax.swing.JRadioButton jrbFindByItemKey;
     private javax.swing.JRadioButton jrbFindByItemName;
     private javax.swing.JRadioButton jrbFindByManufacturer;
+    private javax.swing.JRadioButton jrbFindByPartNum;
     private javax.swing.JTextField jtfCompanyBranch;
     private javax.swing.JTextField jtfSearchText;
     private javax.swing.JTextField jtfWarehouse;
