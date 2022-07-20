@@ -528,6 +528,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_SUPPLIED = 207543;
     public static final int TRNX_DPS_SUPPLIED_ETY = 207544;
     public static final int TRNX_DPS_SUPPLIED_ORDER = 207545; // order whit supplied movements
+    public static final int TRNX_DPS_SUPPLIED_ORDER_INVOICE = 207546; // order whit supplied movements invoice
 
     public static final int TRNX_DPS_RETURN_PEND = 207551;
     public static final int TRNX_DPS_RETURN_PEND_ETY = 207552;

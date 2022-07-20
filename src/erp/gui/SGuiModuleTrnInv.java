@@ -63,6 +63,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsPurSupplied;
     private javax.swing.JMenuItem jmiDpsPurSuppliedEty;
     private javax.swing.JMenuItem jmiDpsPurOrderSupplies;
+    private javax.swing.JMenuItem jmiDpsPurOrderSuppliesInvoice;
 
     private javax.swing.JMenu jmMenuDpsPurRet;
     private javax.swing.JMenuItem jmiDpsPurReturnPend;
@@ -232,6 +233,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPurSupplied = new JMenuItem("Compras surtidas");
         jmiDpsPurSuppliedEty = new JMenuItem("Compras surtidas a detalle");
         jmiDpsPurOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
+        jmiDpsPurOrderSuppliesInvoice = new JMenuItem("Pedidos de compras a surtir con factura");
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPend);
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPendEty);
         jmMenuDpsPurSup.addSeparator();
@@ -239,11 +241,13 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuDpsPurSup.add(jmiDpsPurSuppliedEty);
         jmMenuDpsPurSup.addSeparator();
         jmMenuDpsPurSup.add(jmiDpsPurOrderSupplies);
+        jmMenuDpsPurSup.add(jmiDpsPurOrderSuppliesInvoice);
         jmiDpsPurSupplyPend.addActionListener(this);
         jmiDpsPurSupplyPendEty.addActionListener(this);
         jmiDpsPurSupplied.addActionListener(this);
         jmiDpsPurSuppliedEty.addActionListener(this);
         jmiDpsPurOrderSupplies.addActionListener(this);
+        jmiDpsPurOrderSuppliesInvoice.addActionListener(this);
 
         jmMenuDpsPurRet = new JMenu("Devoluciones compras");
         jmiDpsPurReturnPend = new JMenuItem("Compras por devolver");
@@ -962,6 +966,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                     viewClass = erp.mtrn.view.SViewOrderSuppliedWithMovs.class;                    
                     title = "Pedidos " + dpsCategory.toLowerCase() + " c/surtidos";
                     break;
+                case SDataConstants.TRNX_DPS_SUPPLIED_ORDER_INVOICE:
+                    viewClass = erp.mtrn.view.SViewOrderSuppliedWithMovsInvoice.class;                    
+                    title = "Pedidos " + dpsCategory.toLowerCase() + " surtidos facturas";
+                    break;
                 case SDataConstants.TRNX_DPS_RETURNED:
                     viewClass = erp.mtrn.view.SViewDpsStockReturn.class;
                     title = dpsCategory + " devueltas";
@@ -1283,6 +1291,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsPurOrderSupplies) {
                 showView(SDataConstants.TRNX_DPS_SUPPLIED_ORDER, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
+            else if (item == jmiDpsPurOrderSuppliesInvoice) {
+                showView(SDataConstants.TRNX_DPS_SUPPLIED_ORDER_INVOICE, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if (item == jmiDpsPurReturned) {
                 showView(SDataConstants.TRNX_DPS_RETURNED, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]);

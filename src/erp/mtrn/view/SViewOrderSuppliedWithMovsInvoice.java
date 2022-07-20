@@ -30,10 +30,10 @@ import sa.lib.grid.SGridUtils;
 
 /**
  *
- * @author Uriel Castañeda, Sergio Flores
- * 2017-03-08 (sflores): Reordering of command buttons and corresponding action methods.
+ * @author Claudio Peña
+ * 
  */
-public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private JButton mjbImport;
     private JButton mjbSupply;
@@ -44,8 +44,8 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     
-    public SViewOrderSuppliedWithMovs(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_DPS_SUPPLIED_ORDER, auxType01);
+    public SViewOrderSuppliedWithMovsInvoice(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
+        super(client, tabTitle, SDataConstants.TRNX_DPS_SUPPLIED_ORDER_INVOICE, auxType01);
         initComponentsCustom();
     }
 
@@ -83,7 +83,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         addTaskBarUpperComponent(mjbViewLinks);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
-        
+            
         STableField[] aoKeyFields = new STableField[2];
         
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "f_id_1");
@@ -93,7 +93,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
         
-        aoTableColumns = new STableColumn[15];
+        aoTableColumns = new STableColumn[17];
         
         columnNumber = 0;
         
@@ -103,7 +103,9 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fecha doc.", STableConstants.WIDTH_DATE);
         aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cb_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", isViewForPurchases() ? "Proveedor" : "Cliente", 200);
-        aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave" + (isViewForPurchases() ? "Proveedor" : "Cliente"), 200);
+        aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dateFac", "Año factura", STableConstants.WIDTH_DATE);
+        aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "codeFac", "Tipo", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "numFac", "Num. fac", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[columnNumber++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb", "Sucursal" + (isViewForPurchases() ? "Proveedor" : "Cliente"), 200);
         aoTableColumns[columnNumber] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE);
         aoTableColumns[columnNumber++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererCurrency());
@@ -253,7 +255,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         for (STableSetting mvTableSetting : mvTableSettings) {
             setting = (erp.lib.table.STableSetting) mvTableSetting;
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {               
-                sqlDiogPeriod += (sqlDiogPeriod.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "g.dt");
+                sqlDiogPeriod += (sqlDiogPeriod.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
@@ -263,13 +265,11 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         }
         
         if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-            // Sales & customers:
 
             sqlBizPartner = "AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " ";
             sqlOrderByDoc = "f_id_1,f_id_2,f_dt_code, num_ser, CAST(num AS UNSIGNED INTEGER), num, dt, bp_key, bp, id_bp ";
         }
         else {
-            // Purchases & suppliers:
 
             sqlBizPartner = "AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " ";
             sqlOrderByDoc = "f_id_1,f_id_2,bp_key, bp, id_bp, f_dt_code, num_ser, CAST(num AS UNSIGNED INTEGER), num, dt ";
@@ -288,14 +288,21 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
                 "COALESCE(SUM(f_sup_orig_qty), 0) AS f_sup_orig_qty, " +
                 "((COALESCE(SUM(f_sup_orig_qty), 0) * 100 ) / SUM(f_orig_qty))/100 AS f_per_sup, " +
                 "SUM(f_orig_qty)- COALESCE(SUM(f_sup_orig_qty), 0) AS f_sup_orig_qty_pend, " +
-                "(((SUM(f_orig_qty) - COALESCE(SUM(f_sup_orig_qty), 0)) * 100 ) / SUM(f_orig_qty))/100 AS f_per_pend " +
-                "FROM (SELECT de.id_year, de.id_doc, de.id_ety, " +
-                "d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
-                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
+                "(((SUM(f_orig_qty) - COALESCE(SUM(f_sup_orig_qty), 0)) * 100 ) / SUM(f_orig_qty))/100 AS f_per_pend, " +
+                "(SELECT dt FROM trn_dps AS d WHERE d.id_year = (SELECT id_des_year FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2)) AS dateFac, " +
+                "(SELECT num FROM trn_dps AS d WHERE d.id_year = (SELECT id_des_year FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2)) AS codeFac, " +
+                "(SELECT num_ref FROM trn_dps AS d WHERE d.id_year = (SELECT id_des_year FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2)) AS numFac " +
+                "FROM (SELECT de.id_year,de.id_doc,de.id_ety, d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
+                "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "dt.code AS f_dt_code, cb.code AS f_cb_code, b.id_bp, b.bp, bc.bp_key, bb.bpb, " +
                 "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +
-                "de.qty AS f_qty, " +
-                "de.orig_qty AS f_orig_qty, " +
+                "de.qty AS f_qty,de.orig_qty AS f_orig_qty, " +
                 "COALESCE((SELECT SUM(ge.qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN 1 ELSE -1 END) FROM trn_diog_ety AS ge, trn_diog AS g WHERE " +
                 "ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND " +
                 "ge.id_year = g.id_year AND ge.id_doc = g.id_doc AND ge.b_del = 0 AND g.b_del = 0), 0) AS f_sup_qty, " +
@@ -322,13 +329,8 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
                 "d.fid_ct_dps = " + (isViewForPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[0]) + " AND " +
                 "d.fid_cl_dps = " + (isViewForPurchases() ?  SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[1]) + " AND " + 
                 "d.fid_tp_dps = " + (isViewForPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[2]) + " " +  
-                "GROUP BY de.id_year, de.id_doc, de.id_ety, " +
-                "d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
-                "dt.code, cb.code, b.id_bp, b.bp, bc.bp_key, bb.bpb, " +
-                "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol, uo.symbol, " +
-                "de.qty, de.orig_qty) AS DPS_ETY_TMP " + 
-                "GROUP BY id_year, id_doc, dt, num_ser, num, num_ref, tot_r, tot_cur_r, b_close, ts_close, usr, cur_key, f_num, " +
-                "f_dt_code, f_cb_code, id_bp, bp, bp_key, bpb " +
+                "GROUP BY d.dt , d.num_ser , d.num , d.num_ref , d.tot_r , d.tot_cur_r , d.b_close , d.ts_close , uc.usr , c.cur_key , dt.code , cb.code , b.id_bp , b.bp , bc.bp_key , bb.bpb ) AS DPS_ETY_TMP " + 
+                "GROUP BY id_year , id_doc , dt , num_ser , num , num_ref , tot_r , tot_cur_r , b_close , ts_close , usr , cur_key , f_num , f_dt_code , f_cb_code , id_bp , bp , bp_key , bpb " +
                 "ORDER BY " + sqlOrderByDoc + "; ";
     }
 

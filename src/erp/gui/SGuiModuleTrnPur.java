@@ -109,7 +109,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersAutPending;
     private javax.swing.JMenuItem jmiOrdersAutAutorized;
     private javax.swing.JMenuItem jmiOrdersAutRejected;
-    private javax.swing.JMenuItem jmiOrdersAutAutorizedSupply;
     private javax.swing.JMenuItem jmiOrdersPrice;
     private javax.swing.JMenuItem jmiOrdersPriceHist;
     private javax.swing.JMenuItem jmiOrdersFunctionalArea;
@@ -336,7 +335,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutPending = new JMenuItem("Pedidos por autorizar");
         jmiOrdersAutAutorized = new JMenuItem("Pedidos autorizados");
         jmiOrdersAutRejected = new JMenuItem("Pedidos rechazados");
-//        jmiOrdersAutAutorizedSupply = new JMenuItem("Pedidos de compras a surtir");
         jmiOrdersPrice = new JMenuItem("Precios de compras");
         jmiOrdersPriceHist = new JMenuItem("Historial de precios de compras");
         jmiOrdersFunctionalArea = new JMenuItem("Control de límite máximo mensual por área funcional");
@@ -358,8 +356,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.add(jmiOrdersAutAutorized);
         jmOrd.add(jmiOrdersAutRejected);
         jmOrd.addSeparator();
-//        jmOrd.add(jmiOrdersAutAutorizedSupply);
-//        jmOrd.addSeparator();
         jmOrd.add(jmiOrdersPrice);
         jmOrd.add(jmiOrdersPriceHist);
         jmOrd.addSeparator();
@@ -634,7 +630,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutPending.addActionListener(this);
         jmiOrdersAutAutorized.addActionListener(this);
         jmiOrdersAutRejected.addActionListener(this);
-//        jmiOrdersAutAutorizedSupply.addActionListener(this);
         jmiOrdersPrice.addActionListener(this);
         jmiOrdersPriceHist.addActionListener(this);
         jmiOrdersFunctionalArea.addActionListener(this);
@@ -1559,9 +1554,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiOrdersAutRejected) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_REJ);
             }
-//            else if (item == jmiOrdersAutAutorizedSupply) {
-//                showView(SDataConstants.TRNX_DPS_SUPPLY, SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_AUT_STK);
-//            }
             else if (item == jmiOrdersMailPending) {
                 showView(SDataConstants.TRNX_DPS_SEND_PEND, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ORD);
             }
