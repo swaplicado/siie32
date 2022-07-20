@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 204.1/ 2022-07-20
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Implementación de funcionalidad de surtido de almacenes por medio de los pedidos de compras.
+2) Correción en vista de surtido de pedidos alhacer refresh en la vista.
+
+================================================================================
 SIIE 3.2 204.0/ 2022-07-19
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
