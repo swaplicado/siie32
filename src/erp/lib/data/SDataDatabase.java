@@ -217,13 +217,13 @@ public final class SDataDatabase implements java.io.Serializable {
             }
             catch (SQLException e) {
                 try {
-                    Logger logger = Logger.getLogger("Logs/logs_");
+                    Logger logger = Logger.getLogger("logs/logs_");
                     logger.setUseParentHandlers(false);
                     SimpleDateFormat format = new SimpleDateFormat("yyyy_MM");
                     GregorianCalendar calendar = new GregorianCalendar();
                     calendar.setTime(mtTimestamp);
                     FileHandler fh;
-                    fh = new FileHandler("Logs/logs_" + format.format(Calendar.getInstance().getTime()) + ".log", true);
+                    fh = new FileHandler("logs/logs_" + format.format(Calendar.getInstance().getTime()) + ".log", true);
                     logger.addHandler(fh);
                     SimpleFormatter formatter = new SimpleFormatter() {
                             private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
