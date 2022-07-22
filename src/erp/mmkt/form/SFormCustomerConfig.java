@@ -540,7 +540,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
                         else {
                             customerBranchConfig = new SDataCustomerBranchConfig();
                             customerBranchConfig.setPkCustomerBranchId(moBizPartnerBranch.getPkBizPartnerBranchId());
-                            customerBranchConfig.setDbmsCob(moBizPartnerBranch.getBizPartnerBranch());
+                            customerBranchConfig.setDbmsCustomerBranch(moBizPartnerBranch.getBizPartnerBranch());
                             customerBranchConfig.setDbmsSalesRoute("");
                             customerBranchConfig.setDbmsSalesAgent("");
                             customerBranchConfig.setFkSalesRouteId(1);

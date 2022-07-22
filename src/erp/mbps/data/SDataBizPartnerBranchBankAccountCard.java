@@ -5,16 +5,15 @@
 
 package erp.mbps.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SDataBizPartnerBranchBankAccountCard extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -107,7 +106,7 @@ public class SDataBizPartnerBranchBankAccountCard extends erp.lib.data.SDataRegi
                     "bank_acc_card.id_bpb = bpb.id_bpb " +
                     "INNER JOIN erp.fins_tp_card AS tp_card ON " +
                     "bank_acc_card.fid_tp_card = tp_card.id_tp_card " +
-                    "WHERE bank_acc_card.id_bpb = " + key[0] + " AND bank_acc_card.id_bank_acc = " + key[1] + " AND bank_acc_card.id_card = " + key[2] + " ";
+                    "WHERE bank_acc_card.id_bpb = " + key[0] + " AND bank_acc_card.id_bank_acc = " + key[1] + " AND bank_acc_card.id_card = " + key[2] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

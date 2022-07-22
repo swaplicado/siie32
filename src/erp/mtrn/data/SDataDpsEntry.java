@@ -1075,7 +1075,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     sql = "SELECT COUNT(*) FROM trn_dps_ety_compl " +
                             "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + " ";
                     resultSet = statement.executeQuery(sql);
-                    if (resultSet.next() && resultSet.getInt(1) == 1) {
+                    if (resultSet.next() && resultSet.getInt(1) > 0) {
                         moDbmsComplement = new SDataDpsEntryComplement();
                         if (moDbmsComplement.read(new int[] { mnPkYearId, mnPkDocId, mnPkEntryId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);

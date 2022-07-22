@@ -99,6 +99,7 @@ public class SFormBizPartnerBranchAddress extends javax.swing.JDialog implements
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jckIsDeleted);

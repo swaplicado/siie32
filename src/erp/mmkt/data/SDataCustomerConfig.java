@@ -39,7 +39,6 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
 
     public SDataCustomerConfig() {
         super(SDataConstants.MKT_CFG_CUS);
-
         reset();
     }
 
@@ -113,7 +112,6 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
-
     }
 
     @Override
@@ -126,7 +124,9 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
         reset();
 
         try {
-            sql = "SELECT * FROM mkt_cfg_cus WHERE id_cus = " + key[0] + " ";
+            sql = "SELECT * " +
+                    "FROM mkt_cfg_cus " +
+                    "WHERE id_cus = " + key[0] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

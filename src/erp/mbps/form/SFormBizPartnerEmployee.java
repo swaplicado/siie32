@@ -591,6 +591,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckIsActive.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jckIsActive);
 
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("AN eliminado");
         jckIsDeleted.setToolTipText("Asociado de negocios eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(125, 23));

@@ -239,7 +239,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel14.add(jckIsDeleted);

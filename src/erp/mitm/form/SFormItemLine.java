@@ -371,7 +371,7 @@ public class SFormItemLine extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(jckIsDeleted);
@@ -398,8 +398,8 @@ public class SFormItemLine extends javax.swing.JDialog implements erp.lib.form.S
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-640)/2, (screenSize.height-400)/2, 640, 400);
+        setSize(new java.awt.Dimension(640, 400));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

@@ -68,8 +68,8 @@ public class SDataBizPartnerBranchBankAccountLayoutBank extends erp.lib.data.SDa
 
         try {
             sql = "SELECT * " +
-                    "FROM erp.bpsu_bank_acc_lay_bank  " +
-                    "WHERE id_bpb = " + key[0] + " AND id_bank_acc = " + key[1] + " AND id_tp_lay_bank = " + key[2] + " ";
+                    "FROM erp.bpsu_bank_acc_lay_bank " +
+                    "WHERE id_bpb = " + key[0] + " AND id_bank_acc = " + key[1] + " AND id_tp_lay_bank = " + key[2] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

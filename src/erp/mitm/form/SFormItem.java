@@ -580,7 +580,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jckIsDeleted.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);

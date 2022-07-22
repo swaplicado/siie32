@@ -21,7 +21,7 @@ public class SDataCustomerBranchConfigRow extends erp.lib.table.STableRow {
         SDataCustomerBranchConfig data = (SDataCustomerBranchConfig) moData;
 
         mvValues.clear();
-        mvValues.add(data.getDbmsCob());
+        mvValues.add(data.getDbmsCustomerBranch());
         mvValues.add(data.getDbmsSalesRoute());
         mvValues.add(data.getDbmsSalesAgent());        
         mvValues.add(data.getDbmsSalesSupervisor());        
@@ -32,6 +32,5 @@ public class SDataCustomerBranchConfigRow extends erp.lib.table.STableRow {
         mvValues.add(data.getUserEditTs());
         mvValues.add(data.getDbmsUserDelete());
         mvValues.add(data.getUserDeleteTs());
-
     }
 }

@@ -371,7 +371,7 @@ public class SFormCustomerBranchConfig extends javax.swing.JDialog implements er
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         moCustomerBranchConfig = (SDataCustomerBranchConfig) registry;
 
-        moFieldCustomerBranch.setFieldValue( moCustomerBranchConfig.getDbmsCob());
+        moFieldCustomerBranch.setFieldValue( moCustomerBranchConfig.getDbmsCustomerBranch());
         moFieldFkSalesRouteId.setKey(new int[] { moCustomerBranchConfig.getFkSalesRouteId() });
         if (jcbFkSalesAgentId_n.getItemCount() > 0) {
             moFieldFkSalesAgentId_n.setKey(new int[] { moCustomerBranchConfig.getFkSalesAgentId_n() });
@@ -400,7 +400,7 @@ public class SFormCustomerBranchConfig extends javax.swing.JDialog implements er
         moCustomerBranchConfig.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
         moCustomerBranchConfig.setFkSalesAgentId_n(moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]);
         moCustomerBranchConfig.setFkSalesSupervisorId_n(moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0]);
-        moCustomerBranchConfig.setDbmsCob(moFieldCustomerBranch.getString());
+        moCustomerBranchConfig.setDbmsCustomerBranch(moFieldCustomerBranch.getString());
         moCustomerBranchConfig.setDbmsSalesRoute(jcbFkSalesRouteId.getSelectedItem().toString());
         if (jcbFkSalesAgentId_n.getSelectedIndex() > 0) {
             moCustomerBranchConfig.setDbmsSalesAgent(jcbFkSalesAgentId_n.getSelectedItem().toString());

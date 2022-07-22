@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Sergio Flores, Claudio Peña
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -241,23 +241,15 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
         try {
             sql = "SELECT bpb_con.*, bpb.fid_bp, tp.tp_con, t1.tp_tel, t2.tp_tel, t3.tp_tel, un.usr, ue.usr, ud.usr " +
                     "FROM erp.bpsu_bpb_con AS bpb_con " +
-                    "INNER JOIN erp.bpsu_bpb AS bpb ON " +
-                    "bpb_con.id_bpb = bpb.id_bpb " +
-                    "INNER JOIN erp.bpss_tp_con AS tp ON " +
-                    "bpb_con.fid_tp_con = tp.id_tp_con " +
-                    "INNER JOIN erp.bpss_tp_tel AS t1 ON " +
-                    "bpb_con.fid_tp_tel_01 = t1.id_tp_tel " +
-                    "INNER JOIN erp.bpss_tp_tel AS t2 ON " +
-                    "bpb_con.fid_tp_tel_02 = t2.id_tp_tel " +
-                    "INNER JOIN erp.bpss_tp_tel AS t3 ON " +
-                    "bpb_con.fid_tp_tel_03 = t3.id_tp_tel " +
-                    "INNER JOIN erp.usru_usr AS un ON " +
-                    "bpb_con.fid_usr_new = un.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ue ON " +
-                    "bpb_con.fid_usr_edit = ue.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ud ON " +
-                    "bpb_con.fid_usr_del = ud.id_usr " +
-                    "WHERE bpb_con.id_bpb = " + key[0] + " AND bpb_con.id_con = " + key[1] + " ";
+                    "INNER JOIN erp.bpsu_bpb AS bpb ON bpb_con.id_bpb = bpb.id_bpb " +
+                    "INNER JOIN erp.bpss_tp_con AS tp ON bpb_con.fid_tp_con = tp.id_tp_con " +
+                    "INNER JOIN erp.bpss_tp_tel AS t1 ON bpb_con.fid_tp_tel_01 = t1.id_tp_tel " +
+                    "INNER JOIN erp.bpss_tp_tel AS t2 ON bpb_con.fid_tp_tel_02 = t2.id_tp_tel " +
+                    "INNER JOIN erp.bpss_tp_tel AS t3 ON bpb_con.fid_tp_tel_03 = t3.id_tp_tel " +
+                    "INNER JOIN erp.usru_usr AS un ON bpb_con.fid_usr_new = un.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ue ON bpb_con.fid_usr_edit = ue.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ud ON bpb_con.fid_usr_del = ud.id_usr " +
+                    "WHERE bpb_con.id_bpb = " + key[0] + " AND bpb_con.id_con = " + key[1] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

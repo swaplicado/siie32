@@ -140,7 +140,7 @@ public class SFormItemFamily extends javax.swing.JDialog implements erp.lib.form
         jPanel12.add(jLabel2);
         jPanel12.add(jLabel3);
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jPanel12.add(jckIsDeleted);
 

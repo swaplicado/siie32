@@ -298,6 +298,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
         jPanel3.add(jPanel14);
 
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jPanel3.add(jckIsDeleted);
 

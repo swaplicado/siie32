@@ -209,7 +209,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel13.setLayout(new java.awt.BorderLayout());
 
-        jPanel19.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel19.setLayout(new java.awt.GridLayout(6, 1, 0, 2));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -228,7 +228,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         jLabel2.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel6.add(jLabel2);
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Asociado negocios eliminado");
         jPanel6.add(jckIsDeleted);
 
@@ -325,10 +325,10 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel3.add(jPanel13, java.awt.BorderLayout.WEST);
 
-        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Categorías:"));
+        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Categorías del asociado de negocios:"));
         jPanel9.setLayout(new java.awt.BorderLayout());
 
-        jPanel15.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel15.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -417,7 +417,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jckIsCategoryDeleted.setForeground(java.awt.Color.red);
+        jckIsCategoryDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsCategoryDeleted.setText("Categoría eliminada");
         jckIsCategoryDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jckIsCategoryDeleted.setPreferredSize(new java.awt.Dimension(200, 23));

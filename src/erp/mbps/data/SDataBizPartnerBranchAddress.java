@@ -10,16 +10,16 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mcfg.data.SDataParamsErp;
+import erp.mloc.data.SDataBolZipCode;
 import erp.mloc.data.SDataCountry;
 import erp.mloc.data.SDataState;
-import erp.mloc.data.SDataBolZipCode;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import sa.gui.util.SUtilConsts;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Sergio Flores, Isabel Servín
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -194,15 +194,11 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
         try {
             sql = "SELECT a.*, ta.tp_add, un.usr, ue.usr, ud.usr " +
                     "FROM erp.bpsu_bpb_add AS a " +
-                    "INNER JOIN erp.bpss_tp_add AS ta ON " +
-                    "a.fid_tp_add = ta.id_tp_add " +
-                    "INNER JOIN erp.usru_usr AS un ON " +
-                    "a.fid_usr_new = un.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ue ON " +
-                    "a.fid_usr_edit = ue.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ud ON " +
-                    "a.fid_usr_del = ud.id_usr " +
-                    "WHERE a.id_bpb = " + key[0] + " AND a.id_add = " + key[1] + " ";
+                    "INNER JOIN erp.bpss_tp_add AS ta ON a.fid_tp_add = ta.id_tp_add " +
+                    "INNER JOIN erp.usru_usr AS un ON a.fid_usr_new = un.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ue ON a.fid_usr_edit = ue.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ud ON a.fid_usr_del = ud.id_usr " +
+                    "WHERE a.id_bpb = " + key[0] + " AND a.id_add = " + key[1] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

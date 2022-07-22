@@ -62,18 +62,20 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Isabel Servín, Sergio Flores, Claudio Peña
+ * @author Alfonso Flores, Isabel Servín, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormExtendedInterface, java.awt.event.ActionListener {
     
-    private static final int PANEL_MKT = 2;
+    private static final int TAB_MAIN = 0;
+    private static final int TAB_ADIT = 1;
+    private static final int TAB_MKT = 2;
 
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private java.util.Vector<erp.lib.form.SFormField> mvFieldsCategory;
-    private java.util.Vector<erp.lib.form.SFormField> mvFieldsCusConfig;
+    private java.util.Vector<erp.lib.form.SFormField> mvFieldsCustomerConfig;
     private erp.client.SClientInterface miClient;
 
     private erp.mbps.data.SDataBizPartner moBizPartner;
@@ -189,9 +191,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         bgGuaranteeType = new javax.swing.ButtonGroup();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jpBizPartner = new javax.swing.JPanel();
-        jPanel19 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
+        jpBizPartner11 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlFkBizPartnerIdentityTypeId = new javax.swing.JLabel();
         jcbFkBizPartnerIdentityTypeId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -222,8 +223,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jftAlternativeId = new javax.swing.JFormattedTextField();
         jlFiscalFrgId = new javax.swing.JLabel();
         jtfFiscalFrgId = new javax.swing.JTextField();
-        jPanel4 = new javax.swing.JPanel();
-        jPanel26 = new javax.swing.JPanel();
+        jpBizPartner12 = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
         jlDummy1 = new javax.swing.JLabel();
         jlIconCustomer = new javax.swing.JLabel();
@@ -250,8 +250,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel6 = new javax.swing.JPanel();
         jlBizArea = new javax.swing.JLabel();
         jcbFkBizArea = new javax.swing.JComboBox();
-        jpCategory = new javax.swing.JPanel();
-        jPanel44 = new javax.swing.JPanel();
+        jpAdditional = new javax.swing.JPanel();
+        jpAdditional1 = new javax.swing.JPanel();
         jPanel45 = new javax.swing.JPanel();
         jPanel29 = new javax.swing.JPanel();
         jlFkBizPartnerCategoryId = new javax.swing.JLabel();
@@ -351,45 +351,48 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel22 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         jtfNotes = new javax.swing.JTextField();
-        jpBizPartnerBranch = new javax.swing.JPanel();
+        jpBizPartnerBranches = new javax.swing.JPanel();
         jPanel31 = new javax.swing.JPanel();
         jbAddBranch = new javax.swing.JButton();
         jbModifyBranch = new javax.swing.JButton();
         jpMarketing = new javax.swing.JPanel();
-        jPanel21 = new javax.swing.JPanel();
-        jPanel30 = new javax.swing.JPanel();
+        jpMarketing1 = new javax.swing.JPanel();
+        jpCusConfig = new javax.swing.JPanel();
+        jPanel64 = new javax.swing.JPanel();
         jlFkCustomerTypeId = new javax.swing.JLabel();
-        jPanel55 = new javax.swing.JPanel();
         jcbFkCustomerTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkCustomerTypeId = new javax.swing.JButton();
+        jPanel65 = new javax.swing.JPanel();
         jlFkMarketSegmentId = new javax.swing.JLabel();
-        jPanel56 = new javax.swing.JPanel();
         jcbFkMarketSegmentId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkMarketSegmentId = new javax.swing.JButton();
+        jPanel66 = new javax.swing.JPanel();
         jlFkMarketSubsegmentId = new javax.swing.JLabel();
-        jPanel57 = new javax.swing.JPanel();
         jcbFkMarketSubsegmentId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkMarketSubsegmentId = new javax.swing.JButton();
+        jPanel67 = new javax.swing.JPanel();
         jlFkDistributionChannelId = new javax.swing.JLabel();
-        jPanel58 = new javax.swing.JPanel();
         jcbFkDistributionChannelId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkDistributionChannelId = new javax.swing.JButton();
+        jPanel68 = new javax.swing.JPanel();
         jlFkSalesRouteId = new javax.swing.JLabel();
-        jPanel25 = new javax.swing.JPanel();
         jcbFkSalesRouteId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkSalesRouteId = new javax.swing.JButton();
+        jPanel69 = new javax.swing.JPanel();
         jlFkSalesAgentId_n = new javax.swing.JLabel();
-        jPanel59 = new javax.swing.JPanel();
         jcbFkSalesAgentId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkSalesAgentId_n = new javax.swing.JButton();
+        jPanel70 = new javax.swing.JPanel();
         jlFkSalesSupervisorId_n = new javax.swing.JLabel();
-        jPanel27 = new javax.swing.JPanel();
         jcbFkSalesSupervisorId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkSalesSupervisorId_n = new javax.swing.JButton();
+        jPanel71 = new javax.swing.JPanel();
         jckIsFreeDiscountDoc = new javax.swing.JCheckBox();
         jckIsFreeCommissions = new javax.swing.JCheckBox();
+        jPanel72 = new javax.swing.JPanel();
         jckIsSignRestricted = new javax.swing.JCheckBox();
         jlIsSignRestrictedHint = new javax.swing.JLabel();
+        jPanel73 = new javax.swing.JPanel();
         jckIsSignImmex = new javax.swing.JCheckBox();
         jlIsSignImmexHint = new javax.swing.JLabel();
         jpCusBranchConfig = new javax.swing.JPanel();
@@ -420,14 +423,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jpBizPartner.setLayout(new java.awt.BorderLayout());
 
-        jPanel19.setPreferredSize(new java.awt.Dimension(1008, 220));
-        jPanel19.setLayout(new java.awt.BorderLayout());
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setPreferredSize(new java.awt.Dimension(611, 200));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel13.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jpBizPartner11.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpBizPartner11.setLayout(new java.awt.GridLayout(7, 1, 0, 2));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -446,12 +445,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel24.add(jLabel1);
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Asociado negocios eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(jckIsDeleted);
 
-        jPanel13.add(jPanel24);
+        jpBizPartner11.add(jPanel24);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -469,7 +468,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jckIsAttRelatedParty.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(jckIsAttRelatedParty);
 
-        jPanel13.add(jPanel18);
+        jpBizPartner11.add(jPanel18);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -480,7 +479,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfLastName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel28.add(jtfLastName);
 
-        jPanel13.add(jPanel28);
+        jpBizPartner11.add(jPanel28);
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -491,7 +490,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel2.add(jtfFirstName);
 
-        jPanel13.add(jPanel2);
+        jpBizPartner11.add(jPanel2);
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -502,7 +501,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfBizPartner.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel32.add(jtfBizPartner);
 
-        jPanel13.add(jPanel32);
+        jpBizPartner11.add(jPanel32);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -519,7 +518,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbRecreateBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel34.add(jbRecreateBizPartnerCommercial);
 
-        jPanel13.add(jPanel34);
+        jpBizPartner11.add(jPanel34);
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -553,19 +552,13 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jtfFiscalFrgId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel33.add(jtfFiscalFrgId);
 
-        jPanel13.add(jPanel33);
+        jpBizPartner11.add(jPanel33);
 
-        jPanel1.add(jPanel13, java.awt.BorderLayout.NORTH);
+        jPanel1.add(jpBizPartner11, java.awt.BorderLayout.WEST);
 
-        jPanel19.add(jPanel1, java.awt.BorderLayout.WEST);
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Categorías:"));
-        jPanel4.setMinimumSize(new java.awt.Dimension(355, 220));
-        jPanel4.setPreferredSize(new java.awt.Dimension(1, 210));
-        jPanel4.setLayout(new java.awt.BorderLayout());
-
-        jPanel26.setPreferredSize(new java.awt.Dimension(385, 200));
-        jPanel26.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jpBizPartner12.setBorder(javax.swing.BorderFactory.createTitledBorder("Categorías del asociado de negocios:"));
+        jpBizPartner12.setPreferredSize(new java.awt.Dimension(385, 200));
+        jpBizPartner12.setLayout(new java.awt.GridLayout(6, 1, 0, 2));
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -597,7 +590,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlIconCreditor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/bp_cdr.png"))); // NOI18N
         jPanel20.add(jlIconCreditor);
 
-        jPanel26.add(jPanel20);
+        jpBizPartner12.add(jPanel20);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -621,7 +614,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbCreditor.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel15.add(jbCreditor);
 
-        jPanel26.add(jPanel15);
+        jpBizPartner12.add(jPanel15);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -637,7 +630,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jckIsAttSalesAgent.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel11.add(jckIsAttSalesAgent);
 
-        jPanel26.add(jPanel11);
+        jpBizPartner12.add(jPanel11);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -654,17 +647,17 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jckIsAttPartnerShareholder.setText("Es socio/accionista");
         jPanel12.add(jckIsAttPartnerShareholder);
 
-        jPanel26.add(jPanel12);
+        jpBizPartner12.add(jPanel12);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jckIsCategoryDeleted.setForeground(java.awt.Color.red);
+        jckIsCategoryDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsCategoryDeleted.setText("Categoría eliminada");
         jckIsCategoryDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jckIsCategoryDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel3.add(jckIsCategoryDeleted);
 
-        jPanel26.add(jPanel3);
+        jpBizPartner12.add(jPanel3);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -676,19 +669,17 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jcbFkBizArea.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel6.add(jcbFkBizArea);
 
-        jPanel26.add(jPanel6);
+        jpBizPartner12.add(jPanel6);
 
-        jPanel4.add(jPanel26, java.awt.BorderLayout.NORTH);
+        jPanel1.add(jpBizPartner12, java.awt.BorderLayout.CENTER);
 
-        jPanel19.add(jPanel4, java.awt.BorderLayout.CENTER);
-
-        jpBizPartner.add(jPanel19, java.awt.BorderLayout.NORTH);
+        jpBizPartner.add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jTabbedPane1.addTab("Información general", jpBizPartner);
 
-        jpCategory.setLayout(new java.awt.BorderLayout());
+        jpAdditional.setLayout(new java.awt.BorderLayout());
 
-        jPanel44.setLayout(new java.awt.BorderLayout());
+        jpAdditional1.setLayout(new java.awt.BorderLayout());
 
         jPanel45.setBorder(javax.swing.BorderFactory.createTitledBorder("Categoría y tipo de asociado de negocios e información de crédito:"));
         jPanel45.setLayout(new java.awt.GridLayout(14, 1, 0, 2));
@@ -931,7 +922,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel45.add(jPanel52);
 
-        jPanel44.add(jPanel45, java.awt.BorderLayout.WEST);
+        jpAdditional1.add(jPanel45, java.awt.BorderLayout.WEST);
 
         jPanel46.setBorder(javax.swing.BorderFactory.createTitledBorder("Información adicional:"));
         jPanel46.setLayout(new java.awt.GridLayout(14, 1, 0, 2));
@@ -1112,13 +1103,13 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jPanel46.add(jPanel22);
 
-        jPanel44.add(jPanel46, java.awt.BorderLayout.CENTER);
+        jpAdditional1.add(jPanel46, java.awt.BorderLayout.CENTER);
 
-        jpCategory.add(jPanel44, java.awt.BorderLayout.NORTH);
+        jpAdditional.add(jpAdditional1, java.awt.BorderLayout.NORTH);
 
-        jpBizPartnerBranch.setBorder(javax.swing.BorderFactory.createTitledBorder("Sucursales del asociado de negocios:"));
-        jpBizPartnerBranch.setPreferredSize(new java.awt.Dimension(787, 250));
-        jpBizPartnerBranch.setLayout(new java.awt.BorderLayout());
+        jpBizPartnerBranches.setBorder(javax.swing.BorderFactory.createTitledBorder("Sucursales del asociado de negocios:"));
+        jpBizPartnerBranches.setPreferredSize(new java.awt.Dimension(787, 250));
+        jpBizPartnerBranches.setLayout(new java.awt.BorderLayout());
 
         jPanel31.setPreferredSize(new java.awt.Dimension(871, 23));
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 1, 0));
@@ -1133,139 +1124,178 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbModifyBranch.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel31.add(jbModifyBranch);
 
-        jpBizPartnerBranch.add(jPanel31, java.awt.BorderLayout.NORTH);
+        jpBizPartnerBranches.add(jPanel31, java.awt.BorderLayout.NORTH);
 
-        jpCategory.add(jpBizPartnerBranch, java.awt.BorderLayout.CENTER);
+        jpAdditional.add(jpBizPartnerBranches, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Información adicional", jpCategory);
+        jTabbedPane1.addTab("Información adicional", jpAdditional);
 
+        jpMarketing.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de comercialización para clientes:"));
         jpMarketing.setLayout(new java.awt.BorderLayout(0, 10));
 
-        jPanel21.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de comercialización para clientes:"));
-        jPanel21.setPreferredSize(new java.awt.Dimension(100, 300));
-        jPanel21.setLayout(new java.awt.BorderLayout());
+        jpMarketing1.setLayout(new java.awt.BorderLayout());
 
-        jPanel30.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del cliente:"));
-        jPanel30.setPreferredSize(new java.awt.Dimension(400, 175));
-        jPanel30.setLayout(new java.awt.GridLayout(10, 2, 5, 2));
+        jpCusConfig.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del cliente:"));
+        jpCusConfig.setLayout(new java.awt.GridLayout(10, 1, 0, 2));
+
+        jPanel64.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkCustomerTypeId.setText("Tipo de cliente: *");
-        jPanel30.add(jlFkCustomerTypeId);
+        jlFkCustomerTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel64.add(jlFkCustomerTypeId);
 
-        jPanel55.setLayout(new java.awt.BorderLayout(5, 5));
-        jPanel55.add(jcbFkCustomerTypeId, java.awt.BorderLayout.CENTER);
+        jcbFkCustomerTypeId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel64.add(jcbFkCustomerTypeId);
 
         jbFkCustomerTypeId.setText("...");
         jbFkCustomerTypeId.setToolTipText("Seleccionar tipo de cliente");
         jbFkCustomerTypeId.setFocusable(false);
         jbFkCustomerTypeId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel55.add(jbFkCustomerTypeId, java.awt.BorderLayout.EAST);
+        jPanel64.add(jbFkCustomerTypeId);
 
-        jPanel30.add(jPanel55);
+        jpCusConfig.add(jPanel64);
+
+        jPanel65.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkMarketSegmentId.setText("Segmento de mercado: *");
-        jPanel30.add(jlFkMarketSegmentId);
+        jlFkMarketSegmentId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel65.add(jlFkMarketSegmentId);
 
-        jPanel56.setLayout(new java.awt.BorderLayout(5, 5));
-        jPanel56.add(jcbFkMarketSegmentId, java.awt.BorderLayout.CENTER);
+        jcbFkMarketSegmentId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel65.add(jcbFkMarketSegmentId);
 
         jbFkMarketSegmentId.setText("...");
-        jbFkMarketSegmentId.setToolTipText("Seleccionar segmento de mercado del cliente");
+        jbFkMarketSegmentId.setToolTipText("Seleccionar segmento de mercado");
         jbFkMarketSegmentId.setFocusable(false);
         jbFkMarketSegmentId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel56.add(jbFkMarketSegmentId, java.awt.BorderLayout.EAST);
+        jPanel65.add(jbFkMarketSegmentId);
 
-        jPanel30.add(jPanel56);
+        jpCusConfig.add(jPanel65);
+
+        jPanel66.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkMarketSubsegmentId.setText("Subsegmento de mercado: *");
-        jPanel30.add(jlFkMarketSubsegmentId);
+        jlFkMarketSubsegmentId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel66.add(jlFkMarketSubsegmentId);
 
-        jPanel57.setLayout(new java.awt.BorderLayout(5, 5));
-        jPanel57.add(jcbFkMarketSubsegmentId, java.awt.BorderLayout.CENTER);
+        jcbFkMarketSubsegmentId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel66.add(jcbFkMarketSubsegmentId);
 
         jbFkMarketSubsegmentId.setText("...");
-        jbFkMarketSubsegmentId.setToolTipText("Seleccionar subsegmento de mercado del cliente");
+        jbFkMarketSubsegmentId.setToolTipText("Seleccionar subsegmento de mercado");
         jbFkMarketSubsegmentId.setFocusable(false);
         jbFkMarketSubsegmentId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel57.add(jbFkMarketSubsegmentId, java.awt.BorderLayout.EAST);
+        jPanel66.add(jbFkMarketSubsegmentId);
 
-        jPanel30.add(jPanel57);
+        jpCusConfig.add(jPanel66);
+
+        jPanel67.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkDistributionChannelId.setText("Canal de distribución: *");
-        jPanel30.add(jlFkDistributionChannelId);
+        jlFkDistributionChannelId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel67.add(jlFkDistributionChannelId);
 
-        jPanel58.setLayout(new java.awt.BorderLayout(5, 5));
-        jPanel58.add(jcbFkDistributionChannelId, java.awt.BorderLayout.CENTER);
+        jcbFkDistributionChannelId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel67.add(jcbFkDistributionChannelId);
 
         jbFkDistributionChannelId.setText("...");
-        jbFkDistributionChannelId.setToolTipText("Seleccionar canal de distribución del cliente");
+        jbFkDistributionChannelId.setToolTipText("Seleccionar canal de distribución");
         jbFkDistributionChannelId.setFocusable(false);
         jbFkDistributionChannelId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel58.add(jbFkDistributionChannelId, java.awt.BorderLayout.EAST);
+        jPanel67.add(jbFkDistributionChannelId);
 
-        jPanel30.add(jPanel58);
+        jpCusConfig.add(jPanel67);
+
+        jPanel68.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkSalesRouteId.setText("Ruta de ventas: *");
-        jPanel30.add(jlFkSalesRouteId);
+        jlFkSalesRouteId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel68.add(jlFkSalesRouteId);
 
-        jPanel25.setLayout(new java.awt.BorderLayout(5, 5));
-        jPanel25.add(jcbFkSalesRouteId, java.awt.BorderLayout.CENTER);
+        jcbFkSalesRouteId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel68.add(jcbFkSalesRouteId);
 
-        jbFkSalesRouteId.setText("jButton1");
+        jbFkSalesRouteId.setText("...");
+        jbFkSalesRouteId.setToolTipText("Seleccionar ruta de ventas");
         jbFkSalesRouteId.setFocusable(false);
         jbFkSalesRouteId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel25.add(jbFkSalesRouteId, java.awt.BorderLayout.LINE_END);
+        jPanel68.add(jbFkSalesRouteId);
 
-        jPanel30.add(jPanel25);
+        jpCusConfig.add(jPanel68);
+
+        jPanel69.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkSalesAgentId_n.setText("Agente de ventas:");
-        jPanel30.add(jlFkSalesAgentId_n);
+        jlFkSalesAgentId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel69.add(jlFkSalesAgentId_n);
 
-        jPanel59.setLayout(new java.awt.BorderLayout(5, 5));
-        jPanel59.add(jcbFkSalesAgentId_n, java.awt.BorderLayout.CENTER);
+        jcbFkSalesAgentId_n.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel69.add(jcbFkSalesAgentId_n);
 
         jbFkSalesAgentId_n.setText("...");
-        jbFkSalesAgentId_n.setToolTipText("Seleccionar agente de ventas del cliente");
+        jbFkSalesAgentId_n.setToolTipText("Seleccionar agente de ventas");
         jbFkSalesAgentId_n.setFocusable(false);
         jbFkSalesAgentId_n.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel59.add(jbFkSalesAgentId_n, java.awt.BorderLayout.EAST);
+        jPanel69.add(jbFkSalesAgentId_n);
 
-        jPanel30.add(jPanel59);
+        jpCusConfig.add(jPanel69);
+
+        jPanel70.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkSalesSupervisorId_n.setText("Supervisor de ventas:");
-        jPanel30.add(jlFkSalesSupervisorId_n);
+        jlFkSalesSupervisorId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel70.add(jlFkSalesSupervisorId_n);
 
-        jPanel27.setLayout(new java.awt.BorderLayout(5, 5));
-        jPanel27.add(jcbFkSalesSupervisorId_n, java.awt.BorderLayout.CENTER);
+        jcbFkSalesSupervisorId_n.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel70.add(jcbFkSalesSupervisorId_n);
 
-        jbFkSalesSupervisorId_n.setText("jButton1");
+        jbFkSalesSupervisorId_n.setText("...");
+        jbFkSalesSupervisorId_n.setToolTipText("Seleccionar supervisor de ventas");
         jbFkSalesSupervisorId_n.setFocusable(false);
         jbFkSalesSupervisorId_n.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel27.add(jbFkSalesSupervisorId_n, java.awt.BorderLayout.LINE_END);
+        jPanel70.add(jbFkSalesSupervisorId_n);
 
-        jPanel30.add(jPanel27);
+        jpCusConfig.add(jPanel70);
+
+        jPanel71.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsFreeDiscountDoc.setText("Sin descuento");
-        jPanel30.add(jckIsFreeDiscountDoc);
+        jckIsFreeDiscountDoc.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel71.add(jckIsFreeDiscountDoc);
 
         jckIsFreeCommissions.setText("Sin comisiones");
-        jPanel30.add(jckIsFreeCommissions);
+        jckIsFreeCommissions.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel71.add(jckIsFreeCommissions);
 
-        jckIsSignRestricted.setText("Es restringido al timbrar CFDI");
-        jPanel30.add(jckIsSignRestricted);
+        jpCusConfig.add(jPanel71);
+
+        jPanel72.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsSignRestricted.setText("Es cliente restringido al timbrar CFDI");
+        jckIsSignRestricted.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel72.add(jckIsSignRestricted);
 
         jlIsSignRestrictedHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlIsSignRestrictedHint.setText("(Validar permiso especial al timbrar.)");
-        jPanel30.add(jlIsSignRestrictedHint);
+        jlIsSignRestrictedHint.setText("(Validar permiso especial al timbrar CFDI de facturas)");
+        jlIsSignRestrictedHint.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel72.add(jlIsSignRestrictedHint);
 
-        jckIsSignImmex.setText("Es IMMEX al timbrar CFDI");
-        jPanel30.add(jckIsSignImmex);
+        jpCusConfig.add(jPanel72);
+
+        jPanel73.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsSignImmex.setText("Es cliente IMMEX al timbrar CFDI");
+        jckIsSignImmex.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel73.add(jckIsSignImmex);
 
         jlIsSignImmexHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlIsSignImmexHint.setText("(Validar permiso especial al timbrar.)");
-        jPanel30.add(jlIsSignImmexHint);
+        jlIsSignImmexHint.setText("(Validar permiso especial al timbrar CFDI de facturas)");
+        jlIsSignImmexHint.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel73.add(jlIsSignImmexHint);
 
-        jPanel21.add(jPanel30, java.awt.BorderLayout.WEST);
+        jpCusConfig.add(jPanel73);
+
+        jpMarketing1.add(jpCusConfig, java.awt.BorderLayout.NORTH);
 
         jpCusBranchConfig.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de las sucursales del cliente:"));
         jpCusBranchConfig.setPreferredSize(new java.awt.Dimension(783, 22));
@@ -1301,9 +1331,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jpCusBranchConfig.add(jpNotesAction, java.awt.BorderLayout.PAGE_START);
 
-        jPanel21.add(jpCusBranchConfig, java.awt.BorderLayout.CENTER);
+        jpMarketing1.add(jpCusBranchConfig, java.awt.BorderLayout.CENTER);
 
-        jpMarketing.add(jPanel21, java.awt.BorderLayout.NORTH);
+        jpMarketing.add(jpMarketing1, java.awt.BorderLayout.CENTER);
 
         jTabbedPane1.addTab("Comercialización", jpMarketing);
 
@@ -1380,7 +1410,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         mvFields = new Vector<>();
         mvFieldsCategory = new Vector<>();
-        mvFieldsCusConfig = new Vector<>();
+        mvFieldsCustomerConfig = new Vector<>();
 
         moIconHasCategorySup = new ImageIcon(getClass().getResource("/erp/img/bp_sup.png"));
         moIconHasCategoryCus = new ImageIcon(getClass().getResource("/erp/img/bp_cus.png"));
@@ -1392,7 +1422,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moComboboxGrpMarketSegment = new SFormComboBoxGroup(miClient);
 
         moCusBranchConfigPane = new STablePane(miClient);
-        moCusBranchConfigPane.setDoubleClickAction(this, "publicActionConfigCobEdit");
+        moCusBranchConfigPane.setDoubleClickAction(this, "publicActionModifyCusBranchConfig");
         jpCusBranchConfig.add(moCusBranchConfigPane, BorderLayout.CENTER);
 
         erp.lib.table.STableColumnForm tableColumnsBizPartnerBranch[];
@@ -1402,8 +1432,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jpBizPartner.add(moPanelBizPartnerBranch, BorderLayout.CENTER);
 
         moBizPartnerBranchPane = new STablePane(miClient);
-        moBizPartnerBranchPane.setDoubleClickAction(this, "publicActionModify");
-        jpBizPartnerBranch.add(moBizPartnerBranchPane, BorderLayout.CENTER);
+        moBizPartnerBranchPane.setDoubleClickAction(this, "publicActionModifyBranch");
+        jpBizPartnerBranches.add(moBizPartnerBranchPane, BorderLayout.CENTER);
 
         maoDbmsCategorySettings = new SDataBizPartnerCategory[SDataConstantsSys.BPSX_CT_BP_QTY];
 
@@ -1583,17 +1613,17 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCategory.add(moFieldWeb);
         mvFieldsCategory.add(moFieldNotes);
 
-        mvFieldsCusConfig.add(moFieldFkCustomerTypeId);
-        mvFieldsCusConfig.add(moFieldFkMarketSegmentId);
-        mvFieldsCusConfig.add(moFieldFkMarketSubsegmentId);
-        mvFieldsCusConfig.add(moFieldFkDistributionChannelId);
-        mvFieldsCusConfig.add(moFieldFkSalesRouteId);
-        mvFieldsCusConfig.add(moFieldFkSalesAgentId_n);
-        mvFieldsCusConfig.add(moFieldFkSalesSupervisorId_n);
-        mvFieldsCusConfig.add(moFieldIsFreeDiscountDoc);
-        mvFieldsCusConfig.add(moFieldIsFreeCommissions);
-        mvFieldsCusConfig.add(moFieldIsSignRestricted);
-        mvFieldsCusConfig.add(moFieldIsSignImmex);
+        mvFieldsCustomerConfig.add(moFieldFkCustomerTypeId);
+        mvFieldsCustomerConfig.add(moFieldFkMarketSegmentId);
+        mvFieldsCustomerConfig.add(moFieldFkMarketSubsegmentId);
+        mvFieldsCustomerConfig.add(moFieldFkDistributionChannelId);
+        mvFieldsCustomerConfig.add(moFieldFkSalesRouteId);
+        mvFieldsCustomerConfig.add(moFieldFkSalesAgentId_n);
+        mvFieldsCustomerConfig.add(moFieldFkSalesSupervisorId_n);
+        mvFieldsCustomerConfig.add(moFieldIsFreeDiscountDoc);
+        mvFieldsCustomerConfig.add(moFieldIsFreeCommissions);
+        mvFieldsCustomerConfig.add(moFieldIsSignRestricted);
+        mvFieldsCustomerConfig.add(moFieldIsSignImmex);
 
         moFormBizPartnerBranch = new SFormBizPartnerBranch(miClient);
 
@@ -1651,9 +1681,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartnerBranchPane.addTableColumn(tableColumnsBizPartnerBranch[i]);
         }
 
-        SFormUtilities.createActionMap(rootPane, this, "publicActionAdd", "add", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
-        SFormUtilities.createActionMap(rootPane, this, "publicActionModify", "modify", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
-        SFormUtilities.createActionMap(rootPane, this, "publicActionDelete", "delete", KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "publicActionAddBranch", "add", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "publicActionModifyBranch", "modify", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
 
         i = 0;
         tableColumnsCob = new STableColumnForm[11];
@@ -1762,7 +1791,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbCreditor.setEnabled(true);
             jbDebtor.setEnabled(true);
             
-            jTabbedPane1.setEnabledAt(PANEL_MKT, false);
+            jTabbedPane1.setEnabledAt(TAB_MKT, false);
         }
         else if (mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP) {
             setFieldEnableCategory(true);
@@ -1771,7 +1800,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbCreditor.setEnabled(true);
             jbDebtor.setEnabled(true);
             
-            jTabbedPane1.setEnabledAt(PANEL_MKT, false);
+            jTabbedPane1.setEnabledAt(TAB_MKT, false);
         }
         else if (mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CUS) {
             setFieldEnableCategory(true);
@@ -1780,7 +1809,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbCreditor.setEnabled(true);
             jbDebtor.setEnabled(true);
             
-            jTabbedPane1.setEnabledAt(PANEL_MKT, true);
+            jTabbedPane1.setEnabledAt(TAB_MKT, true);
         }
         
         SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerCategoryId, SDataConstants.BPSS_CT_BP);
@@ -2223,21 +2252,23 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             int index = moBizPartnerBranchPane.getTable().getSelectedRow();
 
             if (index != -1) {
-                SDataBizPartnerBranch dataBranch = (SDataBizPartnerBranch) moBizPartnerBranchPane.getTableRow(index).getData();
+                SDataBizPartnerBranch branch = (SDataBizPartnerBranch) moBizPartnerBranchPane.getTableRow(index).getData();
                 
                 moFormBizPartnerBranch.setParamBizPartnerDescription(getBizPartnerName());
                 moFormBizPartnerBranch.formRefreshCatalogues();
                 moFormBizPartnerBranch.formReset();
-                moFormBizPartnerBranch.setRegistry(dataBranch);
+                moFormBizPartnerBranch.setRegistry(branch);
                 moFormBizPartnerBranch.setVisible(true);
 
                 if (moFormBizPartnerBranch.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                    dataBranch = (erp.mbps.data.SDataBizPartnerBranch) moFormBizPartnerBranch.getRegistry();
-                    dataBranch.setFkUserEditId(miClient.getSessionXXX().getUser().getPkUserId());
-                    dataBranch.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser()); 
-                    dataBranch.setUserEditTs(new Date());
+                    branch = (erp.mbps.data.SDataBizPartnerBranch) moFormBizPartnerBranch.getRegistry();
+                    branch.setFkUserEditId(miClient.getSessionXXX().getUser().getPkUserId());
+                    branch.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser()); 
+                    branch.setUserEditTs(new Date());
 
-                    moBizPartnerBranchPane.getTableModel().getTableRows().set(index, new SDataBizPartnerBranchRow(dataBranch));
+                    moBizPartnerBranchPane.setTableRow(new SDataBizPartnerBranchRow(branch), index);
+                    ((STableModel) moBizPartnerBranchPane.getTable().getModel()).getTableRow(index).setStyle(branch.getIsDeleted() ? STableConstants.STYLE_DELETE : 0);
+                    
                     moBizPartnerBranchPane.renderTableRows();
                     moBizPartnerBranchPane.setTableRowSelection(index);
                 }
@@ -2325,23 +2356,36 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         int index = moCusBranchConfigPane.getTable().getSelectedRow();
         
         if (index != -1) {
-            SDataCustomerBranchConfig cusBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();;
+            SDataCustomerBranchConfig oldCustomerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();
             
-            SFormCustomerBranchConfig formCusBranchConfig = new SFormCustomerBranchConfig(miClient);
-            formCusBranchConfig.formRefreshCatalogues();
-            formCusBranchConfig.formReset();
-            formCusBranchConfig.setRegistry(cusBranchConfig);
-            formCusBranchConfig.setVisible(true);
+            SFormCustomerBranchConfig form = new SFormCustomerBranchConfig(miClient);
+            form.formRefreshCatalogues();
+            form.formReset();
+            form.setRegistry(oldCustomerBranchConfig);
+            form.setVisible(true);
             
-            if (formCusBranchConfig.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                cusBranchConfig = (SDataCustomerBranchConfig) formCusBranchConfig.getRegistry();
-                cusBranchConfig.setFkUserEditId(miClient.getSessionXXX().getUser().getPkUserId());
-                cusBranchConfig.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser()); 
-                cusBranchConfig.setUserEditTs(new Date());
+            if (form.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+                // create new configuration:
+                
+                SDataCustomerBranchConfig newCustomerBranchConfig = (SDataCustomerBranchConfig) form.getRegistry();
+                newCustomerBranchConfig.setFkUserEditId(miClient.getSessionXXX().getUser().getPkUserId());
+                newCustomerBranchConfig.setDbmsUserEdit(miClient.getSessionXXX().getUser().getUser()); 
+                newCustomerBranchConfig.setUserEditTs(new Date());
 
-                moBizPartner.getDbmsBizPartnerBranches().get(index + 1).setDbmsDataCustomerBranchConfig(cusBranchConfig);
-                moCusBranchConfigPane.setTableRow(new SDataCustomerBranchConfigRow(cusBranchConfig), index);
+                moCusBranchConfigPane.setTableRow(new SDataCustomerBranchConfigRow(newCustomerBranchConfig), index);
                 moCusBranchConfigPane.renderTableRows();
+                moCusBranchConfigPane.setTableRowSelection(index);
+                
+                // replace old configuration with new one into corresponding branch:
+                
+                for (int branchIndex = 0; branchIndex < moBizPartnerBranchPane.getTableGuiRowCount(); branchIndex++) {
+                    SDataBizPartnerBranch branch = ((SDataBizPartnerBranch) moBizPartnerBranchPane.getTableRow(branchIndex).getData());
+                    
+                    if ((branch.getPkBizPartnerBranchId() != 0 && branch.getPkBizPartnerBranchId() == oldCustomerBranchConfig.getPkCustomerBranchId()) || (branch.getDbmsDataCustomerBranchConfig() == oldCustomerBranchConfig)) {
+                        branch.setDbmsDataCustomerBranchConfig(newCustomerBranchConfig);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -2351,43 +2395,44 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         if (index != -1) {
             if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
-                SDataCustomerBranchConfig cusBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();
+                // update existing configuration:
                 
-                if (cusBranchConfig.getDbmsSalesAgent().length() > 0) {
-                    int nPosition = 0;
-                    
-                    for (int i = 0; i < moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
-                        int nPkCustomerVector = moBizPartner.getDbmsBizPartnerBranches().get(i).getDbmsDataCustomerBranchConfig().getPkCustomerBranchId();
-                        int nPkCustomerGrid = cusBranchConfig.getPkCustomerBranchId();
-                        if (nPkCustomerVector == nPkCustomerGrid) {
-                            nPosition = i;
-                            break;
-                        }
-                    }
-                    moBizPartner.getDbmsBizPartnerBranches().get(nPosition).getDbmsDataCustomerBranchConfig().setIsDeleted(true);
-                }
+                SDataCustomerBranchConfig customerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();
                 
-                moCusBranchConfigPane.removeTableRow(index);
+                customerBranchConfig.setIsDeleted(!customerBranchConfig.getIsDeleted());
+                customerBranchConfig.setFkUserDeleteId(miClient.getSessionXXX().getUser().getPkUserId());
+                customerBranchConfig.setDbmsUserDelete(miClient.getSessionXXX().getUser().getUser()); 
+                customerBranchConfig.setUserDeleteTs(new Date());
+                
+                customerBranchConfig.setIsRegistryEdited(true);
+
+                moCusBranchConfigPane.setTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig), index);
+                ((STableModel) moCusBranchConfigPane.getTable().getModel()).getTableRow(index).setStyle(customerBranchConfig.getIsDeleted() ? STableConstants.STYLE_DELETE : 0);
+                
                 moCusBranchConfigPane.renderTableRows();
-                moCusBranchConfigPane.setTableRowSelection(index < moCusBranchConfigPane.getTableGuiRowCount() ? index : moCusBranchConfigPane.getTableGuiRowCount() - 1);
+                moCusBranchConfigPane.setTableRowSelection(index);
             }
         }
     }
 
     private void actionAddCusBranchConfig() {
-        if (moBizPartnerBranchPane.getTableGuiRowCount() > 0 && moCusBranchConfigPane.getTableGuiRowCount() < moBizPartnerBranchPane.getTableGuiRowCount()) {
+        if (moBizPartnerBranchPane.getTableGuiRowCount() > 0 && moBizPartnerBranchPane.getTableGuiRowCount() != moCusBranchConfigPane.getTableGuiRowCount()) {
             moCusBranchConfigPane.clearTableRows();
             
-            for (int i = 0; i < moBizPartnerBranchPane.getTableGuiRowCount(); i++) {
-                SDataBizPartnerBranch branch = ((SDataBizPartnerBranch) moBizPartnerBranchPane.getTableRow(i).getData());
+            for (int index = 0; index < moBizPartnerBranchPane.getTableGuiRowCount(); index++) {
+                SDataBizPartnerBranch branch = ((SDataBizPartnerBranch) moBizPartnerBranchPane.getTableRow(index).getData());
                 SDataCustomerBranchConfig customerBranchConfig = branch.getDbmsDataCustomerBranchConfig();
                 
                 if (customerBranchConfig != null) {
-                    customerBranchConfig.setIsDeleted(false);
-                    moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
+                    if (branch.getIsDeleted() && !customerBranchConfig.getIsDeleted()) {
+                        customerBranchConfig.setIsDeleted(true); // homogenize deletion status, only if branch is deleted
+                        customerBranchConfig.setIsRegistryEdited(true); // allow to save this customer configuration
+                    }
                 }
                 else {
                     customerBranchConfig = new SDataCustomerBranchConfig();
+                    customerBranchConfig.setPkCustomerBranchId(branch.getPkBizPartnerBranchId());
+                    customerBranchConfig.setIsDeleted(false);
                     customerBranchConfig.setFkSalesRouteId(SDataConstantsSys.MKTU_SAL_ROUTE_DEFAULT);
                     customerBranchConfig.setFkSalesAgentId_n(0);
                     customerBranchConfig.setFkSalesSupervisorId_n(0);
@@ -2400,18 +2445,21 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                     customerBranchConfig.setUserNewTs(new Date());
                     customerBranchConfig.setUserEditTs(null);
                     customerBranchConfig.setUserDeleteTs(null);
-                    customerBranchConfig.setDbmsCob(branch.getBizPartnerBranch());
+                    
+                    customerBranchConfig.setDbmsCustomerBranch(branch.getBizPartnerBranch());
                     customerBranchConfig.setDbmsSalesRoute("");
                     customerBranchConfig.setDbmsSalesAgent("");
-
-                    moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
+                    customerBranchConfig.setDbmsSalesSupervisor("");
+                    
+                    branch.setDbmsDataCustomerBranchConfig(customerBranchConfig);
                 }
+                
+                moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
+                ((STableModel) moCusBranchConfigPane.getTable().getModel()).getTableRow(index).setStyle(customerBranchConfig.getIsDeleted() ? STableConstants.STYLE_DELETE : 0);
             }
             
             moCusBranchConfigPane.renderTableRows();
-            int index = moCusBranchConfigPane.getTableGuiRowCount() - 1;
-            moCusBranchConfigPane.getTable().setRowSelectionInterval(index, index);
-            moCusBranchConfigPane.getVerticalScrollBar().setValue((index + 1) * moCusBranchConfigPane.getTable().getRowHeight());
+            moCusBranchConfigPane.setTableRowSelection(0);
         }
     }
 
@@ -2526,17 +2574,17 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         }
     }
 
-    public void publicActionConfigCobEdit() {
+    public void publicActionModifyCusBranchConfig() {
         actionModifyCusBranchConfig();
     }
 
-    public void publicActionAdd() {
+    public void publicActionAddBranch() {
         if (jTabbedPane1.getSelectedIndex() == 1 && jbAddBranch.isEnabled()) {
             actionAddBranch();
         }
     }
 
-    public void publicActionModify() {
+    public void publicActionModifyBranch() {
         if (jTabbedPane1.getSelectedIndex() == 1 && jbModifyBranch.isEnabled()) {
             actionModifyBranch();
         }
@@ -2550,26 +2598,19 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
-    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
@@ -2579,12 +2620,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
     private javax.swing.JPanel jPanel43;
-    private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
@@ -2596,16 +2635,21 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel52;
     private javax.swing.JPanel jPanel53;
     private javax.swing.JPanel jPanel54;
-    private javax.swing.JPanel jPanel55;
-    private javax.swing.JPanel jPanel56;
-    private javax.swing.JPanel jPanel57;
-    private javax.swing.JPanel jPanel58;
-    private javax.swing.JPanel jPanel59;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel60;
     private javax.swing.JPanel jPanel61;
     private javax.swing.JPanel jPanel62;
+    private javax.swing.JPanel jPanel64;
+    private javax.swing.JPanel jPanel65;
+    private javax.swing.JPanel jPanel66;
+    private javax.swing.JPanel jPanel67;
+    private javax.swing.JPanel jPanel68;
+    private javax.swing.JPanel jPanel69;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel70;
+    private javax.swing.JPanel jPanel71;
+    private javax.swing.JPanel jPanel72;
+    private javax.swing.JPanel jPanel73;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -2733,11 +2777,16 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlNumberExporter;
     private javax.swing.JLabel jlTaxRegime;
     private javax.swing.JLabel jlWeb;
+    private javax.swing.JPanel jpAdditional;
+    private javax.swing.JPanel jpAdditional1;
     private javax.swing.JPanel jpBizPartner;
-    private javax.swing.JPanel jpBizPartnerBranch;
-    private javax.swing.JPanel jpCategory;
+    private javax.swing.JPanel jpBizPartner11;
+    private javax.swing.JPanel jpBizPartner12;
+    private javax.swing.JPanel jpBizPartnerBranches;
     private javax.swing.JPanel jpCusBranchConfig;
+    private javax.swing.JPanel jpCusConfig;
     private javax.swing.JPanel jpMarketing;
+    private javax.swing.JPanel jpMarketing1;
     private javax.swing.JPanel jpNotesAction;
     private javax.swing.JRadioButton jrbGuaranteeTypePay;
     private javax.swing.JRadioButton jrbGuaranteeTypePayProp;
@@ -2789,8 +2838,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         for (int i = 0; i < mvFieldsCategory.size(); i++) {
             ((erp.lib.form.SFormField) mvFieldsCategory.get(i)).resetField();
         }
-        for (int i = 0; i < mvFieldsCusConfig.size(); i++) {
-            ((erp.lib.form.SFormField) mvFieldsCusConfig.get(i)).resetField();
+        for (int i = 0; i < mvFieldsCustomerConfig.size(); i++) {
+            ((erp.lib.form.SFormField) mvFieldsCustomerConfig.get(i)).resetField();
         }
 
         jtfFirstName.setText("");
@@ -2918,37 +2967,37 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
             
             if (moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0] == 0) {
-                validation.setTabbedPaneIndex(0);
+                validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jcbFkTaxIdentityTypeId);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxIdentityTypeId.getText() + "'.");
             }
             else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER && jtfLastName.getText().isEmpty()) {
-                validation.setTabbedPaneIndex(0);
+                validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfLastName);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlLastName.getText() + "'.");
             }
             else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER && jtfFirstName.getText().isEmpty()) {
-                validation.setTabbedPaneIndex(0);
+                validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfFirstName);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFirstName.getText() + "'.");
             }
             else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_ORG && jtfBizPartner.getText().isEmpty()) {
-                validation.setTabbedPaneIndex(0);
+                validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
             else if (fiscalId.isEmpty()) {
-                validation.setTabbedPaneIndex(0);
+                validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfFiscalId);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFiscalId.getText() + "'.");
             }
             else if (!fiscalId.equals(DCfdConsts.RFC_GEN_NAC) && !fiscalId.equals(DCfdConsts.RFC_GEN_INT) && fiscalId.length() != fiscalIdLength) {
-                validation.setTabbedPaneIndex(0);
+                validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfFiscalId);
                 validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "', debe tener " + fiscalIdLength + " caracteres.");
             }
             else if (!alternativeId.isEmpty() && alternativeId.length() != DCfdConsts.LEN_CURP) {
-                validation.setTabbedPaneIndex(0);
+                validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jftAlternativeId);
                 validation.setMessage("El valor del campo '" + jlAlternativeId.getText() + "', '" + alternativeId + "', debe tener " + DCfdConsts.LEN_CURP + " caracteres.");
             }
@@ -2956,7 +3005,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 if (jckIsDeleted.isSelected() || jckIsCategoryDeleted.isSelected()) {
                     try {
                         if (SFinUtilities.hasBizPartnerMovesFinance(miClient, miClient.getSessionXXX().getSystemYear(), moBizPartner.getPkBizPartnerId())) {
-                            validation.setTabbedPaneIndex(0);
+                            validation.setTabbedPaneIndex(TAB_MAIN);
                             validation.setComponent(jckIsDeleted);
                             validation.setMessage("No se puede eliminar al '" + getTitle() + "' o a su categoría debido a que tiene movimientos en el ejercicio actual " + miClient.getSessionXXX().getSystemYear() + ".");
                         }
@@ -2967,14 +3016,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                     
                     if (!validation.getIsError()) {
                         if (jckIsDeleted.isSelected() && miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar al '" + getTitle() + "'?") != JOptionPane.YES_OPTION) {
-                            validation.setTabbedPaneIndex(0);
+                            validation.setTabbedPaneIndex(TAB_MAIN);
                             validation.setComponent(jckIsDeleted);
                             validation.setMessage("Se debe deseleccionar el campo '" + jckIsDeleted.getText() + "' para no eliminar al '" + getTitle() + "'.");
                         }
                         
                         if (!validation.getIsError()) {
                             if (jckIsCategoryDeleted.isSelected() && miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar la categoría del '" + getTitle() + "'?") != JOptionPane.YES_OPTION) {
-                                validation.setTabbedPaneIndex(0);
+                                validation.setTabbedPaneIndex(TAB_MAIN);
                                 validation.setComponent(jckIsCategoryDeleted);
                                 validation.setMessage("Se debe deseleccionar el campo '" + jckIsCategoryDeleted.getText() + "' para no eliminar la categoría del '" + getTitle() + "'.");
                             }
@@ -2988,7 +3037,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                     
                     if (valCount > 0 && miClient.showMsgBoxConfirm("El valor del campo '" + jlBizPartner.getText() + "', '" + moFieldBizPartner.getString() + "',"
                             + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
-                        validation.setTabbedPaneIndex(0);
+                        validation.setTabbedPaneIndex(TAB_MAIN);
                         validation.setComponent(jtfBizPartner);
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlBizPartner.getText() + "'.");
                     }
@@ -2999,7 +3048,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                         
                         if (valCount > 0 && miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "',"
                                 + "\nya existe " + valCount + " " + (valCount == 1 ? "vez" : "veces") + " en el sistema, ¿desea conservarlo?") != JOptionPane.YES_OPTION) {
-                            validation.setTabbedPaneIndex(0);
+                            validation.setTabbedPaneIndex(TAB_MAIN);
                             validation.setComponent(jtfFiscalId);
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFiscalId.getText() + "'.");
                         }
@@ -3008,11 +3057,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 
                 if (!validation.getIsError()) {
                     validation = moPanelBizPartnerBranch.formValidate();
-                    validation.setTabbedPaneIndex(0);
+                    validation.setTabbedPaneIndex(TAB_MAIN);
                 }
 
                 if (!validation.getIsError() && !isCompany()) {
-                    validation.setTabbedPaneIndex(1);
+                    validation.setTabbedPaneIndex(TAB_ADIT);
                     
                     for (int i = 0; i < mvFieldsCategory.size(); i++) {
                         if (!((erp.lib.form.SFormField) mvFieldsCategory.get(i)).validateField()) {
@@ -3063,21 +3112,23 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 }
 
                 if (!validation.getIsError() && isCustomer()) {
-                    validation.setTabbedPaneIndex(2);
+                    validation.setTabbedPaneIndex(TAB_MKT);
                     
-                    for (int i = 0; i < mvFieldsCusConfig.size(); i++) {
-                        if (!((erp.lib.form.SFormField) mvFieldsCusConfig.get(i)).validateField()) {
+                    for (int index = 0; index < mvFieldsCustomerConfig.size(); index++) {
+                        if (!((erp.lib.form.SFormField) mvFieldsCustomerConfig.get(index)).validateField()) {
                             validation.setIsError(true);
-                            validation.setComponent(((erp.lib.form.SFormField) mvFieldsCusConfig.get(i)).getComponent());
+                            validation.setComponent(((erp.lib.form.SFormField) mvFieldsCustomerConfig.get(index)).getComponent());
                             break;
                         }
                     }
                     
                     if (!validation.getIsError()) {
-                        for (int i = 0; i < moCusBranchConfigPane.getTableGuiRowCount(); i++) {
-                            SDataCustomerBranchConfig oDataCustomerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(i).getData();
-                            if (oDataCustomerBranchConfig.getDbmsSalesRoute().isEmpty()) {
-                                validation.setMessage("No se ha capturado la configuración de comercialización para la sucursal del cliente del renglón " + (i + 1) + ".");
+                        for (int index = 0; index < moCusBranchConfigPane.getTableGuiRowCount(); index++) {
+                            SDataCustomerBranchConfig customerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();
+                            if (customerBranchConfig.getDbmsSalesRoute().isEmpty() && 
+                                    miClient.showMsgBoxConfirm("Falta completar la configuración de la sucursal del cliente '" + customerBranchConfig.getDbmsCustomerBranch() + "', del renglón " + (index + 1) + "."
+                                            + "\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Completar la configuración de la sucursal del cliente '" + customerBranchConfig.getDbmsCustomerBranch() + "', del renglón " + (index + 1) + ".");
                                 break;
                             }
                         }
@@ -3087,12 +3138,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                                 validation.setComponent(jcbFkSalesAgentId_n);
                                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSalesAgentId_n.getText() + "'.");
                             }
-                            
-                            if (!validation.getIsError()) {
-                                if (moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] != 0 && moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] == moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]) {
-                                    validation.setComponent(jcbFkSalesSupervisorId_n);
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkSalesSupervisorId_n.getText() + "'.");
-                                }
+                            else if (moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] != 0 && moFieldFkSalesSupervisorId_n.getKeyAsIntArray()[0] == moFieldFkSalesAgentId_n.getKeyAsIntArray()[0]) {
+                                validation.setComponent(jcbFkSalesAgentId_n);
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkSalesAgentId_n.getText() + "'.");
                             }
                         }
                     }
@@ -3161,9 +3209,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         for (int index = 1; index < moBizPartner.getDbmsBizPartnerBranches().size(); index++) { // start from index 1 to skip headquarters
             SDataBizPartnerBranch branch = moBizPartner.getDbmsBizPartnerBranches().get(index);
             moBizPartnerBranchPane.addTableRow(new SDataBizPartnerBranchRow(branch));
-            if (branch.getIsDeleted()) {
-                ((STableModel) moBizPartnerBranchPane.getTable().getModel()).getTableRow(index - 1).setStyle(STableConstants.STYLE_DELETE);
-            }
+            ((STableModel) moBizPartnerBranchPane.getTable().getModel()).getTableRow(index - 1).setStyle(branch.getIsDeleted() ? STableConstants.STYLE_DELETE : 0);
         }
 
         moBizPartnerBranchPane.renderTableRows();
@@ -3310,13 +3356,18 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldIsSignImmex.setFieldValue(moCustomerConfig.getIsSignImmex());
             }
 
-            for (int branch = 1; branch < moBizPartner.getDbmsBizPartnerBranches().size(); branch++) {
-                if (moBizPartner.getDbmsBizPartnerBranches().get(branch).getDbmsDataCustomerBranchConfig() != null) {
-                    if (!moBizPartner.getDbmsBizPartnerBranches().get(branch).getDbmsDataCustomerBranchConfig().getIsDeleted()) {
-                        moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(moBizPartner.getDbmsBizPartnerBranches().get(branch).getDbmsDataCustomerBranchConfig()));
-                    }
+            int row = 0;
+            for (int index = 1; index < moBizPartner.getDbmsBizPartnerBranches().size(); index++) { // start from index 1 to skip headquarters
+                SDataCustomerBranchConfig customerBranchConfig = moBizPartner.getDbmsBizPartnerBranches().get(index).getDbmsDataCustomerBranchConfig();
+                
+                if (customerBranchConfig != null) {
+                    moCusBranchConfigPane.addTableRow(new SDataCustomerBranchConfigRow(customerBranchConfig));
+                    ((STableModel) moCusBranchConfigPane.getTable().getModel()).getTableRow(row++).setStyle(customerBranchConfig.getIsDeleted() ? STableConstants.STYLE_DELETE : 0);
                 }
             }
+            
+            moCusBranchConfigPane.renderTableRows();
+            moCusBranchConfigPane.setTableRowSelection(0);
         }
 
         jckIsDeleted.setEnabled(true);
@@ -3505,6 +3556,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         // Save customer configuration:
 
         if (mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS) {
+            // Customer headquarters:
+            
             if (moCustomerConfig == null) {
                 moCustomerConfig = new SDataCustomerConfig();
                 moCustomerConfig.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -3525,37 +3578,73 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moCustomerConfig.setIsSignRestricted(moFieldIsSignRestricted.getBoolean());
             moCustomerConfig.setIsSignImmex(moFieldIsSignImmex.getBoolean());
 
-            SDataCustomerBranchConfig customerBranchConfig = moBizPartner.getDbmsBizPartnerBranchHq().getDbmsDataCustomerBranchConfig();
+            SDataCustomerBranchConfig customerBranchConfigHq = moBizPartner.getDbmsBizPartnerBranchHq().getDbmsDataCustomerBranchConfig();
             
-            if (customerBranchConfig == null) {
-                customerBranchConfig = new SDataCustomerBranchConfig();
-                customerBranchConfig.setDbmsCob(moBizPartner.getDbmsBizPartnerBranchHq().getBizPartnerBranch());
-                customerBranchConfig.setDbmsSalesRoute(moFieldFkSalesRouteId.getString());
-                customerBranchConfig.setDbmsSalesAgent("");
-                customerBranchConfig.setDbmsSalesSupervisor("");
-                customerBranchConfig.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
-                customerBranchConfig.setFkSalesAgentId_n(0);
-                customerBranchConfig.setFkSalesSupervisorId_n(0);
-                customerBranchConfig.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-                customerBranchConfig.setFkUserEditId(SUtilConsts.USR_NA_ID);
-                customerBranchConfig.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
-                customerBranchConfig.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
-                customerBranchConfig.setDbmsUserEdit("");
-                customerBranchConfig.setDbmsUserDelete("");
-                customerBranchConfig.setUserNewTs(new Date());
-                customerBranchConfig.setUserEditTs(null);
-                customerBranchConfig.setUserDeleteTs(null);
+            if (customerBranchConfigHq == null) {
+                customerBranchConfigHq = new SDataCustomerBranchConfig();
+                customerBranchConfigHq.setDbmsCustomerBranch(moBizPartner.getDbmsBizPartnerBranchHq().getBizPartnerBranch());
+                customerBranchConfigHq.setDbmsSalesRoute(moFieldFkSalesRouteId.getString());
+                customerBranchConfigHq.setDbmsSalesAgent("");
+                customerBranchConfigHq.setDbmsSalesSupervisor("");
+                customerBranchConfigHq.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
+                customerBranchConfigHq.setFkSalesAgentId_n(0);
+                customerBranchConfigHq.setFkSalesSupervisorId_n(0);
+                customerBranchConfigHq.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+                customerBranchConfigHq.setFkUserEditId(SUtilConsts.USR_NA_ID);
+                customerBranchConfigHq.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
+                customerBranchConfigHq.setDbmsUserNew(miClient.getSessionXXX().getUser().getUser());
+                customerBranchConfigHq.setDbmsUserEdit("");
+                customerBranchConfigHq.setDbmsUserDelete("");
+                customerBranchConfigHq.setUserNewTs(new Date());
+                customerBranchConfigHq.setUserEditTs(null);
+                customerBranchConfigHq.setUserDeleteTs(null);
             }
             else {
-                customerBranchConfig.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
-                customerBranchConfig.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                customerBranchConfigHq.setFkSalesRouteId(moFieldFkSalesRouteId.getKeyAsIntArray()[0]);
+                customerBranchConfigHq.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
             }
             
-            customerBranchConfig.setIsRegistryEdited(true);
-            moBizPartner.getDbmsBizPartnerBranchHq().setDbmsDataCustomerBranchConfig(customerBranchConfig);
+            customerBranchConfigHq.setIsRegistryEdited(true);
+            moBizPartner.getDbmsBizPartnerBranchHq().setDbmsDataCustomerBranchConfig(customerBranchConfigHq);
 
             moCustomerConfig.setIsRegistryEdited(true);
             moBizPartner.setDbmsDataCustomerConfig(moCustomerConfig);
+            
+            // Other customer branches:
+            
+            for (int index = 0; index < moCusBranchConfigPane.getTableGuiRowCount(); index++) {
+                SDataCustomerBranchConfig customerBranchConfig = (SDataCustomerBranchConfig) moCusBranchConfigPane.getTableRow(index).getData();
+                
+                if (customerBranchConfig.getIsRegistryEdited()) { // discard new registries, if a new registry has been modified, then it will appear as edited as well
+                    SDataBizPartnerBranch branch = null;
+
+                    // get customer branch by matching branch ID:
+
+                    if (customerBranchConfig.getPkCustomerBranchId() != 0) {
+                        branch = moBizPartner.getDbmsBizPartnerBranch(new int[] { customerBranchConfig.getPkCustomerBranchId() });
+                    }
+
+                    if (branch == null) {
+                        // get customer branch by matching object's references of branch configuration:
+
+                        for (SDataBizPartnerBranch bpb : moBizPartner.getDbmsBizPartnerBranches()) {
+                            if (bpb.getDbmsDataCustomerBranchConfig() == customerBranchConfig) {
+                                branch = bpb;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (branch == null) {
+                        miClient.showMsgBoxWarning("No se encontró la sucursal correspondiente a la configuración de comercialización de la sucursal del cliente del renglón " + (index + 1) + ".");
+                    }
+                    else {
+                        customerBranchConfig.setIsRegistryEdited(true);
+                        branch.setDbmsDataCustomerBranchConfig(customerBranchConfig);
+                        branch.setIsRegistryEdited(true); // allow to save the customer configuration
+                    }
+                }
+            }
         }
         
         moBizPartner.setIsRegistryEdited(true);

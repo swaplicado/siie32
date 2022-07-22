@@ -125,6 +125,7 @@ public abstract class SModSysConsts {
     public static final int BPSU_BA_DEF = 1;
 
     public static final String TXT_HQ = "MATRIZ";
+    public static final String TXT_BRANCH = "SUCURSAL";
     public static final String TXT_OFFICIAL = "OFICIAL";
 
     /*

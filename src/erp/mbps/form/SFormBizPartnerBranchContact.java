@@ -310,6 +310,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jPanel22.add(jPanel8);
 
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jPanel22.add(jckIsDeleted);
 

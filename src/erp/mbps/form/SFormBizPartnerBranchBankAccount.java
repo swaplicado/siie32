@@ -353,6 +353,7 @@ public class SFormBizPartnerBranchBankAccount extends javax.swing.JDialog implem
         jckIsDefault.setText("Cuenta por default");
         jPanel3.add(jckIsDefault);
 
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jPanel3.add(jckIsDeleted);
 

@@ -111,7 +111,7 @@ public class SFormElementType extends javax.swing.JDialog implements erp.lib.for
         jPanel3.add(jLabel2);
         jPanel3.add(jLabel3);
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jPanel3.add(jckIsDeleted);
 
@@ -119,8 +119,8 @@ public class SFormElementType extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-250)/2, 400, 250);
+        setSize(new java.awt.Dimension(400, 250));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

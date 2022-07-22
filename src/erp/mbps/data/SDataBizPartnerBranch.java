@@ -196,19 +196,13 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         try {
             sql = "SELECT bpb.*, bp.bp, tp_bpb.tp_bpb, tax_reg.tax_reg, un.usr, ue.usr, ud.usr " +
                     "FROM erp.bpsu_bpb AS bpb " +
-                    "INNER JOIN erp.bpsu_bp AS bp ON " +
-                    "bpb.fid_bp = bp.id_bp " +
-                    "INNER JOIN erp.bpss_tp_bpb AS tp_bpb ON " +
-                    "bpb.fid_tp_bpb = tp_bpb.id_tp_bpb " +
-                    "INNER JOIN erp.usru_usr AS un ON " +
-                    "bpb.fid_usr_new = un.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ue ON " +
-                    "bpb.fid_usr_edit = ue.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ud ON " +
-                    "bpb.fid_usr_del = ud.id_usr " +
-                    "LEFT OUTER JOIN erp.finu_tax_reg AS tax_reg ON " +
-                    "bpb.fid_tax_reg_n = tax_reg.id_tax_reg " +
-                    "WHERE bpb.id_bpb = " + key[0] + " ";
+                    "INNER JOIN erp.bpsu_bp AS bp ON bpb.fid_bp = bp.id_bp " +
+                    "INNER JOIN erp.bpss_tp_bpb AS tp_bpb ON bpb.fid_tp_bpb = tp_bpb.id_tp_bpb " +
+                    "INNER JOIN erp.usru_usr AS un ON bpb.fid_usr_new = un.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ue ON bpb.fid_usr_edit = ue.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ud ON bpb.fid_usr_del = ud.id_usr " +
+                    "LEFT OUTER JOIN erp.finu_tax_reg AS tax_reg ON bpb.fid_tax_reg_n = tax_reg.id_tax_reg " +
+                    "WHERE bpb.id_bpb = " + key[0] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -239,9 +233,9 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
 
                 statementAux = statement.getConnection().createStatement();
                 
-                // Read aswell company branch bookkeeping center:
+                // Read as well company branch bookkeeping center:
 
-                sql = "SELECT id_bkc FROM fin_cob_bkc WHERE id_cob = " + key[0] + ";";
+                sql = "SELECT id_bkc FROM fin_cob_bkc WHERE id_cob = " + mnPkBizPartnerBranchId + ";";
                 resultSet = statement.executeQuery(sql);
                 if (resultSet.next()) {
                     moDbmsDataCompanyBranchBkc = new SDataCompanyBranchBkc();
@@ -250,13 +244,13 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
                 
-                // Read aswell business partner branch addresses:
+                // Read as well business partner branch addresses:
 
-                sql = "SELECT id_bpb, id_add FROM erp.bpsu_bpb_add WHERE id_bpb = " + key[0] + " ORDER BY fid_tp_add;";
+                sql = "SELECT id_add FROM erp.bpsu_bpb_add WHERE id_bpb = " + mnPkBizPartnerBranchId + " ORDER BY fid_tp_add, id_add;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataBizPartnerBranchAddress BizPartnerBranchAddress = new SDataBizPartnerBranchAddress();
-                    if (BizPartnerBranchAddress.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_add") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (BizPartnerBranchAddress.read(new int[] { mnPkBizPartnerBranchId, resultSet.getInt("id_add") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
@@ -264,13 +258,13 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Read aswell the business partner branch contacts:
+                // Read as well business partner branch contacts:
 
-                sql = "SELECT id_bpb, id_con FROM erp.bpsu_bpb_con WHERE id_bpb = " + key[0] + " ORDER BY id_con;";
+                sql = "SELECT id_con FROM erp.bpsu_bpb_con WHERE id_bpb = " + mnPkBizPartnerBranchId + " ORDER BY id_con;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataBizPartnerBranchContact bizPartnerBranchContact = new SDataBizPartnerBranchContact();
-                    if (bizPartnerBranchContact.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_con") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (bizPartnerBranchContact.read(new int[] { mnPkBizPartnerBranchId, resultSet.getInt("id_con") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
@@ -278,13 +272,13 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Read aswell the business partner branch bank accounts:
+                // Read as well business partner branch bank accounts:
 
-                sql = "SELECT id_bpb, id_bank_acc FROM erp.bpsu_bank_acc WHERE id_bpb = " + key[0] + " ORDER BY id_bank_acc;";
+                sql = "SELECT id_bank_acc FROM erp.bpsu_bank_acc WHERE id_bpb = " + mnPkBizPartnerBranchId + " ORDER BY id_bank_acc;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataBizPartnerBranchBankAccount bizPartnerBranchBankAccount = new SDataBizPartnerBranchBankAccount();
-                    if (bizPartnerBranchBankAccount.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_bank_acc") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (bizPartnerBranchBankAccount.read(new int[] { mnPkBizPartnerBranchId, resultSet.getInt("id_bank_acc") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
@@ -292,13 +286,13 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Read aswell business partner branch notes:
+                // Read as well business partner branch notes:
 
-                sql = "SELECT id_bpb, id_nts FROM erp.bpsu_bpb_nts WHERE id_bpb = " + key[0] + " ORDER BY id_nts;";
+                sql = "SELECT id_nts FROM erp.bpsu_bpb_nts WHERE id_bpb = " + mnPkBizPartnerBranchId + " ORDER BY id_nts;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataBizPartnerBranchNote bizPartnerBranchNote = new SDataBizPartnerBranchNote();
-                    if (bizPartnerBranchNote.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (bizPartnerBranchNote.read(new int[] { mnPkBizPartnerBranchId, resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
@@ -308,11 +302,11 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
 
                 // Read configuration of customer braches:
 
-                sql = "SELECT id_cusb FROM mkt_cfg_cusb WHERE id_cusb = " + key[0] + ";";
+                sql = "SELECT COUNT(*) FROM mkt_cfg_cusb WHERE id_cusb = " + mnPkBizPartnerBranchId + ";";
                 resultSet = statement.executeQuery(sql);
-                if (resultSet.next()) {
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
                     moDbmsDataCustomerBranchConfig = new SDataCustomerBranchConfig();
-                    if (moDbmsDataCustomerBranchConfig.read(new int[] { resultSet.getInt("id_cusb") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (moDbmsDataCustomerBranchConfig.read(new int[] { mnPkBizPartnerBranchId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                 }
@@ -349,7 +343,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
 
                         sql = "SELECT s.dns, " + query + fieldsApprove + "cs.num_start, cs.num_end_n " +
                                 "FROM trn_dnc_" + table + "_cob AS d INNER JOIN trn_dnc_" + table + " AS c ON " +
-                                "d.id_cob = " + key[0] + " AND d.id_dnc = c.id_dnc AND " +
+                                "d.id_cob = " + mnPkBizPartnerBranchId + " AND d.id_dnc = c.id_dnc AND " +
                                 "d.b_del = FALSE AND c.b_del = FALSE " +
                                 "INNER JOIN trn_dnc_" + table + "_dns AS cs ON " +
                                 "c.id_dnc = cs.id_dnc AND cs.b_del = FALSE " +
@@ -449,7 +443,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Save aswell adddresses:
+                // Save as well adddresses:
 
                 if (!mvDbmsBizPartnerBranchAddresses.isEmpty() && mvDbmsBizPartnerBranchAddresses.get(0).getIsDeleted() != mbIsDeleted) { // homogenize deletion status of official address
                     mvDbmsBizPartnerBranchAddresses.get(0).setIsDeleted(mbIsDeleted);
@@ -475,7 +469,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Save aswell contacts:
+                // Save as well contacts:
 
                 if (!mvDbmsBizPartnerBranchContacts.isEmpty() && mvDbmsBizPartnerBranchContacts.get(0).getIsDeleted() != mbIsDeleted) { // homogenize deletion status of official contact
                     mvDbmsBizPartnerBranchContacts.get(0).setIsDeleted(mbIsDeleted);
@@ -501,7 +495,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Save aswell bank accounts:
+                // Save as well bank accounts:
 
                 for (SDataBizPartnerBranchBankAccount bankAccount : mvDbmsBizPartnerBranchBankAccounts) {
                     // save only new or edited bank accounts:
@@ -522,7 +516,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Save aswell notes:
+                // Save as well notes:
 
                 String sql = "DELETE FROM erp.bpsu_bpb_nts "
                         + "WHERE id_bpb = " + mnPkBizPartnerBranchId + ";"; // first delete all existing notes
@@ -539,14 +533,17 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
                     }
                 }
 
-                // Save aswell customer-branch configurations, if applies:
+                // Save as well customer-branch configurations, if applies:
                 
                 if (moDbmsDataCustomerBranchConfig != null) {
                     // save only new or edited registry:
                     
-                    if (moDbmsDataCustomerBranchConfig.getIsRegistryNew() || moDbmsDataCustomerBranchConfig.getIsRegistryEdited() || moDbmsDataCustomerBranchConfig.getIsDeleted() != mbIsDeleted) {
+                    if (moDbmsDataCustomerBranchConfig.getIsRegistryNew() || moDbmsDataCustomerBranchConfig.getIsRegistryEdited() || (mbIsDeleted && !moDbmsDataCustomerBranchConfig.getIsDeleted())) {
                         moDbmsDataCustomerBranchConfig.setPkCustomerBranchId(mnPkBizPartnerBranchId);
-                        moDbmsDataCustomerBranchConfig.setIsDeleted(mbIsDeleted); // homogenize deletion status
+                        
+                        if (mbIsDeleted) {
+                            moDbmsDataCustomerBranchConfig.setIsDeleted(true); // homogenize deletion status, only if branch is deleted
+                        }
                         
                         if (moDbmsDataCustomerBranchConfig.getIsRegistryNew()) {
                             moDbmsDataCustomerBranchConfig.setFkUserNewId(userId);

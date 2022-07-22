@@ -5,16 +5,15 @@
 
 package erp.mbps.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SDataBizPartnerNote extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -65,7 +64,9 @@ public class SDataBizPartnerNote extends erp.lib.data.SDataRegistry implements j
         reset();
 
         try {
-            sql = "SELECT * FROM erp.bpsu_bp_nts WHERE id_bp = " + key[0] + " AND id_nts = " + key[1] + " ";
+            sql = "SELECT * " +
+                    "FROM erp.bpsu_bp_nts " +
+                    "WHERE id_bp = " + key[0] + " AND id_nts = " + key[1] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

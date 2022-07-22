@@ -105,7 +105,7 @@ public class SFormUnitType extends javax.swing.JDialog implements erp.lib.form.S
         jPanel3.add(jLabel2);
         jPanel3.add(jLabel3);
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jPanel3.add(jckIsDeleted);
 
@@ -127,8 +127,8 @@ public class SFormUnitType extends javax.swing.JDialog implements erp.lib.form.S
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-400)/2, (screenSize.height-250)/2, 400, 250);
+        setSize(new java.awt.Dimension(400, 250));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

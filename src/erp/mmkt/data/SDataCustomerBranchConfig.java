@@ -14,7 +14,7 @@ import java.util.Date;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SDataCustomerBranchConfig extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -30,7 +30,7 @@ public class SDataCustomerBranchConfig extends erp.lib.data.SDataRegistry implem
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected java.lang.String msDbmsCob;
+    protected java.lang.String msDbmsCustomerBranch;
     protected java.lang.String msDbmsSalesRoute;
     protected java.lang.String msDbmsSalesAgent;
     protected java.lang.String msDbmsSalesSupervisor;
@@ -55,7 +55,7 @@ public class SDataCustomerBranchConfig extends erp.lib.data.SDataRegistry implem
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
 
-    public void setDbmsCob(java.lang.String s) { msDbmsCob = s; }
+    public void setDbmsCustomerBranch(java.lang.String s) { msDbmsCustomerBranch = s; }
     public void setDbmsSalesRoute(java.lang.String s) { msDbmsSalesRoute = s; }
     public void setDbmsSalesAgent(java.lang.String s) { msDbmsSalesAgent = s; }
     public void setDbmsSalesSupervisor(java.lang.String s) { msDbmsSalesSupervisor = s; }
@@ -75,7 +75,7 @@ public class SDataCustomerBranchConfig extends erp.lib.data.SDataRegistry implem
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public java.lang.String getDbmsCob() { return msDbmsCob; }
+    public java.lang.String getDbmsCustomerBranch() { return msDbmsCustomerBranch; }
     public java.lang.String getDbmsSalesRoute() { return msDbmsSalesRoute; }
     public java.lang.String getDbmsSalesAgent() { return msDbmsSalesAgent; }
     public java.lang.String getDbmsSalesSupervisor() { return msDbmsSalesSupervisor; }
@@ -109,7 +109,7 @@ public class SDataCustomerBranchConfig extends erp.lib.data.SDataRegistry implem
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
-        msDbmsCob = "";
+        msDbmsCustomerBranch = "";
         msDbmsSalesRoute = "";
         msDbmsSalesAgent = "";
         msDbmsSalesSupervisor = "";
@@ -130,26 +130,16 @@ public class SDataCustomerBranchConfig extends erp.lib.data.SDataRegistry implem
         try {
             sql = "SELECT bpb.bpb, bp.bp, sr.sal_route, bp1.bp AS agt, bp2.bp AS sup, un.usr, ue.usr, ud.usr, cusb.* " +
                     "FROM mkt_cfg_cusb AS cusb " +
-                        "INNER JOIN erp.bpsu_bpb AS bpb ON " +
-                            "cusb.id_cusb = bpb.id_bpb " +
-                        "INNER JOIN mkt_cfg_cus AS cus ON " +
-                            "bpb.fid_bp = cus.id_cus " +
-                        "INNER JOIN erp.bpsu_bp AS bp ON " +
-                            "bpb.fid_bp = bp.id_bp " +
-                        "INNER JOIN mktu_sal_route AS sr ON " +
-                            "cusb.fid_sal_route = sr.id_sal_route " +
-                        "LEFT JOIN erp.bpsu_bp AS bp1 ON " +
-                            "cusb.fid_sal_agt_n = bp1.id_bp " +
-                        "LEFT JOIN erp.bpsu_bp AS bp2 ON " +
-                            "cusb.fid_sal_sup_n = bp2.id_bp " +
-                        "INNER JOIN erp.usru_usr AS un ON " +
-                            "cusb.fid_usr_new = un.id_usr " +
-                        "INNER JOIN erp.usru_usr AS ue ON " +
-                            "cusb.fid_usr_edit = ue.id_usr " +
-                        "INNER JOIN erp.usru_usr AS ud ON " +
-                            "cusb.fid_usr_del = ud.id_usr " +
-                    "WHERE cusb.id_cusb = " + key[0] + " " +
-                    "ORDER BY bpb.bpb, bp.bp ";
+                    "INNER JOIN erp.bpsu_bpb AS bpb ON cusb.id_cusb = bpb.id_bpb " +
+                    "INNER JOIN mkt_cfg_cus AS cus ON bpb.fid_bp = cus.id_cus " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON bpb.fid_bp = bp.id_bp " +
+                    "INNER JOIN mktu_sal_route AS sr ON cusb.fid_sal_route = sr.id_sal_route " +
+                    "LEFT JOIN erp.bpsu_bp AS bp1 ON cusb.fid_sal_agt_n = bp1.id_bp " +
+                    "LEFT JOIN erp.bpsu_bp AS bp2 ON cusb.fid_sal_sup_n = bp2.id_bp " +
+                    "INNER JOIN erp.usru_usr AS un ON cusb.fid_usr_new = un.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ue ON cusb.fid_usr_edit = ue.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ud ON cusb.fid_usr_del = ud.id_usr " +
+                    "WHERE cusb.id_cusb = " + key[0] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -167,7 +157,7 @@ public class SDataCustomerBranchConfig extends erp.lib.data.SDataRegistry implem
                 mtUserEditTs = resultSet.getTimestamp("cusb.ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("cusb.ts_del");
 
-                msDbmsCob = resultSet.getString("bpb.bpb");
+                msDbmsCustomerBranch = resultSet.getString("bpb.bpb");
                 msDbmsSalesRoute = resultSet.getString("sr.sal_route");
                 msDbmsSalesAgent = resultSet.getString("agt");
                 msDbmsSalesSupervisor = resultSet.getString("sup");

@@ -290,7 +290,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     "LEFT OUTER JOIN erp.bpss_tp_cred AS tp_cred ON bp_ct.fid_tp_cred_n = tp_cred.id_tp_cred " +
                     "LEFT OUTER JOIN erp.cfgu_lan AS lan ON bp_ct.fid_lan_n = lan.id_lan " +
                     "LEFT OUTER JOIN erp.cfgu_cur AS cur ON bp_ct.fid_cur_n = cur.id_cur " +
-                    "WHERE bp_ct.id_bp = " + key[0] + " AND bp_ct.id_ct_bp = " + key[1] + " ";
+                    "WHERE bp_ct.id_bp = " + key[0] + " AND bp_ct.id_ct_bp = " + key[1] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

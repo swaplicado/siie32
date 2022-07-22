@@ -168,7 +168,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel6.add(jLabel1);
 
-        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Asociado negocios eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel6.add(jckIsDeleted);

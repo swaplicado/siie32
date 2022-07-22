@@ -106,7 +106,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jtfStreetNumberExt = new javax.swing.JTextField();
         jtfStreetNumberInt = new javax.swing.JTextField();
 
-        setPreferredSize(new java.awt.Dimension(515, 190));
+        setPreferredSize(new java.awt.Dimension(515, 180));
         setLayout(new java.awt.GridLayout(7, 1, 5, 2));
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -460,6 +460,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         setCountryEnabled(false);
         itemStateChangedCountry();
         renderAddress();
+        jtfAddressCodeRo.setText("");
     }
 
     @Override

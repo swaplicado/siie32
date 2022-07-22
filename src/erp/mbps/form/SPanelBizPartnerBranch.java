@@ -317,6 +317,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jckIsAddPrt.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel13.add(jckIsAddPrt);
 
+        jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jckIsDeleted);
@@ -1229,7 +1230,8 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         moBizPartnerBranch.setIsAddressPrintable(moFieldIsAddressPrintable.getBoolean());
         moBizPartnerBranch.setIsDeleted(moFieldIsDeleted.getBoolean());
 
-        moBizPartnerBranch.setDbmsTaxRegion(jcbFkTaxRegionId_n.getSelectedItem().toString());
+        moBizPartnerBranch.setDbmsBizPartnerBranchType(mbParamIsInMainWindow ? SModSysConsts.TXT_HQ : SModSysConsts.TXT_BRANCH);
+        moBizPartnerBranch.setDbmsTaxRegion(jcbFkTaxRegionId_n.getSelectedIndex() <= 0 ? "" : jcbFkTaxRegionId_n.getSelectedItem().toString());
         
         // Get official address:
 

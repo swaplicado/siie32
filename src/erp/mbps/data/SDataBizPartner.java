@@ -273,7 +273,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         reset();
 
         try {
-            sql = "SELECT * FROM erp.bpsu_bp WHERE id_bp = " + key[0] + " ";
+            sql = "SELECT * " +
+                    "FROM erp.bpsu_bp " +
+                    "WHERE id_bp = " + key[0] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -316,7 +318,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
                 statementAux = statement.getConnection().createStatement();
 
-                // Read aswell business partner category settings:
+                // Read as well business partner category settings:
 
                 for (i = 0; i < SDataConstantsSys.BPSX_CT_BP_QTY; i++) {
                     category = 0;
@@ -342,25 +344,20 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
 
                     if (category != 0) {
-                        sql = "SELECT count(*) f_count FROM erp.bpsu_bp_ct WHERE id_bp = " + key[0] + " AND id_ct_bp = " + category + " ";
+                        sql = "SELECT COUNT(*) FROM erp.bpsu_bp_ct WHERE id_bp = " + mnPkBizPartnerId + " AND id_ct_bp = " + category + ";";
                         resultSet = statement.executeQuery(sql);
-                        if (!resultSet.next()) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                        }
-                        else {
-                            if (resultSet.getInt("f_count") > 0) {
-                                maoDbmsCategorySettings[i] = new SDataBizPartnerCategory();
-                                if (maoDbmsCategorySettings[i].read(new int[] { mnPkBizPartnerId, category }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                                }
+                        if (resultSet.next() && resultSet.getInt(1) > 0) {
+                            maoDbmsCategorySettings[i] = new SDataBizPartnerCategory();
+                            if (maoDbmsCategorySettings[i].read(new int[] { mnPkBizPartnerId, category }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                             }
                         }
                     }
                 }
 
-                // Read aswell business partner branches:
+                // Read as well business partner branches:
 
-                sql = "SELECT id_bpb, bpb, fid_tp_bpb FROM erp.bpsu_bpb WHERE fid_bp = " + key[0] + " ORDER BY fid_tp_bpb, bpb, id_bpb ";
+                sql = "SELECT id_bpb, bpb, fid_tp_bpb FROM erp.bpsu_bpb WHERE fid_bp = " + mnPkBizPartnerId + " ORDER BY fid_tp_bpb, bpb, id_bpb;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataBizPartnerBranch branch = new SDataBizPartnerBranch();
@@ -372,13 +369,13 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Read aswell the notes:
+                // Read as well business partner notes:
 
-                sql = "SELECT id_bp, id_nts FROM erp.bpsu_bp_nts WHERE id_bp = " + key[0] + " ORDER BY id_nts ";
+                sql = "SELECT id_nts FROM erp.bpsu_bp_nts WHERE id_bp = " + mnPkBizPartnerId + " ORDER BY id_nts;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SDataBizPartnerNote note = new SDataBizPartnerNote();
-                    if (note.read(new int[] { resultSet.getInt("id_bp"), resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (note.read(new int[] { mnPkBizPartnerId, resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
@@ -386,7 +383,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Read aswell business partner ítems descriptions:
+                // Read as well business partner ítems descriptions:
 
                 SDataBizPartnerItemDescription description = new SDataBizPartnerItemDescription();
 
@@ -397,32 +394,28 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     mvDbmsItemBizPartnerDescription = description.getDbmsItemBizPartnerDescriptions();
                 }
 
-                // Read aswell customer configuration, if exists:
+                // Read as well customer configuration, if exists:
 
                 if (mbIsCustomer) {
-                    sql = "SELECT count(*) AS f_count FROM mkt_cfg_cus WHERE id_cus = " + mnPkBizPartnerId + " ";
+                    sql = "SELECT COUNT(*) FROM mkt_cfg_cus WHERE id_cus = " + mnPkBizPartnerId + ";";
                     resultSet = statement.executeQuery(sql);
-                    if (resultSet.next()) {
-                        if (resultSet.getInt("f_count") == 1) {
-                            moDbmsDataCustomerConfig = new SDataCustomerConfig();
-                            if (moDbmsDataCustomerConfig.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                            }
+                    if (resultSet.next() && resultSet.getInt(1) > 0) {
+                        moDbmsDataCustomerConfig = new SDataCustomerConfig();
+                        if (moDbmsDataCustomerConfig.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
                 }
 
-                // Read aswell sales agent configuration, if exists:
+                // Read as well sales agent configuration, if exists:
 
                 if (mbIsAttributeSalesAgent) {
-                    sql = "SELECT count(*) AS f_count FROM mkt_cfg_sal_agt WHERE id_sal_agt = " + mnPkBizPartnerId + " ";
+                    sql = "SELECT COUNT(*) FROM mkt_cfg_sal_agt WHERE id_sal_agt = " + mnPkBizPartnerId + ";";
                     resultSet = statement.executeQuery(sql);
-                    if (resultSet.next()) {
-                        if (resultSet.getInt("f_count") == 1) {
-                            moDbmsDataConfigurationSalesAgent = new SDataConfigurationSalesAgent();
-                            if (moDbmsDataConfigurationSalesAgent.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                            }
+                    if (resultSet.next() && resultSet.getInt(1) > 0) {
+                        moDbmsDataConfigurationSalesAgent = new SDataConfigurationSalesAgent();
+                        if (moDbmsDataConfigurationSalesAgent.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
                 }
@@ -430,14 +423,12 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 // Read information of the employee, of the human resources module, if exists:
 
                 if (mbIsAttributeEmployee) {
-                    sql = "SELECT count(*) AS f_count FROM erp.hrsu_emp WHERE id_emp = " + mnPkBizPartnerId + " ";
+                    sql = "SELECT COUNT(*) FROM erp.hrsu_emp WHERE id_emp = " + mnPkBizPartnerId + ";";
                     resultSet = statement.executeQuery(sql);
-                    if (resultSet.next()) {
-                        if (resultSet.getInt("f_count") == 1) {
-                            moDbmsDataEmployee = new SDataEmployee();
-                            if (moDbmsDataEmployee.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                            }
+                    if (resultSet.next() && resultSet.getInt(1) > 0) {
+                        moDbmsDataEmployee = new SDataEmployee();
+                        if (moDbmsDataEmployee.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
                 }
@@ -523,7 +514,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 throw new Exception(msDbmsError);
             }
             else {
-                // Save aswell business partner category settings:
+                // Save as well business partner category settings:
 
                 for (int i = 0; i < maoDbmsCategorySettings.length; i++) { // note that category settings can have null elements!
                     // save only existing and new or edited branches:
@@ -548,7 +539,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Save aswell branches:
+                // Save as well branches:
                 
                 if (!mvDbmsBizPartnerBranches.isEmpty() && mvDbmsBizPartnerBranches.get(0).getIsDeleted() != mbIsDeleted) { // homogenize deletion status of headquarters
                     mvDbmsBizPartnerBranches.get(0).setIsDeleted(mbIsDeleted);
@@ -574,7 +565,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
                 
-                // Save aswell notes:
+                // Save as well notes:
 
                 String sql = "DELETE FROM erp.bpsu_bp_nts "
                         + "WHERE id_bp = " + mnPkBizPartnerId + ";"; // first delete all existing notes
@@ -591,7 +582,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Save aswell customer configuration, if applies:
+                // Save as well customer configuration, if applies:
 
                 if (moDbmsDataCustomerConfig != null) {
                     // save only new or edited registry:
@@ -613,7 +604,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Save aswell sales-agent configuration, if applies:
+                // Save as well sales-agent configuration, if applies:
 
                 if (moDbmsDataConfigurationSalesAgent != null) {
                     // save only new or edited registry:
@@ -635,7 +626,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     }
                 }
 
-                // Save aswell employee data, if applies:
+                // Save as well employee data, if applies:
 
                 if (moDbmsDataEmployee != null) {
                     // save only new or edited registry:

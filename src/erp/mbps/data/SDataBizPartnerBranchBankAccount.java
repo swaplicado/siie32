@@ -200,23 +200,15 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
         try {
             sql = "SELECT bank_acc.*, bpb.fid_bp, tp.tp_acc_cash, bp.bp_comm, cur.cur_key, iss.card_iss, un.usr, ue.usr, ud.usr " +
                     "FROM erp.bpsu_bank_acc AS bank_acc " +
-                    "INNER JOIN erp.bpsu_bpb AS bpb ON " +
-                    "bank_acc.id_bpb = bpb.id_bpb " +
-                    "INNER JOIN erp.fins_tp_acc_cash AS tp ON " +
-                    "bank_acc.fid_ct_acc_cash = tp.id_ct_acc_cash AND bank_acc.fid_tp_acc_cash = tp.id_tp_acc_cash " +
-                    "INNER JOIN erp.bpsu_bp AS bp ON " +
-                    "bank_acc.fid_bank = bp.id_bp " +
-                    "INNER JOIN erp.cfgu_cur AS cur ON " +
-                    "bank_acc.fid_cur = cur.id_cur " +
-                    "INNER JOIN erp.finu_card_iss AS iss ON " +
-                    "bank_acc.fid_card_iss = iss.id_card_iss " +
-                    "INNER JOIN erp.usru_usr AS un ON " +
-                    "bank_acc.fid_usr_new = un.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ue ON " +
-                    "bank_acc.fid_usr_edit = ue.id_usr " +
-                    "INNER JOIN erp.usru_usr AS ud ON " +
-                    "bank_acc.fid_usr_del = ud.id_usr " +
-                    "WHERE bank_acc.id_bpb = " + key[0] + " AND bank_acc.id_bank_acc = " + key[1] + " ";
+                    "INNER JOIN erp.bpsu_bpb AS bpb ON bank_acc.id_bpb = bpb.id_bpb " +
+                    "INNER JOIN erp.fins_tp_acc_cash AS tp ON bank_acc.fid_ct_acc_cash = tp.id_ct_acc_cash AND bank_acc.fid_tp_acc_cash = tp.id_tp_acc_cash " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON bank_acc.fid_bank = bp.id_bp " +
+                    "INNER JOIN erp.cfgu_cur AS cur ON bank_acc.fid_cur = cur.id_cur " +
+                    "INNER JOIN erp.finu_card_iss AS iss ON bank_acc.fid_card_iss = iss.id_card_iss " +
+                    "INNER JOIN erp.usru_usr AS un ON bank_acc.fid_usr_new = un.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ue ON bank_acc.fid_usr_edit = ue.id_usr " +
+                    "INNER JOIN erp.usru_usr AS ud ON bank_acc.fid_usr_del = ud.id_usr " +
+                    "WHERE bank_acc.id_bpb = " + key[0] + " AND bank_acc.id_bank_acc = " + key[1] + ";";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -262,11 +254,11 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
 
                 // Read aswell bank account cards:
 
-                sql = "SELECT id_bpb, id_bank_acc, id_card FROM erp.bpsu_bank_acc_card WHERE id_bpb = " + key[0] + " AND id_bank_acc = " + key[1] + " ORDER BY id_bpb, id_bank_acc ";
+                sql = "SELECT id_card FROM erp.bpsu_bank_acc_card WHERE id_bpb = " + mnPkBizPartnerBranchId + " AND id_bank_acc = " + mnPkBankAccountId + " ORDER BY id_card;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     erp.mbps.data.SDataBizPartnerBranchBankAccountCard card = new SDataBizPartnerBranchBankAccountCard();
-                    if (card.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_bank_acc"), resultSet.getInt("id_card") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (card.read(new int[] { mnPkBizPartnerBranchId, mnPkBankAccountId, resultSet.getInt("id_card") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
@@ -276,11 +268,11 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
                 
                 // Read aswell bank account layout type:
 
-                sql = "SELECT id_bpb, id_bank_acc, id_tp_lay_bank FROM erp.bpsu_bank_acc_lay_bank WHERE id_bpb = " + key[0] + " AND id_bank_acc = " + key[1] + " ORDER BY id_bpb, id_bank_acc ";
+                sql = "SELECT id_tp_lay_bank FROM erp.bpsu_bank_acc_lay_bank WHERE id_bpb = " + mnPkBizPartnerBranchId + " AND id_bank_acc = " + mnPkBankAccountId + " ORDER BY id_tp_lay_bank;";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     erp.mbps.data.SDataBizPartnerBranchBankAccountLayoutBank layout = new SDataBizPartnerBranchBankAccountLayoutBank();
-                    if (layout.read(new int[] { resultSet.getInt("id_bpb"), resultSet.getInt("id_bank_acc"), resultSet.getInt("id_tp_lay_bank") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (layout.read(new int[] { mnPkBizPartnerBranchId, mnPkBankAccountId, resultSet.getInt("id_tp_lay_bank") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
