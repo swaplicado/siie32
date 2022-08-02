@@ -22,7 +22,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  * Handling additional information for CFDI.
- * @author Juan Barajas, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Sergio Flores, Isabel Servín, Claudio Peña
  */
 public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -400,8 +400,8 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                         "relation_tp = '" + msRelationType + "', " +
                         "related_uuid = '" + msRelatedUuid + "', " +
                         "xml = '" + msXml + "', " +
-                        "fid_related_dps_year = " + (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
-                        "fid_related_dps_doc = " + (mnFkRelatedDpsDocId_n == 0 ? "NULL " : mnFkRelatedDpsDocId_n + " ") +
+                        "fid_related_dps_year_n = " + (mnFkRelatedDpsYearId_n == 0 ? "NULL, " : mnFkRelatedDpsYearId_n + ", ") +
+                        "fid_related_dps_doc_n = " + (mnFkRelatedDpsDocId_n == 0 ? "NULL " : mnFkRelatedDpsDocId_n + " ") +
                         "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
             }
 
