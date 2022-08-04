@@ -12,6 +12,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -19,10 +20,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -263,14 +270,26 @@ public class SSetExchangeRate {
                 exchangeRate.setPkDateId(newDate);
                 exchangeRate.save(connection);
                 System.out.println("Saved value: " + valueExchangeRate + " at " + exchangeRateDay);
-                try(FileWriter fw = new FileWriter("exchangeRateLog.txt", true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    PrintWriter out = new PrintWriter(bw))
-                    {
-                        Date date = new Date();
-                        out.println("/**" + date + " " + "Saved value: " + valueExchangeRate + " at " + exchangeRateDay + "**/");
-                } catch (IOException ex) {
-                    System.err.println(ex);
+                try{
+                    Logger logger = Logger.getLogger("logs/logsExchangeRate_");
+                    logger.setUseParentHandlers(false);
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy_MM");
+                    FileHandler fh;
+                    fh = new FileHandler("logs/logsExchangeRate_" + format.format(Calendar.getInstance().getTime()) + ".log", true);
+                    logger.addHandler(fh);
+                    SimpleFormatter formatter = new SimpleFormatter() {
+                            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            
+                            public String format() {
+                                return String.format("%s \n", dateFormat.format(Calendar.getInstance().getTime()));
+                            }
+                    };
+                    fh.setFormatter(formatter);
+                    String message = "Saved value: " + valueExchangeRate + " at " + exchangeRateDay;
+                    logger.info(message);
+                    fh.close();
+                } catch (SecurityException ex) {
+                    Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -327,16 +346,31 @@ public class SSetExchangeRate {
 
         } 
         catch (Exception e) {
-            try(FileWriter fw = new FileWriter("exchangeRateLog.txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter out = new PrintWriter(bw))
-                {
-                    Date date = new Date();
-                    out.println("/**" + date + " " + e + "**/");
-            } catch (IOException ex) {
-                System.err.println(ex);
-            }
+            try{
+                    Logger logger = Logger.getLogger("logs/logsExchangeRate_");
+                    logger.setUseParentHandlers(false);
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy_MM");
+                    FileHandler fh;
+                    fh = new FileHandler("logs/logsExchangeRate_" + format.format(Calendar.getInstance().getTime()) + ".log", true);
+                    logger.addHandler(fh);
+                    SimpleFormatter formatter = new SimpleFormatter() {
+                            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            
+                            public String format() {
+                                return String.format("%s \n", dateFormat.format(Calendar.getInstance().getTime()));
+                            }
+                    };
+                    fh.setFormatter(formatter);
+                    String message = " - " + e;
+                    logger.info(message);
+                    fh.close();
+                } catch (SecurityException ex) {
+                    Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
+                }
             System.err.println(e);
+            
         }
     }
 
