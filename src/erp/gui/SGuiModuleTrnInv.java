@@ -9,10 +9,8 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
-import erp.form.SFormOptionPickerItems;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
 import erp.mod.SModConsts;
@@ -114,6 +112,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogInventoryValuationPrcCalc;
     private javax.swing.JMenuItem jmiIogInventoryValuationUpdCost;
     private javax.swing.JMenuItem jmiIogInventoryMfgCost;
+    private javax.swing.JMenuItem jmiIogIdentifiedCosts;
     private javax.swing.JMenuItem jmiIogStockValueByWarehouse;
     private javax.swing.JMenuItem jmiIogStockValueByItem;
     private javax.swing.JMenuItem jmiIogStockTheoricalCost;
@@ -360,6 +359,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogInventoryValuationPrcCalc = new JMenuItem("Valuación de inventarios");
         jmiIogInventoryValuationUpdCost = new JMenuItem("Actualización de costos de inventarios");
         jmiIogInventoryMfgCost = new JMenuItem("Costos de producción por producto");
+        jmiIogIdentifiedCosts = new JMenuItem("Costos identificados de ventas");
         jmiIogStockValueByWarehouse = new JMenuItem("Valor de inventarios por almacén");
         jmiIogStockValueByItem = new JMenuItem("Valor de inventarios por ítem");
         jmiIogStockTheoricalCost = new JMenuItem("Valor valuación vs. valor teórico");
@@ -385,6 +385,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogInventoryValuationUpdCost);
         jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogInventoryMfgCost);
+        jmMenuIog.add(jmiIogIdentifiedCosts);
+        jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogStockValueByWarehouse);
         jmMenuIog.add(jmiIogStockValueByItem);
         //jmMenuIog.add(jmiIogStockValueByDiogType); sflores, 2016-03-09, evaluating to remove it
@@ -404,6 +406,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogInventoryValuationPrcCalc.addActionListener(this);
         jmiIogInventoryValuationUpdCost.addActionListener(this);
         jmiIogInventoryMfgCost.addActionListener(this);
+        jmiIogIdentifiedCosts.addActionListener(this);
         jmiIogStockValueByWarehouse.addActionListener(this);
         jmiIogStockValueByItem.addActionListener(this);
         jmiIogStockTheoricalCost.addActionListener(this);
@@ -608,6 +611,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogInventoryValuationPrcCalc.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogInventoryValuationUpdCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogInventoryMfgCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogIdentifiedCosts.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockValueByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockTheoricalCost.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1420,6 +1424,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiIogInventoryMfgCost) {
                 miClient.getSession().showView(SModConsts.TRN_INV_MFG_CST, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiIogIdentifiedCosts) {
+                miClient.getSession().showView(SModConsts.TRN_COST_IDENT_CALC, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiIogStockValueByWarehouse) {
                 miClient.getSession().showView(SModConsts.TRNX_STK_COST, SModConsts.CFGU_COB_ENT, null);

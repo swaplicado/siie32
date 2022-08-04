@@ -412,6 +412,8 @@ public abstract class SModConsts {
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;
+    public static final int TRN_COST_IDENT_CALC = 2023081;
+    public static final int TRN_COST_IDENT_LOT = 2023082;
     public static final int TRN_PDF = 2023059;
     public static final int TRN_CFD = 2023051;
     public static final int TRN_CFD_SIGN_LOG = 2023052;
@@ -1088,6 +1090,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
         TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_ITEM_COST, "trn_item_cost");
+        TablesMap.put(TRN_COST_IDENT_CALC, "trn_cost_ident_calc");
+        TablesMap.put(TRN_COST_IDENT_LOT, "trn_cost_ident_lot");
         TablesMap.put(TRN_PDF, "trn_pdf");
         TablesMap.put(TRN_CFD, "trn_cfd");
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");

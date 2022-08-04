@@ -12,6 +12,8 @@ import erp.mod.trn.db.SDbDpsEntry;
 import erp.mod.trn.db.SDbDpsEntryPrice;
 import erp.mod.trn.db.SDbFunctionalAreaBudget;
 import erp.mod.trn.db.SDbFunctionalAreaBudgets;
+import erp.mod.trn.db.SDbIdentifiedCostCalculation;
+import erp.mod.trn.db.SDbIdentifiedCostLot;
 import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemCost;
@@ -24,6 +26,7 @@ import erp.mod.trn.db.SDbMaintUserSupervisor;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormFunctionalAreaBudgets;
+import erp.mod.trn.form.SFormIdentifiedCostCalculation;
 import erp.mod.trn.form.SFormInventoryValuation;
 import erp.mod.trn.form.SFormItemCost;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
@@ -39,6 +42,7 @@ import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsSendWebService;
 import erp.mod.trn.view.SViewFunctionalAreaBudgets;
 import erp.mod.trn.view.SViewFunctionalAreaExpenses;
+import erp.mod.trn.view.SViewIdentifiedCostCalculation;
 import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
@@ -75,6 +79,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormItemRequiredDpsConfig moFormItemRequiredDpsConfig;
     private SFormInventoryValuation moFormInventoryValuationPrcCalc;
     private SFormInventoryValuation moFormInventoryValuationUpdCost;
+    private SFormIdentifiedCostCalculation moFormIdentifiedCostCalculation;
     private SFormMmsConfig moFormMmsConfiguration;
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
@@ -173,6 +178,12 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 registry = new SDbFunctionalAreaBudgets();
+                break;
+            case SModConsts.TRN_COST_IDENT_CALC:
+                registry = new SDbIdentifiedCostCalculation();
+                break;
+            case SModConsts.TRN_COST_IDENT_LOT:
+                registry = new SDbIdentifiedCostLot();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -359,6 +370,9 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_FUNC_EXPENSES:
                 view = new SViewFunctionalAreaExpenses(miClient, subtype, "Control presupuestos mensuales gastos");
                 break;
+            case SModConsts.TRN_COST_IDENT_CALC:
+                view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -387,6 +401,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_INV_VAL_COST_UPD:
                 if (moFormInventoryValuationUpdCost == null) moFormInventoryValuationUpdCost = new SFormInventoryValuation(miClient, SModConsts.TRNX_INV_VAL_UPD_COST, "Actualización de costos de inventarios");
                 form = moFormInventoryValuationUpdCost;
+                break;
+            case SModConsts.TRN_COST_IDENT_CALC:
+                if (moFormIdentifiedCostCalculation == null) moFormIdentifiedCostCalculation = new SFormIdentifiedCostCalculation(miClient, "Costos identificados de ventas");
+                form = moFormIdentifiedCostCalculation;
                 break;
             case SModConsts.TRN_MMS_CFG:
                 if (moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por correo-e");

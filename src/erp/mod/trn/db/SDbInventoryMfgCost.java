@@ -235,7 +235,9 @@ public class SDbInventoryMfgCost extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
-        verifyRegistryNew(session);
+        if (mbRegistryNew) {
+            verifyRegistryNew(session);
+        }
         
         if (mbRegistryNew) {
             mbDeleted = false;

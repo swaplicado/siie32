@@ -93,6 +93,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
+    
     public static final int USD_XRT_POLICY_BANXICO = 1;
     public static final int USD_XRT_POLICY_INFORMAL = 2;
     
