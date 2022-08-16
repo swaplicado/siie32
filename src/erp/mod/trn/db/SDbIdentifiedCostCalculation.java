@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -39,8 +40,8 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
     
     protected ArrayList<SDbIdentifiedCostLot> maChildrenIdentifiedCostLots;
     
-    protected HashMap<String, SDbIdentifiedCostLot> moMapIdentifiedCostLotsByLotKey; // key: lot key as String (0-0-0), value: identified lot for cost
-    protected HashMap<String, SDbIdentifiedCostLot> moMapIdentifiedCostLotsByOrderKey; // key: manufacturing order key as String (0-0), value: identified lot for cost
+    protected String msAuxCalculationLog;
+    protected HashMap<String, SDbIdentifiedCostLot> moAuxMapIdentifiedCostLots; // key: lot key as String (0-0-0), value: identified lot for cost
     protected ArrayList<SRowIdentifiedCostDps> maAuxIdentifiedCostDpsRows;
     protected ArrayList<SRowIdentifiedCostDpsEntry> maAuxIdentifiedCostDpsEntryRows;
     protected ArrayList<SRowIdentifiedCostDpsEntrySupplyLot> maAuxIdentifiedCostDpsEntrySupplyLotRows;
@@ -72,7 +73,8 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
     
     public ArrayList<SDbIdentifiedCostLot> getChildrenIdentifiedCostLots() { return maChildrenIdentifiedCostLots; }
     
-    public HashMap<String, SDbIdentifiedCostLot> getMapIdentifiedCostLotsByLotKey() { return moMapIdentifiedCostLotsByLotKey; }
+    public String getAuxCalculationLog() { return msAuxCalculationLog; }
+    public HashMap<String, SDbIdentifiedCostLot> getAuxMapIdentifiedCostLots() { return moAuxMapIdentifiedCostLots; }
     public ArrayList<SRowIdentifiedCostDps> getAuxIdentifiedCostDpsRows() { return maAuxIdentifiedCostDpsRows; }
     public ArrayList<SRowIdentifiedCostDpsEntry> getAuxIdentifiedCostDpsEntryRows() { return maAuxIdentifiedCostDpsEntryRows; }
     public ArrayList<SRowIdentifiedCostDpsEntrySupplyLot> getAuxIdentifiedCostDpsEntrySupplyLotRows() { return maAuxIdentifiedCostDpsEntrySupplyLotRows; }
@@ -104,7 +106,8 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
         
         maChildrenIdentifiedCostLots = new ArrayList<>();
         
-        moMapIdentifiedCostLotsByLotKey = new HashMap<>();
+        msAuxCalculationLog = "";
+        moAuxMapIdentifiedCostLots = new HashMap<>();
         maAuxIdentifiedCostDpsRows = new ArrayList<>();
         maAuxIdentifiedCostDpsEntryRows = new ArrayList<>();
         maAuxIdentifiedCostDpsEntrySupplyLotRows = new ArrayList<>();
@@ -267,6 +270,18 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    /**
+     * Add calculation log entry and, if required, print it to system output.
+     * @param entry
+     * @param out 
+     */
+    private void addCalculationLogEntry(final String entry, final boolean print) {
+        msAuxCalculationLog += (msAuxCalculationLog.isEmpty() ? "" : "\n") + entry;
+        if (print) {
+            System.out.println(entry);
+        }
     }
     
     /**
@@ -482,11 +497,11 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
             ResultSet resultSet = statement.executeQuery(sql);
             
             if (resultSet.next()) {
-                System.out.println("- OP #" + resultSet.getString("num") + " " + resultSet.getDate("dt") + " PK=" + SLibUtils.textKey(orderKey) + " Ref. '" + resultSet.getString("ref") + "'...");
+                addCalculationLogEntry("- OP #" + resultSet.getString("num") + " " + resultSet.getDate("dt") + " PK=" + SLibUtils.textKey(orderKey) + " Ref. '" + resultSet.getString("ref") + "'...", true);
                 
                 int[] orderLotKey = new int[] { resultSet.getInt("fid_lot_item_nr"), resultSet.getInt("fid_lot_unit_nr"), resultSet.getInt("fid_lot_n") };
                 
-                identifiedCostLotMfg = moMapIdentifiedCostLotsByLotKey.get(SLibUtils.textKey(orderLotKey)); // lot may be processed already
+                identifiedCostLotMfg = moAuxMapIdentifiedCostLots.get(SLibUtils.textKey(orderLotKey)); // lot may be processed already
                 
                 if (identifiedCostLotMfg == null) {
                     double mfgCost = 0.0;
@@ -663,7 +678,7 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
     private void checkIdentifiedCostLot(final int[] lotKey) throws Exception {
         String lotKeyAsString = SLibUtils.textKey(lotKey);
         
-        if (moMapIdentifiedCostLotsByLotKey.containsKey(lotKeyAsString)) {
+        if (moAuxMapIdentifiedCostLots.containsKey(lotKeyAsString)) {
             throw new Exception("¡El lote PK=" + lotKeyAsString + " ya existe en la colección de costos identificados de lotes!");
         }
     }
@@ -680,7 +695,7 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
         checkIdentifiedCostLot(lotKey);
         
         SDbIdentifiedCostLot identifiedCostLot = SDbIdentifiedCostLot.createIdentifiedCostLot(lotKey, costUnit, costUnitType, jointMfgLotKey_n);
-        moMapIdentifiedCostLotsByLotKey.put(SLibUtils.textKey(lotKey), identifiedCostLot);
+        moAuxMapIdentifiedCostLots.put(SLibUtils.textKey(lotKey), identifiedCostLot);
         
         return identifiedCostLot;
     }
@@ -694,7 +709,7 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
      */
     private SDbIdentifiedCostLot getIdentifiedCostLot(final SGuiSession session, final int[] lotKey) throws Exception {
         String lotKeyAsString = SLibUtils.textKey(lotKey); // convenience variable
-        SDbIdentifiedCostLot identifiedCostLot = moMapIdentifiedCostLotsByLotKey.get(lotKeyAsString);
+        SDbIdentifiedCostLot identifiedCostLot = moAuxMapIdentifiedCostLots.get(lotKeyAsString);
 
         if (identifiedCostLot == null) {
             // get former costs:
@@ -734,7 +749,8 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
     }
     
     /**
-     * Calculate identified costs of sales according to stock supplies of SIIE-Web.
+     * Calculate identified costs for lots of sales according to stock supplies of SIIE-Web.
+     * Update as well children identified cost for lots.
      * @param session GUI session.
      * @param start Start of period.
      * @param end End of period.
@@ -747,25 +763,27 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
         mtDateEnd = end;
         mbRecalculate = recalculate;
         
-        moMapIdentifiedCostLotsByLotKey.clear();
+        msAuxCalculationLog = "";
+        moAuxMapIdentifiedCostLots.clear();
         maAuxIdentifiedCostDpsRows.clear();
         maAuxIdentifiedCostDpsEntryRows.clear();
         maAuxIdentifiedCostDpsEntrySupplyLotRows.clear();
         maAuxIdentifiedCostLotRows.clear();
         
-        System.out.println("Calculando costos identificados de ventas del " + SLibUtils.DateFormatDate.format(mtDateStart) + " al " + SLibUtils.DateFormatDate.format(mtDateEnd) + "...");
+        addCalculationLogEntry("Calculando costos identificados de ventas "
+                + "del " + SLibUtils.DateFormatDate.format(mtDateStart) + (SLibTimeUtils.isSameDate(mtDateStart, mtDateEnd) ? "" : " al " + SLibUtils.DateFormatDate.format(mtDateEnd)) + "...", true);
         
         // calculate unit costs:
         
-        System.out.println("Obteniendo surtidos externos...");
+        addCalculationLogEntry("Obteniendo surtidos externos...", true);
         ArrayList<Supply> supplies = getSupplies(session.getStatement().getConnection(), externalDatabase);
-        System.out.println("Surtidos externos obtenidos: " + SLibUtils.DecimalFormatInteger.format(supplies.size()) + ".");
+        addCalculationLogEntry("Surtidos externos obtenidos: " + SLibUtils.DecimalFormatInteger.format(supplies.size()) + ".", true);
         
         int count = 0;
         for (Supply supply : supplies) {
-            System.out.println((++count) + ". " + supply.DocTypeCode + " #" + supply.getDpsNumber() + " " + SLibUtils.DateFormatDate.format(supply.DocDate) + " PK=" + supply.getDpsKeyAsString() + "; "
+            addCalculationLogEntry((++count) + ". " + supply.DocTypeCode + " #" + supply.getDpsNumber() + " " + SLibUtils.DateFormatDate.format(supply.DocDate) + " PK=" + supply.getDpsKeyAsString() + "; "
                     + "MVT #" + supply.SupplyDocNumber + " PK=" + supply.SupplyMovementId + "; MVT Row PK=" + supply.SupplyMovementRowId + "; MVT Row Lot PK=" + supply.SupplyMovementRowLotId + "; "
-                    + "Ítem '" + supply.SupplyDocRowItemName + "' Unit '" + supply.SupplyDocRowUnitCode + "' Lot '" + supply.SupplyLotLot + "'...");
+                    + "Ítem '" + supply.SupplyDocRowItemName + "' Unit '" + supply.SupplyDocRowUnitCode + "' Lot '" + supply.SupplyLotLot + "'...", true);
             
             if (supply.SupplyMovementId == 0) {
                 // non-existing supply:
@@ -790,7 +808,7 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
         
         // prepare unit costs for rendering:
         
-        System.out.println("Preparando costos identificados para su exhibición...");
+        addCalculationLogEntry("Preparando costos identificados para su exhibición...", true);
         HashMap<String, SRowIdentifiedCostDps> dpsRows = new HashMap<>(); // key: DPS key as String (0-0), value: row object
         HashMap<String, SRowIdentifiedCostDpsEntry> dpsEntryRows = new HashMap<>(); // key: DPS entry key as String (0-0-0), value: row object
         HashMap<String, SRowIdentifiedCostLot> lotRows = new HashMap<>(); // key: lot key as String (0-0-0), value: row object
@@ -837,6 +855,13 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
         maAuxIdentifiedCostDpsRows.addAll(dpsRows.values());
         maAuxIdentifiedCostDpsEntryRows.addAll(dpsEntryRows.values());
         maAuxIdentifiedCostLotRows.addAll(lotRows.values());
+        
+        // update as well children identified cost for lots:
+        
+        maChildrenIdentifiedCostLots.clear();
+        maChildrenIdentifiedCostLots.addAll(moAuxMapIdentifiedCostLots.values());
+        
+        addCalculationLogEntry("El cálculo ha finalizado.", true);
     }
     
     public class Supply {

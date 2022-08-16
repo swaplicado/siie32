@@ -28,7 +28,9 @@ public class SRowIdentifiedCostLot implements SGridRow {
 
     // lot unit cost:
 
-    public double LotUnitCost;
+    public double LotCostUnit;
+    public String CostUnitType;
+    public String CalculationIssue;
 
     public SRowIdentifiedCostLot(SDbIdentifiedCostCalculation.Supply supply) {
         ItemCode = supply.SupplyDocRowItemCode;
@@ -44,7 +46,9 @@ public class SRowIdentifiedCostLot implements SGridRow {
         LotBlocked = supply.LotBlocked;
         LotDeleted = supply.LotDeleted;
 
-        LotUnitCost = supply.LotCostUnit;
+        LotCostUnit = supply.LotCostUnit;
+        CostUnitType = supply.CostUnitType;
+        CalculationIssue = supply.CalculationIssue;
     }
     
     public int[] getLotKey() {
@@ -107,7 +111,13 @@ public class SRowIdentifiedCostLot implements SGridRow {
                 value = LotExpiration;
                 break;
             case 5:
-                value = LotUnitCost;
+                value = LotCostUnit;
+                break;
+            case 6:
+                value = CostUnitType;
+                break;
+            case 7:
+                value = CalculationIssue;
                 break;
             default:
                 // do nothing

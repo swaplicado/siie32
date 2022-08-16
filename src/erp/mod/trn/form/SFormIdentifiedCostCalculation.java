@@ -7,13 +7,17 @@ import erp.mod.trn.db.SDbIdentifiedCostCalculation;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import javax.swing.JButton;
-import sa.gui.util.SUtilConsts;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
-import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -22,13 +26,16 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
-import sa.lib.gui.bean.SBeanFormDialog;
+import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
  * @author Sergio Flores
  */
-public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements ActionListener {
+public class SFormIdentifiedCostCalculation extends SBeanForm implements ActionListener, PropertyChangeListener {
+    
+    private static final int MODE_CALC_PEND = 1;
+    private static final int MODE_CALC_DONE = 2;
     
     private SDbIdentifiedCostCalculation moRegistry;
     protected String msSiieWebDatabase;
@@ -36,6 +43,7 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
     protected SGridPaneForm moGridDpsEntryRows;
     protected SGridPaneForm moGridDpsEntrySupplyLotRows;
     protected SGridPaneForm moGridLotRows;
+    protected int mnMode;
     
     /**
      * Creates new form SFormIdentifiedCostCalculation
@@ -57,8 +65,6 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        bgCosts = new javax.swing.ButtonGroup();
-        bgCutoff = new javax.swing.ButtonGroup();
         jpDirectCosts = new javax.swing.JPanel();
         jpSettings = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -79,13 +85,16 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         jlFolio = new javax.swing.JLabel();
         jtfFolio = new javax.swing.JTextField();
         jPanel9 = new javax.swing.JPanel();
+        jProgressBar = new javax.swing.JProgressBar();
         jpResults = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jTabbedPane = new javax.swing.JTabbedPane();
         jpResultsDpsRows = new javax.swing.JPanel();
         jpResultsDpsEntryRows = new javax.swing.JPanel();
         jpResultsDpsEntrySupplyLotRows = new javax.swing.JPanel();
         jpResultsLotRows = new javax.swing.JPanel();
-        jpResultsErrors = new javax.swing.JPanel();
+        jpResultsLog = new javax.swing.JPanel();
+        jspCalculationLog = new javax.swing.JScrollPane();
+        jtaCalculationLog = new javax.swing.JTextArea();
 
         jpDirectCosts.setLayout(new java.awt.BorderLayout());
 
@@ -140,7 +149,7 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
 
         jPanel1.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
         jlFolio.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlFolio.setText("Folio:");
@@ -157,6 +166,10 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         jPanel1.add(jPanel2);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jProgressBar.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel9.add(jProgressBar);
+
         jPanel1.add(jPanel9);
 
         jpSettings.add(jPanel1, java.awt.BorderLayout.EAST);
@@ -167,21 +180,31 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         jpResults.setLayout(new java.awt.BorderLayout());
 
         jpResultsDpsRows.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Costos documentos", jpResultsDpsRows);
+        jTabbedPane.addTab("Costos documentos", jpResultsDpsRows);
 
         jpResultsDpsEntryRows.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Costos partidas documentos", jpResultsDpsEntryRows);
+        jTabbedPane.addTab("Costos partidas documentos", jpResultsDpsEntryRows);
 
         jpResultsDpsEntrySupplyLotRows.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Costos surtidos partidas documentos", jpResultsDpsEntrySupplyLotRows);
+        jTabbedPane.addTab("Costos surtidos partidas documentos", jpResultsDpsEntrySupplyLotRows);
 
         jpResultsLotRows.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Costos unitarios lotes", jpResultsLotRows);
+        jTabbedPane.addTab("Costos unitarios lotes", jpResultsLotRows);
 
-        jpResultsErrors.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Errores cálculo", jpResultsErrors);
+        jpResultsLog.setLayout(new java.awt.BorderLayout());
 
-        jpResults.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        jtaCalculationLog.setEditable(false);
+        jtaCalculationLog.setBackground(java.awt.SystemColor.control);
+        jtaCalculationLog.setColumns(20);
+        jtaCalculationLog.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
+        jtaCalculationLog.setRows(5);
+        jspCalculationLog.setViewportView(jtaCalculationLog);
+
+        jpResultsLog.add(jspCalculationLog, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane.addTab("Bitácora cálculo", jpResultsLog);
+
+        jpResults.add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
         jpDirectCosts.add(jpResults, java.awt.BorderLayout.CENTER);
 
@@ -189,8 +212,6 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgCosts;
-    private javax.swing.ButtonGroup bgCutoff;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -200,7 +221,8 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JProgressBar jProgressBar;
+    private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbCalculate;
     private javax.swing.JButton jbReset;
     private javax.swing.JLabel jlEnd;
@@ -211,9 +233,11 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
     private javax.swing.JPanel jpResultsDpsEntryRows;
     private javax.swing.JPanel jpResultsDpsEntrySupplyLotRows;
     private javax.swing.JPanel jpResultsDpsRows;
-    private javax.swing.JPanel jpResultsErrors;
+    private javax.swing.JPanel jpResultsLog;
     private javax.swing.JPanel jpResultsLotRows;
     private javax.swing.JPanel jpSettings;
+    private javax.swing.JScrollPane jspCalculationLog;
+    private javax.swing.JTextArea jtaCalculationLog;
     private javax.swing.JTextField jtfFolio;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolRecalculate;
     private sa.lib.gui.bean.SBeanFieldDate moDateEnd;
@@ -231,9 +255,6 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         moFields.addField(moDateEnd);
         moFields.addField(moBoolRecalculate);
         moFields.setFormButton(jbCalculate);
-        
-        jbSave.setEnabled(false);
-        jbCancel.setText(SUtilConsts.TXT_CLOSE);
         
         try {
             msSiieWebDatabase = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_WEB_DB);
@@ -342,6 +363,8 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Lote"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Expiración lote"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Costo unitario lote $ ML"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo costo unitario"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Problema cálculo"));
                 
                 return gridColumnsForm;
             }
@@ -361,26 +384,38 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         }
     }
     
+    private void enableFields(final boolean enable) {
+        moDateStart.setEditable(enable);
+        moDateEnd.setEditable(enable);
+        moBoolRecalculate.setEditable(enable);
+        jbCalculate.setEnabled(enable);
+        jbReset.setEnabled(!enable);
+        
+        mnMode = enable ? MODE_CALC_PEND : MODE_CALC_DONE;
+    }
+    
+    private void validateGridDps() throws Exception {
+        if (moGridDpsRows.getTable().getRowCount() == 0) {
+            Date start = moDateStart.getValue();
+            Date end = moDateEnd.getValue();
+            
+            throw new Exception("No se encontraron surtidos de documentos "
+                    + "del " + SLibUtils.DateFormatDate.format(start) + (SLibTimeUtils.isSameDate(start, end) ? "" : " al " + SLibUtils.DateFormatDate.format(end)) + ".");
+        }
+    }
+    
     private void actionPerformedCalculate() {
-        if (SGuiUtils.computeValidation(miClient, validateForm())) {
-            try {
-                moRegistry.calculate(miClient.getSession(), moDateStart.getValue(), moDateEnd.getValue(), moBoolRecalculate.getValue(), msSiieWebDatabase);
-                
-                moGridDpsRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostDpsRows()));
-                moGridDpsEntryRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostDpsEntryRows()));
-                moGridDpsEntrySupplyLotRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostDpsEntrySupplyLotRows()));
-                moGridLotRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostLotRows()));
-                
-                moDateStart.setEditable(false);
-                moDateEnd.setEditable(false);
-                moBoolRecalculate.setEditable(false);
-                jbCalculate.setEnabled(false);
-                jbReset.setEnabled(true);
-                
-                jbCancel.requestFocusInWindow();
-            }
-            catch (Exception e) {
-                SLibUtils.showException(this, e);
+        if (SGuiUtils.computeValidation(miClient, SGuiUtils.validateDateRange(moDateStart, moDateEnd))) {
+            Date start = moDateStart.getValue();
+            Date end = moDateEnd.getValue();
+
+            if (miClient.showMsgBoxConfirm("Se realizará el cálculo de los costos identificados de surtidos de documentos de ventas "
+                    + "del " + SLibUtils.DateFormatDate.format(start) + (SLibTimeUtils.isSameDate(start, end) ? "" : " al " + SLibUtils.DateFormatDate.format(end)) + "."
+                    + "\nEl proceso puede demorar varios segundos."
+                    + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                Calculator calculator = new Calculator();
+                calculator.addPropertyChangeListener(this);
+                calculator.execute();
             }
         }
     }
@@ -390,12 +425,10 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         moGridDpsEntryRows.clearGridRows();
         moGridDpsEntrySupplyLotRows.clearGridRows();
         moGridLotRows.clearGridRows();
+        jtaCalculationLog.setText("");
+        jTabbedPane.setSelectedIndex(0);
 
-        moDateStart.setEditable(true);
-        moDateEnd.setEditable(true);
-        moBoolRecalculate.setEditable(true);
-        jbCalculate.setEnabled(true);
-        jbReset.setEnabled(false);
+        enableFields(true);
         
         moDateStart.getComponent().requestFocusInWindow();
     }
@@ -432,9 +465,10 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         if (moRegistry.isRegistryNew()) {
             moRegistry.setDateStart(miClient.getSession().getCurrentDate());
             moRegistry.setDateEnd(miClient.getSession().getCurrentDate());
+            jtfRegistryKey.setText("");
         }
         else {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NON_UPDATABLE);
+            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
         jtfFolio.setText("" + moRegistry.getPkCalculationId());
@@ -442,11 +476,13 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
         moDateEnd.setValue(moRegistry.getDateEnd());
         moBoolRecalculate.setValue(moRegistry.isRecalculate());
         
+        setFormEditable(true);
+        
         if (moRegistry.isRegistryNew()) {
-            
+            enableFields(true);
         }
         else {
-            
+            enableFields(false);
         }
         
         addAllListeners();
@@ -470,21 +506,33 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
 
     @Override
     public SGuiValidation validateForm() {
-        SGuiValidation validation = moFields.validateFields();
+        SGuiValidation validation = null;
         
-        if (validation.isValid()) {
-            validation = SGuiUtils.validateDateRange(moDateStart, moDateEnd);
+        if (mnMode == MODE_CALC_PEND) {
+            validation = new SGuiValidation();
+            validation.setMessage("Se debe realizar el cálculo de costos identificados.");
+            validation.setComponent(jbCalculate);
+        }
+        else {
+            validation = moFields.validateFields();
+
+            if (validation.isValid()) {
+                validation = SGuiUtils.validateDateRange(moDateStart, moDateEnd);
+
+                if (validation.isValid()) {
+                    try {
+                        validateGridDps();
+                    }
+                    catch (Exception e) {
+                        validation.setMessage(e.getMessage());
+                    }
+                }
+            }
         }
         
         return validation;
     }
     
-    @Override
-    public void actionSave() {
-        if (SGuiUtils.computeValidation(miClient, validateForm())) {
-        }
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
@@ -496,6 +544,60 @@ public class SFormIdentifiedCostCalculation extends SBeanFormDialog implements A
             else if (button == jbReset) {
                 actionPerformedReset();
             }
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("progress")) {
+            int progress = (Integer) evt.getNewValue();
+
+            if (progress > 0 && progress < 100) {
+                jProgressBar.setIndeterminate(true);
+            }
+            else {
+                jProgressBar.setIndeterminate(false);
+            }
+        }
+    }
+    
+    class Calculator extends SwingWorker<Void, Void> {
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            try {
+                if (SGuiUtils.computeValidation(miClient, SGuiUtils.validateDateRange(moDateStart, moDateEnd))) {
+                    enableFields(false);
+                    
+                    setProgress(1); // start
+                    jbReset.setEnabled(false);
+                    jbSave.setEnabled(false);
+                    
+                    moRegistry.calculate(miClient.getSession(), moDateStart.getValue(), moDateEnd.getValue(), moBoolRecalculate.getValue(), msSiieWebDatabase);
+
+                    moGridDpsRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostDpsRows()));
+                    moGridDpsEntryRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostDpsEntryRows()));
+                    moGridDpsEntrySupplyLotRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostDpsEntrySupplyLotRows()));
+                    moGridLotRows.populateGrid(new Vector<>(moRegistry.getAuxIdentifiedCostLotRows()));
+                    jtaCalculationLog.setText(moRegistry.getAuxCalculationLog());
+
+                    validateGridDps();
+
+                    jbCancel.requestFocusInWindow();
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+            
+            return null;
+        }
+        
+        @Override
+        public void done() {
+            setProgress(100); // end
+            jbReset.setEnabled(true);
+            jbSave.setEnabled(true);
         }
     }
 }

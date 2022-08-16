@@ -283,7 +283,7 @@ public class SDbIdentifiedCostLot extends SDbRegistryUser {
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
-                    "NOW()" + ", " + 
+                    "NOW()" + " " + 
                     ")";
         }
         else {
@@ -304,7 +304,7 @@ public class SDbIdentifiedCostLot extends SDbRegistryUser {
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
 
@@ -342,13 +342,14 @@ public class SDbIdentifiedCostLot extends SDbRegistryUser {
      * @param lotKey Lot key: item ID, unit ID, lot ID.
      * @param costUnit Unit cost for lot.
      * @param costUnitType Unit cost type. Available options: constants COST_UNIT_TP_..., i.e., "STK" = from stock; "MFG" = from manufacturing.
-     * @param jointMfgLotKey_n Joint manufacturing lot key: item ID, unit ID, lot ID. Can be <code>null</code>.
+     * @param jointMfgLotKey Joint manufacturing lot key: item ID, unit ID, lot ID. Can be <code>null</code>.
      * @return New instance of identified cost for lot.
      */
-    public static SDbIdentifiedCostLot createIdentifiedCostLot(final int[] lotKey, final Double costUnit, final String costUnitType, final int[] jointMfgLotKey_n) {
+    public static SDbIdentifiedCostLot createIdentifiedCostLot(final int[] lotKey, final Double costUnit, final String costUnitType, final int[] jointMfgLotKey) {
         SDbIdentifiedCostLot identifiedCostLot = new SDbIdentifiedCostLot();
         
         identifiedCostLot.setLotKey(lotKey);
+        identifiedCostLot.setJountMfgLotKey(jointMfgLotKey);
         identifiedCostLot.setCostUnitType(costUnitType);
 
         if (costUnit == null) {
