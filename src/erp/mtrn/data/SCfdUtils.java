@@ -4234,6 +4234,7 @@ public abstract class SCfdUtils implements Serializable {
 
                         impuestosRetenidos.getEltHijosImpuestoRetenido().add(impuestoRetencion);
                         break;
+                        
                     case SModSysConsts.FINS_TP_TAX_CHARGED:
                         dTotalImptoTrasladado += tax.getImporte();
                         impuestoTraslado.getAttImpuesto().setOption(tax.getImpuesto());
@@ -4242,6 +4243,7 @@ public abstract class SCfdUtils implements Serializable {
 
                         impuestosTrasladados.getEltHijosImpuestoTrasladado().add(impuestoTraslado);
                         break;
+                        
                     default:
                         throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + tax.getImpuestoTipo() + ").");
                 }

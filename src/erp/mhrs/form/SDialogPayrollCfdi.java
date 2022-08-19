@@ -646,30 +646,37 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     
     /**
      * Adds a recipt to be emitted.
-     * Please note that must be public in order to be invoked by double-clicking grid of available receipts.
+     * Must be public in order to be invoked by double-clicking grid of available receipts.
      * @return 
      */
     public boolean actionPerformedAdd() {
         boolean error = true;
-        SHrsPayrollEmployeeReceipt row = null;
-
-        if (moFieldDateIssue.getDate() == null) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateIssue.getText() + "'.");
-            jftDateIssue.requestFocusInWindow();
-        }
-        else if (moFieldDatePayment.getDate() == null) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDatePayment.getText() + "'.");
-            jftDatePayment.requestFocusInWindow();
-        }
-        else if (!moFieldCfdiRelatedUuid.getString().isEmpty() && moFieldCfdiRelatedUuid.getString().length() != DCfdVer3Consts.LEN_UUID) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiRelatedUuid.getText() + "':\n"
-                    + "debe ser de " + DCfdVer3Consts.LEN_UUID + " caracteres.");
-            jtfCfdiRelatedUuid.requestFocusInWindow();
+        int rows = moTablePaneReceiptAvailable.getTableGuiRowCount();
+        
+        if (rows == 0) {
+            miClient.showMsgBoxWarning("No hay recibos disponibles que agregar.");
         }
         else {
             int index = moTablePaneReceiptAvailable.getTable().getSelectedRow();
-            
-            if (index != -1) {
+
+            if (index == -1) {
+                miClient.showMsgBoxWarning("Se debe elegir un recibo disponible.");
+                moTablePaneReceiptAvailable.getTable().requestFocusInWindow();
+            }
+            else if (moFieldDateIssue.getDate() == null) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateIssue.getText() + "'.");
+                jftDateIssue.requestFocusInWindow();
+            }
+            else if (moFieldDatePayment.getDate() == null) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDatePayment.getText() + "'.");
+                jftDatePayment.requestFocusInWindow();
+            }
+            else if (!moFieldCfdiRelatedUuid.getString().isEmpty() && moFieldCfdiRelatedUuid.getString().length() != DCfdVer3Consts.LEN_UUID) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiRelatedUuid.getText() + "':\n"
+                        + "debe ser de " + DCfdVer3Consts.LEN_UUID + " caracteres.");
+                jtfCfdiRelatedUuid.requestFocusInWindow();
+            }
+            else {
                 int xmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
                 int paymentType = 0;
 
@@ -679,10 +686,10 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
                 else if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
                     paymentType = SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER;
                 }
-                
+
                 Object field = SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { paymentType }, SLibConstants.FIELD_TYPE_TEXT);
-                
-                row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow();
+
+                SHrsPayrollEmployeeReceipt row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow();
                 row.setNumberSeries(moConfig.getNumberSeries());
                 row.setDateOfIssue(moFieldDateIssue.getDate());
                 row.setDateOfPayment(moFieldDatePayment.getDate());
@@ -699,10 +706,9 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
                 moTablePaneReceiptSelected.renderTableRows();
                 moTablePaneReceiptSelected.setTableRowSelection(moTablePaneReceiptSelected.getTableGuiRowCount() - 1);
 
+                computeTotals();
                 error = false;
             }
-            
-            computeTotals();
         }
 
         return !error;
@@ -713,64 +719,95 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
      * @return 
      */
     private void actionPerformedAddAll() {
-        int filterDepartmentId = jcbFilterDepartment.getSelectedIndex() <= 0 ? 0 : ((int[]) ((SFormComponentItem) jcbFilterDepartment.getSelectedItem()).getPrimaryKey())[0];
-        
-        int from = 0;
         int rows = moTablePaneReceiptAvailable.getTableGuiRowCount();
-        int processed = 0;
         
-        for (int row = 0; row < rows; row++) {
-            moTablePaneReceiptAvailable.setTableRowSelection(from);
-            
-            if (filterDepartmentId != 0 && filterDepartmentId != ((SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow()).getDepartmentId()) {
-                from++; // skip current row and go next
-            }
-            else {
-                if (actionPerformedAdd()) {
-                    processed++;
-                }
-                else {
+        if (rows == 0) {
+            miClient.showMsgBoxWarning("No hay recibos disponibles que agregar.");
+        }
+        else if (moFieldDateIssue.getDate() == null) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateIssue.getText() + "'.");
+            jftDateIssue.requestFocusInWindow();
+        }
+        else if (moFieldDatePayment.getDate() == null) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDatePayment.getText() + "'.");
+            jftDatePayment.requestFocusInWindow();
+        }
+        else if (!moFieldCfdiRelatedUuid.getString().isEmpty() && rows > 1) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdiRelatedUuid.getText() + "':\n"
+                    + "este campo sólo se puede especificar cuando se agrega un recibo a la vez.");
+            jtfCfdiRelatedUuid.requestFocusInWindow();
+        }
+        else if (!moFieldCfdiRelatedUuid.getString().isEmpty() && moFieldCfdiRelatedUuid.getString().length() != DCfdVer3Consts.LEN_UUID) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiRelatedUuid.getText() + "':\n"
+                    + "debe ser de " + DCfdVer3Consts.LEN_UUID + " caracteres.");
+            jtfCfdiRelatedUuid.requestFocusInWindow();
+        }
+        else {
+            int from = 0;
+            int processed = 0;
+            int filterDepartmentId = jcbFilterDepartment.getSelectedIndex() <= 0 ? 0 : ((int[]) ((SFormComponentItem) jcbFilterDepartment.getSelectedItem()).getPrimaryKey())[0];
+
+            for (int row = 0; row < rows; row++) {
+                moTablePaneReceiptAvailable.setTableRowSelection(from);
+
+                if (filterDepartmentId != 0 && filterDepartmentId != ((SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow()).getDepartmentId()) {
                     from++; // skip current row and go next
                 }
+                else {
+                    if (actionPerformedAdd()) {
+                        processed++;
+                    }
+                    else {
+                        from++; // skip current row and go next
+                    }
+                }
             }
-        }
-        
-        if (processed == 0) {
-            miClient.showMsgBoxWarning("¡No se agregó ningún recibo disponible!");
+
+            if (processed == 0) {
+                miClient.showMsgBoxWarning("¡No se agregó ningún recibo disponible!");
+            }
         }
     }
 
     /**
      * Removes a recipt about to be emitted.
-     * Please note that must be public in order to be invoked by double-clicking grid of selected receipts.
+     * Must be public in order to be invoked by double-clicking grid of selected receipts.
      * @return 
      */
     public boolean actionPerformedRemove() {
         boolean error = true;
-        SHrsPayrollEmployeeReceipt row = null;
-
-        int index = moTablePaneReceiptSelected.getTable().getSelectedRow();
+        int rows = moTablePaneReceiptSelected.getTableGuiRowCount();
         
-        if (index != -1) {
-            row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptSelected.getSelectedTableRow();
-            for (int i = 1; i <= 5; i++) {
-                row.getValues().remove(4);
+        if (rows == 0) {
+            miClient.showMsgBoxWarning("No hay recibos seleccionados que remover.");
+        }
+        else {
+            int index = moTablePaneReceiptSelected.getTable().getSelectedRow();
+            
+            if (index == -1) {
+                miClient.showMsgBoxWarning("Se debe elegir un recibo seleccionado.");
+                moTablePaneReceiptSelected.getTable().requestFocusInWindow();
             }
+            else {
+                SHrsPayrollEmployeeReceipt row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptSelected.getSelectedTableRow();
+                for (int i = 1; i <= 5; i++) {
+                    row.getValues().remove(4);
+                }
 
-            moTablePaneReceiptSelected.removeTableRow(index);
-            moTablePaneReceiptSelected.renderTableRows();
-            moTablePaneReceiptSelected.setTableRowSelection(index < moTablePaneReceiptSelected.getTableGuiRowCount() ? index : moTablePaneReceiptSelected.getTableGuiRowCount() - 1);
+                moTablePaneReceiptSelected.removeTableRow(index);
+                moTablePaneReceiptSelected.renderTableRows();
+                moTablePaneReceiptSelected.setTableRowSelection(index < moTablePaneReceiptSelected.getTableGuiRowCount() ? index : moTablePaneReceiptSelected.getTableGuiRowCount() - 1);
 
-            row.prepareTableRow();
-            moTablePaneReceiptAvailable.addTableRow(row);
-            moTablePaneReceiptAvailable.renderTableRows();
-            moTablePaneReceiptAvailable.setTableRowSelection(moTablePaneReceiptAvailable.getTableGuiRowCount() - 1);
+                row.prepareTableRow();
+                moTablePaneReceiptAvailable.addTableRow(row);
+                moTablePaneReceiptAvailable.renderTableRows();
+                moTablePaneReceiptAvailable.setTableRowSelection(moTablePaneReceiptAvailable.getTableGuiRowCount() - 1);
 
-            error = false;
+                computeTotals();
+                error = false;
+            }
         }
         
-        computeTotals();
-
         return !error;
     }
 
@@ -779,23 +816,29 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
      * @return 
      */
     private void actionPerformedRemoveAll() {
-        int from = 0;
         int rows = moTablePaneReceiptSelected.getTableGuiRowCount();
-        int processed = 0;
         
-        for (int row = 0; row < rows; row++) {
-            moTablePaneReceiptSelected.setTableRowSelection(from);
-            
-            if (actionPerformedRemove()) {
-                processed++;
-            }
-            else {
-                from++; // skip current row and go next
-            }
+        if (rows == 0) {
+            miClient.showMsgBoxWarning("No hay recibos seleccionados que remover.");
         }
-        
-        if (processed == 0) {
-            miClient.showMsgBoxWarning("¡No se removió ningún recibo seleccionado!");
+        else {
+            int from = 0;
+            int processed = 0;
+
+            for (int row = 0; row < rows; row++) {
+                moTablePaneReceiptSelected.setTableRowSelection(from);
+
+                if (actionPerformedRemove()) {
+                    processed++;
+                }
+                else {
+                    from++; // skip current row and go next
+                }
+            }
+
+            if (processed == 0) {
+                miClient.showMsgBoxWarning("¡No se removió ningún recibo seleccionado!");
+            }
         }
     }
     

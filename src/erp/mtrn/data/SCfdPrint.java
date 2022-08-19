@@ -40,6 +40,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.log.db.SDbBillOfLading;
@@ -1992,32 +1993,34 @@ public class SCfdPrint {
 
                         double sueldo;
                         double salario;
+                        
+                        if (SHrsCfdUtils.isTypeRecruitmentSchemaForEmployment(payrollReceipt.getFkRecruitmentSchemaTypeId())) {
+                            switch (payrollReceipt.getFkPaymentTypeId()) {
+                                case SModSysConsts.HRSS_TP_PAY_WEE:
+                                    sueldo = 0;
+                                    salario = payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmp.getSalary() : payrollReceipt.getSalary();
+                                    paramsMap.put("Sueldo", sueldo);
+                                    paramsMap.put("Salario", salario);
+                                    paramsMap.put("IngresoDiario", salario);
+                                    break;
 
-                        switch (payrollReceipt.getFkPaymentTypeId()) {
-                            case SModSysConsts.HRSS_TP_PAY_WEE:
-                                sueldo = 0;
-                                salario = payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmp.getSalary() : payrollReceipt.getSalary();
-                                paramsMap.put("Sueldo", sueldo);
-                                paramsMap.put("Salario", salario);
-                                paramsMap.put("IngresoDiario", salario);
-                                break;
+                                case SModSysConsts.HRSS_TP_PAY_FOR:
+                                    SDbConfig config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
 
-                            case SModSysConsts.HRSS_TP_PAY_FOR:
-                                SDbConfig config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
+                                    sueldo = payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmp.getSalary() : payrollReceipt.getWage();
+                                    if (config.isFortnightStandard()) {
+                                        salario = SLibUtils.roundAmount(sueldo / (SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED / SHrsConsts.YEAR_MONTHS));
+                                    }
+                                    else {
+                                        salario = SLibUtils.roundAmount(sueldo * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS);
+                                    }
+                                    paramsMap.put("Sueldo", sueldo);
+                                    paramsMap.put("Salario", salario);
+                                    paramsMap.put("IngresoDiario", salario);
+                                    break;
 
-                                sueldo = payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmp.getSalary() : payrollReceipt.getWage();
-                                if (config.isFortnightStandard()) {
-                                    salario = SLibUtils.roundAmount(sueldo / (SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED / SHrsConsts.YEAR_MONTHS));
-                                }
-                                else {
-                                    salario = SLibUtils.roundAmount(sueldo * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS);
-                                }
-                                paramsMap.put("Sueldo", sueldo);
-                                paramsMap.put("Salario", salario);
-                                paramsMap.put("IngresoDiario", salario);
-                                break;
-
-                            default:
+                                default:
+                            }
                         }
                     }
 

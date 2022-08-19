@@ -404,17 +404,34 @@ public class SHrsPayroll {
             
             for (SDbDeduction deduction : maDeductions) {
                 if (deduction.isWithholding()) {
-                    SDbPayrollReceiptDeduction payrollReceiptDeduction = createPayrollReceiptDeduction(
-                            hrsReceipt, deduction, 
-                            1, 0, true,
-                            0, 0, ++moveId);
+                    // check if current deduction matches configuration settings:
+                    
+                    boolean matchesConfig = false;
+                    
+                    switch (deduction.getFkDeductionTypeId()) {
+                        case SModSysConsts.HRSS_TP_DED_TAX:
+                            matchesConfig = deduction.getPkDeductionId() == moConfig.getFkDeductionTaxId_n();
+                            break;
+                        case SModSysConsts.HRSS_TP_DED_SSC:
+                            matchesConfig = deduction.getPkDeductionId() == moConfig.getFkDeductionSsContributionId_n();
+                            break;
+                        default:
+                            // to nothing
+                    }
+                    
+                    if (matchesConfig) {
+                        SDbPayrollReceiptDeduction payrollReceiptDeduction = createPayrollReceiptDeduction(
+                                hrsReceipt, deduction, 
+                                1, 0, true,
+                                0, 0, ++moveId);
 
-                    SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
-                    hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
-                    hrsReceiptDeduction.setDeduction(deduction);
-                    hrsReceiptDeduction.setPayrollReceiptDeduction(payrollReceiptDeduction);
+                        SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
+                        hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
+                        hrsReceiptDeduction.setDeduction(deduction);
+                        hrsReceiptDeduction.setPayrollReceiptDeduction(payrollReceiptDeduction);
 
-                    hrsReceiptDeductions.add(hrsReceiptDeduction);
+                        hrsReceiptDeductions.add(hrsReceiptDeduction);
+                    }
                 }
             }
         }
@@ -914,17 +931,31 @@ public class SHrsPayroll {
         //payrollReceipt.setCfdRequired();
         //payrollReceipt.setDeleted();
         payrollReceipt.setFkPaymentTypeId(hrsEmployee.getEmployee().getFkPaymentTypeId());
-        payrollReceipt.setFkSalaryTypeId(hrsEmployee.getEmployee().getFkSalaryTypeId());
         payrollReceipt.setFkEmployeeTypeId(hrsEmployee.getEmployee().getFkEmployeeTypeId());
-        payrollReceipt.setFkWorkerTypeId(hrsEmployee.getEmployee().getFkWorkerTypeId());
         payrollReceipt.setFkMwzTypeId(hrsEmployee.getEmployee().getFkMwzTypeId());
         payrollReceipt.setFkDepartmentId(hrsEmployee.getEmployee().getFkDepartmentId());
         payrollReceipt.setFkPositionId(hrsEmployee.getEmployee().getFkPositionId());
-        payrollReceipt.setFkShiftId(hrsEmployee.getEmployee().getFkShiftId());
-        payrollReceipt.setFkContractTypeId(hrsEmployee.getEmployee().getFkContractTypeId());
-        payrollReceipt.setFkRecruitmentSchemaTypeId(recruitmentSchemaType != SModSysConsts.HRSS_TP_REC_SCHE_NA ? recruitmentSchemaType : hrsEmployee.getEmployee().getFkRecruitmentSchemaTypeId());
-        payrollReceipt.setFkPositionRiskTypeId(hrsEmployee.getEmployee().getFkPositionRiskTypeId());
-        payrollReceipt.setFkWorkingDayTypeId(hrsEmployee.getEmployee().getFkWorkingDayTypeId());
+        
+        if (recruitmentSchemaType == SModSysConsts.HRSS_TP_REC_SCHE_NA || SHrsCfdUtils.isTypeRecruitmentSchemaForEmployment(recruitmentSchemaType)) {
+            payrollReceipt.setFkRecruitmentSchemaTypeId(hrsEmployee.getEmployee().getFkRecruitmentSchemaTypeId());
+            
+            payrollReceipt.setFkSalaryTypeId(hrsEmployee.getEmployee().getFkSalaryTypeId());
+            payrollReceipt.setFkWorkerTypeId(hrsEmployee.getEmployee().getFkWorkerTypeId());
+            payrollReceipt.setFkShiftId(hrsEmployee.getEmployee().getFkShiftId());
+            payrollReceipt.setFkContractTypeId(hrsEmployee.getEmployee().getFkContractTypeId());
+            payrollReceipt.setFkPositionRiskTypeId(hrsEmployee.getEmployee().getFkPositionRiskTypeId());
+            payrollReceipt.setFkWorkingDayTypeId(hrsEmployee.getEmployee().getFkWorkingDayTypeId());
+        }
+        else {
+            payrollReceipt.setFkRecruitmentSchemaTypeId(recruitmentSchemaType);
+            
+            payrollReceipt.setFkSalaryTypeId(SModSysConsts.HRSS_TP_SAL_FIX);
+            payrollReceipt.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NA);
+            payrollReceipt.setFkShiftId(SModSysConsts.HRSU_SHT_NA);
+            payrollReceipt.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
+            payrollReceipt.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_NA);
+            payrollReceipt.setFkWorkingDayTypeId(SModSysConsts.HRSS_TP_WORK_DAY_NA);
+        }
         //payrollReceipt.setFkUserInsertId();
         //payrollReceipt.setFkUserUpdateId();
         //payrollReceipt.setTsUserInsert();

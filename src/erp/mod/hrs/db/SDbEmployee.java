@@ -798,7 +798,6 @@ public class SDbEmployee extends SDbRegistryUser {
             case FIELD_DATE_LAST_DISMISS:
                 msSql += "dt_dis_n = " + (value == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format((Date) value) + "'") + " ";
                 break;
-
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

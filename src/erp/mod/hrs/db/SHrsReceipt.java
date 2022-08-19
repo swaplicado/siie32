@@ -612,7 +612,7 @@ public class SHrsReceipt {
                 // prepare for update or removal of existing tax deduction:
                 hrsReceiptDeductionTaxOld = hrsReceiptDeduction;
                 
-                if (payrollReceiptDeduction.isUserEdited() || !payrollReceiptDeduction.isAutomatic()) {
+                if (payrollReceiptDeduction.isUserEdited() || !payrollReceiptDeduction.isAutomatic() || payrollReceiptDeduction.getFkDeductionId() != moHrsPayroll.getConfig().getFkDeductionTaxId_n()) {
                     // user edited tax:
                     isUserTax = true;
                     userTax = payrollReceiptDeduction.getAmount_r();

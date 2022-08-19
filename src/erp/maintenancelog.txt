@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 205.2/ 2022-08-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la emisión de recibos de nómina cuando hay más de una deducción ISR en el catálogo de deducciones.
+2) Corrección a la remoción indebida de deducciones de ley configuradas automáticamente, cuando son distintas a las de la configuración del módulo RH.
+3) Corrección automática de datos laborales, p. ej., régimen de contratación, tipo de jornada laboral, etc., al emitir CFDI de nóminas de empleados de regímenes de contratación de relación laboral subordinada, p. ej., sueldos y salarios, cuando se emiten sus recibos en regímenes de contratación de relación laboral no subordinada, p. ej., asimilados.
+4) Mejoramiento a la emisión de la representación impresa de CFDI de nóminas de regímenes de contratación de relación laboral no subordinada, p. ej., asimilados.
+5) Mejoramiento a las validaciones de timbrado de CFDI de nóminas.
+
+================================================================================
 SIIE 3.2 205.1/ 2022-08-16
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

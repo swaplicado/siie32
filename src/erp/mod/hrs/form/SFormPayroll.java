@@ -1607,18 +1607,26 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
 
     private void actionTaxSubsidyChange() {
-       if (mbIsWithTaxSubsidy) {
-           if (miClient.showMsgBoxConfirm("Se quitará el pago de Subsidio para el empleo a todos los recibos que lo tengan.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-               mbIsWithTaxSubsidy = false;
-           }
-       }
-       else {
-           mbIsWithTaxSubsidy = true;
-       }
-       
-       jtfTaxSubsidyOption.setText(mbIsWithTaxSubsidy ? TXT_WITH_TAX_SUB_PAY : TXT_WITHOUT_TAX_SUB_PAY);
-       jtfTaxSubsidyOption.setCaretPosition(0);
-       computeReceipts();
+        boolean changed = false;
+        
+        if (mbIsWithTaxSubsidy) {
+            if (moHrsPayroll.getHrsReceipts().isEmpty() || miClient.showMsgBoxConfirm("Se removerá el pago de Subsidio para el empleo a todos los recibos que lo tengan.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                mbIsWithTaxSubsidy = false;
+                changed = true;
+            }
+        }
+        else {
+            if (moHrsPayroll.getHrsReceipts().isEmpty() || miClient.showMsgBoxConfirm("Se agregará el pago de Subsidio para el empleo a todos los recibos que lo requieran.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                mbIsWithTaxSubsidy = true;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            jtfTaxSubsidyOption.setText(mbIsWithTaxSubsidy ? TXT_WITH_TAX_SUB_PAY : TXT_WITHOUT_TAX_SUB_PAY);
+            jtfTaxSubsidyOption.setCaretPosition(0);
+            computeReceipts();
+        }
     }
 
     private void actionGoTabReceipts() {

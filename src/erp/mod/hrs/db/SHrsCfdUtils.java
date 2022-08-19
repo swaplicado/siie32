@@ -43,6 +43,40 @@ import sa.lib.srv.SSrvConsts;
  */
 public abstract class SHrsCfdUtils {
     
+    /**
+     * Check if type of contract is for employment.
+     * @param tipoContrato SAT code of type of contract.
+     * @return <code>true</code> if type of contract is for employment.
+     */
+    public static boolean isTypeContractForEmployment(final String tipoContrato) {
+        return tipoContrato.compareTo(DCfdi33Catalogs.ClaveTipoContratoModalidadTrabajoComision) <= 0;
+    }
+    
+    /**
+     * Check if type of recruitment schema is for employment.
+     * @param tipoRegimenContratación SAT code of type of recruitment schema.
+     * @return <code>true</code> if type of recruitment schema is for employment.
+     */
+    public static boolean isTypeRecruitmentSchemaForEmployment(final String tipoRegimenContratación) {
+        return tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenSueldos) || 
+                tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenJubilados) || 
+                tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenPensionados) || 
+                tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenJubiladosOPensionados);
+    }
+    
+    /**
+     * Check if type of recruitment schema is for employment.
+     * @param tipoRegimenContratación Type of recruitment schema.
+     * @return <code>true</code> if type of recruitment schema is for employment.
+     */
+    public static boolean isTypeRecruitmentSchemaForEmployment(final int tipoRegimenContratación) {
+        return SLibUtils.belongsTo(tipoRegimenContratación, new int[] { 
+            SModSysConsts.HRSS_TP_REC_SCHE_WAG, 
+            SModSysConsts.HRSS_TP_REC_SCHE_RET, 
+            SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN, 
+            SModSysConsts.HRSS_TP_REC_SCHE_PEN });
+    }
+    
     private static boolean validateReceiptsPendingCfdi( final SGuiSession session, final int payrollId) throws Exception {
         ArrayList<SDataCfd> cfds = SCfdUtils.getPayrollCfds((SClientInterface) session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { payrollId });
         SCfdUtils.existsCfdiPending((SClientInterface) session.getClient(), cfds);
