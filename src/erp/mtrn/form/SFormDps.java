@@ -4145,8 +4145,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             else {
-                boolean validateCreditLimit = risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED;
-                boolean validateExpiredDocs = risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED || risk == SModSysConsts.BPSS_RISK_A_RISK_LOW;
+                boolean validateCreditLimit = risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS || risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED;
+                boolean validateExpiredDocs = risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS || risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED || risk == SModSysConsts.BPSS_RISK_A_RISK_LOW;
                 boolean canOmitCreditLimit = risk == SModSysConsts.BPSS_RISK_B_RISK_MED;
                 boolean canOmitExpiredDocs = risk == SModSysConsts.BPSS_RISK_B_RISK_MED || risk == SModSysConsts.BPSS_RISK_A_RISK_LOW;
 
