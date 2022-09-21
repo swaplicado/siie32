@@ -196,7 +196,7 @@ public class SViewPtu extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
-        moSuscriptionsSet.add(SModConsts.HRSU_TP_EMP_DIS);
         moSuscriptionsSet.add(SDataConstants.BPSX_BP_EMP);
+        moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 }

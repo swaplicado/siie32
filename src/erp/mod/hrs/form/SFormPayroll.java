@@ -2934,8 +2934,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         registry.getChildPayrollReceiptsToDelete().clear();
         registry.getChildPayrollReceiptsToDelete().addAll(maPayrollReceiptsDeleted);
         
-        registry.setFkPaysheetCustomTypeId(1);
-        
         if (mbAuxOpenRegAgain) {
             SGuiParams params = new SGuiParams();
             registry.computePrimaryKey(miClient.getSession());

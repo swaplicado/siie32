@@ -17,13 +17,14 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Isabel Servín
+ * @author Sergio Flores, Edwin Carmona, Isabel Servín, Sergio Flores
  */
 public abstract class SBpsUtils {
 
     /**
      * @param idCategory Business partner category, constants defined in <code>erp.mod.SModSysConsts.BPSS_CT_BP_...</code>.
      * @param number Number noun, constants defined in <code>sa.lib.SUtilConsts.NUM_...</code>.
+     * @return Name of business partner category.
      */
     public static String getBizPartnerCategoryName(final int idCategory, final int number) {
         String name = "";
@@ -155,7 +156,7 @@ public abstract class SBpsUtils {
         int index = 0;
         int len = 0;
         String bankAccountNumberFormat = "";
-        ArrayList<String> abankAccountNumberFormat = new ArrayList<String>();
+        ArrayList<String> abankAccountNumberFormat = new ArrayList<>();
         
         index = accountNumber.length();
         while (index > 0) {

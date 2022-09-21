@@ -2222,7 +2222,7 @@ public abstract class SDataReadTableRows {
                         "re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND " +
                         "re.fid_tp_sys_mov_xxx = " + (((int[]) ((Object[]) filterKey)[1])[0] == SDataConstantsSys.TRNS_CT_DPS_PUR ?
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) + " " +
-                        (((Object[]) filterKey).length != 4 ? "" : "AND (re.fid_cfd_n IS NULL OR (re.fid_cfd_n IS NOT NULL AND re.fid_cfd_n <> " + ((Object[]) filterKey)[3] + ")) ") + 
+                        (((Object[]) filterKey).length != 4 ? "" : "AND (re.fid_cfd_n IS NULL OR (re.fid_cfd_n IS NOT NULL AND re.fid_cfd_n <> " + ((Object[]) filterKey)[3] + ")) ") +
                         "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
                         "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " + (((Object[]) filterKey).length == 2 ? "" : "AND d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[2])[0] + " ") +
                         "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
@@ -2230,9 +2230,9 @@ public abstract class SDataReadTableRows {
                         "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
                         "GROUP BY b.id_bp, b.bp, d.id_year, d.id_doc, d.dt, dt.code, d.num_ser, d.num, " +
                         "d.tot_r, d.exc_rate, d.tot_cur_r, c.cur_key, cob.code " +
-                        "HAVING " + (((int[]) ((Object[]) filterKey)[1])[0] == SDataConstantsSys.TRNS_CT_DPS_SAL ?
-                            "SUM(debit - credit) > 0 OR SUM(debit_cur - credit_cur) > 0 " :
-                            "SUM(credit - debit) > 0 OR SUM(credit_cur - debit_cur) > 0 ") +
+                        "HAVING " + (((int[]) ((Object[]) filterKey)[1])[0] == SDataConstantsSys.TRNS_CT_DPS_PUR ?
+                            "SUM(credit - debit) > 0 OR SUM(credit_cur - debit_cur) > 0 " :
+                            "SUM(debit - credit) > 0 OR SUM(debit_cur - credit_cur) > 0 ") +
                         "ORDER BY d.dt DESC, dt.code, f_num, cob.code, d.id_year, d.id_doc ";
                 break;
 

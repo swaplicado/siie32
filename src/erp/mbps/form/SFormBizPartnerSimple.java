@@ -1368,7 +1368,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         moBizPartnerCategory.setFkBizPartnerCategoryId(moFieldFkBizPartnerCategoryId.getKeyAsIntArray()[0]);
         moBizPartnerCategory.setFkBizPartnerTypeId(jcbFkBizPartnerTypeId.getSelectedIndex() <= 0 ? SDataConstantsSys.BPSU_TP_BP_DEFAULT : moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);
         moBizPartnerCategory.setFkCreditTypeId_n(SDataConstantsSys.BPSS_TP_CRED_CRED_NO);
-        moBizPartnerCategory.setFkRiskId_n(SModSysConsts.BPSS_RISK_C_RSK_H);
+        moBizPartnerCategory.setFkRiskId_n(SModSysConsts.BPSS_RISK_C_RISK_HIGH);
         moBizPartnerCategory.setFkPaymentSystemTypeId_n(0);
         moBizPartnerCategory.setFkCfdAddendaTypeId(SDataConstantsSys.BPSS_TP_CFD_ADD_NA);
 

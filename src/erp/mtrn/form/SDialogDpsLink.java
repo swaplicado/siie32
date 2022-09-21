@@ -401,7 +401,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
         }
      }   
     
-    private void updateLink() {
+    private void updateQuantitiesToLink() {
         SDataEntryDpsDpsLink entry = null;
 
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
@@ -440,8 +440,10 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
     
     private void actionEntryPriceSelected(SFormComponentItem item) {
         SDataEntryDpsDpsLink selectedRow = (SDataEntryDpsDpsLink) moTablePane.getSelectedTableRow();
+        
         if (selectedRow != null) {
             selectedRow.setAuxSGuiDpsEntryPrice(null);
+            
             if (item != null) {
                 if (item.getPrimaryKey() != null) {
                    selectedRow.setAuxSGuiDpsEntryPrice((SGuiDpsEntryPrice) item.getComplement());
@@ -553,7 +555,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
         double totalLinked = 0;
         SFormValidation validation = new SFormValidation();
 
-        updateLink();
+        updateQuantitiesToLink();
 
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
             SDataEntryDpsDpsLink entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
@@ -775,7 +777,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
 
         switch (type) {
             case SDataConstants.TRNX_DPS_DES:
-                Vector<SDataEntryDpsDpsLink> entries = new Vector<SDataEntryDpsDpsLink>();
+                Vector<SDataEntryDpsDpsLink> entries = new Vector<>();
                 for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
                     SDataEntryDpsDpsLink entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
                     if (entry.getQuantityToLink() > 0) {

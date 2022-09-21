@@ -207,28 +207,20 @@
                 <Component class="javax.swing.JLabel" name="jlDummy01">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[25, 23]"/>
+                      <Dimension value="[15, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlFkCheckId_n">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Cheque del movimiento:"/>
+                    <Property name="text" type="java.lang.String" value="Cheque relacionado:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JComboBox" name="jcbFkCheckId_n">
                   <Properties>
-                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="4">
-                        <StringItem index="0" value="Item 1"/>
-                        <StringItem index="1" value="Item 2"/>
-                        <StringItem index="2" value="Item 3"/>
-                        <StringItem index="3" value="Item 4"/>
-                      </StringArray>
-                    </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[300, 23]"/>
                     </Property>
@@ -289,15 +281,16 @@
                 <Component class="javax.swing.JLabel" name="jlDummy02">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[25, 23]"/>
+                      <Dimension value="[10, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JCheckBox" name="jckIsExchangeRatePreserverd">
+                <Component class="javax.swing.JCheckBox" name="jckIsExchangeRatePreserved">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Conservar TC"/>
+                    <Property name="text" type="java.lang.String" value="Conservar TC doc."/>
+                    <Property name="enabled" type="boolean" value="false"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -377,7 +370,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="jtfDpsValueCyCurKeyRo">
+                <Component class="javax.swing.JTextField" name="jtfDpsValueCyKeyRo">
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>
                     <Property name="text" type="java.lang.String" value="CUR"/>
@@ -462,7 +455,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="jtfDpsValueCurKeyRo">
+                <Component class="javax.swing.JTextField" name="jtfDpsValueKeyRo">
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>
                     <Property name="text" type="java.lang.String" value="CUR"/>

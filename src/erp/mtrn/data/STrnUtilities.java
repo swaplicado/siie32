@@ -145,6 +145,7 @@ public abstract class STrnUtilities {
     /**
      * Obtains available stock on a certain year up to cut off date.
      * @param client ERP Client interface.
+     * @param year Year.
      * @param itemId Lot item ID (primary key).
      * @param unitId Lot unit ID (primary key).
      * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
@@ -258,7 +259,7 @@ public abstract class STrnUtilities {
         String sql = "";
         ResultSet resulSet = null;
         STrnStockMove stockMove = null;
-        Vector<STrnStockMove> stockMoves = new Vector<STrnStockMove>();
+        Vector<STrnStockMove> stockMoves = new Vector<>();
 
         sql = "SELECT s.id_item, s.id_unit, s.id_lot, l.lot, l.dt_exp_n, l.b_block, " +
                 "IF(l.dt_exp_n IS NOT NULL, 0, 1) AS f_ord, " +
@@ -366,8 +367,8 @@ public abstract class STrnUtilities {
     /**
      * Obtains lots as stock moves for a given quantity.
      *
-     * @param stockMoves Vector of STrnStockMove objects, with available lots.
-     * @param quantity Quantity required.
+     * @param availableMoves
+     * @param quantityReq
      * @return Vector of STrnStockMove objects, with required lots.
      * @throws java.lang.Exception
      */
@@ -375,7 +376,7 @@ public abstract class STrnUtilities {
     public static Vector<STrnStockMove> obtainRequiredLots(final Vector<STrnStockMove> availableMoves, final double quantityReq) throws Exception {
         double quantitySum = 0;
         STrnStockMove requiredMove = null;
-        Vector<STrnStockMove> requiredMoves = new Vector<STrnStockMove>();
+        Vector<STrnStockMove> requiredMoves = new Vector<>();
 
         if (quantityReq > 0) {
             for (STrnStockMove availableMove : availableMoves) {
@@ -404,8 +405,6 @@ public abstract class STrnUtilities {
      * @param date DIOG date (stock move date).
      * @param prodOrderKey Production order primary key (one document per available warehouse).
      * @param iogTypeKey IOG type key. Constants defined in SDataConstantsSys.
-     * @param warehouseKey Warehouse primary key.
-     * @param justThisWarehouse Flag that indicates that only provided warehouse must be considered for materials assignated in production order to consume them.
      * @return Vector of SDataDiog objects.
      * @throws java.lang.Exception
      */
@@ -427,7 +426,7 @@ public abstract class STrnUtilities {
         SDataCompanyBranchEntity warehouse = null;
         SDataDiog iog = null;
         SDataDiogEntry iogEntry = null;
-        Vector<SDataDiog> iogs = new Vector<SDataDiog>();
+        Vector<SDataDiog> iogs = new Vector<>();
 
         sql = "SELECT s.id_cob, s.id_wh, s.id_item, s.id_unit, s.id_lot, " +    // 04
                 "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, " +           // 09
@@ -474,7 +473,7 @@ public abstract class STrnUtilities {
 
                     warehouse = (SDataCompanyBranchEntity) SDataUtilities.readRegistry(client, SDataConstants.CFGU_COB_ENT, curWarehouseKey, SLibConstants.EXEC_MODE_SILENT);
                     items = warehouse.getDnsForDiog(new int[] { iogTypeKey[0], iogTypeKey[1] });
-                    series = items.size() == 0 ? "" : items.get(0).toString();
+                    series = items.isEmpty() ? "" : items.get(0).toString();
 
                     iog = new SDataDiog();
                     iog.setPkYearId(year);
@@ -1260,7 +1259,7 @@ public abstract class STrnUtilities {
      * Gets all production order charge entry lots that fit provided parameters.
      */
     private static Vector<SDataProductionOrderChargeEntryLot> getProdOrderChargeEntryLots(final SDataProductionOrder prodOrder, final int chargeId, final int itemId, final int unitId) {
-        Vector<SDataProductionOrderChargeEntryLot> chargeEntryLots = new Vector<SDataProductionOrderChargeEntryLot>();
+        Vector<SDataProductionOrderChargeEntryLot> chargeEntryLots = new Vector<>();
 
         for (SDataProductionOrderCharge charge : prodOrder.getDbmsProductionOrderCharges()) {
             if (charge.getPkChargeId() == chargeId) {
@@ -1299,7 +1298,7 @@ public abstract class STrnUtilities {
         double qtyLotted = 0;
         double qtyProcessed = 0;
         Vector<SDataProductionOrderChargeEntryLot> chargeEntryLots = null;
-        Vector<STrnStockMove> stockMoves = new Vector<STrnStockMove>();
+        Vector<STrnStockMove> stockMoves = new Vector<>();
 
         if (qtyToAssign > 0) {
             chargeEntryLots = getProdOrderChargeEntryLots(prodOrder, chargeId, itemId, unitId);
@@ -1346,7 +1345,7 @@ public abstract class STrnUtilities {
         double qtyToReturnApprobed = qtyToReturn <= qtyAssigned ? qtyToReturn : qtyAssigned;
         SDataProductionOrderChargeEntryLot chargeEntryLot = null;
         Vector<SDataProductionOrderChargeEntryLot> chargeEntryLots = null;
-        Vector<STrnStockMove> stockMoves = new Vector<STrnStockMove>();
+        Vector<STrnStockMove> stockMoves = new Vector<>();
 
         if (qtyAssigned > 0 && qtyToReturnApprobed > 0) {
             chargeEntryLots = getProdOrderChargeEntryLots(prodOrder, chargeId, itemId, unitId);
@@ -2593,7 +2592,6 @@ public abstract class STrnUtilities {
      * @param nPacId pac ID.
      * @param dateAcquisition date of acquisition.
      * @return true fi exists.
-     * @throws Exception
      */
     public static boolean validateExistsAcquisitionStamp(final SClientInterface client, final int nPacId,  final Date dateAcquisition) {
         String sSql = "";

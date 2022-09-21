@@ -249,7 +249,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatShift = new JMenuItem("Turnos");
         jmiCatEmployeeType = new JMenuItem("Tipos de empleado");
         jmiCatWorkerType = new JMenuItem("Tipos de obrero");
-        jmiCatEmployeeDismissType = new JMenuItem("Tipos de baja");
+        jmiCatEmployeeDismissType = new JMenuItem("Motivos de baja");
         jmiCatMwzType = new JMenuItem("Áreas geográficas");
         jmiCatMwzTypeWage = new JMenuItem("Salarios mínimos de áreas geográficas");
         jmiCatUma = new JMenuItem("Unidades de Medida y Actualización (UMA)");

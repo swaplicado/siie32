@@ -58,7 +58,7 @@ import sa.lib.SLibUtils;
 public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
     private erp.client.SClientInterface miClient;
-    private int mnBizPartnerCategoryId;
+    private int mnBizPartnerCategory;
 
     private int mnFormResult;
     private int mnFormStatus;
@@ -95,7 +95,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     public SDialogRecordPayment(erp.client.SClientInterface client, int idBizPartnerCategory) {
         super(client.getFrame(), true);
         miClient = client;
-        mnBizPartnerCategoryId = idBizPartnerCategory;
+        mnBizPartnerCategory = idBizPartnerCategory;
         initComponents();
         initComponentsExtra();
     }
@@ -135,14 +135,14 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jbAccExchangeRate = new javax.swing.JButton();
         jbAccExchangeRateAcumSet = new javax.swing.JButton();
         jlDummy02 = new javax.swing.JLabel();
-        jckIsExchangeRatePreserverd = new javax.swing.JCheckBox();
+        jckIsExchangeRatePreserved = new javax.swing.JCheckBox();
         jpPaymentCenter = new javax.swing.JPanel();
         jlPanelDpsFinder = new javax.swing.JLabel();
         jpPaymentSouth = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlDpsValueCy = new javax.swing.JLabel();
         jtfDpsValueCy = new javax.swing.JTextField();
-        jtfDpsValueCyCurKeyRo = new javax.swing.JTextField();
+        jtfDpsValueCyKeyRo = new javax.swing.JTextField();
         jbDpsValueCy = new javax.swing.JButton();
         jlDummy03 = new javax.swing.JLabel();
         jlDpsExchangeRateSys = new javax.swing.JLabel();
@@ -151,7 +151,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jPanel8 = new javax.swing.JPanel();
         jlDpsValue = new javax.swing.JLabel();
         jtfDpsValue = new javax.swing.JTextField();
-        jtfDpsValueCurKeyRo = new javax.swing.JTextField();
+        jtfDpsValueKeyRo = new javax.swing.JTextField();
         jbDpsValue = new javax.swing.JButton();
         jlDummy04 = new javax.swing.JLabel();
         jlDpsExchangeRate = new javax.swing.JLabel();
@@ -255,14 +255,13 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jbAccExchangeRateAcumView.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbAccExchangeRateAcumView);
 
-        jlDummy01.setPreferredSize(new java.awt.Dimension(25, 23));
+        jlDummy01.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel10.add(jlDummy01);
 
-        jlFkCheckId_n.setText("Cheque del movimiento:");
-        jlFkCheckId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkCheckId_n.setText("Cheque relacionado:");
+        jlFkCheckId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlFkCheckId_n);
 
-        jcbFkCheckId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkCheckId_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel10.add(jcbFkCheckId_n);
 
@@ -292,12 +291,13 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jbAccExchangeRateAcumSet.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel12.add(jbAccExchangeRateAcumSet);
 
-        jlDummy02.setPreferredSize(new java.awt.Dimension(25, 23));
+        jlDummy02.setPreferredSize(new java.awt.Dimension(10, 23));
         jPanel12.add(jlDummy02);
 
-        jckIsExchangeRatePreserverd.setText("Conservar TC");
-        jckIsExchangeRatePreserverd.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jckIsExchangeRatePreserverd);
+        jckIsExchangeRatePreserved.setText("Conservar TC doc.");
+        jckIsExchangeRatePreserved.setEnabled(false);
+        jckIsExchangeRatePreserved.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel12.add(jckIsExchangeRatePreserved);
 
         jpPaymentNorth.add(jPanel12);
 
@@ -326,11 +326,11 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jtfDpsValueCy.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfDpsValueCy);
 
-        jtfDpsValueCyCurKeyRo.setEditable(false);
-        jtfDpsValueCyCurKeyRo.setText("CUR");
-        jtfDpsValueCyCurKeyRo.setFocusable(false);
-        jtfDpsValueCyCurKeyRo.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel7.add(jtfDpsValueCyCurKeyRo);
+        jtfDpsValueCyKeyRo.setEditable(false);
+        jtfDpsValueCyKeyRo.setText("CUR");
+        jtfDpsValueCyKeyRo.setFocusable(false);
+        jtfDpsValueCyKeyRo.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel7.add(jtfDpsValueCyKeyRo);
 
         jbDpsValueCy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbDpsValueCy.setToolTipText("Calcular");
@@ -371,11 +371,11 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         jtfDpsValue.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jtfDpsValue);
 
-        jtfDpsValueCurKeyRo.setEditable(false);
-        jtfDpsValueCurKeyRo.setText("CUR");
-        jtfDpsValueCurKeyRo.setFocusable(false);
-        jtfDpsValueCurKeyRo.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel8.add(jtfDpsValueCurKeyRo);
+        jtfDpsValueKeyRo.setEditable(false);
+        jtfDpsValueKeyRo.setText("CUR");
+        jtfDpsValueKeyRo.setFocusable(false);
+        jtfDpsValueKeyRo.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel8.add(jtfDpsValueKeyRo);
 
         jbDpsValue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbDpsValue.setToolTipText("Calcular");
@@ -469,7 +469,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     private void initComponentsExtra() {
         Method method = null;
 
-        switch (mnBizPartnerCategoryId) {
+        switch (mnBizPartnerCategory) {
             case SDataConstantsSys.BPSS_CT_BP_SUP:
                 setTitle("Pago a proveedores");
                 manDpsClassKey = SDataConstantsSys.TRNS_CL_DPS_PUR_DOC;
@@ -564,7 +564,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     }
 
     private void renderSystemSettings() {
-        jtfDpsValueCurKeyRo.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+        jtfDpsValueKeyRo.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
     }
 
     private void renderParamSettings() {
@@ -589,8 +589,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             jtfAccountCashCurRo.setText("");
             jtfDateRo.setText("");
 
-            jckIsExchangeRatePreserverd.setEnabled(false);
-            jckIsExchangeRatePreserverd.setSelected(false);
+            jckIsExchangeRatePreserved.setEnabled(false);
+            jckIsExchangeRatePreserved.setSelected(false);
 
             jlFkCheckId_n.setEnabled(false);
             jcbFkCheckId_n.setEnabled(false);
@@ -621,7 +621,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                 jbAccExchangeRateAcumSet.setEnabled(true);
 
                 moFieldAccExchangeRateSys.setFieldValue(mdParamExchangeRateToday);
-                moFieldAccExchangeRate.setFieldValue(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ?
+                moFieldAccExchangeRate.setFieldValue(mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP ?
                 madParamAccountCashBal[1] == 0d ? 0d : madParamAccountCashBal[0] / madParamAccountCashBal[1] : mdParamExchangeRateToday);
 
                 if (moFieldAccExchangeRate.getDouble() == 0d) {
@@ -637,11 +637,11 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             jtfDateRo.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(moParamRecord.getDate()));
             msAccCurKey = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { moParamAccountCash.getFkCurrencyId() }, SLibConstants.DESCRIPTION_CODE);
 
-            jckIsExchangeRatePreserverd.setEnabled(false);
-            jckIsExchangeRatePreserverd.setSelected(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? 
+            jckIsExchangeRatePreserved.setEnabled(false);
+            jckIsExchangeRatePreserved.setSelected(mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP ? 
                     miClient.getSessionXXX().getParamsCompany().getIsExchangeRatePurPreserved() : miClient.getSessionXXX().getParamsCompany().getIsExchangeRateSalPreserved());
 
-            if ((mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP || mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS) && moParamAccountCash.getIsCheckWalletApplying()) {
+            if ((mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP || mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS) && moParamAccountCash.getIsCheckWalletApplying()) {
                 jlFkCheckId_n.setEnabled(true);
                 jcbFkCheckId_n.setEnabled(true);
             }
@@ -670,7 +670,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             jtfDpsExchangeRateSysRo.setText("");
             jtfDpsExchangeRate.setText("");
             
-            jtfDpsValueCyCurKeyRo.setText("");
+            jtfDpsValueCyKeyRo.setText("");
         }
         else {
             jtfDpsValueCy.setEnabled(true);
@@ -698,7 +698,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                 jbDpsExchangeRateCopy.setEnabled(moParamAccountCash != null && moParamAccountCash.getFkCurrencyId() == moDps.getFkCurrencyId());
             }
             
-            jtfDpsValueCyCurKeyRo.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moDps.getFkCurrencyId() }));
+            jtfDpsValueCyKeyRo.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moDps.getFkCurrencyId() }));
             
             actionPerformedConcept();
         }
@@ -708,7 +708,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         double exr = 0;
 
         if (moDps != null && madDpsBalance != null) {
-            if (!jckIsExchangeRatePreserverd.isSelected()) {
+            if (!jckIsExchangeRatePreserved.isSelected()) {
                 // Set default exchange rate:
                 
                 moFieldDpsExchangeRateSys.setFieldValue(madDpsBalance[1] == 0d ? 1d : madDpsBalance[0] / madDpsBalance[1]);
@@ -807,7 +807,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             if (validation.getComponent() != null) {
                 validation.getComponent().requestFocus();
             }
-            if (validation.getMessage().length() > 0) {
+            if (!validation.getMessage().isEmpty()) {
                 miClient.showMsgBoxWarning(validation.getMessage());
             }
         }
@@ -960,7 +960,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     private javax.swing.JButton jbOk;
     private javax.swing.ButtonGroup jbtButtonGroup;
     private javax.swing.JComboBox jcbFkCheckId_n;
-    private javax.swing.JCheckBox jckIsExchangeRatePreserverd;
+    private javax.swing.JCheckBox jckIsExchangeRatePreserved;
     private javax.swing.JLabel jlAccExchangeRate;
     private javax.swing.JLabel jlAccExchangeRateSys;
     private javax.swing.JLabel jlAccountCash;
@@ -992,9 +992,9 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     private javax.swing.JTextField jtfDpsExchangeRate;
     private javax.swing.JTextField jtfDpsExchangeRateSysRo;
     private javax.swing.JTextField jtfDpsValue;
-    private javax.swing.JTextField jtfDpsValueCurKeyRo;
     private javax.swing.JTextField jtfDpsValueCy;
-    private javax.swing.JTextField jtfDpsValueCyCurKeyRo;
+    private javax.swing.JTextField jtfDpsValueCyKeyRo;
+    private javax.swing.JTextField jtfDpsValueKeyRo;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -1071,11 +1071,11 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
                     if (!validation.getIsError()) {
                         if (moFieldDpsValueCy.getDouble() > madDpsBalance[1]) {
-                            msg = "El valor para el campo '" + jlDpsValueCy.getText() + "' no debería ser mayor al saldo del documento en " + jtfDpsValueCyCurKeyRo.getText() + ".\n" +
+                            msg = "El valor para el campo '" + jlDpsValueCy.getText() + "' no debería ser mayor al saldo del documento en " + jtfDpsValueCyKeyRo.getText() + ".\n" +
                                     "Existe una diferencia de " + miClient.getSessionXXX().getFormatters().getDecimalsCurrencyFormat().format(Math.abs(moFieldDpsValueCy.getDouble() - madDpsBalance[1])) + ".\n" + SLibConstants.MSG_CNF_MSG_CONT;
                             if (miClient.showMsgBoxConfirm(msg) != JOptionPane.YES_OPTION) {
                                 msg = "El valor para el campo '" + jlDpsValueCy.getText() + "' debe ser menor o igual a " +
-                                        miClient.getSessionXXX().getFormatters().getDecimalsCurrencyFormat().format(madDpsBalance[1]) + " " + jtfDpsValueCyCurKeyRo.getText() + ".\n";
+                                        miClient.getSessionXXX().getFormatters().getDecimalsCurrencyFormat().format(madDpsBalance[1]) + " " + jtfDpsValueCyKeyRo.getText() + ".\n";
                                 validation.setMessage(msg);
                                 if (jtfDpsValueCy.isEnabled()) {
                                     validation.setComponent(jtfDpsValueCy);
@@ -1089,7 +1089,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         
         if (!validation.getIsError()) {
             try {
-                Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
+                Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategory,
                         moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, null);
                 if (config == null) {
                     validation.setMessage("No se encuentró la cuenta contable del asociado de negocios.");
@@ -1139,8 +1139,8 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), 
                 SLibTimeUtils.digestYear(moParamRecord.getDate())[0], 
                 moDps.getPkYearId(), moDps.getPkDocId(), 
-                mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
-                mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], 
+                mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
+                mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], 
                 null);
         
         double dTotalBalance = 0d;
@@ -1236,14 +1236,14 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
             oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
             oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
-            oDsmEntry.setDbmsCtSysMovId(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
-            oDsmEntry.setDbmsTpSysMovId(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
-            oDsm.setDbmsSubsystemTypeBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_CT_BP, new int[] { mnBizPartnerCategoryId }, SLibConstants.DESCRIPTION_CODE));
+            oDsmEntry.setDbmsCtSysMovId(mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
+            oDsmEntry.setDbmsTpSysMovId(mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+            oDsm.setDbmsSubsystemTypeBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_CT_BP, new int[] { mnBizPartnerCategory }, SLibConstants.DESCRIPTION_CODE));
             oDsmEntry.setFkBizPartnerId(moDps.getFkBizPartnerId_r());
             oDsmEntry.setDbmsFkBizPartnerBranchId_n(moDps.getFkBizPartnerBranchId());
 
             try {
-                Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
+                Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategory,
                         moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, balance.getTaxKey());
                 if (config.size() > 0) {
                     oDsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
@@ -1256,7 +1256,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             }
         }
 
-        switch (mnBizPartnerCategoryId) {
+        switch (mnBizPartnerCategory) {
             case SDataConstantsSys.BPSS_CT_BP_SUP:
                 oDsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_SUP);
                 break;
@@ -1272,7 +1272,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
         oDsm.setDbmsErpTaxModel(miClient.getSessionXXX().getParamsErp().getTaxModel());
         oDsm.setDate(miClient.getSessionXXX().getWorkingDate());
-        oDsm.setFkSubsystemCategoryId(mnBizPartnerCategoryId);
+        oDsm.setFkSubsystemCategoryId(mnBizPartnerCategory);
         oDsm.setFkCompanyBranchId(idBranch);
         oDsm.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         oDsm.setDbmsFkCompanyBranch(moParamRecord.getFkCompanyBranchId());
@@ -1287,7 +1287,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
             for (SDataRecordEntry entry : oRecord.getDbmsRecordEntries()) {
                 entry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_ACC, new Object[] { entry.getFkAccountIdXXX() }));
-                entry.setDbmsCurrencyKey(jtfDpsValueCyCurKeyRo.getText());
+                entry.setDbmsCurrencyKey(jtfDpsValueCyKeyRo.getText());
 
                 if (entry.getFkSystemMoveCategoryIdXXX() == SDataConstantsSys.FINS_CT_SYS_MOV_BPS) {
                     entry.setDbmsAccountComplement(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
@@ -1348,17 +1348,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
 
     @Override
     public java.lang.Object getValue(int type) {
-        Object value = null;
-
-        switch (type) {
-            case SDataConstants.FIN_REC_ETY:
-                value = null;
-                break;
-
-            default:
-        }
-
-        return value;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

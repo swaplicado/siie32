@@ -6,7 +6,6 @@ package erp.lib.table;
 
 import java.util.Vector;
 
-
 /**
  *
  * @author Sergio Flores
@@ -37,7 +36,7 @@ public abstract class STableRow implements sa.lib.grid.SGridRow, java.io.Seriali
         mnStyle = STableConstants.UNDEFINED;
         moPrimaryKey = null;
         moData = null;
-        mvValues = new Vector<Object>();
+        mvValues = new Vector<>();
 
         manRowPrimaryKey = pk;
         msRowCode = code;

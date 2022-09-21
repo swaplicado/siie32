@@ -4128,31 +4128,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     private boolean isBizPartnerCreditOk(final int risk, final boolean isDocBeingOpened) {
-        boolean validateCreditLimit = false;
-        boolean validateExpiredDocs = false;
-        boolean canOmitCreditLimit = false;
-        boolean canOmitExpiredDocs = false;
         boolean isCreditOk = true;
 
         if (isApplingCreditValidation()) {
-            if (risk == SModSysConsts.BPSS_RISK_D_BLK) {
+            if (risk == SModSysConsts.BPSS_RISK_D_BLOCKED) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
                 isCreditOk = false;
             }
-            else if (risk == SModSysConsts.BPSS_RISK_E_TRL) {
-                miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_TRIAL);
+            else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_WO_OPS) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_TRIAL_WO_OPS);
                 isCreditOk = false;
             }
+            else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS) {
+                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_BP_TRIAL_W_OPS + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                    isCreditOk = false;
+                }
+            }
             else {
-                validateCreditLimit = risk == SModSysConsts.BPSS_RISK_B_RSK_M || risk == SModSysConsts.BPSS_RISK_C_RSK_H;
-                validateExpiredDocs = risk == SModSysConsts.BPSS_RISK_A_RSK_L || risk == SModSysConsts.BPSS_RISK_B_RSK_M || risk == SModSysConsts.BPSS_RISK_C_RSK_H;
-                canOmitCreditLimit = risk == SModSysConsts.BPSS_RISK_B_RSK_M;
-                canOmitExpiredDocs = risk == SModSysConsts.BPSS_RISK_A_RSK_L || risk == SModSysConsts.BPSS_RISK_B_RSK_M;
+                boolean validateCreditLimit = risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED;
+                boolean validateExpiredDocs = risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED || risk == SModSysConsts.BPSS_RISK_A_RISK_LOW;
+                boolean canOmitCreditLimit = risk == SModSysConsts.BPSS_RISK_B_RISK_MED;
+                boolean canOmitExpiredDocs = risk == SModSysConsts.BPSS_RISK_B_RISK_MED || risk == SModSysConsts.BPSS_RISK_A_RISK_LOW;
 
                 if (validateCreditLimit && !checkBizPartnerCreditLimitOk(canOmitCreditLimit, isDocBeingOpened)) {
                     isCreditOk = false;
                 }
-                else if (validateExpiredDocs && !checkBizPartnerExpiredDocsOk(canOmitExpiredDocs, isDocBeingOpened)) {
+                
+                if (validateExpiredDocs && !checkBizPartnerExpiredDocsOk(canOmitExpiredDocs, isDocBeingOpened)) {
                     isCreditOk = false;
                 }
             }

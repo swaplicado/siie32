@@ -108,11 +108,12 @@ public abstract class SModSysConsts {
     public static final int BPSS_TP_CFD_ADD_CFD_ADD_LOREAL = 3;
     public static final int BPSS_TP_CFD_ADD_CFD_ADD_BACHOCO = 4;
 
-    public static final int BPSS_RISK_A_RSK_L = 1;
-    public static final int BPSS_RISK_B_RSK_M = 2;
-    public static final int BPSS_RISK_C_RSK_H = 3;
-    public static final int BPSS_RISK_D_BLK = 4;
-    public static final int BPSS_RISK_E_TRL = 5;
+    public static final int BPSS_RISK_A_RISK_LOW = 1; // risk low
+    public static final int BPSS_RISK_B_RISK_MED = 2; // risk medium
+    public static final int BPSS_RISK_C_RISK_HIGH = 3; // risk high
+    public static final int BPSS_RISK_D_BLOCKED = 4; // blocked
+    public static final int BPSS_RISK_E_TRIAL_WO_OPS = 5; // trial wo/operations
+    public static final int BPSS_RISK_E_TRIAL_W_OPS = 6; // trial w/operations
 
     public static final int BPSS_LINK_ALL = 1;
     public static final int BPSS_LINK_CUS_MKT_TP = 2;

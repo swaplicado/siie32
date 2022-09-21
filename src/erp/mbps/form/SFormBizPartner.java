@@ -1991,7 +1991,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbAddBranch.setEnabled(mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO);
 
             moFieldFkCreditTypeId_n.setFieldValue(new int[] { SDataConstantsSys.BPSS_TP_CRED_CRED_NO });
-            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
+            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RISK_HIGH });
             moFieldGuaranteeAmount.setFieldValue(0d);
             moFieldInsuranceAmount.setFieldValue(0d);
             moFieldIsGuaranteeInProcess.setFieldValue(false);
@@ -2019,7 +2019,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moFieldCreditLimit.setFieldValue(0d);
             moFieldDaysOfCredit.setFieldValue(0);
             moFieldDaysOfGrace.setFieldValue(0);
-            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
+            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RISK_HIGH });
             moFieldGuaranteeAmount.setFieldValue(0d);
             moFieldInsuranceAmount.setFieldValue(0d);
             moFieldIsGuaranteeInProcess.setFieldValue(false);
@@ -3498,7 +3498,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartnerCategory.setFkBizPartnerCategoryId(mnParamBizPartnerCategory);
         moBizPartnerCategory.setFkBizPartnerTypeId(jcbFkBizPartnerTypeId.getSelectedIndex() <= 0 ? SDataConstantsSys.BPSU_TP_BP_DEFAULT : moFieldFkBizPartnerTypeId.getKeyAsIntArray()[1]);
         moBizPartnerCategory.setFkCreditTypeId_n(!jckIsCreditByUser.isSelected() ? SDataConstantsSys.BPSS_TP_CRED_CRED_NO : moFieldFkCreditTypeId_n.getKeyAsIntArray()[0]);
-        moBizPartnerCategory.setFkRiskId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C_RSK_H : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
+        moBizPartnerCategory.setFkRiskId_n(!jckIsCreditByUser.isSelected() ? SModSysConsts.BPSS_RISK_C_RISK_HIGH : moFieldFkRiskTypeId.getKeyAsIntArray()[0]);
         moBizPartnerCategory.setFkPaymentSystemTypeId_n(mnTempFkPaymentSystemTypeId);
         moBizPartnerCategory.setFkCfdAddendaTypeId(moFieldFkCfdAddendaTypeId.getKeyAsIntArray()[0]);
 

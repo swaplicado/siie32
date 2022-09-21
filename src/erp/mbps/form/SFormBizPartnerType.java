@@ -463,7 +463,7 @@ public class SFormBizPartnerType extends javax.swing.JDialog implements erp.lib.
 
         jtfCurrencyKey.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         moFieldFkCreditTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_TP_CRED_CRED_NO });
-        moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RSK_H });
+        moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RISK_HIGH });
         jckIsDeleted.setEnabled(false);
         jcbPkBizPartnerCategoryId.setEnabled(true);
     }

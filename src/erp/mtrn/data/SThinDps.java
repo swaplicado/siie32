@@ -6,6 +6,7 @@ import erp.mod.trn.db.STrnUtils;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 
 /**
  * Versión "delgada" del registro SDataDps (tabla trn_dps).
@@ -18,6 +19,9 @@ public class SThinDps implements Serializable, SThinData {
     protected int mnPkDocId;
     protected String msNumberSeries;
     protected String msNumber;
+    protected Date mtDate;
+    protected double mdTotalCy;
+    protected double mdTotal;
     protected int mnFkDpsCategoryId;
     protected int mnFkDpsClassId;
     protected int mnFkDpsTypeId;
@@ -42,6 +46,9 @@ public class SThinDps implements Serializable, SThinData {
         mnPkDocId = 0;
         msNumberSeries = "";
         msNumber = "";
+        mtDate = null;
+        mdTotalCy = 0;
+        mdTotal = 0;
         mnFkDpsCategoryId = 0;
         mnFkDpsClassId = 0;
         mnFkDpsTypeId = 0;
@@ -73,6 +80,18 @@ public class SThinDps implements Serializable, SThinData {
         return msNumber;
     }
 
+    public Date getDate() {
+        return mtDate;
+    }
+    
+    public double getTotalCy() {
+        return mdTotalCy;
+    }
+
+    public double getTotal() {
+        return mdTotal;
+    }
+    
     public int getFkDpsCategoryId() {
         return mnFkDpsCategoryId;
     }
@@ -138,7 +157,8 @@ public class SThinDps implements Serializable, SThinData {
         reset();
         
         int[] key = (int[]) primaryKey;
-        String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, "
+        String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.tot_r, "
+                + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, "
                 + "d.fid_bp_r, d.fid_bpb, d.fid_cur, c.cur, c.cur_key "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
@@ -153,6 +173,9 @@ public class SThinDps implements Serializable, SThinData {
                 mnPkDocId = resultSetDps.getInt("d.id_doc");
                 msNumberSeries = resultSetDps.getString("d.num_ser");
                 msNumber = resultSetDps.getString("d.num");
+                mtDate = resultSetDps.getDate("d.dt");
+                mdTotalCy = resultSetDps.getDouble("d.tot_cur_r");
+                mdTotal = resultSetDps.getDouble("d.tot_r");
                 mnFkDpsCategoryId = resultSetDps.getInt("d.fid_ct_dps");
                 mnFkDpsClassId = resultSetDps.getInt("d.fid_cl_dps");
                 mnFkDpsTypeId = resultSetDps.getInt("d.fid_tp_dps");
@@ -167,19 +190,18 @@ public class SThinDps implements Serializable, SThinData {
                         + "FROM trn_cfd "
                         + "WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + ";";
                 try (ResultSet resultSetCfd = statement.executeQuery(sql)) {
-                    if (!resultSetCfd.next()) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
-                    else {
+                    if (resultSetCfd.next()) {
                         mnDbmsCfdId = resultSetCfd.getInt("id_cfd");
                     }
                 }
                 
-                moThinDpsCfd = new SThinDpsCfd();
-                moThinDpsCfd.read(new int[] { mnPkYearId, mnPkDocId}, statement);
-                
-                moThinCfd = new SThinCfd();
-                moThinCfd.read(new int[] { mnDbmsCfdId }, statement);
+                if (mnDbmsCfdId != 0) {
+                    moThinDpsCfd = new SThinDpsCfd();
+                    moThinDpsCfd.read(new int[] { mnPkYearId, mnPkDocId}, statement);
+
+                    moThinCfd = new SThinCfd();
+                    moThinCfd.read(new int[] { mnDbmsCfdId }, statement);
+                }
             }
         }
     }

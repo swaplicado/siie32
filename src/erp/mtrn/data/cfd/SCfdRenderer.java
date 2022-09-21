@@ -38,6 +38,7 @@ import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -46,6 +47,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.xml.SXmlUtils;
 
 /**
@@ -192,11 +194,16 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                             if (miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditInvoice()) {
                                 int risk = bizPartnerCategory.getEffectiveRiskTypeId();
 
-                                if (risk == SModSysConsts.BPSS_RISK_D_BLK) {
+                                if (risk == SModSysConsts.BPSS_RISK_D_BLOCKED) {
                                     validation.setMessage(SLibConstants.MSG_INF_BP_BLOCKED);
                                 }
-                                else if (risk == SModSysConsts.BPSS_RISK_E_TRL) {
-                                    validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL);
+                                else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_WO_OPS) {
+                                    validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_WO_OPS);
+                                }
+                                else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS) {
+                                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_BP_TRIAL_W_OPS + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                        validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_W_OPS);
+                                    }
                                 }
                             }
                         }

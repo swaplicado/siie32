@@ -711,7 +711,7 @@ public class SModuleHrs extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY id_cl_abs, name, id_tp_abs ";
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                settings = new SGuiCatalogueSettings("Tipo baja", 1);
+                settings = new SGuiCatalogueSettings("Motivo baja", 1);
                 sql = "SELECT id_tp_emp_dis AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY name, id_tp_emp_dis ";
                 break;
@@ -862,7 +862,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewAbsenceType(miClient, "Tipos incidencia");
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                view = new SViewEmployeeDismissalType(miClient, "Tipos baja");
+                view = new SViewEmployeeDismissalType(miClient, "Motivos baja");
                 break;
             case SModConsts.HRSU_TP_EMP:
                 view = new SViewEmployeeType(miClient, "Tipos empleado");
@@ -1170,7 +1170,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormAbsenceType;
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                if (moFormEmployeeDismissalType == null) moFormEmployeeDismissalType = new SFormEmployeeDismissalType(miClient, "Tipo de baja");
+                if (moFormEmployeeDismissalType == null) moFormEmployeeDismissalType = new SFormEmployeeDismissalType(miClient, "Motivo de baja");
                 form = moFormEmployeeDismissalType;
                 break;
             case SModConsts.HRSU_TP_EMP:
