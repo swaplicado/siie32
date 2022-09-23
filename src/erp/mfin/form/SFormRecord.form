@@ -818,7 +818,7 @@
                         <Component class="javax.swing.JLabel" name="jlGuiModeInput">
                           <Properties>
                             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                              <Color blue="ff" green="0" red="0" type="rgb"/>
+                              <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                             </Property>
                             <Property name="horizontalAlignment" type="int" value="0"/>
                             <Property name="text" type="java.lang.String" value="Modo captura:"/>
@@ -941,7 +941,7 @@
                             <Component class="javax.swing.JButton" name="jbMoneyInPaymentCus">
                               <Properties>
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="ff" green="0" red="0" type="rgb"/>
+                                  <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Ingr.+ cobro cte."/>
                                 <Property name="toolTipText" type="java.lang.String" value="Ingreso de dinero + cobro cliente"/>
@@ -992,7 +992,7 @@
                             <Component class="javax.swing.JButton" name="jbMiPaymentCus">
                               <Properties>
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="ff" green="0" red="0" type="rgb"/>
+                                  <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Cobro cte."/>
                                 <Property name="toolTipText" type="java.lang.String" value="Cobro cliente"/>
@@ -1120,7 +1120,7 @@
                             <Component class="javax.swing.JButton" name="jbMoneyOutPaymentSup">
                               <Properties>
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="ff" green="0" red="0" type="rgb"/>
+                                  <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Egr.+ pago prv."/>
                                 <Property name="toolTipText" type="java.lang.String" value="Egreso de dinero + pago proveedor"/>
@@ -1181,7 +1181,7 @@
                             <Component class="javax.swing.JButton" name="jbMoPaymentSup">
                               <Properties>
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="ff" green="0" red="0" type="rgb"/>
+                                  <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Pago prv."/>
                                 <Property name="toolTipText" type="java.lang.String" value="Pago proveedor"/>
@@ -1297,6 +1297,9 @@
                           <SubComponents>
                             <Component class="javax.swing.JButton" name="jbDbtPaymentSup">
                               <Properties>
+                                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
+                                </Property>
                                 <Property name="text" type="java.lang.String" value="Pago prv."/>
                                 <Property name="toolTipText" type="java.lang.String" value="Pago proveedor"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
@@ -1397,6 +1400,9 @@
                           <SubComponents>
                             <Component class="javax.swing.JButton" name="jbCdtPaymentCus">
                               <Properties>
+                                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
+                                </Property>
                                 <Property name="text" type="java.lang.String" value="Cobro cte."/>
                                 <Property name="toolTipText" type="java.lang.String" value="Cobro cliente"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">

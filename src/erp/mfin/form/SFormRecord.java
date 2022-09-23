@@ -608,7 +608,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jpCommands13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 2, 0));
 
-        jlGuiModeInput.setForeground(new java.awt.Color(0, 0, 255));
+        jlGuiModeInput.setForeground(java.awt.Color.blue);
         jlGuiModeInput.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlGuiModeInput.setText("Modo captura:");
         jlGuiModeInput.setToolTipText("Modo de captura de cobros y pagos");
@@ -661,7 +661,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbMoneyInOther.setPreferredSize(new java.awt.Dimension(105, 23));
         jPanel22.add(jbMoneyInOther);
 
-        jbMoneyInPaymentCus.setForeground(new java.awt.Color(0, 0, 255));
+        jbMoneyInPaymentCus.setForeground(java.awt.Color.blue);
         jbMoneyInPaymentCus.setText("Ingr.+ cobro cte.");
         jbMoneyInPaymentCus.setToolTipText("Ingreso de dinero + cobro cliente");
         jbMoneyInPaymentCus.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -679,7 +679,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jPanel23.setBorder(javax.swing.BorderFactory.createTitledBorder("Contrapartidas ingresos (abonos):"));
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jbMiPaymentCus.setForeground(new java.awt.Color(0, 0, 255));
+        jbMiPaymentCus.setForeground(java.awt.Color.blue);
         jbMiPaymentCus.setText("Cobro cte.");
         jbMiPaymentCus.setToolTipText("Cobro cliente");
         jbMiPaymentCus.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -738,7 +738,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbMoneyOutOther.setPreferredSize(new java.awt.Dimension(105, 23));
         jPanel25.add(jbMoneyOutOther);
 
-        jbMoneyOutPaymentSup.setForeground(new java.awt.Color(0, 0, 255));
+        jbMoneyOutPaymentSup.setForeground(java.awt.Color.blue);
         jbMoneyOutPaymentSup.setText("Egr.+ pago prv.");
         jbMoneyOutPaymentSup.setToolTipText("Egreso de dinero + pago proveedor");
         jbMoneyOutPaymentSup.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -762,7 +762,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jPanel26.setBorder(javax.swing.BorderFactory.createTitledBorder("Contrapartidas egresos (cargos):"));
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jbMoPaymentSup.setForeground(new java.awt.Color(0, 0, 255));
+        jbMoPaymentSup.setForeground(java.awt.Color.blue);
         jbMoPaymentSup.setText("Pago prv.");
         jbMoPaymentSup.setToolTipText("Pago proveedor");
         jbMoPaymentSup.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -812,6 +812,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jpControlCashAccount2.setBorder(javax.swing.BorderFactory.createTitledBorder("Cargos:"));
         jpControlCashAccount2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
+        jbDbtPaymentSup.setForeground(java.awt.Color.blue);
         jbDbtPaymentSup.setText("Pago prv.");
         jbDbtPaymentSup.setToolTipText("Pago proveedor");
         jbDbtPaymentSup.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -857,6 +858,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         jpControlCashAccount3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 2, 0));
 
+        jbCdtPaymentCus.setForeground(java.awt.Color.blue);
         jbCdtPaymentCus.setText("Cobro cte.");
         jbCdtPaymentCus.setToolTipText("Cobro cliente");
         jbCdtPaymentCus.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -1692,10 +1694,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         
         switch (bizPartnerCategoryX) {
             case SDataConstants.BPSX_BP_SUP:
-                dialog = jrbModeInputSimple.isSelected() ? moDialogPaymentSup : moDialogPaymentMultipleSup;
+                dialog = jrbModeInputMultiple.isSelected() ? moDialogPaymentMultipleSup : moDialogPaymentSup;
                 break;
             case SDataConstants.BPSX_BP_CUS:
-                dialog = jrbModeInputSimple.isSelected() ? moDialogPaymentCus : moDialogPaymentMultipleCus;
+                dialog = jrbModeInputMultiple.isSelected() ? moDialogPaymentMultipleCus : moDialogPaymentCus;
                 break;
             default:
                 // do nothing
@@ -1750,10 +1752,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         
         switch (bizPartnerCategoryX) {
             case SDataConstants.BPSX_BP_SUP:
-                dialog = jrbModeInputSimple.isSelected() ? moDialogPaymentCompleteSup : moDialogPaymentMultipleSup;
+                dialog = jrbModeInputMultiple.isSelected() ? moDialogPaymentMultipleSup : moDialogPaymentCompleteSup;
                 break;
             case SDataConstants.BPSX_BP_CUS:
-                dialog = jrbModeInputSimple.isSelected() ? moDialogPaymentCompleteCus : moDialogPaymentMultipleCus;
+                dialog = jrbModeInputMultiple.isSelected() ? moDialogPaymentMultipleCus : moDialogPaymentCompleteCus;
                 break;
             default:
                 // do nothing
@@ -1761,9 +1763,18 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         
         if (dialog != null) {
             try {
-                double exchangeRate = SDataUtilities.obtainExchangeRate(miClient, moAccountCash.getFkCurrencyId(), moRecord.getDate());
-                double[] cashBalance = SDataUtilities.obtainAccountCashBalanceUpdated(miClient, moAccountCash.getFkCurrencyId(), moRecord.getDate(), moAccountCash.getPrimaryKey(), 
-                        moAccountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH ? SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH : SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, moRecord, null);
+                double exchangeRate = 0d;
+                double[] cashBalance = null;
+                
+                if (moAccountCash == null) {
+                    exchangeRate = 1;
+                    cashBalance = new double[] { 0, 0 };
+                }
+                else {
+                    exchangeRate = SDataUtilities.obtainExchangeRate(miClient, moAccountCash.getFkCurrencyId(), moRecord.getDate());
+                    cashBalance = SDataUtilities.obtainAccountCashBalanceUpdated(miClient, moAccountCash.getFkCurrencyId(), moRecord.getDate(), moAccountCash.getPrimaryKey(), 
+                            moAccountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH ? SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH : SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, moRecord, null);
+                }
 
                 dialog.formRefreshCatalogues();
                 dialog.formReset();
@@ -2454,10 +2465,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         if (moAccountCash == null) {
             jpCommands.add(jpCommandsJournal, BorderLayout.CENTER);
-            jlGuiModeInput.setEnabled(false);
-            jrbModeInputSimple.setEnabled(false);
-            jrbModeInputMultiple.setEnabled(false);
-            bgModeInput.clearSelection();
+            jlGuiModeInput.setEnabled(true);
+            jrbModeInputSimple.setEnabled(true);
+            jrbModeInputMultiple.setEnabled(true);
+            bgModeInput.setSelected(jrbModeInputSimple.getModel(), true);
             
             jbDbtExchangeRateDiff.setEnabled(false); // action reserved to cash-account journal vouchers
             jbCdtExchangeRateDiff.setEnabled(false); // action reserved to cash-account journal vouchers

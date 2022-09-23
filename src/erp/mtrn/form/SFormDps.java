@@ -4139,23 +4139,35 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_TRIAL_WO_OPS);
                 isCreditOk = false;
             }
-            else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_BP_TRIAL_W_OPS + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                    isCreditOk = false;
-                }
-            }
             else {
-                boolean validateCreditLimit = risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS || risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED;
-                boolean validateExpiredDocs = risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS || risk == SModSysConsts.BPSS_RISK_C_RISK_HIGH || risk == SModSysConsts.BPSS_RISK_B_RISK_MED || risk == SModSysConsts.BPSS_RISK_A_RISK_LOW;
-                boolean canOmitCreditLimit = risk == SModSysConsts.BPSS_RISK_B_RISK_MED;
-                boolean canOmitExpiredDocs = risk == SModSysConsts.BPSS_RISK_B_RISK_MED || risk == SModSysConsts.BPSS_RISK_A_RISK_LOW;
-
-                if (validateCreditLimit && !checkBizPartnerCreditLimitOk(canOmitCreditLimit, isDocBeingOpened)) {
-                    isCreditOk = false;
+                // risks low, med., high & trial w/ops.:
+                
+                if (risk == SModSysConsts.BPSS_RISK_F_TRIAL_W_OPS) {
+                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_BP_TRIAL_W_OPS + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        isCreditOk = false;
+                    }
                 }
                 
-                if (validateExpiredDocs && !checkBizPartnerExpiredDocsOk(canOmitExpiredDocs, isDocBeingOpened)) {
-                    isCreditOk = false;
+                if (isCreditOk) {
+                    // validate credit limit:
+                    
+                    boolean validateCreditLimit = risk > SModSysConsts.BPSS_RISK_A_RISK_LOW;
+                    boolean canOmitCreditLimit = risk <= SModSysConsts.BPSS_RISK_B_RISK_MED;
+                    
+                    if (validateCreditLimit && !isBizPartnerCreditLimitOk(canOmitCreditLimit, isDocBeingOpened)) {
+                        isCreditOk = false;
+                    }
+
+                    if (isCreditOk) {
+                        // validate overdue documents:
+                        
+                        boolean validateOverdueDocs = true; // all risks apply
+                        boolean canOmitOverdueDocs = risk != SModSysConsts.BPSS_RISK_C_RISK_HIGH;
+
+                        if (validateOverdueDocs && !areBizPartnerOverdueDocsOk(canOmitOverdueDocs, isDocBeingOpened)) {
+                            isCreditOk = false;
+                        }
+                    }
                 }
             }
         }
@@ -6151,7 +6163,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return params;
     }
 
-    private boolean checkBizPartnerCreditLimitOk(final boolean canOmitCreditLimit, final boolean isDocBeingOpened) {
+    private boolean isBizPartnerCreditLimitOk(final boolean canOmitCreditLimit, final boolean isDocBeingOpened) {
         boolean confirmOmission = true;
         boolean isCreditLimitOk = true;
         String msgCreditLimit = "";
@@ -6205,7 +6217,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return isCreditLimitOk;
     }
 
-    private boolean checkBizPartnerExpiredDocsOk(final boolean canOmitExpiredDocs, final boolean isDocBeingOpened) {
+    private boolean areBizPartnerOverdueDocsOk(final boolean canOmitOverdueDocs, final boolean isDocBeingOpened) {
         long expiredDays = 0;
         boolean isExpiredDocsOk = true;
         String msgExpiredDocs = "";
@@ -6226,7 +6238,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         if (!msgExpiredDocs.isEmpty()) {
-            if (canOmitExpiredDocs) {
+            if (canOmitOverdueDocs) {
                 if (miClient.showMsgBoxConfirm(msgExpiredDocs + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                     isExpiredDocsOk = false;
                 }

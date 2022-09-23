@@ -200,7 +200,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                                 else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_WO_OPS) {
                                     validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_WO_OPS);
                                 }
-                                else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_W_OPS) {
+                                else if (risk == SModSysConsts.BPSS_RISK_F_TRIAL_W_OPS) {
                                     if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_BP_TRIAL_W_OPS + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                                         validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_W_OPS);
                                     }

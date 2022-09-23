@@ -113,7 +113,7 @@ public abstract class SModSysConsts {
     public static final int BPSS_RISK_C_RISK_HIGH = 3; // risk high
     public static final int BPSS_RISK_D_BLOCKED = 4; // blocked
     public static final int BPSS_RISK_E_TRIAL_WO_OPS = 5; // trial wo/operations
-    public static final int BPSS_RISK_E_TRIAL_W_OPS = 6; // trial w/operations
+    public static final int BPSS_RISK_F_TRIAL_W_OPS = 6; // trial w/operations
 
     public static final int BPSS_LINK_ALL = 1;
     public static final int BPSS_LINK_CUS_MKT_TP = 2;
