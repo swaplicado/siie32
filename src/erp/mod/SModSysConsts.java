@@ -941,6 +941,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_LOAN_UNI = 3;      // Union loans
     public static final int HRSS_TP_LOAN_LOAN_3RD = 4;      // Third parties loans
     public static final int HRSS_TP_LOAN_LOAN_GLASS = 6;    // Glasses loans
+    public static final int HRSS_TP_LOAN_LOAN_SCHOOL = 7;   // School loans
     public static final int HRSS_TP_LOAN_HOME = 11;         // Home credit
     public static final int HRSS_TP_LOAN_CONS = 12;         // Consumer credit
 

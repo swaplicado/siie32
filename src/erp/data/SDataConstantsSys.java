@@ -91,6 +91,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
+    public static final String CFG_PARAM_HRS_VARIABLE_EARNINGS = "HRS_VARIABLE_EARNINGS";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
@@ -261,7 +262,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_ORD_CLO = 104057;
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
     public static final int PRV_SAL_COMP_SIGN_REST = 104062;
-    public static final int PRV_SAL_COMP_SIGN_IMMEX = 105063;
+    public static final int PRV_SAL_COMP_SIGN_IMMEX = 104063;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;

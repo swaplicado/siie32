@@ -116,7 +116,7 @@ public class SDbLoan extends SDbRegistryUser {
     }
     
     public boolean isPlainLoan() {
-        return SLibUtils.belongsTo(mnFkLoanTypeId, new int[] { SModSysConsts.HRSS_TP_LOAN_LOAN_COM, SModSysConsts.HRSS_TP_LOAN_LOAN_UNI, SModSysConsts.HRSS_TP_LOAN_LOAN_3RD, SModSysConsts.HRSS_TP_LOAN_LOAN_GLASS });
+        return SLibUtils.belongsTo(mnFkLoanTypeId, new int[] { SModSysConsts.HRSS_TP_LOAN_LOAN_COM, SModSysConsts.HRSS_TP_LOAN_LOAN_UNI, SModSysConsts.HRSS_TP_LOAN_LOAN_3RD, SModSysConsts.HRSS_TP_LOAN_LOAN_GLASS, SModSysConsts.HRSS_TP_LOAN_LOAN_SCHOOL });
     }
 
     @Override
