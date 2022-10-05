@@ -1833,8 +1833,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (jbSignXml.isEnabled()) {
            if (isRowSelected()) {
                 boolean canEmitCompMonExt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_MON_EXT).HasRight;
-                boolean canEmitCompSignRestricted = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_REST).HasRight;
-                boolean canEmitCompSignImmex = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_REST).HasRight;
+                boolean canEmitCompSignRestricted = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_RESTRICT).HasRight;
+                boolean canEmitCompSignImmex = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_RESTRICT).HasRight;
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 SDataCustomerConfig customerConfig = (SDataCustomerConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUS, new int[] { dps.getFkBizPartnerId_r() } , SLibConstants.EXEC_MODE_SILENT);
                 
@@ -2102,10 +2102,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         boolean dnsRight = false; 
         if (mbIsOrd) {
             if (mbIsCategoryPur) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_ALL_DNS).HasRight;
             }
             else if (mbIsCategorySal) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_ALL_DNS).HasRight;
             }
             if (!dnsRight) {
                 ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();

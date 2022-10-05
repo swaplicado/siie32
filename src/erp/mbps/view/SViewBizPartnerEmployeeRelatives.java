@@ -222,7 +222,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
-        boolean isPermissionEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PER_EMP_DATA).HasRight;
+        boolean isPermissionEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_EMP_PERS_DATA).HasRight;
 
         jbNew.setEnabled(false);
         jbEdit.setEnabled(((levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && employeesCrudEnabled) || !isPermissionEdit);

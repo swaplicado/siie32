@@ -1,9 +1,15 @@
 ================================================================================
+SIIE 3.2 205.7/ 2022-10-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de configuración opcional de régimen de contratación de empleados por empresa para generación de recibos de nómina.
+
+================================================================================
 SIIE 3.2 205.6/ 2022-10-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Implementación de variante al reporte de percepciones y deducciones, "percepciones variables".
-2) Implementación de configuración de régimen de contratación de empleados por empresa.
+1) Implementación de variante al reporte de percepciones y deducciones, "percepciones variables", y de permiso de usuario correspondiente.
+2) Implementación de consulta de altas y bajas por período.
 
 ================================================================================
 SIIE 3.2 205.5/ 2022-10-05

@@ -295,10 +295,10 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         boolean dnsRight = false; 
         if (mbIsOrdPur || mbIsOrdSal) {
             if (mbIsOrdPur) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_DNS).HasRight;
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_ALL_DNS).HasRight;
             }
             else if (mbIsOrdSal) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_DNS).HasRight;
+                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_ALL_DNS).HasRight;
             }
             if (!dnsRight) {
                 ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();

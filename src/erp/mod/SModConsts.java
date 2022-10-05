@@ -728,8 +728,9 @@ public abstract class SModConsts {
     public static final int HRSX_BEN_SUM = 2064052;
     public static final int HRSX_BEN_DET = 2064053;
     public static final int HRSX_BEN_VAC_PEND = 2064056;
-    public static final int HRSX_EMP_INT = 2064061;     // employees integral
+    public static final int HRSX_EMP_INT = 2064061; // employees integral query
     public static final int HRSX_EMP_CON_EXP = 2064066; // employees contract expiration
+    public static final int HRSX_EMP_LOG_HIRE_BY_PER = 2064069; // hire and dismisss query by period
     public static final int HRSX_EMP_MASSIVE_UPD_SSC = 2063071;
     public static final int HRSX_LOAN_PAY = 2064091;
     public static final int HRSX_ABS_MOV = 2064101;
@@ -737,6 +738,7 @@ public abstract class SModConsts {
     public static final int HRSX_EAR_SSC = 2064103;
     public static final int HRSX_PTU = 2064106;
     public static final int HRSX_IMPORT_CAP = 2064110;
+    
     public static final int HRSX_LAYOUT_SUA_HIRE = 1; // High worker
     public static final int HRSX_LAYOUT_SUA_DISMISS = 2; // Low worker
     public static final int HRSX_LAYOUT_IDSE_HIRE = 3; // High worker IDSE
@@ -751,7 +753,6 @@ public abstract class SModConsts {
     public static final int HRSX_LAYOUT_SUA_ABS_TRUANCY = 1; // Absence of the worker variable
     public static final int HRSX_LAYOUT_SUA_ABS_INABILITY = 2; // Disability the worker variable
     public static final int HRSX_LAYOUT_SUA_AFI = 14; // Affiliate data
-    
     public static final int HRSX_HIRE_DISMISSED = 0; // Employee hire log dismissed
     public static final int HRSX_HIRE_ACTIVE = 1;    // Employee hire log active
 

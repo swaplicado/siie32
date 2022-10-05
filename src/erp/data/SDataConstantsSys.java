@@ -192,11 +192,15 @@ public abstract class SDataConstantsSys {
     public static final int PRV_FIN_ACC_ITEM = 102012;
     public static final int PRV_FIN_DPS_DNS = 102013;
     public static final int PRV_FIN_DPS_DNC = 102014;
+    //public static final int PRV_FIN_DIOM_DNS = 102015;
+    //public static final int PRV_FIN_DIOM_DNC = 102016;
+    //public static final int PRV_FIN_DIOM_OUT = 102017;
+    //public static final int PRV_FIN_DIOM_IN = 102018;
     public static final int PRV_FIN_MOV_ACC_CASH = 102019;
     public static final int PRV_FIN_MOV_CDR = 102020;
     public static final int PRV_FIN_MOV_DBR = 102021;
     public static final int PRV_FIN_COUNTER_RCPT = 102022;
-    public static final int PRV_FIN_CFD_PAY = 102051;
+    public static final int PRV_FIN_CFD_PAYMENT = 102051;
     public static final int PRV_FIN_REP = 102901;
     public static final int PRV_FIN_REP_STATS = 102902;
     public static final int PRV_FIN_REP_INDEX = 102903;
@@ -204,6 +208,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_DPS_DNS = 103001;
     public static final int PRV_PUR_DPS_DNC = 103002;
     public static final int PRV_PUR_DPS_PRT_FMT = 103003;
+    //public static final int PRV_PUR_DIOM_DNS = 103004;
+    //public static final int PRV_PUR_DIOM_DNC = 103005;
     public static final int PRV_PUR_DOC_EST = 103006;
     public static final int PRV_PUR_DOC_EST_AUTHORN = 103071;
     public static final int PRV_PUR_DOC_ORD = 103007;
@@ -224,7 +230,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_DOC_ORD_REJECT_OWN = 103022;
     public static final int PRV_PUR_DOC_ORD_DELAY = 103023;
     public static final int PRV_PUR_DOC_OMT_DOC_SRC = 103024;
-    public static final int PRV_PUR_DOC_ORD_DNS = 103025;
+    public static final int PRV_PUR_DOC_ORD_ALL_DNS = 103025;
     public static final int PRV_PUR_PRICE_CHG = 103031;
     public static final int PRV_PUR_CRED_CONFIG = 103041;
     public static final int PRV_PUR_ITEM_SUP = 103051;
@@ -235,6 +241,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DPS_DNS = 104001;
     public static final int PRV_SAL_DPS_DNC = 104002;
     public static final int PRV_SAL_DPS_PRT_FMT = 104003;
+    //public static final int PRV_SAL_DIOM_DNS = 104004;
+    //public static final int PRV_SAL_DIOM_DNC = 104005;
     public static final int PRV_SAL_DOC_EST = 104006;
     public static final int PRV_SAL_DOC_EST_AUTHORN = 104071;
     public static final int PRV_SAL_DOC_ORD = 104007;
@@ -255,13 +263,13 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_ORD_REJECT_OWN = 104022;
     public static final int PRV_SAL_DOC_ORD_DELAY = 104023;
     public static final int PRV_SAL_DOC_OMT_DOC_SRC = 104024;
-    public static final int PRV_SAL_DOC_ORD_DNS = 104025;
+    public static final int PRV_SAL_DOC_ORD_ALL_DNS = 104025;
     public static final int PRV_SAL_PRICE_CHG = 104031;
     public static final int PRV_SAL_CRED_CONFIG = 104041;
     public static final int PRV_SAL_DOC_EST_CLO = 104056;
     public static final int PRV_SAL_DOC_ORD_CLO = 104057;
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
-    public static final int PRV_SAL_COMP_SIGN_REST = 104062;
+    public static final int PRV_SAL_COMP_SIGN_RESTRICT = 104062;
     public static final int PRV_SAL_COMP_SIGN_IMMEX = 104063;
     public static final int PRV_SAL_REP = 104901;
 
@@ -340,7 +348,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_PAY_WEE = 109011;
     public static final int PRV_HRS_PAY_FOR = 109012;
     public static final int PRV_HRS_AUX_HRS = 109021;
-    public static final int PRV_HRS_PER_EMP_DATA = 109091;
+    public static final int PRV_HRS_EMP_PERS_DATA = 109091;
+    public static final int PRV_HRS_EMP_VARIABLE_EARNINGS = 109092;
     public static final int PRV_HRS_REP = 109901;
 
     public static final int PRV_QLT_LOT_APR = 110001;

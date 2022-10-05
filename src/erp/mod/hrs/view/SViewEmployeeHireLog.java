@@ -47,14 +47,15 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
         setRowButtonsEnabled(false);
         
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
-        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
+        moFilterEmployee.initFilter(0); // disables status filter
+        
+        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         
         jbLayoutEmployeeHire = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout alta empleados", this);
         jbLayoutEmployeeEntry = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout re-ingreso empleados", this);
         jbLayoutEmployeeDismiss = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout baja empleados", this);
         jbLayoutEmployeeAfi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout movimientos afiliatorios empleados", this);
         
-        getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeHire);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeEntry);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeDismiss);
@@ -128,7 +129,7 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
             }
         }
-
+        
         msSql = "SELECT "
                 + "v.id_emp AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_log AS " + SDbConsts.FIELD_ID + "2, "
