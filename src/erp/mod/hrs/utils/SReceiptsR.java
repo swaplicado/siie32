@@ -21,7 +21,6 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.db.SDbFormerPayrollImport;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
@@ -493,6 +492,7 @@ public class SReceiptsR {
 
             cfd.ver32.DElementComprobante comprobanteCfdi32 = null;
             cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
+            cfd.ver40.DElementComprobante comprobanteCfdi40 = null;
             
             SCfdPacket packet = new SCfdPacket();
             packet.setCfdId(cfdId);
@@ -511,11 +511,20 @@ public class SReceiptsR {
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                         comprobanteCfdi33 = (cfd.ver33.DElementComprobante) SCfdUtils.createCfdi33RootElement((SClientInterface) session.getClient(), receipt);
-                        comprobanteCfdi33 = this.addOtrosPagosSubsidy(comprobanteCfdi33, causedSubsidy, payedSubsidy, relationedUuid);
+                        comprobanteCfdi33 = this.addOtrosPagosSubsidyCfdi33(comprobanteCfdi33, causedSubsidy, payedSubsidy, relationedUuid);
                         cfdVersion = comprobanteCfdi33.getVersion();
                         comprobanteCfdi33.getAttFecha().setDatetime(new Date());
                         
                         packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
+                        packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                        comprobanteCfdi40 = (cfd.ver40.DElementComprobante) SCfdUtils.createCfdi40RootElement((SClientInterface) session.getClient(), receipt);
+                        comprobanteCfdi40 = this.addOtrosPagosSubsidyCfdi40(comprobanteCfdi40, causedSubsidy, payedSubsidy, relationedUuid);
+                        cfdVersion = comprobanteCfdi40.getVersion();
+                        comprobanteCfdi40.getAttFecha().setDatetime(new Date());
+                        
+                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi40));
                         packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
                     break;
                 default:
@@ -544,6 +553,10 @@ public class SReceiptsR {
                     comprobanteCfdi33.getAttSello().setString(packet.getCfdSignature());
                     packet.setAuxCfdRootElement(comprobanteCfdi33);
                     break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                    comprobanteCfdi33.getAttSello().setString(packet.getCfdSignature());
+                    packet.setAuxCfdRootElement(comprobanteCfdi40);
+                    break;
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
             }
@@ -553,7 +566,7 @@ public class SReceiptsR {
 
             // end of Generate CFDI
             
-            SDbFormerPayrollImport payrollImport = new SDbFormerPayrollImport();
+            erp.mod.hrs.db.SDbFormerPayrollImport payrollImport = new erp.mod.hrs.db.SDbFormerPayrollImport();
             payrollImport.setPayrollId(receipt.getParentPayroll().getPkNominaId());
             payrollImport.setRegenerateNonStampedCfdi(cfdiPendingSigned);
             payrollImport.getCfdPackets().addAll(cfdPackets);
@@ -587,7 +600,7 @@ public class SReceiptsR {
      * 
      * @return the object Comprobante modified
      */
-    private cfd.ver33.DElementComprobante addOtrosPagosSubsidy(cfd.ver33.DElementComprobante comprobante, double causedSubsidy, double payedSubsidy, String relationedUuid) {
+    private cfd.ver33.DElementComprobante addOtrosPagosSubsidyCfdi33(cfd.ver33.DElementComprobante comprobante, double causedSubsidy, double payedSubsidy, String relationedUuid) {
         cfd.ver3.nom12.DElementOtrosPagos otrosPagos = new cfd.ver3.nom12.DElementOtrosPagos();
         cfd.ver3.nom12.DElementOtroPago otroPago;
         
@@ -649,6 +662,93 @@ public class SReceiptsR {
             comprobante.getAttTotal().setDouble(comprobante.getAttTotal().getDouble() + payedSubsidy);
             
             for (DElementConcepto concepto : comprobante.getEltConceptos().getEltConceptos()) {
+                if (concepto.getAttClaveProdServ().getString().equals("84111505")) {
+                    concepto.getAttImporte().setDouble(concepto.getAttImporte().getDouble() + payedSubsidy);
+                    concepto.getAttValorUnitario().setDouble(concepto.getAttValorUnitario().getDouble() + payedSubsidy);
+                }
+            }
+        }
+        
+        return comprobante;   
+    }
+    
+    /**
+     * add or change the node OtrosPagos
+     * update the fields Total, SubTotal and totalOtrosPagos
+     * add the node Cfdis relacionados
+     * 
+     * @param comprobante
+     * @param causedSubsidy
+     * @param payedSubsidy
+     * @param relationedUuid
+     * 
+     * @return the object Comprobante modified
+     */
+    private cfd.ver40.DElementComprobante addOtrosPagosSubsidyCfdi40(cfd.ver40.DElementComprobante comprobante, double causedSubsidy, double payedSubsidy, String relationedUuid) {
+        cfd.ver3.nom12.DElementOtrosPagos otrosPagos = new cfd.ver3.nom12.DElementOtrosPagos();
+        cfd.ver3.nom12.DElementOtroPago otroPago;
+        
+        // crea el elemento otros pagos con los datos del subsidio
+        otroPago = new cfd.ver3.nom12.DElementOtroPago();
+        otroPago.getAttTipoOtroPago().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE));
+        otroPago.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey("012" + ""));
+        otroPago.getAttConcepto().setString(SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF.toUpperCase());
+        otroPago.getAttImporte().setDouble(payedSubsidy);
+
+        cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
+        subsidioEmpleo.getAttSubsidioCausado().setDouble(causedSubsidy);
+        otroPago.setEltSubsidioEmpleo(subsidioEmpleo);
+        
+        for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+            if (element.getName().compareTo("nomina12:Nomina") == 0) {
+                // si la nómina ya tiene el nodo OtrosPagos
+                if (((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos() != null) {
+                    cfd.ver3.nom12.DElementOtroPago aux = null;
+                    //Si alguno de los pagos de OtrosPagos es subsidio
+                    for (cfd.ver3.nom12.DElementOtroPago op : ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago()) {
+                        if(op.getAttClave().getString().equals("012")) {
+                            aux = op;
+                        }
+                    }
+                    
+                    // se quita el nodo de subsidio anterior
+                    if (aux != null) {
+                        ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().remove(aux);
+                    }
+                    
+                    //se reemplaza con el nuevo con los valores correctos
+                    ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().add(otroPago);
+                    otrosPagos = ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos();
+                }
+                // si no tiene OtrosPagos, se agrega este con un hijo subsidio
+                else {
+                    otrosPagos.getEltHijosOtroPago().add(otroPago);
+                    ((cfd.ver3.nom12.DElementNomina) element).setEltOtrosPagos(otrosPagos);
+                }
+                
+                ((cfd.ver3.nom12.DElementNomina) element).getAttTotalOtrosPagos().setDouble(otrosPagos.getTotal());
+            }
+        }
+        
+        // se agrega el nodo CfdiRelacionados
+        cfd.ver40.DElementCfdiRelacionados cfdiRelacionados = new cfd.ver40.DElementCfdiRelacionados();
+        cfdiRelacionados.getAttTipoRelacion().setString("04");
+
+        cfd.ver40.DElementCfdiRelacionado cfdiRelacionado = new cfd.ver40.DElementCfdiRelacionado();
+        cfdiRelacionado.getAttUuid().setString(relationedUuid);
+        cfdiRelacionados.getEltCfdiRelacionados().add(cfdiRelacionado);
+        
+        ArrayList<cfd.ver40.DElementCfdiRelacionados> arrCfdiRelacionados = new ArrayList<>();
+        arrCfdiRelacionados.add(cfdiRelacionados);
+        
+        comprobante.setEltOpcCfdiRelacionados(arrCfdiRelacionados);
+        
+        // Si se paga un centavo al empleado se actualizan los montos sumandoles 0.01
+        if (payedSubsidy == 0.01d) {
+            comprobante.getAttSubTotal().setDouble(comprobante.getAttSubTotal().getDouble() + payedSubsidy);
+            comprobante.getAttTotal().setDouble(comprobante.getAttTotal().getDouble() + payedSubsidy);
+            
+            for (cfd.ver40.DElementConcepto concepto : comprobante.getEltConceptos().getEltConceptos()) {
                 if (concepto.getAttClaveProdServ().getString().equals("84111505")) {
                     concepto.getAttImporte().setDouble(concepto.getAttImporte().getDouble() + payedSubsidy);
                     concepto.getAttValorUnitario().setDouble(concepto.getAttValorUnitario().getDouble() + payedSubsidy);

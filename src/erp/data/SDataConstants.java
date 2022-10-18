@@ -437,7 +437,6 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_ETY_NTS = 207049;
     public static final int TRN_DPS_ETY_PRC = 207063;
     public static final int TRN_DPS_ETY_TAX = 207050;
-    public static final int TRN_DPS_ETY_COMPL = 207064;
     public static final int TRN_DPS_ETY_COMMS = 207051;
     public static final int TRN_DPS_RISS = 207052;
     public static final int TRN_DPS_REPL = 207053;
@@ -476,7 +475,9 @@ public abstract class SDataConstants {
     public static final int TRN_CFD_FIN_REC = 207104;
     public static final int TRN_PAY = 207401;
     public static final int TRN_PAY_PAY = 207402;
-    public static final int TRN_PAY_PAY_DOC = 207403;
+    public static final int TRN_PAY_PAY_TAX = 2023403;
+    public static final int TRN_PAY_PAY_DOC = 207404;
+    public static final int TRN_PAY_PAY_DOC_TAX = 207405;
     public static final int TRN_PAC = 207097;
     public static final int TRN_TP_CFD_PAC = 207098;
     public static final int TRN_SIGN = 207085;
@@ -960,7 +961,6 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_ETY_NTS, "trn_dps_ety_nts");
         TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
-        TablesMap.put(TRN_DPS_ETY_COMPL, "trn_dps_ety_compl");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
@@ -999,7 +999,9 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
         TablesMap.put(TRN_PAY, "trn_pay");
         TablesMap.put(TRN_PAY_PAY, "trn_pay_pay");
+        TablesMap.put(TRN_PAY_PAY_TAX, "trn_pay_pay_tax");
         TablesMap.put(TRN_PAY_PAY_DOC, "trn_pay_pay_doc");
+        TablesMap.put(TRN_PAY_PAY_DOC_TAX, "trn_pay_pay_doc_tax");
         TablesMap.put(TRN_PAC, "trn_pac");
         TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
         TablesMap.put(TRN_SIGN, "trn_sign");

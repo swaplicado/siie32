@@ -11,6 +11,7 @@
 
 package erp.mtrn.form;
 
+import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -849,7 +850,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jtfNameEmisor.setText(bizPartnerEmisor.getBizPartner());
         jtfInvoiceCfdi.setText(moDps.getNumberSeries() + moDps.getNumber());
         jtfPaymentType.setText(moDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CASH ? 
-                SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE : SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PPD);
+                DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD);
         jtfDateCfdi.setText(SLibUtils.DbmsDateFormatDatetime.format(moDps.getDateDoc()));
 
         jtfRfcEmisor.setCaretPosition(0); 

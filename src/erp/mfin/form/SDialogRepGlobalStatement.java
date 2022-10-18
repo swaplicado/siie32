@@ -28,7 +28,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.apache.poi.hssf.util.CellRangeAddress;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -1130,7 +1129,7 @@ public class SDialogRepGlobalStatement extends javax.swing.JDialog implements ja
         CellStyle negritasFacturacion = getCellStyle(true, msnNoneFormat, IndexedColors.YELLOW.getIndex());
         CellStyle monedaFacturacion = getCellStyle(false, msnCashFormat, IndexedColors.YELLOW.getIndex());
         
-        pagina.addMergedRegion(new CellRangeAddress(0,0,0,8));
+        pagina.addMergedRegion(new org.apache.poi.hssf.util.CellRangeAddress(0,0,0,8));
         pagina.autoSizeColumn(0);
         Row filaTitulo = pagina.createRow(numFila);
         filaTitulo.setHeightInPoints((float)28.80);

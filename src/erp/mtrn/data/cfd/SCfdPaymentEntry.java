@@ -18,6 +18,7 @@ import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataBookkeepingNumber;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
+import erp.mfin.data.SDataTax;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mfin.data.SFinBalanceTax;
@@ -40,8 +41,8 @@ import sa.lib.gui.SGuiSession;
 
 /**
  * GUI data structure for input of an individual payment for CFDI of Payments.
- * Represents the XML element pago10:Pago, child of the CFDI complement's root element pago10:Pagos.
- * @author Sergio Flores
+ * Represents the XML element pago20:Pago, child of the CFDI complement's root element pago20:Pagos.
+ * @author Sergio Flores, Isabel Servín
  */
 public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     
@@ -76,6 +77,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public int[] AccountDestKey;    // can be null when destiny cash account (e.g., receipt bank) is not needed
     public SDataRecord DataRecord;
     public ArrayList<SCfdPaymentEntryDoc> PaymentEntryDocs;
+    public ArrayList<SDataReceiptPaymentPayTax> ReceiptPaymentPayTaxes;
     
     public int AuxGridIndex;
     public int AuxUserId;
@@ -112,6 +114,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         AccountDestKey = null;
         DataRecord = record;
         PaymentEntryDocs = new ArrayList<>();
+        ReceiptPaymentPayTaxes = new ArrayList<>();
         
         AuxGridIndex = -1;
         AuxUserId = 0;
@@ -700,10 +703,22 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 paymentConcept = composeConcept(paymentEntryDoc.ThinDps.getDpsNumber(), bizPartnerName, accountCashDest, paymentEntryDoc.PayPayment, ExchangeRate);
             }
             
+            paymentEntryDoc.ReceiptPaymentPayDocTaxes.clear();
+            
             for (SDataRecordEntry recordEntry : oDsm.getDbmsRecord().getDbmsRecordEntries()) {
+                SDataReceiptPaymentPayDocTax payDocTax = new SDataReceiptPaymentPayDocTax();
                 recordEntry.setConcept(paymentConcept); // same concept for all related bookkeeping registries
                 AuxDbmsRecordEntries.add(recordEntry);
+                
+                if (SLibUtils.compareKeys(SDataConstantsSys.FINS_TP_SYS_MOV_TAX_SAL_EFVO, new int[] { recordEntry.getFkSystemMoveClassId(), recordEntry.getFkSystemMoveTypeId() })) {
+                    payDocTax.setTax(SLibUtils.roundAmount(recordEntry.getDebitCy())); 
+                    payDocTax.setDbmsTax((SDataTax) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FINU_TAX, 
+                            new int[] { recordEntry.getFkTaxBasicId_n(), recordEntry.getFkTaxId_n() }, SLibConstants.EXEC_MODE_SILENT)); 
+                    paymentEntryDoc.ReceiptPaymentPayDocTaxes.add(payDocTax);
+                }
             }
+            
+            paymentEntryDoc.calculatePayPaymentDocTaxesBase(paymentEntryDoc.PayPayment * paymentEntryDoc.ExchangeRate);
             
             if (EntryType == TYPE_FACTORING_FEE) {
                 // accounting counterpart for factoring fees:
@@ -748,6 +763,55 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             }
             
             oDsm.getDbmsEntries().clear();
+        }
+        
+        /*
+        * section 1.1: calculate payment taxes.
+        */
+        
+        ReceiptPaymentPayTaxes.clear();
+        
+        for (SCfdPaymentEntryDoc paymentEntryDoc : PaymentEntryDocs) {
+            for (SDataReceiptPaymentPayDocTax payDocTax : paymentEntryDoc.ReceiptPaymentPayDocTaxes) {
+                boolean found = false;
+                for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
+                    if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
+                        if (payDocTax.getFkCfdTaxId() == payTax.getFkCfdTaxId()&&
+                                payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId()) {
+                            payTax.setBase(payTax.getBase() + (payDocTax.getBase() / paymentEntryDoc.ExchangeRate));
+                            payTax.setTax(payTax.getTax() + (payDocTax.getTax() / paymentEntryDoc.ExchangeRate));
+                            found = true;
+                        }
+                    }
+                    else if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                        if (payDocTax.getFkCfdTaxId() == payTax.getFkCfdTaxId() &&
+                                payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId() &&
+                                payDocTax.getRate() == payTax.getRate() &&
+                                payDocTax.getFactorCode().equals(payTax.getFactorCode())) {
+                            payTax.setBase(payTax.getBase() + (payDocTax.getBase() / paymentEntryDoc.ExchangeRate));
+                            payTax.setTax(payTax.getTax() + (payDocTax.getTax() / paymentEntryDoc.ExchangeRate));
+                            found = true;
+                        }
+                    }
+                }
+                if (!found) {
+                    SDataReceiptPaymentPayTax payTax = new SDataReceiptPaymentPayTax();
+                    payTax.setBase(payDocTax.getBase() / paymentEntryDoc.ExchangeRate);
+                    payTax.setTax(payDocTax.getTax() / paymentEntryDoc.ExchangeRate);
+                    payTax.setFkCfdTaxId(payDocTax.getFkCfdTaxId());
+                    payTax.setFkTaxTypeId(payDocTax.getFkTaxTypeId());
+                    if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                        payTax.setFactorCode(payDocTax.getFactorCode());
+                        payTax.setRate(payDocTax.getRate());
+                    }
+                    ReceiptPaymentPayTaxes.add(payTax);
+                }
+            }
+        }
+        
+        for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
+            payTax.setBase(Math.floor(payTax.getBase() * 10 * 10) / 100); // truncar a 2 decimales 
+            payTax.setTax(Math.floor(payTax.getTax() * 10 * 10) / 100); // truncar a 2 decimales
         }
         
         /*

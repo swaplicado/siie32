@@ -20,7 +20,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  * Class for handling additional information for the CFDI in XML format.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SXmlDpsCfd extends SXmlDocument {
 
@@ -56,27 +56,28 @@ public class SXmlDpsCfd extends SXmlDocument {
         String cfdiRelacionadosName = new DElementCfdiRelacionados().getName();
         if (SXmlUtils.hasChildElement(nodeList.item(0), cfdiRelacionadosName)) {
             Vector<Node> cfdiRelacionadosNodes = SXmlUtils.extractChildElements(nodeList.item(0), cfdiRelacionadosName);
-            
-            NamedNodeMap cfdiRelacionadosNodesMap = cfdiRelacionadosNodes.get(0).getAttributes();
-
-            DElementCfdiRelacionados cfdiRelacionados = new DElementCfdiRelacionados();
-            cfdiRelacionados.getAttTipoRelacion().setString(SXmlUtils.extractAttributeValue(cfdiRelacionadosNodesMap, "TipoRelacion", true));
-            
-            String cfdiRelacionadoName = new DElementCfdiRelacionado().getName();
-            if (SXmlUtils.hasChildElement(cfdiRelacionadosNodes.get(0), cfdiRelacionadoName)) {
-                Vector<Node> cfdiRelacionadoNodes = SXmlUtils.extractChildElements(cfdiRelacionadosNodes.get(0), cfdiRelacionadoName);
+            for (Node node : cfdiRelacionadosNodes) {
+                NamedNodeMap cfdiRelacionadosNodesMap = node.getAttributes();
+                DElementCfdiRelacionados cfdiRelacionados = new DElementCfdiRelacionados();
+                cfdiRelacionados.getAttTipoRelacion().setString(SXmlUtils.extractAttributeValue(cfdiRelacionadosNodesMap, "TipoRelacion", true));
                 
-                for (Node cfdiRelacionadoNode : cfdiRelacionadoNodes) {
-                    NamedNodeMap cfdiRelacionadoNodesMap = cfdiRelacionadoNode.getAttributes();
+                String cfdiRelacionadoName = new DElementCfdiRelacionado().getName();
+                if (SXmlUtils.hasChildElement(node, cfdiRelacionadoName)) {
+                    Vector<Node> cfdiRelacionadoNodes = SXmlUtils.extractChildElements(node, cfdiRelacionadoName);
 
-                    DElementCfdiRelacionado cfdiRelacionado = new DElementCfdiRelacionado();
-                    cfdiRelacionado.getAttUuid().setString(SXmlUtils.extractAttributeValue(cfdiRelacionadoNodesMap, "UUID", true));
-                    
-                    cfdiRelacionados.getEltCfdiRelacionados().add(cfdiRelacionado);
+                    for (Node cfdiRelacionadoNode : cfdiRelacionadoNodes) {
+                        NamedNodeMap cfdiRelacionadoNodesMap = cfdiRelacionadoNode.getAttributes();
+
+                        DElementCfdiRelacionado cfdiRelacionado = new DElementCfdiRelacionado();
+                        cfdiRelacionado.getAttUuid().setString(SXmlUtils.extractAttributeValue(cfdiRelacionadoNodesMap, "UUID", true));
+
+                        cfdiRelacionados.getEltCfdiRelacionados().add(cfdiRelacionado);
+                    }
                 }
-            }
 
-            maElements.add(cfdiRelacionados);
+                maElements.add(cfdiRelacionados);
+            }
+            
             mbAvailableCfdiRelacionados = true;
         }
         

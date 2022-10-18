@@ -8,13 +8,14 @@ package erp.mtrn.data.cfd;
 
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SThinDps;
+import java.util.ArrayList;
 import java.util.HashMap;
 import sa.lib.SLibUtils;
 
 /**
  * GUI data structure for input of an individual document payment of a payment for CFDI of Payments.
- * Represents the XML element pago10:DoctoRelacionado, child of the element pago10:Pago.
- * @author Sergio Flores
+ * Represents the XML element pago20:DoctoRelacionado, child of the element pago20:Pago.
+ * @author Sergio Flores, Isabel Servin
  */
 public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
@@ -49,7 +50,23 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     public double PayPaymentLimMax; // maximum limit according to Official Input Guide for CFDI with payments complement.
     public double PayPaymentLocal;  // payment in local currency
     
+    public ArrayList<SDataReceiptPaymentPayDocTax> ReceiptPaymentPayDocTaxes;
+    
     public int AuxGridIndex;
+    
+    public void calculatePayPaymentDocTaxesBase(double pay) {
+        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
+            if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // -
+                pay -= docTax.getTax();
+            }
+            else if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) { // +
+                pay += docTax.getTax();
+            }
+        }
+        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
+            docTax.setBase(SLibUtils.roundAmount(pay));
+        }
+    }
     
     public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SThinDps thinDps, int entryNumber, int entryType, int installment, double balancePrev, double payment, double exchangeRate) {
         ParentPaymentEntry = parentPaymentEntry;
@@ -70,6 +87,8 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         //PayPaymentLocal...    set in method computePaymentAmounts()
         
         AuxGridIndex = -1;
+        
+        ReceiptPaymentPayDocTaxes = new ArrayList<>();
         
         computePaymentAmounts();
     }

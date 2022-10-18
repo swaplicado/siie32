@@ -4,7 +4,7 @@
  */
 
 /*
- * SDialogCfdiPurchaseOrder.java
+ * SDialogCfdiPurchaseOrder33.java
  *
  * Created on 27/05/2020, 02:58:00 PM
  */
@@ -26,7 +26,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
-import erp.mtrn.data.SRowCfdiImport;
+import erp.mtrn.data.SRowCfdiImport33;
 import erp.mtrn.data.STrnDpsUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -43,7 +43,7 @@ import sa.lib.SLibUtils;
  *
  * @author Isabel Servín
  */
-public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
+public class SDialogCfdiPurchaseOrder33 extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
 
     public static final int VALUE_TYPE_PURCHASE_ORDER_ENTRIES = 1;
     public static final int VALUE_TYPE_ROW_CFDI = 2;
@@ -69,11 +69,11 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
     private erp.mtrn.form.SPanelDps moPanelDps;
     
     private HashMap<String, Double> moPurchaseOrderEntriesMap;
-    private SRowCfdiImport moRowCfdiImport; 
+    private SRowCfdiImport33 moRowCfdiImport; 
     
     /** Creates new form SDialogDpsLink
      * @param client */
-    public SDialogCfdiPurchaseOrder(erp.client.SClientInterface client) {
+    public SDialogCfdiPurchaseOrder33(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         initComponents();
@@ -708,7 +708,7 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
                 break;
                     
             case VALUE_TYPE_ROW_CFDI:
-                moRowCfdiImport = (SRowCfdiImport) value;
+                moRowCfdiImport = (SRowCfdiImport33) value;
                 
                 DElementConcepto concepto = moRowCfdiImport.getConcepto();
                 jtfNoIdentificacion.setText(concepto.getAttNoIdentificacion().getString());
@@ -741,9 +741,9 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
     }
             
     /**
-     * @param type Options accepted: SDialogCfdiPurchaseOrder.VALUE_TYPE_ENTRY_DPS_DPS_LINK or 
-     * SDialogCfdiPurchaseOrder.VALUE_TYPE_FACTOR_CONV or 
-     * SDataConstants.TRN_DPS_ETY. 
+     * @param type Options accepted: SDialogCfdiPurchaseOrder33.VALUE_TYPE_ENTRY_DPS_DPS_LINK or 
+ SDialogCfdiPurchaseOrder33.VALUE_TYPE_FACTOR_CONV or 
+ SDataConstants.TRN_DPS_ETY. 
      * @return 
      */
     @Override

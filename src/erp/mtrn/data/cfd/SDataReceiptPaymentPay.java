@@ -9,6 +9,7 @@ import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataRecord;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataCfdPayment;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -17,10 +18,13 @@ import java.util.Date;
 import sa.lib.SLibUtils;
 
 /**
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
+    public static final int VALUE_BASE = 1; 
+    public static final int VALUE_TAX = 2; 
+    
     protected SDataReceiptPayment moParentReceiptPayment;
     
     protected int mnPkReceiptId;
@@ -49,6 +53,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
     
     protected SDataRecord moDbmsRecord;
     
+    protected ArrayList<SDataReceiptPaymentPayTax> maDbmsReceiptPaymentPayTaxes;
     protected ArrayList<SDataReceiptPaymentPayDoc> maDbmsReceiptPaymentPayDocs;
     
     protected boolean mbAuxIsProcessingCfdi; // to reduce reading time when extra stuff is useless
@@ -62,11 +67,12 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
 
         moParentReceiptPayment = parentReceiptPayment;
 
+        maDbmsReceiptPaymentPayTaxes = new ArrayList<>();
         maDbmsReceiptPaymentPayDocs = new ArrayList<>();
         
         reset();
     }
-
+    
     public void setPkReceiptId(int n) { mnPkReceiptId = n; }
     public void setPkPaymentId(int n) { mnPkPaymentId = n; }
     public void setEntryType(int n) { mnEntryType = n; }
@@ -136,6 +142,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
     
     public SDataRecord getDbmsRecord() { return moDbmsRecord; }
 
+    public ArrayList<SDataReceiptPaymentPayTax> getDbmsReceiptPaymentPayTaxes() { return maDbmsReceiptPaymentPayTaxes; }
     public ArrayList<SDataReceiptPaymentPayDoc> getDbmsReceiptPaymentPayDocs() { return maDbmsReceiptPaymentPayDocs; }
     
     public void setAuxIsProcessingCfdi(boolean b) { mbAuxIsProcessingCfdi = b; }
@@ -143,6 +150,36 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
     public boolean isAuxIsProcessingCfdi() { return mbAuxIsProcessingCfdi; }
     
     public int[] getBankPayeeKey() { return new int[] { mnFkBankPayeeCompanyBranchId_n, mnFkBankPayeeAccountCashId_n }; }
+    
+    public double getRetainedTax(int typeTax) {
+        double tax = 0;
+        for (SDataReceiptPaymentPayTax payTax : maDbmsReceiptPaymentPayTaxes) {
+            if (payTax.getFkCfdTaxId() == typeTax && payTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
+                tax += payTax.getTax() * mdExchangeRate;
+            }
+        }
+        return tax;
+    }
+    
+    public double getChargedVatTax(int[] typeTax) {
+        double tax = 0;
+        for (SDataReceiptPaymentPayTax payTax : maDbmsReceiptPaymentPayTaxes) {
+            if (payTax.getRate() == typeTax[0] * 0.01 && payTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                tax += (typeTax[1] == VALUE_BASE ? payTax.getBase() : payTax.getTax()) * mdExchangeRate;
+            }
+        }
+        return tax;
+    }
+    
+    public double getChargedVatExemptBase() {
+        double tax = 0;
+        for (SDataReceiptPaymentPayTax payTax : maDbmsReceiptPaymentPayTaxes) {
+            if (payTax.getFactorCode().equals("E")) {
+                tax += payTax.getBase() * mdExchangeRate;
+            }
+        }
+        return tax;
+    }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -185,6 +222,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         
         moDbmsRecord = null;
         
+        maDbmsReceiptPaymentPayTaxes.clear();
         maDbmsReceiptPaymentPayDocs.clear();
         
         //mbAuxIsProcessingCfdi = false; // prevent from reseting this flag!
@@ -247,6 +285,25 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                             }
                             
                             moParentReceiptPayment.getXtaRecordsMap().put(recordKey, moDbmsRecord);
+                        }
+                        
+                        sql = "SELECT id_tax "
+                                + "FROM trn_pay_pay_tax "
+                                + "WHERE id_rcp = " + key[0] + " AND id_pay = " + key[1] + " "
+                                + "ORDER BY id_tax;";
+                        
+                        try (Statement statementTaxes = statement.getConnection().createStatement()) {
+                            ResultSet resultSetTaxes = statementTaxes.executeQuery(sql);
+                            while (resultSetTaxes.next()) {
+                                SDataReceiptPaymentPayTax payTax = new SDataReceiptPaymentPayTax();
+                                
+                                int[] payTaxKey = new int[] { mnPkReceiptId, mnPkPaymentId, resultSetTaxes.getInt("id_tax") };
+                                if (payTax.read(payTaxKey, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\nDocumento relacionado #" + SLibUtils.textImplode(payTaxKey, "-") + ".");
+                                }
+                                
+                                maDbmsReceiptPaymentPayTaxes.add(payTax);
+                            }
                         }
 
                         // read as well all documents:
@@ -368,10 +425,25 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
                 // save as well all documents:
                 
                 if (!mbIsRegistryNew) {
+                    sql = "DELETE FROM trn_pay_pay_tax "
+                            + "WHERE id_rcp = " + mnPkReceiptId + " AND id_pay = " + mnPkPaymentId + ";";
+                    
+                    statement.execute(sql);
+                    
                     sql = "DELETE FROM trn_pay_pay_doc "
                             + "WHERE id_rcp = " + mnPkReceiptId + " AND id_pay = " + mnPkPaymentId + ";";
                     
                     statement.execute(sql);
+                }
+                
+                for (SDataReceiptPaymentPayTax payTax : maDbmsReceiptPaymentPayTaxes) {
+                    payTax.setPkReceiptId(mnPkReceiptId);
+                    payTax.setPkPaymentId(mnPkPaymentId);
+                    payTax.setPkTaxId(0);
+                    
+                    if (payTax.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nImpuestos pago.");
+                    }
                 }
                 
                 for (SDataReceiptPaymentPayDoc payDoc : maDbmsReceiptPaymentPayDocs) {
@@ -434,6 +506,10 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         clone.setFkFinRecordNumberId(mnFkFinRecordNumberId);
         
         clone.setDbmsRecord(moDbmsRecord);
+        
+        for (SDataReceiptPaymentPayTax payTax : maDbmsReceiptPaymentPayTaxes) {
+            clone.getDbmsReceiptPaymentPayTaxes().add(payTax.clone());
+        }
         
         for (SDataReceiptPaymentPayDoc payDoc : maDbmsReceiptPaymentPayDocs) {
             clone.getDbmsReceiptPaymentPayDocs().add(payDoc.clone());
@@ -509,6 +585,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         
         setDbmsRecord(paymentEntry.DataRecord);
         
+        maDbmsReceiptPaymentPayTaxes = paymentEntry.ReceiptPaymentPayTaxes;
         maDbmsReceiptPaymentPayDocs.clear();
         
         for (SCfdPaymentEntryDoc paymentEntryDoc : paymentEntry.PaymentEntryDocs) {

@@ -11,8 +11,10 @@
 
 package erp.mtrn.form;
 
+import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.ver33.DCfdi33Consts;
+import cfd.ver40.DCfdi40Consts;
 import erp.SClientUtils;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -526,38 +528,68 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                                 cfdiWithOutXml++;
                             }
                             else {
-                                cfd.ver33.DElementComprobante comprobante33 = null;
+                                SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery = null;
                                 
-                                try {
-                                    comprobante33 = DCfdUtils.getCfdi33(xml);
-                                }
-                                catch (Exception e) {
-                                    SLibUtils.printException(this, e);
-                                }
+                                float version = DCfdUtils.getCfdiVersion(xml);
+                                if (version == DCfdConsts.CFDI_VER_33) {
+                                    cfd.ver33.DElementComprobante comprobante33 = null;
+                                    try {
+                                        comprobante33 = DCfdUtils.getCfdi33(xml);
+                                    }
+                                    catch (Exception e) {
+                                        SLibUtils.printException(this, e);
+                                    }
                                 
-                                if (comprobante33 != null) {
-                                    SCfdUtilsHandler.CfdiAckQuery cfdiAckQuery = new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfdType, comprobante33);
+                                    if (comprobante33 != null) {
+                                        cfdiAckQuery = new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfdType, comprobante33);
 
-                                    switch (cfdiAckQuery.CfdiStatus){
-                                        case DCfdi33Consts.CFDI_ESTATUS_VIG:
-                                            cfdiValid++;
-                                            break;
-                                        case DCfdi33Consts.CFDI_ESTATUS_CAN:
-                                            cfdiCanceled++;
-                                            break;
-                                        case DCfdi33Consts.CFDI_ESTATUS_NO_ENC:
-                                            cfdiNotFound++;
-                                            break;
-                                        default:
-                                            // do nothing
+                                        switch (cfdiAckQuery.CfdiStatus){
+                                            case DCfdi33Consts.CFDI_ESTATUS_VIG:
+                                                cfdiValid++;
+                                                break;
+                                            case DCfdi33Consts.CFDI_ESTATUS_CAN:
+                                                cfdiCanceled++;
+                                                break;
+                                            case DCfdi33Consts.CFDI_ESTATUS_NO_ENC:
+                                                cfdiNotFound++;
+                                                break;
+                                            default:
+                                                // do nothing
+                                        }
                                     }
-
-                                    if (cfdType == SDataConstantsSys.TRNS_TP_CFD_INV) {
-                                        addResultPaneRow(docType, docNumber, resultSet.getDate("c.ts"), resultSet.getString("_bp_issuer"), resultSet.getString("c.xml_rfc_emi"), uuid, cfdiAckQuery);
+                                }
+                                else if (version == DCfdConsts.CFDI_VER_40) {
+                                    cfd.ver40.DElementComprobante comprobante40 = null;
+                                    try {
+                                        comprobante40 = DCfdUtils.getCfdi40(xml);
                                     }
-                                    else {
-                                        addResultPaneRow(docType, docNumber, resultSet.getDate("c.ts"), resultSet.getString("_bp_receiver"), resultSet.getString("c.xml_rfc_rec"), uuid, cfdiAckQuery);
+                                    catch (Exception e) {
+                                        SLibUtils.printException(this, e);
                                     }
+                                    
+                                    if (comprobante40 != null) {
+                                        cfdiAckQuery = new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfdType, comprobante40);
+                                        
+                                        switch (cfdiAckQuery.CfdiStatus){
+                                            case DCfdi40Consts.CFDI_ESTATUS_VIG:
+                                                cfdiValid++;
+                                                break;
+                                            case DCfdi40Consts.CFDI_ESTATUS_CAN:
+                                                cfdiCanceled++;
+                                                break;
+                                            case DCfdi40Consts.CFDI_ESTATUS_NO_ENC:
+                                                cfdiNotFound++;
+                                                break;
+                                            default:
+                                                // do nothing
+                                        }
+                                    }
+                                }
+                                if (cfdType == SDataConstantsSys.TRNS_TP_CFD_INV) {
+                                    addResultPaneRow(docType, docNumber, resultSet.getDate("c.ts"), resultSet.getString("_bp_issuer"), resultSet.getString("c.xml_rfc_emi"), uuid, cfdiAckQuery);
+                                }
+                                else {
+                                    addResultPaneRow(docType, docNumber, resultSet.getDate("c.ts"), resultSet.getString("_bp_receiver"), resultSet.getString("c.xml_rfc_rec"), uuid, cfdiAckQuery);
                                 }
                             }
                         }

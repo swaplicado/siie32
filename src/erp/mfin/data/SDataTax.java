@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín
  */
 public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
@@ -43,6 +43,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
+    protected int mnDbmsCfdTaxId;
 
     public SDataTax() {
         super(SDataConstants.FINU_TAX);
@@ -91,6 +92,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
+    public void setDbmsCfdTaxId(int n) { mnDbmsCfdTaxId = n; }
 
     public java.lang.String getDbmsTaxType() { return msDbmsTaxType; }
     public java.lang.String getDbmsTaxCalculationType() { return msDbmsTaxCalculationType; }
@@ -98,6 +100,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
+    public int getDbmsCfdTaxId() { return mnDbmsCfdTaxId; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -138,6 +141,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
         msDbmsUserNew = "";
         msDbmsUserEdit = "";
         msDbmsUserDelete = "";
+        mnDbmsCfdTaxId = 0;
     }
 
     @Override
@@ -150,7 +154,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
         reset();
 
         try {
-            sql = "SELECT tax.*, tp_tax.tp_tax, tp_tax_cal.tp_tax_cal, tp_tax_app.tp_tax_app, un.usr, ue.usr, ud.usr " +
+            sql = "SELECT tax.*, tp_tax.tp_tax, tp_tax_cal.tp_tax_cal, tp_tax_app.tp_tax_app, tax_bas.fid_cfd_tax, un.usr, ue.usr, ud.usr " +
                     "FROM erp.finu_tax AS tax " +
                     "INNER JOIN erp.fins_tp_tax AS tp_tax ON " +
                     "tax.fid_tp_tax = tp_tax.id_tp_tax " +
@@ -158,13 +162,15 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "tax.fid_tp_tax_cal = tp_tax_cal.id_tp_tax_cal " +
                     "INNER JOIN erp.fins_tp_tax_app AS tp_tax_app ON " +
                     "tax.fid_tp_tax_app = tp_tax_app.id_tp_tax_app " +
+                    "INNER JOIN erp.finu_tax_bas AS tax_bas ON " +
+                    "tax.id_tax_bas = tax_bas.id_tax_bas " + 
                     "INNER JOIN erp.usru_usr AS un ON " +
                     "tax.fid_usr_new=un.id_usr " +
                     "INNER JOIN erp.usru_usr AS ue ON " +
                     "tax.fid_usr_edit=ue.id_usr " +
                     "INNER JOIN erp.usru_usr AS ud ON " +
                     "tax.fid_usr_del=ud.id_usr " +
-                    "WHERE id_tax_bas = " + key[0]  + " AND id_tax = " + key[1] + " ";
+                    "WHERE tax.id_tax_bas = " + key[0]  + " AND tax.id_tax = " + key[1] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -194,6 +200,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msDbmsUserNew = resultSet.getString("un.usr");
                 msDbmsUserEdit = resultSet.getString("ue.usr");
                 msDbmsUserDelete = resultSet.getString("ud.usr");
+                mnDbmsCfdTaxId = resultSet.getInt("tax_bas.fid_cfd_tax");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

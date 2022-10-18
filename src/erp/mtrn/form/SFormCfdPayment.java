@@ -8,6 +8,7 @@ package erp.mtrn.form;
 import cfd.DCfdConsts;
 import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DCfdi33Utils;
+import cfd.ver40.DCfdi40Catalogs;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -112,6 +113,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private java.lang.String msXmlRelationType;
     private java.awt.Color moBackgroundDefaultColor;
+    
+    private SCfdXmlCatalogs moXmlCatalogs;
+    
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;
     */
@@ -192,6 +196,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfRecFiscalIdRo = new javax.swing.JTextField();
         jtfRecCountryRo = new javax.swing.JTextField();
         jtfRecForeignFiscalIdRo = new javax.swing.JTextField();
+        jtfRecTaxRegime = new javax.swing.JTextField();
+        jbRecTaxRegime = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jlRecCfdiUsage = new javax.swing.JLabel();
         jcbRecCfdiUsage = new javax.swing.JComboBox();
@@ -435,8 +441,21 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfRecForeignFiscalIdRo.setText("TEXT");
         jtfRecForeignFiscalIdRo.setToolTipText("ID tributario");
         jtfRecForeignFiscalIdRo.setFocusable(false);
-        jtfRecForeignFiscalIdRo.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfRecForeignFiscalIdRo.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel12.add(jtfRecForeignFiscalIdRo);
+
+        jtfRecTaxRegime.setEditable(false);
+        jtfRecTaxRegime.setText("TEXT");
+        jtfRecTaxRegime.setToolTipText("Regimén fiscal receptor");
+        jtfRecTaxRegime.setEnabled(false);
+        jtfRecTaxRegime.setFocusable(false);
+        jtfRecTaxRegime.setPreferredSize(new java.awt.Dimension(45, 23));
+        jPanel12.add(jtfRecTaxRegime);
+
+        jbRecTaxRegime.setText("...");
+        jbRecTaxRegime.setToolTipText("Habilitar regimen fiscal receptor");
+        jbRecTaxRegime.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel12.add(jbRecTaxRegime);
 
         jpRegistryReceptor.add(jPanel12);
 
@@ -1093,7 +1112,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jtfDocExchangeRateCurRo.setEditable(false);
         jtfDocExchangeRateCurRo.setText("DOC/PAY");
-        jtfDocExchangeRateCurRo.setToolTipText("Sucursal de la empresa");
+        jtfDocExchangeRateCurRo.setToolTipText("");
         jtfDocExchangeRateCurRo.setFocusable(false);
         jtfDocExchangeRateCurRo.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel35.add(jtfDocExchangeRateCurRo);
@@ -1512,6 +1531,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbVouResume.addActionListener(this);
         
         jbRecBizPartnerPick.addActionListener(this);
+        jbRecTaxRegime.addActionListener(this);
         jbRecCfdRelatedAdd.addActionListener(this);
         jbRecCfdRelatedDelete.addActionListener(this);
         jbRecCfdRelatedPick.addActionListener(this);
@@ -1551,11 +1571,19 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocExchangeRate.addFocusListener(this);
         jtfDocDocBalancePrev.addFocusListener(this);
         jtfDocDocPayment.addFocusListener(this);
+        jtfRecTaxRegime.addFocusListener(this);
         
         jtfAccConceptPrefixRo.setText(SFinConsts.TXT_INVOICE);
         jtfPayAmountLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jtfVouTotalLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jtfPayTotalPaymentsLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+        
+        try {
+            moXmlCatalogs = new SCfdXmlCatalogs(miClient.getSession());
+        }
+        catch (Exception ex) {
+            miClient.showMsgBoxInformation(ex.getMessage());
+        }
         
         // create and asign action maps:
 
@@ -1826,8 +1854,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 if (moThinDocDpsRelated.getThinCfd() == null) {
                     throw new Exception(msg + "carece de CFDI.");
                 }
-                else if (moThinDocDpsRelated.getThinCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-                    throw new Exception(msg + "debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + ".");
+                else if (moThinDocDpsRelated.getThinCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_33
+                        && moThinDocDpsRelated.getThinCfd().getFkXmlTypeId() != SDataConstantsSys.TRNS_TP_XML_CFDI_40) {
+                    throw new Exception(msg + "debe ser CFDI versión " + DCfdConsts.CFDI_VER_33 + " o " + DCfdConsts.CFDI_VER_40);
                 }
                 else if (!moThinDocDpsRelated.getThinCfd().isStamped()) {
                     throw new Exception(msg + "no está timbrado.");
@@ -2435,6 +2464,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private void actionPerformedRecBizPartnerPick() {
         miClient.pickOption(SDataConstants.BPSX_BP_CUS, moFieldRecBizPartner, null);
+    }
+    
+    private void actionPerformedRecTaxRegime() {
+        jtfRecTaxRegime.setEnabled(true);
+        jtfRecTaxRegime.setEditable(true);
+        jtfRecTaxRegime.setFocusable(true);
     }
 
     private void actionPerformedRecCfdRelatedAdd() {
@@ -3332,6 +3367,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfRecFiscalIdRo.setText("");
             jtfRecCountryRo.setText("");
             jtfRecForeignFiscalIdRo.setText("");
+            jtfRecTaxRegime.setText("");
             moFieldRecCfdiUse.resetField();
             moFieldRecCfdRelatedUuid.resetField();
             
@@ -3339,15 +3375,29 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         else {
             moDataRecBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldRecBizPartner.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+            
             jtfRecFiscalIdRo.setText(moDataRecBizPartner.getFiscalId());
             jtfRecCountryRo.setText(moDataRecBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode());
             jtfRecForeignFiscalIdRo.setText(moDataRecBizPartner.getFiscalFrgId());
-            moFieldRecCfdiUse.setFieldValue(DCfdi33Catalogs.CFDI_USO_POR_DEF); // fixed value in CFDI 3.3!
-            moFieldRecCfdRelatedUuid.setFieldValue("");
+            jtfRecTaxRegime.setText(moDataRecBizPartner.getDbmsCategorySettingsCus().getTaxRegime());
             
             jtfRecFiscalIdRo.setCaretPosition(0);
             jtfRecCountryRo.setCaretPosition(0);
             jtfRecForeignFiscalIdRo.setCaretPosition(0);
+            jtfRecTaxRegime.setCaretPosition(0); 
+            
+            switch (((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(moDataCfdPayment.getDbmsDataCfd().getFkCfdTypeId())) {
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                    moFieldRecCfdiUse.setFieldValue(DCfdi33Catalogs.CFDI_USO_POR_DEF);
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                    moFieldRecCfdiUse.setFieldValue(DCfdi40Catalogs.ClaveUsoCfdiPagos);
+                    break;
+                default:
+                    // do nothing
+            }
+            
+            moFieldRecCfdRelatedUuid.setFieldValue("");
         }
     }
 
@@ -3441,6 +3491,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         computeDocBalancePend();
     }
     
+    private void focusLostRecTaxRegime() {
+        String description = moXmlCatalogs.getEntryName(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, jtfRecTaxRegime.getText());
+        if (description.isEmpty()) {
+            miClient.showMsgBoxWarning("El régimen fiscal del receptor no existe, favor de verificar.");
+        }
+    }
+    
     private void valueChangedPayments() {
         // show docs of current payment, if any:
         
@@ -3529,6 +3586,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JButton jbRecCfdRelatedAdd;
     private javax.swing.JButton jbRecCfdRelatedDelete;
     private javax.swing.JButton jbRecCfdRelatedPick;
+    private javax.swing.JButton jbRecTaxRegime;
     private javax.swing.JButton jbVouDatePick;
     private javax.swing.JButton jbVouNext;
     private javax.swing.JButton jbVouResume;
@@ -3643,6 +3701,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfRecFiscalIdRo;
     private javax.swing.JTextField jtfRecForeignFiscalIdRo;
     private javax.swing.JTextField jtfRecRelationTypeRo;
+    private javax.swing.JTextField jtfRecTaxRegime;
     private javax.swing.JTextField jtfVouBranchCodeRo;
     private javax.swing.JTextField jtfVouBranchNameRo;
     private javax.swing.JTextField jtfVouConfirm;
@@ -3755,6 +3814,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
     
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbRecBizPartner, SDataConstants.BPSX_BP_CUS);
         SFormUtilities.populateComboBox(miClient, jcbPayFactoringBank, SDataConstants.BPSX_BP_ATT_BANK);
@@ -3770,6 +3830,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 validation.setIsError(true);
                 validation.setComponent(field.getComponent());
                 break;
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            String description;
+            description = moXmlCatalogs.getEntryName(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, jtfRecTaxRegime.getText());
+            if (description.isEmpty()) {
+                validation.setMessage("El régimen fiscal del receptor no existe, favor de verificar.");
+                validation.setComponent(jtfRecTaxRegime);
             }
         }
         
@@ -4093,7 +4162,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouUuidRo.setText(cfd.getUuid());
         jtfVouUuidRo.setCaretPosition(0);
         
-        jtfVouVersionRo.setText(moDataCfdPayment.getComprobanteVersion());
+        jtfVouVersionRo.setText(cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33 ? DCfdConsts.CFDI_VER_33 + "" : 
+                cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_40 ? DCfdConsts.CFDI_VER_40 + "" : "?");
         jtfVouVersionRo.setCaretPosition(0);
         
         moFieldVouDate.setFieldValue(moDataCfdPayment.getComprobanteFecha());
@@ -4145,7 +4215,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             enablePayControls(false);
             enableDocControls(false);
             
-            jbOk.setEnabled(false);
+            jbOk.setEnabled(true);
             jbCancel.requestFocusInWindow();
         }
     }
@@ -4235,6 +4305,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         moDataCfdPayment.setAuxCfdConfirmacion(moFieldVouConfirm.getString());
         moDataCfdPayment.setAuxCfdEmisorRegimenFiscal(moFieldVouTaxRegime.getFieldValue().toString());
+        moDataCfdPayment.setAuxCfdReceptorRegimenFiscal(jtfRecTaxRegime.getText());
         moDataCfdPayment.setAuxCfdDbmsDataReceptor(moDataRecBizPartner);
         
         SDataBizPartner factoringBank = null;
@@ -4326,6 +4397,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             else if (button == jbRecBizPartnerPick) {
                 actionPerformedRecBizPartnerPick();
+            }
+            else if (button == jbRecTaxRegime) {
+                actionPerformedRecTaxRegime();
             }
             else if (button == jbRecCfdRelatedAdd) {
                 actionPerformedRecCfdRelatedAdd();
@@ -4464,6 +4538,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             else if (textField == jtfDocDocBalancePrev || textField == jtfDocDocPayment) {
                 focusLostDocPayment();
+            }
+            else if (textField == jtfRecTaxRegime) {
+                focusLostRecTaxRegime();
             }
         }
     }

@@ -6,7 +6,7 @@
 package erp.cli;
 
 import cfd.DElement;
-import cfd.ver33.DElementCfdiRelacionados;
+import cfd.ver40.DElementCfdiRelacionados;
 import erp.SParamsApp;
 import erp.cfd.SXmlDpsCfd;
 import java.sql.ResultSet;
@@ -15,7 +15,7 @@ import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
 
 /**
- *
+ * Clase para actualizar la llave foranea del DPS en la tabla de CFD.
  * @author Isabel Servín
  */
 public class SUpdateTrnDpsCfd {

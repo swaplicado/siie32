@@ -531,6 +531,7 @@ public abstract class SDataConstantsSys {
     public static final int ITMU_TP_LEV_NA = 1;
 
     public static final int ITMU_UNIT_NA = 1;
+    public static final int ITMU_KG = 59;
 
     public static final int ITMU_TP_VAR_NA = 1;
 
@@ -799,6 +800,8 @@ public abstract class SDataConstantsSys {
     //public static final int FINS_TP_ACC_SYS_PAY_MORT = 25;
     //public static final int FINS_TP_ACC_SYS_REC_NOTE = 26;
     //public static final int FINS_TP_ACC_SYS_REC_MORT = 27;
+    
+    public static final int[] FINS_TP_SYS_MOV_TAX_SAL_EFVO = new int[] { 32, 32 }; // table fid_tp_sys_mov
     
     public static final int FINS_CT_SYS_MOV_NA = 1; // table fid_ct_sys_mov_xxx
     public static final int FINS_CT_SYS_MOV_ASSET = 2; // table fid_ct_sys_mov_xxx
@@ -1139,6 +1142,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_XML_CFD = 2;
     public static final int TRNS_TP_XML_CFDI_32 = 3;
     public static final int TRNS_TP_XML_CFDI_33 = 4;
+    public static final int TRNS_TP_XML_CFDI_40 = 5;
 
     public static final int TRNS_TP_CFD_INV = 1;        // invoice
     public static final int TRNS_TP_CFD_BOL = 2;        // bill of lading
@@ -1172,19 +1176,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_BOL_MOTOR_CFG = 33;    // BOL: motortransport configuration
     public static final int TRNS_CFD_CAT_BOL_TRAILER_STP = 34;  // BOL: trailer subtype
     public static final int TRNS_CFD_CAT_BOL_TRANSP_PART = 35;  // BOL: transport part
-    
-    public static final String TRNS_CFD_CAT_PAY_WAY_99 = "99";  // Por definir
-    
-    public static final String TRNS_CFD_CAT_PAY_MET_PUE = "PUE";    // Pago en una sola exhibición
-    public static final String TRNS_CFD_CAT_PAY_MET_PPD = "PPD";    // Pago en parcialidades o diferido
-    
-    public static final String TRNS_CFD_CAT_TP_REL_CDT = "01";  // credit note
-    
-    public static final String TRNS_CFD_CAT_CTY_GRP_UE = "Unión Europea";   // European Union
-    public static final String TRNS_CFD_CAT_CTY_GRP_TLCAN = "TLCAN";        // TLCAN
-    
-    public static final String TRNS_CFD_CAT_CFD_USE_G02 = "G02";    // Devoluciones, descuentos o bonificaciones
-    public static final String TRNS_CFD_CAT_CFD_USE_P01 = "P01";    // Por definir
     
     public static final int TRNU_DPS_NAT_DEF = 1;
     
@@ -1704,6 +1695,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_CFDI_33 = 207112;
     public static final int REP_TRN_CFDI_33_CRP_10 = 207113;
     public static final int REP_TRN_CFDI_ACK_CAN = 207103;
+    public static final int REP_TRN_CFDI_40 = 207114;
+    public static final int REP_TRN_CFDI_40_CRP_20 = 207116;
     public static final int REP_TRN_SHIP = 207104;
     public static final int REP_TRN_COMMS_ITEM = 207105;
     public static final int REP_TRN_COMMS_DPS = 207106;
@@ -1711,7 +1704,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_DIOG = 207108;
     public static final int REP_TRN_DPS_SHIP_ITEM = 207109;
     public static final int REP_TRN_CON_STK = 207110;
-    public static final int REP_TRN_CFDI_PAYROLL = 207111;
+    public static final int REP_TRN_CFDI_PAYROLL_33 = 207111;
+    public static final int REP_TRN_CFDI_PAYROLL_40 = 207115;
 
     public static final int REP_MFG_PROG_MON = 208001;
     public static final int REP_MFG_ORD = 208002;

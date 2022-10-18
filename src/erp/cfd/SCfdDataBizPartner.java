@@ -9,11 +9,12 @@ import cfd.DElement;
 import cfd.ver3.DCfdVer3Utils;
 import cfd.ver3.cce11.DElementTipoDomicilioInt;
 import cfd.ver3.cce11.DElementTipoDomicilioNac;
+import cfd.ver4.DCfdVer4Utils;
 import erp.data.SDataConstantsSys;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SCfdDataBizPartner {
 
@@ -34,6 +35,7 @@ public class SCfdDataBizPartner {
     protected String msBizPartnerStateCode;
     protected String msBizPartnerStateName;
     protected String msBizPartnerZipCode;
+    protected String msBizPartnerZipCodeHq;
     protected String msBizPartnerPoBox;
     protected String msBizPartnerCountryCode;
     protected String msBizPartnerCountryName;
@@ -73,6 +75,7 @@ public class SCfdDataBizPartner {
         msBizPartnerStateCode = "";
         msBizPartnerStateName = "";
         msBizPartnerZipCode = "";
+        msBizPartnerZipCodeHq = "";
         msBizPartnerPoBox = "";
         msBizPartnerCountryCode = "";
         msBizPartnerCountryName = "";
@@ -112,6 +115,7 @@ public class SCfdDataBizPartner {
     public void setBizPartnerStateCode(String s) { msBizPartnerStateCode = s; }
     public void setBizPartnerStateName(String s) { msBizPartnerStateName = s; }
     public void setBizPartnerZipCode(String s) { msBizPartnerZipCode = s; }
+    public void setBizPartnerZipCodeHq(String s) { msBizPartnerZipCodeHq = s; }
     public void setBizPartnerPoBox(String s) { msBizPartnerPoBox = s; }
     public void setBizPartnerCountryCode(String s) { msBizPartnerCountryCode = s; }
     public void setBizPartnerCountryName(String s) { msBizPartnerCountryName = s; }
@@ -150,6 +154,7 @@ public class SCfdDataBizPartner {
     public String getBizPartnerStateCode() { return msBizPartnerStateCode; }
     public String getBizPartnerStateName() { return msBizPartnerStateName; }
     public String getBizPartnerZipCode() { return msBizPartnerZipCode; }
+    public String getBizPartnerZipCodeHq() { return msBizPartnerZipCodeHq; }
     public String getBizPartnerPoBox() { return msBizPartnerPoBox; }
     public String getBizPartnerCountryCode() { return msBizPartnerCountryCode; }
     public String getBizPartnerCountryName() { return msBizPartnerCountryName; }
@@ -179,7 +184,16 @@ public class SCfdDataBizPartner {
     public cfd.DElement createRootElementEmisor() throws java.lang.Exception {
         DElement element = null;
 
-        if (mfVersion == DCfdConsts.CFDI_VER_33) {
+        if (mfVersion == DCfdConsts.CFDI_VER_40) {
+            cfd.ver40.DElementEmisor emisor = new cfd.ver40.DElementEmisor();
+
+            emisor.getAttRfc().setString(msBizPartnerRfc);
+            emisor.getAttNombre().setString(DCfdVer4Utils.formatAttributeValueAsText(msBizPartnerName));
+            //emisor.getAttRegimenFiscal().setString(...
+            
+            element = emisor;
+        }
+        else if (mfVersion == DCfdConsts.CFDI_VER_33) {
             cfd.ver33.DElementEmisor emisor = new cfd.ver33.DElementEmisor();
 
             emisor.getAttRfc().setString(msBizPartnerRfc);
@@ -270,7 +284,7 @@ public class SCfdDataBizPartner {
     public cfd.ver3.cce11.DElementEmisor createRootElementEmisorIntCommerce() throws java.lang.Exception {
         cfd.ver3.cce11.DElementEmisor emisor = null;
         
-        if (mfVersion == DCfdConsts.CFDI_VER_33) {
+        if (mfVersion == DCfdConsts.CFDI_VER_33 || mfVersion == DCfdConsts.CFDI_VER_40) {
             if (msBizPartnerRfc.length() == DCfdConsts.LEN_RFC_PER) {
                 if (msBizPartnerCurp.isEmpty()) {
                     throw new Exception("El CURP del emisor no existe, y es requerido.");
@@ -312,7 +326,35 @@ public class SCfdDataBizPartner {
     public cfd.DElement createRootElementReceptor() throws java.lang.Exception {
         DElement element = null;
 
-        if (mfVersion == DCfdConsts.CFDI_VER_33) {
+        if (mfVersion == DCfdConsts.CFDI_VER_40) {
+            if (mbIsCfdiWithIntCommerce) {
+                if (msBizPartnerRfc.compareTo(DCfdConsts.RFC_GEN_INT) != 0) {
+                    throw new Exception("El RFC del receptor debe ser '" + DCfdConsts.RFC_GEN_INT + "'.");
+                }
+                if (msBizPartnerCountryCode.isEmpty()) {
+                    throw new Exception("El código de país del receptor no existe, y es requerido.");
+                }
+                if (msBizPartnerFiscalForeing.isEmpty()) {
+                    throw new Exception("El ID fiscal del receptor no existe, y es requerido.");
+                }
+            }
+
+            cfd.ver40.DElementReceptor receptor = new cfd.ver40.DElementReceptor();
+
+            receptor.getAttRfc().setString(msBizPartnerRfc);
+            receptor.getAttNombre().setString(DCfdVer4Utils.formatAttributeValueAsText(msBizPartnerName));
+            receptor.getAttDomicilioFiscalReceptor().setString(msBizPartnerZipCodeHq);
+            
+            if (mbIsCfdiWithIntCommerce) {
+                receptor.getAttResidenciaFiscal().setString(msBizPartnerCountryCode);
+                receptor.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
+            }
+
+            //receptor.getAttUsoCFDI().setString(...
+
+            element = receptor;
+        }
+        else if (mfVersion == DCfdConsts.CFDI_VER_33) {
             if (mbIsCfdiWithIntCommerce) {
                 if (msBizPartnerRfc.compareTo(DCfdConsts.RFC_GEN_INT) != 0) {
                     throw new Exception("El RFC del receptor debe ser '" + DCfdConsts.RFC_GEN_INT + "'.");
@@ -399,7 +441,7 @@ public class SCfdDataBizPartner {
     public cfd.ver3.cce11.DElementReceptor createRootElementReceptorIntCommerce() throws java.lang.Exception {
         cfd.ver3.cce11.DElementReceptor receptor = null;
 
-        if (mfVersion == DCfdConsts.CFDI_VER_33) {
+        if (mfVersion == DCfdConsts.CFDI_VER_33 || mfVersion == DCfdConsts.CFDI_VER_40) {
             receptor = new cfd.ver3.cce11.DElementReceptor();
 
             receptor.setEltDomicilio(new DElementTipoDomicilioInt());
@@ -431,7 +473,7 @@ public class SCfdDataBizPartner {
     public cfd.ver3.cce11.DElementDestinatario createRootElementDestinatarioIntCommerce() throws java.lang.Exception {
         cfd.ver3.cce11.DElementDestinatario destinatario = null;
 
-        if (mfVersion == DCfdConsts.CFDI_VER_33) {
+        if (mfVersion == DCfdConsts.CFDI_VER_33 || mfVersion == DCfdConsts.CFDI_VER_40) {
             destinatario = new cfd.ver3.cce11.DElementDestinatario();
 
             destinatario.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
@@ -462,6 +504,9 @@ public class SCfdDataBizPartner {
     public String getCfdLugarExpedicion() throws Exception {
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
             throw new Exception("Versión inválida de CFDI: " + DCfdConsts.CFDI_VER_33 + ".");
+        }
+        else if (mfVersion == DCfdConsts.CFDI_VER_40) {
+            throw new Exception("Versión inválida de CFDI: " + DCfdConsts.CFDI_VER_40 + ".");
         }
         else {
             if (mnBizPartnerBranchHqId != mnBizPartnerBranchId) {

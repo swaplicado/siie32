@@ -25,22 +25,42 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
 /**
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     public static final int FIELD_NUM = 1001; // number
     public static final int FIELD_ST_RCP = 1002; // receipt status
-
+    
+    public static final int RETAINED_INCOME_TAX = 1;
+    public static final int RETAINED_VAT = 2;
+    public static final int RETAINED_SPECIAL_TAX = 3;
+    public static final int[] CHARGED_16_BASE = new int[] { 16, 1 };
+    public static final int[] CHARGED_16_TAX = new int[] { 16, 2 };
+    public static final int[] CHARGED_08_BASE = new int[] { 8, 1 };
+    public static final int[] CHARGED_08_TAX = new int[] { 8, 2 };
+    public static final int[] CHARGED_00_BASE = new int[] { 0, 1 };
+    
     protected int mnPkReceiptId;
     protected java.lang.String msSeries;
     protected int mnNumber;
     protected java.util.Date mtDatetime;
-    protected java.lang.String msTaxRegimeCode;
+    protected java.lang.String msTaxRegimeCodeIssuier;
+    protected java.lang.String msTaxRegimeCodeReceptor;
     protected java.lang.String msConfirmationNum;
     protected java.lang.String msCfdiRelationCode;
     protected java.lang.String msCfdiRelatedUuid;
-    protected double mdPaymentLoc_r;
+    protected double mdTotalRetainedVat;
+    protected double mdTotalRetainedIncomeTax;
+    protected double mdTotalRetainedSpecialTax;
+    protected double mdTotalChargedVat16Base;
+    protected double mdTotalChargedVat16Tax;
+    protected double mdTotalChargedVat08Base;
+    protected double mdTotalChargedVat08Tax;
+    protected double mdTotalChargedVat00Base;
+    protected double mdTotalChargedVat00Tax;
+    protected double mdTotalChargedVatExemptBase;
+    protected double mdTotalPaymentLocal_r;
     protected boolean mbIsDeleted;
     protected int mnFkReceiptStatusId;
     protected int mnFkCompanyBranchId;
@@ -81,11 +101,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public void setSeries(java.lang.String s) { msSeries = s; }
     public void setNumber(int n) { mnNumber = n; }
     public void setDatetime(java.util.Date t) { mtDatetime = t; }
-    public void setTaxRegimeCode(java.lang.String s) { msTaxRegimeCode = s; }
+    public void setTaxRegimeCodeIssuier(java.lang.String s) { msTaxRegimeCodeIssuier = s; }
+    public void setTaxRegimeCodeReceptor(java.lang.String s) { msTaxRegimeCodeReceptor = s; }
     public void setConfirmationNum(java.lang.String s) { msConfirmationNum = s; }
     public void setCfdiRelationCode(java.lang.String s) { msCfdiRelationCode = s; }
     public void setCfdiRelatedUuid(java.lang.String s) { msCfdiRelatedUuid = s; }
-    public void setPaymentLoc_r(double d) { mdPaymentLoc_r = d; }
+    public void setTotalRetainedVat(double d) { mdTotalRetainedVat = d; }
+    public void setTotalRetainedIncomeTax(double d) { mdTotalRetainedIncomeTax = d; }
+    public void setTotalRetainedSpecialTax(double d) { mdTotalRetainedSpecialTax = d; }
+    public void setTotalChargedVat16Base(double d) { mdTotalChargedVat16Base = d; }
+    public void setTotalChargedVat16Tax(double d) { mdTotalChargedVat16Tax = d; }
+    public void setTotalChargedVat08Base(double d) { mdTotalChargedVat08Base = d; }
+    public void setTotalChargedVat08Tax(double d) { mdTotalChargedVat08Tax = d; }
+    public void setTotalChargedVat00Base(double d) { mdTotalChargedVat00Base = d; }
+    public void setTotalChargedVat00Tax(double d) { mdTotalChargedVat00Tax = d; }
+    public void setTotalChargedVatExemptBase(double d) { mdTotalChargedVatExemptBase = d; }
+    public void setTotalPaymentLocal_r(double d) { mdTotalPaymentLocal_r = d; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkReceiptStatusId(int n) { mnFkReceiptStatusId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
@@ -103,11 +134,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public java.lang.String getSeries() { return msSeries; }
     public int getNumber() { return mnNumber; }
     public java.util.Date getDatetime() { return mtDatetime; }
-    public java.lang.String getTaxRegimeCode() { return msTaxRegimeCode; }
+    public java.lang.String getTaxRegimeCodeIssuier() { return msTaxRegimeCodeIssuier; }
+    public java.lang.String getTaxRegimeCodeReceptor() { return msTaxRegimeCodeReceptor; }
     public java.lang.String getConfirmationNum() { return msConfirmationNum; }
     public java.lang.String getCfdiRelationCode() { return msCfdiRelationCode; }
     public java.lang.String getCfdiRelatedUuid() { return msCfdiRelatedUuid; }
-    public double getPaymentLoc_r() { return mdPaymentLoc_r; }
+    public double getTotalRetainedVat() { return mdTotalRetainedVat; }
+    public double getTotalRetainedIncomeTax() { return mdTotalRetainedIncomeTax; }
+    public double getTotalRetainedSpecialTax() { return mdTotalRetainedSpecialTax; }
+    public double getTotalChargedVat16Base() { return mdTotalChargedVat16Base; }
+    public double getTotalChargedVat16Tax() { return mdTotalChargedVat16Tax; }
+    public double getTotalChargedVat08Base() { return mdTotalChargedVat08Base; }
+    public double getTotalChargedVat08Tax() { return mdTotalChargedVat08Tax; }
+    public double getTotalChargedVat00Base() { return mdTotalChargedVat00Base; }
+    public double getTotalChargedVat00Tax() { return mdTotalChargedVat00Tax; }
+    public double getTotalChargedVatExemptBase() { return mdTotalChargedVatExemptBase; }
+    public double getTotalPaymentLocal_r() { return mdTotalPaymentLocal_r; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkReceiptStatusId() { return mnFkReceiptStatusId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
@@ -148,11 +190,38 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
     public boolean getAuxIsProcessingCfdi() { return mbAuxIsProcessingCfdi; }
     
     private void computePaymentLoc() {
-        mdPaymentLoc_r = 0;
+        mdTotalPaymentLocal_r = 0;
         
         if (mnFkReceiptStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
             for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
-                mdPaymentLoc_r = SLibUtils.roundAmount(mdPaymentLoc_r + pay.getPaymentLoc());
+                mdTotalPaymentLocal_r = SLibUtils.roundAmount(mdTotalPaymentLocal_r + pay.getPaymentLoc());
+            }
+        }
+    }
+    
+    private void computeTotalTaxes() {
+        mdTotalRetainedVat = 0;
+        mdTotalRetainedIncomeTax = 0;
+        mdTotalRetainedSpecialTax = 0;
+        mdTotalChargedVat16Base = 0;
+        mdTotalChargedVat16Tax = 0;
+        mdTotalChargedVat08Base = 0;
+        mdTotalChargedVat08Tax = 0;
+        mdTotalChargedVat00Base = 0;
+        mdTotalChargedVat00Tax = 0;
+        mdTotalChargedVatExemptBase = 0;
+
+        if (mnFkReceiptStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+            for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
+                mdTotalRetainedVat = SLibUtils.roundAmount(mdTotalRetainedVat + pay.getRetainedTax(RETAINED_VAT));
+                mdTotalRetainedIncomeTax = SLibUtils.roundAmount(mdTotalRetainedIncomeTax + pay.getRetainedTax(RETAINED_INCOME_TAX));
+                mdTotalRetainedSpecialTax = SLibUtils.roundAmount(mdTotalRetainedSpecialTax + pay.getRetainedTax(RETAINED_SPECIAL_TAX));
+                mdTotalChargedVat16Base = SLibUtils.roundAmount(mdTotalChargedVat16Base + pay.getChargedVatTax(CHARGED_16_BASE));
+                mdTotalChargedVat16Tax = SLibUtils.roundAmount(mdTotalChargedVat16Tax + pay.getChargedVatTax(CHARGED_16_TAX));
+                mdTotalChargedVat08Base = SLibUtils.roundAmount(mdTotalChargedVat08Base + pay.getChargedVatTax(CHARGED_08_BASE));
+                mdTotalChargedVat08Tax = SLibUtils.roundAmount(mdTotalChargedVat08Tax + pay.getChargedVatTax(CHARGED_08_TAX));
+                mdTotalChargedVat00Base = SLibUtils.roundAmount(mdTotalChargedVat00Base + pay.getChargedVatTax(CHARGED_00_BASE));
+                mdTotalChargedVatExemptBase += pay.getChargedVatExemptBase();
             }
         }
     }
@@ -193,11 +262,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         msSeries = "";
         mnNumber = 0;
         mtDatetime = null;
-        msTaxRegimeCode = "";
+        msTaxRegimeCodeIssuier = "";
+        msTaxRegimeCodeReceptor = "";
         msConfirmationNum = "";
         msCfdiRelationCode = "";
         msCfdiRelatedUuid = "";
-        mdPaymentLoc_r = 0;
+        mdTotalRetainedVat = 0;
+        mdTotalRetainedIncomeTax = 0;
+        mdTotalRetainedSpecialTax = 0;
+        mdTotalChargedVat16Base = 0;
+        mdTotalChargedVat16Tax = 0;
+        mdTotalChargedVat08Base = 0;
+        mdTotalChargedVat08Tax = 0;
+        mdTotalChargedVat00Base = 0;
+        mdTotalChargedVat00Tax = 0;
+        mdTotalChargedVatExemptBase = 0;
+        mdTotalPaymentLocal_r = 0;
         mbIsDeleted = false;
         mnFkReceiptStatusId = 0;
         mnFkCompanyBranchId = 0;
@@ -241,11 +321,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                     msSeries = resultSet.getString("ser");
                     mnNumber = resultSet.getInt("num");
                     mtDatetime = resultSet.getTimestamp("dt");
-                    msTaxRegimeCode = resultSet.getString("tax_regime_code");
+                    msTaxRegimeCodeIssuier = resultSet.getString("tax_regime_code_iss");
+                    msTaxRegimeCodeReceptor = resultSet.getString("tax_regime_code_rec");
                     msConfirmationNum = resultSet.getString("conf_num");
                     msCfdiRelationCode = resultSet.getString("cfdi_relation_code");
                     msCfdiRelatedUuid = resultSet.getString("cfdi_related_uuid");
-                    mdPaymentLoc_r = resultSet.getDouble("pay_loc_r");
+                    mdTotalRetainedVat = resultSet.getDouble("tot_ret_vat");
+                    mdTotalRetainedIncomeTax = resultSet.getDouble("tot_ret_income_tax");
+                    mdTotalRetainedSpecialTax = resultSet.getDouble("tot_ret_special_tax");
+                    mdTotalChargedVat16Base = resultSet.getDouble("tot_cha_vat_16_base");
+                    mdTotalChargedVat16Tax = resultSet.getDouble("tot_cha_vat_16_tax");
+                    mdTotalChargedVat08Base = resultSet.getDouble("tot_cha_vat_08_base");
+                    mdTotalChargedVat08Tax = resultSet.getDouble("tot_cha_vat_08_tax");
+                    mdTotalChargedVat00Base = resultSet.getDouble("tot_cha_vat_00_base");
+                    mdTotalChargedVat00Tax = resultSet.getDouble("tot_cha_vat_00_tax");
+                    mdTotalChargedVatExemptBase = resultSet.getDouble("tot_cha_vat_exempt_base");
+                    mdTotalPaymentLocal_r = resultSet.getDouble("tot_pay_loc_r");
                     mbIsDeleted = resultSet.getBoolean("b_del");
                     mnFkReceiptStatusId = resultSet.getInt("fid_st_rcp");
                     mnFkCompanyBranchId = resultSet.getInt("fid_cob");
@@ -318,6 +409,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                 String sql = "";
                 
                 computePaymentLoc();
+                computeTotalTaxes();
                 
                 if (mnPkReceiptId == 0) {
                     sql = "SELECT COALESCE(MAX(id_rcp), 0) + 1 "
@@ -343,11 +435,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "'" + msSeries + "', " +
                             mnNumber + ", " +
                             "'" + SLibUtils.DbmsDateFormatDatetime.format(mtDatetime) + "', " +
-                            "'" + msTaxRegimeCode + "', " +
+                            "'" + msTaxRegimeCodeIssuier + "', " +
+                            "'" + msTaxRegimeCodeReceptor + "', " +
                             "'" + msConfirmationNum + "', " +
                             "'" + msCfdiRelationCode + "', " +
                             "'" + msCfdiRelatedUuid + "', " +
-                            mdPaymentLoc_r + ", " +
+                            mdTotalRetainedVat + ", " + 
+                            mdTotalRetainedIncomeTax + ", " +
+                            mdTotalRetainedSpecialTax + ", " +
+                            mdTotalChargedVat16Base + ", " +
+                            mdTotalChargedVat16Tax + ", " +
+                            mdTotalChargedVat08Base + ", " +
+                            mdTotalChargedVat08Tax + ", " +
+                            mdTotalChargedVat00Base + ", " +
+                            mdTotalChargedVat00Tax + ", " +
+                            mdTotalChargedVatExemptBase + ", " +
+                            mdTotalPaymentLocal_r + ", " +
                             mbIsDeleted + ", " +
                             mnFkReceiptStatusId + ", " +
                             mnFkCompanyBranchId + ", " +
@@ -372,11 +475,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                             "ser = '" + msSeries + "', " +
                             "num = " + mnNumber + ", " +
                             "dt = '" + SLibUtils.DbmsDateFormatDatetime.format(mtDatetime) + "', " +
-                            "tax_regime_code = '" + msTaxRegimeCode + "', " +
+                            "tax_regime_code_iss='" + msTaxRegimeCodeIssuier + "', " +
+                            "tax_regime_code_rec='" + msTaxRegimeCodeReceptor + "', " +
                             "conf_num = '" + msConfirmationNum + "', " +
                             "cfdi_relation_code = '" + msCfdiRelationCode + "', " +
                             "cfdi_related_uuid = '" + msCfdiRelatedUuid + "', " +
-                            "pay_loc_r=" + mdPaymentLoc_r + ", " +
+                            "tot_ret_vat = " + mdTotalRetainedVat + ", " +
+                            "tot_ret_income_tax = " + mdTotalRetainedIncomeTax + ", " +
+                            "tot_ret_special_tax = " + mdTotalRetainedSpecialTax + ", " +
+                            "tot_cha_vat_16_base = " + mdTotalChargedVat16Base + ", " +
+                            "tot_cha_vat_16_tax = " + mdTotalChargedVat16Tax + ", " +
+                            "tot_cha_vat_08_base = " + mdTotalChargedVat08Base + ", " +
+                            "tot_cha_vat_08_tax = " + mdTotalChargedVat08Tax + ", " +
+                            "tot_cha_vat_00_base = " + mdTotalChargedVat00Base + ", " +
+                            "tot_cha_vat_00_tax = " + mdTotalChargedVat00Tax + ", " +
+                            "tot_cha_vat_exempt_base = " + mdTotalChargedVatExemptBase + ", " +
+                            "tot_pay_loc_r = " + mdTotalPaymentLocal_r + ", " +
                             "b_del = " + (mbIsDeleted ? 1 : 0) + ", " +
                             "fid_st_rcp = " + mnFkReceiptStatusId + ", " +
                             "fid_cob = " + mnFkCompanyBranchId + ", " +
@@ -402,7 +516,17 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
                 // save as well all documents:
                 
                 if (!mbIsRegistryNew) {
+                    sql = "DELETE FROM trn_pay_pay_doc_tax "
+                            + "WHERE id_rcp = " + mnPkReceiptId + ";";
+                    
+                    statement.execute(sql);
+                    
                     sql = "DELETE FROM trn_pay_pay_doc "
+                            + "WHERE id_rcp = " + mnPkReceiptId + ";";
+                    
+                    statement.execute(sql);
+                    
+                    sql = "DELETE FROM trn_pay_pay_tax "
                             + "WHERE id_rcp = " + mnPkReceiptId + ";";
                     
                     statement.execute(sql);
@@ -468,7 +592,7 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
 
         try {
             if (testAnnulment(connection, "No se puede anular el comprobante: ")) {
-                mdPaymentLoc_r = 0;
+                mdTotalPaymentLocal_r = 0;
                 mnFkReceiptStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                 mnFkReceiptAnnulationTypeId = mnAuxAnnulType;
                 save(connection);
@@ -497,11 +621,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         clone.setSeries(msSeries);
         clone.setNumber(mnNumber);
         clone.setDatetime((Date) mtDatetime.clone());
-        clone.setTaxRegimeCode(msTaxRegimeCode);
+        clone.setTaxRegimeCodeIssuier(msTaxRegimeCodeIssuier);
+        clone.setTaxRegimeCodeReceptor(msTaxRegimeCodeReceptor);
         clone.setConfirmationNum(msConfirmationNum);
         clone.setCfdiRelationCode(msCfdiRelationCode);
         clone.setCfdiRelatedUuid(msCfdiRelatedUuid);
-        clone.setPaymentLoc_r(mdPaymentLoc_r);
+        clone.setTotalRetainedVat(mdTotalRetainedVat);
+        clone.setTotalRetainedIncomeTax(mdTotalRetainedIncomeTax);
+        clone.setTotalRetainedSpecialTax(mdTotalRetainedSpecialTax);
+        clone.setTotalChargedVat16Base(mdTotalChargedVat16Base);
+        clone.setTotalChargedVat16Tax(mdTotalChargedVat16Tax);
+        clone.setTotalChargedVat08Base(mdTotalChargedVat08Base);
+        clone.setTotalChargedVat08Tax(mdTotalChargedVat08Tax);
+        clone.setTotalChargedVat00Base(mdTotalChargedVat00Base);
+        clone.setTotalChargedVat00Tax(mdTotalChargedVat00Tax);
+        clone.setTotalChargedVatExemptBase(mdTotalChargedVatExemptBase);
+        clone.setTotalPaymentLocal_r(mdTotalPaymentLocal_r);
         clone.setIsDeleted(mbIsDeleted);
         clone.setFkReceiptStatusId(mnFkReceiptStatusId);
         clone.setFkCompanyBranchId(mnFkCompanyBranchId);
@@ -575,11 +710,22 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         msSeries = cfd.getSeries();
         mnNumber = cfd.getNumber();
         mtDatetime = (Date) cfd.getTimestamp().clone();
-        msTaxRegimeCode = cfdPayment.getAuxCfdEmisorRegimenFiscal();
+        msTaxRegimeCodeIssuier = cfdPayment.getAuxCfdEmisorRegimenFiscal();
+        msTaxRegimeCodeReceptor = cfdPayment.getAuxCfdReceptorRegimenFiscal();
         msConfirmationNum = cfdPayment.getAuxCfdConfirmacion();
         msCfdiRelationCode = cfdPayment.getAuxCfdCfdiRelacionadosTipoRelacion();
         msCfdiRelatedUuid = cfdPayment.getAuxCfdCfdiRelacionadoUuid();
-        //mdPaymentLoc_r = ...; // computed in computePaymentLoc()
+        //mdTotalRetainedVat = ...; // computed in computeTotalTaxes()
+        //mdTotalRetainedIncomeTax = ...; // computed in computeTotalTaxes()
+        //mdTotalRetainedSpecialTax = ...; // computed in computeTotalTaxes()
+        //mdTotalChargedVat16Base = ...; // computed in computeTotalTaxes()
+        //mdTotalChargedVat16Tax = ...; // computed in computeTotalTaxes()
+        //mdTotalChargedVat08Base = ...; // computed in computeTotalTaxes()
+        //mdTotalChargedVat08Tax = ...; // computed in computeTotalTaxes()
+        //mdTotalChargedVat00Base = ...; // computed in computeTotalTaxes()
+        //mdTotalChargedVat00Tax = ...; // computed in computeTotalTaxes()
+        //mdTotalChargedVatExemptBase = ...; // computed in computeTotalTaxes()
+        //mdTotalPaymentLocal_r = ...; // computed in computePaymentLoc()
         mbIsDeleted = false;
         mnFkReceiptStatusId = SLibUtilities.belongsTo(cfd.getFkXmlStatusId(), new int[] { SDataConstantsSys.TRNS_ST_DPS_NEW, SDataConstantsSys.TRNS_ST_DPS_EMITED }) ? SDataConstantsSys.TRNS_ST_DPS_EMITED : cfd.getFkXmlStatusId();
         mnFkCompanyBranchId = cfd.getFkCompanyBranchId_n();
@@ -604,5 +750,6 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
         }
         
         computePaymentLoc();
+        computeTotalTaxes();
     }
 }

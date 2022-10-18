@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
@@ -33,9 +32,9 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
     protected int mnFkDestinationBizPartnerAddress_n;
     protected int mnFkDestinationAddressAddress_n;
     
-    protected SDbBolMerchandise moXtaMerchandise;
-    protected SDataBizPartnerBranchAddress moXtaOriginBizPartnerBranchAddress;
-    protected SDataBizPartnerBranchAddress moXtaDestinationBizPartnerBranchAddress;
+    protected SDbBolMerchandise moParentMerchandise;
+    protected SDataBizPartnerBranchAddress moDataOriginBizPartnerBranchAddress;
+    protected SDataBizPartnerBranchAddress moDataDestinationBizPartnerBranchAddress;
     
     protected String msXtaItemName;
     protected String msXtaUnitName;
@@ -48,7 +47,6 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
     public void setPkMerchandiseId(int n) { mnPkMerchandiseId = n; }
     public void setPkMerchandiseQuantityId(int n) { mnPkMerchandiseQuantityId = n; }
     public void setQuantity(double d) { mdQuantity = d; }
-    public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkOriginBizPartnerAddress_n(int n) { mnFkOriginBizPartnerAddress_n = n; }
     public void setFkOriginAddressAddress_n(int n) { mnFkOriginAddressAddress_n = n; }
     public void setFkDestinationBizPartnerAddress_n(int n) { mnFkDestinationBizPartnerAddress_n = n; }
@@ -62,18 +60,17 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
     public int getFkOriginAddressAddress_n() { return mnFkOriginAddressAddress_n; }
     public int getFkDestinationBizPartnerAddress_n() { return mnFkDestinationBizPartnerAddress_n; }
     public int getFkDestinationAddressAddress_n() { return mnFkDestinationAddressAddress_n; }
-    public boolean isDeleted() { return mbDeleted; }
     
-    public void setXtaMerchandise(SDbBolMerchandise o) { moXtaMerchandise = o; }
-    public void setXtaOriginBizPartnerBranchAddress(SDataBizPartnerBranchAddress o) { moXtaOriginBizPartnerBranchAddress = o; }
-    public void setXtaDestinationBizPartnerBranchAddress(SDataBizPartnerBranchAddress o) { moXtaDestinationBizPartnerBranchAddress = o; }
+    public void setParentMerchandise(SDbBolMerchandise o) { moParentMerchandise = o; }
+    public void setDataOriginBizPartnerBranchAddress(SDataBizPartnerBranchAddress o) { moDataOriginBizPartnerBranchAddress = o; }
+    public void setDataDestinationBizPartnerBranchAddress(SDataBizPartnerBranchAddress o) { moDataDestinationBizPartnerBranchAddress = o; }
+    
+    public SDbBolMerchandise getParentMerchandise() { return moParentMerchandise; } 
+    public SDataBizPartnerBranchAddress getDataOriginBizPartnerBranchAddress() { return moDataOriginBizPartnerBranchAddress; }
+    public SDataBizPartnerBranchAddress getDataDestinationBizPartnerBranchAddress() { return moDataDestinationBizPartnerBranchAddress; }
     
     public void setXtaItemName(String s) { msXtaItemName = s; } 
     public void setXtaUnitName(String s) { msXtaUnitName = s; } 
-    
-    public SDbBolMerchandise getXtaMerchandise() { return moXtaMerchandise; } 
-    public SDataBizPartnerBranchAddress getXtaOriginBizPartnerBranchAddress() { return moXtaOriginBizPartnerBranchAddress; }
-    public SDataBizPartnerBranchAddress getXtaDestinationBizPartnerBranchAddress() { return moXtaDestinationBizPartnerBranchAddress; }
     
     public String getXtaItemName() { return msXtaItemName; }
     public String getXtaUnitName() { return msXtaUnitName; }
@@ -98,15 +95,14 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
         mnPkMerchandiseId = 0;
         mnPkMerchandiseQuantityId = 0;
         mdQuantity = 0;
-        mbDeleted = false;
         mnFkOriginBizPartnerAddress_n = 0;
         mnFkOriginAddressAddress_n = 0;
         mnFkDestinationBizPartnerAddress_n = 0;
         mnFkDestinationAddressAddress_n = 0;
         
-        moXtaMerchandise = new SDbBolMerchandise();
-        moXtaOriginBizPartnerBranchAddress = null;
-        moXtaDestinationBizPartnerBranchAddress = null;
+        moParentMerchandise = null;
+        moDataOriginBizPartnerBranchAddress = null;
+        moDataDestinationBizPartnerBranchAddress = null;
         
         msXtaItemName = "";
         msXtaUnitName = "";
@@ -133,7 +129,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
         
         mnPkMerchandiseQuantityId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_merch_qty), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_merch_qty), 0) + 1 FROM " + getSqlTable() + " WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkMerchandiseQuantityId = resultSet.getInt(1);
@@ -175,17 +171,19 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
             
             // Read merchandise
             
-            moXtaMerchandise.readXta(session, new int[] { mnPkBillOfLadingId, mnPkMerchandiseId });
+            moParentMerchandise = new SDbBolMerchandise();
+            moParentMerchandise.readXta(session, new int[] { mnPkBillOfLadingId, mnPkMerchandiseId });
             
             // Read BizPartnerBranchAddresses
             
             if (mnFkOriginBizPartnerAddress_n != 0 && mnFkOriginAddressAddress_n != 0) {
-                moXtaOriginBizPartnerBranchAddress = new SDataBizPartnerBranchAddress();
-                moXtaOriginBizPartnerBranchAddress.read(new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n }, statement);
+                moDataOriginBizPartnerBranchAddress = new SDataBizPartnerBranchAddress();
+                moDataOriginBizPartnerBranchAddress.read(new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n }, statement);
             }
+            
             if (mnFkDestinationBizPartnerAddress_n != 0 && mnFkDestinationAddressAddress_n != 0) {
-                moXtaDestinationBizPartnerBranchAddress = new SDataBizPartnerBranchAddress();
-                moXtaDestinationBizPartnerBranchAddress.read(new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n }, statement);
+                moDataDestinationBizPartnerBranchAddress = new SDataBizPartnerBranchAddress();
+                moDataDestinationBizPartnerBranchAddress.read(new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n }, statement);
             }
             
             mbRegistryNew = false;
@@ -236,6 +234,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
                 "fk_dest_add_add_n = " + (mnFkDestinationAddressAddress_n == 0 ? "NULL " : mnFkDestinationAddressAddress_n + " ") +
                 getSqlWhere();
         }
+        
         session.getStatement().execute(msSql);
         
         mbRegistryNew = false;
@@ -243,7 +242,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbBolMerchandiseQuantity clone() throws CloneNotSupportedException {
         SDbBolMerchandiseQuantity registry = new SDbBolMerchandiseQuantity();
         
         registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
@@ -256,9 +255,10 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
         registry.setFkDestinationBizPartnerAddress_n(this.getFkDestinationBizPartnerAddress_n());
         registry.setFkDestinationAddressAddress_n(this.getFkDestinationAddressAddress_n());
         
-        registry.setXtaMerchandise(this.getXtaMerchandise());
-        registry.setXtaOriginBizPartnerBranchAddress(this.getXtaOriginBizPartnerBranchAddress());
-        registry.setXtaDestinationBizPartnerBranchAddress(this.getXtaDestinationBizPartnerBranchAddress());
+        registry.setParentMerchandise(this.getParentMerchandise()); // el clon comparte este registro que es inmutable
+        registry.setDataOriginBizPartnerBranchAddress(this.getDataOriginBizPartnerBranchAddress()); // el clon comparte este registro que es de sólo lectura
+        registry.setDataDestinationBizPartnerBranchAddress(this.getDataDestinationBizPartnerBranchAddress()); // el clon comparte este registro que es de sólo lectura
+        
         registry.setXtaItemName(this.getXtaItemName());
         registry.setXtaUnitName(this.getXtaUnitName());
 

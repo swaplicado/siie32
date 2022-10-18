@@ -17,6 +17,7 @@ import erp.mod.SModConsts;
  * @author Isabel Servín, Sergio Flores
  */
 public class SCfdBolUtils {
+    
     public static void sign(final SClientInterface client, final int[] idCfd) throws Exception {
         SDataCfd cfd = SCfdUtils.getCfd(client, SDataConstantsSys.TRNS_TP_CFD_BOL, idCfd); 
         
@@ -36,6 +37,7 @@ public class SCfdBolUtils {
                     throw new Exception("El tipo del CFDI '" + cfd.getCfdNumber() + "' es obsoleto.");
 
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
                     try {
                         if (((SClientInterface) client).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticBol()) {
                             if (SCfdUtils.signAndSendCfdi(client, cfd, 0, true, true)) {
