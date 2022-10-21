@@ -49,7 +49,7 @@ public class SUtilsJSON {
      * @throws com.fasterxml.jackson.core.JsonProcessingException
      * @throws erp.mod.hrs.link.db.SConfigException
      */
-    public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, IOException {
             ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
             
@@ -65,6 +65,7 @@ public class SUtilsJSON {
             objResponse.fdys = sDb.getAllFirstDayOfYear(lastSyncDate);
             objResponse.absences = sDb.getAllAbsences(lastSyncDate);
             objResponse.cuts = sDb.getAllCutsCalendar(lastSyncDate);
+            objResponse.vacations = sDb.getEmployeeVacations(lastSyncDate);
             
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);

@@ -6,6 +6,10 @@
 package erp.mod.hrs.link.db;
 
 import erp.lib.SLibUtilities;
+import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.db.SRowBenefitCardex;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +25,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 import sun.misc.BASE64Encoder;
 
 /**
@@ -820,5 +827,223 @@ public class SShareDB {
         }
 
         return imageString;
+    }
+    
+    public ArrayList<SEmployeeVacations> getEmployeeVacations(String strDate) throws SConfigException, ClassNotFoundException, SQLException, UnsupportedEncodingException, IOException {
+        SMySqlClass mdb = new SMySqlClass();
+        String empresas[]= new String[3];
+        empresas[0] = "erp_aeth";
+        empresas[1] = "erp_amesa";
+        empresas[2] = "erp_otsa";
+        empresas[3] = "erp_th";
+        
+        ArrayList<SEmployeeVacations> lEmp = null;
+        lEmp = new ArrayList();
+        SEmployeeVacations emp = null;
+         
+        for(int num_empresas = 0 ; num_empresas < empresas.length ; num_empresas ++){
+        
+            Connection conn = mdb.connect("", "", empresas[num_empresas], "", "");
+
+            if (conn == null) {
+                return null;
+            }
+
+            String sql = "";
+            String sqlCutOff = "";
+            String sqlBenefit = "";
+            Object filter = null;
+            // creación del hashmap utilizado para saber tipo de pago
+            HashMap<Integer, Integer> paymentTypeBenefitVacationMap = new HashMap<>();
+
+            String sqlMap = "SELECT tp.id_tp_pay, b.id_ben "
+                    + "FROM hrs_ben AS b "
+                    + "RIGHT OUTER JOIN erp.hrss_tp_pay AS tp ON b.fk_tp_pay_n = tp.id_tp_pay OR b.fk_tp_pay_n IS NULL "
+                    + "WHERE NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
+                    + "b.fk_ear = (SELECT id_ear FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
+                    + " WHERE fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_EAR + " AND fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
+                    + " fk_cl_abs_n IS NOT NULL ORDER BY id_ear LIMIT 1) "
+                    + "UNION "
+                    + "SELECT NULL AS id_tp_pay, b.id_ben "
+                    + "FROM hrs_ben AS b "
+                    + "WHERE NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
+                    + "b.fk_ear = (SELECT id_ear FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
+                    + " WHERE fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_EAR + " AND fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
+                    + " fk_cl_abs_n IS NOT NULL ORDER BY id_ear LIMIT 1) "
+                    + "ORDER BY id_tp_pay;";
+
+
+                Statement st = conn.createStatement();
+                ResultSet res = st.executeQuery(sqlMap);
+                while (res.next()) {
+                    paymentTypeBenefitVacationMap.put(res.getInt("id_tp_pay"), res.getInt("id_ben"));
+                }
+
+            try {
+
+                // prepare SQL filter for table of benefits:
+
+                Integer defaultBenefitId = paymentTypeBenefitVacationMap.get(0); // default benefit
+                Integer benefitId;
+
+                sqlBenefit = "CASE ";
+
+                benefitId = paymentTypeBenefitVacationMap.get(SModSysConsts.HRSS_TP_PAY_WEE);
+                sqlBenefit += "WHEN e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + " THEN " + (benefitId == null ? defaultBenefitId : benefitId) + " ";
+
+                benefitId = paymentTypeBenefitVacationMap.get(SModSysConsts.HRSS_TP_PAY_FOR);
+                sqlBenefit += "WHEN e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_FOR + " THEN " + (benefitId == null ? defaultBenefitId : benefitId) + " ";
+
+                sqlBenefit += "ELSE " + (defaultBenefitId == null ? 0 : defaultBenefitId) + " ";
+
+                sqlBenefit += "END";
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+
+
+             sqlCutOff = "'" + strDate + "'";
+
+             sql += (sql.isEmpty() ? "" : "AND ") + "NOT e.b_del ";
+             sql += "AND e.b_act = 1";
+
+            /*
+            NOTE (due to former functionality):
+            Meaning of row-view's primary key (required so for cardex dialog):
+            ID_1 = employee's ID
+            ID_2 = employee's anniversary (starting from 0, 1, 2 and so over)
+            ID_3 = days elapsed in employee's current anniversary
+            ID_4 = benefit-table's ID
+            */
+
+            String sqlVac = "SELECT b.id_bp AS _employee_id, b.bp AS _employee, e.num AS _employee_number, d.name AS _department, "
+                    + "e.dt_ben AS _benefits, e.dt_dis_n AS _dismiss, e.b_act AS _active, tp.name AS _payment_type, "
+                    + "@cut_off := IF(e.b_act, " + sqlCutOff + ", e.dt_dis_n) AS _cut_off, "
+                    + "@seniority := TIMESTAMPDIFF(YEAR, e.dt_ben, @cut_off) AS _seniority, "
+                    + "@vac_right := (SELECT COALESCE(SUM(bra.ben_day), 0) "
+                    + "  FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW_AUX) + " AS bra "
+                    + "  WHERE bra.id_ben = " + sqlBenefit + " AND "
+                    + "  bra.ann <= TIMESTAMPDIFF(YEAR, e.dt_ben, @cut_off)) AS _vac_right, "
+                    + "@vac_ear := (SELECT COALESCE(SUM(pre.unt_all), 0.0) "
+                    + "  FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                    + "  INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                    + "  INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                    + "  WHERE pre.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
+                    + "  pre.ben_year > 0 AND pre.ben_year >= YEAR(e.dt_ben) AND "
+                    + "  pr.id_emp = e.id_emp AND ((p.dt_end >= e.dt_ben AND p.dt_end <= @cut_off) OR p.id_pay = 0)) AS _vac_ear, "
+                    + "@vac_ded := (SELECT COALESCE(SUM(prd.unt_all), 0.0) "
+                    + "  FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                    + "  INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                    + "  INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                    + "  WHERE prd.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND "
+                    + "  prd.ben_year > 0 AND prd.ben_year >= YEAR(e.dt_ben) AND "
+                    + "  pr.id_emp = e.id_emp AND ((p.dt_end >= e.dt_ben AND p.dt_end <= @cut_off) OR p.id_pay = 0)) AS _vac_ded, "
+                    + "@vac_right - (@vac_ear + @vac_ded) AS _vac_pend, "
+                    + "b.id_bp AS " + SDbConsts.FIELD_ID + "1, "
+                    + "@seniority AS " + SDbConsts.FIELD_ID + "2, "
+                    + "DATEDIFF(@cut_off, DATE_ADD(e.dt_ben, INTERVAL @seniority YEAR)) AS " + SDbConsts.FIELD_ID + "3, "
+                    + sqlBenefit + " AS " + SDbConsts.FIELD_ID + "4, "
+                    + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
+                    + "e.num AS " + SDbConsts.FIELD_CODE + " "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON b.id_bp = e.id_emp "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON b.id_bp = em.id_emp "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS d ON e.fk_dep = d.id_dep "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
+                    + "WHERE " + sql
+                    + "ORDER BY b.bp, b.id_bp;";
+
+
+
+
+            Statement stV = conn.createStatement();
+            ResultSet resV = st.executeQuery(sqlVac);
+
+
+
+
+            while (resV.next()) {
+                emp = new SEmployeeVacations();
+
+                emp.setEmployee_id(resV.getInt("_employee_id"));
+                emp.setEmployee_number(resV.getInt("_employee_number"));
+
+                String dbmsSchema = "erp_aeth.";
+                int yearBenefits = SLibTimeUtils.digestYear(resV.getDate("_benefits"))[0];
+                ArrayList<SDataVacations> lVac = null;
+                lVac = new ArrayList();
+                SDataVacations vac = null;
+
+                    for (int anniversary = resV.getInt("_seniority") + 1; anniversary >= 1; anniversary--) {
+                        String sqlV;
+                        ResultSet resultSet;
+
+                        int benefitYear = yearBenefits + anniversary - 1;
+                        int mnFormSubtype = SModSysConsts.HRSS_TP_BEN_VAC;
+                        // scheduled days (only for vacations):
+
+                            sqlV = "SELECT SUM(eff_day) AS _days_sched "
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                                    + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
+                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
+                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+                                    + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
+                                    + "NOT b_del;";
+
+                            Statement stCon = conn.createStatement();
+
+                            resultSet = stCon.executeQuery(sqlV);
+                            if (resultSet.next()) {
+                                vac.setVacation_programm(resultSet.getDouble("_day_sched"));
+                            }
+
+                        // payed days and amount:
+
+                        double payedDays = 0;
+                        double payedAmount = 0;
+
+                        sqlV = "SELECT SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _amount "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                                + "WHERE pr.id_emp = " + resV.getInt("_employee_id") + " AND pre.fk_tp_ben = " + mnFormSubtype + " AND "
+                                + "pre.ben_year = " + benefitYear + " AND pre.ben_ann = " + anniversary + " AND "
+                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getString("_cut_off")) + "' AND "
+                                + "NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del;";
+                        resultSet = stCon.executeQuery(sqlV);
+                        if (resultSet.next()) {
+                            payedDays = resultSet.getDouble("_days");
+
+                        }
+
+                        sqlV = "SELECT SUM(prd.unt_all) AS _days, SUM(prd.amt_r) AS _amount "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                                + "WHERE pr.id_emp = " + resV.getInt("_employee_id") + " AND prd.fk_tp_ben = " + mnFormSubtype + " AND "
+                                + "prd.ben_year = " + benefitYear + " AND prd.ben_ann = " + anniversary + " AND "
+                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getString("_cut_off")) + "' AND "
+                                + "NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del;";
+                        resultSet = stCon.executeQuery(sqlV);
+                        if (resultSet.next()) {
+                            payedDays = (payedDays - resultSet.getDouble("_days")); // decrement days
+                        }
+
+                        vac.setVacation_consumed(payedDays);
+
+                        lVac.add(vac);
+                        resultSet.close();
+                    }
+                emp.setRows(lVac);
+
+                lEmp.add(emp);
+            }
+            conn.close();
+        }
+        
+        
+        
+        return lEmp;
     }
 }
