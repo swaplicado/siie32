@@ -979,7 +979,8 @@ public class SShareDB {
                         String sqlV;
                         ResultSet resultSet;
                         vac = new SDataVacations();
-
+                        double programados_no_gozados = 0;
+                        
                         int benefitYear = yearBenefits + anniversary - 1;
                         int mnFormSubtype = SModSysConsts.HRSS_TP_BEN_VAC;
                         // scheduled days (only for vacations):
@@ -996,7 +997,7 @@ public class SShareDB {
 
                             resultSet = stCon.executeQuery(sqlV);
                             if (resultSet.next()) {
-                                vac.setVacation_programm(resultSet.getDouble("_days_sched"));
+                                programados_no_gozados = resultSet.getDouble("_days_sched");
                             }
 
                         // payed days and amount:
@@ -1030,9 +1031,10 @@ public class SShareDB {
                         if (resultSet.next()) {
                             payedDays = (payedDays - resultSet.getDouble("_days")); // decrement days
                         }
-
+                        programados_no_gozados = programados_no_gozados - payedDays;
+                        vac.setVacation_programm(programados_no_gozados);
                         vac.setVacation_consumed(payedDays);
-
+                        vac.setAnniversary(anniversary);
                         lVac.add(vac);
                         resultSet.close();
                     }
