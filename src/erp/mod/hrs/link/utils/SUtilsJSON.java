@@ -49,7 +49,7 @@ public class SUtilsJSON {
      * @throws com.fasterxml.jackson.core.JsonProcessingException
      * @throws erp.mod.hrs.link.db.SConfigException
      */
-    public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, IOException {
+    public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
             ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
             

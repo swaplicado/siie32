@@ -829,9 +829,9 @@ public class SShareDB {
         return imageString;
     }
     
-    public ArrayList<SEmployeeVacations> getEmployeeVacations(String strDate) throws SConfigException, ClassNotFoundException, SQLException, UnsupportedEncodingException, IOException {
+    public ArrayList<SEmployeeVacations> getEmployeeVacations(String strDate) throws SConfigException, ClassNotFoundException, SQLException {
         SMySqlClass mdb = new SMySqlClass();
-        String empresas[]= new String[3];
+        String empresas[]= new String[4];
         empresas[0] = "erp_aeth";
         empresas[1] = "erp_amesa";
         empresas[2] = "erp_otsa";
@@ -906,7 +906,7 @@ public class SShareDB {
              sqlCutOff = "'" + strDate + "'";
 
              sql += (sql.isEmpty() ? "" : "AND ") + "NOT e.b_del ";
-             sql += "AND e.b_act = 1";
+             sql += "AND e.b_act = 1 ";
 
             /*
             NOTE (due to former functionality):
@@ -978,6 +978,7 @@ public class SShareDB {
                     for (int anniversary = resV.getInt("_seniority") + 1; anniversary >= 1; anniversary--) {
                         String sqlV;
                         ResultSet resultSet;
+                        vac = new SDataVacations();
 
                         int benefitYear = yearBenefits + anniversary - 1;
                         int mnFormSubtype = SModSysConsts.HRSS_TP_BEN_VAC;
@@ -995,7 +996,7 @@ public class SShareDB {
 
                             resultSet = stCon.executeQuery(sqlV);
                             if (resultSet.next()) {
-                                vac.setVacation_programm(resultSet.getDouble("_day_sched"));
+                                vac.setVacation_programm(resultSet.getDouble("_days_sched"));
                             }
 
                         // payed days and amount:
@@ -1009,7 +1010,7 @@ public class SShareDB {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                                 + "WHERE pr.id_emp = " + resV.getInt("_employee_id") + " AND pre.fk_tp_ben = " + mnFormSubtype + " AND "
                                 + "pre.ben_year = " + benefitYear + " AND pre.ben_ann = " + anniversary + " AND "
-                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getString("_cut_off")) + "' AND "
+                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getDate("_cut_off")) + "' AND "
                                 + "NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del;";
                         resultSet = stCon.executeQuery(sqlV);
                         if (resultSet.next()) {
@@ -1023,7 +1024,7 @@ public class SShareDB {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                                 + "WHERE pr.id_emp = " + resV.getInt("_employee_id") + " AND prd.fk_tp_ben = " + mnFormSubtype + " AND "
                                 + "prd.ben_year = " + benefitYear + " AND prd.ben_ann = " + anniversary + " AND "
-                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getString("_cut_off")) + "' AND "
+                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getDate("_cut_off")) + "' AND "
                                 + "NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del;";
                         resultSet = stCon.executeQuery(sqlV);
                         if (resultSet.next()) {
