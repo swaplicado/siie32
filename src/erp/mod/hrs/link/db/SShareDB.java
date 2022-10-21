@@ -1033,8 +1033,8 @@ public class SShareDB {
                         }
                         programados_no_gozados = programados_no_gozados - payedDays;
                         vac.setVacation_programm(programados_no_gozados);
+                        vac.setAnniversary(benefitYear);
                         vac.setVacation_consumed(payedDays);
-                        vac.setAnniversary(anniversary);
                         lVac.add(vac);
                         resultSet.close();
                     }
