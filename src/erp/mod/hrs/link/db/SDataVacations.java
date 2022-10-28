@@ -15,6 +15,7 @@ public class SDataVacations {
     double vacation_consumed = 0;
     double vacation_programm = 0;
     int anniversary = 0;
+    int year = 0;
     
     public double getVacation_consumed() {
         return vacation_consumed;
@@ -46,6 +47,14 @@ public class SDataVacations {
 
     public void setAnniversary(int anniversary) {
         this.anniversary = anniversary;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
     
 }

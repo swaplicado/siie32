@@ -304,6 +304,7 @@ public class SShareDB {
                 emp.firstname = res.getString("firstname");
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
+                //emp.benefit_date = res.getString("dt_ben");
                 emp.email = res.getString("email_01");
                 emp.overtime_policy = res.getInt("overtime");
                 emp.checker_policy = res.getInt("checker_policy");
@@ -852,7 +853,6 @@ public class SShareDB {
             String sql = "";
             String sqlCutOff = "";
             String sqlBenefit = "";
-            Object filter = null;
             // creación del hashmap utilizado para saber tipo de pago
             HashMap<Integer, Integer> paymentTypeBenefitVacationMap = new HashMap<>();
 
@@ -971,15 +971,27 @@ public class SShareDB {
 
                 String dbmsSchema = "erp_aeth.";
                 int yearBenefits = SLibTimeUtils.digestYear(resV.getDate("_benefits"))[0];
+                
+                // Listado de vacaciones
                 ArrayList<SDataVacations> lVac = null;
                 lVac = new ArrayList();
                 SDataVacations vac = null;
+                
+                //Listado de incidentes
+                ArrayList<SDataIncidents> lInc = null;
+                lInc = new ArrayList();
+                SDataIncidents incidents = null;
 
                     for (int anniversary = resV.getInt("_seniority") + 1; anniversary >= 1; anniversary--) {
                         String sqlV;
+                        String sqlCons;
+                        String sqlInc;
                         ResultSet resultSet;
                         vac = new SDataVacations();
+                        
                         double programados_no_gozados = 0;
+                        double consumed = 0;
+                        double portal_consumed = 0;
                         
                         int benefitYear = yearBenefits + anniversary - 1;
                         int mnFormSubtype = SModSysConsts.HRSS_TP_BEN_VAC;
@@ -999,7 +1011,58 @@ public class SShareDB {
                             if (resultSet.next()) {
                                 programados_no_gozados = resultSet.getDouble("_days_sched");
                             }
-
+                        
+                        // consumed days:
+                            sqlCons = "SELECT SUM(eff_day) AS _days_consu "
+                                    + "FROM"
+                                    + " hrs_abs_cns "
+                                    + "INNER JOIN"
+                                    + " hrs_abs "
+                                    + "ON"
+                                    + " hrs_abs_cns.id_abs = hrs_abs.id_abs "
+                                    + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
+                                    + "ext_req_id IS NULL AND "
+                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
+                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+                                    + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
+                                    + "NOT hrs_abs_cns.b_del AND NOT hrs_abs.b_del;"; 
+                          
+                            resultSet = stCon.executeQuery(sqlCons);
+                            if (resultSet.next()) {
+                                consumed = resultSet.getDouble("_days_consu");
+                            }
+                            
+                        // consumos de incidencias de solicitudes sistema Portal GH
+                        
+                            sqlInc = "SELECT hrs_abs.ext_req_id AS application, hrs_abs.ben_year AS year, hrs_abs.ben_ann AS anniversary, hrs_abs_cns.eff_day AS consumed "
+                                    + "FROM"
+                                    + " hrs_abs_cns "
+                                    + "INNER JOIN"
+                                    + " hrs_abs "
+                                    + "ON"
+                                    + " hrs_abs_cns.id_abs = hrs_abs.id_abs "
+                                    + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
+                                    + "ext_req_id IS NOT NULL AND "
+                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
+                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+                                    + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
+                                    + "NOT hrs_abs_cns.b_del AND NOT hrs_abs.b_del;"; 
+                            
+                            resultSet = stCon.executeQuery(sqlInc);
+                            if (resultSet.next()) {
+                                incidents = new SDataIncidents();
+                                // agregar renglon de incidencia
+                                incidents.setId_breakdown(resultSet.getInt("application"));
+                                incidents.setAnniversary(anniversary);
+                                incidents.setYear(benefitYear);
+                                incidents.setDay_consumed(resultSet.getInt("consumed"));
+                                
+                                //sacar los días consumidos ligados al portal
+                                portal_consumed = portal_consumed + resultSet.getInt("consumed");
+                                
+                                //agregar el renglon de vacaciones en la lista
+                                lInc.add(incidents);
+                            }
                         // payed days and amount:
 
                         double payedDays = 0;
@@ -1031,15 +1094,20 @@ public class SShareDB {
                         if (resultSet.next()) {
                             payedDays = (payedDays - resultSet.getDouble("_days")); // decrement days
                         }
-                        programados_no_gozados = programados_no_gozados - payedDays;
+                        programados_no_gozados = programados_no_gozados - consumed;
+                        payedDays = payedDays - portal_consumed;
+                        //insertar información de vacaciones por año y aniversario
                         vac.setVacation_programm(programados_no_gozados);
-                        vac.setAnniversary(benefitYear);
+                        vac.setAnniversary(anniversary);
+                        vac.setYear(benefitYear);
                         vac.setVacation_consumed(payedDays);
+                        
+                        //agregar el renglon de vacaciones en la lista
                         lVac.add(vac);
                         resultSet.close();
                     }
                 emp.setRows(lVac);
-
+                emp.setIncidents(lInc);
                 lEmp.add(emp);
             }
             conn.close();

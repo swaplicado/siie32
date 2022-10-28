@@ -15,6 +15,7 @@ public class SEmployeeVacations {
     private int employee_id = 0;
     private int employee_number = 0;
     private ArrayList<SDataVacations> rows;
+    private ArrayList<SDataIncidents> incidents;
         
     public int getEmployee_id() {
         return employee_id;
@@ -39,4 +40,14 @@ public class SEmployeeVacations {
     public void setRows(ArrayList<SDataVacations> rows) {
         this.rows = rows;
     }
+
+    public ArrayList<SDataIncidents> getIncidents() {
+        return incidents;
+    }
+
+    public void setIncidents(ArrayList<SDataIncidents> incidents) {
+        this.incidents = incidents;
+    }
+    
+    
 }
