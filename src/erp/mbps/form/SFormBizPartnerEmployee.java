@@ -79,9 +79,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.mbps.data.SDataBizPartnerBranch moBizPartnerBranch;
     private erp.mbps.data.SDataEmployee moEmployee;
     private erp.lib.form.SFormField moFieldNumber;
-    private erp.lib.form.SFormField moFieldFirstname;
     private erp.lib.form.SFormField moFieldLastname1;
     private erp.lib.form.SFormField moFieldLastname2;
+    private erp.lib.form.SFormField moFieldFirstname;
     private erp.lib.form.SFormField moFieldFiscalId;
     private erp.lib.form.SFormField moFieldAlternativeId;
     private erp.lib.form.SFormField moFieldEmail;
@@ -197,13 +197,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlNumber = new javax.swing.JLabel();
         jftNumber = new javax.swing.JFormattedTextField();
         jtfBizPartner_Ro = new javax.swing.JTextField();
-        jPanel22 = new javax.swing.JPanel();
-        jlFirstname = new javax.swing.JLabel();
-        jtfFirstname = new javax.swing.JTextField();
         jPanel25 = new javax.swing.JPanel();
         jlLastname = new javax.swing.JLabel();
         jtfLastname1 = new javax.swing.JTextField();
+        jlLastname1 = new javax.swing.JLabel();
         jtfLastname2 = new javax.swing.JTextField();
+        jPanel22 = new javax.swing.JPanel();
+        jlFirstname = new javax.swing.JLabel();
+        jtfFirstname = new javax.swing.JTextField();
         jPanel29 = new javax.swing.JPanel();
         jlFiscalId = new javax.swing.JLabel();
         jtfFiscalId = new javax.swing.JTextField();
@@ -459,6 +460,37 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel19.add(jPanel26);
 
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlLastname.setText("Apellido paterno:*");
+        jlLastname.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel25.add(jlLastname);
+
+        jtfLastname1.setToolTipText("Apellido paterno");
+        jtfLastname1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfLastname1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jtfLastname1FocusLost(evt);
+            }
+        });
+        jPanel25.add(jtfLastname1);
+
+        jlLastname1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlLastname1.setText("Apellido materno:*");
+        jlLastname1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel25.add(jlLastname1);
+
+        jtfLastname2.setToolTipText("Apellido materno");
+        jtfLastname2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfLastname2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jtfLastname2FocusLost(evt);
+            }
+        });
+        jPanel25.add(jtfLastname2);
+
+        jPanel19.add(jPanel25);
+
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFirstname.setText("Nombre(s):*");
@@ -474,32 +506,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel22.add(jtfFirstname);
 
         jPanel19.add(jPanel22);
-
-        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlLastname.setText("Apellido(s):*");
-        jlLastname.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel25.add(jlLastname);
-
-        jtfLastname1.setToolTipText("Apellido paterno");
-        jtfLastname1.setPreferredSize(new java.awt.Dimension(200, 23));
-        jtfLastname1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jtfLastname1FocusLost(evt);
-            }
-        });
-        jPanel25.add(jtfLastname1);
-
-        jtfLastname2.setToolTipText("Apellido materno");
-        jtfLastname2.setPreferredSize(new java.awt.Dimension(200, 23));
-        jtfLastname2.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jtfLastname2FocusLost(evt);
-            }
-        });
-        jPanel25.add(jtfLastname2);
-
-        jPanel19.add(jPanel25);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -546,7 +552,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkBank_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(jcbFkBank_n);
 
-        jlBankAccount.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jlBankAccount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBankAccount.setText("Cuenta bancaria:");
         jlBankAccount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlBankAccount);
@@ -566,7 +572,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkGroceryService.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel42.add(jcbFkGroceryService);
 
-        jlGroceryServiceAccount.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jlGroceryServiceAccount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlGroceryServiceAccount.setText("Cuenta despensa:");
         jlGroceryServiceAccount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel42.add(jlGroceryServiceAccount);
@@ -1498,15 +1504,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jftNumber, jlNumber);
         moFieldNumber.setLengthMax(10);
         moFieldNumber.setTabbedPaneIndex(0, jTabbedPane);
-        moFieldFirstname = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstname, jlFirstname);
-        moFieldFirstname.setLengthMax(100);
-        moFieldFirstname.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLastname1 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLastname1, jlLastname);
         moFieldLastname1.setLengthMax(50);
         moFieldLastname1.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLastname2 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfLastname2, jlLastname);
         moFieldLastname2.setLengthMax(49);
         moFieldLastname2.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldFirstname = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstname, jlFirstname);
+        moFieldFirstname.setLengthMax(100);
+        moFieldFirstname.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
         moFieldFiscalId.setLengthMin(DCfdConsts.LEN_RFC_PER);
         moFieldFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
@@ -1683,9 +1689,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jpOficialAddress.add(moPanelBizPartnerBranchAddress, BorderLayout.NORTH);
 
         mvFields.add(moFieldNumber);
-        mvFields.add(moFieldFirstname);
         mvFields.add(moFieldLastname1);
         mvFields.add(moFieldLastname2);
+        mvFields.add(moFieldFirstname);
         mvFields.add(moFieldFiscalId);
         mvFields.add(moFieldAlternativeId);
         mvFields.add(moFieldSocialSecurityNumber);
@@ -2529,6 +2535,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlImgPhoto;
     private javax.swing.JLabel jlImgSignature;
     private javax.swing.JLabel jlLastname;
+    private javax.swing.JLabel jlLastname1;
     private javax.swing.JLabel jlMate;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlOvertimePolicy;

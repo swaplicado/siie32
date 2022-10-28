@@ -738,21 +738,20 @@ public class SHrsPayrollDataProvider {
                 + "WHERE pr.id_pay = " + payrollId + " AND pr.id_emp = " + employeeId + " AND NOT pr.b_del;";
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
-            if (!resultSet.next()) {
-                throw new Exception("No fue posible determinar si el empleado ID=" + employeeId + " tiene recibo en la nómina ID=" + payrollId + ".");
-            }
-            else {
+            if (resultSet.next()) {
                 if (resultSet.getInt(1) == 0) {
                     // el empleado no tiene recibo en la nómina aún:
                     
                     sql = "SELECT trs.rec_sche_cat "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp "
                             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = e.fk_tp_rec_sche "
+                            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = e.fk_tp_rec_sche "
                             + "WHERE e.id_emp = " + employeeId + " AND NOT e.b_del;";
 
                     try (ResultSet resultSet1 = miStatement.executeQuery(sql)) {
                         if (!resultSet1.next()) {
-                            throw new Exception("No fue posible determinar la categoría del esquema de reclutamiento del empleado ID=" + employeeId + ".");
+                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID=" + employeeId + ".");
                         }
                         else {
                             category = resultSet1.getInt("trs.rec_sche_cat");
@@ -769,7 +768,7 @@ public class SHrsPayrollDataProvider {
 
                     try (ResultSet resultSet1 = miStatement.executeQuery(sql)) {
                         if (!resultSet1.next()) {
-                            throw new Exception("No fue posible determinar la categoría del esquema de reclutamiento del empleado ID=" + employeeId + ", nómina ID=" + payrollId + ".");
+                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID=" + employeeId + ", nómina ID=" + payrollId + ".");
                         }
                         else {
                             category = resultSet1.getInt("trs.rec_sche_cat");
@@ -942,7 +941,7 @@ public class SHrsPayrollDataProvider {
 
         Date annualStart = SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(fiscalYear));
         Date annualEnd = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)).compareTo(dateEnd) < 0 ? SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)) : dateEnd;
-        int recruitmentSchemaCat = srcHrsEmployee.getEmployee().getXtaRecruitmentSchemaCat();
+        int recruitmentSchemaCat = srcHrsEmployee.getEmployee().getXtaEffectiveRecruitmentSchemaCat(); // convenience variable
 
         newHrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(readEmployeeHireLogs(employeeId, annualStart, annualEnd), annualStart, annualEnd));
         newHrsEmployee.setAnnualTaxableEarnings(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, TAX_STD, payrollId));

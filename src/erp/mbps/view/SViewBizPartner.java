@@ -98,7 +98,6 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         moTabFilterDeleted = new STabFilterDeleted(this);
         
         jbBizPartnerExport = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_BP_EXPORT), "Exportar a otra " + (mbIsViewEmployees ? "empresa" : "categoría"), this);
-        jbBizPartnerExport.setEnabled(false);
         
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
@@ -518,7 +517,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         
         jbDelete.setEnabled(false); // allways disabled, business partners are disabled only within form
         
-        if (mbIsViewBizPartnersSimple || (mbIsViewEmployees && !employeesCrudEnabled)) {
+        if (mbIsViewEmployees) {
+            jbBizPartnerExport.setEnabled(employeesCrudEnabled);
+        }
+        else if (mbIsViewBizPartnersSimple) {
             jbBizPartnerExport.setEnabled(false);
         }
         else {

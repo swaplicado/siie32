@@ -18,18 +18,16 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogCfdiGeneration extends SBeanFormDialog {
 
-    private SPanelHrsDepartmentsWithReceipts moPanelHrsDepartmentsWithReceipts;
-    private SGuiClient oGlient;
+    private SGuiClient miClient;
     
     /**
-     * Creates new form SDialogPrintOrderPayroll
+     * Creates new form SDialogCfdiGeneration
      * @param client
      * @param title
      */
-
     public SDialogCfdiGeneration(SGuiClient client, final String title) throws Exception {
         this.setTitle(title);
-        oGlient = client;
+        miClient = client;
         initComponents();
         initComponentsCustom();
     }
@@ -129,6 +127,6 @@ public class SDialogCfdiGeneration extends SBeanFormDialog {
     @Override
     public void actionSave() {
         SFilesGeneration gen = new SFilesGeneration();
-        gen.readCfds(oGlient, moIntYear.getValue());
+        gen.readCfds(miClient, moIntYear.getValue());
     }
 }

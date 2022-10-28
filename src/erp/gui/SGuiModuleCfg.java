@@ -268,7 +268,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatCompanyERP.setEnabled(hasRightCompany);
         jmiCatCompany.setEnabled(hasRightCompany);
         jmiCatCompanyBranchEntity.setEnabled(hasRightCompany);
-        jmiImpCfdiGeneration.setEnabled(true);
+        jmiImpCfdiGeneration.setEnabled(miClient.getSessionXXX().getUser().isAdministrator());
         
         // GUI configuration:
         

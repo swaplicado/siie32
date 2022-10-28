@@ -383,7 +383,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
             moTextShift.setValue(miClient.getSession().readField(SModConsts.HRSU_SHT, new int[] { moEmployee.getFkShiftId() }, SDbRegistry.FIELD_NAME));
             moTextEmployeeType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { moEmployee.getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
             moTextWorkerType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { moEmployee.getFkWorkerTypeId() }, SDbRegistry.FIELD_NAME));
-            moTextRecruitmentSchemaType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moEmployee.getFkRecruitmentSchemaTypeId()}, SDbRegistry.FIELD_NAME));
+            moTextRecruitmentSchemaType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moEmployee.getEffectiveRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME));
             moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { moEmployee.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
         }
     }

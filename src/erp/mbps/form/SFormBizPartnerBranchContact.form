@@ -108,9 +108,9 @@
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Asociado de negocios: *"/>
+                    <Property name="text" type="java.lang.String" value="Asociado negocios: *"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -156,7 +156,7 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Sucursal asociado: *"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -199,7 +199,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Prefijo:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -225,7 +225,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Apellido(s): *"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -233,7 +233,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="LASTNAME"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[300, 23]"/>
+                      <Dimension value="[200, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -251,7 +251,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Nombre(s): *"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -259,7 +259,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="FIRSTNAME"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[300, 23]"/>
+                      <Dimension value="[200, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -277,7 +277,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Sufijo:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -303,7 +303,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Puesto: "/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -329,7 +329,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tipo de contacto: *"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

@@ -1000,7 +1000,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 throw new Exception(msDbmsError);
             }
 
-            if (isDocument()) {
+            if (isDocument() && !isPrepaymentOnly()) {
                 // Check that document's balance is equal to document's value:
 
                 i = 1;
@@ -1153,7 +1153,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento de ajuste!\nSe debe eliminar las pólizas contables de cierre o apertura de ejercicio, antes de eliminar el documento.";
                         break;
                     case 221:
-                        if (isDocument() || isAdjustment()) {
+                        if ((isDocument() || isAdjustment()) && !isPrepaymentOnly()) {
                             sSql = "SELECT count(*) AS f_count " +
                                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
@@ -1167,7 +1167,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                         break;
                     case 222:
-                        if (isDocument() || isAdjustment()) {
+                        if ((isDocument() || isAdjustment()) && !isPrepaymentOnly()) {
                             sSql = "SELECT count(*) AS f_count " +
                                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
@@ -1744,6 +1744,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     public boolean isDpsTypeContractSal() {
         return moXtaDpsType.isDpsTypeContractSal();
+    }
+    
+    public boolean isPrepaymentOnly() {
+        boolean hasAccountableEntries = false;
+        boolean isPrepaymentOnly = true;
+        
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+            if (dpsEntry.isAccountable()) {
+                hasAccountableEntries = true;
+                if (!dpsEntry.getIsPrepayment()) {
+                    isPrepaymentOnly = false;
+                    break;
+                }
+            }
+        }
+        
+        return hasAccountableEntries && isPrepaymentOnly;
     }
 
     public int[] getDpsCategoryKey() { return new int[] { mnFkDpsCategoryId }; }

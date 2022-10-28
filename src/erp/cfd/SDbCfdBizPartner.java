@@ -21,7 +21,7 @@ import sa.lib.SLibUtils;
  */
 public class SDbCfdBizPartner {
 
-    private final SClientInterface miClient;
+    protected SClientInterface miClient;
     
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
