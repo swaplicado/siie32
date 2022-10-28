@@ -1013,14 +1013,14 @@ public class SShareDB {
                             }
                         
                         // consumed days:
-                            sqlCons = "SELECT SUM(eff_day) AS _days_consu "
+                            sqlCons = "SELECT SUM(hrs_abs_cns.eff_day) AS _days_consu "
                                     + "FROM"
                                     + " hrs_abs_cns "
                                     + "INNER JOIN"
                                     + " hrs_abs "
                                     + "ON"
                                     + " hrs_abs_cns.id_abs = hrs_abs.id_abs "
-                                    + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
+                                    + "WHERE hrs_abs.id_emp = " + resV.getInt("_employee_id") + " AND "
                                     + "ext_req_id IS NULL AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
@@ -1041,7 +1041,7 @@ public class SShareDB {
                                     + " hrs_abs "
                                     + "ON"
                                     + " hrs_abs_cns.id_abs = hrs_abs.id_abs "
-                                    + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
+                                    + "WHERE hrs_abs.id_emp = " + resV.getInt("_employee_id") + " AND "
                                     + "ext_req_id IS NOT NULL AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
