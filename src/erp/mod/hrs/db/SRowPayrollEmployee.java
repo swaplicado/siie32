@@ -30,12 +30,14 @@ public class SRowPayrollEmployee implements SGridRow {
     protected String msBank; // name of bank from banks catalog of SAT
     protected String msBankAccount; // number of bank account
     protected SHrsReceipt moHrsReceipt;
+    protected boolean mbShowRecruitmentSchemaIcon;
 
     /**
      * Creates new row payroll employee.
      * @param rowCase Row case: CASE_EMPLOYEE, CASE_RECEIPT.
+     * @param showRecruitmentSchemaIcon Whether showing recruitment-schema icon is required or not.
      */
-    public SRowPayrollEmployee(final int rowCase) {
+    public SRowPayrollEmployee(final int rowCase, final boolean showRecruitmentSchemaIcon) {
         mnRowCase = rowCase;
         mnPkEmployeeId = 0;
         mnFkPaymentTypeId = 0;
@@ -50,6 +52,7 @@ public class SRowPayrollEmployee implements SGridRow {
         msBank = "";
         msBankAccount = "";
         moHrsReceipt = null;
+        mbShowRecruitmentSchemaIcon = showRecruitmentSchemaIcon;
     }
     
     /**
@@ -71,6 +74,7 @@ public class SRowPayrollEmployee implements SGridRow {
         msBank = row.getBank();
         msBankAccount = row.getBankAccount();
         moHrsReceipt = row.getHrsReceipt();
+        mbShowRecruitmentSchemaIcon = row.isShowRecruitmentSchemaIcon();
     }
 
     public void setRowCase(int n) { mnRowCase = n; }
@@ -87,6 +91,7 @@ public class SRowPayrollEmployee implements SGridRow {
     public void setBank(String s) { msBank = s; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setHrsReceipt(SHrsReceipt o) { moHrsReceipt = o; }
+    public void setShowRecruitmentSchemaIcon(boolean b) { mbShowRecruitmentSchemaIcon = b; }
 
     public int getRowCase() { return mnRowCase; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
@@ -102,6 +107,7 @@ public class SRowPayrollEmployee implements SGridRow {
     public String getBank() { return msBank; }
     public String getBankAccount() { return msBankAccount; }
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
+    public boolean isShowRecruitmentSchemaIcon() { return mbShowRecruitmentSchemaIcon; }
 
     public double getTotalNet() {
         return SLibUtils.roundAmount(mdTotalEarnings - mdTotalDeductions);
@@ -167,34 +173,69 @@ public class SRowPayrollEmployee implements SGridRow {
                     case 3:
                         value = msRecruitmentSchemaType;
                         break;
+                    case 4:
+                        value = SHrsUtils.getRecruitmentSchemaIcon(mnRecruitmentSchemaTypeId);
+                        break;
                     default:
                 }
                 break;
                 
             case CASE_RECEIPT:
-                switch(row) {
-                    case 0:
-                        value = msName;
-                        break;
-                    case 1:
-                        value = msNumber;
-                        break;
-                    case 2:
-                        value = mdTotalEarnings;
-                        break;
-                    case 3:
-                        value = mdTotalDeductions;
-                        break;
-                    case 4:
-                        value = getTotalNet();
-                        break;
-                    case 5:
-                        value = msBank;
-                        break;
-                    case 6:
-                        value = msBankAccount;
-                        break;
-                    default:
+                if (mbShowRecruitmentSchemaIcon) {
+                    
+                    switch(row) {
+                        case 0:
+                            value = msName;
+                            break;
+                        case 1:
+                            value = msNumber;
+                            break;
+                        case 2:
+                            value = SHrsUtils.getRecruitmentSchemaIcon(mnRecruitmentSchemaTypeId);
+                            break;
+                        case 3:
+                            value = mdTotalEarnings;
+                            break;
+                        case 4:
+                            value = mdTotalDeductions;
+                            break;
+                        case 5:
+                            value = getTotalNet();
+                            break;
+                        case 6:
+                            value = msBank;
+                            break;
+                        case 7:
+                            value = msBankAccount;
+                            break;
+                        default:
+                    }
+                }
+                else {
+                    switch(row) {
+                        case 0:
+                            value = msName;
+                            break;
+                        case 1:
+                            value = msNumber;
+                            break;
+                        case 2:
+                            value = mdTotalEarnings;
+                            break;
+                        case 3:
+                            value = mdTotalDeductions;
+                            break;
+                        case 4:
+                            value = getTotalNet();
+                            break;
+                        case 5:
+                            value = msBank;
+                            break;
+                        case 6:
+                            value = msBankAccount;
+                            break;
+                        default:
+                    }
                 }
                 break;
                 

@@ -21,6 +21,7 @@ import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
+import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -59,6 +60,7 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridConsts;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 import sa.lib.prt.SPrtConsts;
@@ -70,21 +72,109 @@ import sa.lib.prt.SPrtUtils;
  */
 public abstract class SHrsUtils {
     
+    public static final int[] RecruitmentSchemaTypesForWages = new int[] {
+        SModSysConsts.HRSS_TP_REC_SCHE_WAG
+    };
+    
+    public static final int[] RecruitmentSchemaTypesForAssimilated = new int[] {
+        SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO,
+        SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV,
+        SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD,
+        SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL,
+        SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO,
+        SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA,
+        SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH
+    };
+    
+    public static final int[] RecruitmentSchemaTypesForRetirees = new int[] {
+        SModSysConsts.HRSS_TP_REC_SCHE_RET,
+        SModSysConsts.HRSS_TP_REC_SCHE_PEN,
+        SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN
+    };
+    
+    public static final int[] RecruitmentSchemaTypesForOthers = new int[] {
+        SModSysConsts.HRSS_TP_REC_SCHE_COMP,
+        SModSysConsts.HRSS_TP_REC_SCHE_OTH
+    };
+    
+    /**
+     * Check if given type of recuitment schema is for wages.
+     * @param recruitmentSchemaType
+     * @return 
+     */
+    public static boolean isWages(final int recruitmentSchemaType) {
+        return SLibUtils.belongsTo(recruitmentSchemaType, RecruitmentSchemaTypesForWages);
+    }
+    
     /**
      * Check if given type of recuitment schema is for assimilated.
      * @param recruitmentSchemaType
      * @return 
      */
-    public static boolean isAssimilable(final int recruitmentSchemaType) {
-        return SLibUtils.belongsTo(recruitmentSchemaType, new int[] {
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA,
-            SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH
-        });
+    public static boolean isAssimilated(final int recruitmentSchemaType) {
+        return SLibUtils.belongsTo(recruitmentSchemaType, RecruitmentSchemaTypesForAssimilated);
+    }
+    
+    /**
+     * Check if given type of recuitment schema is for retirees.
+     * @param recruitmentSchemaType
+     * @return 
+     */
+    public static boolean isRetirees(final int recruitmentSchemaType) {
+        return SLibUtils.belongsTo(recruitmentSchemaType, RecruitmentSchemaTypesForRetirees);
+    }
+    
+    /**
+     * Check if given type of recuitment schema is for assimilated.
+     * @param recruitmentSchemaType
+     * @return 
+     */
+    public static boolean isOthers(final int recruitmentSchemaType) {
+        return SLibUtils.belongsTo(recruitmentSchemaType, RecruitmentSchemaTypesForOthers);
+    }
+    
+    public static int getRecruitmentSchemaIcon(final int recruitmentSchemaType) {
+        int icon = 0;
+        
+        if (isWages(recruitmentSchemaType)) {
+            icon = SGridConsts.ICON_CIRC_BLUE;
+        }
+        else if (isAssimilated(recruitmentSchemaType)) {
+            icon = SGridConsts.ICON_CIRC_MAGENTA;
+        }
+        else if (isRetirees(recruitmentSchemaType)) {
+            icon = SGridConsts.ICON_CIRC_RED;
+        }
+        else if (isOthers(recruitmentSchemaType)) {
+            icon = SGridConsts.ICON_CIRC_BLACK;
+        }
+        else {
+            icon = SGridConsts.ICON_CIRC_WHITE; // default: white (looks like 'empty')
+        }
+        
+        return icon;
+    }
+    
+    public static Color getRecruitmentSchemaColor(final int recruitmentSchemaType) {
+        Color color = null;
+        
+        if (isWages(recruitmentSchemaType)) {
+            color = Color.BLUE;
+        }
+        else if (isAssimilated(recruitmentSchemaType)) {
+            color = Color.MAGENTA;
+        }
+        else if (isRetirees(recruitmentSchemaType)) {
+            color = Color.RED;
+        }
+        else if (isOthers(recruitmentSchemaType)) {
+            color = Color.BLACK;
+        }
+        else {
+            color = Color.BLACK; // default: black
+        }
+        
+        return color;
     }
     
     /**

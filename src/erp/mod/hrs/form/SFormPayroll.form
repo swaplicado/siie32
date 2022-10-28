@@ -1096,6 +1096,7 @@
                                 <Component class="javax.swing.JLabel" name="jlFilter">
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="Agregar:"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Tipos de reg&#xed;menes de contrataci&#xf3;n"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[50, 23]"/>
                                     </Property>
@@ -1104,6 +1105,9 @@
                                 </Component>
                                 <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolFilterWages">
                                   <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
+                                    </Property>
                                     <Property name="text" type="java.lang.String" value="Sueldos"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[70, 23]"/>
@@ -1112,6 +1116,9 @@
                                 </Component>
                                 <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolFilterAssimilated">
                                   <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="ff" green="0" id="magenta" palette="1" red="ff" type="palette"/>
+                                    </Property>
                                     <Property name="text" type="java.lang.String" value="Asimilados"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[80, 23]"/>
@@ -1120,6 +1127,9 @@
                                 </Component>
                                 <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolFilterRetirees">
                                   <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="0" green="0" id="red" palette="1" red="ff" type="palette"/>
+                                    </Property>
                                     <Property name="text" type="java.lang.String" value="Jubilados"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[75, 23]"/>

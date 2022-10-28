@@ -111,34 +111,22 @@ public class SViewAccountingDeduction extends SGridPaneView implements ActionLis
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_DED) + " AS v "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS ded ON "
-                + "v.id_ded = ded.id_ded "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_ACC) + " AS vt ON "
-                + "v.id_tp_acc = vt.id_tp_acc ";
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS ded ON v.id_ded = ded.id_ded "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_ACC) + " AS vt ON v.id_tp_acc = vt.id_tp_acc ";
         if (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP) {
-            msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS ref ON "
-                    + "v.id_ref = ref.id_dep ";
+            msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS ref ON v.id_ref = ref.id_dep ";
         }
         else if (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_EMP) {
-            msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ref ON "
-                    + "v.id_ref = ref.id_bp "
-                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON "
-                    + "ref.id_bp = em.id_emp ";
+            msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ref ON v.id_ref = ref.id_bp "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON ref.id_bp = em.id_emp ";
         }
-        msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS ac ON "
-                + "v.fk_acc = ac.pk_acc "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                + "v.fk_usr_ins = ui.id_usr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
-                + "v.fk_usr_upd = uu.id_usr "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON "
-                + "v.fk_cc_n = cc.pk_cc "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bb ON "
-                + "v.fk_bp_n = bb.id_bp "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON "
-                + "v.fk_item_n = i.id_item "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FINU_TAX) + " AS tax ON "
-                + "v.fk_tax_bas_n = tax.id_tax_bas AND v.fk_tax_tax_n = tax.id_tax "
+        msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS ac ON v.fk_acc = ac.pk_acc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON v.fk_usr_ins = ui.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON v.fk_usr_upd = uu.id_usr "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON v.fk_cc_n = cc.pk_cc "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bb ON v.fk_bp_n = bb.id_bp "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON v.fk_item_n = i.id_item "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FINU_TAX) + " AS tax ON v.fk_tax_bas_n = tax.id_tax_bas AND v.fk_tax_tax_n = tax.id_tax "
                 + "WHERE v.id_tp_acc = " + mnGridSubtype + (sql.isEmpty() ? "" : " AND " + sql) + " "
                 + "ORDER BY ded.code, ded.name, f_ref, v.id_ded, v.id_tp_acc ";
     }

@@ -937,7 +937,7 @@ public class SHrsPayroll {
         payrollReceipt.setFkPositionId(hrsEmployee.getEmployee().getFkPositionId());
         
         if (recruitmentSchemaType == SModSysConsts.HRSS_TP_REC_SCHE_NA || SHrsCfdUtils.isTypeRecruitmentSchemaForEmployment(recruitmentSchemaType)) {
-            payrollReceipt.setFkRecruitmentSchemaTypeId(hrsEmployee.getEmployee().getFkRecruitmentSchemaTypeId());
+            payrollReceipt.setFkRecruitmentSchemaTypeId(recruitmentSchemaType == SModSysConsts.HRSS_TP_REC_SCHE_NA ? hrsEmployee.getEmployee().getEffectiveRecruitmentSchemaTypeId() : recruitmentSchemaType);
             
             payrollReceipt.setFkSalaryTypeId(hrsEmployee.getEmployee().getFkSalaryTypeId());
             payrollReceipt.setFkWorkerTypeId(hrsEmployee.getEmployee().getFkWorkerTypeId());

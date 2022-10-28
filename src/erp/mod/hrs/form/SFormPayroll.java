@@ -76,6 +76,7 @@ import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneForm;
+import sa.lib.grid.cell.SGridCellRendererIconCircle;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiField;
@@ -751,18 +752,22 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFilter.setText("Agregar:");
+        jlFilter.setToolTipText("Tipos de regímenes de contratación");
         jlFilter.setPreferredSize(new java.awt.Dimension(50, 23));
         jlFilter.setRequestFocusEnabled(false);
         jPanel4.add(jlFilter);
 
+        moBoolFilterWages.setForeground(java.awt.Color.blue);
         moBoolFilterWages.setText("Sueldos");
         moBoolFilterWages.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel4.add(moBoolFilterWages);
 
+        moBoolFilterAssimilated.setForeground(java.awt.Color.magenta);
         moBoolFilterAssimilated.setText("Asimilados");
         moBoolFilterAssimilated.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel4.add(moBoolFilterAssimilated);
 
+        moBoolFilterRetirees.setForeground(java.awt.Color.red);
         moBoolFilterRetirees.setText("Jubilados");
         moBoolFilterRetirees.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel4.add(moBoolFilterRetirees);
@@ -1131,6 +1136,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Régimen contratación"));
+                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Régimen contratación");
+                columnForm.setCellRenderer(new SGridCellRendererIconCircle());
+                gridColumnsForm.add(columnForm);
 
                 return gridColumnsForm;
             }
@@ -1152,6 +1160,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
+                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Régimen contratación");
+                columnForm.setCellRenderer(new SGridCellRendererIconCircle());
+                gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total percepciones $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total deducciones $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total neto $"));
@@ -1681,25 +1692,27 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         HashSet<Integer> recruitmentSchemaTypesSet = new HashSet<>();
 
         if (moBoolFilterWages.isSelected()) {
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
+            for (int type : SHrsUtils.RecruitmentSchemaTypesForWages) {
+                recruitmentSchemaTypesSet.add(type);
+            }
         }
+        
         if (moBoolFilterAssimilated.isSelected()) {
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH);
+            for (int type : SHrsUtils.RecruitmentSchemaTypesForAssimilated) {
+                recruitmentSchemaTypesSet.add(type);
+            }
         }
+        
         if (moBoolFilterRetirees.isSelected()) {
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_PEN);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN);
+            for (int type : SHrsUtils.RecruitmentSchemaTypesForRetirees) {
+                recruitmentSchemaTypesSet.add(type);
+            }
         }
+        
         if (moBoolFilterOthers.isSelected()) {
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_COMP);
-            recruitmentSchemaTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_OTH);
+            for (int type : SHrsUtils.RecruitmentSchemaTypesForOthers) {
+                recruitmentSchemaTypesSet.add(type);
+            }
         }
         
         return recruitmentSchemaTypesSet;
@@ -1721,7 +1734,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moGridPaneEmployeesAvailable.getTable().requestFocusInWindow();
         }
         else if (recruitmentSchemaTypesSet != null && recruitmentSchemaTypesSet.isEmpty()) {
-            miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + "'.");
+            miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + ": (" + jlFilter.getToolTipText() + ")'.");
             moBoolFilterWages.requestFocusInWindow();
         }
         else if (recruitmentSchemaTypesSet != null && !recruitmentSchemaTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemaTypeId())) {

@@ -53,8 +53,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     private erp.mbps.data.SDataBizPartnerBranchAddress moBizPartnerBranchAddress;
     private erp.mbps.data.SDataBizPartnerBranchContact moBizPartnerBranchContact;
     private erp.lib.form.SFormField moFieldFkBizPartnerIdentityTypeId;
-    private erp.lib.form.SFormField moFieldFirstName;
     private erp.lib.form.SFormField moFieldLastName;
+    private erp.lib.form.SFormField moFieldFirstName;
     private erp.lib.form.SFormField moFieldBizPartner;
     private erp.lib.form.SFormField moFieldBizPartnerCommercial;
     private erp.lib.form.SFormField moFieldFiscalId;
@@ -98,13 +98,14 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jLabel1 = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel22 = new javax.swing.JPanel();
-        jlFirstName = new javax.swing.JLabel();
-        jtfFirstName = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jckIsAttRelatedParty = new javax.swing.JCheckBox();
         jPanel25 = new javax.swing.JPanel();
         jlLastName = new javax.swing.JLabel();
         jtfLastName = new javax.swing.JTextField();
+        jlFirstName = new javax.swing.JLabel();
+        jtfFirstName = new javax.swing.JTextField();
         jPanel26 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         jtfBizPartner = new javax.swing.JTextField();
@@ -158,8 +159,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkBizPartnerIdentityTypeId.setForeground(new java.awt.Color(0, 0, 255));
-        jlFkBizPartnerIdentityTypeId.setText("Tipo de identidad: *");
-        jlFkBizPartnerIdentityTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlFkBizPartnerIdentityTypeId.setText("Tipo identidad: *");
+        jlFkBizPartnerIdentityTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlFkBizPartnerIdentityTypeId);
 
         jcbFkBizPartnerIdentityTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -177,13 +178,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFirstName.setText("Nombre(s): *");
-        jlFirstName.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel22.add(jlFirstName);
-
-        jtfFirstName.setText("NOMBRES");
-        jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel22.add(jtfFirstName);
+        jLabel3.setPreferredSize(new java.awt.Dimension(305, 23));
+        jPanel22.add(jLabel3);
 
         jLabel2.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel22.add(jLabel2);
@@ -197,23 +193,32 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLastName.setText("Apellido(s): *");
-        jlLastName.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlLastName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel25.add(jlLastName);
 
         jtfLastName.setText("APELLIDOS");
         jtfLastName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel25.add(jtfLastName);
 
+        jlFirstName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlFirstName.setText("Nombre(s): *");
+        jlFirstName.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel25.add(jlFirstName);
+
+        jtfFirstName.setText("NOMBRES");
+        jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel25.add(jtfFirstName);
+
         jPanel19.add(jPanel25);
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setText("Nombre: *");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlBizPartner.setText("Razón social: *");
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel26.add(jlBizPartner);
 
         jtfBizPartner.setText("ASOCIADO DE NEGOCIOS");
-        jtfBizPartner.setPreferredSize(new java.awt.Dimension(354, 23));
+        jtfBizPartner.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel26.add(jtfBizPartner);
 
         jPanel19.add(jPanel26);
@@ -221,11 +226,11 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartnerCommercial.setText("Nombre comercial:");
-        jlBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlBizPartnerCommercial);
 
         jtfBizPartnerCommercial.setText("NOMBRE COMERCIAL");
-        jtfBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(354, 23));
+        jtfBizPartnerCommercial.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel27.add(jtfBizPartnerCommercial);
 
         jbSetBizPartnerCommercial.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
@@ -239,7 +244,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFiscalId.setText("RFC: *");
-        jlFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jlFiscalId);
 
         jtfFiscalId.setText("RFC");
@@ -248,7 +253,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
 
         jlAlternativeId.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAlternativeId.setText("CURP:");
-        jlAlternativeId.setPreferredSize(new java.awt.Dimension(54, 23));
+        jlAlternativeId.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel29.add(jlAlternativeId);
 
         jftAlternativeId.setText("CURP");
@@ -266,7 +271,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmail.setText("Cuenta correo-e:");
-        jlEmail.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlEmail);
 
         jtfEmail.setText("CUENTA CORREO-E");
@@ -278,7 +283,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCodeBankSantander.setText("Código Santander:");
-        jlCodeBankSantander.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCodeBankSantander.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlCodeBankSantander);
 
         jtfCodeBankSantander.setText("CODE BANK");
@@ -290,7 +295,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCodeBankBanBajio.setText("Código BanBajío:");
-        jlCodeBankBanBajio.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCodeBankBanBajio.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel30.add(jlCodeBankBanBajio);
 
         jtfCodeBankBanBajio.setText("CODE BANK");
@@ -302,7 +307,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkFiscalBankId.setText("Banco SAT: *");
-        jlFkFiscalBankId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlFkFiscalBankId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlFkFiscalBankId);
 
         jcbFkFiscalBankId.setPreferredSize(new java.awt.Dimension(354, 23));
@@ -319,7 +324,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkSalesAgentTypeId.setText("Tipo agente ventas:");
-        jlFkSalesAgentTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlFkSalesAgentTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlFkSalesAgentTypeId);
 
         jcbFkSalesAgentTypeId.setPreferredSize(new java.awt.Dimension(354, 23));
@@ -382,10 +387,10 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         mvFields = new Vector<>();
 
         moFieldFkBizPartnerIdentityTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerIdentityTypeId, jlFkBizPartnerIdentityTypeId);
-        moFieldFirstName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstName, jlFirstName);
-        moFieldFirstName.setLengthMax(100);
         moFieldLastName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLastName, jlLastName);
         moFieldLastName.setLengthMax(100);
+        moFieldFirstName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstName, jlFirstName);
+        moFieldFirstName.setLengthMax(100);
         moFieldBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfBizPartner, jlBizPartner);
         moFieldBizPartner.setLengthMax(202);
         moFieldBizPartnerCommercial = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBizPartnerCommercial, jlBizPartnerCommercial);
@@ -413,8 +418,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         moFieldFkSalesAgentTypeId.setPickerButton(jbFkSalesAgentTypeId);
 
         mvFields.add(moFieldFkBizPartnerIdentityTypeId);
-        mvFields.add(moFieldFirstName);
         mvFields.add(moFieldLastName);
+        mvFields.add(moFieldFirstName);
         mvFields.add(moFieldBizPartner);
         mvFields.add(moFieldBizPartnerCommercial);
         mvFields.add(moFieldFiscalId);
@@ -699,6 +704,7 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;

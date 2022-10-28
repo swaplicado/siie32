@@ -104,7 +104,9 @@ public class SDbEmployee extends SDbRegistryUser {
     protected String msXtaEmployeeProperName;
     protected String msXtaEmployeeRfc;
     protected String msXtaEmployeeCurp;
-    protected int mnXtaRecruitmentSchemaCat;
+    protected int mnXtaMembershipRecruitmentSchemaTypeId;
+    /** Effective recruitment-schema category. Used in computing taxable earnings and withheld taxes in fiscal year. */
+    protected int mnXtaEffectiveRecruitmentSchemaCat;
     
     protected Date mtAuxHireLogDate;
     protected String msAuxHireLogNotes;
@@ -235,13 +237,17 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setXtaEmployeePropername(String s) { msXtaEmployeeProperName = s; }
     public void setXtaEmployeeRfc(String s) { msXtaEmployeeRfc = s; }
     public void setXtaEmployeeCurp(String s) { msXtaEmployeeCurp = s; }
-    public void setXtaRecruitmentSchemaCat(int n) { mnXtaRecruitmentSchemaCat = n; }
+    public void setXtaMembershipRecruitmentSchemaTypeId(int n) { mnXtaMembershipRecruitmentSchemaTypeId = n; }
+    /** Set effective recruitment-schema category. Used in computing taxable earnings and withheld taxes in fiscal year. */
+    public void setXtaEffectiveRecruitmentSchemaCat(int n) { mnXtaEffectiveRecruitmentSchemaCat = n; }
     
     public String getXtaEmployeeName() { return msXtaEmployeeName; }
     public String getXtaEmployeeProperName() { return msXtaEmployeeProperName; }
     public String getXtaEmployeeRfc() { return msXtaEmployeeRfc; }
     public String getXtaEmployeeCurp() { return msXtaEmployeeCurp; }
-    public int getXtaRecruitmentSchemaCat() { return mnXtaRecruitmentSchemaCat; }
+    public int getXtaMembershipRecruitmentSchemaTypeId() { return mnXtaMembershipRecruitmentSchemaTypeId; }
+    /** Get effective recruitment-schema category. Used in computing taxable earnings and withheld taxes in fiscal year. */
+    public int getXtaEffectiveRecruitmentSchemaCat() { return mnXtaEffectiveRecruitmentSchemaCat; }
     
     public void setAuxHireLogDate(Date t) { mtAuxHireLogDate = t; }
     public void setAuxHireLogNotes(String s) { msAuxHireLogNotes = s; }
@@ -289,6 +295,15 @@ public class SDbEmployee extends SDbRegistryUser {
         }
         
         return settlementSalary;
+    }
+    
+    /**
+     * Gets effective type of recruitment schema.
+     * If available, that one set in employee's membership, otherwise actual employee's type of recruitment schema.
+     * @return Effective type of recruitment schema.
+     */
+    public int getEffectiveRecruitmentSchemaTypeId() {
+        return mnXtaMembershipRecruitmentSchemaTypeId != 0 ? mnXtaMembershipRecruitmentSchemaTypeId : mnFkRecruitmentSchemaTypeId;
     }
     
     /**
@@ -378,7 +393,8 @@ public class SDbEmployee extends SDbRegistryUser {
         msXtaEmployeeProperName = "";
         msXtaEmployeeRfc = "";
         msXtaEmployeeCurp = "";
-        mnXtaRecruitmentSchemaCat = 0;
+        mnXtaMembershipRecruitmentSchemaTypeId = 0;
+        mnXtaEffectiveRecruitmentSchemaCat = 0;
         
         mtAuxHireLogDate = null;
         msAuxHireLogNotes = "";
@@ -486,10 +502,14 @@ public class SDbEmployee extends SDbRegistryUser {
 
             mbOldActive = mbActive;
             
-            msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " WHERE id_bp = " + mnPkEmployeeId + ";";
+            // employee's names, fiscal and legal ID:
+            msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " "
+                    + "WHERE id_bp = " + mnPkEmployeeId + ";";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
-                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\n"
+                        + "Nombre, RFC y CURP del empleado.");
             }
             else {
                 msXtaEmployeeName = resultSet.getString("bp");
@@ -498,13 +518,30 @@ public class SDbEmployee extends SDbRegistryUser {
                 msXtaEmployeeCurp = resultSet.getString("alt_id");
             }
             
-            msSql = "SELECT rec_sche_cat FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " WHERE id_tp_rec_sche = " + mnFkRecruitmentSchemaTypeId+ ";";
+            // employee's membership type of recruitment schema:
+            msSql = "SELECT fk_tp_rec_sche_n "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " "
+                    + "WHERE id_emp = " + mnPkEmployeeId + ";";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
-                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\n"
+                        + "Membresía del empleado.");
             }
             else {
-                mnXtaRecruitmentSchemaCat = resultSet.getInt("rec_sche_cat");
+                mnXtaMembershipRecruitmentSchemaTypeId = resultSet.getInt("fk_tp_rec_sche_n");
+            }
+            
+            // employee's effective category of recruitment schema:
+            msSql = "SELECT rec_sche_cat "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " "
+                    + "WHERE id_tp_rec_sche = " + getEffectiveRecruitmentSchemaTypeId() + ";";
+            resultSet = session.getStatement().executeQuery(msSql);
+            if (!resultSet.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\n"
+                        + "Tipo de régimen de contratación del empleado.");
+            }
+            else {
+                mnXtaEffectiveRecruitmentSchemaCat = resultSet.getInt("rec_sche_cat");
             }
             
             mbRegistryNew = false;
@@ -771,7 +808,8 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());
         registry.setXtaEmployeeRfc(this.getXtaEmployeeRfc());
         registry.setXtaEmployeeCurp(this.getXtaEmployeeCurp());
-        registry.setXtaRecruitmentSchemaCat(this.getXtaRecruitmentSchemaCat());
+        registry.setXtaMembershipRecruitmentSchemaTypeId(this.getXtaMembershipRecruitmentSchemaTypeId());
+        registry.setXtaEffectiveRecruitmentSchemaCat(this.getXtaEffectiveRecruitmentSchemaCat());
 
         registry.setAuxHireLogDate(this.getAuxHireLogDate());
         registry.setAuxHireLogNotes(this.getAuxHireLogNotes());
