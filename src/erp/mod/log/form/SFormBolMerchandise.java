@@ -7,6 +7,7 @@ package erp.mod.log.form;
 import erp.SClient;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormOptionPickerInterface;
@@ -45,6 +46,8 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
     
     public static final int MERCHANDISE_DISCHARGED = 1;
     public static final int MERCHANDISE_CHARGED = 2;
+    
+    public static final int ENABLE_DISABLE_LIST = 1;
     
     private SDbBillOfLading moBillOfLading;
     private SDbBolMerchandiseQuantity moRegistry;
@@ -96,7 +99,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
     }
     
     private void actionUnit() {
-        if (moKeyUnit.getValue()[0] == 59) { // Kilo
+        if (moKeyUnit.getValue()[0] == SDataConstantsSys.ITMU_KG) { // kg
             moDecimalWeight.setEnabled(false);
         }
         else {
@@ -110,6 +113,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void populateItemList() {
         if (moBillOfLading != null) {
             modelo = new DefaultListModel();
@@ -126,14 +130,11 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         SFormOptionPickerInterface picker = ((SClient) miClient).getOptionPicker(optionType);
 
         picker.formReset();
-//        picker.setFilterKey(filterKey);
         picker.formRefreshOptionPane();
-//        picker.setSelectedPrimaryKey(new Object[] { field.getString() });
         picker.setFormVisible(true);
 
         if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moKeyItem.setValue(picker.getSelectedPrimaryKey());
-//            field.getComponent().requestFocus();
         }
 
         return picker.getFormResult();
@@ -172,7 +173,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
         jScrollPane1 = new javax.swing.JScrollPane();
         jListItems = new javax.swing.JList();
 
-        setTitle("Listado de tarifas");
+        setTitle("Mercancias");
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -351,11 +352,11 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
         
-        moKeyItem.setValue(new int[] { moRegistry.getXtaMerchandise().getFkItemId() });
-        moKeyUnit.setValue(new int[] { moRegistry.getXtaMerchandise().getFkUnitId() });
+        moKeyItem.setValue(new int[] { moRegistry.getParentMerchandise() != null ? moRegistry.getParentMerchandise().getFkItemId() : 0 });
+        moKeyUnit.setValue(new int[] { moRegistry.getParentMerchandise() != null ? moRegistry.getParentMerchandise().getFkUnitId() : 0 });
         moDecimalQty.setValue(moRegistry.getQuantity());
-        moDecimalWeight.setValue(moRegistry.getXtaMerchandise().getWeight());
-        moTextUuid.setValue(moRegistry.getXtaMerchandise().getExternalUUID());
+        moDecimalWeight.setValue(moRegistry.getParentMerchandise() != null ? moRegistry.getParentMerchandise().getWeight() : 0);
+        moTextUuid.setValue(moRegistry.getParentMerchandise() != null ? moRegistry.getParentMerchandise().getExternalUUID() : "");
         
         addAllListeners();
     }
@@ -382,27 +383,36 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
             registry.setFkOriginAddressAddress_n(moLocationKey[1]);
             registry.setFkDestinationBizPartnerAddress_n(0);
             registry.setFkDestinationAddressAddress_n(0);
-            registry.setXtaOriginBizPartnerBranchAddress(add);
-            registry.getXtaMerchandise().setWeight(registry.getXtaMerchandise().getWeight() + moDecimalWeight.getValue());
+            registry.setDataOriginBizPartnerBranchAddress(add);
+            if (registry.getParentMerchandise() == null) {
+                SDbBolMerchandise merch = new SDbBolMerchandise();
+                registry.setParentMerchandise(merch);
+            }
+            registry.getParentMerchandise().setWeight(registry.getParentMerchandise().getWeight() + moDecimalWeight.getValue());
         }
         else if (mnFormSubtype == 1) {
             registry.setFkOriginBizPartnerAddress_n(0);
             registry.setFkOriginAddressAddress_n(0);
             registry.setFkDestinationBizPartnerAddress_n(moLocationKey[0]);
             registry.setFkDestinationAddressAddress_n(moLocationKey[1]);
-            registry.setXtaDestinationBizPartnerBranchAddress(add);
+            registry.setDataDestinationBizPartnerBranchAddress(add);
         }
-        registry.getXtaMerchandise().setFkItemId(moKeyItem.getValue()[0]);
-        registry.getXtaMerchandise().setFkUnitId(moKeyUnit.getValue()[0]);
-        registry.getXtaMerchandise().updateSatCodes(miClient.getSession());
-        registry.getXtaMerchandise().setXtaItem(item);
-        registry.getXtaMerchandise().setXtaUnit(unit);
+        if (registry.getParentMerchandise() == null) {
+            SDbBolMerchandise merch = new SDbBolMerchandise();
+            registry.setParentMerchandise(merch);
+        }
+        registry.getParentMerchandise().setFkItemId(moKeyItem.getValue()[0]);
+        registry.getParentMerchandise().setFkUnitId(moKeyUnit.getValue()[0]);
+        registry.getParentMerchandise().updateSatCodes(miClient.getSession());
+        registry.getParentMerchandise().setDataItem(item);
+        registry.getParentMerchandise().setDataUnit(unit);
         
-        registry.getXtaMerchandise().updateSatCodes(miClient.getSession());
+        registry.getParentMerchandise().updateSatCodes(miClient.getSession());
         
-        registry.setXtaItemName(registry.getXtaMerchandise().getXtaItem().getItem());
-        registry.setXtaUnitName(registry.getXtaMerchandise().getXtaUnit().getSymbol());
-        }else{
+        registry.setXtaItemName(registry.getParentMerchandise().getDataItem().getItem());
+        registry.setXtaUnitName(registry.getParentMerchandise().getDataUnit().getSymbol());
+        }
+        else {
             registry.setQuantity(moDecimalQty.getValue());
         }
         return registry;
@@ -418,8 +428,8 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
                 moBillOfLading = (SDbBillOfLading) value;
                 populateItemList();
                 break;
-            case 1: 
-                jListItems.setEnabled(false);
+            case ENABLE_DISABLE_LIST: 
+                jListItems.setEnabled((boolean) value);
                 break;
             default:
         }
@@ -468,7 +478,7 @@ public class SFormBolMerchandise extends SBeanForm implements ActionListener, It
 
     @Override
     public void focusLost(FocusEvent e) {
-        if (moKeyUnit.getValue()[0] == 59) { // Kilo
+        if (moKeyUnit.getValue()[0] == SDataConstantsSys.ITMU_KG) {
              moDecimalWeight.setValue(moDecimalQty.getValue());
         }
     }

@@ -30,10 +30,10 @@ import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
 import cfd.ver2.DAttributeOptionTipoDeComprobante;
 import cfd.ver3.cce11.DElementDescripcionesEspecificas;
-import cfd.ver3.ccp20.DElementCartaPorte;
 import cfd.ver3.clf10.DElementLeyenda;
 import cfd.ver3.clf10.DElementLeyendasFiscales;
-import cfd.ver33.DCfdi33Catalogs;
+import cfd.ver40.DCfdi40Catalogs;
+import cfd.ver40.DElementInformacionGlobal;
 import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
@@ -98,7 +98,7 @@ import sa.lib.gui.SGuiSession;
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Adrián Avilés
  */
-public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33 {
+public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
 
     public static final int FIELD_REF_BKR = 1;
     public static final int FIELD_SAL_AGT = 2;
@@ -2557,7 +2557,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                     }
                 }
-
+                
                 // Read aswell CFD:
 
                 sSql = "SELECT id_cfd FROM trn_cfd WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " ";
@@ -3017,7 +3017,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         // Determinación de los distintos impuestos del documento:
                         
                         boolean bFoundEmptyTaxes = false;
-                        ArrayList<TaxForAccounting> aTaxesForAccountingArray = new ArrayList();
+                        ArrayList<TaxForAccounting> aTaxesForAccountingArray = new ArrayList<>();
                         
                         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                             if (dpsEntry.getDbmsEntryTaxes().isEmpty()) {
@@ -3049,7 +3049,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         // Obtención de configuraciones de contabilización: la predeterminada y las específicas de los impuestos del documento:
                         
-                        ArrayList<SFinAccountConfig> aAccountConfigsOperationsArray = new ArrayList();
+                        ArrayList<SFinAccountConfig> aAccountConfigsOperationsArray = new ArrayList<>();
                         
                         // configuración de contabilización predeterminada (sin impuesto):
                         
@@ -3234,8 +3234,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         // Create journal voucher entries:
                         
                         ArrayList<SFinAmount> aAmountsEntriesArray;
-                        ArrayList<SFinAccountConfig> aAccountConfigsPrepaymentsArray = new ArrayList();
-                        ArrayList<SFinAccountConfig> aAccountConfigsPrepaymentsToInvoiceArray = new ArrayList();
+                        ArrayList<SFinAccountConfig> aAccountConfigsPrepaymentsArray = new ArrayList<>();
+                        ArrayList<SFinAccountConfig> aAccountConfigsPrepaymentsToInvoiceArray = new ArrayList<>();
                         SFinAccountConfig oAccountConfigPrepayments = null;
                         SFinAccountConfig oAccountConfigPrepaymentsToInvoice = null;
                         SFinAccountConfig oAccountConfigItem = null;
@@ -5435,7 +5435,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return impuestosXml;
     }
       
-    private ArrayList<SCfdDataImpuesto> createCfdiNodeImpuestos33() {
+    private ArrayList<SCfdDataImpuesto> createCfdiNodeImpuestos33_40() {
         ArrayList<SCfdDataImpuesto> impuestos = new ArrayList<>();
         DCfdTaxes taxes = new DCfdTaxes();
         
@@ -5550,31 +5550,31 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     /*
-     * Implementation of SCfdXmlCfdi32 and SCfdXmlCfdi33:
+     * Implementation of SCfdXmlCfdi32, SCfdXmlCfdi33 and SCfdXmlCfdi40:
      */
 
     @Override
-    public int getCfdType() { // CFDI 3.2 & 3.3
+    public int getCfdType() { // CFDI 3.2 & 3.3 & 4.0
         return SDataConstantsSys.TRNS_TP_CFD_INV;
     }
 
     @Override
-    public String getComprobanteVersion() { // CFDI 3.3
-        return "" + DCfdConsts.CFDI_VER_33;
+    public String getComprobanteVersion() { // CFDI 3.3 & 4.0
+        return "" + DCfdConsts.CFDI_VER_40;
     }
-
+    
     @Override
-    public String getComprobanteSerie() { // CFDI 3.2 & 3.3
+    public String getComprobanteSerie() { // CFDI 3.2 & 3.3 & 4.0
         return msNumberSeries;
     }
 
     @Override
-    public String getComprobanteFolio() { // CFDI 3.2 & 3.3
+    public String getComprobanteFolio() { // CFDI 3.2 & 3.3 & 4.0
         return msNumber;
     }
 
     @Override
-    public Date getComprobanteFecha() { // CFDI 3.2 & 3.3
+    public Date getComprobanteFecha() { // CFDI 3.2 & 3.3 & 4.0
         int[] creation = SLibTimeUtilities.digestDate(mtDate);
         int[] modification = SLibTimeUtilities.digestDate(mtUserEditTs);
         java.util.Date date = null;
@@ -5619,7 +5619,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteFormaPago() { // CFDI 3.3
+    public String getComprobanteFormaPago() { // CFDI 3.3 & 4.0
         return moDbmsDataDpsCfd.getPaymentWay();
     }
 
@@ -5629,17 +5629,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteCondicionesPago() { // CFDI 3.3
+    public String getComprobanteCondicionesPago() { // CFDI 3.3 & 4.0
         return moDbmsDataDpsCfd.getPaymentConditions();
     }
 
     @Override
-    public double getComprobanteSubtotal() { // CFDI 3.2 & 3.3
+    public double getComprobanteSubtotal() { // CFDI 3.2 & 3.3 & 4.0
         return mdSubtotalProvisionalCy_r;
     }
 
     @Override
-    public double getComprobanteDescuento() { // CFDI 3.2 & 3.3
+    public double getComprobanteDescuento() { // CFDI 3.2 & 3.3 & 4.0
         return mdDiscountDocCy_r;
     }
 
@@ -5649,17 +5649,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteMoneda() { // CFDI 3.2 & 3.3
+    public String getComprobanteMoneda() { // CFDI 3.2 & 3.3 & 4.0
         return msDbmsCurrencyKey;
     }
 
     @Override
-    public double getComprobanteTipoCambio() { // CFDI 3.2 & 3.3
+    public double getComprobanteTipoCambio() { // CFDI 3.2 & 3.3 & 4.0
         return mdExchangeRate;
     }
 
     @Override
-    public double getComprobanteTotal() { // CFDI 3.2 & 3.3
+    public double getComprobanteTotal() { // CFDI 3.2 & 3.3 & 4.0
         return mdTotalCy_r;
     }
 
@@ -5669,8 +5669,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteTipoComprobante() { // CFDI 3.3
-        return isDocument() ? DCfdi33Catalogs.CFD_TP_I : DCfdi33Catalogs.CFD_TP_E;
+    public String getComprobanteTipoComprobante() { // CFDI 3.3 & 4.0
+        return isDocument() ? DCfdi40Catalogs.CFD_TP_I : DCfdi40Catalogs.CFD_TP_E;
+    }
+    
+    @Override
+    public String getComprobanteExportacion() { // CFDI 4.0
+        return moDbmsDataDpsCfd.getExportation();
     }
 
     @Override
@@ -5679,7 +5684,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteMetodoPago() { // CFDI 3.3
+    public String getComprobanteMetodoPago() { // CFDI 3.3 & 4.0
         return moDbmsDataDpsCfd.getPaymentMethod();
     }
 
@@ -5689,32 +5694,51 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteLugarExpedicion() { // CFDI 3.3
+    public String getComprobanteLugarExpedicion() { // CFDI 3.3 & 4.0
         return moDbmsDataDpsCfd.getZipIssue();
     }
 
     @Override
-    public String getComprobanteConfirmacion() { // CFDI 3.3
+    public String getComprobanteConfirmacion() { // CFDI 3.3 & 4.0
         return moDbmsDataDpsCfd.getConfirmation();
-    }
-
-    @Override
-    public String getCfdiRelacionadosTipoRelacion() { // CFDI 3.3
-        return moDbmsDataDpsCfd.getCfdiRelacionadosTipoRelacion();
     }
     
     @Override
-    public ArrayList<String> getCfdiRelacionados() { // CFDI 3.3
+    public String getCfdiRelacionados33TipoRelacion() { // CFDI 3.3 
+        return moDbmsDataDpsCfd.getRelationType();
+    }
+    
+    @Override
+    public ArrayList<String> getCfdiRelacionados33() { // CFDI 3.3 
         return moDbmsDataDpsCfd.getCfdiRelacionados();
     }
 
     @Override
-    public int getEmisorId() { // CFDI 3.2 & 3.3
+    public STrnCfdRelated getCfdiRelacionados() { // CFDI 4.0
+        return moDbmsDataDpsCfd.getRelatedDocument();
+    }
+    
+    @Override
+    public DElement getElementInformacionGlobal() { // CFDI 4.0
+        DElementInformacionGlobal global = null;
+        if (!moDbmsDataDpsCfd.getGlobalPeriodocity().isEmpty() && 
+                !moDbmsDataDpsCfd.getGlobalMonths().isEmpty() &&
+                moDbmsDataDpsCfd.getGlobalYear() != 0) {
+            global = new DElementInformacionGlobal();
+            global.getAttPeriodicidad().setString(moDbmsDataDpsCfd.getGlobalPeriodocity());
+            global.getAttMeses().setString(moDbmsDataDpsCfd.getGlobalMonths());
+            global.getAttAño().setInteger(moDbmsDataDpsCfd.getGlobalYear());
+        }
+        return global;
+    }
+    
+    @Override
+    public int getEmisorId() { // CFDI 3.2 & 3.3 & 4.0
         return moAuxCfdParams.getEmisor().getPkBizPartnerId();
     }
 
     @Override
-    public int getEmisorSucursalId() { // CFDI 3.2 & 3.3
+    public int getEmisorSucursalId() { // CFDI 3.2 & 3.3 & 4.0
         return mnFkCompanyBranchId;
     }
 
@@ -5735,54 +5759,59 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public String getEmisorRegimenFiscal() { // CFDI 3.3
-        return moDbmsDataDpsCfd.getTaxRegime();
+    public String getEmisorRegimenFiscal() { // CFDI 3.3 & 4.0
+        return moDbmsDataDpsCfd.getTaxRegimeIssuing();
     }
 
     @Override
-    public int getReceptorId() { // CFDI 3.2 & 3.3
+    public int getReceptorId() { // CFDI 3.2 & 3.3 & 4.0
         return mnFkBizPartnerId_r;
     }
 
     @Override
-    public int getReceptorSucursalId() { // CFDI 3.2 & 3.3
+    public int getReceptorSucursalId() { // CFDI 3.2 & 3.3 & 4.0
         return mnFkBizPartnerBranchId;
     }
     
     @Override
-    public String getReceptorResidenciaFiscal() { // CFDI 3.3
+    public String getReceptorResidenciaFiscal() { // CFDI 3.3 & 4.0
         // Implement ASAP!(Sergio Flores, 2017-08-10)
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public String getReceptorNumRegIdTrib() { // CFDI 3.3
+    public String getReceptorNumRegIdTrib() { // CFDI 3.3 & 4.0
         // Implement ASAP! (Sergio Flores, 2017-08-10)
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
-    public String getReceptorUsoCFDI() { // CFDI 3.3
+    public String getReceptorUsoCFDI() { // CFDI 3.3 & 4.0
         return moDbmsDataDpsCfd.getCfdiUsage();
+    }
+    
+    @Override
+    public String getReceptorRegimenFiscal() { // CFDI 4.0
+        return moDbmsDataDpsCfd.getTaxRegimeReceptor();
     }
 
     @Override
-    public int getDestinatarioId() { // CFDI 3.2 & 3.3
+    public int getDestinatarioId() { // CFDI 3.2 & 3.3 & 4.0
         return mnFkBizPartnerAddresseeId_n != 0 ? mnFkBizPartnerAddresseeId_n : mnFkAddresseeBizPartnerId_nr;
     }
 
     @Override
-    public int getDestinatarioSucursalId() { // CFDI 3.2 & 3.3
+    public int getDestinatarioSucursalId() { // CFDI 3.2 & 3.3 & 4.0
         return mnFkAddresseeBizPartnerBranchId_n;
     }
 
     @Override
-    public int getDestinatarioDomicilioId() { // CFDI 3.2 & 3.3
+    public int getDestinatarioDomicilioId() { // CFDI 3.2 & 3.3 & 4.0
         return mnFkAddresseeBizPartnerBranchAddressId_n;
     }
     
     @Override
-    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception { // CFDI 3.2 & 3.3
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception { // CFDI 3.2 & 3.3 & 4.0
         ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
         
         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
@@ -5799,7 +5828,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_INV);
                 
-                if (dpsEntry.getDbmsComplement() == null || dpsEntry.getDbmsComplement().getConcept().isEmpty()) {
+                if (dpsEntry.getDbmsDpsCfdEntry() == null || dpsEntry.getDbmsDpsCfdEntry().getConcept().isEmpty()) {
                     //use original data of current document entry:
                     
                     String descripcion = dpsEntry.getConcept();
@@ -5819,15 +5848,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 else {
                     //use custom (user defined) data of current document entry:
                     
-                    concepto.setClaveProdServ(dpsEntry.getDbmsComplement().getCfdProdServ());
-                    concepto.setNoIdentificacion(dpsEntry.getDbmsComplement().getConceptKey());
-                    concepto.setClaveUnidad(dpsEntry.getDbmsComplement().getCfdUnit());
+                    concepto.setClaveProdServ(dpsEntry.getDbmsDpsCfdEntry().getCfdProdServ());
+                    concepto.setNoIdentificacion(dpsEntry.getDbmsDpsCfdEntry().getConceptKey());
+                    concepto.setClaveUnidad(dpsEntry.getDbmsDpsCfdEntry().getCfdUnit());
                     concepto.setUnidad("");
-                    concepto.setDescripcion(dpsEntry.getDbmsComplement().getConcept());
+                    concepto.setDescripcion(dpsEntry.getDbmsDpsCfdEntry().getConcept());
                 }
                 
-                if (dpsEntry.getDbmsComplement() != null && dpsEntry.getDbmsComplement().getPredial().isEmpty()) {
-                    concepto.setPredial(dpsEntry.getDbmsComplement().getPredial());
+                if (dpsEntry.getDbmsDpsCfdEntry() != null && dpsEntry.getDbmsDpsCfdEntry().getPredial().isEmpty()) {
+                    concepto.setPredial(dpsEntry.getDbmsDpsCfdEntry().getPredial());
                 }
                 
                 double price;
@@ -5842,6 +5871,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 concepto.setValorUnitario(price);
                 concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
                 concepto.setDescuento(dpsEntry.getDiscountDocCy());
+                concepto.setObjetoImpuesto(dpsEntry.getDbmsDpsCfdEntry().getTaxObject());
                 
                 concepto.computeCfdImpuestosConceptos(dpsEntry);
                 
@@ -5853,56 +5883,60 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion) { // CFDI 3.2 & 3.3
+    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion) { // CFDI 3.2 & 3.3 & 4.0
         ArrayList<SCfdDataImpuesto> cfdDataImpuestos = null;
         
         if (cfdiVersion == DCfdConsts.CFDI_VER_32) {
             cfdDataImpuestos = createCfdiNodeImpuestos32();
         }
-        else if (cfdiVersion == DCfdConsts.CFDI_VER_33) {
-            cfdDataImpuestos = createCfdiNodeImpuestos33();
+        else if (cfdiVersion == DCfdConsts.CFDI_VER_33 || cfdiVersion == DCfdConsts.CFDI_VER_40) {
+            cfdDataImpuestos = createCfdiNodeImpuestos33_40();
         }
         
         return cfdDataImpuestos;
     }
 
     @Override
-    public DElement getElementComplemento() throws Exception { // CFDI 3.2 & 3.3
+    public DElement getElementComplemento() throws Exception { // CFDI 3.2 & 3.3 & 4.0
         DElementParent complemento = null;
         
         if (requireComplementoComercioExterior()) {
-            complemento = new cfd.ver33.DElementComplemento();
+            complemento = new cfd.ver40.DElementComplemento();
             complemento.getElements().add(createCfdiNodeComplementoComercioExterior11());
         }
         
         if (requireComplementoLeyendasFiscales()) {
             if (complemento == null) {
-                complemento = new cfd.ver33.DElementComplemento();
+                complemento = new cfd.ver40.DElementComplemento();
             }
             complemento.getElements().add(createCfdiNodeComplementoLeyendasFiscales10());
         }
         
         if (moDbmsDataCfdBol != null) {
-            if (complemento == null) {
-                complemento = new cfd.ver33.DElementComplemento();
-            }
-            cfd.ver33.DElementComprobante comprobanteCartaPorte = DCfdUtils.getCfdi33(moDbmsDataCfdBol.getDocXml());
-            cfd.ver3.ccp20.DElementCartaPorte ccp = new DElementCartaPorte();
+            cfd.ver40.DElementComprobante comprobanteCartaPorte = DCfdUtils.getCfdi40(moDbmsDataCfdBol.getDocXml());
+            cfd.ver3.ccp20.DElementCartaPorte ccp = null;
             if (comprobanteCartaPorte.getEltOpcComplemento() != null) {
                 for (DElement element : comprobanteCartaPorte.getEltOpcComplemento().getElements()) {
                     if (element.getName().compareTo("cartaporte20:CartaPorte") == 0) {
                         ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        break;
                     }
                 }
             }
-            complemento.getElements().add((DElement) ccp);
+            
+            if (ccp != null) {
+                if (complemento == null) {
+                    complemento = new cfd.ver40.DElementComplemento();
+                }
+                complemento.getElements().add((DElement) ccp);
+            }
         }
         
         return complemento;
     }
     
     @Override
-    public DElement getElementAddenda() { // CFDI 3.2 & 3.3
+    public DElement getElementAddenda() { // CFDI 3.2 & 3.3 & 4.0
         DElement addenda = null;
 
         // Create custom addendas when needed:

@@ -15,7 +15,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SCfdDataConcepto {
     
@@ -33,6 +33,7 @@ public class SCfdDataConcepto {
     protected double mdValorUnitario;
     protected double mdImporte;
     protected double mdDescuento;
+    protected String msObjetoImpuesto;
     protected ArrayList<SCfdDataImpuesto> maImpuestosXml;
     protected String msPredial;
     
@@ -53,6 +54,7 @@ public class SCfdDataConcepto {
         mdValorUnitario = 0;
         mdImporte = 0;
         mdDescuento = 0;
+        msObjetoImpuesto = "";
         maImpuestosXml = new ArrayList<>();
         msPredial = "";
     }
@@ -113,6 +115,7 @@ public class SCfdDataConcepto {
     public void setValorUnitario(double d) { mdValorUnitario = d; }
     public void setImporte(double d) { mdImporte = d; }
     public void setDescuento(double d) { mdDescuento = d; }
+    public void setObjetoImpuesto(String s) { msObjetoImpuesto = s; }
     public void setPredial(String s) { msPredial = s; }
     
     public boolean hasIntCommerceComplement() { return mbHasIntCommerceComplement; }
@@ -126,6 +129,7 @@ public class SCfdDataConcepto {
     public double getValorUnitario() { return mdValorUnitario; }
     public double getImporte() { return mdImporte; }
     public double getDescuento() { return mdDescuento; }
+    public String getObjetoImpuesto() { return msObjetoImpuesto; }
     public String getPredial() { return msPredial; }
     
     public ArrayList<SCfdDataImpuesto> getCfdDataImpuestos() { return maImpuestosXml; }
@@ -276,6 +280,101 @@ public class SCfdDataConcepto {
             cfd.ver33.DElementConceptoCuentaPredial cuentaPredial = new cfd.ver33.DElementConceptoCuentaPredial();
             cuentaPredial.getAttNumero().setString(msPredial);
             concepto.setEltOpcConceptoCuentaPredial(cuentaPredial);
+        }
+        
+        return concepto;
+    }
+    
+    /**
+     * Create node for concept version 4.0.
+     * @param isGlobal
+     * @return XML node of class cfd.ver40.DElementConcepto.
+     * @throws Exception 
+     */
+    public cfd.ver40.DElementConcepto createRootElementConcept40(boolean isGlobal) throws Exception {
+        cfd.ver40.DElementConcepto concepto = new cfd.ver40.DElementConcepto();
+        
+        concepto.getAttClaveProdServ().setString(msClaveProdServ);
+        concepto.getAttNoIdentificacion().setString(msNoIdentificacion);
+        concepto.getAttCantidad().setDouble(mdCantidad);
+        concepto.getAttClaveUnidad().setString(msClaveUnidad);
+        concepto.getAttDescripcion().setString(msDescripcion);
+        concepto.getAttValorUnitario().setDouble(mdValorUnitario);
+        concepto.getAttImporte().setDouble(mdImporte);
+        concepto.getAttDescuento().setDouble(mdDescuento);
+        concepto.getAttObjetoImp().setString(msObjetoImpuesto);
+        if (isGlobal) {
+            concepto.getAttCantidad().setDecimals(0);
+        }
+        else {
+            concepto.getAttUnidad().setString(msUnidad);
+        }
+        
+        if (mbHasIntCommerceComplement) {
+            String valorOriginal;
+            String valorIntCommerce;
+            
+            valorOriginal = concepto.getAttValorUnitario().getAttributeForOriginalString();
+            valorOriginal = valorOriginal.substring(0, valorOriginal.length() - 1);
+            valorIntCommerce = removeTrailingZeros(valorOriginal, INT_COMMERCE_DECS);
+            
+            if (valorIntCommerce.length() < valorOriginal.length()) {
+                concepto.getAttValorUnitario().setDecimals(concepto.getAttValorUnitario().getDecimals() - (valorOriginal.length() - valorIntCommerce.length()));
+            }
+        }
+        else {
+            switch (mnCfdType) {
+                case SDataConstantsSys.TRNS_TP_CFD_INV:
+                    break;
+                case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                    concepto.getAttCantidad().setDecimals(0);
+                    concepto.getAttValorUnitario().setDecimals(0);
+                    concepto.getAttImporte().setDecimals(0);
+                    break;
+                case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                    concepto.getAttCantidad().setDecimals(0);
+                    break;
+                default:
+            }
+        }
+        
+        // Taxes:
+            
+        cfd.ver40.DElementConceptoImpuestosRetenciones impuestosRetenciones = new cfd.ver40.DElementConceptoImpuestosRetenciones();
+        cfd.ver40.DElementConceptoImpuestosTraslados impuestosTrasladados = new cfd.ver40.DElementConceptoImpuestosTraslados();
+        
+        for (SCfdDataImpuesto impuesto : maImpuestosXml) {
+            switch (impuesto.getImpuestoTipo()) {
+                case SModSysConsts.FINS_TP_TAX_RETAINED:
+                    impuestosRetenciones.getEltImpuestoRetenciones().add((cfd.ver40.DElementConceptoImpuestoRetencion) impuesto.createRootElementConceptoImpuesto40());
+                    break;
+                case SModSysConsts.FINS_TP_TAX_CHARGED:
+                    impuestosTrasladados.getEltImpuestoTrasladados().add((cfd.ver40.DElementConceptoImpuestoTraslado) impuesto.createRootElementConceptoImpuesto40());
+                    break;
+                default:
+            }
+        }
+        
+        if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty() || !impuestosRetenciones.getEltImpuestoRetenciones().isEmpty()) {
+            concepto.setEltOpcConceptoImpuestos(new cfd.ver40.DElementConceptoImpuestos());
+        }
+        
+        if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
+            concepto.getEltOpcConceptoImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
+        }
+        
+        if (!impuestosRetenciones.getEltImpuestoRetenciones().isEmpty()) {
+            concepto.getEltOpcConceptoImpuestos().setEltOpcImpuestosRetenciones(impuestosRetenciones);
+        }
+        
+        // Predial account:
+        
+        if (!msPredial.isEmpty()) {
+            cfd.ver40.DElementConceptoCuentaPredial cuentaPredial = new cfd.ver40.DElementConceptoCuentaPredial();
+            cuentaPredial.getAttNumero().setString(msPredial);
+            ArrayList<cfd.ver40.DElementConceptoCuentaPredial> arrCuentaPredial = new ArrayList<>();
+            arrCuentaPredial.add(cuentaPredial);
+            concepto.setEltOpcConceptoCuentaPredial(arrCuentaPredial);
         }
         
         return concepto;

@@ -19,7 +19,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class SCfdPaymentUtils {
     
@@ -62,6 +62,7 @@ public abstract class SCfdPaymentUtils {
                     throw new Exception("El tipo del CFDI '" + cfd.getCfdNumber() + "' es obsoleto.");
 
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
                     try {
                         if (((SClientInterface) client).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
                             if (SCfdUtils.signAndSendCfdi(client, cfd, 0, true, true)) {

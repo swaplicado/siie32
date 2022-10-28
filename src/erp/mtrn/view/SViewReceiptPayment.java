@@ -44,7 +44,7 @@ import sa.lib.srv.SLock;
 
 /**
  * User view for management of database registries of CFDI of Payments.
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SViewReceiptPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -176,7 +176,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.can_st", "Estatus cancelación", 35);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Deudor", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC Deudor", 100);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "p.pay_loc_r", "Total loc $", 100);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "p.tot_pay_loc_r", "Total loc $", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.uuid", "UUID CFDI", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.bp", "Banco factoraje", 150);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.fiscal_id", "RFC banco factoraje", 100);
@@ -656,7 +656,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
             SLibUtils.printException(this, e);
         }
          
-        msSql = "SELECT c.id_cfd, p.dt, CONCAT(p.ser, IF(length(p.ser) = 0, '', '-'), p.num) AS _num, p.pay_loc_r, p.b_del, " +
+        msSql = "SELECT c.id_cfd, p.dt, CONCAT(p.ser, IF(length(p.ser) = 0, '', '-'), p.num) AS _num, p.tot_pay_loc_r, p.b_del, " +
                 "c.uuid, c.can_st, cob.code AS _cob_code, bp.bp, bp.fiscal_id, fb.bp, fb.fiscal_id, " +
                 "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS _ico, " +
                 "IF(c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */

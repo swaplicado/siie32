@@ -14,7 +14,6 @@ import erp.lib.data.SDataDatabase;
 import erp.mcfg.data.SDataCompany;
 import erp.mcfg.data.SDataParamsErp;
 import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -185,14 +184,14 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
         return read;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( { "unchecked", "deprecation" } )
     private boolean launchRmiRegistry() {
         boolean error = false;
 
         try {
             System.out.println("RMI Registry launching attempt...");
             rmiRegistry = java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(moParamsApp.getErpRmiRegistryPort()));
-            System.setSecurityManager(new RMISecurityManager());
+            System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
         catch (Exception e) {
             error = true;

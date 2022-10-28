@@ -137,6 +137,7 @@ public class SShareDB {
      * @throws ClassNotFoundException
      * @throws SConfigException
      */
+    @SuppressWarnings("unchecked")
     public ArrayList<SDepartment> getDepartments(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");

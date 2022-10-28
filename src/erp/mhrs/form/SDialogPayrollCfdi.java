@@ -46,7 +46,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListSelectionListener {
 
@@ -683,7 +683,7 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
                 if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
                     paymentType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
                 }
-                else if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                else if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33 || xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_40) {
                     paymentType = SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER;
                 }
 

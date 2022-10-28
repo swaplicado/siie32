@@ -77,6 +77,7 @@ public abstract class SRedisConnectionUtils {
      * @param userId id del usuario
      * @param userName nombre de usuario
      */
+    @SuppressWarnings("deprecation")
     public static void setSessionsUsers(Jedis jedis, int companyId, int userId, String userName) {
         String session = SESSION + "+"
                 + jedis.clientId() + "+"

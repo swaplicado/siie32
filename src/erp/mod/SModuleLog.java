@@ -107,6 +107,16 @@ public class SModuleLog extends SGuiModule {
         SDbRegistry registry = null;
 
         switch (type) {
+            case SModConsts.LOGS_TP_BOL_PERSON:
+                registry = new SDbRegistrySysFly(type) {
+                    @Override
+                    public void initRegistry() { }
+                    @Override
+                    public String getSqlTable() { return SModConsts.TablesMap.get(type); }
+                    @Override
+                    public String getSqlWhere(int[] key) { return "WHERE id_tp_bol_person = " + key[0] + " "; }
+                };
+                break;
             case SModConsts.LOGS_INC:
                 registry = new SDbRegistrySysFly(type) {
                     @Override
@@ -239,7 +249,7 @@ public class SModuleLog extends SGuiModule {
                 sql = "SELECT id_tp_bol_person AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " 
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE b_del = 0 "
-                        + "ORDER BY name ";
+                        + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGU_TP_VEH:
                 settings = new SGuiCatalogueSettings("Tipo vehículo", 1);
@@ -298,7 +308,7 @@ public class SModuleLog extends SGuiModule {
                 switch (subtype) {
                     case SModSysConsts.LOGS_TP_BOL_PERSON_DRI: title = "Chofer"; break;
                     case SModSysConsts.LOGS_TP_BOL_PERSON_OWN: title = "Propietario"; break;
-                    case SModSysConsts.LOGS_TP_BOL_PERSON_LES: title = "Arrendatario"; break;
+                    case SModSysConsts.LOGS_TP_BOL_PERSON_LES: title = "Arrendador"; break;
                     case SModSysConsts.LOGS_TP_BOL_PERSON_NOT: title = "Notificado"; break;
                 }
                 settings = new SGuiCatalogueSettings(title, 1, 1);

@@ -33,8 +33,8 @@ public interface SCfdXmlCfdi33 {
     public String getComprobanteMetodoPago();       // MetodoPago
     public String getComprobanteLugarExpedicion();  // LugarExpedicion
     public String getComprobanteConfirmacion();     // Confirmacion
-    public String getCfdiRelacionadosTipoRelacion();
-    public ArrayList<String> getCfdiRelacionados();
+    public String getCfdiRelacionados33TipoRelacion();
+    public ArrayList<String> getCfdiRelacionados33();
     public int getEmisorId();
     public int getEmisorSucursalId();
     public String getEmisorRegimenFiscal();         // Emisor/RegimentFiscal

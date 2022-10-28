@@ -1895,6 +1895,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             break;
                         case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                         case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                        case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
                             try {
                                 if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
                                     if (SCfdUtils.signAndSendCfdi(miClient, dps.getDbmsDataCfd(), 0, true, true)) {

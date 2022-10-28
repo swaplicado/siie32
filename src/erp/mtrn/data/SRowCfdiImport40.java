@@ -21,9 +21,9 @@ import sa.lib.SLibUtils;
  *
  * @author Isabel Servín
  */
-public final class SRowCfdiImport extends erp.lib.table.STableRow {
+public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     
-    private final cfd.ver33.DElementConcepto moConcepto;
+    private final cfd.ver40.DElementConcepto moConcepto;
     private final SClientInterface miClient;
     private SDataItem moItem;
     private SDataItem moReferenceItem;
@@ -37,8 +37,8 @@ public final class SRowCfdiImport extends erp.lib.table.STableRow {
     private final int mnRowCount;
     private String msClaveUnidadSiie; 
     
-    private HashSet<cfd.ver33.DElementConceptoImpuestoTraslado> moTaxChargedMatched;
-    private HashSet<cfd.ver33.DElementConceptoImpuestoRetencion> moTaxRetainedMatched;
+    private HashSet<cfd.ver40.DElementConceptoImpuestoTraslado> moTaxChargedMatched;
+    private HashSet<cfd.ver40.DElementConceptoImpuestoRetencion> moTaxRetainedMatched;
     
     /**
      * 
@@ -46,7 +46,7 @@ public final class SRowCfdiImport extends erp.lib.table.STableRow {
      * @param concepto Concepto del CFDI.
      * @param row
      */
-    public SRowCfdiImport(SClientInterface client, cfd.ver33.DElementConcepto concepto, int row){
+    public SRowCfdiImport40(SClientInterface client, cfd.ver40.DElementConcepto concepto, int row){
         moConcepto = concepto;
         miClient = client;
         mnRowCount = row;
@@ -70,7 +70,7 @@ public final class SRowCfdiImport extends erp.lib.table.STableRow {
         }
     }
     
-    public cfd.ver33.DElementConcepto getConcepto() { return moConcepto; }
+    public cfd.ver40.DElementConcepto getConcepto() { return moConcepto; }
     public SDataItem getItem() { return moItem; }
     public SDataItem getReferenceItem() { return moReferenceItem; }
     public SDataUnit getUnit() { return moUnit; }
@@ -84,11 +84,11 @@ public final class SRowCfdiImport extends erp.lib.table.STableRow {
     public String getClaveUnidadSiie() { return msClaveUnidadSiie; }
     public String getClaveUnidadCfdi() { return moConcepto.getAttClaveUnidad().getString(); } 
     
-    public HashSet<cfd.ver33.DElementConceptoImpuestoRetencion> getTaxRetainedMatched(){ return moTaxRetainedMatched; }
-    public HashSet<cfd.ver33.DElementConceptoImpuestoTraslado> getTaxChargedMatched(){ return moTaxChargedMatched; }
+    public HashSet<cfd.ver40.DElementConceptoImpuestoRetencion> getTaxRetainedMatched(){ return moTaxRetainedMatched; }
+    public HashSet<cfd.ver40.DElementConceptoImpuestoTraslado> getTaxChargedMatched(){ return moTaxChargedMatched; }
     
-    public void addTaxChargedMatched(cfd.ver33.DElementConceptoImpuestoTraslado o){ moTaxChargedMatched.add(o); }
-    public void addTaxRetainedMatched(cfd.ver33.DElementConceptoImpuestoRetencion o){ moTaxRetainedMatched.add(o); }
+    public void addTaxChargedMatched(cfd.ver40.DElementConceptoImpuestoTraslado o){ moTaxChargedMatched.add(o); }
+    public void addTaxRetainedMatched(cfd.ver40.DElementConceptoImpuestoRetencion o){ moTaxRetainedMatched.add(o); }
     
     public double getEquivalentQuantity() {
         return moConcepto.getAttCantidad().getDouble() * mdConvFactor;

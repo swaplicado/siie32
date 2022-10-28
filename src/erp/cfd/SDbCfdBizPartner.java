@@ -17,7 +17,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SDbCfdBizPartner {
 
@@ -28,6 +28,7 @@ public class SDbCfdBizPartner {
     protected int mnBizPartnerBranchAddressId;
     protected int mnIssuingBizPartnerId;
     protected int mnIssuingBizPartnerBranchId;
+    protected String msZipCodeHq;
     protected boolean mbIsIssuer;
     protected boolean mbIsIssueForIntCommerce;
     
@@ -38,6 +39,7 @@ public class SDbCfdBizPartner {
         mnBizPartnerBranchId = 0;
         mnIssuingBizPartnerId = 0;
         mnIssuingBizPartnerBranchId = 0;
+        msZipCodeHq = "";
         mbIsIssuer = false;
         mbIsIssueForIntCommerce = false;
     }
@@ -99,9 +101,11 @@ public class SDbCfdBizPartner {
                     }
                     else if (!mbIsIssuer && bizPartnerBranch.getIsAddressPrintable()) {
                         bizPartnerBranchAddress = bizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial();
+                        msZipCodeHq = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getZipCode();
                     }
                     else {
                         bizPartnerBranchAddress = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial();
+                        msZipCodeHq = bizPartnerBranchAddress.getZipCode();
                     }
                     
                     if (bizPartnerBranchAddress == null) {
@@ -136,6 +140,7 @@ public class SDbCfdBizPartner {
                         cfdBizPartner.setBizPartnerStateCode(bizPartnerBranchAddress.getDbmsDataState().getStateCode());
                         cfdBizPartner.setBizPartnerStateName(bizPartnerBranchAddress.getState());
                         cfdBizPartner.setBizPartnerZipCode(bizPartnerBranchAddress.getZipCode());
+                        cfdBizPartner.setBizPartnerZipCodeHq(msZipCodeHq);
                         cfdBizPartner.setBizPartnerPoBox(bizPartnerBranchAddress.getPoBox());
                         cfdBizPartner.setBizPartnerCountryCode(bizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
                         cfdBizPartner.setBizPartnerCountryName(bizPartnerBranchAddress.getDbmsDataCountry().getCountry());

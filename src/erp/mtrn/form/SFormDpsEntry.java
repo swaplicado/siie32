@@ -5,6 +5,7 @@
 
 package erp.mtrn.form;
 
+import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -38,12 +39,12 @@ import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataDpsCfdEntry;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
 import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryCommissions;
 import erp.mtrn.data.SDataDpsEntryCommissionsRow;
-import erp.mtrn.data.SDataDpsEntryComplement;
 import erp.mtrn.data.SDataDpsEntryNotes;
 import erp.mtrn.data.SDataDpsEntryNotesRow;
 import erp.mtrn.data.SDataDpsEntryPrice;
@@ -76,7 +77,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Claudio Peña
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Claudio Peña, Isabel Servín
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -6083,13 +6084,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(moDpsEntry.getFkCostCenterId_n().isEmpty() ? moPanelFkCostCenterId_n.getEmptyAccountId() : moDpsEntry.getFkCostCenterId_n());
         moPanelFkCostCenterId_n.refreshPanel();
         
-        if (moDpsEntry.getDbmsComplement() != null) {
-            moFieldComplConceptKey.setFieldValue(moDpsEntry.getDbmsComplement().getConceptKey());
-            moFieldComplConcept.setFieldValue(moDpsEntry.getDbmsComplement().getConcept());
-            moFieldComplCfdProdServ.setFieldValue(moDpsEntry.getDbmsComplement().getCfdProdServ());
-            moFieldComplCfdUnit.setFieldValue(moDpsEntry.getDbmsComplement().getCfdUnit());
-            
-            moFieldComplPredial.setFieldValue(moDpsEntry.getDbmsComplement().getPredial());
+        if (moDpsEntry.getDbmsDpsCfdEntry() != null) {
+            moFieldComplConceptKey.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getConceptKey());
+            moFieldComplConcept.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getConcept());
+            moFieldComplCfdProdServ.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getCfdProdServ());
+            moFieldComplCfdUnit.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getCfdUnit());
+            moFieldComplPredial.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getPredial());
         }
 
         renderDpsEntryValue();
@@ -6218,26 +6218,23 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setDbmsAddElektraPartPriceUnitary(moFieldAddElektraPartPriceUnitary.getDouble());
             moDpsEntry.setDbmsAddJsonData(composeAddendaJsonData());
         }
+               
+        SDataDpsCfdEntry cfdEntry = new SDataDpsCfdEntry();
+
+        if (!moFieldComplConcept.getString().isEmpty()) {
+            cfdEntry.setConceptKey(moFieldComplConceptKey.getString());
+            cfdEntry.setConcept(moFieldComplConcept.getString());
+            cfdEntry.setCfdProdServ(moFieldComplCfdProdServ.getString());
+            cfdEntry.setCfdUnit(moFieldComplCfdUnit.getString());
+        }
+
+        if (!moFieldComplPredial.getString().isEmpty()) {
+            cfdEntry.setPredial(moFieldComplPredial.getString());
+        }
         
-        if (moFieldComplConcept.getString().isEmpty() && moFieldComplPredial.getString().isEmpty()) {
-            moDpsEntry.setDbmsComplement(null);
-        }
-        else {
-            SDataDpsEntryComplement complement = new SDataDpsEntryComplement();
-            
-            if (!moFieldComplConcept.getString().isEmpty()) {
-                complement.setConceptKey(moFieldComplConceptKey.getString());
-                complement.setConcept(moFieldComplConcept.getString());
-                complement.setCfdProdServ(moFieldComplCfdProdServ.getString());
-                complement.setCfdUnit(moFieldComplCfdUnit.getString());
-            }
-            
-            if (!moFieldComplPredial.getString().isEmpty()) {
-                complement.setPredial(moFieldComplPredial.getString());
-            }
-            
-            moDpsEntry.setDbmsComplement(complement);
-        }
+        cfdEntry.setTaxObject(moPaneTaxes.getTableModel().getRowCount() > 0 ? DCfdi40Catalogs.ClaveObjetoImpSí : DCfdi40Catalogs.ClaveObjetoImpNo);
+
+        moDpsEntry.setDbmsDpsCfdEntry(cfdEntry);
         
         moDpsEntry.setFlagMinorChangesEdited(mbPostEmissionEditionDone);
         

@@ -402,7 +402,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
      * @return True if CFD is an own CFD and a CFDI.
      */
     public boolean isCfdi() {
-        return isOwnCfd() && (mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_33);
+        return isOwnCfd() && (mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_33 || mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_40);
     }
 
     /**

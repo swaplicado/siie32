@@ -377,7 +377,6 @@ public abstract class SModConsts {
     public static final int TRN_DPS_ETY_NTS = 2023019;
     public static final int TRN_DPS_ETY_PRC = 2023015;
     public static final int TRN_DPS_ETY_TAX = 2023020;
-    public static final int TRN_DPS_ETY_COMPL = 2023064;
     public static final int TRN_DPS_ETY_COMMS = 2023021;
     public static final int TRN_DPS_RISS = 2023022;
     public static final int TRN_DPS_REPL = 2023023;
@@ -422,7 +421,9 @@ public abstract class SModConsts {
     public static final int TRN_CFD_FIN_REC = 2023058;
     public static final int TRN_PAY = 2023401;
     public static final int TRN_PAY_PAY = 2023402;
-    public static final int TRN_PAY_PAY_DOC = 2023403;
+    public static final int TRN_PAY_PAY_TAX = 2023403;
+    public static final int TRN_PAY_PAY_DOC = 2023404;
+    public static final int TRN_PAY_PAY_DOC_TAX = 2023405;
     public static final int TRN_PAC = 2023055;
     public static final int TRN_TP_CFD_PAC = 2023056;
     public static final int TRN_SIGN = 2023057;
@@ -534,7 +535,7 @@ public abstract class SModConsts {
     public static final int LOGS_INC = 2041007;
 
     public static final int LOGU_TP_VEH = 2042001;
-    public static final int LOGU_BPB_ADD_NEI = 2043021;
+    public static final int LOGU_BPB_ADD_NEI = 2042005;
     public static final int LOGU_SPOT = 2042002;
     public static final int LOGU_SPOT_COB = 2042003;
     public static final int LOGU_SPOT_COB_ENT = 2042004;
@@ -552,9 +553,10 @@ public abstract class SModConsts {
     public static final int LOG_SHIP_DEST_ETY = 2043006;
     public static final int LOG_BOL = 2043016;
     public static final int LOG_BOL_TRANSP_MODE = 2043017;
-    public static final int LOG_BOL_LOCATION = 2043018;
-    public static final int LOG_BOL_MERCH = 2043019;
-    public static final int LOG_BOL_MERCH_QTY = 2043020;
+    public static final int LOG_BOL_TRANSP_MODE_EXTRA = 2043018;
+    public static final int LOG_BOL_LOCATION = 2043019;
+    public static final int LOG_BOL_MERCH = 2043020;
+    public static final int LOG_BOL_MERCH_QTY = 2043021;
 
     public static final int LOGX_TP_VEH = 2044001;
     public static final int LOGX_RATE = 2044002;
@@ -1056,7 +1058,6 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_ETY_NTS, "trn_dps_ety_nts");
         TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
-        TablesMap.put(TRN_DPS_ETY_COMPL, "trn_dps_ety_compl");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
@@ -1101,7 +1102,9 @@ public abstract class SModConsts {
         TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
         TablesMap.put(TRN_PAY, "trn_pay");
         TablesMap.put(TRN_PAY_PAY, "trn_pay_pay");
+        TablesMap.put(TRN_PAY_PAY_TAX, "trn_pay_pay_tax");
         TablesMap.put(TRN_PAY_PAY_DOC, "trn_pay_pay_doc");
+        TablesMap.put(TRN_PAY_PAY_DOC_TAX, "trn_pay_pay_doc_tax");
         TablesMap.put(TRN_PAC, "trn_pac");
         TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
         TablesMap.put(TRN_SIGN, "trn_sign");
@@ -1191,6 +1194,7 @@ public abstract class SModConsts {
         TablesMap.put(LOG_SHIP_DEST_ETY, "log_ship_dest_ety");
         TablesMap.put(LOG_BOL, "log_bol");
         TablesMap.put(LOG_BOL_TRANSP_MODE, "log_bol_transp_mode");
+        TablesMap.put(LOG_BOL_TRANSP_MODE_EXTRA, "log_bol_transp_mode_extra");
         TablesMap.put(LOG_BOL_LOCATION, "log_bol_location");
         TablesMap.put(LOG_BOL_MERCH, "log_bol_merch");
         TablesMap.put(LOG_BOL_MERCH_QTY, "log_bol_merch_qty");
