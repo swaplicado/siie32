@@ -319,7 +319,6 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet = null;
-        SDbAbsenceType absenceType = null;
 
         initRegistry();
         initQueryMembers();
@@ -357,9 +356,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
-            // Read Absence type:
+            // Read absence type:
             
-            absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
+            SDbAbsenceType absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
             msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
             msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
             
@@ -448,6 +447,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         }
 
         session.getStatement().execute(msSql);
+        
+        // Read absence type:
+            
         SDbAbsenceType absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
         msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
         msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
