@@ -189,4 +189,34 @@ public class SUtilsJSON {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Revisar si se pueden meter las incidencias y de poderse insertarlas
+     * 
+     * @param sJsonInc
+     */
+    
+    public static String insertData(String sJsonInc) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+            ObjectMapper mapper = new ObjectMapper();
+            boolean setinIncidents = false;
+            mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
+            SShareDB sDb = new SShareDB();
+            
+            // revisar si hay incidencias para esas fechas
+            boolean isAvailable = sDb.cheakIncidents(sJsonInc);
+            
+            if (isAvailable == false){
+                return "hay una incidencia para esos días";
+            }else{
+                setinIncidents = sDb.setinIncidents(sJsonInc);
+            }
+            
+            
+            SRootJSON objResponse = new SRootJSON();
+            
+            // Java objects to JSON string - pretty-print
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+    }
 }

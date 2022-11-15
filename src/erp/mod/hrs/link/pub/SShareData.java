@@ -30,6 +30,7 @@ import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+import erp.mod.hrs.link.db.SIncidentResponse;
 
 /**
  *
@@ -206,5 +207,15 @@ public class SShareData {
         }
         
         return null;
+    }
+    
+    /**
+     * 
+     * @param startDate
+     * @return 
+     */
+    public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        return SUtilsJSON.insertData(sJsonInc);
     }
 }

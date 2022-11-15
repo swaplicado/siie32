@@ -29,6 +29,9 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sun.misc.BASE64Encoder;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -1118,5 +1121,100 @@ public class SShareDB {
         
         
         return lEmp;
+    }
+    
+    public boolean cheakIncidents (String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
+        SMySqlClass mdb = new SMySqlClass();
+        String empresas[]= new String[4];
+        ResultSet resultSet;
+        empresas[0] = "erp_aeth";
+        empresas[1] = "erp_amesa";
+        empresas[2] = "erp_otsa";
+        empresas[3] = "erp_th";
+        
+        
+        try {
+            boolean isAvailable = false;
+            String incidents = "";
+            JSONParser parser = new JSONParser();
+            JSONObject root = (JSONObject) parser.parse(sJsonInc);
+            
+            String company = empresas[(int) root.get("company_id")];
+            
+            Connection conn = mdb.connect("", "", company, "", "");
+
+            if (conn == null) {
+                return false;
+            }
+            
+            incidents = "SELECT * "
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                                    + "WHERE id_emp = " + root.get("employee_id") + " AND "
+                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
+                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+                                    + "dt_sta BETWEEN '" + root.get("date_ini") + "' AND '" + root.get("date_fin") + "' OR "
+                                    + "dt_end BETWEEN '" + root.get("date_") + "' AND '" + root.get("date_fin") + "' AND "
+                                    + "NOT b_del;";
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(incidents);
+            if (resultSet.next()) {
+                isAvailable = false;
+            }else{
+                isAvailable = true;
+            }
+            
+            return isAvailable;
+        } catch (ParseException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+    
+    public boolean  setinIncidents(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
+        SMySqlClass mdb = new SMySqlClass();
+        String empresas[]= new String[4];
+        ResultSet resultSet;
+        empresas[0] = "erp_aeth";
+        empresas[1] = "erp_amesa";
+        empresas[2] = "erp_otsa";
+        empresas[3] = "erp_th";
+         try {
+            boolean isAvailable = false;
+            String incidents = "";
+            JSONParser parser = new JSONParser();
+            JSONObject root = (JSONObject) parser.parse(sJsonInc);
+            
+            String company = empresas[(int) root.get("company_id")];
+            
+            Connection conn = mdb.connect("", "", company, "", "");
+
+            if (conn == null) {
+                return false;
+            }
+            
+            incidents = "SELECT * "
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                                    + "WHERE id_emp = " + root.get("employee_id") + " AND "
+                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
+                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+                                    + "dt_sta BETWEEN '" + root.get("date_ini") + "' AND '" + root.get("date_fin") + "' OR "
+                                    + "dt_end BETWEEN '" + root.get("date_") + "' AND '" + root.get("date_fin") + "' AND "
+                                    + "NOT b_del;";
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(incidents);
+            if (resultSet.next()) {
+                isAvailable = false;
+            }else{
+                isAvailable = true;
+            }
+            
+            return isAvailable;
+        } catch (ParseException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        
     }
 }
