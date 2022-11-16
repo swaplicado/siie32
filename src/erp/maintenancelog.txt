@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 208.0/ 2022-10-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
+2) Implementación de nombre fiscal y régimen de capital en asociados de negocios aplicable a clientes, personas morales.
+3) Refactorización de formas de captura de asociados de negocios para apellidos y nombres de personas físicas.
+4) Implementación de atributo para ID de solicitud externa de incidencias de empleados.
+5) Corrección a la validación de cancelación de facturas de anticipos.
+6) Asignación de permiso 'administrador' a la regeneración de archivos de CFDI en el módulo Configuración.
+
+================================================================================
 SIIE 3.2 208.0/ 2022-10-18
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
