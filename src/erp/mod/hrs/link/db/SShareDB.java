@@ -1393,11 +1393,31 @@ public class SShareDB {
                 SDbAbsence insert = new SDbAbsence();
                 
                 insert.setPkEmployeeId(Integer.parseInt(root.get("employee_id").toString()));
+                insert.computePrimaryKey(session);
+                insert.setNumber(row.get("folio").toString());
+                insert.setDate((Date) root.get("date_send"));
+                insert.setDateStart((Date) row.get("date_ini"));
+                insert.setDateEnd((Date) row.get("date_end"));
+                insert.setEffectiveDays(Integer.parseInt(row.get("effective_days").toString()));
+                insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
+                insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
+                insert.setExternarRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
+                insert.setFkAbsenceClassId(SModSysConsts.HRSU_TP_ABS_VAC[0]);
+                insert.setFkAbsenceTypeId(SModSysConsts.HRSU_TP_ABS_VAC[1]);
+                insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
+                
+                insert.save(session);
+                
             }
             
         } catch (ParseException ex) {
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } catch (Exception ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-        
+    
+        return true;
     }
 }
