@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1139,7 +1140,7 @@ public class SShareDB {
             JSONParser parser = new JSONParser();
             JSONObject root = (JSONObject) parser.parse(sJsonInc);
             
-            String company = empresas[(int) root.get("company_id")];
+            String company = empresas[Integer.parseInt(root.get("company_id").toString()) ];
             
             Connection conn = mdb.connect("", "", company, "", "");
 
@@ -1149,11 +1150,11 @@ public class SShareDB {
             
             incidents = "SELECT * "
                                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
-                                    + "WHERE id_emp = " + root.get("employee_id") + " AND "
+                                    + "WHERE id_emp = " + root.get("employee_id").toString() + " AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
-                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
-                                    + "dt_sta BETWEEN '" + root.get("date_ini") + "' AND '" + root.get("date_fin") + "' OR "
-                                    + "dt_end BETWEEN '" + root.get("date_") + "' AND '" + root.get("date_fin") + "' AND "
+                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND ( "
+                                    + "dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
+                                    + "dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
                                     + "NOT b_del;";
             Statement stCon = conn.createStatement();
 
@@ -1185,7 +1186,7 @@ public class SShareDB {
             JSONParser parser = new JSONParser();
             JSONObject root = (JSONObject) parser.parse(sJsonInc);
             
-            String company = empresas[(int) root.get("company_id")];
+            String company = empresas[Integer.parseInt(root.get("company_id").toString())];
             
             Connection conn = mdb.connect("", "", company, "", "");
 
@@ -1195,11 +1196,11 @@ public class SShareDB {
             
             incidents = "SELECT * "
                                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
-                                    + "WHERE id_emp = " + root.get("employee_id") + " AND "
+                                    + "WHERE id_emp = " + root.get("employee_id").toString() + " AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
-                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
-                                    + "dt_sta BETWEEN '" + root.get("date_ini") + "' AND '" + root.get("date_fin") + "' OR "
-                                    + "dt_end BETWEEN '" + root.get("date_") + "' AND '" + root.get("date_fin") + "' AND "
+                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND ( "
+                                    + "dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
+                                    + "dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
                                     + "NOT b_del;";
             Statement stCon = conn.createStatement();
 
