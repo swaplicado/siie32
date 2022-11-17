@@ -42,6 +42,7 @@ import erp.mod.hrs.db.SDbAbsenceClass;
 import erp.mod.hrs.db.SDbAbsenceType;
 import erp.musr.data.SDataUser;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import javax.swing.ImageIcon;
@@ -1391,13 +1392,18 @@ public class SShareDB {
                 JSONObject row = (JSONObject) rows.get(i);
                 
                 SDbAbsence insert = new SDbAbsence();
+                insert.initRegistry();
+                
+                Date date_send = new SimpleDateFormat("yyyy-MM-dd").parse(root.get("date_send").toString());
+                Date start_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("start_date").toString());
+                Date end_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("end_date").toString());
                 
                 insert.setPkEmployeeId(Integer.parseInt(root.get("employee_id").toString()));
                 insert.computePrimaryKey(session);
                 insert.setNumber(row.get("folio").toString());
-                insert.setDate((Date) root.get("date_send"));
-                insert.setDateStart((Date) row.get("date_ini"));
-                insert.setDateEnd((Date) row.get("date_end"));
+                insert.setDate(date_send);
+                insert.setDateStart(start_date);
+                insert.setDateEnd(end_date);
                 insert.setEffectiveDays(Integer.parseInt(row.get("effective_days").toString()));
                 insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
                 insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
@@ -1405,7 +1411,7 @@ public class SShareDB {
                 insert.setFkAbsenceClassId(SModSysConsts.HRSU_TP_ABS_VAC[0]);
                 insert.setFkAbsenceTypeId(SModSysConsts.HRSU_TP_ABS_VAC[1]);
                 insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
-                
+                           
                 insert.save(session);
                 
             }
