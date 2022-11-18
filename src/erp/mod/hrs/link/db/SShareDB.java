@@ -33,6 +33,33 @@ import sun.misc.BASE64Encoder;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.SModUtils;
+import erp.mod.SModuleHrs;
+import erp.mod.hrs.db.SDbAbsence;
+import erp.mod.hrs.db.SDbAbsenceClass;
+import erp.mod.hrs.db.SDbAbsenceType;
+import erp.musr.data.SDataUser;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+import org.json.simple.JSONArray;
+import sa.gui.util.SUtilConsts;
+import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbDatabase;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiDatePicker;
+import sa.lib.gui.SGuiDateRangePicker;
+import sa.lib.gui.SGuiSession;
+import sa.lib.gui.SGuiUserGui;
+import sa.lib.gui.SGuiYearMonthPicker;
+import sa.lib.gui.SGuiYearPicker;
 
 /**
  *
@@ -1173,49 +1200,230 @@ public class SShareDB {
     }
     
     public boolean  setinIncidents(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
-        SMySqlClass mdb = new SMySqlClass();
+        SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+        
         String empresas[]= new String[4];
-        ResultSet resultSet;
+        String company = "";
+        
         empresas[0] = "erp_aeth";
         empresas[1] = "erp_amesa";
         empresas[2] = "erp_otsa";
         empresas[3] = "erp_th";
-         try {
-            boolean isAvailable = false;
-            String incidents = "";
-            JSONParser parser = new JSONParser();
-            JSONObject root = (JSONObject) parser.parse(sJsonInc);
+        
+         boolean isAvailable = false;
+         String incidents = "";
+         JSONParser parser = new JSONParser();
+         JSONObject root;
+        try {
+            root = (JSONObject) parser.parse(sJsonInc);
+            company = empresas[Integer.parseInt(root.get("company_id").toString()) ];
+        } catch (ParseException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
             
-            String company = empresas[Integer.parseInt(root.get("company_id").toString())];
-            
-            Connection conn = mdb.connect("", "", company, "", "");
+        database.connect(
+                "localhost", // agregar esta constante a la configuración de CAP Link
+                "3306", // agregar esta constante a la configuración de CAP Link
+                company, // agregar esta constante a la configuración de CAP Link
+                "root", // agregar esta constante a la configuración de CAP Link
+                "msroot"); // agregar esta constante a la configuración de CAP Link
+        
+        SGuiSession session = new SGuiSession(null);
+        JFrame frame = new JFrame();
 
-            if (conn == null) {
-                return false;
+        SGuiClient client = new SGuiClient() {
+
+            @Override
+            public JFrame getFrame() {
+                return frame;
+            }
+
+            @Override
+            public JTabbedPane getTabbedPane() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public SDbDatabase getSysDatabase() {
+                return database;
+            }
+
+            @Override
+            public Statement getSysStatement() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public SGuiSession getSession() {
+                return session;
+            }
+
+            @Override
+            public SGuiDatePicker getDatePicker() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public SGuiDateRangePicker getDateRangePicker() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public SGuiYearPicker getYearPicker() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public SGuiYearMonthPicker getYearMonthPicker() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public JFileChooser getFileChooser() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public ImageIcon getImageIcon(int icon) {
+                return null;
+            }
+
+            @Override
+            public SGuiUserGui readUserGui(int[] key) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public SGuiUserGui saveUserGui(int[] key, String gui) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public HashMap<String, Object> createReportParams() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getTableCompany() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getTableUser() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getAppName() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getAppRelease() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getAppCopyright() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getAppProvider() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void computeSessionSettings() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void preserveSessionSettings() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void showMsgBoxError(String msg) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void showMsgBoxWarning(String msg) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void showMsgBoxInformation(String msg) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public int showMsgBoxConfirm(String msg) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            public Object getLockManager() {
+                return null;
+            }
+        };
+        
+        session.setClient(client);
+        
+        SDataUser user = new SDataUser();
+        user.setPkUserId(SUtilConsts.USR_NA_ID); // agregar esta constante a la configuración de CAP Link
+
+        session.setUser(user);
+
+        Date now = new Date();
+        
+        session.setSystemDate(now);
+        session.setCurrentDate(now);
+        session.setUserTs(now);
+        session.setDatabase(database);
+    
+        session.setModuleUtils(new SModUtils());
+        session.getModules().add(new SModuleHrs(session.getClient()));
+        
+        try {
+            root = (JSONObject) parser.parse(sJsonInc);
+            JSONArray rows = (JSONArray) root.get("rows");
+            for (int i = 0 ; rows.size() > i ; i++){
+                JSONObject row = (JSONObject) rows.get(i);
+                
+                SDbAbsence insert = new SDbAbsence();
+                insert.initRegistry();
+                
+                Date date_send = new SimpleDateFormat("yyyy-MM-dd").parse(root.get("date_send").toString());
+                Date start_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("start_date").toString());
+                Date end_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("end_date").toString());
+                
+                insert.setPkEmployeeId(Integer.parseInt(root.get("employee_id").toString()));
+                insert.computePrimaryKey(session);
+                insert.setNumber(row.get("folio").toString());
+                insert.setDate(date_send);
+                insert.setDateStart(start_date);
+                insert.setDateEnd(end_date);
+                insert.setEffectiveDays(Integer.parseInt(row.get("effective_days").toString()));
+                insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
+                insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
+                insert.setExternarRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
+                insert.setFkAbsenceClassId(SModSysConsts.HRSU_TP_ABS_VAC[0]);
+                insert.setFkAbsenceTypeId(SModSysConsts.HRSU_TP_ABS_VAC[1]);
+                insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
+                           
+                insert.save(session);
+                
             }
             
-            incidents = "SELECT * "
-                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
-                                    + "WHERE id_emp = " + root.get("employee_id").toString() + " AND "
-                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
-                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND ( "
-                                    + "dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
-                                    + "dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
-                                    + "NOT b_del;";
-            Statement stCon = conn.createStatement();
-
-            resultSet = stCon.executeQuery(incidents);
-            if (resultSet.next()) {
-                isAvailable = false;
-            }else{
-                isAvailable = true;
-            }
-            
-            return isAvailable;
         } catch (ParseException ex) {
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
             return false;
+        } catch (Exception ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-        
+    
+        return true;
     }
 }
