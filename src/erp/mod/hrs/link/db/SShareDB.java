@@ -1082,7 +1082,7 @@ public class SShareDB {
                                     + "NOT hrs_abs_cns.b_del AND NOT hrs_abs.b_del;"; 
                             
                             resultSet = stCon.executeQuery(sqlInc);
-                            if (resultSet.next()) {
+                            while (resultSet.next()) {
                                 incidents = new SDataIncidents();
                                 // agregar renglon de incidencia
                                 incidents.setId_breakdown(resultSet.getInt("application"));
@@ -1129,6 +1129,7 @@ public class SShareDB {
                         }
                         programados_no_gozados = programados_no_gozados - consumed;
                         payedDays = payedDays - portal_consumed;
+                        if( payedDays < 0 ) { payedDays = 0; }
                         //insertar información de vacaciones por año y aniversario
                         vac.setVacation_programm(programados_no_gozados);
                         vac.setAnniversary(anniversary);
