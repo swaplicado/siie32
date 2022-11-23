@@ -14,14 +14,43 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import sun.misc.BASE64Encoder;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
+import sun.misc.BASE64Encoder;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.SModUtils;
+import erp.mod.SModuleHrs;
+import erp.mod.hrs.db.SDbAbsence;
+import erp.musr.data.SDataUser;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.ParseException;
+import sa.gui.util.SUtilConsts;
+import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbDatabase;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiDatePicker;
+import sa.lib.gui.SGuiDateRangePicker;
+import sa.lib.gui.SGuiSession;
+import sa.lib.gui.SGuiUserGui;
+import sa.lib.gui.SGuiYearMonthPicker;
+import sa.lib.gui.SGuiYearPicker;
 
 /**
  *
@@ -257,6 +286,7 @@ public class SShareDB {
                 + "    e.dt_ben, "
                 + "    e.dt_hire, "
                 + "    e.dt_dis_n, "
+                + "    e.dt_tp_pay, "
                 + "    e.overtime, "
                 + "    e.checker_policy, "
                 + "    e.fk_tp_pay, "
@@ -297,6 +327,8 @@ public class SShareDB {
                 emp.firstname = res.getString("firstname");
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
+                //emp.benefit_date = res.getString("dt_ben");
+                emp.dt_tp_pay = res.getString("dt_tp_pay");
                 emp.email = res.getString("email_01");
                 emp.overtime_policy = res.getInt("overtime");
                 emp.checker_policy = res.getInt("checker_policy");

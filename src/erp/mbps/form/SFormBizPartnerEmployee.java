@@ -105,6 +105,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldDateLastHire;
     private erp.lib.form.SFormField moFieldDateLastDismissal_n;
     private erp.lib.form.SFormField moFieldFkPaymentType;
+    private erp.lib.form.SFormField moFieldDatePaymentType;
     private erp.lib.form.SFormField moFieldFkSalaryType;
     private erp.lib.form.SFormField moFieldSalary;
     private erp.lib.form.SFormField moFieldDateChangeSalary;
@@ -215,12 +216,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSocialSecurityNumber = new javax.swing.JTextField();
         jPanel24 = new javax.swing.JPanel();
         jlFkBank_n = new javax.swing.JLabel();
-        jcbFkBank_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkBank_n = new javax.swing.JComboBox<>();
         jlBankAccount = new javax.swing.JLabel();
         jtfBankAccount = new javax.swing.JTextField();
         jPanel42 = new javax.swing.JPanel();
         jlFkGroceryService = new javax.swing.JLabel();
-        jcbFkGroceryService = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkGroceryService = new javax.swing.JComboBox<>();
         jlGroceryServiceAccount = new javax.swing.JLabel();
         jtfGroceryServiceAccount = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
@@ -262,12 +263,17 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel9 = new javax.swing.JPanel();
         jlDateLastDismissal_n = new javax.swing.JLabel();
         jftDateLastDismissal_n = new javax.swing.JFormattedTextField();
+        jlAux1 = new javax.swing.JLabel();
+        jlDatePaymentType = new javax.swing.JLabel();
         jPanel28 = new javax.swing.JPanel();
         jlFkPaymentType = new javax.swing.JLabel();
-        jcbFkPaymentType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkPaymentType = new javax.swing.JComboBox<>();
+        jftDatePaymentType = new javax.swing.JFormattedTextField();
+        jbDatePaymentType = new javax.swing.JButton();
+        jbDatePaymentTypeEdit = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jlFkSalaryType = new javax.swing.JLabel();
-        jcbFkSalaryType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSalaryType = new javax.swing.JComboBox<>();
         jckChangeSalary = new javax.swing.JCheckBox();
         jPanel10 = new javax.swing.JPanel();
         jlSalary = new javax.swing.JLabel();
@@ -288,14 +294,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jbDateChangeSalarySscBase = new javax.swing.JButton();
         jPanel31 = new javax.swing.JPanel();
         jlFkMwzType = new javax.swing.JLabel();
-        jcbFkMwzType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkMwzType = new javax.swing.JComboBox<>();
         jPanel4 = new javax.swing.JPanel();
         jPanel30 = new javax.swing.JPanel();
         jlFkEmployeeType = new javax.swing.JLabel();
-        jcbFkEmployeeType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkEmployeeType = new javax.swing.JComboBox<>();
         jPanel15 = new javax.swing.JPanel();
         jlFkWorkerType = new javax.swing.JLabel();
-        jcbFkWorkerType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkWorkerType = new javax.swing.JComboBox<>();
         jPanel12 = new javax.swing.JPanel();
         jckIsUnionized = new javax.swing.JCheckBox();
         jckIsMfgOperator = new javax.swing.JCheckBox();
@@ -305,16 +311,16 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jradCheckerSometimes = new javax.swing.JRadioButton();
         jPanel17 = new javax.swing.JPanel();
         jlFkDepartment = new javax.swing.JLabel();
-        jcbFkDepartment = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkDepartment = new javax.swing.JComboBox<>();
         jPanel32 = new javax.swing.JPanel();
         jlFkPosition = new javax.swing.JLabel();
-        jcbFkPosition = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkPosition = new javax.swing.JComboBox<>();
         jPanel21 = new javax.swing.JPanel();
         jlFkShift = new javax.swing.JLabel();
-        jcbFkShift = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkShift = new javax.swing.JComboBox<>();
         jPanel44 = new javax.swing.JPanel();
         jlFkWorkingDayType = new javax.swing.JLabel();
-        jcbFkWorkingDayType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkWorkingDayType = new javax.swing.JComboBox<>();
         jPanel11 = new javax.swing.JPanel();
         jlWorkingHoursDay = new javax.swing.JLabel();
         jtfWorkingHoursDay = new javax.swing.JTextField();
@@ -325,7 +331,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jradOvertimeSometimes = new javax.swing.JRadioButton();
         jPanel27 = new javax.swing.JPanel();
         jlFkContractType = new javax.swing.JLabel();
-        jcbFkContractType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkContractType = new javax.swing.JComboBox<>();
         jPanel59 = new javax.swing.JPanel();
         jlContractExpiration = new javax.swing.JLabel();
         jftContractExpiration = new javax.swing.JFormattedTextField();
@@ -333,10 +339,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlContractExpirationHint = new javax.swing.JLabel();
         jPanel33 = new javax.swing.JPanel();
         jlFkRecruitmentSchemaType = new javax.swing.JLabel();
-        jcbFkRecruitmentSchemaType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkRecruitmentSchemaType = new javax.swing.JComboBox<>();
         jPanel23 = new javax.swing.JPanel();
         jlFkPositionRiskType = new javax.swing.JLabel();
-        jcbFkPositionRiskType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkPositionRiskType = new javax.swing.JComboBox<>();
         jPanel35 = new javax.swing.JPanel();
         jPanel51 = new javax.swing.JPanel();
         jPanel43 = new javax.swing.JPanel();
@@ -353,16 +359,16 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfUmf = new javax.swing.JTextField();
         jPanel36 = new javax.swing.JPanel();
         jlFkCatalogueSexTypeId = new javax.swing.JLabel();
-        jcbFkCatalogueSexTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCatalogueSexTypeId = new javax.swing.JComboBox<>();
         jPanel37 = new javax.swing.JPanel();
         jlFkCatalogueBloodTypeTypeId = new javax.swing.JLabel();
-        jcbFkCatalogueBloodTypeTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCatalogueBloodTypeTypeId = new javax.swing.JComboBox<>();
         jPanel39 = new javax.swing.JPanel();
         jlFkCatalogueEducationTypeId = new javax.swing.JLabel();
-        jcbFkCatalogueEducationTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCatalogueEducationTypeId = new javax.swing.JComboBox<>();
         jPanel38 = new javax.swing.JPanel();
         jlFkCatalogueMaritalStatusTypeId = new javax.swing.JLabel();
-        jcbFkCatalogueMaritalStatusTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCatalogueMaritalStatusTypeId = new javax.swing.JComboBox<>();
         jPanel40 = new javax.swing.JPanel();
         jPanel58 = new javax.swing.JPanel();
         jlRelative = new javax.swing.JLabel();
@@ -376,7 +382,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftMateDateBirth = new javax.swing.JFormattedTextField();
         jbMateDateBirth = new javax.swing.JButton();
         jtfMateAge = new javax.swing.JTextField();
-        jcbFkMateCatalogueSexTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkMateCatalogueSexTypeId = new javax.swing.JComboBox<>();
         jckMateDeceased = new javax.swing.JCheckBox();
         jPanel53 = new javax.swing.JPanel();
         jlSon1 = new javax.swing.JLabel();
@@ -384,7 +390,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth1 = new javax.swing.JFormattedTextField();
         jbSonDateBirth1 = new javax.swing.JButton();
         jtfSonAge1 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId1 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatalogueSexTypeId1 = new javax.swing.JComboBox<>();
         jckSonDeceased1 = new javax.swing.JCheckBox();
         jPanel54 = new javax.swing.JPanel();
         jlSon2 = new javax.swing.JLabel();
@@ -392,7 +398,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth2 = new javax.swing.JFormattedTextField();
         jbSonDateBirth2 = new javax.swing.JButton();
         jtfSonAge2 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId2 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatalogueSexTypeId2 = new javax.swing.JComboBox<>();
         jckSonDeceased2 = new javax.swing.JCheckBox();
         jPanel55 = new javax.swing.JPanel();
         jlSon3 = new javax.swing.JLabel();
@@ -400,7 +406,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth3 = new javax.swing.JFormattedTextField();
         jbSonDateBirth3 = new javax.swing.JButton();
         jtfSonAge3 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId3 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatalogueSexTypeId3 = new javax.swing.JComboBox<>();
         jckSonDeceased3 = new javax.swing.JCheckBox();
         jPanel56 = new javax.swing.JPanel();
         jlSon4 = new javax.swing.JLabel();
@@ -408,7 +414,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth4 = new javax.swing.JFormattedTextField();
         jbSonDateBirth4 = new javax.swing.JButton();
         jtfSonAge4 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId4 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatalogueSexTypeId4 = new javax.swing.JComboBox<>();
         jckSonDeceased4 = new javax.swing.JCheckBox();
         jPanel57 = new javax.swing.JPanel();
         jlSon5 = new javax.swing.JLabel();
@@ -416,7 +422,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth5 = new javax.swing.JFormattedTextField();
         jbSonDateBirth5 = new javax.swing.JButton();
         jtfSonAge5 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId5 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatalogueSexTypeId5 = new javax.swing.JComboBox<>();
         jckSonDeceased5 = new javax.swing.JCheckBox();
         jpBranchAddress = new javax.swing.JPanel();
         jpOficialAddress = new javax.swing.JPanel();
@@ -773,6 +779,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel9.add(jftDateLastDismissal_n);
 
+        jlAux1.setPreferredSize(new java.awt.Dimension(55, 23));
+        jPanel9.add(jlAux1);
+
+        jlDatePaymentType.setText("A partir de:*");
+        jlDatePaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlDatePaymentType);
+
         jPanel3.add(jPanel9);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
@@ -781,8 +794,24 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlFkPaymentType);
 
-        jcbFkPaymentType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel28.add(jcbFkPaymentType);
+
+        jftDatePaymentType.setText("yyyy/mm/dd");
+        jftDatePaymentType.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel28.add(jftDatePaymentType);
+
+        jbDatePaymentType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDatePaymentType.setToolTipText("Seleccionar fecha");
+        jbDatePaymentType.setFocusable(false);
+        jbDatePaymentType.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel28.add(jbDatePaymentType);
+
+        jbDatePaymentTypeEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbDatePaymentTypeEdit.setToolTipText("Modificar fecha");
+        jbDatePaymentTypeEdit.setFocusable(false);
+        jbDatePaymentTypeEdit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel28.add(jbDatePaymentTypeEdit);
 
         jPanel3.add(jPanel28);
 
@@ -1557,6 +1586,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldDateLastDismissal_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkPaymentType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPaymentType, jlFkPaymentType);
         moFieldFkPaymentType.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldDatePaymentType = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDatePaymentType, jlFkPaymentType);
+        moFieldDatePaymentType.setPickerButton(jbDatePaymentType);
+        moFieldDatePaymentType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkSalaryType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSalaryType, jlFkSalaryType);
         moFieldFkSalaryType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfSalary, jlSalary);
@@ -1707,6 +1739,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldDateLastHire);
         mvFields.add(moFieldDateLastDismissal_n);
         mvFields.add(moFieldFkPaymentType);
+        mvFields.add(moFieldDatePaymentType);
         mvFields.add(moFieldFkSalaryType);
         mvFields.add(moFieldSalary);
         mvFields.add(moFieldDateChangeSalary);
@@ -1773,6 +1806,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jbImageSignatureRemove.addActionListener(this);
         jbDateBenefitsEdit.addActionListener(this);
         jbDateBenefits.addActionListener(this);
+        jbDatePaymentType.addActionListener(this);
+        jbDatePaymentTypeEdit.addActionListener(this);
         jbDateLastHire.addActionListener(this);
         jbDateChangeSalary.addActionListener(this);
         jbDateChangeWage.addActionListener(this);
@@ -1785,6 +1820,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkDepartment.addItemListener(this);
         jcbFkContractType.addItemListener(this);
         jftDateBenefits.addFocusListener(this);
+        jcbFkPaymentType.addFocusListener(this);
         jftDateBirth.addFocusListener(this);
         jftMateDateBirth.addFocusListener(this);
         jftSonDateBirth1.addFocusListener(this);
@@ -1892,6 +1928,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftDateBenefits.setFocusable(enable);
         jbDateBenefits.setEnabled(enable);
         jbDateBenefitsEdit.setEnabled(!enable);
+    }
+    
+    private void updateStatusDatePaymentType(boolean enable) {
+        jcbFkPaymentType.setEnabled(enable);
+        jftDatePaymentType.setEditable(enable);
+        jftDatePaymentType.setFocusable(enable);
+        jbDatePaymentType.setEnabled(enable);
+        jbDatePaymentTypeEdit.setEnabled(!enable);
     }
 
     private void updateStatusDateLastHire(boolean enable) {
@@ -2093,6 +2137,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         updateStatusDateBenefits(true);
         jftDateBenefits.requestFocus();
     }
+    
+    private void actionDatePaymentTypeEdit() {
+        updateStatusDatePaymentType(true);
+        jcbFkPaymentType.requestFocus();
+    }
 
     private void actionDateBirth() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateBirth.getDate(), moFieldDateBirth);
@@ -2209,6 +2258,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateLastHire.getDate(), moFieldDateLastHire);
     }
 
+    private void actionDatePaymentType() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDatePaymentType.getDate(), moFieldDatePaymentType);
+    }
+    
     private void actionDateSalaryChange() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateChangeSalary.getDate(), moFieldDateChangeSalary);
     }
@@ -2436,6 +2489,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JButton jbDateChangeSalarySscBase;
     private javax.swing.JButton jbDateChangeWage;
     private javax.swing.JButton jbDateLastHire;
+    private javax.swing.JButton jbDatePaymentType;
+    private javax.swing.JButton jbDatePaymentTypeEdit;
     private javax.swing.JButton jbImagePhoto;
     private javax.swing.JButton jbImagePhotoRemove;
     private javax.swing.JButton jbImagePhotoView;
@@ -2495,6 +2550,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JFormattedTextField jftDateChangeWage;
     private javax.swing.JFormattedTextField jftDateLastDismissal_n;
     private javax.swing.JFormattedTextField jftDateLastHire;
+    private javax.swing.JFormattedTextField jftDatePaymentType;
     private javax.swing.JFormattedTextField jftMateDateBirth;
     private javax.swing.JFormattedTextField jftNumber;
     private javax.swing.JFormattedTextField jftSonDateBirth1;
@@ -2503,6 +2559,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JFormattedTextField jftSonDateBirth4;
     private javax.swing.JFormattedTextField jftSonDateBirth5;
     private javax.swing.JLabel jlAlternativeId;
+    private javax.swing.JLabel jlAux1;
     private javax.swing.JLabel jlBankAccount;
     private javax.swing.JLabel jlBirthPlace;
     private javax.swing.JLabel jlCheckerPolicy;
@@ -2512,6 +2569,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlDateBirth;
     private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
+    private javax.swing.JLabel jlDatePaymentType;
     private javax.swing.JLabel jlEmail;
     private javax.swing.JLabel jlFirstname;
     private javax.swing.JLabel jlFiscalId;
@@ -2635,6 +2693,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldDateBirth.setFieldValue(miClient.getSessionXXX().getWorkingDate());
         moFieldDateBenefits.setFieldValue(miClient.getSessionXXX().getWorkingDate());
         moFieldDateLastHire.setFieldValue(miClient.getSessionXXX().getWorkingDate());
+        moFieldDatePaymentType.setFieldValue(miClient.getSessionXXX().getWorkingDate());
         moFieldWorkingHoursDay.setFieldValue(SHrsConsts.WORKING_DAY_HOURS);
         moPanelBizPartnerBranchAddress.formReset();
         moPanelBizPartnerBranchAddress.setParamIsInMainWindow(true);
@@ -2650,6 +2709,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeSalarySscBase.setEnabled(false);
         jckChangeSalarySscBase.setSelected(true);
         updateStatusDateBenefits(true);
+        updateStatusDatePaymentType(true);
         updateStatusDateLastHire(true);
         updateEmployeeNextNumber();
 
@@ -3006,6 +3066,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldDateLastDismissal_n.setFieldValue(moEmployee.getDateLastDismissal_n());
             moFieldFkPaymentType.setFieldValue(new int[] { moEmployee.getFkPaymentTypeId() });
             itemStateChangePaymentType();
+            moFieldDatePaymentType.setFieldValue(moEmployee.getDatePaymentType());
             moFieldFkSalaryType.setFieldValue(new int[] { moEmployee.getFkSalaryTypeId() });
 
             moFieldSalary.setFieldValue(moEmployee.getSalary());
@@ -3096,6 +3157,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeSalarySscBase.setEnabled(moEmployee != null && moFieldSalarySscBase.getDouble() != 0);
         jckChangeSalarySscBase.setSelected(moFieldSalarySscBase.getDouble() == 0);
         updateStatusDateBenefits(false);
+        updateStatusDatePaymentType(false);
         updateStatusDateLastHire(false);
 
         itemStateChangePaymentType();
@@ -3469,6 +3531,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             }
             else if (button == jbDateLastHire) {
                 actionDateLastHire();
+            }
+            else if (button == jbDatePaymentType) {
+                actionDatePaymentType();
+            }
+            else if (button == jbDatePaymentTypeEdit) {
+                actionDatePaymentTypeEdit();
             }
             else if (button == jbDateChangeSalary) {
                 actionDateSalaryChange();
