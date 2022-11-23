@@ -20,8 +20,7 @@ import cfd.ver3.ccp20.DElementRemolques;
 import cfd.ver3.ccp20.DElementSeguros;
 import cfd.ver3.ccp20.DElementTiposFigura;
 import cfd.ver3.ccp20.DElementUbicacion;
-import cfd.ver33.DCfdi33Catalogs;
-import cfd.ver33.DElementComplemento;
+import cfd.ver40.DCfdi40Catalogs;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
 import erp.data.SDataConstantsSys;
@@ -33,6 +32,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mloc.data.SDataBolZipCode;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataCfd;
+import erp.mtrn.data.STrnCfdRelated;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -45,7 +45,6 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -53,7 +52,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlCfdi33, Serializable {
+public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40, Serializable {
     
     protected int mnPkBillOfLadingId;
     protected String msBillOfLadingType;
@@ -70,14 +69,13 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     protected String msEnvironmentalInsurerPolicy;
     protected String msMerchandiseInsurerPolicy;
     protected String msPremium;
-//    protected boolean mbDeleted;
+    //protected boolean mbDeleted;
     protected int mnFkBillOfLadingStatusId;
     protected int mnFkCompanyBranchId;
     protected int mnFkInputOutputCountry_n;
     protected int mnFkGrossWeightUnit;
     protected int mnFkEnviromentalInsurer_n;
     protected int mnFkMerchandiseInsurer_n;
-
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -89,24 +87,25 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     protected ArrayList<SDbBolLocation> maBolLocations;
     protected ArrayList<SDbBolMerchandise> maBolMerchandises;
     
-    protected SDataCfd moDbmsDataCfd;
+    protected SDataCfd moDataCfd;
     
     protected String msXtaCtyCode;
     protected String msXtaGrossWeightUnitCode;
     protected String msXtaTaxRegime;
-    protected SDbInsurer moXtaEnvironmentalInsurer;
-    protected SDbInsurer moXtaMerchandiseInsurer;
+    protected SDbInsurer moDataEnvironmentalInsurer;
+    protected SDbInsurer moDataMerchandiseInsurer;
     
     protected int mnAuxCfdId;
-    protected String msAuxCfdCfdiRelacionadosTipoRelacion;
-    protected String msAuxCfdCfdiRelacionadoUuid; // available when CFDI is not stored in SIIE, e.g., third-party
+    protected String msAuxCfdExportation;
+    protected String msAuxCfdCfdiRelacionado33TipoRelacion;
+    protected String msAuxCfdCfdiRelacionado33Uuid; // available when CFDI is not stored in SIIE, e.g., third-party
+    protected STrnCfdRelated moAuxCfdiRelacionados;
     protected SDataBizPartner moAuxDbmsDataEmisor;
     protected SDataBizPartnerBranch moAuxDbmsDataEmisorSucursal;
     
     protected int mnLastDbActionResult;
     protected int mnDbmsErrorId;
     protected java.lang.String msDbmsError;
-    
     
     public SDbBillOfLading() {
         super(SModConsts.LOG_BOL);
@@ -125,8 +124,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         for (SDbBolMerchandise merch : maBolMerchandises) {
             if (merch.getFkItemId() == o.getFkItemId()) {
                 found = true;
-                merch.addMerchandiseQuantity(o.getBolMerchandiseQuantity().get(0));
-                //merch.addMerchandiseQuantity(o.getBolMerchandiseQuantity().get(o.getBolMerchandiseQuantity().size() - 1));
+                merch.addMerchandiseQuantity(o.getChildBolMerchandiseQuantities().get(0));
                 merch.updateTotalItemQuantity();
             }
         }
@@ -138,8 +136,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public void removeMerchandise(SDbBolMerchandise o) {
         for (SDbBolMerchandise merch : maBolMerchandises) {
             if (merch.getFkItemId() == o.getFkItemId()) {
-                merch.removeMerchandiseQuantity(o.getBolMerchandiseQuantity().get(0));
-                if (merch.maBolMerchandiseQuantity.isEmpty()) {
+                merch.removeMerchandiseQuantity(o.getChildBolMerchandiseQuantities().get(0));
+                if (merch.maChildBolMerchandiseQuantities.isEmpty()) {
                     maBolMerchandises.remove(merch);
                     break;
                 }
@@ -223,7 +221,6 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
-    public void setDbmsDataCfd (SDataCfd o) { moDbmsDataCfd = o;}
     
     public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public String getBillOfLadingType() { return msBillOfLadingType; }
@@ -251,37 +248,42 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
-    public SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
-
+    
     public void setBolTransportationMode(SDbBolTransportationMode o) { moBolTransportationMode = o; }
-    public void setBolLocations(ArrayList<SDbBolLocation> v) { maBolLocations = v; }
-    public void setBolMerchandises(ArrayList<SDbBolMerchandise> v) { maBolMerchandises = v; }
     
     public SDbBolTransportationMode getBolTransportationMode() { return moBolTransportationMode; }
     public ArrayList<SDbBolLocation> getBolLocations() { return maBolLocations; }
     public ArrayList<SDbBolMerchandise> getBolMerchandises() { return maBolMerchandises; }
     
+    public void setDataCfd (SDataCfd o) { moDataCfd = o;}
+    
+    public SDataCfd getDataCfd() { return moDataCfd; }
+    
     public void setXtaCtyCode(String s) { msXtaCtyCode = s; }
     public void setXtaGrossWeightUnitCode(String s) { msXtaGrossWeightUnitCode = s; }
     public void setXtaTaxRegime(String s) { msXtaTaxRegime = s; }
-    public void setXtaEnvironmentalInsurer(SDbInsurer o) { moXtaEnvironmentalInsurer = o; } 
-    public void setXtaMerchandiseInsurer(SDbInsurer o) { moXtaMerchandiseInsurer = o; } 
+    public void setDataEnvironmentalInsurer(SDbInsurer o) { moDataEnvironmentalInsurer = o; } 
+    public void setDataMerchandiseInsurer(SDbInsurer o) { moDataMerchandiseInsurer = o; } 
     
     public String getXtaCtyCode() { return msXtaCtyCode; }
     public String getXtaGrossWeightUnitCode() { return msXtaGrossWeightUnitCode; }
     public String getXtaTaxRegime() { return msXtaTaxRegime; }
-    public SDbInsurer getXtaEnvironmentalInsurer() { return moXtaEnvironmentalInsurer; }
-    public SDbInsurer getXtaMerchandiseInsurer() { return moXtaMerchandiseInsurer; }
+    public SDbInsurer getDataEnvironmentalInsurer() { return moDataEnvironmentalInsurer; }
+    public SDbInsurer getDataMerchandiseInsurer() { return moDataMerchandiseInsurer; }
     
     public void setAuxCfdId(int i) { mnAuxCfdId = i; }
-    public void setAuxCfdCfdiRelacionadosTipoRelacion(String s) { msAuxCfdCfdiRelacionadosTipoRelacion = s; }
-    public void setAuxCfdCfdiRelacionadoUuid(String s) { msAuxCfdCfdiRelacionadoUuid = s; }
+    public void setAuxCfdExportation(String s) { msAuxCfdExportation = s; }
+    public void setAuxCfdCfdiRelacionado33TipoRelacion(String s) { msAuxCfdCfdiRelacionado33TipoRelacion = s; }
+    public void setAuxCfdCfdiRelacionado33Uuid(String s) { msAuxCfdCfdiRelacionado33Uuid = s; }
+    public void setCfdiRelacionados(STrnCfdRelated o) { moAuxCfdiRelacionados = o; }
     public void setAuxDbmsDataEmisor(SDataBizPartner o) { moAuxDbmsDataEmisor = o; }
     public void setAuxDbmsDataEmisorSucursal(SDataBizPartnerBranch o) { moAuxDbmsDataEmisorSucursal = o; }
     
     public int getAuxCfdId() { return mnAuxCfdId; }
-    public String getAuxCfdCfdiRelacionadosTipoRelacion() { return msAuxCfdCfdiRelacionadosTipoRelacion; }
-    public String getAuxCfdCfdiRelacionadoUuid() { return msAuxCfdCfdiRelacionadoUuid; }
+    public String getAuxCfdExportation() { return msAuxCfdExportation; }
+    public String getAuxCfdCfdiRelacionado33TipoRelacion() { return msAuxCfdCfdiRelacionado33TipoRelacion; }
+    public String getAuxCfdCfdiRelacionado33Uuid() { return msAuxCfdCfdiRelacionado33Uuid; }
+    //public STrnCfdRelated getCfdiRelacionados() { return moAuxCfdiRelacionados; } // se implementa en las interfaces
     public SDataBizPartner getAuxDbmsDataEmisor() { return moAuxDbmsDataEmisor; }
     public SDataBizPartnerBranch getAuxDbmsDataEmisorSucursal() { return moAuxDbmsDataEmisorSucursal; }
     
@@ -339,21 +341,29 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        moBolTransportationMode = new SDbBolTransportationMode();
+        moBolTransportationMode = null;
         maBolLocations = new ArrayList<>();
         maBolMerchandises = new ArrayList<>();
         
-        moDbmsDataCfd = null;
-        
-        msAuxCfdCfdiRelacionadosTipoRelacion = "";
-        msAuxCfdCfdiRelacionadoUuid = ""; 
-        mnAuxCfdId = 0;
+        moDataCfd = null;
         
         msXtaCtyCode = "";
         msXtaGrossWeightUnitCode = "";
         msXtaTaxRegime = "";
-        moXtaEnvironmentalInsurer = new SDbInsurer();
-        moXtaMerchandiseInsurer = new SDbInsurer();
+        moDataEnvironmentalInsurer = null;
+        moDataMerchandiseInsurer = null;
+        
+        mnAuxCfdId = 0;
+        msAuxCfdExportation = "";
+        msAuxCfdCfdiRelacionado33TipoRelacion = "";
+        msAuxCfdCfdiRelacionado33Uuid = ""; 
+        moAuxCfdiRelacionados = null;
+        moAuxDbmsDataEmisor = null;
+        moAuxDbmsDataEmisorSucursal = null;
+        
+        mnLastDbActionResult = 0;
+        mnDbmsErrorId = 0;
+        msDbmsError = "";
     }
 
     @Override
@@ -430,52 +440,65 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
             mnAuxCfdId = resultSet.getInt("id_cfd");
+            msAuxCfdExportation = !mbInternationalBol ? DCfdi40Catalogs.ClaveExportacionNoAplica : DCfdi40Catalogs.ClaveExportacionAplica;
             
             mbRegistryNew = false;
         }
         
         // Read transportation mode:
         
-        msSql = "SELECT id_bol, id_transp_mode FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_TRANSP_MODE) + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        msSql = "SELECT id_transp_mode "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_TRANSP_MODE) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " "
+                + "ORDER BY id_transp_mode ";
         resultSet = statement.executeQuery(msSql);
         if (resultSet.next()) {
-            moBolTransportationMode.read(session, new int[] { resultSet.getInt("id_bol"), resultSet.getInt("id_transp_mode") } ) ;
+            moBolTransportationMode = new SDbBolTransportationMode();
+            moBolTransportationMode.read(session, new int[] { mnPkBillOfLadingId, resultSet.getInt("id_transp_mode") } ) ;
         }
         
         // Read locations:
         
-        msSql = "SELECT id_bol, id_location FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_LOCATION) + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        msSql = "SELECT id_location "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_LOCATION) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " "
+                + "ORDER BY id_location ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
             SDbBolLocation location = new SDbBolLocation(this);
-            location.read(session, new int[] { resultSet.getInt("id_bol"), resultSet.getInt("id_location") } );
+            location.read(session, new int[] { mnPkBillOfLadingId, resultSet.getInt("id_location") } );
             maBolLocations.add(location);
         }
         
         // Read merchandises:
         
-        msSql = "SELECT id_bol, id_merch FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH) + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        msSql = "SELECT id_merch "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " "
+                + "ORDER BY id_merch ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
             SDbBolMerchandise merch = new SDbBolMerchandise();
-            merch.read(session, new int[] { resultSet.getInt("id_bol"), resultSet.getInt("id_merch") } );
+            merch.read(session, new int[] { mnPkBillOfLadingId, resultSet.getInt("id_merch") } );
             maBolMerchandises.add(merch);
         }
         
         // Read Insurers
         
         if (mnFkEnviromentalInsurer_n != 0) {
-            moXtaEnvironmentalInsurer.read(session, new int[] { mnFkEnviromentalInsurer_n });
+            moDataEnvironmentalInsurer = new SDbInsurer();
+            moDataEnvironmentalInsurer.read(session, new int[] { mnFkEnviromentalInsurer_n });
         }
         if (mnFkMerchandiseInsurer_n != 0) {
-            moXtaMerchandiseInsurer.read(session, new int[] { mnFkMerchandiseInsurer_n });
+            moDataMerchandiseInsurer = new SDbInsurer();
+            moDataMerchandiseInsurer.read(session, new int[] { mnFkMerchandiseInsurer_n });
         }
         
         // Read cfd
         
         if (mnAuxCfdId != 0) {
-            moDbmsDataCfd = new SDataCfd();
-            moDbmsDataCfd.read(new int[] { mnAuxCfdId }, statement);
+            moDataCfd = new SDataCfd();
+            moDataCfd.read(new int[] { mnAuxCfdId }, statement);
         }
         
         updateSatCtyCode(session);
@@ -561,24 +584,48 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 "ts_usr_upd = " + "NOW()" + " " +
                 getSqlWhere();
         }
+        
         session.getStatement().execute(msSql);
         
         // Save transportation mode:
         
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_TRANSP_MODE_EXTRA) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        session.getStatement().execute(msSql);
+        
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_TRANSP_MODE) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        session.getStatement().execute(msSql);
+        
         moBolTransportationMode.setPkBillOfLadingId(mnPkBillOfLadingId);
+        moBolTransportationMode.setRegistryNew(true);
         moBolTransportationMode.save(session);
         
         // Save locations:
         
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_LOCATION) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        session.getStatement().execute(msSql);
+        
         for (SDbBolLocation location : maBolLocations) {
             location.setPkBillOfLadingId(mnPkBillOfLadingId);
+            location.setRegistryNew(true);
             location.save(session);
         }
         
         // Save merchandises
         
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        session.getStatement().execute(msSql);
+        
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " ";
+        session.getStatement().execute(msSql);
+        
         for (SDbBolMerchandise merchandise : maBolMerchandises) {
             merchandise.setPkBillOfLadingId(mnPkBillOfLadingId);
+            merchandise.setRegistryNew(true);
             merchandise.save(session);
         }
         
@@ -587,7 +634,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbBillOfLading clone() throws CloneNotSupportedException {
         SDbBillOfLading registry = new SDbBillOfLading();
         
         registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
@@ -617,23 +664,32 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
-        registry.setBolTransportationMode(this.getBolTransportationMode());
-        registry.setBolLocations(this.getBolLocations());
-        registry.setBolMerchandises(this.getBolMerchandises());
+        if (this.getBolTransportationMode() != null) {
+            registry.setBolTransportationMode(this.getBolTransportationMode().clone());
+        }
         
-        registry.setDbmsDataCfd(this.getDbmsDataCfd());
+        for (SDbBolLocation loc : this.getBolLocations()) {
+            registry.getBolLocations().add(loc.clone());
+        }
+        for (SDbBolMerchandise merch : this.getBolMerchandises()) {
+            registry.getBolMerchandises().add(merch.clone());
+        }
+        
+        registry.setDataCfd(this.getDataCfd()); 
         
         registry.setXtaCtyCode(this.getXtaCtyCode());
         registry.setXtaGrossWeightUnitCode(this.getXtaGrossWeightUnitCode());
         registry.setXtaTaxRegime(this.getXtaTaxRegime());
-        registry.setXtaEnvironmentalInsurer(this.getXtaEnvironmentalInsurer());
-        registry.setXtaMerchandiseInsurer(this.getXtaMerchandiseInsurer());
+        registry.setDataEnvironmentalInsurer(this.getDataEnvironmentalInsurer());
+        registry.setDataMerchandiseInsurer(this.getDataMerchandiseInsurer());
         
         registry.setAuxCfdId(this.getAuxCfdId());
-        registry.setAuxCfdCfdiRelacionadosTipoRelacion(this.getAuxCfdCfdiRelacionadosTipoRelacion());
-        registry.setAuxCfdCfdiRelacionadoUuid(this.getAuxCfdCfdiRelacionadoUuid());
-        registry.setAuxDbmsDataEmisor(this.getAuxDbmsDataEmisor());
-        registry.setAuxDbmsDataEmisorSucursal(this.getAuxDbmsDataEmisorSucursal());
+        registry.setAuxCfdExportation(this.getAuxCfdExportation());
+        registry.setAuxCfdCfdiRelacionado33TipoRelacion(this.getAuxCfdCfdiRelacionado33TipoRelacion());
+        registry.setAuxCfdCfdiRelacionado33Uuid(this.getAuxCfdCfdiRelacionado33Uuid());
+        registry.setCfdiRelacionados(this.getCfdiRelacionados()); // este miembro no se clona
+        registry.setAuxDbmsDataEmisor(this.getAuxDbmsDataEmisor()); // el clon comparte este registro que es de sólo lectura
+        registry.setAuxDbmsDataEmisorSucursal(this.getAuxDbmsDataEmisorSucursal()); // el clon comparte este registro que es de sólo lectura
 
         return registry;
     }
@@ -660,7 +716,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             throw new Exception(msDbmsError);
         }
         
-        else if (pnAction == SDbConsts.ACTION_DELETE && moDbmsDataCfd != null && (moDbmsDataCfd.isStamped())) {
+        else if (pnAction == SDbConsts.ACTION_DELETE && moDataCfd != null && (moDataCfd.isStamped())) {
             mnDbmsErrorId = 21;
             msDbmsError = sMsg + "¡El documento está timbrado!";
             throw new Exception(msDbmsError);
@@ -709,8 +765,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                     "fk_usr_upd = " + mnFkUserUpdateId + ", ts_usr_upd = NOW() " +
                     "WHERE id_bol = " + mnPkBillOfLadingId + " ";
             oStatement.execute(sSql);
-            if (moDbmsDataCfd != null) {
-                moDbmsDataCfd.annul(connection);
+            if (moDataCfd != null) {
+                moDataCfd.annul(connection);
             }
 
             mnQueryResultId = SLibConstants.DB_ACTION_ANNUL_OK;
@@ -729,159 +785,179 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     }
 
     @Override
-    public int getCfdType() {
+    public int getCfdType() { // CFDI 3.3 & 4.0
         return SDataConstantsSys.TRNS_TP_CFD_BOL;
     }
 
     @Override
-    public String getComprobanteVersion() {
-        return "" + DCfdConsts.CFDI_VER_33;
+    public String getComprobanteVersion() { // CFDI 3.3 & 4.0
+        return "" + DCfdConsts.CFDI_VER_40;
     }
 
     @Override
-    public String getComprobanteSerie() {
+    public String getComprobanteSerie() { // CFDI 3.3 & 4.0
         return msSeries;
     }
 
     @Override
-    public String getComprobanteFolio() {
+    public String getComprobanteFolio() { // CFDI 3.3 & 4.0
         return msNumber;
     }
 
     @Override
-    public Date getComprobanteFecha() {
+    public Date getComprobanteFecha() { // CFDI 3.3 & 4.0
         return mtDate;
     }
 
     @Override
-    public String getComprobanteFormaPago() {
+    public String getComprobanteFormaPago() { // CFDI 3.3 & 4.0
         return "";
     }
 
     @Override
-    public String getComprobanteCondicionesPago() {
-        return "";  // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public String getComprobanteCondicionesPago() { // CFDI 3.3 & 4.0
+        return ""; 
     }
 
     @Override
-    public double getComprobanteSubtotal() {
-        return 0;   // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+    public double getComprobanteSubtotal() { // CFDI 3.3 & 4.0
+        return 0;  
     }
 
     @Override
-    public double getComprobanteDescuento() {
-        return 0;   // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public double getComprobanteDescuento() { // CFDI 3.3 & 4.0
+        return 0;   
     }
 
     @Override
-    public String getComprobanteMoneda() {
-        return DCfdi33Catalogs.ClaveMonedaXxx;  // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+    public String getComprobanteMoneda() { // CFDI 3.3 & 4.0
+        return DCfdi40Catalogs.ClaveMonedaXxx;  
     }
 
     @Override
-    public double getComprobanteTipoCambio() {
-        return 0;   // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public double getComprobanteTipoCambio() { // CFDI 3.3 & 4.0
+        return 0;   
     }
 
     @Override
-    public double getComprobanteTotal() {
-        return 0;   // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+    public double getComprobanteTotal() { // CFDI 3.3 & 4.0
+        return 0;   
     }
 
     @Override
-    public String getComprobanteTipoComprobante() {
-        return DCfdi33Catalogs.CFD_TP_T; // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
-    }
-
-    @Override
-    public String getComprobanteMetodoPago() {
-        return ""; // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public String getComprobanteTipoComprobante() { // CFDI 3.3 & 4.0
+        return DCfdi40Catalogs.CFD_TP_T; 
     }
     
     @Override
-    public String getComprobanteLugarExpedicion() {
+    public String getComprobanteExportacion() { // CFDI 4.0
+        return msAuxCfdExportation;
+    }
+
+    @Override
+    public String getComprobanteMetodoPago() { // CFDI 3.3 & 4.0
+        return ""; 
+    }
+    
+    @Override
+    public String getComprobanteLugarExpedicion() { // CFDI 3.3 & 4.0
         return moAuxDbmsDataEmisorSucursal.getDbmsBizPartnerBranchAddressOfficial().getZipCode();
     }
 
     @Override
-    public String getComprobanteConfirmacion() {
+    public String getComprobanteConfirmacion() { // CFDI 3.3 & 4.0
         return "";
     }
 
     @Override
-    public String getCfdiRelacionadosTipoRelacion() {
-        return msAuxCfdCfdiRelacionadosTipoRelacion;
+    public String getCfdiRelacionados33TipoRelacion() { // CFDI 3.3
+        return msAuxCfdCfdiRelacionado33TipoRelacion;
     }
 
     @Override
-    public ArrayList<String> getCfdiRelacionados() {
+    public ArrayList<String> getCfdiRelacionados33() { // CFDI 3.3
         ArrayList<String> cfdis = null;
         
-        if (!msAuxCfdCfdiRelacionadoUuid.isEmpty()) {
+        if (!msAuxCfdCfdiRelacionado33Uuid.isEmpty()) {
             cfdis = new ArrayList<>();
-            cfdis.add(msAuxCfdCfdiRelacionadoUuid);
+            cfdis.add(msAuxCfdCfdiRelacionado33Uuid);
         }
         
         return cfdis;
     }
-
+    
     @Override
-    public int getEmisorId() {
+    public STrnCfdRelated getCfdiRelacionados() { // CFDI 4.0
+        return moAuxCfdiRelacionados;
+    }
+    
+    @Override
+    public DElement getElementInformacionGlobal() { // CFDI 4.0
+        return null;
+    }
+    
+    @Override
+    public int getEmisorId() { // CFDI 3.3 & 4.0
         return moAuxDbmsDataEmisor.getPkBizPartnerId();
     }
 
     @Override
-    public int getEmisorSucursalId() {
+    public int getEmisorSucursalId() { // CFDI 3.3 & 4.0
         return mnFkCompanyBranchId;
     }
 
     @Override
-    public String getEmisorRegimenFiscal() {
+    public String getEmisorRegimenFiscal() { // CFDI 3.3 & 4.0
         return msXtaTaxRegime;
     }
 
     @Override
-    public int getReceptorId() {
+    public int getReceptorId() { // CFDI 3.3 & 4.0
         return moAuxDbmsDataEmisor.getPkBizPartnerId();
     }
 
     @Override
-    public int getReceptorSucursalId() {
+    public int getReceptorSucursalId() { // CFDI 3.3 & 4.0
         return mnFkCompanyBranchId;
     }
 
     @Override
-    public String getReceptorResidenciaFiscal() {
+    public String getReceptorResidenciaFiscal() { // CFDI 3.3 & 4.0
         return "";
     }
 
     @Override
-    public String getReceptorNumRegIdTrib() {
+    public String getReceptorNumRegIdTrib() { // CFDI 3.3 & 4.0
         return "";
     }
-
+    
     @Override
-    public String getReceptorUsoCFDI() {
-        return DCfdi33Catalogs.CFDI_USO_POR_DEF; // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+    public String getReceptorUsoCFDI() { // CFDI 3.3 & 4.0
+        return DCfdi40Catalogs.ClaveUsoCfdiSinEfectosFiscales; 
+    }
+    
+    @Override
+    public String getReceptorRegimenFiscal() { // CFDI 4.0
+        return msXtaTaxRegime;
     }
 
     @Override
-    public int getDestinatarioId() {
-        return SLibConstants.UNDEFINED; // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public int getDestinatarioId() { // CFDI 3.3 & 4.0
+        return SLibConstants.UNDEFINED; 
     }
 
     @Override
-    public int getDestinatarioSucursalId() {
-        return SLibConstants.UNDEFINED; // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public int getDestinatarioSucursalId() { // CFDI 3.3 & 4.0
+        return SLibConstants.UNDEFINED; 
     }
 
     @Override
-    public int getDestinatarioDomicilioId() {
-        return SLibConstants.UNDEFINED; // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public int getDestinatarioDomicilioId() { // CFDI 3.3 & 4.0
+        return SLibConstants.UNDEFINED; 
     }
 
     @Override
-    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception {
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception { // CFDI 3.3 & 4.0
         ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
         for (SDbBolMerchandise merch : maBolMerchandises) {
             SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_BOL);
@@ -890,10 +966,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             concepto.setCantidad(merch.getQuantity());
             concepto.setClaveUnidad(merch.getXtaClaveUnidad());
             concepto.setUnidad("");
-            concepto.setDescripcion(merch.getXtaItem().getItem());
+            concepto.setDescripcion(merch.getDataItem().getItem());
             concepto.setValorUnitario(0);
             concepto.setImporte(0);
             concepto.setDescuento(0);
+            concepto.setObjetoImpuesto(DCfdi40Catalogs.ClaveObjetoImpNo);
 
             conceptos.add(concepto);
         }
@@ -902,18 +979,18 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     }
 
     @Override
-    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion) {
-        return null;    // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion) { // CFDI 3.3 & 4.0
+        return null;    
     }
 
     @Override
-    public DElement getElementComplemento() throws Exception {
-        DElementComplemento complemento = new DElementComplemento();
+    public DElement getElementComplemento() throws Exception { // CFDI 3.3 & 4.0
+        cfd.ver40.DElementComplemento complemento = new cfd.ver40.DElementComplemento();
         
         // Encabezado:
         
         DElementCartaPorte ccp = new DElementCartaPorte();
-        ccp.getAttTransInternac().setString(mbInternationalBol ? DCfdi33Catalogs.TxtSí : DCfdi33Catalogs.TxtNo);
+        ccp.getAttTransInternac().setString(mbInternationalBol ? DCfdi40Catalogs.TxtSí : DCfdi40Catalogs.TxtNo);
         if (mbInternationalBol) {
             ccp.getAttEntradaSalidaMerc().setString(msInputOutputBol);
             ccp.getAttViaEntradaSalida().setString(msInputOutputWay);
@@ -927,17 +1004,18 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         for (SDbBolLocation location : maBolLocations) {
             DElementUbicacion origen = null;
             DElementUbicacion destino = null;
+            
             if (location.getXtaIsOrigin()) {
                 origen = new DElementUbicacion();
-                origen.getAttTipoUbicacion().setString("Origen");
-                origen.getAttIDUbicacion().setString(DCfdi33Catalogs.PrefijoClaveOrigen + location.getXtaBizPartnerBranchAddress().getAddressCode());
-                if (location.getXtaBizPartner().getFiscalId().isEmpty()) {
-                    origen.getAttNumRegIdTrib().setString(location.getXtaBizPartner().getFiscalId());
-                    origen.getAttNombreRemitenteDestinatario().setString(location.getXtaBizPartner().getBizPartner());
-                    origen.getAttResidenciaFiscal().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode()); 
+                origen.getAttTipoUbicacion().setString(DCfdi40Catalogs.ClaveOrigen);
+                origen.getAttIDUbicacion().setString(DCfdi40Catalogs.PrefijoClaveOrigen + location.getDataBizPartnerBranchAddress().getAddressCode());
+                if (location.getDataBizPartner().getFiscalId().isEmpty()) {
+                    origen.getAttNumRegIdTrib().setString(location.getDataBizPartner().getFiscalId());
+                    origen.getAttNombreRemitenteDestinatario().setString(location.getDataBizPartner().getBizPartner());
+                    origen.getAttResidenciaFiscal().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode()); 
                 }
                 else {
-                    origen.getAttRFCRemitenteDestinatario().setString(location.getXtaBizPartner().getFiscalId());
+                    origen.getAttRFCRemitenteDestinatario().setString(location.getDataBizPartner().getFiscalId());
                 }
                 origen.getAttFechaHoraSalidaLlegada().setDatetime(location.getDateDeparture_n());
                 
@@ -947,11 +1025,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
                     domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsBolNeighborhood().getNeighborhoodCode());
                 }
-                domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
-                domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
-                domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 
-                if (location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
-                    SDataBolZipCode bolZipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode();
+                domicilio.getAttEstado().setString(location.getDataBizPartnerBranchAddress().getDbmsDataState().getStateCode());
+                domicilio.getAttPais().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
+                domicilio.getAttCodigoPostal().setString(location.getDataBizPartnerBranchAddress().getZipCode()); 
+                if (location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
+                    SDataBolZipCode bolZipCode = location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode();
                     if (bolZipCode.getDbmsBolCounty() != null) {
                         domicilio.getAttMunicipio().setString(bolZipCode.getDbmsBolCounty().getPkCountyCode());
                     }
@@ -960,17 +1038,18 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                     }
                 }
             }
+            
             if (location.getXtaIsDestination()) {
                 destino = new DElementUbicacion();
-                destino.getAttTipoUbicacion().setString("Destino");
-                destino.getAttIDUbicacion().setString(DCfdi33Catalogs.PrefijoClaveDestino + location.getXtaBizPartnerBranchAddress().getAddressCode());
-                if (location.getXtaBizPartner().getFiscalId().isEmpty()) {
-                    destino.getAttNumRegIdTrib().setString(location.getXtaBizPartner().getFiscalId());
-                    destino.getAttNombreRemitenteDestinatario().setString(location.getXtaBizPartner().getBizPartner());
-                    destino.getAttResidenciaFiscal().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode()); 
+                destino.getAttTipoUbicacion().setString(DCfdi40Catalogs.ClaveDestino);
+                destino.getAttIDUbicacion().setString(DCfdi40Catalogs.PrefijoClaveDestino + location.getDataBizPartnerBranchAddress().getAddressCode());
+                if (location.getDataBizPartner().getFiscalId().isEmpty()) {
+                    destino.getAttNumRegIdTrib().setString(location.getDataBizPartner().getFiscalId());
+                    destino.getAttNombreRemitenteDestinatario().setString(location.getDataBizPartner().getBizPartner());
+                    destino.getAttResidenciaFiscal().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode()); 
                 }
                 else {
-                    destino.getAttRFCRemitenteDestinatario().setString(location.getXtaBizPartner().getFiscalId());
+                    destino.getAttRFCRemitenteDestinatario().setString(location.getDataBizPartner().getFiscalId());
                 }
                 destino.getAttFechaHoraSalidaLlegada().setDatetime(location.getDateArrival_n());
                 destino.getAttDistanciaRecorrida().setDouble(location.getDistance());
@@ -981,11 +1060,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
                     domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsBolNeighborhood().getNeighborhoodCode());
                 }
-                domicilio.getAttEstado().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataState().getStateCode());
-                domicilio.getAttPais().setString(location.getXtaBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
-                domicilio.getAttCodigoPostal().setString(location.getXtaBizPartnerBranchAddress().getZipCode()); 
-                if (location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
-                    SDataBolZipCode zipCode = location.getXtaBizPartnerBranchAddress().getDbmsDataBolZipCode();
+                domicilio.getAttEstado().setString(location.getDataBizPartnerBranchAddress().getDbmsDataState().getStateCode());
+                domicilio.getAttPais().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
+                domicilio.getAttCodigoPostal().setString(location.getDataBizPartnerBranchAddress().getZipCode()); 
+                if (location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
+                    SDataBolZipCode zipCode = location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode();
                     if (zipCode.getDbmsBolCounty() != null) {
                         domicilio.getAttMunicipio().setString(zipCode.getDbmsBolCounty().getPkCountyCode());
                     }
@@ -994,9 +1073,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                     }
                 }
             }
+            
             if (origen != null) {
                 ubicaciones.add(origen);
             }
+            
             if (destino != null) {
                 ubicaciones.add(destino);
             }
@@ -1015,7 +1096,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         for (SDbBolMerchandise merch : maBolMerchandises) {
             DElementMercancia mercancia = new DElementMercancia();
             mercancia.getAttBienesTransp().setString(merch.getXtaItemClaveProdServ());
-            mercancia.getAttDescripcion().setString(merch.getXtaItem().getItem());
+            mercancia.getAttDescripcion().setString(merch.getDataItem().getItem());
             mercancia.getAttCantidad().setDouble(merch.getQuantity());
             mercancia.getAttClaveUnidad().setString(merch.getXtaClaveUnidad());
             mercancia.getAttPesoEnKg().setDouble(merch.getXtaClaveUnidad().equals("KGM") ? merch.getQuantity() : merch.getWeight());
@@ -1025,11 +1106,11 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             
             ArrayList<SDbBolMerchandiseQuantity> qtyOr = new ArrayList<>();
             ArrayList<SDbBolMerchandiseQuantity> qtyDe = new ArrayList<>();
-            for (SDbBolMerchandiseQuantity qty : merch.getBolMerchandiseQuantity()) {
-                if (qty.getXtaOriginBizPartnerBranchAddress() != null) {
+            for (SDbBolMerchandiseQuantity qty : merch.getChildBolMerchandiseQuantities()) {
+                if (qty.getDataOriginBizPartnerBranchAddress() != null) {
                     qtyOr.add(qty);
                 }
-                if (qty.getXtaDestinationBizPartnerBranchAddress() != null) {
+                if (qty.getDataDestinationBizPartnerBranchAddress() != null) {
                     qtyDe.add(qty);
                 }
             }
@@ -1041,8 +1122,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                     for (SDbBolMerchandiseQuantity de : qtyDe) {
                         if (de.getQuantity() > 0) {
                             DElementCantidadTransporta elementTransp = new DElementCantidadTransporta();
-                            elementTransp.getAttIDOrigen().setString(DCfdi33Catalogs.PrefijoClaveOrigen + or.getXtaOriginBizPartnerBranchAddress().getAddressCode());
-                            elementTransp.getAttIDDestino().setString(DCfdi33Catalogs.PrefijoClaveDestino + de.getXtaDestinationBizPartnerBranchAddress().getAddressCode());
+                            elementTransp.getAttIDOrigen().setString(DCfdi40Catalogs.PrefijoClaveOrigen + or.getDataOriginBizPartnerBranchAddress().getAddressCode());
+                            elementTransp.getAttIDDestino().setString(DCfdi40Catalogs.PrefijoClaveDestino + de.getDataDestinationBizPartnerBranchAddress().getAddressCode());
                             if (or.getQuantity() > de.getQuantity()) {
                                 or.setQuantity(or.getQuantity() - de.getQuantity());                                
                                 elementTransp.getAttCantidad().setDouble(de.getQuantity());
@@ -1074,24 +1155,24 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Autotransporte:
         
         DElementAutotransporte autotransporte = encabezadoMercancias.getEltAutotransporte();
-        autotransporte.getAttPermSCT().setString(moBolTransportationMode.getXtaVehicle().getPermissonSctType());
-        autotransporte.getAttNumPermisoSCT().setString(moBolTransportationMode.getXtaVehicle().getPermissonSctNumber());
+        autotransporte.getAttPermSCT().setString(moBolTransportationMode.getDataVehicle().getPermissonSctType());
+        autotransporte.getAttNumPermisoSCT().setString(moBolTransportationMode.getDataVehicle().getPermissonSctNumber());
         
         // Identificación vehicular:
         
         DElementIdentificacionVehicular idVehicular = autotransporte.getEltIdentificacionVehicular();
-        idVehicular.getAttConfigVehicular().setString(moBolTransportationMode.getXtaVehicle().getVehicleConfiguration());
-        idVehicular.getAttPlacaVM().setString(moBolTransportationMode.getXtaVehicle().getPlate());
-        idVehicular.getAttAnioModeloVM().setInteger(moBolTransportationMode.getXtaVehicle().getVehicleYear());
+        idVehicular.getAttConfigVehicular().setString(moBolTransportationMode.getDataVehicle().getVehicleConfiguration());
+        idVehicular.getAttPlacaVM().setString(moBolTransportationMode.getDataVehicle().getPlate());
+        idVehicular.getAttAnioModeloVM().setInteger(moBolTransportationMode.getDataVehicle().getVehicleYear());
         
         // Seguros: 
         
         DElementSeguros seguros = autotransporte.getEltSeguros();
-        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getXtaVehicle().getXtaInsurerName());
-        seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getXtaVehicle().getInsurancePolicy());
-        seguros.getAttAseguraMedAmbiente().setString(moXtaEnvironmentalInsurer.getName());
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
+        seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
-        seguros.getAttAseguraCarga().setString(moXtaMerchandiseInsurer.getName());
+        seguros.getAttAseguraCarga().setString(moDataMerchandiseInsurer.getName());
         seguros.getAttPolizaCarga().setString(msMerchandiseInsurerPolicy);
         seguros.getAttPrimaSeguro().setString(msPremium);
         
@@ -1099,16 +1180,16 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         DElementRemolques elementRemolques = new DElementRemolques();
         ArrayList<DElementRemolque> remolques = new ArrayList<>();
-        if (moBolTransportationMode.getXtaTrailer1().getPkTrailerId() != 0) {
+        if (moBolTransportationMode.getDataTrailer1().getPkTrailerId() != 0) {
             DElementRemolque remolque = new DElementRemolque();
-            remolque.getAttSubTipoRem().setString(moBolTransportationMode.getXtaTrailer1().getTrailerSubtype());
-            remolque.getAttPlaca().setString(moBolTransportationMode.getXtaTrailer1().getPlate());
+            remolque.getAttSubTipoRem().setString(moBolTransportationMode.getDataTrailer1().getTrailerSubtype());
+            remolque.getAttPlaca().setString(moBolTransportationMode.getDataTrailer1().getPlate());
             remolques.add(remolque);
         }
-        if (moBolTransportationMode.getXtaTrailer2().getPkTrailerId() != 0) {
+        if (moBolTransportationMode.getDataTrailer2().getPkTrailerId() != 0) {
             DElementRemolque remolque = new DElementRemolque();
-            remolque.getAttSubTipoRem().setString(moBolTransportationMode.getXtaTrailer2().getTrailerSubtype());
-            remolque.getAttPlaca().setString(moBolTransportationMode.getXtaTrailer2().getPlate());
+            remolque.getAttSubTipoRem().setString(moBolTransportationMode.getDataTrailer2().getTrailerSubtype());
+            remolque.getAttPlaca().setString(moBolTransportationMode.getDataTrailer2().getPlate());
             remolques.add(remolque);
         }
         if (remolques.size() > 0) {
@@ -1116,71 +1197,136 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             autotransporte.setEltRemolques(elementRemolques); 
         }
         
-        
         // Figura transporte:
         
         ArrayList<DElementTiposFigura> figuras = ccp.getEltFiguraTransporte().getEltTiposFigura();
         DElementTiposFigura chofer = new DElementTiposFigura();
-        chofer.getAttTipoFigura().setString(DCfdi33Catalogs.ClaveChofer);
-        chofer.getAttNumLicencia().setString(moBolTransportationMode.getXtaDriver().getDriverLicense()); 
-        if (!moBolTransportationMode.getXtaDriver().getFiscalId().isEmpty()) {
-            chofer.getAttRFCFigura().setString(moBolTransportationMode.getXtaDriver().getFiscalId());
+        chofer.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveChofer);
+        chofer.getAttNumLicencia().setString(moBolTransportationMode.getDataDriver().getDriverLicense()); 
+        if (!moBolTransportationMode.getDataDriver().getFiscalId().isEmpty()) {
+            chofer.getAttRFCFigura().setString(moBolTransportationMode.getDataDriver().getFiscalId());
         }
         else {
-            chofer.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getXtaDriver().getFiscalForeginId());
-            chofer.getAttNombreFigura().setString(moBolTransportationMode.getXtaDriver().getName());
-            chofer.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getXtaDriver().getXtaCountry().getCountryCode());
+            chofer.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataDriver().getFiscalForeginId());
+            chofer.getAttNombreFigura().setString(moBolTransportationMode.getDataDriver().getName());
+            chofer.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataDriver().getDataCountry().getCountryCode());
         }
         figuras.add(chofer);
         
-        if (moBolTransportationMode.getXtaOwner().getPkBolPersonId() != 0) {
+        // Propietario 1
+        
+        if (moBolTransportationMode.getDataOwner1().getPkBolPersonId() != 0) {
             DElementTiposFigura propietario = new DElementTiposFigura();
-            propietario.getAttTipoFigura().setString(DCfdi33Catalogs.ClavePropietario);
-            if (!moBolTransportationMode.getXtaOwner().getFiscalId().isEmpty()) {
-                propietario.getAttRFCFigura().setString(moBolTransportationMode.getXtaOwner().getFiscalId());
+            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClavePropietario);
+            if (!moBolTransportationMode.getDataOwner1().getFiscalId().isEmpty()) {
+                propietario.getAttRFCFigura().setString(moBolTransportationMode.getDataOwner1().getFiscalId());
             }
             else {
-                propietario.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getXtaOwner().getFiscalForeginId());
-                propietario.getAttNombreFigura().setString(moBolTransportationMode.getXtaOwner().getName());
-                propietario.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getXtaOwner().getXtaCountry().getCountryCode());
+                propietario.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataOwner1().getFiscalForeginId());
+                propietario.getAttNombreFigura().setString(moBolTransportationMode.getDataOwner1().getName());
+                propietario.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataOwner1().getDataCountry().getCountryCode());
             }
             ArrayList<DElementPartesTransporte> partesTransporte = propietario.getEltPartesTransporte(); 
             DElementPartesTransporte parte = new DElementPartesTransporte();
-            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartOwner());
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartOwner1());
             partesTransporte.add(parte);
             figuras.add(propietario);
         }
         
-        if (moBolTransportationMode.getXtaLessee().getPkBolPersonId() != 0) {
-            DElementTiposFigura arrendador = new DElementTiposFigura();
-            arrendador.getAttTipoFigura().setString(DCfdi33Catalogs.ClaveArrendador);
-            if (!moBolTransportationMode.getXtaLessee().getFiscalId().isEmpty()) {
-                arrendador.getAttRFCFigura().setString(moBolTransportationMode.getXtaLessee().getFiscalId());
+        // Propietario 2
+        
+        if (moBolTransportationMode.getDataOwner2().getPkBolPersonId() != 0) {
+            DElementTiposFigura propietario = new DElementTiposFigura();
+            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClavePropietario);
+            if (!moBolTransportationMode.getDataOwner2().getFiscalId().isEmpty()) {
+                propietario.getAttRFCFigura().setString(moBolTransportationMode.getDataOwner2().getFiscalId());
             }
             else {
-                arrendador.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getXtaLessee().getFiscalForeginId());
-                arrendador.getAttNombreFigura().setString(moBolTransportationMode.getXtaLessee().getName());
-                arrendador.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getXtaLessee().getXtaCountry().getCountryCode());
+                propietario.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataOwner2().getFiscalForeginId());
+                propietario.getAttNombreFigura().setString(moBolTransportationMode.getDataOwner2().getName());
+                propietario.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataOwner2().getDataCountry().getCountryCode());
+            }
+            ArrayList<DElementPartesTransporte> partesTransporte = propietario.getEltPartesTransporte(); 
+            DElementPartesTransporte parte = new DElementPartesTransporte();
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartOwner2());
+            partesTransporte.add(parte);
+            figuras.add(propietario);
+        }
+        
+        // Arrendador 1
+        
+        if (moBolTransportationMode.getDataLessor1().getPkBolPersonId() != 0) {
+            DElementTiposFigura arrendador = new DElementTiposFigura();
+            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveArrendador);
+            if (!moBolTransportationMode.getDataLessor1().getFiscalId().isEmpty()) {
+                arrendador.getAttRFCFigura().setString(moBolTransportationMode.getDataLessor1().getFiscalId());
+            }
+            else {
+                arrendador.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataLessor1().getFiscalForeginId());
+                arrendador.getAttNombreFigura().setString(moBolTransportationMode.getDataLessor1().getName());
+                arrendador.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataLessor1().getDataCountry().getCountryCode());
             }
             ArrayList<DElementPartesTransporte> partesTransporte = arrendador.getEltPartesTransporte();
             DElementPartesTransporte parte = new DElementPartesTransporte();
-            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartLessee());
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartLessor1());
             partesTransporte.add(parte);
             figuras.add(arrendador);
         }
         
-        if (moBolTransportationMode.getXtaNotified().getPkBolPersonId() != 0) {
-            DElementTiposFigura notificado = new DElementTiposFigura();
-            notificado.getAttTipoFigura().setString(DCfdi33Catalogs.ClaveNotificado);
-            if (!moBolTransportationMode.getXtaNotified().getFiscalId().isEmpty()) {
-                notificado.getAttRFCFigura().setString(moBolTransportationMode.getXtaNotified().getFiscalId());
+        // Arrendador 2
+        
+        if (moBolTransportationMode.getDataLessor2().getPkBolPersonId() != 0) {
+            DElementTiposFigura arrendador = new DElementTiposFigura();
+            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveArrendador);
+            if (!moBolTransportationMode.getDataLessor2().getFiscalId().isEmpty()) {
+                arrendador.getAttRFCFigura().setString(moBolTransportationMode.getDataLessor2().getFiscalId());
             }
             else {
-                notificado.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getXtaNotified().getFiscalForeginId());
-                notificado.getAttNombreFigura().setString(moBolTransportationMode.getXtaNotified().getName());
-                notificado.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getXtaNotified().getXtaCountry().getCountryCode());
+                arrendador.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataLessor2().getFiscalForeginId());
+                arrendador.getAttNombreFigura().setString(moBolTransportationMode.getDataLessor2().getName());
+                arrendador.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataLessor2().getDataCountry().getCountryCode());
+            }
+            ArrayList<DElementPartesTransporte> partesTransporte = arrendador.getEltPartesTransporte();
+            DElementPartesTransporte parte = new DElementPartesTransporte();
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartLessor2());
+            partesTransporte.add(parte);
+            figuras.add(arrendador);
+        }
+        
+        if (moBolTransportationMode.getDataNotified().getPkBolPersonId() != 0) {
+            DElementTiposFigura notificado = new DElementTiposFigura();
+            notificado.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveNotificado);
+            if (!moBolTransportationMode.getDataNotified().getFiscalId().isEmpty()) {
+                notificado.getAttRFCFigura().setString(moBolTransportationMode.getDataNotified().getFiscalId());
+            }
+            else {
+                notificado.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataNotified().getFiscalForeginId());
+                notificado.getAttNombreFigura().setString(moBolTransportationMode.getDataNotified().getName());
+                notificado.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataNotified().getDataCountry().getCountryCode());
             } 
             figuras.add(notificado);
+        }
+        
+        for (SDbBolTransportationModeExtra tme : moBolTransportationMode.getBolTransportationModeExtra()) {
+            DElementTiposFigura figura = new DElementTiposFigura();
+            figura.getAttTipoFigura().setString(tme.getBolPerson().getDbmsBolPersonTypeCode());
+            if (!tme.getBolPerson().getFiscalId().isEmpty()) {
+                figura.getAttRFCFigura().setString(tme.getBolPerson().getFiscalId());
+            }
+            else {
+                figura.getAttNumRegIdTribFigura().setString(tme.getBolPerson().getFiscalForeginId());
+                figura.getAttNombreFigura().setString(tme.getBolPerson().getName());
+                figura.getAttResidenciaFiscalFigura().setString(tme.getBolPerson().getDataCountry().getCountryCode());
+            }
+            figura.getAttNumLicencia().setString(tme.getBolPerson().getDriverLicense());
+            if (!figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveNotificado) &&
+                    !figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveChofer)) {
+                ArrayList<DElementPartesTransporte> partesTransporte = figura.getEltPartesTransporte();
+                DElementPartesTransporte parte = new DElementPartesTransporte();
+                parte.getAttParteTransporte().setString(tme.getTransportationPart());
+                partesTransporte.add(parte);
+            }
+            figuras.add(figura);
         }
         
         complemento.getElements().add(ccp);
@@ -1188,7 +1334,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     }
 
     @Override
-    public DElement getElementAddenda() {
+    public DElement getElementAddenda() { // CFDI 3.3 & 4.0
         return null;
     }
 }

@@ -467,11 +467,35 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     }
     
     /**
+     * Check if receipt's type of recuitment schema is for wages.
+     * @return 
+     */
+    public boolean isWage() {
+        return SHrsUtils.isWages(mnFkRecruitmentSchemaTypeId);
+    }
+    
+    /**
      * Check if receipt's type of recuitment schema is for assimilated.
      * @return 
      */
-    public boolean isAssimilable() {
-        return SHrsUtils.isAssimilable(mnFkRecruitmentSchemaTypeId);
+    public boolean isAssimilated() {
+        return SHrsUtils.isAssimilated(mnFkRecruitmentSchemaTypeId);
+    }
+    
+    /**
+     * Check if receipt's type of recuitment schema is for retirees.
+     * @return 
+     */
+    public boolean isRetiree() {
+        return SHrsUtils.isRetirees(mnFkRecruitmentSchemaTypeId);
+    }
+    
+    /**
+     * Check if receipt's type of recuitment schema is for others.
+     * @return 
+     */
+    public boolean isOther() {
+        return SHrsUtils.isOthers(mnFkRecruitmentSchemaTypeId);
     }
     
     @Override

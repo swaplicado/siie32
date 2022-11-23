@@ -61,7 +61,8 @@ public class SFilesGeneration {
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                         cfdiVersion = SCfdConsts.CFDI_PAYROLL_VER_OLD;
                         break;
-                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33://
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
                         cfdiVersion = SCfdConsts.CFDI_PAYROLL_VER_CUR;
                         break;
                     default:
@@ -71,6 +72,7 @@ public class SFilesGeneration {
                 switch (cfdForPrinting.getFkCfdTypeId()) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
                     case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                    case SDataConstantsSys.TRNS_TP_CFD_BOL:
                         this.writeXml(cfdForPrinting.getDocXmlName(), cfdForPrinting.getDocXml(), (SClientInterface) client);
                         if (cfdForPrinting.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED || cfdForPrinting.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                             SCfdUtils.printCfd((SClientInterface) client, cfdForPrinting, cfdiVersion, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, false);
@@ -83,6 +85,8 @@ public class SFilesGeneration {
                             SCfdUtils.printCfd((SClientInterface) client, cfdForPrinting, cfdiVersion, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, false);
                         }
                         break;
+                    default:
+                        // do nothing
                 }
             }
         }

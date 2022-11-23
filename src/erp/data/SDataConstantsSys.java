@@ -91,9 +91,15 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
+    public static final String CFG_PARAM_HRS_VARIABLE_EARNINGS = "HRS_VARIABLE_EARNINGS";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
+    public static final String CFG_PARAM_CFD_ORG_NAMES = "CFD_ORG_NAMES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
+    
+    public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
+    public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
+    public static final int CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE = 13;
     
     public static final int USD_XRT_POLICY_BANXICO = 1;
     public static final int USD_XRT_POLICY_INFORMAL = 2;
@@ -191,11 +197,15 @@ public abstract class SDataConstantsSys {
     public static final int PRV_FIN_ACC_ITEM = 102012;
     public static final int PRV_FIN_DPS_DNS = 102013;
     public static final int PRV_FIN_DPS_DNC = 102014;
+    //public static final int PRV_FIN_DIOM_DNS = 102015;
+    //public static final int PRV_FIN_DIOM_DNC = 102016;
+    //public static final int PRV_FIN_DIOM_OUT = 102017;
+    //public static final int PRV_FIN_DIOM_IN = 102018;
     public static final int PRV_FIN_MOV_ACC_CASH = 102019;
     public static final int PRV_FIN_MOV_CDR = 102020;
     public static final int PRV_FIN_MOV_DBR = 102021;
     public static final int PRV_FIN_COUNTER_RCPT = 102022;
-    public static final int PRV_FIN_CFD_PAY = 102051;
+    public static final int PRV_FIN_CFD_PAYMENT = 102051;
     public static final int PRV_FIN_REP = 102901;
     public static final int PRV_FIN_REP_STATS = 102902;
     public static final int PRV_FIN_REP_INDEX = 102903;
@@ -203,6 +213,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_DPS_DNS = 103001;
     public static final int PRV_PUR_DPS_DNC = 103002;
     public static final int PRV_PUR_DPS_PRT_FMT = 103003;
+    //public static final int PRV_PUR_DIOM_DNS = 103004;
+    //public static final int PRV_PUR_DIOM_DNC = 103005;
     public static final int PRV_PUR_DOC_EST = 103006;
     public static final int PRV_PUR_DOC_EST_AUTHORN = 103071;
     public static final int PRV_PUR_DOC_ORD = 103007;
@@ -223,7 +235,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_DOC_ORD_REJECT_OWN = 103022;
     public static final int PRV_PUR_DOC_ORD_DELAY = 103023;
     public static final int PRV_PUR_DOC_OMT_DOC_SRC = 103024;
-    public static final int PRV_PUR_DOC_ORD_DNS = 103025;
+    public static final int PRV_PUR_DOC_ORD_ALL_DNS = 103025;
     public static final int PRV_PUR_PRICE_CHG = 103031;
     public static final int PRV_PUR_CRED_CONFIG = 103041;
     public static final int PRV_PUR_ITEM_SUP = 103051;
@@ -234,6 +246,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DPS_DNS = 104001;
     public static final int PRV_SAL_DPS_DNC = 104002;
     public static final int PRV_SAL_DPS_PRT_FMT = 104003;
+    //public static final int PRV_SAL_DIOM_DNS = 104004;
+    //public static final int PRV_SAL_DIOM_DNC = 104005;
     public static final int PRV_SAL_DOC_EST = 104006;
     public static final int PRV_SAL_DOC_EST_AUTHORN = 104071;
     public static final int PRV_SAL_DOC_ORD = 104007;
@@ -254,14 +268,14 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_ORD_REJECT_OWN = 104022;
     public static final int PRV_SAL_DOC_ORD_DELAY = 104023;
     public static final int PRV_SAL_DOC_OMT_DOC_SRC = 104024;
-    public static final int PRV_SAL_DOC_ORD_DNS = 104025;
+    public static final int PRV_SAL_DOC_ORD_ALL_DNS = 104025;
     public static final int PRV_SAL_PRICE_CHG = 104031;
     public static final int PRV_SAL_CRED_CONFIG = 104041;
     public static final int PRV_SAL_DOC_EST_CLO = 104056;
     public static final int PRV_SAL_DOC_ORD_CLO = 104057;
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
-    public static final int PRV_SAL_COMP_SIGN_REST = 104062;
-    public static final int PRV_SAL_COMP_SIGN_IMMEX = 105063;
+    public static final int PRV_SAL_COMP_SIGN_RESTRICT = 104062;
+    public static final int PRV_SAL_COMP_SIGN_IMMEX = 104063;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;
@@ -339,7 +353,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_PAY_WEE = 109011;
     public static final int PRV_HRS_PAY_FOR = 109012;
     public static final int PRV_HRS_AUX_HRS = 109021;
-    public static final int PRV_HRS_PER_EMP_DATA = 109091;
+    public static final int PRV_HRS_EMP_PERS_DATA = 109091;
+    public static final int PRV_HRS_EMP_VARIABLE_EARNINGS = 109092;
     public static final int PRV_HRS_REP = 109901;
 
     public static final int PRV_QLT_LOT_APR = 110001;
@@ -521,6 +536,7 @@ public abstract class SDataConstantsSys {
     public static final int ITMU_TP_LEV_NA = 1;
 
     public static final int ITMU_UNIT_NA = 1;
+    public static final int ITMU_KG = 59;
 
     public static final int ITMU_TP_VAR_NA = 1;
 
@@ -789,6 +805,8 @@ public abstract class SDataConstantsSys {
     //public static final int FINS_TP_ACC_SYS_PAY_MORT = 25;
     //public static final int FINS_TP_ACC_SYS_REC_NOTE = 26;
     //public static final int FINS_TP_ACC_SYS_REC_MORT = 27;
+    
+    public static final int[] FINS_TP_SYS_MOV_TAX_SAL_EFVO = new int[] { 32, 32 }; // table fid_tp_sys_mov
     
     public static final int FINS_CT_SYS_MOV_NA = 1; // table fid_ct_sys_mov_xxx
     public static final int FINS_CT_SYS_MOV_ASSET = 2; // table fid_ct_sys_mov_xxx
@@ -1129,6 +1147,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_XML_CFD = 2;
     public static final int TRNS_TP_XML_CFDI_32 = 3;
     public static final int TRNS_TP_XML_CFDI_33 = 4;
+    public static final int TRNS_TP_XML_CFDI_40 = 5;
 
     public static final int TRNS_TP_CFD_INV = 1;        // invoice
     public static final int TRNS_TP_CFD_BOL = 2;        // bill of lading
@@ -1162,19 +1181,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_BOL_MOTOR_CFG = 33;    // BOL: motortransport configuration
     public static final int TRNS_CFD_CAT_BOL_TRAILER_STP = 34;  // BOL: trailer subtype
     public static final int TRNS_CFD_CAT_BOL_TRANSP_PART = 35;  // BOL: transport part
-    
-    public static final String TRNS_CFD_CAT_PAY_WAY_99 = "99";  // Por definir
-    
-    public static final String TRNS_CFD_CAT_PAY_MET_PUE = "PUE";    // Pago en una sola exhibición
-    public static final String TRNS_CFD_CAT_PAY_MET_PPD = "PPD";    // Pago en parcialidades o diferido
-    
-    public static final String TRNS_CFD_CAT_TP_REL_CDT = "01";  // credit note
-    
-    public static final String TRNS_CFD_CAT_CTY_GRP_UE = "Unión Europea";   // European Union
-    public static final String TRNS_CFD_CAT_CTY_GRP_TLCAN = "TLCAN";        // TLCAN
-    
-    public static final String TRNS_CFD_CAT_CFD_USE_G02 = "G02";    // Devoluciones, descuentos o bonificaciones
-    public static final String TRNS_CFD_CAT_CFD_USE_P01 = "P01";    // Por definir
     
     public static final int TRNU_DPS_NAT_DEF = 1;
     
@@ -1694,6 +1700,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_CFDI_33 = 207112;
     public static final int REP_TRN_CFDI_33_CRP_10 = 207113;
     public static final int REP_TRN_CFDI_ACK_CAN = 207103;
+    public static final int REP_TRN_CFDI_40 = 207114;
+    public static final int REP_TRN_CFDI_40_CRP_20 = 207116;
     public static final int REP_TRN_SHIP = 207104;
     public static final int REP_TRN_COMMS_ITEM = 207105;
     public static final int REP_TRN_COMMS_DPS = 207106;
@@ -1701,7 +1709,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_DIOG = 207108;
     public static final int REP_TRN_DPS_SHIP_ITEM = 207109;
     public static final int REP_TRN_CON_STK = 207110;
-    public static final int REP_TRN_CFDI_PAYROLL = 207111;
+    public static final int REP_TRN_CFDI_PAYROLL_33 = 207111;
+    public static final int REP_TRN_CFDI_PAYROLL_40 = 207115;
 
     public static final int REP_MFG_PROG_MON = 208001;
     public static final int REP_MFG_ORD = 208002;

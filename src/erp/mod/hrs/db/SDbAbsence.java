@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores, Claudio Peña
+ * @author Néstor Ávalos, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SDbAbsence extends SDbRegistryUser implements SGridRow {
 
@@ -36,6 +36,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     protected int mnBenefitsYear;
     protected int mnBenefitsAnniversary;
     protected String msNotes;
+    protected int mnExternarRequestId;
     protected boolean mbTimeClockSourced;
     protected boolean mbClosed;
     //protected boolean mbDeleted;
@@ -91,6 +92,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public void setBenefitsYear(int n) { mnBenefitsYear = n; }
     public void setBenefitsAnniversary(int n) { mnBenefitsAnniversary = n; }
     public void setNotes(String s) { msNotes = s; }
+    public void setExternarRequestId(int n) { mnExternarRequestId = n; }
     public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setClosed(boolean b) { mbClosed = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -117,6 +119,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public int getBenefitsYear() { return mnBenefitsYear; }
     public int getBenefitsAnniversary() { return mnBenefitsAnniversary; }
     public String getNotes() { return msNotes; }
+    public int getExternarRequestId() { return mnExternarRequestId; }
     public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isClosed() { return mbClosed; }
     public boolean isDeleted() { return mbDeleted; }
@@ -265,6 +268,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         mnBenefitsYear = 0;
         mnBenefitsAnniversary = 0;
         msNotes = "";
+        mnExternarRequestId = 0;
         mbTimeClockSourced = false;
         mbClosed = false;
         mbDeleted = false;
@@ -319,7 +323,6 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet = null;
-        SDbAbsenceType absenceType = null;
 
         initRegistry();
         initQueryMembers();
@@ -344,6 +347,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             mnBenefitsYear = resultSet.getInt("ben_year");
             mnBenefitsAnniversary = resultSet.getInt("ben_ann");
             msNotes = resultSet.getString("nts");
+            mnExternarRequestId = resultSet.getInt("ext_req_id");
             mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbClosed = resultSet.getBoolean("b_clo");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -357,9 +361,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
-            // Read Absence type:
+            // Read absence type:
             
-            absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
+            SDbAbsenceType absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
             msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
             msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
             
@@ -399,6 +403,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     mnBenefitsYear + ", " + 
                     mnBenefitsAnniversary + ", " + 
                     "'" + msNotes + "', " +
+                    mnExternarRequestId + ", " + 
                     (mbTimeClockSourced ? 1 : 0) + ", " +
                     (mbClosed ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
@@ -432,6 +437,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     "ben_year = " + mnBenefitsYear + ", " +
                     "ben_ann = " + mnBenefitsAnniversary + ", " +
                     "nts = '" + msNotes + "', " +
+                    "ext_req_id = " + mnExternarRequestId + ", " +
                     "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_clo = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -448,6 +454,9 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         }
 
         session.getStatement().execute(msSql);
+        
+        // Read absence type:
+            
         SDbAbsenceType absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
         msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
         msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
@@ -477,6 +486,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         registry.setBenefitsYear(this.getBenefitsYear());
         registry.setBenefitsAnniversary(this.getBenefitsAnniversary());
         registry.setNotes(this.getNotes());
+        registry.setExternarRequestId(this.getExternarRequestId());
         registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());

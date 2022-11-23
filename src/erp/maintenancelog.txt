@@ -1,4 +1,48 @@
 ================================================================================
+SIIE 3.2 208.0/ 2022-10-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
+2) Implementación de nombre fiscal y régimen de capital en asociados de negocios aplicable a clientes, personas morales.
+3) Refactorización de formas de captura de asociados de negocios para apellidos y nombres de personas físicas.
+4) Implementación de atributo para ID de solicitud externa de incidencias de empleados.
+5) Corrección a la validación de cancelación de facturas de anticipos.
+6) Asignación de permiso 'administrador' a la regeneración de archivos de CFDI en el módulo Configuración.
+
+================================================================================
+SIIE 3.2 208.0/ 2022-10-18
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación del CFDI 4.0 para la generación de facturas, traslados y recepción de pagos.
+
+================================================================================
+SIIE 3.2 205.7/ 2022-10-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de configuración opcional de régimen de contratación de empleados por empresa para generación de recibos de nómina.
+
+================================================================================
+SIIE 3.2 205.6/ 2022-10-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de variante al reporte de percepciones y deducciones, "percepciones variables", y de permiso de usuario correspondiente.
+2) Implementación de consulta de altas y bajas por período.
+
+================================================================================
+SIIE 3.2 205.5/ 2022-10-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de nuevo tipo de crédito, "préstamo escolar".
+
+================================================================================
+SIIE 3.2 205.4/ 2022-09-23
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la captura de pagos múltiples en pólizas contables de diario.
+2) Corrección a la lectura del CFD complementario de documentos ligeros en la contabilización de pagos múltiples de proveedores en pólizas contables.
+3) Mejoramiento a las validaciones de niveles de riesgo "jurídico s/operaciones" y "jurídico c/operaciones" para asociados de negocios al capturar facturas.
+
+================================================================================
 SIIE 3.2 205.3/ 2022-09-21
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

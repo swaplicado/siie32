@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -154,14 +153,14 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbBizPartnerBranchAddressNeighborhood clone() throws CloneNotSupportedException {
         SDbBizPartnerBranchAddressNeighborhood registry = new SDbBizPartnerBranchAddressNeighborhood();
         
         registry.setPkBizPartnerBranchAddressId(this.getPkBizPartnerBranchAddressId());
         registry.setPkAddressAddressId(this.getPkAddressAddressId());
         registry.setFkNeighborhoodZipCode(this.getFkNeighborhoodZipCode());
         
-        registry.setDbmsBolNeighborhood(this.getDbmsBolNeighborhood());
+        registry.setDbmsBolNeighborhood(this.getDbmsBolNeighborhood()); // el clon comparte este registro que es de sólo lectura
         
         return registry;
     } 

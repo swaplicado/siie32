@@ -88,20 +88,20 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     private void updateMerchandises(SGridRow gridRow) {
         SDbBolMerchandiseQuantity merchQty = (SDbBolMerchandiseQuantity) gridRow;
-        if(merchQty.getXtaMerchandise().getBolMerchandiseQuantity().size() <= 0){
-            merchQty.getXtaMerchandise().getBolMerchandiseQuantity().add(merchQty);
+        if(merchQty.getParentMerchandise().getChildBolMerchandiseQuantities().size() <= 0){
+            merchQty.getParentMerchandise().getChildBolMerchandiseQuantities().add(merchQty);
         }
         else {
-            merchQty.getXtaMerchandise().getBolMerchandiseQuantity().set(0, merchQty);
+            merchQty.getParentMerchandise().getChildBolMerchandiseQuantities().set(0, merchQty);
         }
-        moBillOfLading.addMerchandise(merchQty.getXtaMerchandise());
+        moBillOfLading.addMerchandise(merchQty.getParentMerchandise());
         updateCurrentChargeData((SDbBolMerchandiseQuantity)gridRow);
         populateCurrentCharge();
     }
     
     public void deleteMerchandises(SGridRow gridRow) {
         SDbBolMerchandiseQuantity merchQty = (SDbBolMerchandiseQuantity) gridRow;
-        moBillOfLading.removeMerchandise(merchQty.getXtaMerchandise());
+        moBillOfLading.removeMerchandise(merchQty.getParentMerchandise());
         populateCurrentCharge();
     }
     
@@ -532,6 +532,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                 else {
                     params.getParamsMap().put(SModConsts.LOG_BOL_LOCATION, moKeyBizPartnerBranchAddress.getValue() );
                     params.getParamsMap().put(SModConsts.LOG_BOL, moBillOfLading);
+                    params.getParamsMap().put(SFormBolMerchandise.ENABLE_DISABLE_LIST, true);
                     moFormParams = params;
                     super.actionRowNew();
                 }
@@ -541,7 +542,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             public void actionRowEdit() {
                 SGuiParams params = new SGuiParams();
                 params.getParamsMap().put(SModConsts.LOG_BOL, moBillOfLading);
-                params.getParamsMap().put(1, 1); // dislabed list
+                params.getParamsMap().put(SFormBolMerchandise.ENABLE_DISABLE_LIST, false);
                 moFormParams = params;
                 super.actionRowEdit();
             }
@@ -563,8 +564,6 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                     }
                     else {
                         super.actionRowDelete();
-//                        removeFromArrayListDestinies((SDbShipmentDestinyEntry) gridRow);
-//                        actionGridChanged();
                     }
                 }
             }
@@ -610,6 +609,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
                 else {
                     params.getParamsMap().put(SModConsts.LOG_BOL_LOCATION, moKeyBizPartnerBranchAddress.getValue() );
                     params.getParamsMap().put(SModConsts.LOG_BOL, moBillOfLading);
+                    params.getParamsMap().put(SFormBolMerchandise.ENABLE_DISABLE_LIST, true);
                     moFormParams = params;
                     super.actionRowNew();
                 }
@@ -619,7 +619,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             public void actionRowEdit() {
                 SGuiParams params = new SGuiParams();
                 params.getParamsMap().put(SModConsts.LOG_BOL, moBillOfLading);
-                params.getParamsMap().put(1, 1); // dislabed list
+                params.getParamsMap().put(SFormBolMerchandise.ENABLE_DISABLE_LIST, false);
                 moFormParams = params;
                 super.actionRowEdit();
             }
@@ -689,7 +689,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         try {
             Vector<SGridRow> vRows = new Vector<>();
             ArrayList<SDbBolMerchandiseQuantity> aRows = new ArrayList<>();
-            for (SDbBolMerchandiseQuantity merch : moRegistry.getXtaMerchandiseQuantityCharge()) {
+            for (SDbBolMerchandiseQuantity merch : moRegistry.getBolMerchandiseQuantityCharges()) {
                 aRows.add(merch);
             }
             for (SDbBolMerchandiseQuantity row : aRows) {
@@ -708,7 +708,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         try {
             Vector<SGridRow> vRows = new Vector<>();
             ArrayList<SDbBolMerchandiseQuantity> aRows = new ArrayList<>();
-            for (SDbBolMerchandiseQuantity merch : moRegistry.getXtaMerchandiseQuantityDischarge()) {
+            for (SDbBolMerchandiseQuantity merch : moRegistry.getBolMerchandiseQuantityDischarges()) {
                 aRows.add(merch);
             }
             for (SDbBolMerchandiseQuantity row : aRows) {
@@ -727,7 +727,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         try {
             Vector<SGridRow> vRows = new Vector<>();
             ArrayList<SRowBillOfLading> aRows = new ArrayList<>();
-            for (SRowBillOfLading bol : moRegistry.getXtaRowsPrecharged()) {
+            for (SRowBillOfLading bol : moRegistry.getRowBolPrecharges()) {
                 aRows.add(bol);
             }
             for (SRowBillOfLading row : aRows) {
@@ -744,7 +744,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     
     private void populateCurrentCharge() {
         try {
-            moRegistry.inicializeRowsCurrentCharge(moRegistry.getXtaRowsPrecharged());
+            moRegistry.inicializeRowsCurrentCharge(moRegistry.getRowBolPrecharges());
             for (SGridRow row : moGridCharge.getModel().getGridRows()){
                 updateCurrentChargeData((SDbBolMerchandiseQuantity)row);
             }
@@ -753,7 +753,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             }
             Vector<SGridRow> vRows = new Vector<>();
             ArrayList<SRowBillOfLading> aRows = new ArrayList<>();
-            for (SRowBillOfLading bol : moRegistry.getXtaRowsCurrentCharge()) {
+            for (SRowBillOfLading bol : moRegistry.getRowBolCurrentCharges()) {
                 aRows.add(bol);
             }
             for (SRowBillOfLading row : aRows) {
@@ -770,7 +770,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     }
     
     private void updatePrechargedData(Vector<SGridRow> rows) {
-        moRegistry.getXtaRowsPrecharged().clear();
+        moRegistry.getRowBolPrecharges().clear();
         for (SGridRow row : rows) {
             SDbBolLocation bol = (SDbBolLocation) row;
             moRegistry.updateRowsPrecharged(bol);
@@ -979,9 +979,9 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
         registry.setDateArrival_n(moDateArrival.isEnabled() ? moDateArrival.getValue() : null);
         registry.setLocationType(moRadioStart.isSelected() ? 1 : moRadioMedium.isSelected() ? 2 : moRadioEnd.isSelected() ? 3 : 0);
         registry.setXtaLocationType(moRadioStart.isSelected() ? "Inicial" : moRadioMedium.isSelected() ? "Intermedia" : moRadioEnd.isSelected() ? "Final" : ""); 
-        registry.setXtaBizPartner(bp);
-        registry.setXtaBizPartnerBranch(bpb);
-        registry.setXtaBizPartnerBranchAddress(bpba);
+        registry.setDataBizPartner(bp);
+        registry.setDataBizPartnerBranch(bpb);
+        registry.setDataBizPartnerBranchAddress(bpba);
         if (moRadioOrigin.isSelected()) {
             registry.setFkOriginBizPartner_n(moKeyBizPartner.getValue()[0]);
             registry.setFkOriginBizPartnerAddress_n(moKeyBizPartnerBranch.getValue()[0]);
@@ -1009,20 +1009,21 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
             registry.setXtaIsDestination(false);
         }
         
-        registry.getXtaMerchandiseQuantityCharge().clear();
+        registry.getBolMerchandiseQuantityCharges().clear();
         for (SGridRow row : moGridCharge.getModel().getGridRows()) {
-            registry.getXtaMerchandiseQuantityCharge().add((SDbBolMerchandiseQuantity) row);
+            registry.getBolMerchandiseQuantityCharges().add((SDbBolMerchandiseQuantity) row);
         }
         
-        registry.getXtaMerchandiseQuantityDischarge().clear();
+        registry.getBolMerchandiseQuantityDischarges().clear();
         for (SGridRow row : moGridDischarge.getModel().getGridRows()) {
-            registry.getXtaMerchandiseQuantityDischarge().add((SDbBolMerchandiseQuantity) row);
+            registry.getBolMerchandiseQuantityDischarges().add((SDbBolMerchandiseQuantity) row);
         }
         
         return registry;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(int type, java.lang.Object value) {
 
        switch (type) {
@@ -1068,14 +1069,6 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     @Override
     public Object getValue(int type) {
         Object value = null;
-//        switch (type) {
-//            case SModConsts.BPSU_BPB:
-//                value = mnFkShipmentCobId;
-//                break;
-//
-//            default:
-//        }
-
         return value;
     }
 
@@ -1103,12 +1096,7 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
-            JButton button = (JButton) e.getSource();
-
-//            if (button == jbAddDocument) {
-//                actionAddDocument();
-//            }
-            
+            JButton button = (JButton) e.getSource();            
         }
     }
 
@@ -1116,13 +1104,11 @@ public class SFormBolLocation extends SBeanForm implements SGridPaneFormOwner, A
     public void itemStateChanged(ItemEvent e) {
        if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
             JComboBox comboBox = (JComboBox)  e.getSource();
-            if(comboBox == moKeyBizPartner) {
-                //actionItemStateChangeKeyCustomer();
+            if (comboBox == moKeyBizPartner) {
             }
-            else if(comboBox == moKeyBizPartnerBranch) {
-                //actionItemStateChangeKeyCustomerBranch();
+            else if (comboBox == moKeyBizPartnerBranch) {
             }
-            else if(comboBox == moKeyBizPartnerBranchAddress) {
+            else if (comboBox == moKeyBizPartnerBranchAddress) {
                 actionItemStateChangeKeyCustomerBranchAddress();
             }
          }

@@ -18,7 +18,6 @@ import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
@@ -46,20 +45,21 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     protected int mnFkDestinationAddressAddress_n;
     protected int mnFkDestinationNeighborhoodZipCode_n;
     
-    protected SDbBizPartnerBranchAddressNeighborhood moDbmsBizPartnerBranchNeighborhood;
+    protected SDbBizPartnerBranchAddressNeighborhood moCompBizPartnerBranchNeighborhood;
     
-    protected SDataBizPartner moXtaBizParter;
-    protected SDataBizPartnerBranch moXtaBizParterBranch;
-    protected SDataBizPartnerBranchAddress moXtaBizPartnerBranchAddress;
+    protected SDataBizPartner moDataBizParter;
+    protected SDataBizPartnerBranch moDataBizParterBranch;
+    protected SDataBizPartnerBranchAddress moDataBizPartnerBranchAddress;
+    
     protected String msXtaLocationType;
     protected boolean mbXtaIsOrigin;
     protected boolean mbXtaIsDestination;
     
-    protected ArrayList<SDbBolMerchandiseQuantity> maXtaMerchandiseQuantityCharge;
-    protected ArrayList<SDbBolMerchandiseQuantity> maXtaMerchandiseQuantityDischarge;
+    protected ArrayList<SDbBolMerchandiseQuantity> maBolMerchandiseQuantityCharges;
+    protected ArrayList<SDbBolMerchandiseQuantity> maBolMerchandiseQuantityDischarges;
     
-    protected ArrayList<SRowBillOfLading> maXtaRowsPrecharge;
-    protected ArrayList<SRowBillOfLading> maXtaRowsCurrentCharge;
+    protected ArrayList<SRowBillOfLading> maRowBolPrecharges;
+    protected ArrayList<SRowBillOfLading> maRowBolCurrentCharges;
     
     public SDbBolLocation(SDbBillOfLading bol) {
         super(SModConsts.LOG_BOL_LOCATION);
@@ -67,58 +67,60 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     }
     
     public void inicializeRowsCurrentCharge(ArrayList<SRowBillOfLading> rows) {
-        maXtaRowsCurrentCharge.clear();
+        maRowBolCurrentCharges.clear();
         for (SRowBillOfLading row : rows) {
             SRowBillOfLading bol = new SRowBillOfLading();
             bol.setItemId(row.getItemId());
             bol.setItem(row.getItem());
             bol.setQuantity(row.getQuantity());
             bol.setUnit(row.getUnit());
-            maXtaRowsCurrentCharge.add(bol);
+            maRowBolCurrentCharges.add(bol);
         }
     }
     
     public void updateRowsPrecharged(SDbBolLocation l) {
-        for (SDbBolMerchandiseQuantity qty : l.maXtaMerchandiseQuantityCharge) {
+        for (SDbBolMerchandiseQuantity qty : l.maBolMerchandiseQuantityCharges) {
             boolean added= false;
-            for (SRowBillOfLading rowPrecharged : maXtaRowsPrecharge) {
-                if (rowPrecharged.getItemId() == qty.getXtaMerchandise().getFkItemId()) {
+            for (SRowBillOfLading rowPrecharged : maRowBolPrecharges) {
+                if (rowPrecharged.getItemId() == qty.getParentMerchandise().getFkItemId()) {
                     rowPrecharged.updateRowCharge(qty);
                     added = true;
                 }
             }
             if (!added) {
                 SRowBillOfLading row = new SRowBillOfLading();
-                row.setItemId(qty.getXtaMerchandise().getFkItemId());
+                row.setItemId(qty.getParentMerchandise().getFkItemId());
                 row.setItem(qty.getXtaItemName());
                 row.setQuantity(qty.getQuantity());
                 row.setUnit(qty.getXtaUnitName());
-                maXtaRowsPrecharge.add(row);
+                maRowBolPrecharges.add(row);
             }
         }
-        for (SDbBolMerchandiseQuantity qty : l.maXtaMerchandiseQuantityDischarge) {
+        
+        for (SDbBolMerchandiseQuantity qty : l.maBolMerchandiseQuantityDischarges) {
             boolean added = false;
-            for (SRowBillOfLading rowPrecharged : maXtaRowsPrecharge) {
-                if (rowPrecharged.getItemId() == qty.getXtaMerchandise().getFkItemId()) {
+            for (SRowBillOfLading rowPrecharged : maRowBolPrecharges) {
+                if (rowPrecharged.getItemId() == qty.getParentMerchandise().getFkItemId()) {
                     rowPrecharged.updateRowDischarge(qty);
                     added = true;
                 }
             }
             if (!added) {
                 SRowBillOfLading row = new SRowBillOfLading();
-                row.setItemId(qty.getXtaMerchandise().getFkItemId());
+                row.setItemId(qty.getParentMerchandise().getFkItemId());
                 row.setItem(qty.getXtaItemName());
                 row.setQuantity(qty.getQuantity());
                 row.setUnit(qty.getXtaUnitName());
-                maXtaRowsPrecharge.add(row);
+                maRowBolPrecharges.add(row);
             }
         }
     }
     
     public void updateRowsCurrentCharge(SDbBolMerchandiseQuantity qty) {
         boolean added = false;
-        for (SRowBillOfLading row : maXtaRowsCurrentCharge) {
-            if (row.getItemId() == qty.getXtaMerchandise().getFkItemId()) {
+        
+        for (SRowBillOfLading row : maRowBolCurrentCharges) {
+            if (row.getItemId() == qty.getParentMerchandise().getFkItemId()) {
                 if (qty.getFkOriginAddressAddress_n() != 0 && qty.getFkOriginBizPartnerAddress_n() != 0) {
                     row.setQuantity(row.getQuantity() + qty.getQuantity());
                     added = true;
@@ -129,13 +131,14 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
                 }
             }
         }
+        
         if (!added) {
             SRowBillOfLading row = new SRowBillOfLading();
-            row.setItemId(qty.getXtaMerchandise().getFkItemId());
+            row.setItemId(qty.getParentMerchandise().getFkItemId());
             row.setItem(qty.getXtaItemName());
             row.setQuantity(qty.getQuantity());
             row.setUnit(qty.getXtaUnitName());
-            maXtaRowsCurrentCharge.add(row);
+            maRowBolCurrentCharges.add(row);
         }
     }
 
@@ -171,35 +174,31 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
     public int getFkDestinationAddressAddress_n() { return mnFkDestinationAddressAddress_n; }
     public int getFkDestinationNeighborhoodZipCode_n() { return mnFkDestinationNeighborhoodZipCode_n; }
     
-    public void setDbmsBizPartnerBranchNeighborhood(SDbBizPartnerBranchAddressNeighborhood o) { moDbmsBizPartnerBranchNeighborhood = o; }
+    public void setDbmsBizPartnerBranchNeighborhood(SDbBizPartnerBranchAddressNeighborhood o) { moCompBizPartnerBranchNeighborhood = o; }
     
-    public SDbBizPartnerBranchAddressNeighborhood getDbmsBizPartnerBranchNeighborhood() { return moDbmsBizPartnerBranchNeighborhood; }
+    public SDbBizPartnerBranchAddressNeighborhood getDbmsBizPartnerBranchNeighborhood() { return moCompBizPartnerBranchNeighborhood; }
     
-    public void setXtaBizPartner(SDataBizPartner o) { moXtaBizParter = o; } 
-    public void setXtaBizPartnerBranch(SDataBizPartnerBranch o) { moXtaBizParterBranch = o; } 
-    public void setXtaBizPartnerBranchAddress(SDataBizPartnerBranchAddress o) { moXtaBizPartnerBranchAddress = o; } 
+    public void setDataBizPartner(SDataBizPartner o) { moDataBizParter = o; } 
+    public void setDataBizPartnerBranch(SDataBizPartnerBranch o) { moDataBizParterBranch = o; } 
+    public void setDataBizPartnerBranchAddress(SDataBizPartnerBranchAddress o) { moDataBizPartnerBranchAddress = o; } 
+    
+    public SDataBizPartner getDataBizPartner() { return moDataBizParter; }
+    public SDataBizPartnerBranch getDataBizPartnerBranch() { return moDataBizParterBranch; }
+    public SDataBizPartnerBranchAddress getDataBizPartnerBranchAddress() { return moDataBizPartnerBranchAddress; }
+    
     public void setXtaLocationType(String s) { msXtaLocationType = s; };
     public void setXtaIsOrigin(boolean b) { mbXtaIsOrigin = b; };
     public void setXtaIsDestination(boolean b) { mbXtaIsDestination = b; };
     
-    public void setXtaMerchandiseQuantityCharge(ArrayList<SDbBolMerchandiseQuantity> a) { maXtaMerchandiseQuantityCharge = a; }
-    public void setXtaMerchandiseQuantityDischarge(ArrayList<SDbBolMerchandiseQuantity> a) { maXtaMerchandiseQuantityDischarge = a; }
-    
-    public void setXtaRowsPrecharged(ArrayList<SRowBillOfLading> a) { maXtaRowsPrecharge = a; }
-    public void setXtaRowsCurrentCharge(ArrayList<SRowBillOfLading> a) { maXtaRowsCurrentCharge = a; }
-    
-    public SDataBizPartner getXtaBizPartner() { return moXtaBizParter; }
-    public SDataBizPartnerBranch getXtaBizPartnerBranch() { return moXtaBizParterBranch; }
-    public SDataBizPartnerBranchAddress getXtaBizPartnerBranchAddress() { return moXtaBizPartnerBranchAddress; }
     public String getXtaLocationType() { return msXtaLocationType; }
     public boolean getXtaIsOrigin() { return mbXtaIsOrigin; }
     public boolean getXtaIsDestination() { return mbXtaIsDestination; }
     
-    public ArrayList<SDbBolMerchandiseQuantity> getXtaMerchandiseQuantityCharge() { return maXtaMerchandiseQuantityCharge; }
-    public ArrayList<SDbBolMerchandiseQuantity> getXtaMerchandiseQuantityDischarge() { return maXtaMerchandiseQuantityDischarge; }
+    public ArrayList<SDbBolMerchandiseQuantity> getBolMerchandiseQuantityCharges() { return maBolMerchandiseQuantityCharges; }
+    public ArrayList<SDbBolMerchandiseQuantity> getBolMerchandiseQuantityDischarges() { return maBolMerchandiseQuantityDischarges; }
     
-    public ArrayList<SRowBillOfLading> getXtaRowsPrecharged() { return maXtaRowsPrecharge; }
-    public ArrayList<SRowBillOfLading> getXtaRowsCurrentCharge() { return maXtaRowsCurrentCharge; }
+    public ArrayList<SRowBillOfLading> getRowBolPrecharges() { return maRowBolPrecharges; }
+    public ArrayList<SRowBillOfLading> getRowBolCurrentCharges() { return maRowBolCurrentCharges; }
     
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -232,20 +231,21 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         mnFkDestinationAddressAddress_n = 0;
         mnFkDestinationNeighborhoodZipCode_n = 0;
         
-        moDbmsBizPartnerBranchNeighborhood = null;
+        moCompBizPartnerBranchNeighborhood = null;
         
-        moXtaBizParter = new SDataBizPartner();
-        moXtaBizParterBranch = new SDataBizPartnerBranch();
-        moXtaBizPartnerBranchAddress = new SDataBizPartnerBranchAddress();
+        moDataBizParter = null;
+        moDataBizParterBranch = null;
+        moDataBizPartnerBranchAddress = null;
+        
         msXtaLocationType = "";
         mbXtaIsOrigin = false;
         mbXtaIsDestination = false;
         
-        maXtaMerchandiseQuantityCharge = new ArrayList<>();
-        maXtaMerchandiseQuantityDischarge = new ArrayList<>();
+        maBolMerchandiseQuantityCharges = new ArrayList<>();
+        maBolMerchandiseQuantityDischarges = new ArrayList<>();
         
-        maXtaRowsPrecharge = new ArrayList<>();
-        maXtaRowsCurrentCharge = new ArrayList<>();
+        maRowBolPrecharges = new ArrayList<>();
+        maRowBolCurrentCharges = new ArrayList<>();
     }
 
     @Override
@@ -269,7 +269,7 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         
         mnPkLocationId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_location), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_location), 0) + 1 FROM " + getSqlTable() + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkLocationId = resultSet.getInt(1);
@@ -318,68 +318,74 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             
             // Read merchandise charge
             
-            maXtaMerchandiseQuantityCharge.clear();
-            msSql = "SELECT id_bol, id_merch, id_merch_qty " + 
-                    "FROM log_bol_merch_qty " + 
+            maBolMerchandiseQuantityCharges.clear();
+            msSql = "SELECT id_merch, id_merch_qty " + 
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + " " + 
                     "WHERE id_bol = " + mnPkBillOfLadingId + " " + 
                     "AND fk_orig_bpb_add_n " + (mnFkOriginBizPartnerAddress_n == 0 ? "IS NULL " : "= " + mnFkOriginBizPartnerAddress_n) + " " +
                     "AND fk_orig_add_add_n " + (mnFkOriginAddressAddress_n == 0 ? "IS NULL " : "= " + mnFkOriginAddressAddress_n) + " " +
                     "AND fk_dest_bpb_add_n IS NULL " +
-                    "AND fk_dest_add_add_n IS NULL ";
+                    "AND fk_dest_add_add_n IS NULL " +
+                    "ORDER BY id_merch, id_merch_qty ";
             ResultSet resultSetMerchandise = statement.executeQuery(msSql);
             while (resultSetMerchandise.next()) {
                 SDbBolMerchandiseQuantity merchQty = new SDbBolMerchandiseQuantity();
-                merchQty.read(session, new int[] { resultSetMerchandise.getInt("id_bol"), 
+                merchQty.read(session, new int[] { mnPkBillOfLadingId, 
                     resultSetMerchandise.getInt("id_merch"), 
                     resultSetMerchandise.getInt("id_merch_qty") });
-                maXtaMerchandiseQuantityCharge.add(merchQty);
+                maBolMerchandiseQuantityCharges.add(merchQty);
             }
             
             // Read merchandise discharge
             
-            maXtaMerchandiseQuantityDischarge.clear();
-            msSql = "SELECT id_bol, id_merch, id_merch_qty " + 
-                    "FROM log_bol_merch_qty " + 
+            maBolMerchandiseQuantityDischarges.clear();
+            msSql = "SELECT id_merch, id_merch_qty " + 
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + " " + 
                     "WHERE id_bol = " + mnPkBillOfLadingId + " " + 
                     "AND fk_orig_bpb_add_n IS NULL " +
                     "AND fk_orig_add_add_n IS NULL " +
                     "AND fk_dest_bpb_add_n " + (mnFkDestinationBizPartnerAddress_n == 0 ? "IS NULL " : "= " + mnFkDestinationBizPartnerAddress_n) + " " +
-                    "AND fk_dest_add_add_n " + (mnFkDestinationAddressAddress_n == 0 ? "IS NULL " : "= " + mnFkDestinationAddressAddress_n);
+                    "AND fk_dest_add_add_n " + (mnFkDestinationAddressAddress_n == 0 ? "IS NULL " : "= " + mnFkDestinationAddressAddress_n) + " " +
+                    "ORDER BY id_merch, id_merch_qty";
             resultSetMerchandise = statement.executeQuery(msSql);
             while (resultSetMerchandise.next()) {
                 SDbBolMerchandiseQuantity merchQty = new SDbBolMerchandiseQuantity();
-                merchQty.read(session, new int[] { resultSetMerchandise.getInt("id_bol"), 
+                merchQty.read(session, new int[] { mnPkBillOfLadingId, 
                     resultSetMerchandise.getInt("id_merch"), 
                     resultSetMerchandise.getInt("id_merch_qty") });
-                maXtaMerchandiseQuantityDischarge.add(merchQty);
+                maBolMerchandiseQuantityDischarges.add(merchQty);
             }
             
             // Read BizPartner
             
-            moXtaBizParter.read(new int[] { mnFkOriginBizPartner_n == 0 ? mnFkDestinationBizPartner_n : mnFkOriginBizPartner_n }, statement);
+            moDataBizParter = new SDataBizPartner();
+            moDataBizParter.read(new int[] { mnFkOriginBizPartner_n == 0 ? mnFkDestinationBizPartner_n : mnFkOriginBizPartner_n }, statement);
             
             // Read BizPartnerBranch
             
-            moXtaBizParterBranch.read(new int[] { mnFkOriginBizPartnerAddress_n == 0 ? mnFkDestinationBizPartnerAddress_n : mnFkOriginBizPartnerAddress_n } , statement);
+            moDataBizParterBranch = new SDataBizPartnerBranch();
+            moDataBizParterBranch.read(new int[] { mnFkOriginBizPartnerAddress_n == 0 ? mnFkDestinationBizPartnerAddress_n : mnFkOriginBizPartnerAddress_n } , statement);
             
             // Read BizPartnerBranchAddress
             
+            moDataBizPartnerBranchAddress = new SDataBizPartnerBranchAddress();
+            
             if (mnFkOriginBizPartnerAddress_n != 0) {
-                moXtaBizPartnerBranchAddress.read(new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n } , statement);
+                moDataBizPartnerBranchAddress.read(new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n } , statement);
             }
             else {
-                moXtaBizPartnerBranchAddress.read(new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n } , statement);
+                moDataBizPartnerBranchAddress.read(new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n } , statement);
             }
             
             // Read neighborhood zip code
             
             if (mnFkDestinationNeighborhoodZipCode_n != 0 || mnFkOriginNeighborhoodZipCode_n != 0) {
-                moDbmsBizPartnerBranchNeighborhood = new SDbBizPartnerBranchAddressNeighborhood();
+                moCompBizPartnerBranchNeighborhood = new SDbBizPartnerBranchAddressNeighborhood();
                 if (mnFkOriginBizPartnerAddress_n != 0) {
-                    moDbmsBizPartnerBranchNeighborhood.read(session, new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n });
+                    moCompBizPartnerBranchNeighborhood.read(session, new int[] { mnFkOriginBizPartnerAddress_n, mnFkOriginAddressAddress_n });
                 }
                 else {
-                    moDbmsBizPartnerBranchNeighborhood.read(session, new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n });
+                    moCompBizPartnerBranchNeighborhood.read(session, new int[] { mnFkDestinationBizPartnerAddress_n, mnFkDestinationAddressAddress_n });
                 }
             }
             
@@ -443,29 +449,32 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
                 "fk_dest_nei_zip_code_n = " + (mnFkDestinationNeighborhoodZipCode_n == 0 ? "NULL " : mnFkDestinationNeighborhoodZipCode_n + " ") +
                 getSqlWhere();
         }
+        
         session.getStatement().execute(msSql);
         
         // Guardar la colonia conforme al domicilio
         
-        moDbmsBizPartnerBranchNeighborhood = new SDbBizPartnerBranchAddressNeighborhood();
+        moCompBizPartnerBranchNeighborhood = new SDbBizPartnerBranchAddressNeighborhood();
+        
         if (mnFkOriginBizPartnerAddress_n != 0 && mnFkOriginAddressAddress_n != 0 && mnFkOriginNeighborhoodZipCode_n != 0) {
-            moDbmsBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkOriginBizPartnerAddress_n);
-            moDbmsBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkOriginAddressAddress_n);
-            moDbmsBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkOriginNeighborhoodZipCode_n);
+            moCompBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkOriginBizPartnerAddress_n);
+            moCompBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkOriginAddressAddress_n);
+            moCompBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkOriginNeighborhoodZipCode_n);
         }
         else if (mnFkDestinationBizPartnerAddress_n != 0 && mnFkDestinationAddressAddress_n != 0 && mnFkDestinationNeighborhoodZipCode_n != 0) {
-            moDbmsBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkDestinationBizPartnerAddress_n);
-            moDbmsBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkDestinationAddressAddress_n);
-            moDbmsBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkDestinationNeighborhoodZipCode_n);
+            moCompBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkDestinationBizPartnerAddress_n);
+            moCompBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkDestinationAddressAddress_n);
+            moCompBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkDestinationNeighborhoodZipCode_n);
         }
-        moDbmsBizPartnerBranchNeighborhood.save(session);
+        
+        moCompBizPartnerBranchNeighborhood.save(session);
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbBolLocation clone() throws CloneNotSupportedException {
         SDbBolLocation registry = new SDbBolLocation(moBillOfLading);
         
         registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
@@ -484,18 +493,30 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         registry.setFkDestinationAddressAddress_n(this.getFkDestinationAddressAddress_n());
         registry.setFkDestinationNeighborhoodZipCode_n(this.getFkDestinationNeighborhoodZipCode_n());
         
-        registry.setXtaBizPartner(this.getXtaBizPartner());
-        registry.setXtaBizPartnerBranch(this.getXtaBizPartnerBranch());
-        registry.setXtaBizPartnerBranchAddress(this.getXtaBizPartnerBranchAddress());
+        registry.setDataBizPartner(this.getDataBizPartner()); // el clon comparte este registro que es de solo lectura
+        registry.setDataBizPartnerBranch(this.getDataBizPartnerBranch()); // el clon comparte este registro que es de solo lectura
+        registry.setDataBizPartnerBranchAddress(this.getDataBizPartnerBranchAddress()); // el clon comparte este registro que es de solo lectura
+        
         registry.setXtaLocationType(this.getXtaLocationType()); 
         registry.setXtaIsOrigin(this.getXtaIsOrigin());
         registry.setXtaIsDestination(this.getXtaIsDestination());
-        registry.setXtaMerchandiseQuantityCharge(this.getXtaMerchandiseQuantityCharge());
-        registry.setXtaMerchandiseQuantityDischarge(this.getXtaMerchandiseQuantityDischarge());
-        registry.setXtaRowsCurrentCharge(this.getXtaRowsCurrentCharge());
-        registry.setXtaRowsPrecharged(this.getXtaRowsPrecharged());
         
-        registry.setDbmsBizPartnerBranchNeighborhood(this.getDbmsBizPartnerBranchNeighborhood());
+        for (SDbBolMerchandiseQuantity mc : this.getBolMerchandiseQuantityCharges()) {
+            registry.getBolMerchandiseQuantityCharges().add(mc.clone());
+        }
+        for (SDbBolMerchandiseQuantity mc : this.getBolMerchandiseQuantityDischarges()) {
+            registry.getBolMerchandiseQuantityDischarges().add(mc.clone());
+        }
+        for (SRowBillOfLading row : this.getRowBolPrecharges()) {
+            registry.getRowBolPrecharges().add(row); // se copiarán sólo referencias a los mismos objetos
+        }
+        for (SRowBillOfLading row : this.getRowBolCurrentCharges()) {
+            registry.getRowBolCurrentCharges().add(row); // se copiarán sólo referencias a los mismos objetos
+        }
+        
+        if (moCompBizPartnerBranchNeighborhood != null) {
+            registry.setDbmsBizPartnerBranchNeighborhood(this.getDbmsBizPartnerBranchNeighborhood().clone());
+        }
         
         return registry;
     }
@@ -553,10 +574,10 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
                 value = mbXtaIsDestination;
                 break;
             case 4: 
-                value = moXtaBizParter.getBizPartner();
+                value = moDataBizParter.getBizPartner();
                 break;
             case 5:
-                value = moXtaBizParterBranch.getBizPartnerBranch();
+                value = moDataBizParterBranch.getBizPartnerBranch();
                 break;
             default:
         }
@@ -576,5 +597,4 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
             default:
         }
     }
-
 }

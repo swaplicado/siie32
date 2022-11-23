@@ -177,7 +177,16 @@ public class SCfdUtilsHandler {
     */
     @SuppressWarnings("deprecation")
     public CfdiAckQuery getCfdiSatStatus(final SDataCfd cfd) throws Exception {
-        return getCfdiSatStatus(cfd.getFkCfdTypeId(), DCfdUtils.getCfdi33(cfd.getDocXml()));
+        float version = DCfdUtils.getCfdiVersion(cfd.getDocXml());
+        
+        if (version == DCfdConsts.CFDI_VER_33) {
+            return getCfdiSatStatus(cfd.getFkCfdTypeId(), DCfdUtils.getCfdi33(cfd.getDocXml()));
+        }
+        else if (version == DCfdConsts.CFDI_VER_40) {
+            return getCfdiSatStatus(cfd.getFkCfdTypeId(), DCfdUtils.getCfdi40(cfd.getDocXml()));
+        }
+        
+        return null;
     }
     
     /**
@@ -189,6 +198,29 @@ public class SCfdUtilsHandler {
     */
     public CfdiAckQuery getCfdiSatStatus(final int cfdType, final cfd.ver33.DElementComprobante comprobante) throws Exception {
         cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
+        
+        if (tfd != null) {
+            float version = comprobante.getVersion();
+            String rfcEmisor = comprobante.getEltEmisor().getAttRfc().getString();
+            String rfcReceptor = comprobante.getEltReceptor().getAttRfc().getString();
+            double total = comprobante.getAttTotal().getDouble();
+            String sello = comprobante.getAttSello().getString();
+            
+            return getCfdiSatStatus(cfdType, version, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total, sello);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Devuelve el estatus del SAT a traves de un DElementComprobante.
+     * @param cfdType Tipo de CFDI, constantes definidas en SDataConstantsSys.TRNS_TP_CFD_...
+     * @param comprobante CFDI.
+     * @return CfdiAckQuery
+     * @throws java.lang.Exception 
+    */
+    public CfdiAckQuery getCfdiSatStatus(final int cfdType, final cfd.ver40.DElementComprobante comprobante) throws Exception {
+        cfd.ver40.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
         
         if (tfd != null) {
             float version = comprobante.getVersion();
@@ -226,7 +258,7 @@ public class SCfdUtilsHandler {
             data += "&tt=" + decimalFormat32.format(total);
             data += "&id=" + uuid;
         }
-        else if (version == DCfdConsts.CFDI_VER_33) {
+        else if (version == DCfdConsts.CFDI_VER_33 || version == DCfdConsts.CFDI_VER_40) {
             DecimalFormat decimalFormat33 = new DecimalFormat("#." + SLibUtils.textRepeat("#", 6)); // max decimals for total according to XSD of CFDI 3.3
             
             data += "?id=" + (uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", DCfdVer3Consts.LEN_UUID) : uuid); // UUID length hyphens included

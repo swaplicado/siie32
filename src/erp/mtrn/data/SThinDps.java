@@ -196,11 +196,39 @@ public class SThinDps implements Serializable, SThinData {
                 }
                 
                 if (mnDbmsCfdId != 0) {
-                    moThinDpsCfd = new SThinDpsCfd();
-                    moThinDpsCfd.read(new int[] { mnPkYearId, mnPkDocId}, statement);
+                    boolean exists = false;
+                    
+                    // read document CFD, if exists:
+                    
+                    sql = "SELECT COUNT(*) "
+                            + "FROM trn_dps_cfd "
+                            + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
+                    try (ResultSet resultSet = statement.executeQuery(sql)) {
+                        if (resultSet.next() && resultSet.getInt(1) > 0) {
+                            exists = true;
+                        }
+                    }
+                    
+                    if (exists) {
+                        moThinDpsCfd = new SThinDpsCfd();
+                        moThinDpsCfd.read(new int[] { mnPkYearId, mnPkDocId}, statement);
+                    }
 
-                    moThinCfd = new SThinCfd();
-                    moThinCfd.read(new int[] { mnDbmsCfdId }, statement);
+                    // read CFD, if exists:
+                    
+                    sql = "SELECT COUNT(*) "
+                            + "FROM trn_cfd "
+                            + "WHERE id_cfd = " + mnDbmsCfdId + ";";
+                    try (ResultSet resultSet = statement.executeQuery(sql)) {
+                        if (resultSet.next() && resultSet.getInt(1) > 0) {
+                            exists = true;
+                        }
+                    }
+
+                    if (exists) {
+                        moThinCfd = new SThinCfd();
+                        moThinCfd.read(new int[] { mnDbmsCfdId }, statement);
+                    }
                 }
             }
         }

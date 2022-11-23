@@ -144,7 +144,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
          */
         
         // generate QR code:
-        if (SLibUtils.belongsTo(reportType, new int[] { SDataConstantsSys.REP_TRN_CFDI, SDataConstantsSys.REP_TRN_CFDI_33, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, SDataConstantsSys.REP_TRN_CFDI_PAYROLL })) {
+        if (SLibUtils.belongsTo(reportType, new int[] { SDataConstantsSys.REP_TRN_CFDI, SDataConstantsSys.REP_TRN_CFDI_33, SDataConstantsSys.REP_TRN_CFDI_40, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, SDataConstantsSys.REP_TRN_CFDI_40_CRP_20, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_40 })) {
             BufferedImage biQrCode = null;
             
             if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_32) {
@@ -157,6 +157,16 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 }
                 else {
                     // params names for other cases of CFDI 3.3:
+                    biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sCfdiUuid"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sSelloCfdiUltDig"));
+                }
+            }
+            else if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_40) {
+                if (reportType == SDataConstantsSys.REP_TRN_CFDI_40_CRP_20) {
+                    // params names are slightly different in CFDI 4.0 with CRP 2.0, and total is allways zero:
+                    biQrCode = DCfd.createQrCodeBufferedImageCfdi40((String) map.get("sTfdUUID"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), 0, (String) map.get("sSelloCfdiUltDig"));
+                }
+                else {
+                    // params names for other cases of CFDI 4.0:
                     biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sCfdiUuid"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sSelloCfdiUltDig"));
                 }
             }

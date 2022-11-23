@@ -12,7 +12,7 @@ import sa.lib.xml.SXmlConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public final class SCfdPacket implements java.io.Serializable {
 
@@ -259,6 +259,11 @@ public final class SCfdPacket implements java.io.Serializable {
             msDocXml = ((cfd.ver33.DElementComprobante) moAuxCfdRootElement).getElementForXml();
             msDocXmlName = DCfd.createFileName((cfd.ver33.DElementComprobante) moAuxCfdRootElement) + ".xml";
             mtXmlDatetime = ((cfd.ver33.DElementComprobante) moAuxCfdRootElement).getAttFecha().getDatetime();
+        }
+        else if (moAuxCfdRootElement instanceof cfd.ver40.DElementComprobante) {
+            msDocXml = ((cfd.ver40.DElementComprobante) moAuxCfdRootElement).getElementForXml();
+            msDocXmlName = DCfd.createFileName((cfd.ver40.DElementComprobante) moAuxCfdRootElement) + ".xml";
+            mtXmlDatetime = ((cfd.ver40.DElementComprobante) moAuxCfdRootElement).getAttFecha().getDatetime();
         }
         else {
             throw new Exception("Not supported CFD version!");

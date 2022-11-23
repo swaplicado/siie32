@@ -6,6 +6,7 @@ package erp.mod.hrs.db;
 
 import cfd.DCfdUtils;
 import cfd.ver33.DCfdi33Catalogs;
+import cfd.ver40.DCfdi40Catalogs;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -35,7 +36,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Irving Sánchez, Juan Barajas, Claudio Peña, Sergio Flores
+ * @author Irving Sánchez, Juan Barajas, Claudio Peña, Sergio Flores, Isabel Servín
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -49,7 +50,7 @@ public abstract class SHrsCfdUtils {
      * @return <code>true</code> if type of contract is for employment.
      */
     public static boolean isTypeContractForEmployment(final String tipoContrato) {
-        return tipoContrato.compareTo(DCfdi33Catalogs.ClaveTipoContratoModalidadTrabajoComision) <= 0;
+        return tipoContrato.compareTo(DCfdi40Catalogs.ClaveTipoContratoModalidadTrabajoComision) <= 0;
     }
     
     /**
@@ -58,10 +59,10 @@ public abstract class SHrsCfdUtils {
      * @return <code>true</code> if type of recruitment schema is for employment.
      */
     public static boolean isTypeRecruitmentSchemaForEmployment(final String tipoRegimenContratación) {
-        return tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenSueldos) || 
-                tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenJubilados) || 
-                tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenPensionados) || 
-                tipoRegimenContratación.equals(DCfdi33Catalogs.ClaveTipoRegimenJubiladosOPensionados);
+        return tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenSueldos) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenJubilados) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenPensionados) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenJubiladosOPensionados);
     }
     
     /**
@@ -218,6 +219,7 @@ public abstract class SHrsCfdUtils {
 
             cfd.ver32.DElementComprobante comprobanteCfdi32 = null;
             cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
+            cfd.ver40.DElementComprobante comprobanteCfdi40 = null;
             
             SCfdPacket packet = new SCfdPacket();
             packet.setCfdId(cfdId);
@@ -239,6 +241,13 @@ public abstract class SHrsCfdUtils {
                         cfdVersion = comprobanteCfdi33.getVersion();
                         
                         packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
+                        packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                        comprobanteCfdi40 = (cfd.ver40.DElementComprobante) SCfdUtils.createCfdi40RootElement((SClientInterface) session.getClient(), hrsFormerReceipt);
+                        cfdVersion = comprobanteCfdi40.getVersion();
+                        
+                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi40));
                         packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
                     break;
                 default:
@@ -266,6 +275,10 @@ public abstract class SHrsCfdUtils {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                     comprobanteCfdi33.getAttSello().setString(packet.getCfdSignature());
                     packet.setAuxCfdRootElement(comprobanteCfdi33);
+                    break;
+                case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                    comprobanteCfdi40.getAttSello().setString(packet.getCfdSignature());
+                    packet.setAuxCfdRootElement(comprobanteCfdi40);
                     break;
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -407,7 +420,8 @@ public abstract class SHrsCfdUtils {
                     "pri.dt_pay, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, " +
                     "TIMESTAMPDIFF(DAY, pr.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                     "tcon.code AS f_emp_cont_tp, twkd.code AS f_emp_jorn_tp, tpay.code AS f_emp_pay, pr.sal_ssc AS f_emp_sal_bc, trsk.code AS f_emp_risk, " +
-                    "IF(emp.b_uni, '" + DCfdi33Catalogs.TxtSí + "', '" + DCfdi33Catalogs.TxtNo + "') AS f_emp_union " +
+                    "IF(emp.b_uni, '" + DCfdi40Catalogs.TxtSí + "', '" + DCfdi40Catalogs.TxtNo + "') AS f_emp_union, " +
+                    "NOW() AS f_emp_date_edit " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " +
@@ -486,8 +500,16 @@ public abstract class SHrsCfdUtils {
                     hrsFormerReceipt.setAuxSueldoMensual(dAmountMonth);
                     
                     if (!resultSet.getString("pri.uuid_rel").isEmpty()) {
-                        hrsFormerReceipt.setCfdiRelacionadosTipoRelacion(DCfdi33Catalogs.ClaveTipoRelaciónSustitución);
-                        hrsFormerReceipt.getCfdiRelacionados().add(resultSet.getString("pri.uuid_rel"));
+                        switch (hrsFormerReceipt.getCfdiVersion()) {
+                            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                                hrsFormerReceipt.setCfdiRelacionadosTipoRelacion(DCfdi33Catalogs.ClaveTipoRelaciónSustitución);
+                                hrsFormerReceipt.getCfdiRelacionados33().add(resultSet.getString("pri.uuid_rel"));
+                                break;
+                            case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                                hrsFormerReceipt.getCfdiRelacionados().addRelatedDocument(DCfdi40Catalogs.ClaveTipoRelaciónSustitución, resultSet.getString("pri.uuid_rel"));
+                                break;
+                            default:
+                        }
                     }
 
                     boolean bTaxSubFound = false;
@@ -574,7 +596,7 @@ public abstract class SHrsCfdUtils {
                                     else if (dTaxSubEffective > 0) {
                                         hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubEffective);
                                     }
-                                    hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo); // code of type of other payment when earning is tax subsidy!
+                                    hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi40Catalogs.ClaveTipoOtroPagoSubsidioEmpleo); // code of type of other payment when earning is tax subsidy!
                                     break;
 
                                 case SModSysConsts.HRSS_TP_EAR_OTH:
@@ -614,7 +636,7 @@ public abstract class SHrsCfdUtils {
                         hrsFormerReceiptConcept.setPkTipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[0]);
                         hrsFormerReceiptConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[1]);
                         hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubEffective);
-                        hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo); // code of type of other payment when earning is tax subsidy!
+                        hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi40Catalogs.ClaveTipoOtroPagoSubsidioEmpleo); // code of type of other payment when earning is tax subsidy!
 
                         hrsFormerReceipt.getChildConcepts().add(hrsFormerReceiptConcept);
 
@@ -715,7 +737,7 @@ public abstract class SHrsCfdUtils {
         
         return (SDataCfd) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT); // read again just signed CFDI
     }
-
+        
     /**
      * Compute CFDI for payroll receipt issue.
      * @param session GUI user session.

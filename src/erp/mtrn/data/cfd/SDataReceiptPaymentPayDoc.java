@@ -5,19 +5,21 @@
 
 package erp.mtrn.data.cfd;
 
+import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import sa.lib.SLibUtils;
 
 /**
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implements java.io.Serializable {
-
+    
     protected int mnPkReceiptId;
     protected int mnPkPaymentId;
     protected int mnPkDocumentId;
@@ -31,10 +33,12 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
     protected double mdPaymentPay;
     protected double mdDocBalanceUnpaidPay_r;
     protected double mdPaymentLoc;
+    protected String msTaxObjectCode;
     protected int mnFkDocYearId;
     protected int mnFkDocDocId;
     protected int mnFkDocCurrencyId;
     
+    protected ArrayList<SDataReceiptPaymentPayDocTax> maDbmsReceiptPaymentPayDocTaxes;
     protected SThinDps moThinDps;
 
     /**
@@ -58,6 +62,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
     public void setPaymentPay(double d) { mdPaymentPay = d; }
     public void setDocBalanceUnpaidPay_r(double d) { mdDocBalanceUnpaidPay_r = d; }
     public void setPaymentLoc(double d) { mdPaymentLoc = d; }
+    public void setTaxObjectCode(java.lang.String s) { msTaxObjectCode = s; }
     public void setFkDocYearId(int n) { mnFkDocYearId = n; }
     public void setFkDocDocId(int n) { mnFkDocDocId = n; }
     public void setFkDocCurrencyId(int n) { mnFkDocCurrencyId = n; }
@@ -75,6 +80,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
     public double getPaymentPay() { return mdPaymentPay; }
     public double getDocBalanceUnpaidPay_r() { return mdDocBalanceUnpaidPay_r; }
     public double getPaymentLoc() { return mdPaymentLoc; }
+    public java.lang.String getTaxObjectCode() { return msTaxObjectCode; }
     public int getFkDocYearId() { return mnFkDocYearId; }
     public int getFkDocDocId() { return mnFkDocDocId; }
     public int getFkDocCurrencyId() { return mnFkDocCurrencyId; }
@@ -94,6 +100,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
         }
     }
 
+    public ArrayList<SDataReceiptPaymentPayDocTax> getDbmsReceiptPaymentPayDocTaxes() { return maDbmsReceiptPaymentPayDocTaxes; }
     public SThinDps getThinDps() { return moThinDps; }
     
     @Override
@@ -125,10 +132,12 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
         mdPaymentPay = 0;
         mdDocBalanceUnpaidPay_r = 0;
         mdPaymentLoc = 0;
+        msTaxObjectCode = "";
         mnFkDocYearId = 0;
         mnFkDocDocId = 0;
         mnFkDocCurrencyId = 0;
         
+        maDbmsReceiptPaymentPayDocTaxes = new ArrayList<>(); 
         moThinDps = null;
     }
 
@@ -161,9 +170,25 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
                     mdPaymentPay = resultSet.getDouble("pay_pay");
                     mdDocBalanceUnpaidPay_r = resultSet.getDouble("doc_bal_unpd_pay_r");
                     mdPaymentLoc = resultSet.getDouble("pay_loc");
+                    msTaxObjectCode = resultSet.getString("tax_object_code");
                     mnFkDocYearId = resultSet.getInt("fid_doc_year");
                     mnFkDocDocId = resultSet.getInt("fid_doc_doc");
                     mnFkDocCurrencyId = resultSet.getInt("fid_doc_cur");
+                    
+                    // read as well document taxes from payment:
+                    
+                    maDbmsReceiptPaymentPayDocTaxes = new ArrayList<SDataReceiptPaymentPayDocTax>();
+                    
+                    sql = "SELECT id_tax "
+                            + "FROM trn_pay_pay_doc_tax "
+                            + "WHERE id_rcp = " + key[0] + " AND id_pay = " + key[1] + " AND id_doc = " + key[2] + ";";
+                    try (ResultSet resultSetTaxes = statement.executeQuery(sql)) {
+                        while (resultSetTaxes.next()) {
+                            SDataReceiptPaymentPayDocTax docTax = new SDataReceiptPaymentPayDocTax();
+                            docTax.read(new int[] { mnPkReceiptId, mnPkPaymentId, mnPkDocumentId, resultSetTaxes.getInt(1) }, statement.getConnection().createStatement());
+                            maDbmsReceiptPaymentPayDocTaxes.add(docTax);
+                        }
+                    }
                     
                     // read as well 'thin' document:
                     
@@ -221,6 +246,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
                             mdPaymentPay + ", " +
                             mdDocBalanceUnpaidPay_r + ", " +
                             mdPaymentLoc + ", " +
+                            "'" + msTaxObjectCode + "', " +
                             mnFkDocYearId + ", " +
                             mnFkDocDocId + ", " +
                             mnFkDocCurrencyId +
@@ -241,6 +267,7 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
                             "pay_pay = " + mdPaymentPay + ", " +
                             "doc_bal_unpd_pay_r = " + mdDocBalanceUnpaidPay_r + ", " +
                             "pay_loc = " + mdPaymentLoc + ", " +
+                            "tax_object_code = '" + msTaxObjectCode + "', " +
                             "fid_doc_year = " + mnFkDocYearId + ", " +
                             "fid_doc_doc = " + mnFkDocDocId + ", " +
                             "fid_doc_cur = " + mnFkDocCurrencyId + " " +
@@ -250,6 +277,15 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
                 }
                 
                 statement.execute(sql);
+                
+                for (SDataReceiptPaymentPayDocTax docTax : maDbmsReceiptPaymentPayDocTaxes) {
+                    docTax.setPkReceiptId(mnPkReceiptId);
+                    docTax.setPkPaymentId(mnPkPaymentId);
+                    docTax.setPkDocumentId(mnPkDocumentId);
+                    if (docTax.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\nImpuestos documento relacionado.");
+                    }
+                }
                 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
@@ -287,9 +323,14 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
         clone.setPaymentPay(mdPaymentPay);
         clone.setDocBalanceUnpaidPay_r(mdDocBalanceUnpaidPay_r);
         clone.setPaymentLoc(mdPaymentLoc);
+        clone.setTaxObjectCode(msTaxObjectCode);
         clone.setFkDocYearId(mnFkDocYearId);
         clone.setFkDocDocId(mnFkDocDocId);
         clone.setFkDocCurrencyId(mnFkDocCurrencyId);
+        
+        for (SDataReceiptPaymentPayDocTax tax : maDbmsReceiptPaymentPayDocTaxes) {
+            clone.getDbmsReceiptPaymentPayDocTaxes().add(tax.clone());
+        }
         
         clone.setThinDps(moThinDps);
 
@@ -327,6 +368,9 @@ public class SDataReceiptPaymentPayDoc extends erp.lib.data.SDataRegistry implem
         //mnFkDocYearId = ...; // set in setThinDps()
         //mnFkDocDocId = ...; // set in setThinDps()
         //mnFkDocCurrencyId = ...; // set in setThinDps()
+        
+        maDbmsReceiptPaymentPayDocTaxes = paymentEntryDoc.ReceiptPaymentPayDocTaxes;
+        msTaxObjectCode = maDbmsReceiptPaymentPayDocTaxes != null && maDbmsReceiptPaymentPayDocTaxes.size() > 0 ? DCfdi40Catalogs.ClaveObjetoImpSí : DCfdi40Catalogs.ClaveObjetoImpNo;
         
         setThinDps(paymentEntryDoc.ThinDps);
     }

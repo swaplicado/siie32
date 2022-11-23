@@ -116,6 +116,7 @@ import erp.mod.hrs.view.SViewDepartmentCostCenter;
 import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
+import erp.mod.hrs.view.SViewEmployeeHireLogByPeriod;
 import erp.mod.hrs.view.SViewEmployeeIdse;
 import erp.mod.hrs.view.SViewEmployeeSua;
 import erp.mod.hrs.view.SViewEmployeeType;
@@ -947,6 +948,18 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_EMP_LOG_HIRE:
                 view = new SViewEmployeeHireLog(miClient, "Bitácora altas y bajas");
+                break;
+            case SModConsts.HRSX_EMP_LOG_HIRE_BY_PER:
+                switch (subtype) {
+                    case SViewEmployeeHireLogByPeriod.GRID_SUBTYPE_HIRE:
+                        view = new SViewEmployeeHireLogByPeriod(miClient, "Altas x período", subtype);
+                        break;
+                    case SViewEmployeeHireLogByPeriod.GRID_SUBTYPE_DISMISS:
+                        view = new SViewEmployeeHireLogByPeriod(miClient, "Bajas x período", subtype);
+                        break;
+                    default:
+                        miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
                 break;
             case SModConsts.HRS_EMP_LOG_SUA:
                 view = new SViewEmployeeSua(miClient, "Bitácora empleados SUA");

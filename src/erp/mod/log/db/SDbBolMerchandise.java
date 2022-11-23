@@ -15,7 +15,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -37,20 +36,21 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     protected int mnFkItemId;
     protected int mnFkUnitId;
     
-    protected ArrayList<SDbBolMerchandiseQuantity> maBolMerchandiseQuantity;
+    protected ArrayList<SDbBolMerchandiseQuantity> maChildBolMerchandiseQuantities;
     
+    protected SDataItem moDataItem;
+    protected SDataUnit moDataUnit;
+
     protected String msXtaItemClaveProdServ;
     protected String msXtaClaveUnidad;
-    protected SDataItem moXtaItem;
-    protected SDataUnit moXtaUnit;
-
+    
     public SDbBolMerchandise() {
         super(SModConsts.LOG_BOL_MERCH);
     }
     
     public void addMerchandiseQuantity (SDbBolMerchandiseQuantity o) {
         boolean found = false;
-        for (SDbBolMerchandiseQuantity merchQty : maBolMerchandiseQuantity) {
+        for (SDbBolMerchandiseQuantity merchQty : maChildBolMerchandiseQuantities) {
             if (merchQty.getFkOriginBizPartnerAddress_n() == o.getFkOriginBizPartnerAddress_n() &&
                     merchQty.getFkOriginAddressAddress_n() == o.getFkOriginAddressAddress_n() &&
                     merchQty.getFkDestinationBizPartnerAddress_n() == o.getFkDestinationBizPartnerAddress_n() &&
@@ -60,17 +60,17 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
             }
         }
         if (!found) {
-            maBolMerchandiseQuantity.add(o);
+            maChildBolMerchandiseQuantities.add(o);
         }
     }
     
     public void removeMerchandiseQuantity(SDbBolMerchandiseQuantity o) {
-        for (SDbBolMerchandiseQuantity merchQty : maBolMerchandiseQuantity) {
+        for (SDbBolMerchandiseQuantity merchQty : maChildBolMerchandiseQuantities) {
             if (merchQty.getFkOriginBizPartnerAddress_n() == o.getFkOriginBizPartnerAddress_n() &&
                     merchQty.getFkOriginAddressAddress_n() == o.getFkOriginAddressAddress_n() &&
                     merchQty.getFkDestinationBizPartnerAddress_n() == o.getFkDestinationBizPartnerAddress_n() &&
                     merchQty.getFkDestinationAddressAddress_n() == o.getFkDestinationAddressAddress_n()) {
-                maBolMerchandiseQuantity.remove(merchQty);
+                maChildBolMerchandiseQuantities.remove(merchQty);
                 break;
             }
         }
@@ -78,7 +78,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     
     public void updateTotalItemQuantity() {
         double qty = 0;
-        for (SDbBolMerchandiseQuantity merchQty : maBolMerchandiseQuantity) {
+        for (SDbBolMerchandiseQuantity merchQty : maChildBolMerchandiseQuantities) {
             if (merchQty.getFkOriginBizPartnerAddress_n() != 0 && merchQty.getFkOriginAddressAddress_n() != 0) {
                 qty += merchQty.getQuantity();
             }
@@ -88,7 +88,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     
     public ArrayList<SDbBolMerchandiseQuantity> getCharge(int[] locationKey) {
         ArrayList<SDbBolMerchandiseQuantity> charge = new ArrayList<>();
-        for (SDbBolMerchandiseQuantity qty : maBolMerchandiseQuantity) {
+        for (SDbBolMerchandiseQuantity qty : maChildBolMerchandiseQuantities) {
             if (qty.getFkOriginBizPartnerAddress_n() == locationKey[0] && qty.getFkOriginAddressAddress_n() == locationKey[1]) {
                 charge.add(qty);
             }
@@ -98,7 +98,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     
     public ArrayList<SDbBolMerchandiseQuantity> getDischarge(int[] locationKey) {
         ArrayList<SDbBolMerchandiseQuantity> discharge = new ArrayList<>();
-        for (SDbBolMerchandiseQuantity qty : maBolMerchandiseQuantity) {
+        for (SDbBolMerchandiseQuantity qty : maChildBolMerchandiseQuantities) {
             if (qty.getFkDestinationBizPartnerAddress_n() == locationKey[0] && qty.getFkDestinationAddressAddress_n()== locationKey[1]) {
                 discharge.add(qty);
             }
@@ -109,7 +109,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     public double getDiferenceWeightChargedDischarged() {
         double charged = 0;
         double discharged = 0;
-        for (SDbBolMerchandiseQuantity merchQty : maBolMerchandiseQuantity) {
+        for (SDbBolMerchandiseQuantity merchQty : maChildBolMerchandiseQuantities) {
             if (merchQty.getFkOriginBizPartnerAddress_n() != 0 && merchQty.getFkOriginAddressAddress_n() != 0) {
                 charged += merchQty.getQuantity();
             }
@@ -117,7 +117,6 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
                 discharged += merchQty.getQuantity();
             }
         }
-        
         return charged - discharged;
     }
     
@@ -200,10 +199,6 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
-    public void setXtaItemClaveProdServ(String s) { msXtaItemClaveProdServ = s; } 
-    public void setXtaClaveUnidad(String s) { msXtaClaveUnidad = s; } 
-    public void setXtaItem(SDataItem o) { moXtaItem = o; }
-    public void setXtaUnit(SDataUnit o) { moXtaUnit = o; }
     
     public int getPkBillOfLadingId() { return mnPkBillOfLadingId; }
     public int getPkMerchandiseId() { return mnPkMerchandiseId; }
@@ -217,14 +212,20 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     public boolean isDeleted() { return mbDeleted; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
+    
+    public ArrayList<SDbBolMerchandiseQuantity> getChildBolMerchandiseQuantities() { return maChildBolMerchandiseQuantities; }
+    
+    public void setDataItem(SDataItem o) { moDataItem = o; }
+    public void setDataUnit(SDataUnit o) { moDataUnit = o; }
+    
+    public SDataItem getDataItem() { return moDataItem; }
+    public SDataUnit getDataUnit() { return moDataUnit; }
+    
+    public void setXtaItemClaveProdServ(String s) { msXtaItemClaveProdServ = s; }
+    public void setXtaClaveUnidad(String s) { msXtaClaveUnidad = s; }
+    
     public String getXtaItemClaveProdServ() { return msXtaItemClaveProdServ; }
     public String getXtaClaveUnidad() { return msXtaClaveUnidad; }
-    public SDataItem getXtaItem() { return moXtaItem; }
-    public SDataUnit getXtaUnit() { return moXtaUnit; }
-    
-    public void setBolMerchandiseQuantity(ArrayList<SDbBolMerchandiseQuantity> a) { maBolMerchandiseQuantity = a; }
-    
-    public ArrayList<SDbBolMerchandiseQuantity> getBolMerchandiseQuantity() { return maBolMerchandiseQuantity; }
     
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -254,12 +255,13 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         mnFkItemId = 0;
         mnFkUnitId = 0;
         
+        maChildBolMerchandiseQuantities = new ArrayList<>();
+        
+        moDataItem = null;
+        moDataUnit = null;
+        
         msXtaItemClaveProdServ = "";
         msXtaClaveUnidad = "";
-        moXtaItem = new SDataItem();
-        moXtaUnit = new SDataUnit();
-
-        maBolMerchandiseQuantity = new ArrayList<>();
     }
 
     @Override
@@ -283,7 +285,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         
         mnPkMerchandiseId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_merch), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_merch), 0) + 1 FROM " + getSqlTable() + " WHERE id_bol = " + mnPkBillOfLadingId + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkMerchandiseId = resultSet.getInt(1);
@@ -333,22 +335,26 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         
         // Read merchandise quantity
         
-        msSql = "SELECT id_bol, id_merch, id_merch_qty FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + 
-                " WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " ";
+        msSql = "SELECT id_merch_qty "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " "
+                + "ORDER BY id_merch_qty ";
         resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql);
         while (resultSet.next()) {
             SDbBolMerchandiseQuantity merchQty = new SDbBolMerchandiseQuantity();
-            merchQty.read(session, new int[] { resultSet.getInt("id_bol"), resultSet.getInt("id_merch"), resultSet.getInt("id_merch_qty") } );
-            maBolMerchandiseQuantity.add(merchQty);
+            merchQty.read(session, new int[] { mnPkBillOfLadingId, mnPkMerchandiseId, resultSet.getInt("id_merch_qty") } );
+            maChildBolMerchandiseQuantities.add(merchQty);
         }
         
         // Read item
         
-        moXtaItem.read(new int[] { mnFkItemId }, session.getStatement());
+        moDataItem = new SDataItem();
+        moDataItem.read(new int[] { mnFkItemId }, session.getStatement());
         
         // Read unit
         
-        moXtaUnit.read(new int[] { mnFkUnitId }, session.getStatement());
+        moDataUnit = new SDataUnit();
+        moDataUnit.read(new int[] { mnFkUnitId }, session.getStatement());
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.READ_OK;
@@ -402,14 +408,20 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
                 "fk_unit = " + mnFkUnitId + " " +
                 getSqlWhere();
         }
+        
         statement = session.getDatabase().getConnection().createStatement();
         statement.execute(msSql);
         
         // Save merchandise quantity
         
-        for (SDbBolMerchandiseQuantity merchQty : maBolMerchandiseQuantity) {
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.LOG_BOL_MERCH_QTY) + " "
+                + "WHERE id_bol = " + mnPkBillOfLadingId + " AND id_merch = " + mnPkMerchandiseId + " ";
+        statement.execute(msSql);
+        
+        for (SDbBolMerchandiseQuantity merchQty : maChildBolMerchandiseQuantities) {
             merchQty.setPkBillOfLadingId(mnPkBillOfLadingId);
             merchQty.setPkMerchandiseId(mnPkMerchandiseId);
+            merchQty.setRegistryNew(true);
             merchQty.save(session);
         }
         
@@ -418,7 +430,7 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbBolMerchandise clone() throws CloneNotSupportedException {
         SDbBolMerchandise registry = new SDbBolMerchandise();
         
         registry.setPkBillOfLadingId(this.getPkBillOfLadingId());
@@ -434,12 +446,15 @@ public class SDbBolMerchandise extends SDbRegistryUser implements Serializable {
         registry.setFkItemId(this.getFkItemId());
         registry.setFkUnitId(this.getFkUnitId());
         
-        registry.setBolMerchandiseQuantity(this.getBolMerchandiseQuantity());
+        for (SDbBolMerchandiseQuantity mq : this.getChildBolMerchandiseQuantities()) {
+            registry.getChildBolMerchandiseQuantities().add(mq.clone());
+        }
+        
+        registry.setDataItem(this.getDataItem()); // el clon comparte este registro que es de sólo lectura
+        registry.setDataUnit(this.getDataUnit()); // el clon comparte este registro que es de sólo lectura
         
         registry.setXtaItemClaveProdServ(this.getXtaItemClaveProdServ());
         registry.setXtaClaveUnidad(this.getXtaClaveUnidad());
-        registry.setXtaItem(this.getXtaItem());
-        registry.setXtaUnit(this.getXtaUnit());
 
         return registry;
     }

@@ -5,7 +5,9 @@
 package erp.mod.hrs.form;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.awt.BorderLayout;
@@ -35,6 +37,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     public static int EMP_STATUS_INA = 2;
     
     protected int mnFilterEmpStatus;
+    protected boolean mbVariableEarningsOnly;
+    protected String[] maVariableEarningsCodes;
     protected SPanelHrsDepartments moPanelHrsDepartments;
     private SPanelHrsFilterPayrollStatus moPanelHrsFilterPayrollStatus;
     
@@ -44,7 +48,18 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
      * @param title
      */
     public SDialogRepHrsEarningDeduction(SGuiClient client, String title) {
+        this(client, title, false);
+    }
+
+    /**
+     * Creates new form SDialogRepHrsEarningDeduction
+     * @param client
+     * @param title
+     * @param variableEarningsOnly
+     */
+    public SDialogRepHrsEarningDeduction(SGuiClient client, String title, boolean variableEarningsOnly) {
         setFormSettings(client, SModConsts.HRSR_PAY_EAR_DED, SLibConsts.UNDEFINED, title);
+        mbVariableEarningsOnly = variableEarningsOnly;
         initComponents();
         initComponentsCustom();
     }
@@ -83,6 +98,8 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel5 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         moRadShowEarDed = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadShowVarEarOnly = new sa.lib.gui.bean.SBeanFieldRadio();
+        jtfVarEarCodes = new javax.swing.JTextField();
         jPanel15 = new javax.swing.JPanel();
         moRadShowEar = new sa.lib.gui.bean.SBeanFieldRadio();
         moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
@@ -205,8 +222,20 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         moGroupFilterTypeEarDed.add(moRadShowEarDed);
         moRadShowEarDed.setText("Percepciones y deducciones");
-        moRadShowEarDed.setPreferredSize(new java.awt.Dimension(200, 23));
+        moRadShowEarDed.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel21.add(moRadShowEarDed);
+
+        moRadShowVarEarOnly.setText("Percepciones variables");
+        moRadShowVarEarOnly.setEnabled(false);
+        moRadShowVarEarOnly.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel21.add(moRadShowVarEarOnly);
+
+        jtfVarEarCodes.setEditable(false);
+        jtfVarEarCodes.setText("CODES");
+        jtfVarEarCodes.setEnabled(false);
+        jtfVarEarCodes.setFocusable(false);
+        jtfVarEarCodes.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel21.add(jtfVarEarCodes);
 
         jPanel5.add(jPanel21);
 
@@ -454,6 +483,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private javax.swing.JPanel jpDepartments;
     private javax.swing.JPanel jpFilterStatusPay;
     private javax.swing.JToggleButton jtbEmployeeActive;
+    private javax.swing.JTextField jtfVarEarCodes;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private javax.swing.ButtonGroup moGroupFilterDateType;
@@ -488,6 +518,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private sa.lib.gui.bean.SBeanFieldRadio moRadShowDed;
     private sa.lib.gui.bean.SBeanFieldRadio moRadShowEar;
     private sa.lib.gui.bean.SBeanFieldRadio moRadShowEarDed;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadShowVarEarOnly;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -570,11 +601,9 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         
         jtbEmployeeActive.setSelected(true);
         moRadReportTypeEarDed.setSelected(true);
-        moRadShowEarDed.setSelected(true);
         moRadFilterTypePeriod.setSelected(true);
         moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
-        
         moRadIsSummary.setSelected(true);
         
         moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
@@ -583,11 +612,37 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
         moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
         
+        if (mbVariableEarningsOnly) {
+            try {
+                maVariableEarningsCodes = SLibUtils.textsTrim(SLibUtils.textExplode(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_VARIABLE_EARNINGS), ";"));
+                jtfVarEarCodes.setText(SLibUtils.textImplode(maVariableEarningsCodes, ", "));
+                jtfVarEarCodes.setToolTipText(jtfVarEarCodes.getText());
+                jtfVarEarCodes.setCaretPosition(0);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+            
+            moRadShowVarEarOnly.setSelected(true);
+            
+            moGroupFilterTypeEarDed.clearSelection();
+            moRadShowEarDed.setEnabled(false);
+            moRadShowEar.setEnabled(false);
+            moRadShowDed.setEnabled(false);
+        }
+        else {
+            maVariableEarningsCodes = null;
+            jtfVarEarCodes.setText("");
+            jtfVarEarCodes.setToolTipText(null);
+            
+            moRadShowEarDed.setSelected(true);
+        }
+        
         reloadCatalogues();
         actionEnableFieldsDates();
         actionEnableFieldsEarDed();
     }
-
+    
     private void itemStateChangedEmployeeActive() {
         populateEmployee();
     }
@@ -813,7 +868,12 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
             sSqlInnerIssue = "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = rcp.id_pay AND rcp_iss.id_emp = rcp.id_emp ";
         }
         
-        moParamsMap.put("sTitle", "REPORTE DE PERCEPCIONES Y DEDUCCIONES" + (moRadIsSummary.isSelected() ? " (RESUMEN)" : " (DETALLE)"));
+        if (mbVariableEarningsOnly) {
+            moParamsMap.put("sTitle", "REPORTE DE PERCEPCIONES VARIABLES" + (moRadIsSummary.isSelected() ? " (RESUMEN)" : " (DETALLE)"));
+        }
+        else {
+            moParamsMap.put("sTitle", "REPORTE DE PERCEPCIONES Y DEDUCCIONES" + (moRadIsSummary.isSelected() ? " (RESUMEN)" : " (DETALLE)"));
+        }
         
         if (moRadFilterTypePeriod.isSelected()) {
             moParamsMap.put("bByPeriod", true);
@@ -835,12 +895,21 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
             sSqlWhere += "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) 
                     + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ";
         }
+        
         moParamsMap.put("RegistroPatronal", ((SClientInterface) miClient).getSessionXXX().getParamsCompany().getRegistrySs());
         moParamsMap.put("sEmiRfc", bizPartnerCompany.getFiscalId());
         
         moParamsMap.put("sEmployee", moKeyEmployee.getSelectedIndex() > 0 ? moKeyEmployee.getSelectedItem() : "(TODOS)");
-        moParamsMap.put("sEarning", !moKeyEarning.isEnabled() ? "(TODAS)" : moKeyEarning.getSelectedIndex() > 0 ? moKeyEarning.getSelectedItem() : "(TODAS)");
-        moParamsMap.put("sDeduction", !moKeyDeduction.isEnabled() ? "(TODAS)" : moKeyDeduction.getSelectedIndex() > 0 ? moKeyDeduction.getSelectedItem() : "(TODAS)");
+        
+        if (mbVariableEarningsOnly) {
+            moParamsMap.put("sEarning", SLibUtils.textImplode(maVariableEarningsCodes, ", "));
+            moParamsMap.put("sDeduction", "N/A");
+        }
+        else {
+            moParamsMap.put("sEarning", !moKeyEarning.isEnabled() ? "(TODAS)" : moKeyEarning.getSelectedIndex() > 0 ? moKeyEarning.getSelectedItem() : "(TODAS)");
+            moParamsMap.put("sDeduction", !moKeyDeduction.isEnabled() ? "(TODAS)" : moKeyDeduction.getSelectedIndex() > 0 ? moKeyDeduction.getSelectedItem() : "(TODAS)");
+        }
+        
         moParamsMap.put("sPaymentType", moKeyPaymentType.getSelectedIndex() > 0 ? moKeyPaymentType.getSelectedItem() : "(TODOS)");
         moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
         
@@ -851,13 +920,17 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moParamsMap.put("sSqlWhere", sSqlWhere);
         moParamsMap.put("sSqlInnerIssue", sSqlInnerIssue);
         
-        if (moRadShowEarDed.isSelected()) {
-            moParamsMap.put("sSqlWhereEarning", moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
-            moParamsMap.put("sSqlWhereDeduction", moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
+        if (mbVariableEarningsOnly) {
+            moParamsMap.put("sSqlWhereEarning", maVariableEarningsCodes != null ? " AND (ear.code IN (" + SLibUtils.textImplode(maVariableEarningsCodes, ", ") + ") AND NOT ear.b_del) ": "");
+            moParamsMap.put("sSqlWhereDeduction", " AND ded.id_ded = 0 ");
+        }
+        else if (moRadShowEarDed.isSelected()) {
+            moParamsMap.put("sSqlWhereEarning", moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] + " " : "");
+            moParamsMap.put("sSqlWhereDeduction", moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] + " " : "");
         }
         else {
-            moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] : "");
-            moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] : "");
+            moParamsMap.put("sSqlWhereEarning", !moKeyEarning.isEnabled() ? " AND ear.id_ear = 0 " : moKeyEarning.getSelectedIndex() > 0 ? " AND ear.id_ear = " + moKeyEarning.getValue()[0] + " " : "");
+            moParamsMap.put("sSqlWhereDeduction", !moKeyDeduction.isEnabled() ? " AND ded.id_ded = 0 " : moKeyDeduction.getSelectedIndex() > 0 ? " AND ded.id_ded = " + moKeyDeduction.getValue()[0] + " " : "");
         }
         mnFormType = SModConsts.HRSR_PAY_EAR_DED;
         

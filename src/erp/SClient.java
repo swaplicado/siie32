@@ -111,7 +111,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 205.3"; // fecha release: 2022-09-21
+    public static final String APP_RELEASE = "3.2 208.0"; // fecha release: 2022-10-28
     public static final String APP_COPYRIGHT = "2007-2022";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -905,7 +905,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         try {
             SDataCertificate certificate = moSessionXXX.getParamsCompany().getDbmsDataCertificate_n();
             if (certificate != null && certificate.getExtraPrivateKeyBytes_n() != null && certificate.getExtraPublicKeyBytes_n() != null) {
-                float[] cfdVersions = new float[] { DCfdConsts.CFDI_VER_32, DCfdConsts.CFDI_VER_33 };
+                float[] cfdVersions = new float[] { DCfdConsts.CFDI_VER_32, DCfdConsts.CFDI_VER_33, DCfdConsts.CFDI_VER_40 };
                 for (float cfdVersion : cfdVersions) {
                     DCfdSignature signature = new DCfdSignature(certificate.getExtraPrivateKeyBytes_n(), certificate.getExtraPublicKeyBytes_n(), certificate.getNumber(), cfdVersion);
                     signature.setDate(certificate.getDate());

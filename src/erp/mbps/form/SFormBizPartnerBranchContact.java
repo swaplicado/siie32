@@ -44,10 +44,10 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
     private erp.lib.form.SFormField moFieldDbmsPkBizPartnerId;
     private erp.lib.form.SFormField moFieldPkBizPartnerBranchId;
     private erp.lib.form.SFormField moFieldContactPrefix;
-    private erp.lib.form.SFormField moFieldContactSuffix;
-    private erp.lib.form.SFormField moFieldFirstName;
-    private erp.lib.form.SFormField moFieldCharge;
     private erp.lib.form.SFormField moFieldLastName;
+    private erp.lib.form.SFormField moFieldFirstName;
+    private erp.lib.form.SFormField moFieldContactSuffix;
+    private erp.lib.form.SFormField moFieldCharge;
     private erp.lib.form.SFormField moFieldFkContactTypeId;
     private erp.lib.form.SFormField moFieldFkTelephoneType01Id;
     private erp.lib.form.SFormField moFieldTelAreaCode01;
@@ -203,8 +203,8 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlDbmsFkBizPartnerId.setForeground(java.awt.Color.blue);
-        jlDbmsFkBizPartnerId.setText("Asociado de negocios: *");
-        jlDbmsFkBizPartnerId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlDbmsFkBizPartnerId.setText("Asociado negocios: *");
+        jlDbmsFkBizPartnerId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel12.add(jlDbmsFkBizPartnerId);
 
         jcbDbmsFkBizPartnerId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -223,7 +223,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
 
         jlPkBizPartnerBranchId.setForeground(java.awt.Color.blue);
         jlPkBizPartnerBranchId.setText("Sucursal asociado: *");
-        jlPkBizPartnerBranchId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlPkBizPartnerBranchId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel7.add(jlPkBizPartnerBranchId);
 
         jcbPkBizPartnerBranchId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -241,7 +241,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlPrefix.setText("Prefijo:");
-        jlPrefix.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlPrefix.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jlPrefix);
 
         jtfPrefix.setText("PREFIX");
@@ -253,11 +253,11 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlLastName.setText("Apellido(s): *");
-        jlLastName.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlLastName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlLastName);
 
         jtfLastName.setText("LASTNAME");
-        jtfLastName.setPreferredSize(new java.awt.Dimension(300, 23));
+        jtfLastName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel9.add(jtfLastName);
 
         jPanel22.add(jPanel9);
@@ -265,11 +265,11 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFirstName.setText("Nombre(s): *");
-        jlFirstName.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFirstName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlFirstName);
 
         jtfFirstName.setText("FIRSTNAME");
-        jtfFirstName.setPreferredSize(new java.awt.Dimension(300, 23));
+        jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel10.add(jtfFirstName);
 
         jPanel22.add(jPanel10);
@@ -277,7 +277,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlSuffix.setText("Sufijo:");
-        jlSuffix.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlSuffix.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel19.add(jlSuffix);
 
         jtfSuffix.setText("SUFFIX");
@@ -289,7 +289,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlCharge.setText("Puesto: ");
-        jlCharge.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlCharge.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel16.add(jlCharge);
 
         jtfCharge.setText("JOB TITLE");
@@ -301,7 +301,7 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkContactTypeId.setText("Tipo de contacto: *");
-        jlFkContactTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkContactTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlFkContactTypeId);
 
         jcbFkContactTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -536,12 +536,12 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         moFieldPkBizPartnerBranchId.setPickerButton(jbPkBizPartnerBranchId);
         moFieldContactPrefix = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPrefix, jlPrefix);
         moFieldContactPrefix.setLengthMax(25);
-        moFieldContactSuffix = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSuffix, jlSuffix);
-        moFieldContactSuffix.setLengthMax(25);
         moFieldLastName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLastName, jlLastName);
         moFieldLastName.setLengthMax(100);
         moFieldFirstName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstName, jlFirstName);
         moFieldFirstName.setLengthMax(100);
+        moFieldContactSuffix = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSuffix, jlSuffix);
+        moFieldContactSuffix.setLengthMax(25);
         moFieldCharge = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCharge, jlCharge);
         moFieldCharge.setLengthMax(50);
         moFieldFkContactTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkContactTypeId, jlFkContactTypeId);
@@ -589,9 +589,9 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         mvFields.add(moFieldDbmsPkBizPartnerId);
         mvFields.add(moFieldPkBizPartnerBranchId);
         mvFields.add(moFieldContactPrefix);
-        mvFields.add(moFieldContactSuffix);
         mvFields.add(moFieldLastName);
         mvFields.add(moFieldFirstName);
+        mvFields.add(moFieldContactSuffix);
         mvFields.add(moFieldCharge);
         mvFields.add(moFieldFkContactTypeId);
         mvFields.add(moFieldIsDeleted);
@@ -917,10 +917,10 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         }
 
         moFieldContactPrefix.setFieldValue(moBizPartnerBranchContact.getContactPrefix());
-        moFieldContactSuffix.setFieldValue(moBizPartnerBranchContact.getContactSuffix());
-        moFieldFirstName.setFieldValue(moBizPartnerBranchContact.getFirstname());
-        moFieldCharge.setFieldValue(moBizPartnerBranchContact.getCharge());
         moFieldLastName.setFieldValue(moBizPartnerBranchContact.getLastname());
+        moFieldFirstName.setFieldValue(moBizPartnerBranchContact.getFirstname());
+        moFieldContactSuffix.setFieldValue(moBizPartnerBranchContact.getContactSuffix());
+        moFieldCharge.setFieldValue(moBizPartnerBranchContact.getCharge());
         moFieldFkContactTypeId.setFieldValue(new int[] { moBizPartnerBranchContact.getFkContactTypeId() });
         moFieldIsDeleted.setFieldValue(moBizPartnerBranchContact.getIsDeleted());
         moFieldFkTelephoneType01Id.setFieldValue(new int[] { moBizPartnerBranchContact.getFkTelephoneType01Id() });
@@ -961,10 +961,10 @@ public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements
         }
 
         moBizPartnerBranchContact.setContactPrefix(moFieldContactPrefix.getString());
-        moBizPartnerBranchContact.setContactSuffix(moFieldContactSuffix.getString());
-        moBizPartnerBranchContact.setFirstname(moFieldFirstName.getString());
-        moBizPartnerBranchContact.setCharge(moFieldCharge.getString());
         moBizPartnerBranchContact.setLastname(moFieldLastName.getString());
+        moBizPartnerBranchContact.setFirstname(moFieldFirstName.getString());
+        moBizPartnerBranchContact.setContactSuffix(moFieldContactSuffix.getString());
+        moBizPartnerBranchContact.setCharge(moFieldCharge.getString());
         moBizPartnerBranchContact.setContact(moFieldLastName.getString().trim() + ", " + moFieldFirstName.getString().trim());
         moBizPartnerBranchContact.setFkContactTypeId(moFieldFkContactTypeId.getKeyAsIntArray()[0]);
         moBizPartnerBranchContact.setDbmsContactType(jcbFkContactTypeId.getSelectedItem().toString());

@@ -17,10 +17,13 @@ import erp.mod.log.db.SDbBolMerchandise;
 import erp.mod.log.db.SDbBolMerchandiseQuantity;
 import erp.mod.log.db.SDbBolPerson;
 import erp.mod.log.db.SDbBolTransportationMode;
+import erp.mod.log.db.SDbBolTransportationModeExtra;
 import erp.mod.log.db.SDbInsurer;
 import erp.mod.log.db.SDbTrailer;
 import erp.mod.log.db.SDbVehicle;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
@@ -28,6 +31,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
@@ -50,15 +54,18 @@ import sa.lib.gui.SGuiValidation;
  *
  * @author Isabel Servín
  */
-public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGridPaneFormOwner, ItemListener {
+public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGridPaneFormOwner, ActionListener, ItemListener {
     
     private SDbBillOfLading moRegistry;
 
     private SGridPaneForm moGridLocations;
     
     private SFormBolLocation moFormLocation;
+    private SFormBolTransportationModeExtra moFormTranspExtra;
     
     private boolean mbFormSettingsOk;
+    
+    private ArrayList<SDbBolTransportationModeExtra> maTranspTranspExtra;
     
     /**
      * Creates new form SFormShipment
@@ -84,9 +91,9 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
         jPanel3 = new javax.swing.JPanel();
         bgTypeLocations = new javax.swing.ButtonGroup();
-        jPanel15 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel23 = new javax.swing.JPanel();
+        jpBol = new javax.swing.JPanel();
+        jpBolShipment = new javax.swing.JPanel();
+        jpBolShipment1 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jlFiscalIdReceptor = new javax.swing.JLabel();
         moTextFiscalIdReceptor = new sa.lib.gui.bean.SBeanFieldText();
@@ -138,7 +145,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jPanel77 = new javax.swing.JPanel();
         jlCfdiRelated = new javax.swing.JLabel();
         moTextCfdiRelated = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel5 = new javax.swing.JPanel();
+        jpBolVehicle = new javax.swing.JPanel();
+        jpBolVehicle1 = new javax.swing.JPanel();
         jPanel33 = new javax.swing.JPanel();
         jlVehicle = new javax.swing.JLabel();
         moKeyVehicle = new sa.lib.gui.bean.SBeanFieldKey();
@@ -178,67 +186,84 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jPanel71 = new javax.swing.JPanel();
         jlTrailerPlate2 = new javax.swing.JLabel();
         moTextTrailerPlate2 = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel6 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
-        jPanel31 = new javax.swing.JPanel();
-        moRadioMyLocations = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel22 = new javax.swing.JPanel();
-        moRadioCustomerLocations = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel32 = new javax.swing.JPanel();
-        moRadioSupplierLocations = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel8 = new javax.swing.JPanel();
-        jPanel55 = new javax.swing.JPanel();
+        jPanel83 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
         moKeyDriver = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel57 = new javax.swing.JPanel();
+        jPanel84 = new javax.swing.JPanel();
         jlDriverFiscalId = new javax.swing.JLabel();
         moTextDriverFiscalId = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel56 = new javax.swing.JPanel();
+        jPanel85 = new javax.swing.JPanel();
         jlDriverLicense = new javax.swing.JLabel();
         moTextDriverLicense = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel58 = new javax.swing.JPanel();
-        jlOwner = new javax.swing.JLabel();
-        moKeyOwner = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel59 = new javax.swing.JPanel();
-        jlOwnerFiscalId = new javax.swing.JLabel();
-        moTextOwnerFiscalId = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel61 = new javax.swing.JPanel();
-        jlTransportationPartOwner = new javax.swing.JLabel();
-        moKeyTransportationPartOwner = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel60 = new javax.swing.JPanel();
-        jlLessee = new javax.swing.JLabel();
-        moKeyLessee = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel73 = new javax.swing.JPanel();
-        jlLesseeFiscalId = new javax.swing.JLabel();
-        moTextLesseeFiscalId = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel62 = new javax.swing.JPanel();
-        jlTransportationPartLessee = new javax.swing.JLabel();
-        moKeyTransportationPartLessee = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel74 = new javax.swing.JPanel();
-        jlNotified = new javax.swing.JLabel();
-        moKeyNotified = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel75 = new javax.swing.JPanel();
-        jlNotifiedFiscalId = new javax.swing.JLabel();
-        moTextNotifiedFiscalId = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel27 = new javax.swing.JPanel();
+        jPanel47 = new javax.swing.JPanel();
         jlTotalDistance = new javax.swing.JLabel();
         moDecimalTotalDistance = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jPanel29 = new javax.swing.JPanel();
+        jPanel48 = new javax.swing.JPanel();
         jlGrossWeight = new javax.swing.JLabel();
         moDecimalGrossWeight = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jPanel43 = new javax.swing.JPanel();
+        jPanel49 = new javax.swing.JPanel();
         jlGrossWeightUnit = new javax.swing.JLabel();
         moKeyGrossWeightUnit = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel4 = new javax.swing.JPanel();
-        jpDestinies = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
+        jpBolExtra = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel55 = new javax.swing.JPanel();
+        jlOwner1 = new javax.swing.JLabel();
+        moKeyOwner1 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel57 = new javax.swing.JPanel();
+        jlOwnerFiscalId1 = new javax.swing.JLabel();
+        moTextOwnerFiscalId1 = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel56 = new javax.swing.JPanel();
+        jlTransportationPartOwner1 = new javax.swing.JLabel();
+        moKeyTransportationPartOwner1 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel58 = new javax.swing.JPanel();
+        jlOwner2 = new javax.swing.JLabel();
+        moKeyOwner2 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel59 = new javax.swing.JPanel();
+        jlOwnerFiscalId2 = new javax.swing.JLabel();
+        moTextOwnerFiscalId2 = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel61 = new javax.swing.JPanel();
+        jlTransportationPartOwner2 = new javax.swing.JLabel();
+        moKeyTransportationPartOwner2 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel60 = new javax.swing.JPanel();
+        jlLessor1 = new javax.swing.JLabel();
+        moKeyLessor1 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel73 = new javax.swing.JPanel();
+        jlLessorFiscalId1 = new javax.swing.JLabel();
+        moTextLessorFiscalId1 = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel62 = new javax.swing.JPanel();
+        jlTransportationPartLessor1 = new javax.swing.JLabel();
+        moKeyTransportationPartLessor1 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel74 = new javax.swing.JPanel();
+        jlLessor2 = new javax.swing.JLabel();
+        moKeyLessor2 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel75 = new javax.swing.JPanel();
+        jlLessorFiscalId2 = new javax.swing.JLabel();
+        moTextLessorFiscalId2 = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel27 = new javax.swing.JPanel();
+        jlTransportationPartLessor2 = new javax.swing.JLabel();
+        moKeyTransportationPartLessor2 = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel29 = new javax.swing.JPanel();
+        jlNotified = new javax.swing.JLabel();
+        moKeyNotified = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel43 = new javax.swing.JPanel();
+        jlNotifiedFiscalId = new javax.swing.JLabel();
+        moTextNotifiedFiscalId = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel50 = new javax.swing.JPanel();
+        jbAddFigures = new javax.swing.JButton();
+        jlAddFigures = new javax.swing.JLabel();
+        jPanel51 = new javax.swing.JPanel();
+        jPanel31 = new javax.swing.JPanel();
+        moRadioMyLocations = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadioCustomerLocations = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadioSupplierLocations = new sa.lib.gui.bean.SBeanFieldRadio();
+        jpLocations = new javax.swing.JPanel();
 
-        jPanel15.setLayout(new java.awt.BorderLayout());
+        jpBol.setLayout(new java.awt.GridLayout(1, 3));
 
-        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
+        jpBolShipment.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del embarque:"));
+        jpBolShipment.setLayout(new java.awt.BorderLayout());
 
-        jPanel23.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del embarque:"));
-        jPanel23.setLayout(new java.awt.GridLayout(17, 1, 0, 5));
+        jpBolShipment1.setLayout(new java.awt.GridLayout(17, 1, 0, 5));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -253,7 +278,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextTaxRegime.setEnabled(false);
         jPanel21.add(moTextTaxRegime);
 
-        jPanel23.add(jPanel21);
+        jpBolShipment1.add(jPanel21);
 
         jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -264,15 +289,16 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextBillOfLadingTp.setEnabled(false);
         jPanel46.add(moTextBillOfLadingTp);
 
-        jPanel23.add(jPanel46);
+        jpBolShipment1.add(jPanel46);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moBoolInternationalShip.setText("Transporte internacional");
+        moBoolInternationalShip.setEnabled(false);
         moBoolInternationalShip.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel25.add(moBoolInternationalShip);
 
-        jPanel23.add(jPanel25);
+        jpBolShipment1.add(jPanel25);
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -285,7 +311,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyInputOutput.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel26.add(moKeyInputOutput);
 
-        jPanel23.add(jPanel26);
+        jpBolShipment1.add(jPanel26);
 
         jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -297,7 +323,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyInputOutputWay.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel39.add(moKeyInputOutputWay);
 
-        jPanel23.add(jPanel39);
+        jpBolShipment1.add(jPanel39);
 
         jPanel82.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -308,7 +334,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyCountry.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel82.add(moKeyCountry);
 
-        jPanel23.add(jPanel82);
+        jpBolShipment1.add(jPanel82);
 
         jPanel78.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -319,7 +345,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextSerie.setEnabled(false);
         jPanel78.add(moTextSerie);
 
-        jPanel23.add(jPanel78);
+        jpBolShipment1.add(jPanel78);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -328,7 +354,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jPanel24.add(jlNumber);
         jPanel24.add(moTextNumber);
 
-        jPanel23.add(jPanel24);
+        jpBolShipment1.add(jPanel24);
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -337,51 +363,51 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jPanel30.add(jlDate);
         jPanel30.add(moDateDate);
 
-        jPanel23.add(jPanel30);
+        jpBolShipment1.add(jPanel30);
 
         jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEnvironmentalInsurer.setText("Aseg. medio ambiente:");
+        jlEnvironmentalInsurer.setText("Aseg. medio amb.:");
         jlEnvironmentalInsurer.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel44.add(jlEnvironmentalInsurer);
 
         moKeyEnvironmentalInsurer.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel44.add(moKeyEnvironmentalInsurer);
 
-        jPanel23.add(jPanel44);
+        jpBolShipment1.add(jPanel44);
 
         jPanel79.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEnvironmentalPolicy.setText("Poliza med. ambiente:");
+        jlEnvironmentalPolicy.setText("Poliza medio amb.:");
         jlEnvironmentalPolicy.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel79.add(jlEnvironmentalPolicy);
 
         moTextEnvironmentalPolicy.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel79.add(moTextEnvironmentalPolicy);
 
-        jPanel23.add(jPanel79);
+        jpBolShipment1.add(jPanel79);
 
         jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlMerchandiseInsurer.setText("Aseg. mercancia:");
+        jlMerchandiseInsurer.setText("Aseg. mercancía:");
         jlMerchandiseInsurer.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel45.add(jlMerchandiseInsurer);
 
         moKeyMerchandiseInsurer.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel45.add(moKeyMerchandiseInsurer);
 
-        jPanel23.add(jPanel45);
+        jpBolShipment1.add(jPanel45);
 
         jPanel80.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlMerchandisePolicy.setText("Poliza mercancia:");
+        jlMerchandisePolicy.setText("Poliza mercancía:");
         jlMerchandisePolicy.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel80.add(jlMerchandisePolicy);
 
         moTextMerchandisePolicy.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel80.add(moTextMerchandisePolicy);
 
-        jPanel23.add(jPanel80);
+        jpBolShipment1.add(jPanel80);
 
         jPanel81.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -392,18 +418,18 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextPremium.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel81.add(moTextPremium);
 
-        jPanel23.add(jPanel81);
+        jpBolShipment1.add(jPanel81);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setText("Asoc. negocios:*");
+        jlBizPartner.setText("Asociado negocios:*");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel28.add(jlBizPartner);
 
         moKeyBizPartner.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel28.add(moKeyBizPartner);
 
-        jPanel23.add(jPanel28);
+        jpBolShipment1.add(jPanel28);
 
         jPanel76.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -411,10 +437,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jlCfdiUsage.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel76.add(jlCfdiUsage);
 
+        moKeyCfdiUsage.setEnabled(false);
         moKeyCfdiUsage.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel76.add(moKeyCfdiUsage);
 
-        jPanel23.add(jPanel76);
+        jpBolShipment1.add(jPanel76);
 
         jPanel77.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -425,12 +452,16 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextCfdiRelated.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel77.add(moTextCfdiRelated);
 
-        jPanel23.add(jPanel77);
+        jpBolShipment1.add(jPanel77);
 
-        jPanel1.add(jPanel23, java.awt.BorderLayout.WEST);
+        jpBolShipment.add(jpBolShipment1, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del vehículo:"));
-        jPanel5.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
+        jpBol.add(jpBolShipment);
+
+        jpBolVehicle.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del embarque:"));
+        jpBolVehicle.setLayout(new java.awt.BorderLayout());
+
+        jpBolVehicle1.setLayout(new java.awt.GridLayout(19, 1, 0, 5));
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -441,7 +472,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyVehicle.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel33.add(moKeyVehicle);
 
-        jPanel5.add(jPanel33);
+        jpBolVehicle1.add(jPanel33);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -453,7 +484,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextPlate.setEnabled(false);
         jPanel34.add(moTextPlate);
 
-        jPanel5.add(jPanel34);
+        jpBolVehicle1.add(jPanel34);
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -465,11 +496,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyPermissonType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel35.add(moKeyPermissonType);
 
-        jPanel5.add(jPanel35);
+        jpBolVehicle1.add(jPanel35);
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPermissonNumber.setText("Num permiso SCT:");
+        jlPermissonNumber.setText("Núm. permiso SCT:");
         jlPermissonNumber.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel36.add(jlPermissonNumber);
 
@@ -478,11 +509,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextPermissonNumber.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel36.add(moTextPermissonNumber);
 
-        jPanel5.add(jPanel36);
+        jpBolVehicle1.add(jPanel36);
 
         jPanel64.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInsurer.setText("Aseguradora:");
+        jlInsurer.setText("Aseg. terceros:");
         jlInsurer.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel64.add(jlInsurer);
 
@@ -490,11 +521,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyInsurer.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel64.add(moKeyInsurer);
 
-        jPanel5.add(jPanel64);
+        jpBolVehicle1.add(jPanel64);
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInsurancePolicy.setText("Póliza de seguro:");
+        jlInsurancePolicy.setText("Póliza terceros:");
         jlInsurancePolicy.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel37.add(jlInsurancePolicy);
 
@@ -503,11 +534,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextInsurancePolicy.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel37.add(moTextInsurancePolicy);
 
-        jPanel5.add(jPanel37);
+        jpBolVehicle1.add(jPanel37);
 
         jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlVehConfiguration.setText("Conf. vehicular:");
+        jlVehConfiguration.setText("Config. vehicular:");
         jlVehConfiguration.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel38.add(jlVehConfiguration);
 
@@ -515,7 +546,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyVehConfiguration.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel38.add(moKeyVehConfiguration);
 
-        jPanel5.add(jPanel38);
+        jpBolVehicle1.add(jPanel38);
 
         jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -527,11 +558,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyTrailer1.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel40.add(moKeyTrailer1);
 
-        jPanel5.add(jPanel40);
+        jpBolVehicle1.add(jPanel40);
 
         jPanel42.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTrailerSubtype1.setText("Subtipo rem 1:");
+        jlTrailerSubtype1.setText("Subtipo remolque 1:");
         jlTrailerSubtype1.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel42.add(jlTrailerSubtype1);
 
@@ -539,11 +570,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyTrailerSubtype1.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel42.add(moKeyTrailerSubtype1);
 
-        jPanel5.add(jPanel42);
+        jpBolVehicle1.add(jPanel42);
 
         jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTrailerPlate1.setText("Placa rem 1:");
+        jlTrailerPlate1.setText("Placa remolque 1:");
         jlTrailerPlate1.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel41.add(jlTrailerPlate1);
 
@@ -552,7 +583,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextTrailerPlate1.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel41.add(moTextTrailerPlate1);
 
-        jPanel5.add(jPanel41);
+        jpBolVehicle1.add(jPanel41);
 
         jPanel70.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -564,11 +595,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyTrailer2.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel70.add(moKeyTrailer2);
 
-        jPanel5.add(jPanel70);
+        jpBolVehicle1.add(jPanel70);
 
         jPanel72.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTrailerSubtype2.setText("Subtipo rem 2:");
+        jlTrailerSubtype2.setText("Subtipo remolque 2:");
         jlTrailerSubtype2.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel72.add(jlTrailerSubtype2);
 
@@ -576,11 +607,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyTrailerSubtype2.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel72.add(moKeyTrailerSubtype2);
 
-        jPanel5.add(jPanel72);
+        jpBolVehicle1.add(jPanel72);
 
         jPanel71.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTrailerPlate2.setText("Placa rem 2:");
+        jlTrailerPlate2.setText("Placa remolque 2:");
         jlTrailerPlate2.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel71.add(jlTrailerPlate2);
 
@@ -589,237 +620,299 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextTrailerPlate2.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel71.add(moTextTrailerPlate2);
 
-        jPanel5.add(jPanel71);
+        jpBolVehicle1.add(jPanel71);
 
-        jPanel1.add(jPanel5, java.awt.BorderLayout.CENTER);
-
-        jPanel6.setLayout(new java.awt.BorderLayout());
-
-        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Ubicaciones de:"));
-        jPanel9.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
-
-        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgTypeLocations.add(moRadioMyLocations);
-        moRadioMyLocations.setSelected(true);
-        moRadioMyLocations.setText("Propias");
-        jPanel31.add(moRadioMyLocations);
-
-        jPanel9.add(jPanel31);
-
-        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgTypeLocations.add(moRadioCustomerLocations);
-        moRadioCustomerLocations.setText("Clientes");
-        jPanel22.add(moRadioCustomerLocations);
-
-        jPanel9.add(jPanel22);
-
-        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgTypeLocations.add(moRadioSupplierLocations);
-        moRadioSupplierLocations.setText("Proveedores");
-        moRadioSupplierLocations.setPreferredSize(new java.awt.Dimension(130, 23));
-        jPanel32.add(moRadioSupplierLocations);
-
-        jPanel9.add(jPanel32);
-
-        jPanel6.add(jPanel9, java.awt.BorderLayout.SOUTH);
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos adicionales:"));
-        jPanel8.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
-
-        jPanel55.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel83.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDriver.setText("Operador:*");
-        jlDriver.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel55.add(jlDriver);
+        jlDriver.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel83.add(jlDriver);
 
         moKeyDriver.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
         moKeyDriver.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel55.add(moKeyDriver);
+        jPanel83.add(moKeyDriver);
+
+        jpBolVehicle1.add(jPanel83);
+
+        jPanel84.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDriverFiscalId.setText("RFC operador:");
+        jlDriverFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel84.add(jlDriverFiscalId);
+
+        moTextDriverFiscalId.setEnabled(false);
+        moTextDriverFiscalId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel84.add(moTextDriverFiscalId);
+
+        jpBolVehicle1.add(jPanel84);
+
+        jPanel85.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDriverLicense.setText("Licencia operador:");
+        jlDriverLicense.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel85.add(jlDriverLicense);
+
+        moTextDriverLicense.setEnabled(false);
+        moTextDriverLicense.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel85.add(moTextDriverLicense);
+
+        jpBolVehicle1.add(jPanel85);
+
+        jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTotalDistance.setText("Tot dist. recorrida:*");
+        jlTotalDistance.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel47.add(jlTotalDistance);
+        jPanel47.add(moDecimalTotalDistance);
+
+        jpBolVehicle1.add(jPanel47);
+
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlGrossWeight.setText("Peso bruto total:*");
+        jlGrossWeight.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel48.add(jlGrossWeight);
+        jPanel48.add(moDecimalGrossWeight);
+
+        jpBolVehicle1.add(jPanel48);
+
+        jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlGrossWeightUnit.setText("Unidad peso bruto:*");
+        jlGrossWeightUnit.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel49.add(jlGrossWeightUnit);
+
+        moKeyGrossWeightUnit.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel49.add(moKeyGrossWeightUnit);
+
+        jpBolVehicle1.add(jPanel49);
+
+        jpBolVehicle.add(jpBolVehicle1, java.awt.BorderLayout.NORTH);
+
+        jpBol.add(jpBolVehicle);
+
+        jpBolExtra.setLayout(new java.awt.BorderLayout());
+
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Figuras de transporte:"));
+        jPanel8.setLayout(new java.awt.GridLayout(17, 1, 0, 5));
+
+        jPanel55.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlOwner1.setText("Propietario 1:");
+        jlOwner1.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel55.add(jlOwner1);
+
+        moKeyOwner1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyOwner1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel55.add(moKeyOwner1);
 
         jPanel8.add(jPanel55);
 
         jPanel57.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDriverFiscalId.setText("RFC operador:");
-        jlDriverFiscalId.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel57.add(jlDriverFiscalId);
+        jlOwnerFiscalId1.setText("RFC propietario 1:");
+        jlOwnerFiscalId1.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel57.add(jlOwnerFiscalId1);
 
-        moTextDriverFiscalId.setEnabled(false);
-        moTextDriverFiscalId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel57.add(moTextDriverFiscalId);
+        moTextOwnerFiscalId1.setEnabled(false);
+        moTextOwnerFiscalId1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel57.add(moTextOwnerFiscalId1);
 
         jPanel8.add(jPanel57);
 
         jPanel56.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDriverLicense.setText("Licencia operador:");
-        jlDriverLicense.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel56.add(jlDriverLicense);
+        jlTransportationPartOwner1.setText("Parte transporte:");
+        jlTransportationPartOwner1.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel56.add(jlTransportationPartOwner1);
 
-        moTextDriverLicense.setEnabled(false);
-        moTextDriverLicense.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel56.add(moTextDriverLicense);
+        moKeyTransportationPartOwner1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyTransportationPartOwner1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel56.add(moKeyTransportationPartOwner1);
 
         jPanel8.add(jPanel56);
 
         jPanel58.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlOwner.setText("Propietario:");
-        jlOwner.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel58.add(jlOwner);
+        jlOwner2.setText("Propietario 2:");
+        jlOwner2.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel58.add(jlOwner2);
 
-        moKeyOwner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
-        moKeyOwner.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel58.add(moKeyOwner);
+        moKeyOwner2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyOwner2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel58.add(moKeyOwner2);
 
         jPanel8.add(jPanel58);
 
         jPanel59.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlOwnerFiscalId.setText("RFC propietario:");
-        jlOwnerFiscalId.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel59.add(jlOwnerFiscalId);
+        jlOwnerFiscalId2.setText("RFC propietario 2:");
+        jlOwnerFiscalId2.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel59.add(jlOwnerFiscalId2);
 
-        moTextOwnerFiscalId.setEnabled(false);
-        moTextOwnerFiscalId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel59.add(moTextOwnerFiscalId);
+        moTextOwnerFiscalId2.setEnabled(false);
+        moTextOwnerFiscalId2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel59.add(moTextOwnerFiscalId2);
 
         jPanel8.add(jPanel59);
 
         jPanel61.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTransportationPartOwner.setText("Parte transporte:");
-        jlTransportationPartOwner.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel61.add(jlTransportationPartOwner);
+        jlTransportationPartOwner2.setText("Parte transporte:");
+        jlTransportationPartOwner2.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel61.add(jlTransportationPartOwner2);
 
-        moKeyTransportationPartOwner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
-        moKeyTransportationPartOwner.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel61.add(moKeyTransportationPartOwner);
+        moKeyTransportationPartOwner2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyTransportationPartOwner2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel61.add(moKeyTransportationPartOwner2);
 
         jPanel8.add(jPanel61);
 
         jPanel60.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlLessee.setText("Arrendatario:");
-        jlLessee.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel60.add(jlLessee);
+        jlLessor1.setText("Arrendador 1:");
+        jlLessor1.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel60.add(jlLessor1);
 
-        moKeyLessee.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
-        moKeyLessee.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel60.add(moKeyLessee);
+        moKeyLessor1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyLessor1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel60.add(moKeyLessor1);
 
         jPanel8.add(jPanel60);
 
         jPanel73.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlLesseeFiscalId.setText("RFC arrendatario:");
-        jlLesseeFiscalId.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel73.add(jlLesseeFiscalId);
+        jlLessorFiscalId1.setText("RFC arrendador 1:");
+        jlLessorFiscalId1.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel73.add(jlLessorFiscalId1);
 
-        moTextLesseeFiscalId.setEnabled(false);
-        moTextLesseeFiscalId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel73.add(moTextLesseeFiscalId);
+        moTextLessorFiscalId1.setEnabled(false);
+        moTextLessorFiscalId1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel73.add(moTextLessorFiscalId1);
 
         jPanel8.add(jPanel73);
 
         jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTransportationPartLessee.setText("Parte transporte:");
-        jlTransportationPartLessee.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel62.add(jlTransportationPartLessee);
+        jlTransportationPartLessor1.setText("Parte transporte:");
+        jlTransportationPartLessor1.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel62.add(jlTransportationPartLessor1);
 
-        moKeyTransportationPartLessee.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
-        moKeyTransportationPartLessee.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel62.add(moKeyTransportationPartLessee);
+        moKeyTransportationPartLessor1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyTransportationPartLessor1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel62.add(moKeyTransportationPartLessor1);
 
         jPanel8.add(jPanel62);
 
         jPanel74.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNotified.setText("Notificado:");
-        jlNotified.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel74.add(jlNotified);
+        jlLessor2.setText("Arrendador 2:");
+        jlLessor2.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel74.add(jlLessor2);
 
-        moKeyNotified.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
-        moKeyNotified.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel74.add(moKeyNotified);
+        moKeyLessor2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyLessor2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel74.add(moKeyLessor2);
 
         jPanel8.add(jPanel74);
 
         jPanel75.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNotifiedFiscalId.setText("RFC notificado:");
-        jlNotifiedFiscalId.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel75.add(jlNotifiedFiscalId);
+        jlLessorFiscalId2.setText("RFC arrendador 2:");
+        jlLessorFiscalId2.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel75.add(jlLessorFiscalId2);
 
-        moTextNotifiedFiscalId.setEnabled(false);
-        moTextNotifiedFiscalId.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel75.add(moTextNotifiedFiscalId);
+        moTextLessorFiscalId2.setEnabled(false);
+        moTextLessorFiscalId2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel75.add(moTextLessorFiscalId2);
 
         jPanel8.add(jPanel75);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalDistance.setText("Tot dist. recorrida:*");
-        jlTotalDistance.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel27.add(jlTotalDistance);
-        jPanel27.add(moDecimalTotalDistance);
+        jlTransportationPartLessor2.setText("Parte transporte:");
+        jlTransportationPartLessor2.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel27.add(jlTransportationPartLessor2);
+
+        moKeyTransportationPartLessor2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyTransportationPartLessor2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel27.add(moKeyTransportationPartLessor2);
 
         jPanel8.add(jPanel27);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlGrossWeight.setText("Peso bruto total:*");
-        jlGrossWeight.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel29.add(jlGrossWeight);
-        jPanel29.add(moDecimalGrossWeight);
+        jlNotified.setText("Notificado:");
+        jlNotified.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel29.add(jlNotified);
+
+        moKeyNotified.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No", "Sí" }));
+        moKeyNotified.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel29.add(moKeyNotified);
 
         jPanel8.add(jPanel29);
 
         jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlGrossWeightUnit.setText("Unidad peso bruto:*");
-        jlGrossWeightUnit.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel43.add(jlGrossWeightUnit);
+        jlNotifiedFiscalId.setText("RFC notificado:");
+        jlNotifiedFiscalId.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel43.add(jlNotifiedFiscalId);
 
-        moKeyGrossWeightUnit.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel43.add(moKeyGrossWeightUnit);
+        moTextNotifiedFiscalId.setEnabled(false);
+        moTextNotifiedFiscalId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel43.add(moTextNotifiedFiscalId);
 
         jPanel8.add(jPanel43);
 
-        jPanel6.add(jPanel8, java.awt.BorderLayout.NORTH);
+        jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel1.add(jPanel6, java.awt.BorderLayout.EAST);
+        jbAddFigures.setText("Figuras adicionales");
+        jbAddFigures.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel50.add(jbAddFigures);
 
-        jPanel15.add(jPanel1, java.awt.BorderLayout.NORTH);
+        jlAddFigures.setText("Figuras adicionales: 0");
+        jPanel50.add(jlAddFigures);
 
-        getContentPane().add(jPanel15, java.awt.BorderLayout.NORTH);
+        jPanel8.add(jPanel50);
 
-        jPanel4.setLayout(new java.awt.BorderLayout(5, 5));
+        jPanel51.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel8.add(jPanel51);
 
-        jpDestinies.setFocusable(false);
-        jpDestinies.setLayout(new java.awt.BorderLayout());
+        jpBolExtra.add(jPanel8, java.awt.BorderLayout.NORTH);
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ubicaciones del traslado:"));
-        jPanel10.setLayout(new java.awt.BorderLayout());
-        jpDestinies.add(jPanel10, java.awt.BorderLayout.CENTER);
+        jPanel31.setBorder(javax.swing.BorderFactory.createTitledBorder("Ubicaciones de:"));
+        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel4.add(jpDestinies, java.awt.BorderLayout.CENTER);
+        bgTypeLocations.add(moRadioMyLocations);
+        moRadioMyLocations.setSelected(true);
+        moRadioMyLocations.setText("Propias");
+        moRadioMyLocations.setPreferredSize(new java.awt.Dimension(85, 23));
+        jPanel31.add(moRadioMyLocations);
 
-        getContentPane().add(jPanel4, java.awt.BorderLayout.CENTER);
+        bgTypeLocations.add(moRadioCustomerLocations);
+        moRadioCustomerLocations.setText("Clientes");
+        moRadioCustomerLocations.setPreferredSize(new java.awt.Dimension(85, 23));
+        jPanel31.add(moRadioCustomerLocations);
+
+        bgTypeLocations.add(moRadioSupplierLocations);
+        moRadioSupplierLocations.setText("Proveedores");
+        moRadioSupplierLocations.setPreferredSize(new java.awt.Dimension(130, 23));
+        jPanel31.add(moRadioSupplierLocations);
+
+        jpBolExtra.add(jPanel31, java.awt.BorderLayout.SOUTH);
+
+        jpBol.add(jpBolExtra);
+
+        getContentPane().add(jpBol, java.awt.BorderLayout.NORTH);
+
+        jpLocations.setBorder(javax.swing.BorderFactory.createTitledBorder("Ubicaciones del traslado:"));
+        jpLocations.setLayout(new java.awt.BorderLayout(5, 5));
+        getContentPane().add(jpLocations, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgTypeLocations;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel21;
-    private javax.swing.JPanel jPanel22;
-    private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
@@ -829,7 +922,6 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
-    private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
@@ -837,7 +929,6 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
@@ -845,13 +936,16 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
-    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
+    private javax.swing.JPanel jPanel49;
+    private javax.swing.JPanel jPanel50;
+    private javax.swing.JPanel jPanel51;
     private javax.swing.JPanel jPanel55;
     private javax.swing.JPanel jPanel56;
     private javax.swing.JPanel jPanel57;
     private javax.swing.JPanel jPanel58;
     private javax.swing.JPanel jPanel59;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel60;
     private javax.swing.JPanel jPanel61;
     private javax.swing.JPanel jPanel62;
@@ -870,7 +964,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JPanel jPanel80;
     private javax.swing.JPanel jPanel81;
     private javax.swing.JPanel jPanel82;
-    private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jPanel83;
+    private javax.swing.JPanel jPanel84;
+    private javax.swing.JPanel jPanel85;
+    private javax.swing.JButton jbAddFigures;
+    private javax.swing.JLabel jlAddFigures;
     private javax.swing.JLabel jlBillOfLadingTp;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlCfdiRelated;
@@ -889,15 +987,19 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JLabel jlInputOutputWay;
     private javax.swing.JLabel jlInsurancePolicy;
     private javax.swing.JLabel jlInsurer;
-    private javax.swing.JLabel jlLessee;
-    private javax.swing.JLabel jlLesseeFiscalId;
+    private javax.swing.JLabel jlLessor1;
+    private javax.swing.JLabel jlLessor2;
+    private javax.swing.JLabel jlLessorFiscalId1;
+    private javax.swing.JLabel jlLessorFiscalId2;
     private javax.swing.JLabel jlMerchandiseInsurer;
     private javax.swing.JLabel jlMerchandisePolicy;
     private javax.swing.JLabel jlNotified;
     private javax.swing.JLabel jlNotifiedFiscalId;
     private javax.swing.JLabel jlNumber;
-    private javax.swing.JLabel jlOwner;
-    private javax.swing.JLabel jlOwnerFiscalId;
+    private javax.swing.JLabel jlOwner1;
+    private javax.swing.JLabel jlOwner2;
+    private javax.swing.JLabel jlOwnerFiscalId1;
+    private javax.swing.JLabel jlOwnerFiscalId2;
     private javax.swing.JLabel jlPermissonNumber;
     private javax.swing.JLabel jlPermissonType;
     private javax.swing.JLabel jlPlate;
@@ -910,11 +1012,19 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JLabel jlTrailerPlate2;
     private javax.swing.JLabel jlTrailerSubtype1;
     private javax.swing.JLabel jlTrailerSubtype2;
-    private javax.swing.JLabel jlTransportationPartLessee;
-    private javax.swing.JLabel jlTransportationPartOwner;
+    private javax.swing.JLabel jlTransportationPartLessor1;
+    private javax.swing.JLabel jlTransportationPartLessor2;
+    private javax.swing.JLabel jlTransportationPartOwner1;
+    private javax.swing.JLabel jlTransportationPartOwner2;
     private javax.swing.JLabel jlVehConfiguration;
     private javax.swing.JLabel jlVehicle;
-    private javax.swing.JPanel jpDestinies;
+    private javax.swing.JPanel jpBol;
+    private javax.swing.JPanel jpBolExtra;
+    private javax.swing.JPanel jpBolShipment;
+    private javax.swing.JPanel jpBolShipment1;
+    private javax.swing.JPanel jpBolVehicle;
+    private javax.swing.JPanel jpBolVehicle1;
+    private javax.swing.JPanel jpLocations;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolInternationalShip;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecimalGrossWeight;
@@ -928,17 +1038,21 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private sa.lib.gui.bean.SBeanFieldKey moKeyInputOutput;
     private sa.lib.gui.bean.SBeanFieldKey moKeyInputOutputWay;
     private sa.lib.gui.bean.SBeanFieldKey moKeyInsurer;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyLessee;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyLessor1;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyLessor2;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMerchandiseInsurer;
     private sa.lib.gui.bean.SBeanFieldKey moKeyNotified;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyOwner;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyOwner1;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyOwner2;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPermissonType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTrailer1;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTrailer2;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTrailerSubtype1;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTrailerSubtype2;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyTransportationPartLessee;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyTransportationPartOwner;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyTransportationPartLessor1;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyTransportationPartLessor2;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyTransportationPartOwner1;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyTransportationPartOwner2;
     private sa.lib.gui.bean.SBeanFieldKey moKeyVehConfiguration;
     private sa.lib.gui.bean.SBeanFieldKey moKeyVehicle;
     private sa.lib.gui.bean.SBeanFieldRadio moRadioCustomerLocations;
@@ -951,11 +1065,13 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private sa.lib.gui.bean.SBeanFieldText moTextEnvironmentalPolicy;
     private sa.lib.gui.bean.SBeanFieldText moTextFiscalIdReceptor;
     private sa.lib.gui.bean.SBeanFieldText moTextInsurancePolicy;
-    private sa.lib.gui.bean.SBeanFieldText moTextLesseeFiscalId;
+    private sa.lib.gui.bean.SBeanFieldText moTextLessorFiscalId1;
+    private sa.lib.gui.bean.SBeanFieldText moTextLessorFiscalId2;
     private sa.lib.gui.bean.SBeanFieldText moTextMerchandisePolicy;
     private sa.lib.gui.bean.SBeanFieldText moTextNotifiedFiscalId;
     private sa.lib.gui.bean.SBeanFieldText moTextNumber;
-    private sa.lib.gui.bean.SBeanFieldText moTextOwnerFiscalId;
+    private sa.lib.gui.bean.SBeanFieldText moTextOwnerFiscalId1;
+    private sa.lib.gui.bean.SBeanFieldText moTextOwnerFiscalId2;
     private sa.lib.gui.bean.SBeanFieldText moTextPermissonNumber;
     private sa.lib.gui.bean.SBeanFieldText moTextPlate;
     private sa.lib.gui.bean.SBeanFieldText moTextPremium;
@@ -994,14 +1110,13 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1050, 720);
         
-        //moFieldKeyBizPartnerGroup = new SGuiFieldKeyGroup(miClient);
-        moTextFiscalIdReceptor.setTextSettings(SGuiUtils.getLabelName(jlFiscalIdReceptor.getText()), 20);
+        moTextFiscalIdReceptor.setTextSettings(SGuiUtils.getLabelName(jlFiscalIdReceptor.getText()), 25);
         moTextBillOfLadingTp.setTextSettings(SGuiUtils.getLabelName(jlBillOfLadingTp), 1);
         moBoolInternationalShip.setBooleanSettings(moBoolInternationalShip.getText(), false);
         moKeyInputOutput.setKeySettings(miClient, SGuiUtils.getLabelName(jlInputOutput.getText()), false);
         moKeyInputOutputWay.setKeySettings(miClient, SGuiUtils.getLabelName(jlInputOutputWay.getText()), false);
         moKeyCountry.setKeySettings(miClient, SGuiUtils.getLabelName(jlCountry), false);
-        moTextSerie.setTextSettings(SGuiUtils.getLabelName(jlSerie.getText()), 15);
+        moTextSerie.setTextSettings(SGuiUtils.getLabelName(jlSerie.getText()), 25);
         moTextNumber.setTextSettings(SGuiUtils.getLabelName(jlNumber.getText()), 15);
         moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
         moDecimalTotalDistance.setDecimalSettings(SGuiUtils.getLabelName(jlTotalDistance.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
@@ -1015,7 +1130,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), true);
         moKeyCfdiUsage.setKeySettings(miClient, SGuiUtils.getLabelName(jlCfdiUsage.getText()), false);
         moKeyVehicle.setKeySettings(miClient, SGuiUtils.getLabelName(jlVehicle.getText()), true);
-        moTextPlate.setTextSettings(SGuiUtils.getLabelName(jlPlate.getText()), 15);
+        moTextPlate.setTextSettings(SGuiUtils.getLabelName(jlPlate.getText()), 10);
         moKeyPermissonType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPermissonType.getText()), false);
         moTextPermissonNumber.setTextSettings(SGuiUtils.getLabelName(jlPermissonNumber.getText()), 50);
         moKeyInsurer.setKeySettings(miClient, SGuiUtils.getLabelName(jlInsurer.getText()), true);
@@ -1023,19 +1138,25 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyVehConfiguration.setKeySettings(miClient, SGuiUtils.getLabelName(jlVehConfiguration.getText()), true);
         moKeyTrailer1.setKeySettings(miClient, SGuiUtils.getLabelName(jlTrailer1.getText()), false);
         moKeyTrailerSubtype1.setKeySettings(miClient, SGuiUtils.getLabelName(jlTrailer1), false);
-        moTextTrailerPlate1.setTextSettings(SGuiUtils.getLabelName(jlTrailerPlate1.getText()), 15);
+        moTextTrailerPlate1.setTextSettings(SGuiUtils.getLabelName(jlTrailerPlate1.getText()), 10);
         moKeyTrailer2.setKeySettings(miClient, SGuiUtils.getLabelName(jlTrailer2.getText()), false);
         moKeyTrailerSubtype2.setKeySettings(miClient, SGuiUtils.getLabelName(jlTrailer2), false);
-        moTextTrailerPlate2.setTextSettings(SGuiUtils.getLabelName(jlTrailerPlate2.getText()), 15);
+        moTextTrailerPlate2.setTextSettings(SGuiUtils.getLabelName(jlTrailerPlate2.getText()), 10);
         moKeyDriver.setKeySettings(miClient, SGuiUtils.getLabelName(jlDriver), true);
         moTextDriverFiscalId.setTextSettings(SGuiUtils.getLabelName(jlDriverFiscalId.getText()), 25);
         moTextDriverLicense.setTextSettings(SGuiUtils.getLabelName(jlDriverLicense.getText()), 16);
-        moKeyOwner.setKeySettings(miClient, SGuiUtils.getLabelName(jlOwner), false);
-        moTextOwnerFiscalId.setTextSettings(SGuiUtils.getLabelName(jlOwnerFiscalId.getText()), 25);
-        moKeyTransportationPartOwner.setKeySettings(miClient, SGuiUtils.getLabelName(jlTransportationPartOwner.getText()), false);
-        moKeyLessee.setKeySettings(miClient, SGuiUtils.getLabelName(jlLessee), false);
-        moTextLesseeFiscalId.setTextSettings(SGuiUtils.getLabelName(jlLesseeFiscalId.getText()), 25);
-        moKeyTransportationPartLessee.setKeySettings(miClient, SGuiUtils.getLabelName(jlTransportationPartLessee.getText()), false);
+        moKeyOwner1.setKeySettings(miClient, SGuiUtils.getLabelName(jlOwner1), false);
+        moTextOwnerFiscalId1.setTextSettings(SGuiUtils.getLabelName(jlOwnerFiscalId1.getText()), 25);
+        moKeyTransportationPartOwner1.setKeySettings(miClient, SGuiUtils.getLabelName(jlTransportationPartOwner1.getText()), false);
+        moKeyOwner2.setKeySettings(miClient, SGuiUtils.getLabelName(jlOwner2), false);
+        moTextOwnerFiscalId2.setTextSettings(SGuiUtils.getLabelName(jlOwnerFiscalId2.getText()), 25);
+        moKeyTransportationPartOwner2.setKeySettings(miClient, SGuiUtils.getLabelName(jlTransportationPartOwner2.getText()), false);
+        moKeyLessor1.setKeySettings(miClient, SGuiUtils.getLabelName(jlLessor1), false);
+        moTextLessorFiscalId1.setTextSettings(SGuiUtils.getLabelName(jlLessorFiscalId1.getText()), 25);
+        moKeyTransportationPartLessor1.setKeySettings(miClient, SGuiUtils.getLabelName(jlTransportationPartLessor1.getText()), false);
+        moKeyLessor2.setKeySettings(miClient, SGuiUtils.getLabelName(jlLessor2), false);
+        moTextLessorFiscalId2.setTextSettings(SGuiUtils.getLabelName(jlLessorFiscalId2.getText()), 25);
+        moKeyTransportationPartLessor2.setKeySettings(miClient, SGuiUtils.getLabelName(jlTransportationPartLessor2.getText()), false);
         moKeyNotified.setKeySettings(miClient, SGuiUtils.getLabelName(jlNotified), false);
         moTextNotifiedFiscalId.setTextSettings(SGuiUtils.getLabelName(jlNotifiedFiscalId.getText()), 25);
         
@@ -1073,12 +1194,18 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moFields.addField(moKeyDriver);
         moFields.addField(moTextDriverFiscalId);
         moFields.addField(moTextDriverLicense);
-        moFields.addField(moKeyOwner);
-        moFields.addField(moTextOwnerFiscalId);
-        moFields.addField(moKeyTransportationPartOwner);
-        moFields.addField(moKeyLessee);
-        moFields.addField(moTextLesseeFiscalId);
-        moFields.addField(moKeyTransportationPartLessee);
+        moFields.addField(moKeyOwner1);
+        moFields.addField(moTextOwnerFiscalId1);
+        moFields.addField(moKeyTransportationPartOwner1);
+        moFields.addField(moKeyOwner2);
+        moFields.addField(moTextOwnerFiscalId2);
+        moFields.addField(moKeyTransportationPartOwner2);
+        moFields.addField(moKeyLessor1);
+        moFields.addField(moTextLessorFiscalId1);
+        moFields.addField(moKeyTransportationPartLessor1);
+        moFields.addField(moKeyLessor2);
+        moFields.addField(moTextLessorFiscalId2);
+        moFields.addField(moKeyTransportationPartLessor2);
         moFields.addField(moKeyNotified);
         moFields.addField(moTextNotifiedFiscalId);
         
@@ -1138,18 +1265,18 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             }
         };
 
-        //mvFormGrids.add(moGridDestinies);
         moFormLocation = new SFormBolLocation(miClient, moRegistry, "Ubicación");
         moGridLocations.setForm(moFormLocation);
         moGridLocations.setPaneFormOwner(this);
 
-
-        jPanel10.add(moGridLocations, BorderLayout.CENTER);
+        moFormTranspExtra = new SFormBolTransportationModeExtra(miClient, "Figuras de transporte");
+        
+        jpLocations.add(moGridLocations, BorderLayout.CENTER);
     }
     
     private Vector<SGridRow> getFirstRows() {
         Vector<SGridRow> rows = new Vector<>(); 
-        int selectedRow = moGridLocations.getTable().getSelectedRow();//.getSelectedGridRow().getRowPrimaryKey();
+        int selectedRow = moGridLocations.getTable().getSelectedRow();
         for (int i = 0; i < selectedRow; i++) {
             rows.add(moGridLocations.getModel().getGridRows().get(i));
         }
@@ -1157,6 +1284,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     }
 
     private void enabledFields() {
+        moBoolInternationalShip.setEnabled(false);
+        moKeyCfdiUsage.setEnabled(false);
         if (!moBoolInternationalShip.isSelected()) {
             moKeyInputOutput.setEnabled(false);
             moKeyInputOutputWay.setEnabled(false);
@@ -1200,8 +1329,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         ArrayList<Integer> itemKeys = new ArrayList<>();
         double weight = 0;
         for (SGridRow row : moGridLocations.getModel().getGridRows()) {
-            for (SDbBolMerchandiseQuantity qty : ((SDbBolLocation) row).getXtaMerchandiseQuantityCharge()) {
-                itemKeys.add(qty.getXtaMerchandise().getFkItemId());
+            for (SDbBolMerchandiseQuantity qty : ((SDbBolLocation) row).getBolMerchandiseQuantityCharges()) {
+                itemKeys.add(qty.getParentMerchandise().getFkItemId());
                 weight += qty.getQuantity();
             }
         }
@@ -1278,23 +1407,43 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
     }
     
-    private void actionKeyOwner() {
-        if (moKeyOwner.getSelectedIndex() >= 1) {
-            SDbBolPerson per = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyOwner.getValue() );
-            moTextOwnerFiscalId.setText("".equals(per.getFiscalId()) && !"".equals(per.getFiscalForeginId()) ? per.getFiscalForeginId() : per.getFiscalId());
+    private void actionKeyOwner1() {
+        if (moKeyOwner1.getSelectedIndex() >= 1) {
+            SDbBolPerson per = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyOwner1.getValue() );
+            moTextOwnerFiscalId1.setText("".equals(per.getFiscalId()) && !"".equals(per.getFiscalForeginId()) ? per.getFiscalForeginId() : per.getFiscalId());
         }
         else {
-            moTextOwnerFiscalId.setText("");
+            moTextOwnerFiscalId1.setText("");
         }
     } 
     
-    private void actionKeyLessee() {
-        if (moKeyLessee.getSelectedIndex() >= 1) {
-            SDbBolPerson per = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyLessee.getValue() );
-            moTextLesseeFiscalId.setText("".equals(per.getFiscalId()) && !"".equals(per.getFiscalForeginId()) ? per.getFiscalForeginId() : per.getFiscalId());
+    private void actionKeyOwner2() {
+        if (moKeyOwner2.getSelectedIndex() >= 1) {
+            SDbBolPerson per = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyOwner2.getValue() );
+            moTextOwnerFiscalId2.setText("".equals(per.getFiscalId()) && !"".equals(per.getFiscalForeginId()) ? per.getFiscalForeginId() : per.getFiscalId());
         }
         else {
-            moTextLesseeFiscalId.setText("");
+            moTextOwnerFiscalId2.setText("");
+        }
+    } 
+    
+    private void actionKeyLessor1() {
+        if (moKeyLessor1.getSelectedIndex() >= 1) {
+            SDbBolPerson per = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyLessor1.getValue() );
+            moTextLessorFiscalId1.setText("".equals(per.getFiscalId()) && !"".equals(per.getFiscalForeginId()) ? per.getFiscalForeginId() : per.getFiscalId());
+        }
+        else {
+            moTextLessorFiscalId1.setText("");
+        }
+    } 
+    
+    private void actionKeyLessor2() {
+        if (moKeyLessor2.getSelectedIndex() >= 1) {
+            SDbBolPerson per = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyLessor2.getValue() );
+            moTextLessorFiscalId2.setText("".equals(per.getFiscalId()) && !"".equals(per.getFiscalForeginId()) ? per.getFiscalForeginId() : per.getFiscalId());
+        }
+        else {
+            moTextLessorFiscalId2.setText("");
         }
     } 
     
@@ -1336,6 +1485,16 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
     }
     
+    private void actionAddFigures() {
+        moFormTranspExtra.setValue(1, maTranspTranspExtra);
+        moFormTranspExtra.setVisible(true);
+        maTranspTranspExtra = new ArrayList<>();
+        if (moFormTranspExtra.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+            maTranspTranspExtra = (ArrayList<SDbBolTransportationModeExtra>) moFormTranspExtra.getValue(1);
+        }
+        jlAddFigures.setText("Figuras adicionales: " + maTranspTranspExtra.size());
+    }
+    
     private SGuiValidation validateLocations() {
         SGuiValidation validation = new SGuiValidation();
         int start = 0;
@@ -1372,10 +1531,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         SGuiValidation validation = new SGuiValidation();
         for (SDbBolMerchandise merch : moRegistry.getBolMerchandises()) {
             if (merch.getDiferenceWeightChargedDischarged() > 0) {
-                validation.setMessage("El ítem " + merch.getXtaItem().getItem() + " no esta completamente descargado.");
+                validation.setMessage("El ítem " + merch.getDataItem().getItem() + " no esta completamente descargado.");
             }
             else if (merch.getDiferenceWeightChargedDischarged() < 0) {
-                validation.setMessage("El ítem " + merch.getXtaItem().getItem() + " tiene una mayor cantidad de descarga que de carga.");
+                validation.setMessage("El ítem " + merch.getDataItem().getItem() + " tiene una mayor cantidad de descarga que de carga.");
             }
         }
         
@@ -1414,7 +1573,6 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         catch(Exception e) {}
     }
 
-
     /*
      * Public methods
      */
@@ -1426,12 +1584,15 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyTrailer1.addItemListener(this);
         moKeyTrailer2.addItemListener(this);
         moKeyDriver.addItemListener(this);
-        moKeyOwner.addItemListener(this);
-        moKeyLessee.addItemListener(this);
+        moKeyOwner1.addItemListener(this);
+        moKeyOwner2.addItemListener(this);
+        moKeyLessor1.addItemListener(this);
+        moKeyLessor2.addItemListener(this);
         moKeyNotified.addItemListener(this);
         moRadioMyLocations.addItemListener(this);
         moRadioCustomerLocations.addItemListener(this);
         moRadioSupplierLocations.addItemListener(this);
+        jbAddFigures.addActionListener(this);
     }
 
     @Override
@@ -1441,15 +1602,19 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyTrailer1.removeItemListener(this);
         moKeyTrailer2.removeItemListener(this);
         moKeyDriver.removeItemListener(this);
-        moKeyOwner.removeItemListener(this);
-        moKeyLessee.removeItemListener(this);
+        moKeyOwner1.removeItemListener(this);
+        moKeyOwner2.removeItemListener(this);
+        moKeyLessor1.removeItemListener(this);
+        moKeyLessor2.removeItemListener(this);
         moKeyNotified.removeItemListener(this);
         moRadioMyLocations.removeItemListener(this);
         moRadioCustomerLocations.removeItemListener(this);
         moRadioSupplierLocations.removeItemListener(this);
+        jbAddFigures.removeActionListener(this);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void reloadCatalogues() {
         try {
             SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
@@ -1459,8 +1624,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             catalogs.populateComboBox(moKeyVehConfiguration, SDataConstantsSys.TRNS_CFD_CAT_BOL_MOTOR_CFG, miClient.getSession().getSystemDate());
             catalogs.populateComboBox(moKeyTrailerSubtype1, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRAILER_STP, miClient.getSession().getSystemDate());
             catalogs.populateComboBox(moKeyTrailerSubtype2, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRAILER_STP, miClient.getSession().getSystemDate());
-            catalogs.populateComboBox(moKeyTransportationPartOwner, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRANSP_PART, miClient.getSession().getSystemDate());
-            catalogs.populateComboBox(moKeyTransportationPartLessee, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRANSP_PART, miClient.getSession().getSystemDate());
+            catalogs.populateComboBox(moKeyTransportationPartOwner1, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRANSP_PART, miClient.getSession().getSystemDate());
+            catalogs.populateComboBox(moKeyTransportationPartOwner2, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRANSP_PART, miClient.getSession().getSystemDate());
+            catalogs.populateComboBox(moKeyTransportationPartLessor1, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRANSP_PART, miClient.getSession().getSystemDate());
+            catalogs.populateComboBox(moKeyTransportationPartLessor2, SDataConstantsSys.TRNS_CFD_CAT_BOL_TRANSP_PART, miClient.getSession().getSystemDate());
             
             miClient.getSession().populateCatalogue(moKeyCountry, SModConsts.LOCU_CTY, SLibConsts.UNDEFINED, null);
             miClient.getSession().populateCatalogue(moKeyGrossWeightUnit, SModConsts.ITMU_UNIT, SLibConsts.UNDEFINED, null);
@@ -1472,8 +1639,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             miClient.getSession().populateCatalogue(moKeyTrailer1, SModConsts.LOG_TRAILER, SLibConstants.UNDEFINED, null);
             miClient.getSession().populateCatalogue(moKeyTrailer2, SModConsts.LOG_TRAILER, SLibConstants.UNDEFINED, null);
             miClient.getSession().populateCatalogue(moKeyDriver, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_DRI, null);
-            miClient.getSession().populateCatalogue(moKeyOwner, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_OWN, null);
-            miClient.getSession().populateCatalogue(moKeyLessee, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_LES, null);
+            miClient.getSession().populateCatalogue(moKeyOwner1, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_OWN, null);
+            miClient.getSession().populateCatalogue(moKeyOwner2, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_OWN, null);
+            miClient.getSession().populateCatalogue(moKeyLessor1, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_LES, null);
+            miClient.getSession().populateCatalogue(moKeyLessor2, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_LES, null);
             miClient.getSession().populateCatalogue(moKeyNotified, SModConsts.LOG_BOL_PERSON, SModSysConsts.LOGS_TP_BOL_PERSON_NOT, null);
                         
             moKeyInputOutput.removeAllItems();
@@ -1494,13 +1663,19 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             moTextTrailerPlate2.setText("");
             moTextDriverFiscalId.setText("");
             moTextDriverLicense.setText("");
-            moTextOwnerFiscalId.setText("");
-            moTextLesseeFiscalId.setText("");
+            moTextOwnerFiscalId1.setText("");
+            moTextOwnerFiscalId2.setText("");
+            moTextLessorFiscalId1.setText("");
+            moTextLessorFiscalId2.setText("");
             moTextNotifiedFiscalId.setText("");
         
             populateLocations();
+            
+            maTranspTranspExtra = new ArrayList<>();
+            jlAddFigures.setText("Figuras adicionales: 0"); 
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             SLibUtils.showException(this, e);
         }
     }
@@ -1521,7 +1696,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             jtfRegistryKey.setText("");
             moBoolInternationalShip.setSelected(false);
             moTextFiscalIdReceptor.setText(((SClientInterface) miClient).getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId());
-            moKeyGrossWeightUnit.setValue(new int[] { 59 }); // KILOGRAMOS
+            moKeyGrossWeightUnit.setValue(new int[] { SDataConstantsSys.ITMU_KG }); // KILOGRAMOS
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
@@ -1551,9 +1726,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextMerchandisePolicy.setText(moRegistry.getMerchandiseInsurerPolicy());
         moTextPremium.setText(moRegistry.getPremium());
         moKeyBizPartner.setValue(new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
-        //moKeyBizPartnerBranch.setValue(new int[] { ... });
-        //moKeyCfdiUsage.setValue(new int[] { ... });
-        //moTextCfdiRelated.setText(...);    
+        if (moRegistry.getBolTransportationMode() != null) {
+            maTranspTranspExtra = moRegistry.getBolTransportationMode().getBolTransportationModeExtra();
+        }
+        jlAddFigures.setText("Figuras adicionales: " + maTranspTranspExtra.size()); 
         
         setFormEditable(true);
         
@@ -1562,8 +1738,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
         else {
             SDbVehicle vehicle = (SDbVehicle) miClient.getSession().readRegistry(SModConsts.LOG_VEH, new int[] { moRegistry.getBolTransportationMode().getFkVehicleId() }, SLibConstants.EXEC_MODE_SILENT);
-            SDbTrailer trailer1 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, new int[] { moRegistry.getBolTransportationMode().getFkTrailerId_1_n() }, SLibConstants.EXEC_MODE_SILENT);
-            SDbTrailer trailer2 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, new int[] { moRegistry.getBolTransportationMode().getFkTrailerId_2_n() }, SLibConstants.EXEC_MODE_SILENT);
+            SDbTrailer trailer1 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, new int[] { moRegistry.getBolTransportationMode().getFkTrailerId1_n() }, SLibConstants.EXEC_MODE_SILENT);
+            SDbTrailer trailer2 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, new int[] { moRegistry.getBolTransportationMode().getFkTrailerId2_n() }, SLibConstants.EXEC_MODE_SILENT);
             
             moKeyVehicle.setValue(new int[] { vehicle.getPkVehicleId() });
             moTextPlate.setValue(vehicle.getPlate());
@@ -1580,19 +1756,27 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             SGuiUtils.locateItemByCode(moKeyTrailerSubtype2, trailer2.getTrailerSubtype());
 
             SDbBolPerson driver = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkDriverId() }, SLibConstants.EXEC_MODE_SILENT);
-            SDbBolPerson owner = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkVehicleOwnerId_n()}, SLibConstants.EXEC_MODE_SILENT);
-            SDbBolPerson lessee = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkVehicleLesseeId_n()}, SLibConstants.EXEC_MODE_SILENT);
+            SDbBolPerson owner1 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkVehicleOwnerId1_n()}, SLibConstants.EXEC_MODE_SILENT);
+            SDbBolPerson owner2 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkVehicleOwnerId2_n()}, SLibConstants.EXEC_MODE_SILENT);
+            SDbBolPerson lessee1 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkVehicleLessorId1_n()}, SLibConstants.EXEC_MODE_SILENT);
+            SDbBolPerson lessee2 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkVehicleLessorId1_n()}, SLibConstants.EXEC_MODE_SILENT);
             SDbBolPerson notified = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, new int[] { moRegistry.getBolTransportationMode().getFkNotifiedId_n() }, SLibConstants.EXEC_MODE_SILENT);
             
             moKeyDriver.setValue(new int[] { driver.getPkBolPersonId() });
             moTextDriverFiscalId.setText(driver.getFiscalId().isEmpty() ? driver.getFiscalForeginId() : driver.getFiscalId());
             moTextDriverLicense.setText(driver.getDriverLicense());
-            moKeyOwner.setValue(new int[] { owner.getPkBolPersonId() });
-            moTextOwnerFiscalId.setText(owner.getFiscalId().isEmpty() ? owner.getFiscalForeginId() : owner.getFiscalId());
-            SGuiUtils.locateItemByCode(moKeyTransportationPartOwner, moRegistry.getBolTransportationMode().getTransportationPartOwner());
-            moKeyLessee.setValue(new int[] { lessee.getPkBolPersonId() });
-            moTextLesseeFiscalId.setText(lessee.getFiscalId().isEmpty() ? lessee.getFiscalForeginId() : lessee.getFiscalId());
-            SGuiUtils.locateItemByCode(moKeyTransportationPartLessee, moRegistry.getBolTransportationMode().getTransportationPartLessee());
+            moKeyOwner1.setValue(new int[] { owner1.getPkBolPersonId() });
+            moTextOwnerFiscalId1.setText(owner1.getFiscalId().isEmpty() ? owner1.getFiscalForeginId() : owner1.getFiscalId());
+            SGuiUtils.locateItemByCode(moKeyTransportationPartOwner1, moRegistry.getBolTransportationMode().getTransportationPartOwner1());
+            moKeyOwner2.setValue(new int[] { owner2.getPkBolPersonId() });
+            moTextOwnerFiscalId2.setText(owner2.getFiscalId().isEmpty() ? owner2.getFiscalForeginId() : owner2.getFiscalId());
+            SGuiUtils.locateItemByCode(moKeyTransportationPartOwner2, moRegistry.getBolTransportationMode().getTransportationPartOwner2());
+            moKeyLessor1.setValue(new int[] { lessee1.getPkBolPersonId() });
+            moTextLessorFiscalId1.setText(lessee1.getFiscalId().isEmpty() ? lessee1.getFiscalForeginId() : lessee1.getFiscalId());
+            SGuiUtils.locateItemByCode(moKeyTransportationPartLessor1, moRegistry.getBolTransportationMode().getTransportationPartLessor1());
+            moKeyLessor2.setValue(new int[] { lessee2.getPkBolPersonId() });
+            moTextLessorFiscalId2.setText(lessee2.getFiscalId().isEmpty() ? lessee2.getFiscalForeginId() : lessee2.getFiscalId());
+            SGuiUtils.locateItemByCode(moKeyTransportationPartLessor2, moRegistry.getBolTransportationMode().getTransportationPartLessor2());
             moKeyNotified.setValue(new int[] { notified.getPkBolPersonId() });
             moTextNotifiedFiscalId.setText(notified.getFiscalId().isEmpty() ? notified.getFiscalForeginId() : notified.getFiscalId());
         }
@@ -1632,39 +1816,53 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         registry.setFkMerchandiseInsurer_n(moKeyMerchandiseInsurer.getValue().length == 0 ? 0 :moKeyMerchandiseInsurer.getValue()[0]);
         registry.setFkBillOfLadingStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         registry.readBizPartner(miClient.getSession(), miClient.getSession().getConfigCompany().getCompanyId());
-        registry.setXtaEnvironmentalInsurer(environmental);
-        registry.setXtaMerchandiseInsurer(merchansise);
+        registry.setDataEnvironmentalInsurer(environmental);
+        registry.setDataMerchandiseInsurer(merchansise);
         registry.updateSatCtyCode(miClient.getSession());
         registry.updateGrossWeightUnitCode(miClient.getSession());
         registry.setXtaTaxRegime(moTextTaxRegime.getValue()); 
+        registry.setAuxCfdExportation(!moBoolInternationalShip.isSelected() ? "01" : "02"); 
         
-        SDbBolTransportationMode transportation = registry.getBolTransportationMode();
+        SDbBolTransportationMode transportation = new SDbBolTransportationMode();
         
-        transportation.setTransportationPartOwner(moKeyTransportationPartOwner.getSelectedItem().getCode());
-        transportation.setTransportationPartLessee(moKeyTransportationPartLessee.getSelectedItem().getCode());
+        transportation.setTransportationPartOwner1(moKeyTransportationPartOwner1.getSelectedItem().getCode());
+        transportation.setTransportationPartOwner2(moKeyTransportationPartOwner2.getSelectedItem().getCode());
+        transportation.setTransportationPartLessor1(moKeyTransportationPartLessor1.getSelectedItem().getCode());
+        transportation.setTransportationPartLessor2(moKeyTransportationPartLessor2.getSelectedItem().getCode());
         transportation.setFkVehicleId(moKeyVehicle.getValue()[0]);
         transportation.setFkDriverId(moKeyDriver.getValue()[0]);
-        transportation.setFkTrailerId_1_n(moKeyTrailer1.getValue().length == 0 ? 0 : moKeyTrailer1.getValue()[0]);
-        transportation.setFkTrailerId_2_n(moKeyTrailer2.getValue().length == 0 ? 0 : moKeyTrailer2.getValue()[0]);
-        transportation.setFkVehicleOwnerId_n(moKeyOwner.getValue().length == 0 ? 0 : moKeyOwner.getValue()[0]);
-        transportation.setFkVehicleLesseeId_n(moKeyLessee.getValue().length == 0 ? 0 : moKeyLessee.getValue()[0]);
+        transportation.setFkTrailerId1_n(moKeyTrailer1.getValue().length == 0 ? 0 : moKeyTrailer1.getValue()[0]);
+        transportation.setFkTrailerId2_n(moKeyTrailer2.getValue().length == 0 ? 0 : moKeyTrailer2.getValue()[0]);
+        transportation.setFkVehicleOwnerId1_n(moKeyOwner1.getValue().length == 0 ? 0 : moKeyOwner1.getValue()[0]);
+        transportation.setFkVehicleOwnerId2_n(moKeyOwner2.getValue().length == 0 ? 0 : moKeyOwner2.getValue()[0]);
+        transportation.setFkVehicleLessorId1_n(moKeyLessor1.getValue().length == 0 ? 0 : moKeyLessor1.getValue()[0]);
+        transportation.setFkVehicleLessorId2_n(moKeyLessor2.getValue().length == 0 ? 0 : moKeyLessor2.getValue()[0]);
         transportation.setFkNotifiedId_n(moKeyNotified.getValue().length == 0 ? 0 : moKeyNotified.getValue()[0]);
+        for (SDbBolTransportationModeExtra tme : maTranspTranspExtra) {
+            transportation.getBolTransportationModeExtra().add(tme);
+        }
+        
+        registry.setBolTransportationMode(transportation);
         
         SDbVehicle veh = (SDbVehicle) miClient.getSession().readRegistry(SModConsts.LOG_VEH, moKeyVehicle.getValue(), SLibConstants.EXEC_MODE_SILENT);
         SDbTrailer tra1 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, moKeyTrailer1.getValue(), SLibConstants.EXEC_MODE_SILENT);
         SDbTrailer tra2 = (SDbTrailer) miClient.getSession().readRegistry(SModConsts.LOG_TRAILER, moKeyTrailer2.getValue(), SLibConstants.EXEC_MODE_SILENT);
         SDbBolPerson driver = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyDriver.getValue(), SLibConstants.EXEC_MODE_SILENT);
-        SDbBolPerson owner = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyOwner.getValue(), SLibConstants.EXEC_MODE_SILENT);
-        SDbBolPerson lessee = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyLessee.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson owner1 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyOwner1.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson owner2 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyOwner2.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson lessee1 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyLessor1.getValue(), SLibConstants.EXEC_MODE_SILENT);
+        SDbBolPerson lessee2 = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyLessor2.getValue(), SLibConstants.EXEC_MODE_SILENT);
         SDbBolPerson notified = (SDbBolPerson) miClient.getSession().readRegistry(SModConsts.LOG_BOL_PERSON, moKeyNotified.getValue(), SLibConstants.EXEC_MODE_SILENT);
         
-        transportation.setXtaVehicle(veh);
-        transportation.setXtaTrailer1(tra1);
-        transportation.setXtaTrailer2(tra2);
-        transportation.setXtaDriver(driver);
-        transportation.setXtaOwner(owner);
-        transportation.setXtaLessee(lessee);
-        transportation.setXtaNotified(notified);
+        transportation.setDataVehicle(veh);
+        transportation.setDataTrailer1(tra1);
+        transportation.setDataTrailer2(tra2);
+        transportation.setDataDriver(driver);
+        transportation.setDataOwner1(owner1);
+        transportation.setDataOwner2(owner2);
+        transportation.setDataLessee1(lessee1);
+        transportation.setDataLessee2(lessee2);
+        transportation.setDataNotified(notified);
         
         registry.getBolLocations().clear();
         for (SGridRow row : moGridLocations.getModel().getGridRows()) {
@@ -1714,6 +1912,34 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
 
         if (validation.isValid()) {
+            if (moKeyOwner1.getSelectedIndex() > 0 && moKeyTransportationPartOwner1.getSelectedIndex() <= 0) {
+                validation.setMessage("Debe especificar la parte transporte del propietario 1.");
+                validation.setComponent(moKeyTransportationPartOwner1);
+            }
+        }
+        
+        if (validation.isValid()) {
+            if (moKeyOwner2.getSelectedIndex() > 0 && moKeyTransportationPartOwner2.getSelectedIndex() <= 0) {
+                validation.setMessage("Debe especificar la parte transporte del propietario 2.");
+                validation.setComponent(moKeyTransportationPartOwner2);
+            }
+        }
+        
+        if (validation.isValid()) {
+            if (moKeyLessor1.getSelectedIndex() > 0 && moKeyTransportationPartLessor1.getSelectedIndex() <= 0) {
+                validation.setMessage("Debe especificar la parte transporte del arrendador 1.");
+                validation.setComponent(moKeyTransportationPartLessor1);
+            }
+        }
+        
+        if (validation.isValid()) {
+            if (moKeyLessor2.getSelectedIndex() > 0 && moKeyTransportationPartLessor2.getSelectedIndex() <= 0) {
+                validation.setMessage("Debe especificar la parte transporte del arrendador 2.");
+                validation.setComponent(moKeyTransportationPartLessor2);
+            }
+        }
+        
+        if (validation.isValid()) {
             if (moGridLocations.getTable().getRowCount() <= 0) {
                 validation.setMessage("Se debe capturar al menos una ubicación.");
             }
@@ -1747,11 +1973,17 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             else if (comboBox == moKeyDriver) {
                 actionKeyDriver();
             }
-            else if (comboBox == moKeyOwner) {
-                actionKeyOwner();
+            else if (comboBox == moKeyOwner1) {
+                actionKeyOwner1();
             }
-            else if (comboBox == moKeyLessee) {
-                actionKeyLessee();
+            else if (comboBox == moKeyOwner2) {
+                actionKeyOwner2();
+            }
+            else if (comboBox == moKeyLessor1) {
+                actionKeyLessor1();
+            }
+            else if (comboBox == moKeyLessor2) {
+                actionKeyLessor2();
             }
             else if (comboBox == moKeyNotified) {
                 actionKeyNotified();
@@ -1780,7 +2012,17 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             }
         }
     }
-
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof javax.swing.JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbAddFigures) {
+                actionAddFigures();
+            }
+        }
+    }
 
     @Override
     public void notifyRowNew(int gridType, int gridSubtype, int row, SGridRow gridRow) {

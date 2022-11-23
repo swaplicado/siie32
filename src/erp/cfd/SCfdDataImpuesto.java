@@ -6,12 +6,13 @@ package erp.cfd;
 
 import cfd.DCfdTax;
 import cfd.ver33.DCfdi33Catalogs;
+import cfd.ver40.DCfdi40Catalogs;
 import erp.mod.SModSysConsts;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SCfdDataImpuesto implements DCfdTax {
     
@@ -142,6 +143,55 @@ public class SCfdDataImpuesto implements DCfdTax {
     }
     
     /**
+     * Create node for taxes in concepts.
+     * CFDI 4.0
+     * @return Node
+     * @throws Exception 
+     */
+    public cfd.DElement createRootElementConceptoImpuesto40() throws Exception {
+        cfd.DElement impuesto = null;
+        
+        switch (mnImpuestoTipo) {
+            case SModSysConsts.FINS_TP_TAX_RETAINED:
+                cfd.ver40.DElementConceptoImpuestoRetencion conceptoImpuestoRetencion = new cfd.ver40.DElementConceptoImpuestoRetencion();
+                
+                if (msTipoFactor.compareToIgnoreCase(DCfdi40Catalogs.FAC_TP_EXENTO) == 0) { // XXX jbarajas falta las constantes para comparar contra tipo exento
+                    throw new Exception("Error al generar el nodo impuesto 'retenido' el tipo de factor debe ser distinto de exento.");
+                }
+                
+                conceptoImpuestoRetencion.getAttBase().setDouble(mdBase);
+                conceptoImpuestoRetencion.getAttImpuesto().setString(msImpuestoClave);
+                conceptoImpuestoRetencion.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
+                
+                conceptoImpuestoRetencion.getAttTasaOCuota().setDouble(mdTasa);
+                conceptoImpuestoRetencion.getAttImporte().setDouble(mdImporte);
+                
+                impuesto = conceptoImpuestoRetencion;
+                break;
+                
+            case SModSysConsts.FINS_TP_TAX_CHARGED:
+                cfd.ver40.DElementConceptoImpuestoTraslado conceptoImpuestoTraslado = new cfd.ver40.DElementConceptoImpuestoTraslado();
+                
+                conceptoImpuestoTraslado.getAttBase().setDouble(mdBase);
+                conceptoImpuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
+                conceptoImpuestoTraslado.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
+                
+                if (msTipoFactor.compareToIgnoreCase(DCfdi40Catalogs.FAC_TP_EXENTO) != 0) {
+                    conceptoImpuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
+                    conceptoImpuestoTraslado.getAttImporte().setDouble(mdImporte);
+                }
+                
+                impuesto = conceptoImpuestoTraslado;
+                break;
+                
+            default:
+                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + mnImpuestoTipo + ").");
+        }
+        
+        return impuesto;
+    }
+    
+    /**
      * Create node for taxes in CFDI.
      * @return Node
      * @throws Exception 
@@ -161,6 +211,42 @@ public class SCfdDataImpuesto implements DCfdTax {
             case SModSysConsts.FINS_TP_TAX_CHARGED:
                 cfd.ver33.DElementImpuestoTraslado impuestoTraslado = new cfd.ver33.DElementImpuestoTraslado();
                 
+                impuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
+                impuestoTraslado.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
+                impuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
+                impuestoTraslado.getAttImporte().setDouble(mdImporte);
+                
+                impuesto = impuestoTraslado;
+                break;
+            default:
+                throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + mnImpuestoTipo + ").");
+        }
+        
+        return impuesto;
+    }
+    
+    /**
+     * Create node for taxes in CFDI.
+     * CFDI 4.0
+     * @return Node
+     * @throws Exception 
+     */
+    public cfd.DElement createRootElementImpuesto40() throws Exception {
+        cfd.DElement impuesto = null;
+        
+        switch (mnImpuestoTipo) {
+            case SModSysConsts.FINS_TP_TAX_RETAINED:
+                cfd.ver40.DElementImpuestoRetencion impuestoRetencion = new cfd.ver40.DElementImpuestoRetencion();
+                
+                impuestoRetencion.getAttImpuesto().setString(msImpuestoClave);
+                impuestoRetencion.getAttImporte().setDouble(mdImporte);
+                
+                impuesto = impuestoRetencion;
+                break;
+            case SModSysConsts.FINS_TP_TAX_CHARGED:
+                cfd.ver40.DElementImpuestoTraslado impuestoTraslado = new cfd.ver40.DElementImpuestoTraslado();
+                
+                impuestoTraslado.getAttBase().setDouble(mdBase);
                 impuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
                 impuestoTraslado.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
                 impuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);

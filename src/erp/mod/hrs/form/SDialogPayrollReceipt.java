@@ -1220,7 +1220,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextShift.setValue(miClient.getSession().readField(SModConsts.HRSU_SHT, new int[] { employee.getFkShiftId() }, SDbRegistry.FIELD_NAME));
         moTextEmployeeType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { employee.getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
         moTextWorkerType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { employee.getFkWorkerTypeId() }, SDbRegistry.FIELD_NAME));
-        moTextRecruitmentSchemaType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME));
+        moTextRecruitmentSchemaType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getEffectiveRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME));
         moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { employee.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
     }
 
@@ -1876,7 +1876,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                     }
 
                     // validate assimilable receipts:
-                    if (moHrsReceipt.getPayrollReceipt().isAssimilable()) {
+                    if (moHrsReceipt.getPayrollReceipt().isAssimilated()) {
                         if (moEarning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
                             // SOURCE CODE WARNING: this code snipet is duplicated as is in method validateForm(), please synchronize any change!
                             miClient.showMsgBoxWarning("El tipo de régimen de contratación de este recibo, "
@@ -1955,7 +1955,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                     }
 
                     // validate assimilable receipts:
-                    if (moHrsReceipt.getPayrollReceipt().isAssimilable()) {
+                    if (moHrsReceipt.getPayrollReceipt().isAssimilated()) {
                         if (moDeduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
                             // SOURCE CODE WARNING: this code snipet is duplicated as is in method validateForm(), please synchronize any change!
                             miClient.showMsgBoxWarning("El tipo de régimen de contratación de este recibo, "
@@ -2226,7 +2226,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         }
         
         // validate assimilable receipts:
-        if (moHrsReceipt.getPayrollReceipt().isAssimilable()) {
+        if (moHrsReceipt.getPayrollReceipt().isAssimilated()) {
             for (SHrsReceiptEarning hrsReceiptEarning : moHrsReceipt.getHrsReceiptEarnings()) {
                 if (hrsReceiptEarning.getEarning().getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
                     // SOURCE CODE WARNING: this code snippet is duplicated as is in method actionAddEarning(), please synchronize any change!

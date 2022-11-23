@@ -27,9 +27,15 @@ import java.util.Vector;
  */
 public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
+    public static final int CFD_ORG_NAMES_FULL_NAME = 1;
+    public static final int CFD_ORG_NAMES_FISCAL_NAME = 2;
+    
     protected int mnPkBizPartnerId;
     protected java.lang.String msBizPartner;
     protected java.lang.String msBizPartnerCommercial;
+    protected java.lang.String msBizPartnerFiscalPolicy;
+    protected java.lang.String msBizPartnerFiscal;
+    protected java.lang.String msBizPartnerCapitalRegime;
     protected java.lang.String msLastname;
     protected java.lang.String msFirstname;
     protected java.lang.String msFiscalId;
@@ -90,6 +96,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     public void setPkBizPartnerId(int n) { mnPkBizPartnerId = n; }
     public void setBizPartner(java.lang.String s) { msBizPartner = s; }
     public void setBizPartnerCommercial(java.lang.String s) { msBizPartnerCommercial = s; }
+    public void setBizPartnerFiscalPolicy(java.lang.String s) { msBizPartnerFiscalPolicy = s; }
+    public void setBizPartnerFiscal(java.lang.String s) { msBizPartnerFiscal = s; }
+    public void setBizPartnerCapitalRegime(java.lang.String s) { msBizPartnerCapitalRegime = s; }
     public void setLastname(java.lang.String s) { msLastname = s; }
     public void setFirstname(java.lang.String s) { msFirstname = s; }
     public void setFiscalId(java.lang.String s) { msFiscalId = s; }
@@ -125,6 +134,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     public int getPkBizPartnerId() { return mnPkBizPartnerId; }
     public java.lang.String getBizPartner() { return msBizPartner; }
     public java.lang.String getBizPartnerCommercial() { return msBizPartnerCommercial; }
+    public java.lang.String getBizPartnerFiscalPolicy() { return msBizPartnerFiscalPolicy; }
+    public java.lang.String getBizPartnerFiscal() { return msBizPartnerFiscal; }
+    public java.lang.String getBizPartnerCapitalRegime() { return msBizPartnerCapitalRegime; }
     public java.lang.String getLastname() { return msLastname; }
     public java.lang.String getFirstname() { return msFirstname; }
     public java.lang.String getFiscalId() { return msFiscalId; }
@@ -180,10 +192,14 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     public erp.mmkt.data.SDataConfigurationSalesAgent getDbmsDataConfigurationSalesAgent() { return moDbmsDataConfigurationSalesAgent; }
     public erp.mbps.data.SDataEmployee getDbmsDataEmployee() { return moDbmsDataEmployee; }
 
-    public java.lang.String getProperName() {
-        return SLibUtilities.textTrim(mnFkBizPartnerIdentityTypeId == SDataConstantsSys.BPSS_TP_BP_IDY_ORG ? msBizPartner : msFirstname + " " + msLastname);
+    public boolean isPerson() {
+        return mnFkBizPartnerIdentityTypeId == SDataConstantsSys.BPSS_TP_BP_IDY_PER;
     }
 
+    public java.lang.String getProperName() {
+        return SLibUtilities.textTrim(isPerson() ? msFirstname + " " + msLastname : msBizPartner);
+    }
+    
     public boolean isDomestic(SClientInterface client) {
         int country = getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
         
@@ -219,6 +235,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         mnPkBizPartnerId = 0;
         msBizPartner = "";
         msBizPartnerCommercial = "";
+        msBizPartnerFiscalPolicy = "";
+        msBizPartnerFiscal = "";
+        msBizPartnerCapitalRegime = "";
         msLastname = "";
         msFirstname = "";
         msFiscalId = "";
@@ -284,6 +303,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 mnPkBizPartnerId = resultSet.getInt("id_bp");
                 msBizPartner = resultSet.getString("bp");
                 msBizPartnerCommercial = resultSet.getString("bp_comm");
+                msBizPartnerFiscalPolicy = resultSet.getString("bp_fiscal_pol");
+                msBizPartnerFiscal = resultSet.getString("bp_fiscal");
+                msBizPartnerCapitalRegime = resultSet.getString("bp_cap_reg");
                 msLastname = resultSet.getString("lastname");
                 msFirstname = resultSet.getString("firstname");
                 msFiscalId = resultSet.getString("fiscal_id");
@@ -469,10 +491,13 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setString(nParam++, msBizPartner);
             callableStatement.setString(nParam++, msBizPartnerCommercial);
+            callableStatement.setString(nParam++, msBizPartnerFiscalPolicy);
+            callableStatement.setString(nParam++, msBizPartnerFiscal);
+            callableStatement.setString(nParam++, msBizPartnerCapitalRegime);
             callableStatement.setString(nParam++, msLastname);
             callableStatement.setString(nParam++, msFirstname);
             callableStatement.setString(nParam++, msFiscalId);

@@ -48,8 +48,10 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     protected Date mtTsUserUpdate;
     */
     
-    protected erp.mloc.data.SDataCountry moXtaCountry;
-    protected erp.mloc.data.SDataState moXtaState;
+    protected String msDbmsBolPersonTypeCode;
+    
+    protected erp.mloc.data.SDataState moDataState;
+    protected erp.mloc.data.SDataCountry moDataCountry;
     
     public SDbBolPerson() {
         super(SModConsts.LOG_BOL_PERSON);
@@ -101,12 +103,16 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public void setXtaCountry(SDataCountry o) { moXtaCountry = o; }
-    public void setXtaState(SDataState o) { moXtaState = o; }
+    public void setDbmsBolPersonTypeCode(String s) { msDbmsBolPersonTypeCode = s; }
     
-    public SDataCountry getXtaCountry() { return moXtaCountry; }
-    public SDataState getXtaState() { return moXtaState; }
-
+    public void setDataState(SDataState o) { moDataState = o; }
+    public void setDataCountry(SDataCountry o) { moDataCountry = o; }
+    
+    public String getDbmsBolPersonTypeCode() { return msDbmsBolPersonTypeCode; }
+    
+    public SDataState getDataState() { return moDataState; }
+    public SDataCountry getDataCountry() { return moDataCountry; }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkBolPersonId = pk[0];
@@ -144,8 +150,10 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        moXtaCountry = null;
-        moXtaState = null;
+        msDbmsBolPersonTypeCode = "";
+        
+        moDataState = null;
+        moDataCountry = null;
     }
 
     @Override
@@ -212,22 +220,24 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+            
+            msDbmsBolPersonTypeCode = (String) session.readField(SModConsts.LOGS_TP_BOL_PERSON, new int[] { mnFkBolPersonTypeId }, FIELD_CODE);
 
             mbRegistryNew = false;
         }
         
-        // Read Country:
-        
-        if (mnFkCountryId_n != 0) {
-            moXtaCountry = new SDataCountry();
-            moXtaCountry.read(new int[] { mnFkCountryId_n }, session.getStatement());
-        }
-        
-        // Read state
+        // Read state:
         
         if (mnFkStateId_n != 0) {
-            moXtaState = new SDataState();
-            moXtaState.read(new int[] { mnFkStateId_n }, session.getStatement());
+            moDataState = new SDataState();
+            moDataState.read(new int[] { mnFkStateId_n }, session.getStatement());
+        }
+        
+        // Read country:
+        
+        if (mnFkCountryId_n != 0) {
+            moDataCountry = new SDataCountry();
+            moDataCountry.read(new int[] { mnFkCountryId_n }, session.getStatement());
         }
         
         mnQueryResultId = SDbConsts.READ_OK;
@@ -241,6 +251,8 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         if (mbRegistryNew) {
             verifyRegistryNew(session);
         }
+        
+        msDbmsBolPersonTypeCode = (String) session.readField(SModConsts.LOGS_TP_BOL_PERSON, new int[] { mnFkBolPersonTypeId }, FIELD_CODE);
         
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -301,6 +313,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
                 "ts_usr_upd = " + "NOW()" + " " +
                 getSqlWhere();
         }
+        
         session.getStatement().execute(msSql);
         
         mbRegistryNew = false;
@@ -333,8 +346,12 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        registry.setDbmsBolPersonTypeCode(this.getDbmsBolPersonTypeCode());
+        
+        registry.setDataState(this.getDataState()); // el clon comparte este registro que es de sólo lectura
+        registry.setDataCountry(this.getDataCountry()); // el clon comparte este registro que es de sólo lectura
 
         return registry;
     }
-    
 }
