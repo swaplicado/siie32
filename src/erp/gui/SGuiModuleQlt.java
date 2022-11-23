@@ -7,20 +7,36 @@ package erp.gui;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.form.SFormOptionPicker;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import redis.clients.jedis.Jedis;
 import sa.lib.SLibConsts;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormOptionPickerInterface;
+import erp.mqlt.data.*;
+import erp.mqlt.form.*;
 
 /**
  *
- * @author Uriel Castañeda
+ * @author Uriel Castañeda, Edwin Carmona
  */
 public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
     private javax.swing.JMenu jmQlt;
     private javax.swing.JMenuItem jmiQltLot;
+    private javax.swing.JMenu jmQltLab;
+    private javax.swing.JMenuItem jmQltLabAnalysis;
+    private javax.swing.JMenuItem jmQltDpsAnalysis;
+    private javax.swing.JMenuItem jmQltDpsAnalysisDetail;
+    private javax.swing.JMenu jmQltCfg;
+    private javax.swing.JMenuItem jmQltItemsVsAnalysisDetail;
+    private javax.swing.JMenuItem jmQltItemsVsAnalysis;
+    
+    private SFormAnalysisItem moFormAnalysisItem;
+    
+    private erp.form.SFormOptionPicker moPickerAnalysis;
     
     public SGuiModuleQlt(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_QLT);
@@ -30,18 +46,81 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private void initComponents() {
         jmQlt = new JMenu("Calidad");
         jmiQltLot = new JMenuItem("Lotes aprobados");
+        jmQltLab = new JMenu("Laboratorio");
+        jmQltLabAnalysis = new JMenuItem("Análisis de laboratorio");
+        jmQltDpsAnalysis = new JMenuItem("Documentos vs análisis");
+        jmQltDpsAnalysisDetail = new JMenuItem("Documentos vs análisis a detalle");
+        jmQltCfg = new JMenu("Configuración");
+        jmQltItemsVsAnalysis = new JMenuItem("Items vs análisis");
+        jmQltItemsVsAnalysisDetail = new JMenuItem("Ítems vs análisis a detalle");
         
         jmQlt.add(jmiQltLot);
+        jmQltLab.add(jmQltLabAnalysis);
+        jmQltLab.add(jmQltDpsAnalysis);
+        jmQltLab.add(jmQltDpsAnalysisDetail);
+        jmQltCfg.add(jmQltItemsVsAnalysis);
+        jmQltCfg.add(jmQltItemsVsAnalysisDetail);
 
         jmiQltLot.setEnabled(true);
+        jmQltLabAnalysis.setEnabled(true);
+        jmQltDpsAnalysis.setEnabled(true);
+        jmQltDpsAnalysisDetail.setEnabled(true);
+        jmQltItemsVsAnalysis.setEnabled(true);
+        jmQltItemsVsAnalysisDetail.setEnabled(true);
 
         jmiQltLot.addActionListener(this);
+        jmQltLabAnalysis.addActionListener(this);
+        jmQltDpsAnalysis.addActionListener(this);
+        jmQltDpsAnalysisDetail.addActionListener(this);
+        jmQltItemsVsAnalysis.addActionListener(this);
+        jmQltItemsVsAnalysisDetail.addActionListener(this);
         
         jmQlt.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_QLT_LOT_APR).HasRight);
+        jmQltLab.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_QLT_LOT_APR).HasRight);
+        jmQltCfg.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_QLT_LOT_APR).HasRight);
     }
 
     private int showForm(int formType, int auxType, java.lang.Object pk, boolean isCopy) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int result = SLibConstants.UNDEFINED;
+
+        try {
+            clearFormMembers();
+            setFrameWaitCursor();
+
+            switch (formType) {
+                case SDataConstants.QLT_ANALYSIS_ITEM:
+                    if (moFormAnalysisItem == null) {
+                        String title = "Análisis vs ítem";
+                        moFormAnalysisItem = new SFormAnalysisItem(miClient, title, formType);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataAnalysisItem();
+                    }
+                    miForm = moFormAnalysisItem;
+                    break;
+                
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM);
+            }
+
+            result = processForm(pk, isCopy);
+
+            if (result == SLibConstants.DB_ACTION_SAVE_OK && moRegistry != null) {
+                switch (formType) {
+                    default:
+                }
+            }
+            
+            clearFormComplement();
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        finally {
+            restoreFrameCursor();
+        }
+
+        return result;
     }
 
     @Override
@@ -56,7 +135,46 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     @Override
     public void showView(int viewType, int auxType01, int auxType02) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        java.lang.String sViewTitle = "";
+        java.lang.Class oViewClass = null;
+
+        try {
+            setFrameWaitCursor();
+
+            switch (viewType) {
+
+                case SDataConstants.QLT_ANALYSIS_ITEM:
+                    oViewClass = erp.mqlt.view.SViewAnalysisItem.class;
+                    sViewTitle = "Análisis vs ítems";
+                    break;
+                    
+                case SDataConstants.QLTX_DPS_ETY_ANALYSIS:
+                    oViewClass = erp.mqlt.view.SViewDpsEntryAnalysisQlt.class;
+                    sViewTitle = "Documentos vs análisis";
+                    break;
+                    
+                case SDataConstants.QLTX_ITEM_ANALYSIS:
+                    oViewClass = erp.mqlt.view.SViewItemAnalysis.class;
+                    sViewTitle = "Items configurados";
+                    break;
+                    
+                case SDataConstants.QLTX_DOCUMENT_ANALYSIS:
+                    oViewClass = erp.mqlt.view.SViewDocumentAnalysis.class;
+                    sViewTitle = "Items configurados";
+                    break;
+                    
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
+            }
+
+            processView(oViewClass, sViewTitle, viewType, auxType01, auxType02);
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        finally {
+            restoreFrameCursor();
+        }
     }
 
    @Override
@@ -76,7 +194,22 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     @Override
     public erp.lib.form.SFormOptionPickerInterface getOptionPicker(int optionType) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SFormOptionPickerInterface picker = null;
+
+        try {
+            switch (optionType) {
+                case SDataConstants.QLT_ANALYSIS:
+                    picker = moPickerAnalysis = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerAnalysis);
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM_PICK);
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+
+        return picker;
     }
 
     @Override
@@ -91,7 +224,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmQlt };
+        return new JMenu[] { jmQlt, jmQltLab, jmQltCfg };
     }
 
     @Override
@@ -106,7 +239,22 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
             if (item == jmiQltLot) {
                 miClient.getSession().showView(SModConsts.QLT_LOT_APR, SLibConsts.UNDEFINED, null);
-            }       
+            }
+            else if (item == jmQltLabAnalysis) {
+                miClient.getSession().showView(SModConsts.QLT_ANALYSIS, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmQltItemsVsAnalysis) {
+                showView(SDataConstants.QLTX_ITEM_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+            }
+            else if (item == jmQltItemsVsAnalysisDetail) {
+                showView(SDataConstants.QLT_ANALYSIS_ITEM, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+            }
+            else if (item == jmQltDpsAnalysis) {
+                showView(SDataConstants.QLTX_DOCUMENT_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+            }
+            else if (item == jmQltDpsAnalysisDetail) {
+                showView(SDataConstants.QLTX_DPS_ETY_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+            }
         }
     }
 }

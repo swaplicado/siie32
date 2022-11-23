@@ -34,6 +34,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
@@ -81,7 +82,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Isabel Servín, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Claudio Peña, Sergio Flores, Edwin Carmona
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -1452,6 +1453,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("nFidTpCarBp", SModSysConsts.LOGS_TP_CAR_CAR);
                             map.put("nLogIncotermExw", SModSysConsts.LOGS_INC_EXW);
                             map.put("bPrintTon", contractKgAsTon);
+                            
+                            boolean hasAnalysis = false;
+                            if (! dps.getDbmsDpsEntries().isEmpty() && SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+                                for (int i = 0; i < dps.getDbmsDpsEntries().size(); i++) {
+                                    int[] pkEty = new int[] { dps.getDbmsDpsEntries().get(i).getPkYearId(), dps.getDbmsDpsEntries().get(i).getPkDocId(), dps.getDbmsDpsEntries().get(i).getPkEntryId() };
+                                    hasAnalysis = ! SDpsQualityUtils.getAnalysisByDocumentEty(miClient.getSession(), dps.getDbmsDpsEntries().get(i).getFkItemId(), pkEty).isEmpty();
+                                    if (hasAnalysis) {
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            map.put("bIsSalesContract", hasAnalysis);
 
                             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CON, map);
                             jasperViewer = new JasperViewer(jasperPrint, false);

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña, Edwin Carmona
  * 
  */
 public abstract class SDataConstantsSys {
@@ -100,6 +100,8 @@ public abstract class SDataConstantsSys {
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
     public static final int CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE = 13;
+    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_TO = "QLT_DPS_ANALYSIS_TO";
+    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_CC = "QLT_DPS_ANALYSIS_CC";
     
     public static final int USD_XRT_POLICY_BANXICO = 1;
     public static final int USD_XRT_POLICY_INFORMAL = 2;

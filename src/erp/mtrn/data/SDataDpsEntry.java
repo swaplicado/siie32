@@ -16,6 +16,7 @@ import erp.mod.trn.db.STrnConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -28,7 +29,7 @@ import sa.lib.SLibUtils;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas, Daniel López, Isabel Servín
+ * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas, Daniel López, Isabel Servín, Edwin Carmona
  */
 public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -172,6 +173,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryTax> mvDbmsEntryTaxes;
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> mvDbmsEntryCommissions;
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> mvDbmsEntryPrices;
+    protected ArrayList<SDataDpsEntryAnalysis> mlDbmsDpsEntryAnalysis;
 
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsSource;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsDestiny;
@@ -202,6 +204,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryTaxes = new Vector<>();
         mvDbmsEntryCommissions = new Vector<>();
         mvDbmsEntryPrices = new Vector<>();
+        mlDbmsDpsEntryAnalysis = new ArrayList<>();
 
         mvDbmsDpsLinksAsSource = new Vector<>();
         mvDbmsDpsLinksAsDestiny = new Vector<>();
@@ -489,6 +492,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryTax> getDbmsEntryTaxes() { return mvDbmsEntryTaxes; }
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> getDbmsEntryCommissions() { return mvDbmsEntryCommissions; }
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> getDbmsEntryPrices() { return mvDbmsEntryPrices; }
+    public ArrayList<SDataDpsEntryAnalysis> getDbmsDpsEntryAnalysis() { return mlDbmsDpsEntryAnalysis; }
 
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsSource() { return mvDbmsDpsLinksAsSource; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsDestiny() { return mvDbmsDpsLinksAsDestiny; }
@@ -677,6 +681,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryTaxes.clear();
         mvDbmsEntryCommissions.clear();
         mvDbmsEntryPrices.clear();
+        mlDbmsDpsEntryAnalysis.clear();
 
         mvDbmsDpsLinksAsSource.clear();
         mvDbmsDpsLinksAsDestiny.clear();
@@ -1082,6 +1087,27 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
+                    
+                    // Read configured quality analysis of Dps Ety
+                    
+                    sql = "SELECT "
+                            + " id_ety_analysis "
+                            + "FROM "
+                            + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " "
+                            + "WHERE "
+                            + "fid_dps_year_n = " + mnPkYearId + " AND "
+                            + "fid_dps_doc_n = " + mnPkDocId + " AND "
+                            + "fid_dps_ety_n = " + mnPkEntryId + " AND "
+                            + "fid_item_id = " + mnFkItemId + " "
+                            + "ORDER BY sort_pos ASC, id_ety_analysis ASC;";
+        
+                    mlDbmsDpsEntryAnalysis = new ArrayList<>();
+                    resultSet = statement.executeQuery(sql);
+                    while (resultSet.next()) {
+                        SDataDpsEntryAnalysis oEtyAnalysis = new SDataDpsEntryAnalysis();
+                        oEtyAnalysis.read(new int[] { resultSet.getInt("id_ety_analysis") }, statement.getConnection().createStatement());
+                        mlDbmsDpsEntryAnalysis.add(oEtyAnalysis);
+                    }
                 }
 
                 mbIsRegistryNew = false;
@@ -1303,6 +1329,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     mvDbmsDpsLinksAsDestiny.clear();
                     mvDbmsDpsAdjustmentsAsDps.clear();
                     mvDbmsDpsAdjustmentsAsAdjustment.clear();
+                    mlDbmsDpsEntryAnalysis.clear();
                 }
                 else {
                     // Save aswell DPS entry links as source:
@@ -1379,6 +1406,26 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         moDbmsDpsCfdEntry.setPkDocId(mnPkDocId);
                         moDbmsDpsCfdEntry.setPkEntryId(mnPkEntryId);
                         moDbmsDpsCfdEntry.save(connection);
+                    }
+                    
+                    // Save quality configurations
+                    if (mlDbmsDpsEntryAnalysis.size() > 0) {
+                        String sql = "DELETE FROM trn_dps_ety_analysis " +
+                                "WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND fid_dps_ety_n = " + mnPkEntryId + ";";
+                        statement.execute(sql);
+                        
+                        for (SDataDpsEntryAnalysis oEtyAnalysis : mlDbmsDpsEntryAnalysis) {
+                            if (oEtyAnalysis.getFkDpsYearId_n() == SLibConsts.UNDEFINED) {
+                                oEtyAnalysis.setFkDpsYearId_n(mnPkYearId);
+                                oEtyAnalysis.setFkDpsDocId_n(mnPkDocId);
+                                oEtyAnalysis.setFkDpsEtyId_n(mnPkEntryId);    
+                            }
+                            
+                            oEtyAnalysis.setIsRegistryNew(true);
+                            oEtyAnalysis.setPkEntryAnalysisId(0);
+                            
+                            oEtyAnalysis.save(connection);
+                        }
                     }
                 }
 
@@ -1833,6 +1880,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.getDbmsEntryTaxes().addAll(mvDbmsEntryTaxes);
         clone.getDbmsEntryCommissions().addAll(mvDbmsEntryCommissions);
         clone.getDbmsEntryPrices().addAll(mvDbmsEntryPrices);
+        clone.getDbmsDpsEntryAnalysis().addAll(mlDbmsDpsEntryAnalysis);
 
         clone.getDbmsDpsLinksAsSource().addAll(mvDbmsDpsLinksAsSource);
         clone.getDbmsDpsLinksAsDestiny().addAll(mvDbmsDpsLinksAsDestiny);

@@ -27,7 +27,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Claudio Peña, Edwin Carmona
  */
 public abstract class SDataReadTableRows {
 
@@ -3146,6 +3146,53 @@ public abstract class SDataReadTableRows {
 
         return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
     }
+    
+    @SuppressWarnings("unchecked")
+    private static SQueryRequest getSettingsCatQlt(erp.client.SClientInterface piClient, int pnDataType, java.lang.Object filterKey, java.util.HashMap<Integer, Object> params) {
+        int i = 0;
+        STableField[] aoPkFields = null;
+        STableField[] aoQueryFields = null;
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
+        ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
+        String sSql = "";
+
+        switch (pnDataType) {
+            case SDataConstants.QLT_ANALYSIS:
+                aoPkFields = new STableField[1];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_analysis");
+
+                i = 0;
+                aoQueryFields = new STableField[1];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "analysis_name");
+
+                sSql = "SELECT id_analysis, analysis_name " +
+                        "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " " +
+                        "WHERE b_del = 0 " +
+                        "ORDER BY analysis_name; ";
+                break;
+
+            default:
+                piClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
+
+        if (aoPkFields != null) {
+            for (STableField tableField : aoPkFields) {
+                aPkFields.add(tableField);
+            }
+        }
+
+        if (aoQueryFields != null) {
+            for (STableField tableField : aoQueryFields) {
+                aQueryFields.add(tableField);
+            }
+
+            aaRpnArguments = new ArrayList[aoQueryFields.length];
+        }
+
+        return new SQueryRequest(aPkFields, aQueryFields, aQueryAdditionalFields, aaRpnArguments, new String[] { sSql });
+    }
 
     /**
      * @param dataType Constants defined in erp.data.SDataConstants.
@@ -3206,6 +3253,9 @@ public abstract class SDataReadTableRows {
         }
         else if (SDataUtilities.isCatalogueHrs(dataType)) {
 
+        }
+        else if (SDataUtilities.isCatalogueQlt(dataType)) {
+            queryRequest = getSettingsCatQlt(client, dataType, filterKey, paramsMap);
         }
         else {
             client.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
