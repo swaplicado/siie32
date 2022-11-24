@@ -270,7 +270,7 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
                 if (mnTabTypeAux02 == 216) {
                     msSql += "ito.item, itn.item, ";
                 }
-                msSql += "his.fk_fid_item_ref_n_old, his.fk_fid_item_ref_n_new, " +
+                msSql += "his.fid_item_ref_old_n, his.fid_item_ref_new_n, " +
                 "@factor := " + (isViewForItemBizPartnerAll() ? "1.0" : "IF(dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + ", -1.0, 1.0)") + " AS _factor, " +
                 "ety.id_ety, ety.concept_key, ety.sort_pos, it.item, it.item_key,  ";
                 if (mnTabTypeAux02 == 216) {        
@@ -289,8 +289,8 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
                 "INNER JOIN erp.bpsu_bp AS bp ON dps.fid_bp_r = bp.id_bp " +
                 "INNER JOIN erp.itmu_item AS it ON ety.fid_item = it.id_item " ;
                 if (mnTabTypeAux02 == 216) {
-                    msSql += "INNER JOIN erp.itmu_item AS ito ON his.fk_fid_item_ref_n_old = ito.id_item " + // 
-                    "INNER JOIN erp.itmu_item AS itn ON his.fk_fid_item_ref_n_new = itn.id_item " + //
+                    msSql += "INNER JOIN erp.itmu_item AS ito ON his.fid_item_ref_old_n = ito.id_item " + // 
+                    "INNER JOIN erp.itmu_item AS itn ON his.fid_item_ref_new_n = itn.id_item " + //
                     "INNER JOIN erp.itmu_unit AS uo ON uo.id_unit = ety.fid_orig_unit ";
                 }
                 msSql += "INNER JOIN erp.usru_usr AS us ON us.id_usr = his.fid_usr_edit " +

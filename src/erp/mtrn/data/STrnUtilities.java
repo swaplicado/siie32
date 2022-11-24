@@ -3640,8 +3640,8 @@ public abstract class STrnUtilities {
         int dpsLength = dpsDoc.length;
 
         for (int i = 0; i < dpsLength; i++) {
-            sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fk_fid_item_ref_n_old, fk_fid_item_ref_n_new, "
-                    + "fk_item_old, fk_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
+            sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
+                    + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
                         + "VALUES (" + dpsDoc[i][0] + ", "
                         + "" + dpsDoc[i][1] + ", "
                         + "" + moDpsEntry.getPkEntryId() + ", " 
