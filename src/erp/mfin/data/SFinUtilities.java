@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -40,7 +41,7 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez, Daniel López, Sergio Flores
+ * @author Juan Barajas, Alfredo Pérez, Daniel López, Sergio Flores, Claudio Peña
  */
 public abstract class SFinUtilities {
     
@@ -1366,11 +1367,31 @@ public abstract class SFinUtilities {
         return true;
     }
     
+    public static boolean isCreditNote(final SClientInterface client, int[] dpsEntryPk)throws Exception {
+        ResultSet resultSet = null;
+        String sql = "";
+        
+        sql = "SELECT * FROM trn_dps AS dps " +
+                "WHERE dps.id_year = " + dpsEntryPk[0] + " AND dps.id_doc = " + dpsEntryPk[1] + " AND " +
+                "dps.fid_ct_dps in (1,2) AND dps.fid_cl_dps = 5 AND dps.fid_tp_dps = 1;" ;
+        
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        if(resultSet.next()){
+            throw new Exception("La nota de credito no se puede modificar");
+        } else  {
+            return true;
+        }
+        
+    }
+    
     public static String getAccountForDpsEntry(final SClientInterface client, int[] dpsEntryPk) throws Exception {
         ResultSet resultSet = null;
         String account = "";
         String sql = "";
         SDataDpsEntry entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        isCreditNote(client, dpsEntryPk);
         
         sql = "SELECT fid_acc " +
                 "FROM trn_dps_rec AS dr " +

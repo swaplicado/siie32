@@ -508,7 +508,7 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
         Statement statementD = miClient.getSession().getStatement().getConnection().createStatement();
         resultSet = statementD.executeQuery(mySql);
             while (resultSet.next()) {
-                msRoute = resultSet.getString("cfg.xml_base_dir");
+                msRoute = resultSet.getString("xml_base_dir");
             }
             
         return  msRoute;

@@ -85,7 +85,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Claudio Peña, Isabel Servín
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Isabel Servín, Claudio Peña
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     

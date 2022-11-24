@@ -36,6 +36,7 @@ import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
+import erp.mod.hrs.db.SHrsUtils;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.redis.SLockUtils;
@@ -44,9 +45,14 @@ import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.awt.Cursor;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.rmi.RemoteException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -54,11 +60,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.MessagingException;
+import javax.swing.JFileChooser;
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -75,7 +88,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores, Claudio Peña
  */
 public abstract class STrnUtilities {
 
@@ -1430,7 +1443,57 @@ public abstract class STrnUtilities {
             client.getFrame().setCursor(cursor);
         }
     }
+    
+    public static void saveDiog(final SClientInterface client, final int[] key) {
+        Cursor cursor = null;
+        Map<String, Object> map = null;
+        JasperPrint jasperPrint = null;
+        JasperViewer jasperViewer = null;
+        SDataDiog diog = null;
+        SDataBizPartnerBranchAddress oAddress = null;
 
+        diog = (SDataDiog) SDataUtilities.readRegistry(client, SDataConstants.TRN_DIOG, key, SLibConstants.EXEC_MODE_VERBOSE);
+        String fileName = (".pdf");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                        File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+            cursor = client.getFrame().getCursor();
+            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
+            map = client.createReportParams();
+            map.put("nPkYearId", diog.getPkYearId());
+            map.put("nPkDocId", diog.getPkDocId());
+            map.put("sCalle", oAddress.getStreet());
+            map.put("sNoExterior", oAddress.getStreetNumberExt());
+            map.put("sNoInterior", oAddress.getStreetNumberInt());
+            map.put("sColonia", oAddress.getNeighborhood());
+            map.put("sLocalidad", oAddress.getLocality());
+            map.put("sReferencia", oAddress.getReference());
+            map.put("sMunicipio", oAddress.getCounty());
+            map.put("sEstado", oAddress.getState());
+            map.put("sPais", oAddress.getDbmsDataCountry().getCountry());
+            map.put("sCodigoPostal", oAddress.getZipCode());
+
+            jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DIOG, map);
+            JRExporter exporter = new JRPdfExporter();
+            exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, new FileOutputStream(file));
+            exporter.exportReport();
+            
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STrnUtilities.class.getName(), e);
+            }
+        
+            finally {
+            client.getFrame().setCursor(cursor);
+            } 
+        }
+    }
+    
     public static String getMailToSendForOrder(final SClientInterface client, final int[] keyDoc) throws Exception {
         String mailToSend = "";
         SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
@@ -1500,7 +1563,7 @@ public abstract class STrnUtilities {
                 rlock = SRedisLockUtils.gainLock(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout() / 1000);
                 */
                 slock = SLockUtils.gainLock(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, bizPartner.getRegistryTimeout());
-                
+                    
                 SDataBizPartnerBranchContact contact;
                 
                 if (idBizPartnerBranch == SLibConsts.UNDEFINED) {
@@ -1509,9 +1572,9 @@ public abstract class STrnUtilities {
                 else {
                     contact = bizPartner.getDbmsBizPartnerBranch(new int[] { idBizPartnerBranch }).getDbmsBizPartnerBranchContactOfficial();
                 }
-                
                 contact.setEmail01(((String) dlgCfdSending.getValue(SDialogCfdSending.VAL_EMAIL)));
                 contact.setIsRegistryEdited(true);
+                contact.save(client.getSession().getStatement().getConnection());
                 
                 request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
                 request.setPacket(bizPartner);
@@ -1933,7 +1996,7 @@ public abstract class STrnUtilities {
                     else {
                         mailBody += "\n" + mms.getTextBody();
                     }
-
+ 
                     SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
                     SMail mail = new SMail(sender, mailSubject, SLibUtils.textToHtml(mailBody), new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mails, ";"))));
 
@@ -3465,5 +3528,589 @@ public abstract class STrnUtilities {
         }
 
         return count;
+    }
+    
+     public static boolean isServiceOrder(SClientInterface miClient, int idYearDps, int idDocDps) throws SQLException {
+        ResultSet resultSet;
+        Statement statement = null;
+        String sql = "";
+        String numSer = "";
+        
+        statement = miClient.getSession().getStatement().getConnection().createStatement();
+        
+        sql = "SELECT * FROM trn_dps WHERE id_year = " + idYearDps + " AND id_doc = " + idDocDps + ";";
+        
+        resultSet = statement.executeQuery(sql);
+
+        if (resultSet.next()) {
+           numSer = resultSet.getString("num_ser");
+        }
+        
+        if (numSer.equals("S")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+            
+    }
+     
+    public static boolean requieredItemGen(SClientInterface miClient, int idItem) throws SQLException {
+        ResultSet resultSet;
+        Statement statement = null;
+        String sql = "";
+        int requieredItem = 0;
+        
+        statement = miClient.getSession().getStatement().getConnection().createStatement();
+        
+        sql  = "SELECT b_item_ref FROM erp.itmu_igen " +
+                "WHERE id_igen  = (SELECT fid_igen " +
+                "FROM erp.itmu_item WHERE id_item = " + idItem + ");";
+        
+        resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+               requieredItem = resultSet.getInt("b_item_ref");
+            }
+            
+            if (requieredItem == 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+            
+    }
+    
+    public static int numberHistDpsEty(SClientInterface miClient, int pkYearId, int pkDocId, int pkDpsEty) throws SQLException {
+        ResultSet resultSet;
+        Statement statement = null;
+        String sql = "";
+        int etyHis = 0;
+        
+        statement = miClient.getSession().getStatement().getConnection().createStatement();
+        
+        sql = "SELECT COUNT(*) AS hist FROM trn_dps_ety_hist "
+                + "WHERE id_year = " + pkYearId + " "
+                + "AND id_doc = " + pkDocId + " "
+                + "AND id_ety = " + pkDpsEty + "; ";
+        
+        resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                etyHis = resultSet.getInt("hist");
+            }
+            
+        return etyHis + 1;
+        
+    }
+    
+    public static void insertDpsEtyHist(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
+        Statement statement = null;
+        String sql = "";
+        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
+        
+        statement = miClient.getSession().getStatement().getConnection().createStatement();
+        
+            sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fk_fid_item_ref_n_old, fk_fid_item_ref_n_new, fid_usr_edit, ts_edit) "
+                        + "VALUES (" + pkYearId + ", "
+                        + "" + pkDocId + ", "
+                        + "" + moDpsEntry.getPkEntryId() + ", " 
+                        + "" + histEty + ", "
+                        + "'" + moDpsEntry.getConceptKey() + "', "
+                        + "'" + conceptKeyNew + "', "
+                        + "'" + moDpsEntry.getConcept() + "', "
+                        + "'" + conceptNew + "', "
+                        + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
+                        + "'" + itemRef + "', "
+                        + "" + miClient.getSession().getUser().getPkUserId() + ", "
+                        + " NOW()); ");
+       
+        statement.executeUpdate(sql);
+        
+    }
+    
+    public static void insertDpsEtyHistItem(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew, int dpsDoc [][]) throws SQLException {
+        Statement statement = null;
+        String sql = "";
+        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
+        
+        statement = miClient.getSession().getStatement().getConnection().createStatement();
+        
+        int dpsLength = dpsDoc.length;
+
+        for (int i = 0; i < dpsLength; i++) {
+            sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fk_fid_item_ref_n_old, fk_fid_item_ref_n_new, "
+                    + "item_old, item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
+                        + "VALUES (" + dpsDoc[i][0] + ", "
+                        + "" + dpsDoc[i][1] + ", "
+                        + "" + moDpsEntry.getPkEntryId() + ", " 
+                        + "" + histEty + ", "
+                        + "(SELECT item_key FROM erp.itmu_item WHERE id_item = " + itemNew + "), "
+                        + "(SELECT item FROM erp.itmu_item WHERE id_item = " + itemNew + "), "
+                        + "'', "
+                        + "'', "
+                        + "NULL, "
+                        + "NULL, "
+                        + "'" + moDpsEntry.getFkItemId() + "', "
+                        + "'" + itemNew + "', "
+                        + "'" + dpsDoc[i][2] + "', "
+                        + "'" + dpsDoc[i][3] + "', "
+                        + "'" + dpsDoc[i][4] + "', "
+                        + "" + miClient.getSession().getUser().getPkUserId() + ", "
+                        + " NOW()); ");
+            
+             statement.executeUpdate(sql);
+         }
+
+    }
+
+    public static void updateItemRefInvoice(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
+        Statement statement = null;
+        String sql = "";
+        String mySql = "";
+        insertDpsEtyHist(miClient, pkYearId, pkDocId, moDpsEntry, conceptKeyNew, conceptNew, itemRef );
+        
+        statement = miClient.getSession().getStatement().getConnection().createStatement();
+        
+        if(!conceptKeyNew.isEmpty()) {
+            mySql = "concept_key = '" + conceptKeyNew + "' "; 
+        }
+        if(!conceptNew.isEmpty()) {
+            if (mySql.isEmpty()) {
+                mySql += "concept = '" + conceptNew + "' ";
+            }
+            else {
+                mySql += ", concept = '" + conceptNew + "' ";
+            }
+        }        
+        if(itemRef > 0) {
+            if (mySql.isEmpty()) {
+                mySql += "fid_item_ref_n = '" + itemRef + "' ";
+            }
+            else {
+                 mySql += ",fid_item_ref_n = '" + itemRef + "' ";
+            }
+        }
+            
+        sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + pkYearId + " " + 
+                "AND id_doc = " + pkDocId + " AND id_ety = " + moDpsEntry.getPkEntryId() + ";";
+        
+        statement.executeUpdate(sql);
+        
+    }
+    
+    public static void updateDpsItemAll(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew) throws SQLException {
+        Statement statement = null;
+        String sql = "";
+        int[][] dpsDocAll = getDpsRelatedId(miClient, pkYearId, pkDocId);
+
+        insertDpsEtyHistItem(miClient, pkYearId, pkDocId, moDpsEntry, itemNew, dpsDocAll);
+
+        statement = miClient.getSession().getStatement().getConnection().createStatement();
+        for (int i = 0; i < dpsDocAll.length; i++) {
+            sql = "UPDATE trn_dps_ety SET concept_key = (SELECT item_key FROM erp.itmu_item WHERE id_item = " + itemNew + ") , " +
+                   "concept = (SELECT item FROM erp.itmu_item WHERE id_item = " + itemNew + ") , fid_item = " + itemNew + " WHERE id_year = " + dpsDocAll[i][0] + " " + 
+                   "AND id_doc = " + dpsDocAll[i][1] + " AND id_ety = " + moDpsEntry.getPkEntryId() + ";";
+
+            statement.executeUpdate(sql);
+            
+        }
+    }
+    
+    public static int quantityRelationsDps(SClientInterface miClient, int pkYearId, int pkDocId) throws SQLException {
+        ResultSet resultSet;
+        String sql = "";
+        int quantityDps = 0;
+        
+         sql  = "SELECT COUNT(*) AS numberDps "
+                + "FROM (SELECT DISTINCT 1 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc "
+                + "FROM trn_dps_dps_supply AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_des_year = d.id_year AND s.id_des_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_src_year = " + pkYearId + " AND s.id_src_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 2 AS f_id_type, "
+                + "'VÍNCULO COMO DESTINO' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc "
+                + "FROM trn_dps_dps_supply AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_des_year = " + pkYearId + " AND s.id_des_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 3 AS f_id_type, "
+                + "'AJUSTE COMO DOCUMENTO' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc "
+                + "FROM trn_dps_dps_adj AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_adj_year = d.id_year AND s.id_adj_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN  erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_dps_year = " + pkYearId + " AND s.id_dps_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 4 AS f_id_type, 'AJUSTE COMO DOCUMENTO DE AJUSTE' AS f_type, d.dt,  t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc " 
+                + "FROM trn_dps_dps_adj AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_dps_year = d.id_year AND s.id_dps_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_adj_year = " + pkYearId + " AND s.id_adj_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 6 AS f_id_type, 'SURTIDO ALMACÉN' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n "
+                + "FROM trn_diog AS d "
+                + "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 "
+                + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "WHERE de.fid_dps_year_n = " + pkYearId + " AND de.fid_dps_doc_n = " + pkDocId + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL "
+                + "UNION SELECT DISTINCT 7 AS f_id_type, 'DEVOLUCIÓN ALMACÉN COMO DOCUMENTO' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n "
+                + "FROM trn_diog AS d "
+                + "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 "
+                + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "WHERE de.fid_dps_year_n = " + pkYearId + " AND de.fid_dps_doc_n = " + pkDocId + " AND de.fid_dps_adj_year_n IS NOT NULL AND de.fid_dps_adj_doc_n IS NOT NULL "
+                + "UNION SELECT DISTINCT 8 AS f_id_type, 'DEVOLUCIÓN ALMACÉN COMO DOCUMENTO DE AJUSTE' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n "
+                + "FROM trn_diog AS d "
+                + "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 "
+                + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog "
+                + "AND d.fid_tp_iog = t.id_tp_iog "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "WHERE de.fid_dps_adj_year_n = " + pkYearId + "  AND de.fid_dps_adj_doc_n = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 9 AS f_id_type, 'COMISIONES' AS f_type, d.dt, '' AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc "
+                + "FROM mkt_comms AS d "
+                + "WHERE d.id_year = " + pkYearId + " AND d.id_doc = " + pkDocId + " AND d.b_del = FALSE "
+                + "UNION SELECT DISTINCT 10 AS f_id_type, 'PARTIDAS COMISIONES' AS f_type, e.dt, '' AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc "
+                + "FROM mkt_comms AS e "
+                + "WHERE e.id_year = " + pkYearId + " AND e.id_doc = " + pkDocId + " AND e.b_del = FALSE "
+                + "UNION SELECT DISTINCT 11 AS f_id_type, 'REIMPRESIÓN DOC. ANTERIOR' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.id_year, d.id_doc "
+                + "FROM trn_dps_riss AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_new_year = d.id_year AND s.id_new_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_old_year = " + pkYearId + " AND s.id_old_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 12 AS f_id_type, "
+                + "'REIMPRESIÓN DOC. NUEVO' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc "
+                + "FROM trn_dps_riss AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_old_year = d.id_year AND s.id_old_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_new_year = " + pkYearId + " AND s.id_new_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 13 AS f_id_type, "
+                + "'SUSTITUCIÓN DOC. ANTERIOR' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc "
+                + "FROM trn_dps_repl AS s INNER JOIN trn_dps AS d ON s.id_new_year = d.id_year AND s.id_new_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_old_year = " + pkYearId + " AND s.id_old_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 14 AS f_id_type, "
+                + "'SUSTITUCIÓN DOC. NUEVO' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc "
+                + "FROM trn_dps_repl AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_old_year = d.id_year AND s.id_old_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_new_year = " + pkYearId + " AND s.id_new_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT "
+                + "15 AS f_id_type, 'CAMBIO FÍSICO' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n "
+                + "FROM trn_dps_iog_chg AS s "
+                + "INNER JOIN trn_diog AS d ON s.id_diog_year = d.id_year AND s.id_diog_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "WHERE s.id_dps_year = " + pkYearId + " AND s.id_dps_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 16 AS f_id_type, "
+                + "'CAMBIO GARANTÍA' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, "
+                + "IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n "
+                + "FROM trn_dps_iog_war s "
+                + "INNER JOIN trn_diog AS d ON s.id_diog_year = d.id_year AND s.id_diog_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "WHERE s.id_dps_year = " + pkYearId + " AND s.id_dps_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 17 AS f_id_type, "
+                + "'MOV. ASOC. NEG. ORIGEN' AS f_type, d.dt, t.code AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc "
+                + "FROM trn_dsm_ety AS s "
+                + "INNER JOIN trn_dsm AS d ON s.id_year = d.id_year AND s.id_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.bpss_ct_bp AS t ON d.fid_ct_dsm = t.id_ct_bp "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "WHERE s.fid_src_dps_year_n = " + pkYearId + " AND s.fid_src_dps_doc_n = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 18 AS f_id_type, "
+                + "'MOV. ASOC. NEG. DESTINO' AS f_type, d.dt, t.code AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc "
+                + "FROM trn_dsm_ety AS s  "
+                + "INNER JOIN trn_dsm AS d ON s.id_year = d.id_year AND s.id_doc = d.id_doc  AND d.b_del = 0 "
+                + "INNER JOIN erp.bpss_ct_bp AS t ON d.fid_ct_dsm = t.id_ct_bp "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "WHERE s.fid_des_dps_year_n = " + pkYearId + " AND s.fid_des_dps_doc_n = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 19 AS f_id_type, "
+                + "'PÓLIZA DOCUMENTO' AS f_type, r.dt, '' AS f_code, "
+                + "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) AS f_num, re.fid_dps_year_n, re.fid_dps_doc_n "
+                + "FROM fin_rec_ety AS re "
+                + "INNER JOIN fin_rec AS r ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num AND r.b_del = 0 AND re.b_del = 0 "
+                + "INNER JOIN erp.bpsu_bpb AS b ON r.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur "
+                + "WHERE re.fid_dps_year_n = " + pkYearId + " AND re.fid_dps_doc_n = " + pkDocId + " AND re.b_del = FALSE AND r.b_del = FALSE AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 1 AND fid_cls_acc_mov = 1) "
+                + "AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 2 AND fid_cls_acc_mov = 2) "
+                + "UNION SELECT DISTINCT "
+                + "20 AS f_id_type,'PÓLIZA DOCUMENTO AJUSTE' AS f_type, r.dt, '' AS f_code, "
+                + "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) AS f_num, re.fid_dps_year_n, re.fid_dps_doc_n "
+                + "FROM fin_rec_ety AS re "
+                + "INNER JOIN fin_rec AS r ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num AND r.b_del = 0 AND re.b_del = 0 "
+                + "INNER JOIN erp.bpsu_bpb AS b ON r.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur "
+                + "WHERE fid_dps_adj_year_n = " + pkYearId + " AND fid_dps_adj_doc_n = " + pkDocId + " AND re.b_del = FALSE AND r.b_del = FALSE "
+                + "AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 1 AND fid_cls_acc_mov = 1) AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 2 AND fid_cls_acc_mov = 2) "
+                + "UNION SELECT DISTINCT 21 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, "
+                + "d.dt, 'ENT' AS f_code,  d.num,  '' AS idYear, '' AS idDoc "
+                + "FROM trn_dvy AS d "
+                + "INNER JOIN trn_dvy_ety AS de ON d.id_dvy = de.id_dvy "
+                + "WHERE NOT d.b_del AND ((de.fk_dps_year = " + pkYearId + " AND de.fk_dps_doc = " + pkDocId + ") OR (de.fk_ord_year = " + pkYearId + " AND de.fk_ord_doc = " + pkDocId + ")) "
+                + "ORDER BY f_id_type , f_code , f_num) AS numberDps ";
+        
+        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+
+        while (resultSet.next()) {
+               quantityDps = (resultSet.getInt("numberDps"));
+        }
+        
+        return quantityDps + 1;
+        
+    }
+    
+    public static int[][] getDpsRelatedId(SClientInterface miClient, int pkYearId, int pkDocId) throws SQLException {
+        ResultSet resultSet;
+        String sql = "";
+        
+        int[][] dpsDocPurc = getDpsRelatedIdPurchaseOrders(miClient, pkYearId, pkDocId);
+        int quantityDpsArr = quantityRelationsDps(miClient, dpsDocPurc[0][0], dpsDocPurc[0][1]);
+        int[][] dpsDoc = new int[quantityDpsArr][5];
+        
+        for (int j = 0; j < dpsDocPurc.length; j++) {
+            sql  = "SELECT DISTINCT 1 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                    + "FROM trn_dps_dps_supply AS s "
+                    + "INNER JOIN trn_dps AS d ON s.id_des_year = d.id_year AND s.id_des_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_src_year = " + dpsDocPurc[j][0] + " AND s.id_src_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 2 AS f_id_type, "
+                    + "'VÍNCULO COMO DESTINO' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                    + "FROM trn_dps_dps_supply AS s "
+                    + "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_des_year = " + dpsDocPurc[j][0] + " AND s.id_des_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 3 AS f_id_type, "
+                    + "'AJUSTE COMO DOCUMENTO' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                    + "FROM trn_dps_dps_adj AS s "
+                    + "INNER JOIN trn_dps AS d ON s.id_adj_year = d.id_year AND s.id_adj_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN  erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_dps_year = " + dpsDocPurc[j][0] + " AND s.id_dps_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 4 AS f_id_type, 'AJUSTE COMO DOCUMENTO DE AJUSTE' AS f_type, d.dt,  t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps " 
+                    + "FROM trn_dps_dps_adj AS s "
+                    + "INNER JOIN trn_dps AS d ON s.id_dps_year = d.id_year AND s.id_dps_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_adj_year = " + dpsDocPurc[j][0] + " AND s.id_adj_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 6 AS f_id_type, 'SURTIDO ALMACÉN' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_diog AS d "
+                    + "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 "
+                    + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "WHERE de.fid_dps_year_n = " + dpsDocPurc[j][0] + " AND de.fid_dps_doc_n = " + dpsDocPurc[j][1] + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL "
+                    + "UNION SELECT DISTINCT 7 AS f_id_type, 'DEVOLUCIÓN ALMACÉN COMO DOCUMENTO' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_diog AS d "
+                    + "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 "
+                    + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "WHERE de.fid_dps_year_n = " + dpsDocPurc[j][0] + " AND de.fid_dps_doc_n = " + dpsDocPurc[j][1] + " AND de.fid_dps_adj_year_n IS NOT NULL AND de.fid_dps_adj_doc_n IS NOT NULL "
+                    + "UNION SELECT DISTINCT 8 AS f_id_type, 'DEVOLUCIÓN ALMACÉN COMO DOCUMENTO DE AJUSTE' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_diog AS d "
+                    + "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 "
+                    + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog "
+                    + "AND d.fid_tp_iog = t.id_tp_iog "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "WHERE de.fid_dps_adj_year_n = " + dpsDocPurc[j][0] + "  AND de.fid_dps_adj_doc_n = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 9 AS f_id_type, 'COMISIONES' AS f_type, d.dt, '' AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM mkt_comms AS d "
+                    + "WHERE d.id_year = " + dpsDocPurc[j][0] + " AND d.id_doc = " + dpsDocPurc[j][1] + " AND d.b_del = FALSE "
+                    + "UNION SELECT DISTINCT 10 AS f_id_type, 'PARTIDAS COMISIONES' AS f_type, e.dt, '' AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM mkt_comms AS e "
+                    + "WHERE e.id_year = " + dpsDocPurc[j][0] + " AND e.id_doc = " + dpsDocPurc[j][1] + " AND e.b_del = FALSE "
+                    + "UNION SELECT DISTINCT 11 AS f_id_type, 'REIMPRESIÓN DOC. ANTERIOR' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                    + "FROM trn_dps_riss AS s "
+                    + "INNER JOIN trn_dps AS d ON s.id_new_year = d.id_year AND s.id_new_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_old_year = " + dpsDocPurc[j][0] + " AND s.id_old_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 12 AS f_id_type, "
+                    + "'REIMPRESIÓN DOC. NUEVO' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                    + "FROM trn_dps_riss AS s "
+                    + "INNER JOIN trn_dps AS d ON s.id_old_year = d.id_year AND s.id_old_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_new_year = " + dpsDocPurc[j][0] + " AND s.id_new_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 13 AS f_id_type, "
+                    + "'SUSTITUCIÓN DOC. ANTERIOR' AS f_type, d.dt, t.code AS f_code,  "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                    + "FROM trn_dps_repl AS s INNER JOIN trn_dps AS d ON s.id_new_year = d.id_year AND s.id_new_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_old_year = " + dpsDocPurc[j][0] + " AND s.id_old_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 14 AS f_id_type, "
+                    + "'SUSTITUCIÓN DOC. NUEVO' AS f_type, d.dt, t.code AS f_code, "
+                    + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                    + "FROM trn_dps_repl AS s "
+                    + "INNER JOIN trn_dps AS d ON s.id_old_year = d.id_year AND s.id_old_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                    + "WHERE s.id_new_year = " + dpsDocPurc[j][0] + " AND s.id_new_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT "
+                    + "15 AS f_id_type, 'CAMBIO FÍSICO' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_dps_iog_chg AS s "
+                    + "INNER JOIN trn_diog AS d ON s.id_diog_year = d.id_year AND s.id_diog_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "WHERE s.id_dps_year = " + dpsDocPurc[j][0] + " AND s.id_dps_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 16 AS f_id_type, "
+                    + "'CAMBIO GARANTÍA' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, "
+                    + "IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_dps_year_n, d.fid_dps_doc_n, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_dps_iog_war s "
+                    + "INNER JOIN trn_diog AS d ON s.id_diog_year = d.id_year AND s.id_diog_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "WHERE s.id_dps_year = " + dpsDocPurc[j][0] + " AND s.id_dps_doc = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 17 AS f_id_type, "
+                    + "'MOV. ASOC. NEG. ORIGEN' AS f_type, d.dt, t.code AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_dsm_ety AS s "
+                    + "INNER JOIN trn_dsm AS d ON s.id_year = d.id_year AND s.id_doc = d.id_doc AND d.b_del = 0 "
+                    + "INNER JOIN erp.bpss_ct_bp AS t ON d.fid_ct_dsm = t.id_ct_bp "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "WHERE s.fid_src_dps_year_n = " + dpsDocPurc[j][0] + " AND s.fid_src_dps_doc_n = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 18 AS f_id_type, "
+                    + "'MOV. ASOC. NEG. DESTINO' AS f_type, d.dt, t.code AS f_code, '' AS f_num, '' AS idYear, '' AS idDoc, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_dsm_ety AS s  "
+                    + "INNER JOIN trn_dsm AS d ON s.id_year = d.id_year AND s.id_doc = d.id_doc  AND d.b_del = 0 "
+                    + "INNER JOIN erp.bpss_ct_bp AS t ON d.fid_ct_dsm = t.id_ct_bp "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                    + "WHERE s.fid_des_dps_year_n = " + dpsDocPurc[j][0] + " AND s.fid_des_dps_doc_n = " + dpsDocPurc[j][1] + " "
+                    + "UNION SELECT DISTINCT 19 AS f_id_type, "
+                    + "'PÓLIZA DOCUMENTO' AS f_type, r.dt, '' AS f_code, "
+                    + "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) AS f_num, re.fid_dps_year_n, re.fid_dps_doc_n, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM fin_rec_ety AS re "
+                    + "INNER JOIN fin_rec AS r ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num AND r.b_del = 0 AND re.b_del = 0 "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON r.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur "
+                    + "WHERE re.fid_dps_year_n = " + dpsDocPurc[j][0] + " AND re.fid_dps_doc_n = " + dpsDocPurc[j][1] + " AND re.b_del = FALSE AND r.b_del = FALSE AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 1 AND fid_cls_acc_mov = 1) "
+                    + "AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 2 AND fid_cls_acc_mov = 2) "
+                    + "UNION SELECT DISTINCT "
+                    + "20 AS f_id_type,'PÓLIZA DOCUMENTO AJUSTE' AS f_type, r.dt, '' AS f_code, "
+                    + "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) AS f_num, re.fid_dps_year_n, re.fid_dps_doc_n, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM fin_rec_ety AS re "
+                    + "INNER JOIN fin_rec AS r ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num AND r.b_del = 0 AND re.b_del = 0 "
+                    + "INNER JOIN erp.bpsu_bpb AS b ON r.fid_cob = b.id_bpb "
+                    + "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur "
+                    + "WHERE fid_dps_adj_year_n = " + dpsDocPurc[j][0] + " AND fid_dps_adj_doc_n = " + dpsDocPurc[j][1] + " AND re.b_del = FALSE AND r.b_del = FALSE "
+                    + "AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 1 AND fid_cls_acc_mov = 1) AND NOT (fid_tp_acc_mov = 4 AND fid_cl_acc_mov = 2 AND fid_cls_acc_mov = 2) "
+                    + "UNION SELECT DISTINCT 21 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, "
+                    + "d.dt, 'ENT' AS f_code,  d.num,  '' AS idYear, '' AS idDoc, '' AS fid_ct_dps, '' AS fid_cl_dps, '' AS fid_tp_dps "
+                    + "FROM trn_dvy AS d "
+                    + "INNER JOIN trn_dvy_ety AS de ON d.id_dvy = de.id_dvy "
+                    + "WHERE NOT d.b_del AND ((de.fk_dps_year = " + dpsDocPurc[j][0] + " AND de.fk_dps_doc = " + dpsDocPurc[j][1] + ") OR (de.fk_ord_year = " + dpsDocPurc[j][0] + " AND de.fk_ord_doc = " + dpsDocPurc[j][1] + ")) "
+                    + "ORDER BY f_id_type , f_code , f_num ";
+
+           resultSet = miClient.getSession().getStatement().executeQuery(sql);
+
+           int i = 1;
+           
+           dpsDoc[0][0] = dpsDocPurc[0][0];
+           dpsDoc[0][1] = dpsDocPurc[0][1];
+           dpsDoc[0][2] = dpsDocPurc[0][2];
+           dpsDoc[0][3] = dpsDocPurc[0][3];
+           dpsDoc[0][4] = dpsDocPurc[0][4];
+           
+           while(resultSet.next()) {
+                dpsDoc[i][0] = resultSet.getInt("id_year");
+                dpsDoc[i][1] = resultSet.getInt("id_doc");
+                dpsDoc[i][2] = resultSet.getInt("fid_ct_dps");
+                dpsDoc[i][3] = resultSet.getInt("fid_cl_dps");
+                dpsDoc[i][4] = resultSet.getInt("fid_tp_dps");
+                
+                i++;
+            }
+        
+       }
+
+        
+       return dpsDoc;
+    }
+
+    public static int[][] getDpsRelatedIdPurchaseOrders(SClientInterface miClient, int pkYearId, int pkDocId) throws SQLException {
+        ResultSet resultSet;
+        String sql = "";
+        int[][] dpsDoc = new int[1][5];
+
+        sql  = "SELECT DISTINCT 2 AS f_id_type, "
+                + "'VÍNCULO COMO DESTINO' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                + "FROM trn_dps_dps_supply AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_des_year = " + pkYearId + " AND s.id_des_doc = " + pkDocId + " "
+                + "UNION SELECT DISTINCT 3 AS f_id_type, "
+                + "'AJUSTE COMO DOCUMENTO' AS f_type, d.dt, t.code AS f_code, "
+                + "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num ,d.id_year, d.id_doc, fid_ct_dps, fid_cl_dps, fid_tp_dps "
+                + "FROM trn_dps_dps_adj AS s "
+                + "INNER JOIN trn_dps AS d ON s.id_adj_year = d.id_year AND s.id_adj_doc = d.id_doc AND d.b_del = 0 "
+                + "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb "
+                + "INNER JOIN  erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
+                + "WHERE s.id_dps_year = " + pkYearId + " AND s.id_dps_doc = " + pkDocId + " "
+                + "ORDER BY f_id_type , f_code , f_num ";
+        
+       resultSet = miClient.getSession().getStatement().executeQuery(sql);
+       
+       if (resultSet.next()) {
+            dpsDoc[0][0] = resultSet.getInt("id_year");
+            dpsDoc[0][1] = resultSet.getInt("id_doc");
+            dpsDoc[0][2] = resultSet.getInt("fid_ct_dps");
+            dpsDoc[0][3] = resultSet.getInt("fid_cl_dps");
+            dpsDoc[0][4] = resultSet.getInt("fid_tp_dps");
+       }
+       else {
+            dpsDoc[0][0] = pkYearId;
+            dpsDoc[0][1] = pkDocId;
+            dpsDoc[0][2] = 1;
+            dpsDoc[0][3] = 3;
+            dpsDoc[0][4] = 1;
+       }
+        
+       return dpsDoc;
     }
 }

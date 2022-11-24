@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña, Edwin Carmona
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -1322,6 +1322,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ALL = 214;
     /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ONE = 215;
+    public static final int TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT = 216;
 
     public static final int TRNX_SAL_TOT = 301;
     public static final int TRNX_SAL_TOT_MONTH = 302;
