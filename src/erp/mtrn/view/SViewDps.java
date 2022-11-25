@@ -1455,10 +1455,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("bPrintTon", contractKgAsTon);
                             
                             boolean hasAnalysis = false;
+                            boolean isPrint = true;
                             if (! dps.getDbmsDpsEntries().isEmpty() && SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
                                 for (int i = 0; i < dps.getDbmsDpsEntries().size(); i++) {
                                     int[] pkEty = new int[] { dps.getDbmsDpsEntries().get(i).getPkYearId(), dps.getDbmsDpsEntries().get(i).getPkDocId(), dps.getDbmsDpsEntries().get(i).getPkEntryId() };
-                                    hasAnalysis = ! SDpsQualityUtils.getAnalysisByDocumentEty(miClient.getSession(), dps.getDbmsDpsEntries().get(i).getFkItemId(), pkEty).isEmpty();
+                                    hasAnalysis = ! SDpsQualityUtils.getAnalysisByDocumentEty(miClient.getSession(), dps.getDbmsDpsEntries().get(i).getFkItemId(), pkEty, isPrint).isEmpty();
                                     if (hasAnalysis) {
                                         break;
                                     }

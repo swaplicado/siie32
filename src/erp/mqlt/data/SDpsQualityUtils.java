@@ -102,9 +102,10 @@ public class SDpsQualityUtils {
      * @param session
      * @param idItem
      * @param entryDocPk
+     * @param isPrint
      * @return 
      */
-    public static ArrayList<SDataDpsEntryAnalysis> getAnalysisByDocumentEty(final SGuiSession session, final int idItem, final int[] entryDocPk) {
+    public static ArrayList<SDataDpsEntryAnalysis> getAnalysisByDocumentEty(final SGuiSession session, final int idItem, final int[] entryDocPk, final boolean isPrint) {
         String sql = "";
         
         sql = "SELECT "
@@ -115,7 +116,8 @@ public class SDpsQualityUtils {
                 + "fid_dps_year_n = " + entryDocPk[0] + " AND "
                 + "fid_dps_doc_n = " + entryDocPk[1] + " AND "
                 + "fid_dps_ety_n = " + entryDocPk[2] + " AND "
-                + "fid_item_id = " + idItem + " "
+                + "fid_item_id = " + idItem + " AND "
+                + "b_required = 1 "
                 + "ORDER BY sort_pos ASC, id_ety_analysis ASC;";
         
         try {
@@ -131,7 +133,7 @@ public class SDpsQualityUtils {
                 lAnalysis.add(oEtyAnalysis);
             }
             
-            if (lAnalysis.isEmpty()) {
+            if (lAnalysis.isEmpty() && !isPrint) {
                 return SDpsQualityUtils.getAnalysisByItem(session, idItem);
             }
             
