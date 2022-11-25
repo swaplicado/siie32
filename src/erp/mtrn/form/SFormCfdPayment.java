@@ -75,7 +75,7 @@ import sa.lib.srv.SLock;
 
 /**
  * User form for input of database registry of CFDI of Payments.
- * @author  Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author  Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  */
 public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
     
@@ -4204,7 +4204,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         computeVouTotal();
         valueChangedPayments();
         
-        if (!SDataUtilities.isPeriodOpen(miClient, cfd.getTimestamp()) || cfd.isStamped()) {
+        if (!SDataUtilities.isPeriodOpen(miClient, cfd.getTimestamp()) || cfd.isStamped() && (!moDataCfdPayment.getAuxCfdPaymentEntries().isEmpty())) {
             mbIsFormReadOnly = true;
         }
         

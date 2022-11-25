@@ -14,10 +14,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mfin.data.SFinUtilities;
 import erp.mitm.form.SPanelFilterItem;
-import erp.mtrn.form.SDialogUpdateAllDpsItem;
-import erp.mtrn.form.SDialogUpdateDpsAccountCenterCost;
 import erp.mtrn.form.SDialogUpdateDpsItemRefConcept;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
@@ -30,48 +27,40 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Isabel Servín, Sergio Flores, Claudio Peña
+ * @author Claudio Peña
  */
-public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STableColumn[] maoTableColumns;
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
     private erp.mitm.form.SPanelFilterItem moPanelFilterItem;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
-    private erp.mtrn.form.SDialogUpdateDpsAccountCenterCost moDialogUpdateDpsAccountCostCenter;
     private erp.mtrn.form.SDialogUpdateDpsItemRefConcept moDialogUpdateDpsItemRefConcept;
-    private erp.mtrn.form.SDialogUpdateAllDpsItem moDialogUpdateAllDpsItem;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     
-    private javax.swing.JButton jbAccountCostCenter;
     private javax.swing.JButton jbChangeItemConcept;
-    private javax.swing.JButton jbChangeItemDocAll;
 
     private boolean mbHasRightAuthor = false;
     
-    private boolean mbIsDpsDoc = false;
-    private boolean mbIsDpsAdj = false;
-
     private int mnRegistryType;
     
     /**
      * Query view of all documents at once.
      * @param client
      * @param tabTitle
-     * @param auxType01 SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_N_BP_ALL or SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ALL.
+     * @param auxType01 SDataConstantsSys.TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT.
      */
-    public SViewQueryDpsByItemBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
+    public SViewQueryDpsByItemHistory(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         this(client, tabTitle, auxType01, 0);
     }
 
     /**
-     * Query view of documents from one business partner and/or item at a time.
      * @param client
      * @param tabTitle
-     * @param auxType01 SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_N_BP_ONE or SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE.
+     * @param auxType01 SDataConstantsSys.TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT.
      * @param auxType02 SDataConstantsSys.TRNX_TP_DPS_DOC or SDataConstantsSys.TRNX_TP_DPS_ADJ.
      */
-    public SViewQueryDpsByItemBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
+    public SViewQueryDpsByItemHistory(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01, auxType02);
         initComponents();
     }
@@ -79,35 +68,18 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
     private void initComponents() {
         int levelDoc;
         maoTableColumns = null;
-        
-        mbIsDpsDoc = mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC;
-        mbIsDpsAdj = mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ADJ;
 
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
         moPanelFilterItem = new SPanelFilterItem(miClient, this, true);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-        moDialogUpdateDpsAccountCostCenter = new SDialogUpdateDpsAccountCenterCost(miClient);
         moDialogUpdateDpsItemRefConcept = new SDialogUpdateDpsItemRefConcept(miClient);
-        moDialogUpdateAllDpsItem = new SDialogUpdateAllDpsItem(miClient);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
-
-        jbAccountCostCenter = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bkk_csh.gif")));
-        jbAccountCostCenter.setPreferredSize(new Dimension(23, 23));
-        jbAccountCostCenter.addActionListener(this);
-        jbAccountCostCenter.setToolTipText("Modificar contabilización");
-        
-        //falta validación solo para ordenes de compra
+     
         jbChangeItemConcept = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link_rev.gif")));
         jbChangeItemConcept.setPreferredSize(new Dimension(23, 23));
         jbChangeItemConcept.addActionListener(this);
-        jbChangeItemConcept.setToolTipText("Modificar ítem/concepto(Ordenes compra)");
-        
-        //falta solo para ordenes de servicio
-        jbChangeItemDocAll = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_ord.gif")));
-        jbChangeItemDocAll.setPreferredSize(new Dimension(23, 23));
-        jbChangeItemDocAll.addActionListener(this);
-        jbChangeItemDocAll.setToolTipText("Modificar ítem en todos los documentos(Ordenes servicio)");
-        
+        jbChangeItemConcept.setToolTipText("Modificar ítem/concepto");
+
         if (isViewForPurchase()) {
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
         }
@@ -122,14 +94,9 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         removeTaskBarUpperComponent(jbDelete);
         
         addTaskBarUpperComponent(moTabFilterDatePeriodRange);
-        if (isViewForItemBizPartnerAll()) {
-            addTaskBarUpperSeparator();
-            addTaskBarUpperComponent(jbAccountCostCenter);
-            addTaskBarUpperSeparator();
-            addTaskBarUpperComponent(jbChangeItemConcept);
-            addTaskBarUpperSeparator();
-            addTaskBarUpperComponent(jbChangeItemDocAll);
-        }
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jbChangeItemConcept);
+        
         if (isViewForItemBizPartnerOne()) {
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(moPanelFilterItem);
@@ -168,28 +135,41 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         moTablePane.reset();
 
         STableField[] aoKeyFields = new STableField[3];
-        maoTableColumns = new STableColumn[28];
-
+        
+        if (mnTabTypeAux02 == 216) {
+            maoTableColumns = new STableColumn[32]; // - 2
+        }
+        else {
+            maoTableColumns = new STableColumn[29];
+        }
         i = 0;
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_year");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_doc");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_ety");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ety.id_year");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ety.id_doc");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ety.id_ety");
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
         
         i = 0;
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dps.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_dnum", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cob.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 200);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave AN", 50);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal AN", 100);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "de.concept_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "it.item", "Ítem", 300);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.concept_key_old", "Clave antigua", STableConstants.WIDTH_ITEM_KEY);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.concept_key_new", "Clave nueva", STableConstants.WIDTH_ITEM_KEY);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.concept_old", "Concepto antiguo", STableConstants.WIDTH_ITEM_KEY);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.concept_new", "Concepto nuevo", STableConstants.WIDTH_ITEM_KEY);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "it.item", "Ítem", 250);
+        if (mnTabTypeAux02 == 216) {
+            maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ito.item", "Ítem referencia antiguo", 200);
+            maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "itn.item", "Ítem referencia nuevo", 200);
+        }
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "us.usr", "Usr modificación", 70);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "his.ts_edit", "Fecha modicación", 110);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_orig_qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uo.symbol", "Unidad", STableConstants.WIDTH_CODE_COB);
+        if (mnTabTypeAux02 == 216) {
+            maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uo.symbol", "Unidad", STableConstants.WIDTH_CODE_COB);
+        }
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_price_u_cur", "Precio unitario mon $", STableConstants.WIDTH_VALUE_UNITARY);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stot_cur_r", "Subtotal mon $", STableConstants.WIDTH_VALUE_2X);
@@ -216,48 +196,15 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_rnum", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "de.sort_pos", "Renglón", 75);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "ety.sort_pos", "Renglón", 75);
 
         for (i = 0; i < maoTableColumns.length; i++) {
             moTablePane.addTableColumn(maoTableColumns[i]);
         }
         moTablePane.createTable(this);
     }
-
-    private void actionAccountCostCenter() {
-        String account = "";
-        String costCenter = "";
-        
-        if (jbAccountCostCenter.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
-                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
-            }
-            else if (!moTablePane.getSelectedTableRow().getIsSummary()) {
-                try {
-                    int gui = isViewForPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
-
-                    account = SFinUtilities.getAccountForDpsEntry(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    costCenter = SFinUtilities.getCostCenterForDpsEntry(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-
-                    moDialogUpdateDpsAccountCostCenter.formReset();
-                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS, new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1] });
-                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS_ETY, moTablePane.getSelectedTableRow().getPrimaryKey());
-                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.FIN_ACC, new String[] { account, costCenter }); 
-                    moDialogUpdateDpsAccountCostCenter.setRegistryType(mnRegistryType);
-                    moDialogUpdateDpsAccountCostCenter.setFormVisible(true);
-
-                    if (moDialogUpdateDpsAccountCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                        miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
-                    }
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
-                }
-            }
-        }
-    }
-        // solo para ordenes de compra
-        private void actionChangeItemConcept() {
+  
+    private void actionChangeItemConcept() {
         if (jbChangeItemConcept.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
@@ -282,34 +229,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             }
         }
     }
-    //solo para ordenes de servicio
-    private void actionChangeItemAll() {
-        if (jbChangeItemDocAll.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null) {
-                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
-            }
-            else if (!moTablePane.getSelectedTableRow().getIsSummary()) {
-                try {
-                    int gui = isViewForPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
 
-                    moDialogUpdateAllDpsItem.formReset();
-                    moDialogUpdateAllDpsItem.setValue(SDataConstants.TRN_DPS, new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1] });
-                    moDialogUpdateAllDpsItem.setValue(SDataConstants.TRN_DPS_ETY, moTablePane.getSelectedTableRow().getPrimaryKey());
-                    moDialogUpdateAllDpsItem.setRegistryType(mnRegistryType);
-                    
-                    moDialogUpdateAllDpsItem.setFormVisible(true);
-
-                    if (moDialogUpdateAllDpsItem.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                        miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
-                    }
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
-                }
-            }
-        }
-    }
-    
     @Override
     public void createSqlQuery() {
         String sqlWherePeriod = "";
@@ -321,20 +241,20 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
 
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 java.util.Date[] range = (java.util.Date[]) setting.getSetting();
-                sqlWherePeriod += "AND d.dt BETWEEN " +
+                sqlWherePeriod += "AND dps.dt BETWEEN " +
                         "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]) + "' AND " +
                         "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]) + "' ";
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlWhereFuncArea += "AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlWhereFuncArea += "AND dps.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
             
            if (isViewForItemBizPartnerOne()) {
                 if (setting.getType() == STableConstants.SETTING_FILTER_ITM_ITEM) {
                     if (((int[]) setting.getSetting())[0] != SLibConstants.UNDEFINED) {
-                        sqlWhereItemBizPartnerOne += "AND de.fid_item = " + ((int[]) setting.getSetting())[0] + " ";
+                        sqlWhereItemBizPartnerOne += "AND ety.fid_item = " + ((int[]) setting.getSetting())[0] + " ";
                     }
                 }
                 else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
@@ -345,69 +265,45 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             }
         }
 
-        int[][] dpsTypeKeys = null;
-        
-        if (mbIsDpsDoc) {
-            dpsTypeKeys = new int[][] { isViewForPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV };
-            mnRegistryType = SDataConstantsSys.TRNX_TP_DPS_DOC;
-        }
-        else if (mbIsDpsAdj) {
-            dpsTypeKeys = new int[][] { isViewForPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN : SDataConstantsSys.TRNU_TP_DPS_SAL_CN };
-            mnRegistryType = SDataConstantsSys.TRNX_TP_DPS_ADJ;
-        }
-        else {
-            switch (mnTabTypeAux01) {
-                case SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_N_BP_ONE:
-                    dpsTypeKeys = new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN };
-                    break;
-                case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE:
-                    dpsTypeKeys = new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_INV, SDataConstantsSys.TRNU_TP_DPS_SAL_CN };
-                    break;
-                default:
-                    // do nothing
-            }
-        }
-        
-        String sqlWhereDpsTypes = "";
-        
-        for (int[] dpsTypeKey : dpsTypeKeys) {
-            sqlWhereDpsTypes += (sqlWhereDpsTypes.isEmpty() ? "" : " OR ") +
-                    "(d.fid_ct_dps = " + dpsTypeKey[0] + " AND " +
-                    "d.fid_cl_dps = " + dpsTypeKey[1] + " AND " +
-                    "d.fid_tp_dps = " + dpsTypeKey[2] + ")";
-        }
-        
-        if (!sqlWhereDpsTypes.isEmpty() && dpsTypeKeys != null) {
-            sqlWhereDpsTypes = "AND " + (dpsTypeKeys.length == 1 ? sqlWhereDpsTypes : "(" + sqlWhereDpsTypes + ")") + " ";
-        }
-        
-        msSql = "SELECT de.id_year, de.id_doc, de.id_ety, " +
-                "d.dt, dt.code, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS _dnum, cob.code, bp.bp, bpc.bp_key, bpb.bpb, " +
+        msSql = "SELECT ety.id_year, ety.id_doc, ety.id_ety, dps.dt, dt.code, CONCAT(dps.num_ser, IF(length(dps.num_ser) = 0, '', '-'), dps.num) AS _dnum, bp.bp, his.concept_key_old, his.concept_key_new, " +
+                "his.concept_old, his.concept_new, it.item, ";
+                if (mnTabTypeAux02 == 216) {
+                    msSql += "ito.item, itn.item, ";
+                }
+                msSql += "his.fid_item_ref_old_n, his.fid_item_ref_new_n, " +
+                "@factor := " + (isViewForItemBizPartnerAll() ? "1.0" : "IF(dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + ", -1.0, 1.0)") + " AS _factor, " +
+                "ety.id_ety, ety.concept_key, ety.sort_pos, it.item, it.item_key,  ";
+                if (mnTabTypeAux02 == 216) {        
+                    msSql += "uo.symbol, "; 
+                }
+                msSql += "c.cur_key, '"  + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS _cur_key, " +
+                "ety.orig_qty * @factor AS _orig_qty, " +
+                "ety.price_u_cur * @factor AS _price_u_cur, ety.stot_cur_r * @factor AS _stot_cur_r, ety.tax_charged_cur_r * @factor AS _tax_charged_cur_r, ety.tax_retained_cur_r * @factor AS _tax_retained_cur_r, ety.tot_cur_r * @factor AS _tot_cur_r, " +
+                "ety.price_u * @factor AS _price_u, ety.stot_r * @factor AS _stot_r, ety.tax_charged_r * @factor AS _tax_charged_r, ety.tax_retained_r * @factor AS _tax_retained_r, ety.tot_r * @factor AS _tot_r, us.usr, his.ts_edit, " +
                 "rbkc.code, rcob.code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as _rper, " +
-                "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as _rnum, " +
-                "@factor := " + (isViewForItemBizPartnerAll() ? "1.0" : "IF(d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + ", -1.0, 1.0)") + " AS _factor, " +
-                "de.id_ety, de.concept_key, de.sort_pos, it.item, it.item_key, uo.symbol, c.cur_key, '"  + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS _cur_key, " +
-                "de.orig_qty * @factor AS _orig_qty, " +
-                "de.price_u_cur * @factor AS _price_u_cur, de.stot_cur_r * @factor AS _stot_cur_r, de.tax_charged_cur_r * @factor AS _tax_charged_cur_r, de.tax_retained_cur_r * @factor AS _tax_retained_cur_r, de.tot_cur_r * @factor AS _tot_cur_r, " +
-                "de.price_u * @factor AS _price_u, de.stot_r * @factor AS _stot_r, de.tax_charged_r * @factor AS _tax_charged_r, de.tax_retained_r * @factor AS _tax_retained_r, de.tot_r * @factor AS _tot_r " +
-                "FROM trn_dps AS d " +
-                "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
-                "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
-                "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
-                "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + (isViewForPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
-                "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
-                "INNER JOIN erp.itmu_item AS it ON de.fid_item = it.id_item " +
-                "INNER JOIN erp.itmu_unit AS uo ON uo.id_unit = de.fid_orig_unit " +
-                "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
-                "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
+                "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as _rnum " +
+                "FROM trn_dps AS dps " +
+                "INNER JOIN trn_dps_ety AS ety ON dps.id_year = ety.id_year AND dps.id_doc = ety.id_doc " +
+                "INNER JOIN trn_dps_ety_hist AS his ON his.id_year = ety.id_year AND his.id_doc = ety.id_doc AND his.id_ety = ety.id_ety " +
+                "INNER JOIN erp.trnu_tp_dps AS dt ON dps.fid_ct_dps = dt.id_ct_dps AND dps.fid_cl_dps = dt.id_cl_dps AND dps.fid_tp_dps = dt.id_tp_dps " +
+                "INNER JOIN erp.bpsu_bp AS bp ON dps.fid_bp_r = bp.id_bp " +
+                "INNER JOIN erp.itmu_item AS it ON ety.fid_item = it.id_item " ;
+                if (mnTabTypeAux02 == 216) {
+                    msSql += "INNER JOIN erp.itmu_item AS ito ON his.fid_item_ref_old_n = ito.id_item " + // 
+                    "INNER JOIN erp.itmu_item AS itn ON his.fid_item_ref_new_n = itn.id_item " + //
+                    "INNER JOIN erp.itmu_unit AS uo ON uo.id_unit = ety.fid_orig_unit ";
+                }
+                msSql += "INNER JOIN erp.usru_usr AS us ON us.id_usr = his.fid_usr_edit " +
+                "INNER JOIN erp.cfgu_cur AS c ON dps.fid_cur = c.id_cur " +
+                "LEFT OUTER JOIN trn_dps_rec AS dr ON dps.id_year = dr.id_dps_year AND dps.id_doc = dr.id_dps_doc " +
                 "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
                 "LEFT OUTER JOIN fin_bkc AS rbkc ON r.id_bkc = rbkc.id_bkc " +
                 "LEFT OUTER JOIN erp.bpsu_bpb AS rcob ON r.fid_cob = rcob.id_bpb " +
-                "WHERE NOT d.b_del AND NOT de.b_del " + 
-                sqlWhereDpsTypes + sqlWherePeriod + sqlWhereFuncArea + sqlWhereItemBizPartnerOne + "AND " +
-                "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
-                (mbHasRightAuthor ? "AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() : "") + ";";
+                "WHERE NOT dps.b_del AND NOT ety.b_del " + 
+                sqlWherePeriod + sqlWhereFuncArea + sqlWhereItemBizPartnerOne + 
+//                "AND " +
+//                "dps.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND dps.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
+                (mbHasRightAuthor ? "AND dps.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() : "") + ";";
     }
 
     @Override
@@ -437,15 +333,9 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
 
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (JButton) e.getSource();
-                
-            if (button == jbAccountCostCenter) {
-                actionAccountCostCenter();
-            }
+            
             if (button == jbChangeItemConcept) {
                 actionChangeItemConcept();
-            }
-            if (button == jbChangeItemDocAll) {
-                actionChangeItemAll();
             }
         }
     }

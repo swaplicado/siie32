@@ -50,6 +50,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartnerBranch;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCurrency;
 import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataBookkeepingNumber;
@@ -65,6 +66,7 @@ import erp.mfin.data.SFinDpsTaxes;
 import erp.mfin.data.SFinMovementType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mqlt.data.SDpsQualityUtils;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
@@ -83,6 +85,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -96,7 +100,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Adrián Avilés
+ * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Adrián Avilés, Edwin Carmona
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
 
@@ -4428,6 +4432,47 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 catch (java.lang.Exception e) {
                     SLibUtilities.printOutException(this, e);
+                }
+            }
+        }
+        
+        /**
+         * Sección de envío de correo de parámetros de calidad en contratos de venta
+         */
+        String qualityBody = "";
+        if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+            SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
+                                                            mvDbmsDpsEntries,
+                                                            oSimpleDateFormat.format(this.getDate()),
+                                                            oSimpleDateFormat.format(this.getDateDoc()),
+                                                            this.getNumber(), 
+                                                            this.getNumberReference(), 
+                                                            this.getNumberSeries(), 
+                                                            companyName, bpName);
+            
+            if (qualityBody != null) {
+                try {
+                    String sMailsTo = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_QLT_DPS_ANALYSIS_TO);
+                    String aMailsTo[] = sMailsTo.split(";");
+                    String sMailsCc = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_QLT_DPS_ANALYSIS_CC);
+                    String aMailsCc[] = sMailsCc.split(";");
+
+                    toRecipients = new ArrayList<>();
+                    for (String string : aMailsTo) {
+                        toRecipients.add(string);
+                    }
+
+                    ArrayList<String> toRecipientsCC = new ArrayList<>();
+                    for (String string : aMailsCc) {
+                        toRecipientsCC.add(string);
+                    }
+
+                    STrnUtilities.sendMail(client, mmsType, qualityBody, "Análisis de calidad. Folio: " + getDpsNumber(), toRecipients, toRecipientsCC, null);
+                    toRecipients.clear();
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SDataDps.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }

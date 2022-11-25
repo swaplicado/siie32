@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public abstract class SModConsts {
 
@@ -378,6 +378,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_ETY_PRC = 2023015;
     public static final int TRN_DPS_ETY_TAX = 2023020;
     public static final int TRN_DPS_ETY_COMMS = 2023021;
+    public static final int TRN_DPS_ETY_ANALYSIS = 2023065;
     public static final int TRN_DPS_RISS = 2023022;
     public static final int TRN_DPS_REPL = 2023023;
     public static final int TRN_DPS_DPS_SUPPLY = 2023024;
@@ -782,6 +783,9 @@ public abstract class SModConsts {
      */
 
     public static final int QLT_LOT_APR = 2073001;
+    public static final int QLT_TP_ANALYSIS = 2073010;
+    public static final int QLT_ANALYSIS = 2073011;
+    public static final int QLT_ANALYSIS_ITEM = 2073012;
     
     public static final HashMap<Integer, String> TablesMap = new HashMap<>();
 
@@ -1059,6 +1063,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
+        TablesMap.put(TRN_DPS_ETY_ANALYSIS, "trn_dps_ety_analysis");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
@@ -1331,5 +1336,8 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ADV_SET, "hrs_adv_set");
         
         TablesMap.put(QLT_LOT_APR, "qlt_lot_apr");
+        TablesMap.put(QLT_TP_ANALYSIS, "qlt_tp_analysis");
+        TablesMap.put(QLT_ANALYSIS, "qlt_analysis");
+        TablesMap.put(QLT_ANALYSIS_ITEM, "qlt_analysis_item");
     }
 }

@@ -36,6 +36,7 @@ import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mqlt.data.SDpsQualityUtils;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataDps;
@@ -43,6 +44,7 @@ import erp.mtrn.data.SDataDpsCfdEntry;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
 import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SDataDpsEntryAnalysis;
 import erp.mtrn.data.SDataDpsEntryCommissions;
 import erp.mtrn.data.SDataDpsEntryCommissionsRow;
 import erp.mtrn.data.SDataDpsEntryNotes;
@@ -70,14 +72,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import sa.lib.SLibUtils;
+import sa.lib.grid.SGridColumnForm;
+import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridPaneForm;
+import sa.lib.grid.SGridRow;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Claudio Peña, Isabel Servín
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Isabel Servín, Claudio Peña
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -90,6 +98,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private static final int TAB_NOT = 4;
     private static final int TAB_CFD_ADD = 5; // CFD addenda
     private static final int TAB_CFD_COMPL = 6; // CFD complement
+    private static final int TAB_QUALITY = 7; // CFD complement
     
     private static final int CFD_COMPL_VALS = 4; //number of CFD complement values
     
@@ -191,6 +200,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.table.STablePane moPaneCommissions;
     private erp.lib.table.STablePaneGrid moPaneGridNotes;
     private erp.lib.table.STablePaneGrid moPaneGridPrices;
+    private SGridPaneForm moGridAnalysis;
     private erp.mtrn.form.SDialogPriceUnitaryWizard moDialogPriceUnitaryWizard;
     private erp.mtrn.form.SDialogItemPriceHistory moDialogItemPriceHistory;
     private erp.mtrn.form.SFormDpsEntryNotes moFormNotes;
@@ -219,6 +229,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private double mdQuantityPrc;
     private boolean mbIsLastPrc;
     private erp.mmkt.data.SParamsItemPriceList moParamsItemPriceList;
+    private ArrayList<SDataDpsEntryAnalysis> mlDpsEntryAnalysis;
     
     private int mnAuxEntryPriceAction;
     private int mnAuxEntryPriceEditedIndex;
@@ -255,7 +266,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel4 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlFkItemId = new javax.swing.JLabel();
-        jcbFkItemId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkItemId = new javax.swing.JComboBox<>();
         jbFkItemId = new javax.swing.JButton();
         jbSetPrepayment = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
@@ -269,7 +280,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbItemBizPartnerDescription = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jlFkOriginalUnitId = new javax.swing.JLabel();
-        jcbFkOriginalUnitId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkOriginalUnitId = new javax.swing.JComboBox<>();
         jbFkOriginalUnitId = new javax.swing.JButton();
         jlPartNum = new javax.swing.JLabel();
         jtPartNum = new javax.swing.JTextField();
@@ -361,7 +372,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel35 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jlFkItemReferenceId_n = new javax.swing.JLabel();
-        jcbFkItemReferenceId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkItemReferenceId_n = new javax.swing.JComboBox<>();
         jbFkItemReferenceId_n = new javax.swing.JButton();
         jPanel40 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
@@ -381,7 +392,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel33 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jlFkTaxRegionId = new javax.swing.JLabel();
-        jcbFkTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkTaxRegionId = new javax.swing.JComboBox<>();
         jbFkTaxRegionId = new javax.swing.JButton();
         jckIsTaxesAutomaticApplying = new javax.swing.JCheckBox();
         jPanel34 = new javax.swing.JPanel();
@@ -455,7 +466,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel38 = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
-        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<>();
         jPanel43 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
         jtfDriver = new javax.swing.JTextField();
@@ -527,7 +538,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jradAccAdvanceBilled = new javax.swing.JRadioButton();
         jPanel62 = new javax.swing.JPanel();
         jlFkCashAccountId_n = new javax.swing.JLabel();
-        jcbFkCashAccountId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCashAccountId_n = new javax.swing.JComboBox<>();
         jPanel64 = new javax.swing.JPanel();
         jlFkCashAccountId_n1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -561,7 +572,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfAddElektraOrder = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jlAddGenBarcode = new javax.swing.JLabel();
-        jcbAddGenBarcode = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbAddGenBarcode = new javax.swing.JComboBox<>();
         jPanel48 = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jPanel70 = new javax.swing.JPanel();
@@ -607,6 +618,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel90 = new javax.swing.JPanel();
         jlComplPredial = new javax.swing.JLabel();
         jtfComplPredial = new javax.swing.JTextField();
+        jpQuality = new javax.swing.JPanel();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -2272,6 +2284,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jTabbedPane.addTab("CFD: XML", jpCfdComplement);
 
+        jpQuality.setLayout(new java.awt.BorderLayout());
+        jTabbedPane.addTab("Calidad", jpQuality);
+
         jpRegistry.add(jTabbedPane, java.awt.BorderLayout.CENTER);
         jTabbedPane.getAccessibleContext().setAccessibleName("Precios");
 
@@ -2651,6 +2666,41 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         for (i = 0; i < aoTableColumns.length; i++) {
             moPaneGridPrices.addTableColumn(aoTableColumns[i]);
         }
+            
+        // Quality pane:
+        
+        moGridAnalysis = new SGridPaneForm((SGuiClient) miClient, SModConsts.TRN_DPS_ETY_ANALYSIS, SDataConstantsSys.UNDEFINED, "Configuración de análisis") {
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();                
+                SGridColumnForm column;
+                
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Orden captura", 100);
+                columns.add(column);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Análisis", 100);
+                columns.add(column);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 100);
+                columns.add(column);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor mínimo", 100);
+                column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                columns.add(column);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor máximo", 100);
+                column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                columns.add(column);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Requerido", 100);
+                column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                columns.add(column);
+                
+                return columns;
+            }
+        };
+        
+        jpQuality.add(moGridAnalysis, BorderLayout.CENTER);
         
         // Complimentary dialogs and forms:
 
@@ -2802,6 +2852,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 }
                 
                 jTabbedPane.setEnabledAt(TAB_PRC, true);
+                
+                // Is sales contract
+                if (moParamDps.isDpsTypeContractSal()) {
+                    jTabbedPane.setEnabledAt(TAB_QUALITY, true);
+                    renderQualityAnalysisConfiguration();
+                }
             }
             else {
                 jTabbedPane.setEnabledAt(TAB_PRC, false);
@@ -3374,6 +3430,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 renderAddendaData();
             }
             
+            // Is sales contract
+            if (moParamDps.isDpsTypeContractSal()) {
+                renderQualityAnalysisConfiguration();
+            }
+            
             // Initialize fields:
 
             jckIsBulk.setSelected(moItem.getIsBulk());
@@ -3757,6 +3818,41 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 default:
             }
         }
+    }
+    
+    /**
+     * Método para renderizar los análisis de Calidad correspondientes
+     */
+    private void renderQualityAnalysisConfiguration() {
+        this.mlDpsEntryAnalysis = new ArrayList<>();
+        
+        if (moDpsEntry.getIsRegistryNew()) {
+            if (moItem != null) {
+                // Obtener configuraciones en base al ítem (versión más nueva)
+                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId());
+            }
+            else {
+                this.mlDpsEntryAnalysis = new ArrayList<>();
+            }
+        }
+        else {
+            // Obtener configuraciones cuando el registro no es nuevo, en base al item y la versión correspondiente
+            this.mlDpsEntryAnalysis = moDpsEntry.getDbmsDpsEntryAnalysis();
+        }
+        
+        Vector<SGridRow> rows = new Vector<>();
+        for (SDataDpsEntryAnalysis oDpsEntryAnalysis : this.mlDpsEntryAnalysis) {
+            rows.add(oDpsEntryAnalysis);
+        }
+        
+        moGridAnalysis.populateGrid(rows);
+        moGridAnalysis.getTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        moGridAnalysis.getTable().setColumnSelectionAllowed(false);
+        moGridAnalysis.getTable().getTableHeader().setReorderingAllowed(false);
+        moGridAnalysis.getTable().getTableHeader().setResizingAllowed(true);
+        moGridAnalysis.getTable().getTableHeader().setEnabled(true);
+        moGridAnalysis.resetSortKeys();
+        moGridAnalysis.setSelectedGridRow(0);
     }
 
     private void setAddendaData() {
@@ -5105,6 +5201,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jpNotesControls1;
     private javax.swing.JPanel jpPrices;
     private javax.swing.JPanel jpPricesData;
+    private javax.swing.JPanel jpQuality;
     private javax.swing.JPanel jpRegistry;
     private javax.swing.JPanel jpTaxInfo;
     private javax.swing.JPanel jpTaxes;
@@ -6080,6 +6177,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
         moPaneGridPrices.renderTableRows();
         moPaneGridPrices.setTableRowSelection(0);
+        
+        // Is sales contract
+        if (moParamDps.isDpsTypeContractSal()) {
+            renderQualityAnalysisConfiguration();
+        }
 
         moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(moDpsEntry.getFkCostCenterId_n().isEmpty() ? moPanelFkCostCenterId_n.getEmptyAccountId() : moDpsEntry.getFkCostCenterId_n());
         moPanelFkCostCenterId_n.refreshPanel();
@@ -6232,6 +6334,16 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             cfdEntry.setPredial(moFieldComplPredial.getString());
         }
         
+        // Is sales contract
+        ArrayList<SDataDpsEntryAnalysis> configurations = new ArrayList<>();
+        if (moParamDps.isDpsTypeContractSal()) {
+            for (SGridRow row : moGridAnalysis.getModel().getGridRows()) {
+                configurations.add((SDataDpsEntryAnalysis) row);
+            }
+        }
+        moDpsEntry.getDbmsDpsEntryAnalysis().clear();
+        moDpsEntry.getDbmsDpsEntryAnalysis().addAll(configurations);
+
         cfdEntry.setTaxObject(moPaneTaxes.getTableModel().getRowCount() > 0 ? DCfdi40Catalogs.ClaveObjetoImpSí : DCfdi40Catalogs.ClaveObjetoImpNo);
 
         moDpsEntry.setDbmsDpsCfdEntry(cfdEntry);
