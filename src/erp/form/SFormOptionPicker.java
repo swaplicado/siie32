@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Edwin Carmona
  */
 public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener {
 
@@ -967,6 +967,12 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia", 350);
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo", 150);
                 setTitle("Seleccionar orden de producción");
+                break;
+                
+            case SDataConstants.QLT_ANALYSIS:
+                aoTableColumns = new STableColumnForm[1];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Análisis", 200);
+                setTitle("Seleccionar análisis");
                 break;
 
             default:

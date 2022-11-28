@@ -6,27 +6,38 @@
 package erp.mod;
 
 import erp.mod.qlt.db.SDbLotApproved;
+import erp.mod.qlt.db.SDbQltyAnalysis;
+import erp.mod.qlt.db.SDbQltyAnalysisType;
+import erp.mod.qlt.form.SFormAnalysis;
 import erp.mod.qlt.form.SFormQltLotApproved;
+import erp.mod.qlt.view.SViewAnalysis;
 import erp.mod.qlt.view.SViewQltLotApproved;
+import java.util.ArrayList;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
+import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridColumnForm;
+import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiCatalogueSettings;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiForm;
 import sa.lib.gui.SGuiModule;
 import sa.lib.gui.SGuiOptionPicker;
+import sa.lib.gui.SGuiOptionPickerSettings;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiReport;
+import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Uriel Castañeda
+ * @author Uriel Castañeda, Edwin Carmona
  */
 public class SModuleQlt extends SGuiModule {
     
     private SFormQltLotApproved moFormQualityLot;
+    private SFormAnalysis moFormAnalysis;
 
     public SModuleQlt(SGuiClient client) {
         super(client, SModConsts.MOD_QLT_N, SLibConsts.UNDEFINED);
@@ -46,6 +57,12 @@ public class SModuleQlt extends SGuiModule {
             case SModConsts.QLT_LOT_APR:
                 registry = new SDbLotApproved();
                 break;
+            case SModConsts.QLT_TP_ANALYSIS:
+                registry = new SDbQltyAnalysisType();
+                break;
+            case SModConsts.QLT_ANALYSIS:
+                registry = new SDbQltyAnalysis();
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -55,7 +72,31 @@ public class SModuleQlt extends SGuiModule {
 
     @Override
     public SGuiCatalogueSettings getCatalogueSettings(final int type, final int subtype, final SGuiParams params) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String sql = "";
+        SGuiCatalogueSettings settings = null;
+
+        switch (type) {
+            case SModConsts.QLT_TP_ANALYSIS:
+                settings = new SGuiCatalogueSettings("Tipo de análisis", 1);
+                sql = "SELECT id_analysis_type AS " + SDbConsts.FIELD_ID + "1, CONCAT(type_code, ' - ', type_name)  AS " + SDbConsts.FIELD_ITEM + " "
+                        + " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
+                        + "ORDER BY type_name ASC ";
+                break;
+            case SModConsts.QLT_ANALYSIS:
+                settings = new SGuiCatalogueSettings("Análisis", 1);
+                sql = "SELECT id_analysis AS " + SDbConsts.FIELD_ID + "1, CONCAT(analysis_name, ' - ', unit_symbol)  AS " + SDbConsts.FIELD_ITEM + " "
+                        + " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
+                        + "ORDER BY analysis_name ASC ";
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        if (settings != null) {
+            settings.setSql(sql);
+        }
+
+        return settings;
     }
 
     @Override
@@ -66,6 +107,9 @@ public class SModuleQlt extends SGuiModule {
             case SModConsts.QLT_LOT_APR:
                 view = new SViewQltLotApproved(miClient, "Lotes aprobados");
                 break;
+            case SModConsts.QLT_ANALYSIS:
+                view = new SViewAnalysis(miClient, "Análisis de laboratorio");
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -75,7 +119,49 @@ public class SModuleQlt extends SGuiModule {
 
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String sql = "";
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        SGuiOptionPickerSettings settings = null;
+        SGuiOptionPicker picker = null;
+
+        switch (type) {
+            case SModConsts.QLT_TP_ANALYSIS:
+                sql = "SELECT ta.id_analysis_type AS " + SDbConsts.FIELD_ID + "1, "
+                        + "ta.type_code AS " + SDbConsts.FIELD_PICK + "1, ta.type_name AS " + SDbConsts.FIELD_PICK + "2 "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta "
+                        + "WHERE ta.b_del = 0 "
+                        + "ORDER BY ta.type_name, ta.type_code ";
+                
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Código"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre"));
+                settings = new SGuiOptionPickerSettings("Tipo de análisis", sql, gridColumns, 1);
+
+                SBeanOptionPicker moPickerAnalysisType = new SBeanOptionPicker();
+                moPickerAnalysisType.setPickerSettings(miClient, type, subtype, settings);
+                picker = moPickerAnalysisType;
+                break;
+                
+            case SModConsts.QLT_ANALYSIS:
+                sql = "SELECT a.id_analysis AS " + SDbConsts.FIELD_ID + "1, "
+                        + "a.analysis_name AS " + SDbConsts.FIELD_PICK + "1, a.unit_symbol AS " + SDbConsts.FIELD_PICK + "2 "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " AS a "
+                        + "WHERE a.b_del = 0 "
+                        + "ORDER BY a.analysis_name, a.id_analysis ";
+                
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Análisis"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Unidad"));
+                settings = new SGuiOptionPickerSettings("Análisis", sql, gridColumns, 1);
+
+                SBeanOptionPicker moPickerAnalysis = new SBeanOptionPicker();
+                moPickerAnalysis.setPickerSettings(miClient, type, subtype, settings);
+                picker = moPickerAnalysis;
+                break;
+                
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        return picker;
     }
 
     @Override
@@ -87,6 +173,10 @@ public class SModuleQlt extends SGuiModule {
             case SModConsts.QLT_LOT_APR:
                 if (moFormQualityLot == null) moFormQualityLot = new SFormQltLotApproved(miClient, "Lotes aprobados");
                 form = moFormQualityLot;
+                break;
+            case SModConsts.QLT_ANALYSIS:
+                if (moFormAnalysis == null) moFormAnalysis = new SFormAnalysis(miClient, "Análisis de laboratorio");
+                form = moFormAnalysis;
                 break;
             
             default:

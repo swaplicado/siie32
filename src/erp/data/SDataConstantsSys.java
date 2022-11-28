@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -100,6 +100,8 @@ public abstract class SDataConstantsSys {
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
     public static final int CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE = 13;
+    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_TO = "QLT_DPS_ANALYSIS_TO";
+    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_CC = "QLT_DPS_ANALYSIS_CC";
     
     public static final int USD_XRT_POLICY_BANXICO = 1;
     public static final int USD_XRT_POLICY_INFORMAL = 2;
@@ -1320,6 +1322,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ALL = 214;
     /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ONE = 215;
+    public static final int TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT = 216;
 
     public static final int TRNX_SAL_TOT = 301;
     public static final int TRNX_SAL_TOT_MONTH = 302;

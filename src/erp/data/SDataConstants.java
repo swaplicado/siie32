@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Edwin Carmona
  */
 public abstract class SDataConstants {
 
@@ -438,6 +438,7 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_ETY_PRC = 207063;
     public static final int TRN_DPS_ETY_TAX = 207050;
     public static final int TRN_DPS_ETY_COMMS = 207051;
+    public static final int TRN_DPS_ETY_ANALYSIS = 207105;
     public static final int TRN_DPS_RISS = 207052;
     public static final int TRN_DPS_REPL = 207053;
     public static final int TRN_DPS_DPS_SUPPLY = 207054;
@@ -709,6 +710,16 @@ public abstract class SDataConstants {
     public static final int MFGX_PROD_BY_IGEN = 210222;
     public static final int MFGX_PROD_BY_ITM_BIZ = 210223;
     public static final int MFGX_PROD_BY_BIZ_ITM = 210224;
+    
+    public static final int QLT_TP_ANALYSIS = 212001;
+    public static final int QLT_ANALYSIS = 212002;
+    public static final int QLT_ANALYSIS_ITEM = 212003;
+    public static final int QLT_ANALYSIS_CONFIGURATION = 212004;
+    public static final int QLT_ANALYSIS_DPS_CONFIGURATION = 212005;
+    
+    public static final int QLTX_DPS_ETY_ANALYSIS = 212101;
+    public static final int QLTX_ITEM_ANALYSIS = 212102;
+    public static final int QLTX_DOCUMENT_ANALYSIS = 212103;
 
     public static final int HRS_SIE_PAY = 220001;
     public static final int HRS_SIE_PAY_EMP = 220002;
@@ -962,6 +973,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
+        TablesMap.put(TRN_DPS_ETY_ANALYSIS, "trn_dps_ety_analysis");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
@@ -1063,6 +1075,12 @@ public abstract class SDataConstants {
         TablesMap.put(MFG_REQ_PUR, "mfg_req_pur");
 
         TablesMap.put(MFG_COST, "mfg_cost");
+        
+        TablesMap.put(QLT_TP_ANALYSIS, "qlt_tp_analysis");
+        TablesMap.put(QLT_ANALYSIS, "qlt_analysis");
+        TablesMap.put(QLT_ANALYSIS_ITEM, "qlt_analysis_item");
+        TablesMap.put(QLT_ANALYSIS_CONFIGURATION, "qlt_analysis_config");
+        TablesMap.put(QLT_ANALYSIS_DPS_CONFIGURATION, "qlt_analysis_dps_config");
 
         TablesMap.put(HRS_SIE_PAY, "hrs_sie_pay");
         TablesMap.put(HRS_SIE_PAY_EMP, "hrs_sie_pay_emp");
