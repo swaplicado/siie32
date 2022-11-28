@@ -11,6 +11,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.mod.hrs.link.db.SShareDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.hrs.link.db.SConfigException;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
 import erp.mod.hrs.link.pub.SShareData;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -201,19 +204,26 @@ public class SUtilsJSON {
             boolean setinIncidents = false;
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
             
+            SIncidentsJSON objResponse = new SIncidentsJSON();
             SShareDB sDb = new SShareDB();
             
             // revisar si hay incidencias para esas fechas
             boolean isAvailable = sDb.cheakIncidents(sJsonInc);
             
             if (isAvailable == false){
-                return "hay una incidencia para esos días";
+                objResponse.response.setCode(RESPONSE_OTHER_INC);
+                objResponse.response.setMessage("hay una incidencia para esos días");
             }else{
                 setinIncidents = sDb.setinIncidents(sJsonInc);
+                if(setinIncidents == true){
+                    objResponse.response.setCode(RESPONSE_OK);
+                    objResponse.response.setMessage("se ingreso correctamente la incidencia");  
+                }else{
+                    objResponse.response.setCode(RESPONSE_ERROR);
+                    objResponse.response.setMessage("Ocurrio un error al ingresar la incidencia");
+                }
             }
             
-            
-            SRootJSON objResponse = new SRootJSON();
             
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);

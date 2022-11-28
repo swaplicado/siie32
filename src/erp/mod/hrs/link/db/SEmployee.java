@@ -19,6 +19,7 @@ public class SEmployee {
     String admission_date;
     String leave_date;
     String dt_tp_pay;
+    String benefit_date;
     String email;
     int company_id;
     int overtime_policy;
@@ -91,6 +92,14 @@ public class SEmployee {
 
     public void setLeave_date(String leave_date) {
         this.leave_date = leave_date;
+    }
+    
+    public String getBenefit_date(){
+        return benefit_date;
+    }
+    
+    public void setBenefit_date(String benefit_date){
+        this.benefit_date = benefit_date;
     }
 
     public String getDt_tp_pay() {
