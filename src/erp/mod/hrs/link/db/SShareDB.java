@@ -325,8 +325,9 @@ public class SShareDB {
                 emp.firstname = res.getString("firstname");
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
-                //emp.benefit_date = res.getString("dt_ben");
+                emp.benefit_date = res.getString("dt_ben");
                 emp.dt_tp_pay = res.getString("dt_tp_pay");
+                emp.benefit_date = res.getString("dt_ben");
                 emp.email = res.getString("email_01");
                 emp.overtime_policy = res.getInt("overtime");
                 emp.checker_policy = res.getInt("checker_policy");
@@ -1024,6 +1025,7 @@ public class SShareDB {
                                     + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+                                    + "ext_req_id IS NULL AND "
                                     + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
                                     + "NOT b_del;";
 
