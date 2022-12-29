@@ -33,6 +33,7 @@ import erp.mod.hrs.db.SHrsBenefitTableAnniversary;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.sql.ResultSet;
@@ -1265,7 +1266,11 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             jtfWorkingHoursDay.setText("" + employee.getWorkingHoursDay());
             
             if (employee.getXtaImageIconPhoto_n() != null) {
-                jlImgPhoto.setIcon(employee.getXtaImageIconPhoto_n());
+                ImageIcon photo = employee.getXtaImageIconPhoto_n();
+                if (photo.getIconHeight() > 300) {
+                    photo = new ImageIcon(photo.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT));
+                }
+                jlImgPhoto.setIcon(photo);
                 jlImgPhoto.setText("");
             }
             else {
