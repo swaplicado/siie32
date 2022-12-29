@@ -31,6 +31,7 @@ import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEmployeeUtils;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
@@ -2115,6 +2116,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     mbPhotoChange = true;
                     enableButtonsPhoto(true);
                     
+                    if (moXtaImageIconPhoto_n.getIconHeight() > 300) {
+                        moXtaImageIconPhoto_n = new ImageIcon(moXtaImageIconPhoto_n.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT));
+                    }
                     jlImgPhoto.setIcon(moXtaImageIconPhoto_n);
                     jlImgPhoto.setText("");
                 }
@@ -3049,7 +3053,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldFkPositionRiskType.setFieldValue(new int[] { moEmployee.getFkPositionRiskTypeId() });
             
             if (moEmployee.getXtaImageIconPhoto_n() != null) {
-                jlImgPhoto.setIcon(moEmployee.getXtaImageIconPhoto_n());
+                ImageIcon photo = moEmployee.getXtaImageIconPhoto_n();
+                if (photo.getIconHeight() > 300) {
+                    photo = new ImageIcon(photo.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT));
+                }
+                jlImgPhoto.setIcon(photo);
                 jlImgPhoto.setText("");
             }
             else {
