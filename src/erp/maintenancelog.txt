@@ -1,5 +1,12 @@
 ================================================================================
-SIIE 3.2 208.0/ 2022-11-24
+SIIE 3.2 209.0/ 2023-01-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la contabilización gradual de nóminas, i.e., en más de un paso.
+2) Validación de tipo de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
+
+================================================================================
+SIIE 3.2 208.1/ 2022-11-24
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
 1) Correción de vista pedidos de compras a surtir con factura (Bug)
@@ -11,11 +18,6 @@ Jhonatan Claudio PEÑA HERNÁNDEZ
 7) Implementación de la vista historial modificación facturas ítem/concepto
 8) Implementación de la vista historial modificación documentos
 9) Correción ruta descarga masiva CFDI
-SIIE 3.2 209.0/ 2023-01-04
-Sergio Abraham FLORES GUTIÉRREZ
---------------------------------------------------------------------------------
-1) Implementación de la contabilización gradual de nóminas, i.e., en más de un paso.
-2) Validación de tipo de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
 
 ================================================================================
 SIIE 3.2 208.0/ 2022-10-28
