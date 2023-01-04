@@ -438,6 +438,8 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_ETY_PRC = 207063;
     public static final int TRN_DPS_ETY_TAX = 207050;
     public static final int TRN_DPS_ETY_COMMS = 207051;
+    public static final int TRN_DPS_ETY_HIST = 207106;
+    public static final int TRN_DPS_ETY_ANALYSIS = 207105;
     public static final int TRN_DPS_RISS = 207052;
     public static final int TRN_DPS_REPL = 207053;
     public static final int TRN_DPS_DPS_SUPPLY = 207054;
@@ -962,6 +964,8 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
+        TablesMap.put(TRN_DPS_ETY_HIST, "trn_dps_ety_hist");
+        TablesMap.put(TRN_DPS_ETY_ANALYSIS, "trn_dps_ety_analysis");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");

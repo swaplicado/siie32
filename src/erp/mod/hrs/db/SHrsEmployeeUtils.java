@@ -211,30 +211,40 @@ public abstract class SHrsEmployeeUtils {
      * @param statement Database statement.
      * @param schema Schema (database name). When empty, current database chosen.
      * @param employeeId ID of employee to insert.
+     * @param userId ID of user.
      * @throws java.lang.Exception
      */
-    public static void insertMembership(final Statement statement, final String schema, final int employeeId) throws Exception {
+    public static void insertMembership(final Statement statement, final String schema, final int employeeId, final int userId) throws Exception {
         String table = (schema.isEmpty() ? "" : (schema + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER); // convenience variable
         String sql = "SELECT COUNT(*) "
                 + "FROM " + table + " "
                 + "WHERE id_emp = " + employeeId + ";";
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
-            boolean insert = false;
+            int count = 0;
             
             if (resultSet.next()) {
-                insert = resultSet.getInt(1) == 0;
+                count = resultSet.getInt(1);
             }
             
-            if (insert) {
+            if (count == 0) {
                 sql = "INSERT INTO " + table + " VALUES ("
                         + employeeId + ", "
-                        + "0, "
-                        + SUtilConsts.USR_NA_ID + ", "
+                        + "FALSE, " // activate registry by default
+                        + SModSysConsts.HRSS_TP_REC_SCHE_NA + ", " // set type of recruitment schema to NA
+                        + userId + ", "
                         + SUtilConsts.USR_NA_ID + ", "
                         + "NOW(), "
-                        + "NOW() "
-                        + ");";
+                        + "NOW());";
+                statement.execute(sql);
+            }
+            else {
+                sql = "UPDATE " + table + " SET "
+                        + "b_del = FALSE, " // reactivate registry if necessary
+                        + "fk_tp_rec_sche_n = " + SModSysConsts.HRSS_TP_REC_SCHE_NA + ", " // reset type of recruitment schema to NA
+                        + "fk_usr_upd = " + userId + ", "
+                        + "ts_usr_upd = NOW() "
+                        + "WHERE id_emp = " + employeeId + ";";
                 statement.execute(sql);
             }
         }

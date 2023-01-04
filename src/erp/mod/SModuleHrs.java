@@ -12,6 +12,8 @@ import erp.mod.hrs.db.SDbAbsenceConsumption;
 import erp.mod.hrs.db.SDbAbsenceType;
 import erp.mod.hrs.db.SDbAccountingDeduction;
 import erp.mod.hrs.db.SDbAccountingEarning;
+import erp.mod.hrs.db.SDbAccountingPayroll;
+import erp.mod.hrs.db.SDbAccountingPayrollReceipt;
 import erp.mod.hrs.db.SDbAdvanceSettlement;
 import erp.mod.hrs.db.SDbAutomaticDeduction;
 import erp.mod.hrs.db.SDbAutomaticDeductionsAux;
@@ -549,6 +551,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_PAY_RCP_DED:
                 registry = new SDbPayrollReceiptDeduction();
+                break;
+            case SModConsts.HRS_ACC_PAY:
+                registry = new SDbAccountingPayroll();
+                break;
+            case SModConsts.HRS_ACC_PAY_RCP:
+                registry = new SDbAccountingPayrollReceipt();
                 break;
             case SModConsts.HRS_ADV_SET:
                 registry = new SDbAdvanceSettlement();

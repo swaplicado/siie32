@@ -47,6 +47,7 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
     protected java.util.Vector<erp.mhrs.data.SDataFormerPayrollMove> mvDbmsDataFormerPayrollMoves;
 
     protected java.util.Vector<erp.mfin.data.SDataRecord> mvAuxDataRecords;
+    protected boolean mbIsAuxAccountingGradual;
 
     public SDataFormerPayroll() {
         super(SDataConstants.HRS_SIE_PAY);
@@ -102,7 +103,11 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
 
     public java.util.Vector<erp.mhrs.data.SDataFormerPayrollEmp> getDbmsDataFormerPayrollEmps() { return mvDbmsDataFormerPayrollEmps; }
     public java.util.Vector<erp.mhrs.data.SDataFormerPayrollMove> getDbmsDataFormerPayrollMoves() { return mvDbmsDataFormerPayrollMoves; }
+    
+    public void setIsAuxAccountingGradual(boolean b) { mbIsAuxAccountingGradual = b; }
+
     public java.util.Vector<erp.mfin.data.SDataRecord> getAuxDataRecords() { return mvAuxDataRecords; }
+    public boolean getIsAuxAccountingGradual() { return mbIsAuxAccountingGradual; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -141,7 +146,9 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
 
         mvDbmsDataFormerPayrollEmps.clear();
         mvDbmsDataFormerPayrollMoves.clear();
+        
         mvAuxDataRecords.clear();
+        mbIsAuxAccountingGradual = false;
     }
 
     @Override
@@ -266,6 +273,16 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
                 throw new Exception(msDbmsError);
             }
             else {
+                // Delete previous accounting, if accounting is not gradually:
+                
+                if (!mbIsAuxAccountingGradual) {
+                    String sql = "UPDATE fin_rec_ety "
+                            + "SET b_del = 1, fid_usr_del = " + mnFkUserDeleteId + ", ts_del = NOW() "
+                            + "WHERE fid_pay_n = " + mnPkPayrollId + " AND NOT b_del;";
+
+                    connection.createStatement().execute(sql);
+                }
+                
                 // Save aswell accounting records:
 
                 for (SDataRecord record : mvAuxDataRecords) {

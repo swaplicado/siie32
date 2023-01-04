@@ -19,6 +19,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsCfdUtils;
+import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.mod.hrs.db.SHrsFormerPayroll;
 import erp.mod.hrs.db.SHrsPayrollAnnul;
 import erp.mod.hrs.db.SHrsUtils;
@@ -938,10 +939,10 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                     String type = "";
                     switch (((int[]) filter)[0]) {
                         case SModSysConsts.HRSS_TP_PAY_WEE:
-                            type = "SEMANAL";
+                            type = SHrsFormerConsts.PAY_WEE;
                             break;
                         case SModSysConsts.HRSS_TP_PAY_FOR:
-                            type = "QUINCENAL";
+                            type = SHrsFormerConsts.PAY_FOR;
                             break;
                         default:
                             // do nothing

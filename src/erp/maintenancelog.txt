@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 209.0/ 2023-01-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la contabilización gradual de nóminas, i.e., en más de un paso.
+2) Validación de tipo de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
+
+================================================================================
 SIIE 3.2 208.0/ 2022-10-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Implementación de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
+1) Implementación de tipo de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
 2) Implementación de nombre fiscal y régimen de capital en asociados de negocios aplicable a clientes, personas morales.
 3) Refactorización de formas de captura de asociados de negocios para apellidos y nombres de personas físicas.
 4) Implementación de atributo para ID de solicitud externa de incidencias de empleados.

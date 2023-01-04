@@ -9,7 +9,6 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataRecord;
@@ -18,7 +17,9 @@ import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -27,31 +28,35 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SHrsFinUtils {
     
+    public static final DecimalFormat RecordNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
+
+    /**
+     * Check if payroll can be opened.
+     * @param session GUI session.
+     * @param payrollId Payroll ID.
+     * @return <code>true</code> if payroll can be opened, otherwise <code>false</code>.
+     * @throws Exception 
+     */
     public static boolean canOpenPayroll(final SGuiSession session, final int payrollId) throws Exception {
-        String sql = "";
-        Object [] pk = null;
-        SDataRecord moRecord = null;     
-        ResultSet resultSet = null;
-        
-        sql = "SELECT DISTINCT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num "
+        String sql = "SELECT DISTINCT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num "
                 + "FROM fin_rec r "
                 + "INNER JOIN fin_rec_ety re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-                + "WHERE fid_pay_n =  " + payrollId + "  AND r.b_del = 0 AND re.b_del = 0 ; ";
+                + "WHERE fid_pay_n =  " + payrollId + "  AND NOT r.b_del AND NOT re.b_del;";
         
-        resultSet = session.getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            moRecord = new SDataRecord();
-            pk = new Object[5];
-            pk [0] = resultSet.getInt("r.id_year");
-            pk [1] = resultSet.getInt("r.id_per");
-            pk [2] = resultSet.getInt("r.id_bkc");
-            pk [3] = resultSet.getString("r.id_tp_rec");
-            pk [4] = resultSet.getInt("r.id_num");
-            
-            moRecord.read(pk, session.getStatement().getConnection().createStatement());
-            if (!SDataUtilities.isPeriodOpen((SClientInterface) session.getClient(), moRecord.getDate())) {
-                //Period is close
-                throw new Exception("El periodo contable de la póliza ' " + moRecord.getRecordNumber() + "' se encuentra cerrado.");
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                Object [] pk = new Object[] {
+                    resultSet.getInt("r.id_year"),
+                    resultSet.getInt("r.id_per"),
+                    resultSet.getInt("r.id_bkc"),
+                    resultSet.getString("r.id_tp_rec"),
+                    resultSet.getInt("r.id_num") };
+
+                SDataRecord record = new SDataRecord();
+                record.read(pk, session.getStatement().getConnection().createStatement());
+                if (!SDataUtilities.isPeriodOpen((SClientInterface) session.getClient(), record.getDate())) {
+                    throw new Exception("El periodo contable de la póliza ' " + record.getRecordNumber() + "' se encuentra cerrado.");
+                }
             }
         }
         
@@ -59,13 +64,47 @@ public abstract class SHrsFinUtils {
     }
     
     public static void deletePayrollRecordEntries(final SGuiSession session, final int payrollId) throws Exception {
-        String sql = "";
+        String sql;
         
         sql = "UPDATE fin_rec_ety SET "
                 + "b_del = 1, "
                 + "fid_usr_del = " + session.getUser().getPkUserId() + ", ts_del = now() "
-                + "WHERE fid_pay_n = " + payrollId + ";";
+                + "WHERE fid_pay_n = " + payrollId + " AND NOT b_del;";
+        
         session.getStatement().execute(sql);
+        
+        sql = "UPDATE hrs_acc_pay SET "
+                + "b_del = 1, "
+                + "fk_usr_upd = " + session.getUser().getPkUserId() + ", ts_usr_upd = now() "
+                + "WHERE id_pay = " + payrollId + " AND NOT b_del;";
+        
+        session.getStatement().execute(sql);
+    }
+    
+    /**
+     * Get last alive accounting payroll for requested payroll.
+     * @param session GUI session.
+     * @param payrollId ID of requested payroll.
+     * @return Last alive accounting payroll, if any, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static SDbAccountingPayroll getLastAccountingPayroll(final SGuiSession session, final int payrollId) throws Exception {
+        SDbAccountingPayroll accountingPayroll = null;
+        
+        String sql = "SELECT id_acc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY) + " "
+                + "WHERE id_pay = " + payrollId + " AND NOT b_del "
+                + "ORDER BY id_acc DESC;";
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            if (resultSet.next()) {
+                accountingPayroll = (SDbAccountingPayroll) session.readRegistry(SModConsts.HRS_ACC_PAY, new int[] { payrollId, resultSet.getInt("id_acc") });
+            }
+        }
+        
+        return accountingPayroll;
     }
     
     /**
@@ -84,7 +123,12 @@ public abstract class SHrsFinUtils {
                         + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                         + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                         + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
-                        + "WHERE p.id_pay = " + payrollId + " AND NOT pr.b_del "
+                        + "WHERE p.id_pay = " + payrollId + " AND NOT pr.b_del AND "
+                            + "pr.id_emp NOT IN (" // exclude payroll receipts already bookkept
+                            + "SELECT apr.id_emp "
+                            + "FROM hrs_acc_pay AS ap "
+                            + "INNER JOIN hrs_acc_pay_rcp AS apr ON apr.id_pay = ap.id_pay "
+                            + "WHERE ap.id_pay = " + payrollId + " AND NOT ap.b_del ORDER BY apr.id_emp) "
                         + "UNION "
                         + "SELECT DISTINCT " + SModConsts.HRS_ACC_DED + " AS _move_type, "
                         + "d.id_ded AS _concept_id, d.code AS _code, d.name AS _name, d.name_abbr AS _name_abbr "
@@ -92,7 +136,13 @@ public abstract class SHrsFinUtils {
                         + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                         + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                         + "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded "
-                        + "WHERE p.id_pay = " + payrollId + " AND NOT pr.b_del;";
+                        + "WHERE p.id_pay = " + payrollId + " AND NOT pr.b_del AND "
+                        + "pr.id_emp NOT IN (" // exclude payroll receipts already bookkept
+                            + "SELECT apr.id_emp "
+                            + "FROM hrs_acc_pay AS ap "
+                            + "INNER JOIN hrs_acc_pay_rcp AS apr ON apr.id_pay = ap.id_pay "
+                            + "WHERE ap.id_pay = " + payrollId + " AND NOT ap.b_del ORDER BY apr.id_emp)"
+                        + ";";
 
                 ResultSet resultSet = statement.executeQuery(sql);
 
@@ -141,6 +191,18 @@ public abstract class SHrsFinUtils {
         return true;
     }
     
+    /**
+     * Validate payroll accounting configuration.
+     * @param session User GUI session.
+     * @param accountId ID of account.
+     * @param costCenterId ID of cost center.
+     * @param bizPartnerId ID of business partner.
+     * @param itemId ID of item.
+     * @param taxBasicId ID of basic tax.
+     * @param taxTaxId ID of tax.
+     * @return <code>true</code> if configurations is valid.
+     * @throws Exception 
+     */
     public static boolean validateAccount(final SGuiSession session, final int accountId, final int costCenterId, final int bizPartnerId, final int itemId, final int taxBasicId, final int taxTaxId) throws Exception {
         String validationMsg;
         
@@ -175,7 +237,7 @@ public abstract class SHrsFinUtils {
         
         int nSystemType = accountLedger.getFkAccountSystemTypeId();
         
-        if ((accountLedger.getIsRequiredBizPartner() || SLibUtilities.belongsTo(nSystemType, new int[] {
+        if ((accountLedger.getIsRequiredBizPartner() || SLibUtils.belongsTo(nSystemType, new int[] {
             SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR })) &&
                 bizPartnerId == SLibConsts.UNDEFINED) {
             throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere asociado de negocios y no está definido.");
@@ -184,7 +246,7 @@ public abstract class SHrsFinUtils {
                 itemId == SLibConsts.UNDEFINED) {
             throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere ítem y no está definido.");
         }
-        if (SLibUtilities.belongsTo(nSystemType, new int[] {
+        if (SLibUtils.belongsTo(nSystemType, new int[] {
             SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT }) &&
                 taxBasicId == SLibConsts.UNDEFINED && taxTaxId == SLibConsts.UNDEFINED) {
             throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere impuesto y no está definido.");
@@ -196,7 +258,7 @@ public abstract class SHrsFinUtils {
     /**
      * Actualizar las configuraciones de contabilización faltantes de percepciones y deducciones, así como borrar las configuraciones obsoletas.
      * @param session User session.
-     * @throws Exception 
+     * @throws java.lang.Exception
      */
     public static void updateAccountingConfigs(final SGuiSession session) throws Exception {
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
@@ -263,5 +325,56 @@ public abstract class SHrsFinUtils {
                 statement.execute(sql.replaceAll("_ear", "_ded")); // para deducciones
             }
         }
+    }
+    
+    /**
+     * Get accounting records of requested payroll.
+     * @param session User session.
+     * @param payrollId ID of payroll.
+     * @param receipts Number of receipts in payroll.
+     * @return If existing, accounting records of requested payroll, otherwise an empty string is returned.
+     * @throws java.lang.Exception
+     */
+    public static String getAccountingRecords(final SGuiSession session, final int payrollId, final int receipts) throws Exception {
+        int bookkept = 0;
+        String records = "";
+        
+        String sql = "SELECT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, "
+                + "r.dt, r.concept, bkc.code, cob.code, COUNT(*) AS _count "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN hrs_acc_pay AS ap ON ap.id_pay = p.id_pay "
+                + "INNER JOIN hrs_acc_pay_rcp AS apr ON apr.id_pay = ap.id_pay AND apr.id_acc = ap.id_acc AND apr.id_emp = pr.id_emp "
+                + "INNER JOIN fin_rec AS r ON r.id_year = apr.fid_rec_year AND r.id_per = apr.fid_rec_per AND r.id_bkc = apr.fid_rec_bkc AND r.id_tp_rec = apr.fid_rec_tp_rec AND r.id_num = apr.fid_rec_num "
+                + "INNER JOIN fin_bkc AS bkc ON bkc.id_bkc = r.id_bkc "
+                + "INNER JOIN erp.bpsu_bpb AS cob ON cob.id_bpb = r.fid_cob "
+                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT ap.b_del AND "
+                + "p.id_pay = " + payrollId + " "
+                + "GROUP BY r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept "
+                + "ORDER BY r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept;";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                records += (records.isEmpty() ? "" : "\n")
+                        + "- En la póliza contable '"
+                        + SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("r.id_year")) + "-"
+                        + SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("r.id_per")) + " "
+                        + resultSet.getString("bkc.code") + " "
+                        + resultSet.getString("cob.code") + " "
+                        + resultSet.getString("r.id_tp_rec") + "-"
+                        + RecordNumberFormat.format(resultSet.getInt("r.id_num")) + "', "
+                        + "del " + SLibUtils.DateFormatDate.format(resultSet.getDate("r.dt")) + ", "
+                        + "\"" + resultSet.getString("r.concept") + "\", hay "
+                        + (resultSet.getInt("_count") == 1 ? "un recibo" : SLibUtils.DecimalFormatInteger.format(resultSet.getInt("_count")) + " recibos") + ".";
+                bookkept += resultSet.getInt("_count");
+            }
+        }
+        
+        records += (records.isEmpty() ? "" : "\n")
+                + "Número de recibos contabilizados: " + SLibUtils.DecimalFormatInteger.format(bookkept) + " de " + SLibUtils.DecimalFormatInteger.format(receipts) + " "
+                + "(" + SLibUtils.DecimalFormatPercentage2D.format(receipts != 0 ? bookkept / (double) receipts : 0) + ").\n"
+                + (bookkept < receipts ? "Número de recibos por contabilizar: " + SLibUtils.DecimalFormatInteger.format(receipts - bookkept) + "." : "");
+        
+        return records;
     }
 }

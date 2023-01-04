@@ -739,27 +739,29 @@ public class SHrsPayrollDataProvider {
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
             if (resultSet.next()) {
-                if (resultSet.getInt(1) == 0) {
+                if (payrollId == 0 || resultSet.getInt(1) == 0) {
                     // el empleado no tiene recibo en la nómina aún:
+                    // obtener la categoría de su esquema de contratación ya sea de su membresía en la empresa o de su propio registro...
                     
-                    sql = "SELECT trs.rec_sche_cat "
+                    sql = "SELECT COALESCE(trsem.rec_sche_cat, trse.rec_sche_cat) AS _rec_sche_cat "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
                             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = e.fk_tp_rec_sche "
-                            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = e.fk_tp_rec_sche "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trse ON trse.id_tp_rec_sche = e.fk_tp_rec_sche "
+                            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trsem ON trsem.id_tp_rec_sche = em.fk_tp_rec_sche_n "
                             + "WHERE e.id_emp = " + employeeId + " AND NOT e.b_del;";
 
                     try (ResultSet resultSet1 = miStatement.executeQuery(sql)) {
                         if (!resultSet1.next()) {
-                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID=" + employeeId + ".");
+                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID = " + employeeId + ".");
                         }
                         else {
-                            category = resultSet1.getInt("trs.rec_sche_cat");
+                            category = resultSet1.getInt("_rec_sche_cat");
                         }
                     }
                 }
                 else {
                     // el empleado ya tiene recibo en la nómina:
+                    // obtener la categoría de su esquema de contratación directamente de su recibo...
                     
                     sql = "SELECT trs.rec_sche_cat "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
@@ -768,7 +770,7 @@ public class SHrsPayrollDataProvider {
 
                     try (ResultSet resultSet1 = miStatement.executeQuery(sql)) {
                         if (!resultSet1.next()) {
-                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID=" + employeeId + ", nómina ID=" + payrollId + ".");
+                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID = " + employeeId + ", nómina ID = " + payrollId + ".");
                         }
                         else {
                             category = resultSet1.getInt("trs.rec_sche_cat");

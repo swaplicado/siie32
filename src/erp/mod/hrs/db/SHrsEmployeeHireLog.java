@@ -201,7 +201,7 @@ public class SHrsEmployeeHireLog {
                     statement.execute(sql);
 
                     // insert employee membership into current company:
-                    SHrsEmployeeUtils.insertMembership(statement, schema, mnPkEmployeeId);
+                    SHrsEmployeeUtils.insertMembership(statement, schema, mnPkEmployeeId, moSession.getUser().getPkUserId());
                 }
             }
             else {

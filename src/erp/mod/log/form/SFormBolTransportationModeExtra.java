@@ -322,6 +322,7 @@ public class SFormBolTransportationModeExtra extends SBeanForm implements Action
     private sa.lib.gui.bean.SBeanFieldText moTextFiscalIdExt;
     // End of variables declaration//GEN-END:variables
 
+    @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 720, 450);
         
@@ -338,6 +339,7 @@ public class SFormBolTransportationModeExtra extends SBeanForm implements Action
             public void initGrid() {
                 setRowButtonsEnabled(false);
             }
+            
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
                 int col = 0;
@@ -416,6 +418,7 @@ public class SFormBolTransportationModeExtra extends SBeanForm implements Action
     }
     
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
             case 1: 

@@ -7,6 +7,7 @@ package erp.mod.hrs.view;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogCfdProcessing;
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mhrs.form.SDialogPayrollAccounting;
@@ -53,7 +54,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     
-    private JButton jbCloseOpen;
+    private JButton jbCloseOpenPayroll;
+    private JButton jbCompleteAccounting;
+    private JButton jbViewAccounting;
     private JButton jbGenerateSignCfdi;
     private JButton jbPrintReports;
     private JButton jbSendCfdi;
@@ -74,7 +77,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-        jbCloseOpen = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Cerrar/abrir nómina", this);
+        jbCloseOpenPayroll = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Cerrar/abrir nómina", this);
+        jbCompleteAccounting = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bkk_csh.gif")), "Completar contabilización", this);
+        jbViewAccounting = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query_rec.gif")), "Ver contabilización", this);
         jbGenerateSignCfdi = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Generar y timbrar recibos nómina", this);
         jbPrintReports = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir reportes nómina", this);
         jbSendCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibos nómina vía mail", this);
@@ -82,7 +87,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         jbGenerateLayoutGroceryService = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delivery.gif")), "Generar layout dispersión despensas", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseOpen);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseOpenPayroll);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCompleteAccounting);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbViewAccounting);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateSignCfdi);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReports);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendCfdi);
@@ -99,35 +106,31 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             else {
                 SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
                 
-                if (miClient.showMsgBoxConfirm("Se eliminará la nómina '" + gridRow.getRowCode()+ "', y no es posible reactivar nóminas eliminadas. \n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                if (miClient.showMsgBoxConfirm("Se eliminará la nómina '" + gridRow.getRowCode()+ "', y no es posible recuperar nóminas eliminadas.\n"
+                        + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                     super.actionRowDelete();
                 }
             }
         }
     }
     
-    private void actionCloseOpen() {
-        if (jbCloseOpen.isEnabled()) {
+    private void actionCloseOpenPayroll() {
+        if (jbCloseOpenPayroll.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
                 try {
                     int action = 0;
+                    boolean isAccounting = false;
+                    boolean isAccountingGradual = false;
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
                     SDbPayroll payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
                     
-                    if (payroll.isClosed()) {
-                        // open payroll:
-                        if (SHrsFinUtils.canOpenPayroll(miClient.getSession(), payroll.getPkPayrollId())) {
-                            if (miClient.showMsgBoxConfirm("Está por abrir la nómina '" + payroll.composePayrollYearAndNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                                action = SUtilConsts.ACTION_OPEN;
-                            }
-                        }
-                    }
-                    else {
+                    if (!payroll.isClosed()) {
                         // close payroll:
-                        if (miClient.showMsgBoxConfirm("Está por cerrar la nómina '" + payroll.composePayrollYearAndNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                        if (miClient.showMsgBoxConfirm("Está por CERRAR la nómina '" + payroll.composePayrollYearAndNumber() + "'.\n"
+                                + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                             if (miClient.showMsgBoxConfirm("¿Desea contabilizar la nómina?") == JOptionPane.YES_OPTION) {
                                 SDialogPayrollAccounting dialog = new SDialogPayrollAccounting((SClientInterface) miClient, payroll);
                                 dialog.resetForm();
@@ -135,6 +138,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
 
                                 if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                     action = SUtilConsts.ACTION_CLOSE;
+                                    isAccounting = true;
+                                    isAccountingGradual = dialog.isAccountingGradual();
                                 }
                             }
                             else {
@@ -142,26 +147,51 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                             }
                         }
                     }
-                    
-                    switch (action) {
-                        case SUtilConsts.ACTION_OPEN:
-                            SHrsFinUtils.deletePayrollRecordEntries(miClient.getSession(), payroll.getPkPayrollId());
-                            payroll.updatePayrollReceiptIssuesOnOpen(miClient.getSession());
-                            break;
-                            
-                        case SUtilConsts.ACTION_CLOSE:
-                            payroll.updatePayrollReceiptIssuesOnClose(miClient.getSession());
-                            break;
-                            
-                        default:
-                            // do nothing
+                    else {
+                        // open payroll:
+                        if (SHrsFinUtils.canOpenPayroll(miClient.getSession(), payroll.getPkPayrollId())) {
+                            if (miClient.showMsgBoxConfirm("Está por ABRIR la nómina '" + payroll.composePayrollYearAndNumber() + "'.\n"
+                                    + (payroll.isAccounting() ? "¡La nómina está contabilizada, y sus asientos contables serán eliminados!\n" : "")
+                                    + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                                action = SUtilConsts.ACTION_OPEN;
+                            }
+                        }
                     }
                     
                     if (action != 0) {
-                        payroll.setAuxFkUserCloseId(miClient.getSession().getUser().getPkUserId());
-                        payroll.saveField(miClient.getSession().getStatement(), gridRow.getRowPrimaryKey(), SDbPayroll.FIELD_CLOSE, action == SUtilConsts.ACTION_CLOSE);
+                        switch (action) {
+                            case SUtilConsts.ACTION_CLOSE:
+                                payroll.updatePayrollReceiptIssuesOnClose(miClient.getSession());
+                                
+                                payroll.setAuxFkUserCloseId(miClient.getSession().getUser().getPkUserId());
+                                payroll.saveField(miClient.getSession().getStatement(), payroll.getPrimaryKey(), SDbPayroll.FIELD_CLOSE, true);
+
+                                if (isAccounting) {
+                                    payroll.saveField(miClient.getSession().getStatement(), payroll.getPrimaryKey(), SDbPayroll.FIELD_ACCOUNTING, true);
+
+                                    if (isAccountingGradual) {
+                                        payroll.saveField(miClient.getSession().getStatement(), payroll.getPrimaryKey(), SDbPayroll.FIELD_ACCOUNTING_GRADUAL, true);
+                                    }
+                                }
+                                break;
+
+                            case SUtilConsts.ACTION_OPEN:
+                                SHrsFinUtils.deletePayrollRecordEntries(miClient.getSession(), payroll.getPkPayrollId());
+                                
+                                payroll.updatePayrollReceiptIssuesOnOpen(miClient.getSession());
+                                
+                                payroll.setAuxFkUserCloseId(miClient.getSession().getUser().getPkUserId());
+                                payroll.saveField(miClient.getSession().getStatement(), payroll.getPrimaryKey(), SDbPayroll.FIELD_CLOSE, false);
+                                payroll.saveField(miClient.getSession().getStatement(), payroll.getPrimaryKey(), SDbPayroll.FIELD_ACCOUNTING, false);
+                                payroll.saveField(miClient.getSession().getStatement(), payroll.getPrimaryKey(), SDbPayroll.FIELD_ACCOUNTING_GRADUAL, false);
+                                break;
+
+                            default:
+                                // do nothing
+                        }
                         
                         miClient.getSession().notifySuscriptors(mnGridType);
+                        ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
                     }
                 }
                 catch (Exception e) {
@@ -171,6 +201,82 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         }
     }
 
+    private void actionCompleteAccounting() {
+        if (jbCompleteAccounting.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    SDbPayroll payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
+                    
+                    if (payroll.isClosed()) {
+                        if (payroll.isAccounting()) {
+                            if (payroll.isAccountingGradual()) {
+                                SDialogPayrollAccounting dialog = new SDialogPayrollAccounting((SClientInterface) miClient, payroll);
+                                dialog.resetForm();
+                                dialog.setVisible(true);
+                                
+                                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    miClient.getSession().notifySuscriptors(mnGridType);
+                                }
+                            }
+                            else {
+                                miClient.showMsgBoxWarning("Cuando se contabilizó la nómina '" + payroll.composePayrollYearAndNumber() + "' no se indicó que fuera gradualmente.");
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("Cuando se cerró la nómina '" + payroll.composePayrollYearAndNumber() + "' no se solicitó que fuera contabilizada.");
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("Para completar la contabilización de la nómina '" + payroll.composePayrollYearAndNumber() + "' es necesario que esté cerrada.");
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+
+    private void actionViewAccounting() {
+        if (jbViewAccounting.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    SDbPayroll payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
+                    
+                    if (payroll.isClosed()) {
+                        if (payroll.isAccounting()) {
+                            int receipts = payroll.getPayrollReceiptsCount();
+                            String message = "Nómina: " + payroll.getName() + ".\n"
+                                    + "Número de recibos: " + SLibUtils.DecimalFormatInteger.format(receipts) + ".\n"
+                                    + "Modalidad de contabilización: " + (payroll.isAccountingGradual() ? "gradual": "un solo paso") + ".\n"
+                                    + "Detalle de la contabilización:\n"
+                                    + SHrsFinUtils.getAccountingRecords(miClient.getSession(), payroll.getPkPayrollId(), receipts);
+                            
+                            miClient.showMsgBoxInformation(message);
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("Cuando se cerró la nómina '" + payroll.composePayrollYearAndNumber() + "' no se solicitó que fuera contabilizada.");
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("Para ver la contabilización de la nómina '" + payroll.composePayrollYearAndNumber() + "' es necesario que esté cerrada y, por supuesto, contabilizada.");
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+    
     private void actionGenerateSignCfdi() {
         if (jbGenerateSignCfdi.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -338,6 +444,17 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
         sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt_end", (SGuiDate) filter);
+        
+        // set connection variables:
+        
+        try {
+            miClient.getSession().getStatement().execute("SET @rcp = 0.0, @acc = 0.0;");
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        
+        // prepare query:
 
         msSql = "SELECT "
                 + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "
@@ -352,6 +469,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + "tps.name, "
                 + "trs.name, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "v.b_acc, "
+                + "v.b_acc_grad, "
                 + "v.b_clo, "
                 + "v.fk_usr_clo, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -370,9 +489,15 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp "
                 + "WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT prd.b_del), 0.0) AS _sum_ded, "
-                + "(SELECT COUNT(*) "
+                + "@rcp := (SELECT COUNT(*) "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
                 + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del) AS _count_rcp, "
+                + "@acc := (SELECT COUNT(*) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY) + " AS ap "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " AS apr ON apr.id_pay = ap.id_pay AND apr.id_acc = ap.id_acc "
+                + " WHERE ap.id_pay = v.id_pay AND NOT ap.b_del) AS _count_acc_rcp, "
+                + "IF(NOT v.b_clo OR @rcp = 0, 0.0, @acc / @rcp) AS _acc_prc, "
+                + "IF(NOT v.b_clo OR @rcp = 0, 0, @acc = @rcp) AS _acc_ok, "
                 + "(SELECT COUNT(*) "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
                 + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pr.b_cfd_req) AS _count_rcp_cfd_not_req, "
@@ -453,7 +578,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas nómina", 200));
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_clo", "Cerrada"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "_accounted", "Contabilizada"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "_acc_ok", "Contabilizada"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "_acc_prc", "Contabilización %", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_acc_grad", "Contabilización gradual"));
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp", "Recibos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_count_rcp_cfd_not_req", "CFDI no requeridos"));
@@ -501,8 +628,14 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbCloseOpen) {
-                actionCloseOpen();
+            if (button == jbCloseOpenPayroll) {
+                actionCloseOpenPayroll();
+            }
+            else if (button == jbCompleteAccounting) {
+                actionCompleteAccounting();
+            }
+            else if (button == jbViewAccounting) {
+                actionViewAccounting();
             }
             else if (button == jbGenerateSignCfdi) {
                 actionGenerateSignCfdi();

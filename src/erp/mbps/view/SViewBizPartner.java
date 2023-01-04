@@ -187,31 +187,40 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             case SDataConstants.BPSX_BP_CO:
                 aoTableColumns = new STableColumn[34];
                 break;
+                
             case SDataConstants.BPSX_BP_SUP:
                 aoTableColumns = new STableColumn[35];
                 break;
+                
             case SDataConstants.BPSX_BP_CUS:
                 aoTableColumns = new STableColumn[38];
                 break;
+                
             case SDataConstants.BPSX_BP_CDR:
             case SDataConstants.BPSX_BP_DBR:
                 aoTableColumns = new STableColumn[29];
                 break;
+                
             case SDataConstants.BPSU_BP:
             case SDataConstants.BPSX_BP_ATT_CARR:
             case SDataConstants.BPSX_BP_ATT_SAL_AGT:
                 aoTableColumns = new STableColumn[24];
                 break;
+                
             case SDataConstants.BPSX_BP_ATT_BANK:
                 aoTableColumns = new STableColumn[26];
                 break;
+                
             case SDataConstants.BPSX_BP_EMP:
-                aoTableColumns = new STableColumn[61];
+                aoTableColumns = new STableColumn[62];
                 break;
+                
             case SDataConstants.BPSX_BP_EMP_CON_EXP:
-                aoTableColumns = new STableColumn[22];
+                aoTableColumns = new STableColumn[23];
                 break;
+                
             default:
+                // nothing
         }
 
         i = 0;
@@ -401,7 +410,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.name", "Tipo contrato", 200);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.con_exp_n", "Terminación contrato", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_con_val", "Días terminación contrato", 75);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "rshe.name", "Tipo régimen", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "rshe.name", "Tipo régimen (empleado)", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emrshe.name", "Tipo régimen (empresa)", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "risk.name", "Riesgo trabajo", 100);
         }
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
@@ -847,7 +857,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, IF(" + mbHasRightEmpWage + ", e.sal, 0) AS f_sal, IF(" + mbHasRightEmpWage + ", e.dt_sal, NULL) AS f_dt_sal, IF(" + mbHasRightEmpWage + ", e.wage, 0) AS f_wage, " +
                 "IF(" + mbHasRightEmpWage + ", e.dt_wage, NULL) AS f_dt_wage, IF(" + mbHasRightEmpWage + ", e.sal_ssc, 0) AS f_sal_ssc, IF(" + mbHasRightEmpWage + ", e.dt_sal_ssc, NULL) AS f_dt_sal_ssc, e.wrk_hrs_day, e.con_exp_n, e.bank_acc, e.grocery_srv_acc, e.b_mfg_ope, e.b_act, e.b_uni, " +
                 "CASE e.overtime WHEN " + SHrsConsts.OVERTIME_NEVER + " THEN '" + SHrsConsts.TXT_OVERTIME_NEVER + "' WHEN " + SHrsConsts.OVERTIME_ALLWAYS + " THEN '" + SHrsConsts.TXT_OVERTIME_ALLWAYS + "' WHEN " + SHrsConsts.OVERTIME_SOMETIMES + " THEN '" + SHrsConsts.TXT_OVERTIME_SOMETIMES + "' END AS _overtime, " +
-                "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, risk.name, bank.name, gsrv.name, " +
+                "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, emrshe.name, risk.name, bank.name, gsrv.name, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_sen, " +
                 "DATEDIFF(e.con_exp_n, CURDATE()) AS _con_val, " +
@@ -880,6 +890,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "LEFT OUTER JOIN erp.hrsu_sht AS sht ON e.fk_sht = sht.id_sht " +
                 "LEFT OUTER JOIN erp.hrss_tp_con AS con ON e.fk_tp_con = con.id_tp_con " +
                 "LEFT OUTER JOIN erp.hrss_tp_rec_sche AS rshe ON e.fk_tp_rec_sche = rshe.id_tp_rec_sche " +
+                "LEFT OUTER JOIN erp.hrss_tp_rec_sche AS emrshe ON em.fk_tp_rec_sche_n = emrshe.id_tp_rec_sche " +
                 "LEFT OUTER JOIN erp.hrss_tp_pos_risk AS risk ON e.fk_tp_pos_risk = risk.id_tp_pos_risk " +
                 "LEFT OUTER JOIN erp.hrss_tp_work_day AS wrktp ON e.fk_tp_work_day = wrktp.id_tp_work_day " +
                 "LEFT OUTER JOIN erp.hrss_bank AS bank ON e.fk_bank_n = bank.id_bank " +

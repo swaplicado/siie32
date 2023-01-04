@@ -943,7 +943,7 @@ public class SCfdPrint {
                     paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                     paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                     paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                    paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
                     
                     paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 }
@@ -1317,7 +1317,6 @@ public class SCfdPrint {
                     paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
                     paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
                     paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
-                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                     
                     cfd.ver3.ccp20.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
                     paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
@@ -1339,7 +1338,9 @@ public class SCfdPrint {
                     paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                     paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                     paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                    paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());  
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                    
+                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 }
             }
         }
@@ -3174,7 +3175,7 @@ public class SCfdPrint {
                         break;
                         
                     case "cartaporte20:CartaPorte":
-                    cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
                     
                         paramsMap.put("bCcp", true);
                         paramsMap.put("sCcpComplemento", ccp.getElementForXml());
@@ -3220,7 +3221,7 @@ public class SCfdPrint {
                         paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                         paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                         paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                        paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
+                        paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
 
                         paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 
@@ -3332,7 +3333,7 @@ public class SCfdPrint {
                         break;
                         
                     case "cartaporte20:CartaPorte":
-                    cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
                     
                         paramsMap.put("bCcp", true);
                         paramsMap.put("sCcpComplemento", ccp.getElementForXml());
@@ -3378,7 +3379,7 @@ public class SCfdPrint {
                         paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                         paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                         paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                        paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
+                        paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
 
                         paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 

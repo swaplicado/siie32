@@ -13,6 +13,8 @@ import erp.mod.hrs.db.SHrsEmployeeHireLog;
 import erp.mod.hrs.db.SHrsEmployeeUtils;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,15 +30,16 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogEmployerSubstitution extends SBeanFormDialog implements FocusListener {
+public class SDialogEmployerSubstitution extends SBeanFormDialog implements ItemListener, FocusListener {
     
-    private static final String ERR_EMP_ACTTIVE = "¡El empleado debe estar inactivo para ser exportado a otra empresa!";
+    private static final String ERR_EMP_ACTTIVE = "¡El empleado está activo, debe estar dado de baja!";
     private static final String WAR_NO_ROLLBACK = "¡Esta operación no se puede revertir!";
 
     protected SDbEmployee moEmployee;
@@ -59,95 +62,237 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgBenefits = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
         jlEmployee = new javax.swing.JLabel();
-        jtfEmployee = new javax.swing.JTextField();
-        jPanel12 = new javax.swing.JPanel();
+        jtfEmployeeName = new javax.swing.JTextField();
+        jtfEmployeeCode = new javax.swing.JTextField();
+        jPanel23 = new javax.swing.JPanel();
+        jlDateBenefitsOld = new javax.swing.JLabel();
+        jtfDateBenefitsOld = new javax.swing.JTextField();
+        jtfDateBenefitsOldLong = new javax.swing.JTextField();
+        jlDateBenefitsOldHint = new javax.swing.JLabel();
+        jPanel22 = new javax.swing.JPanel();
+        jlDateLastHire = new javax.swing.JLabel();
+        jtfDateLastHire = new javax.swing.JTextField();
+        jtfDateLastHireLong = new javax.swing.JTextField();
+        jlDateLastHireHint = new javax.swing.JLabel();
+        jPanel24 = new javax.swing.JPanel();
+        jlDateLastDismissal = new javax.swing.JLabel();
+        jtfDateLastDismissal = new javax.swing.JTextField();
+        jtfDateLastDismissalLong = new javax.swing.JTextField();
+        jlDateLastHireHint1 = new javax.swing.JLabel();
+        jPanel25 = new javax.swing.JPanel();
         jlNewEmployer = new javax.swing.JLabel();
         moKeyNewEmployer = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel11 = new javax.swing.JPanel();
-        jlDate = new javax.swing.JLabel();
-        moDateDate = new sa.lib.gui.bean.SBeanFieldDate();
-        jlDateHint = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jlDateLong = new javax.swing.JLabel();
-        jtfDateLong = new javax.swing.JTextField();
-        jPanel4 = new javax.swing.JPanel();
+        jPanel26 = new javax.swing.JPanel();
+        jlDateHiring = new javax.swing.JLabel();
+        moDateHiring = new sa.lib.gui.bean.SBeanFieldDate();
+        jtfDateHiringLong = new javax.swing.JTextField();
+        jlDateHiringHint = new javax.swing.JLabel();
+        jPanel27 = new javax.swing.JPanel();
+        jlBenefits = new javax.swing.JLabel();
+        moRadDateHiring = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadDateBenefitsOld = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadDateOther = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel28 = new javax.swing.JPanel();
+        jlDateBenefits = new javax.swing.JLabel();
+        moDateBenefits = new sa.lib.gui.bean.SBeanFieldDate();
+        jtfDateBenefitsLong = new javax.swing.JTextField();
+        jlDateBenefitsHint = new javax.swing.JLabel();
+        jPanel29 = new javax.swing.JPanel();
         jlWarning = new javax.swing.JLabel();
         jtfWarning = new javax.swing.JTextField();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del movimiento:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployee.setText("Empleado:");
         jlEmployee.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jlEmployee);
+        jPanel21.add(jlEmployee);
 
-        jtfEmployee.setEditable(false);
-        jtfEmployee.setFocusable(false);
-        jtfEmployee.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel3.add(jtfEmployee);
+        jtfEmployeeName.setEditable(false);
+        jtfEmployeeName.setFocusable(false);
+        jtfEmployeeName.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel21.add(jtfEmployeeName);
 
-        jPanel2.add(jPanel3);
+        jtfEmployeeCode.setEditable(false);
+        jtfEmployeeCode.setToolTipText("Clave empleado");
+        jtfEmployeeCode.setFocusable(false);
+        jtfEmployeeCode.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel21.add(jtfEmployeeCode);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel2.add(jPanel21);
+
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateBenefitsOld.setText("Inicio beneficios:");
+        jlDateBenefitsOld.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel23.add(jlDateBenefitsOld);
+
+        jtfDateBenefitsOld.setEditable(false);
+        jtfDateBenefitsOld.setText("01/01/2001");
+        jtfDateBenefitsOld.setFocusable(false);
+        jtfDateBenefitsOld.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel23.add(jtfDateBenefitsOld);
+
+        jtfDateBenefitsOldLong.setEditable(false);
+        jtfDateBenefitsOldLong.setText("01 de noviembre de 2001");
+        jtfDateBenefitsOldLong.setFocusable(false);
+        jtfDateBenefitsOldLong.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel23.add(jtfDateBenefitsOldLong);
+
+        jlDateBenefitsOldHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDateBenefitsOldHint.setText("(Con el patrón anterior.)");
+        jlDateBenefitsOldHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel23.add(jlDateBenefitsOldHint);
+
+        jPanel2.add(jPanel23);
+
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateLastHire.setText("Última alta:");
+        jlDateLastHire.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel22.add(jlDateLastHire);
+
+        jtfDateLastHire.setEditable(false);
+        jtfDateLastHire.setText("01/01/2001");
+        jtfDateLastHire.setFocusable(false);
+        jtfDateLastHire.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel22.add(jtfDateLastHire);
+
+        jtfDateLastHireLong.setEditable(false);
+        jtfDateLastHireLong.setText("01 de noviembre de 2001");
+        jtfDateLastHireLong.setFocusable(false);
+        jtfDateLastHireLong.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel22.add(jtfDateLastHireLong);
+
+        jlDateLastHireHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDateLastHireHint.setText("(Con el patrón anterior.)");
+        jlDateLastHireHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel22.add(jlDateLastHireHint);
+
+        jPanel2.add(jPanel22);
+
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateLastDismissal.setText("Última baja:");
+        jlDateLastDismissal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel24.add(jlDateLastDismissal);
+
+        jtfDateLastDismissal.setEditable(false);
+        jtfDateLastDismissal.setText("01/01/2001");
+        jtfDateLastDismissal.setFocusable(false);
+        jtfDateLastDismissal.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel24.add(jtfDateLastDismissal);
+
+        jtfDateLastDismissalLong.setEditable(false);
+        jtfDateLastDismissalLong.setText("01 de noviembre de 2001");
+        jtfDateLastDismissalLong.setFocusable(false);
+        jtfDateLastDismissalLong.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel24.add(jtfDateLastDismissalLong);
+
+        jlDateLastHireHint1.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDateLastHireHint1.setText("(Con el patrón anterior.)");
+        jlDateLastHireHint1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel24.add(jlDateLastHireHint1);
+
+        jPanel2.add(jPanel24);
+
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNewEmployer.setText("Patrón sustituto:*");
         jlNewEmployer.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jlNewEmployer);
+        jPanel25.add(jlNewEmployer);
 
         moKeyNewEmployer.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel12.add(moKeyNewEmployer);
+        jPanel25.add(moKeyNewEmployer);
 
-        jPanel2.add(jPanel12);
+        jPanel2.add(jPanel25);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Fecha alta:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel11.add(jlDate);
-        jPanel11.add(moDateDate);
+        jlDateHiring.setText("Fecha alta:*");
+        jlDateHiring.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel26.add(jlDateHiring);
+        jPanel26.add(moDateHiring);
 
-        jlDateHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlDateHint.setText("(fecha de alta con el patrón sustituto)");
-        jlDateHint.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel11.add(jlDateHint);
+        jtfDateHiringLong.setEditable(false);
+        jtfDateHiringLong.setText("01 de noviembre de 2001");
+        jtfDateHiringLong.setFocusable(false);
+        jtfDateHiringLong.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel26.add(jtfDateHiringLong);
 
-        jPanel2.add(jPanel11);
+        jlDateHiringHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDateHiringHint.setText("(Con el patrón sustituto.)");
+        jlDateHiringHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel26.add(jlDateHiringHint);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel2.add(jPanel26);
 
-        jlDateLong.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel5.add(jlDateLong);
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfDateLong.setEditable(false);
-        jtfDateLong.setText("01 de noviembre de 2001");
-        jtfDateLong.setFocusable(false);
-        jtfDateLong.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel5.add(jtfDateLong);
+        jlBenefits.setText("Beneficios...");
+        jlBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel27.add(jlBenefits);
 
-        jPanel2.add(jPanel5);
+        bgBenefits.add(moRadDateHiring);
+        moRadDateHiring.setText("Misma fecha alta");
+        moRadDateHiring.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel27.add(moRadDateHiring);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        bgBenefits.add(moRadDateBenefitsOld);
+        moRadDateBenefitsOld.setText("Respetar antigüedad");
+        moRadDateBenefitsOld.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel27.add(moRadDateBenefitsOld);
+
+        bgBenefits.add(moRadDateOther);
+        moRadDateOther.setText("Otra fecha");
+        jPanel27.add(moRadDateOther);
+
+        jPanel2.add(jPanel27);
+
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateBenefits.setText("Inicio beneficios:*");
+        jlDateBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel28.add(jlDateBenefits);
+        jPanel28.add(moDateBenefits);
+
+        jtfDateBenefitsLong.setEditable(false);
+        jtfDateBenefitsLong.setText("01 de noviembre de 2001");
+        jtfDateBenefitsLong.setFocusable(false);
+        jtfDateBenefitsLong.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(jtfDateBenefitsLong);
+
+        jlDateBenefitsHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDateBenefitsHint.setText("(Con el patrón sustituto.)");
+        jlDateBenefitsHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(jlDateBenefitsHint);
+
+        jPanel2.add(jPanel28);
+
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlWarning.setText("Advertencia:");
         jlWarning.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlWarning);
+        jPanel29.add(jlWarning);
 
         jtfWarning.setEditable(false);
+        jtfWarning.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfWarning.setForeground(java.awt.Color.red);
         jtfWarning.setText("¡Advertencia!");
         jtfWarning.setFocusable(false);
         jtfWarning.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel4.add(jtfWarning);
+        jPanel29.add(jtfWarning);
 
-        jPanel2.add(jPanel4);
+        jPanel2.add(jPanel29);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
@@ -155,24 +300,49 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgBenefits;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JLabel jlDate;
-    private javax.swing.JLabel jlDateHint;
-    private javax.swing.JLabel jlDateLong;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
+    private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
+    private javax.swing.JLabel jlBenefits;
+    private javax.swing.JLabel jlDateBenefits;
+    private javax.swing.JLabel jlDateBenefitsHint;
+    private javax.swing.JLabel jlDateBenefitsOld;
+    private javax.swing.JLabel jlDateBenefitsOldHint;
+    private javax.swing.JLabel jlDateHiring;
+    private javax.swing.JLabel jlDateHiringHint;
+    private javax.swing.JLabel jlDateLastDismissal;
+    private javax.swing.JLabel jlDateLastHire;
+    private javax.swing.JLabel jlDateLastHireHint;
+    private javax.swing.JLabel jlDateLastHireHint1;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlNewEmployer;
     private javax.swing.JLabel jlWarning;
-    private javax.swing.JTextField jtfDateLong;
-    private javax.swing.JTextField jtfEmployee;
+    private javax.swing.JTextField jtfDateBenefitsLong;
+    private javax.swing.JTextField jtfDateBenefitsOld;
+    private javax.swing.JTextField jtfDateBenefitsOldLong;
+    private javax.swing.JTextField jtfDateHiringLong;
+    private javax.swing.JTextField jtfDateLastDismissal;
+    private javax.swing.JTextField jtfDateLastDismissalLong;
+    private javax.swing.JTextField jtfDateLastHire;
+    private javax.swing.JTextField jtfDateLastHireLong;
+    private javax.swing.JTextField jtfEmployeeCode;
+    private javax.swing.JTextField jtfEmployeeName;
     private javax.swing.JTextField jtfWarning;
-    private sa.lib.gui.bean.SBeanFieldDate moDateDate;
+    private sa.lib.gui.bean.SBeanFieldDate moDateBenefits;
+    private sa.lib.gui.bean.SBeanFieldDate moDateHiring;
     private sa.lib.gui.bean.SBeanFieldKey moKeyNewEmployer;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadDateBenefitsOld;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadDateHiring;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadDateOther;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -181,10 +351,18 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
         moEmployee = null;
 
         moKeyNewEmployer.setKeySettings(miClient, SGuiUtils.getLabelName(jlNewEmployer.getText()), true);
-        moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
+        moDateHiring.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateHiring.getText()), true);
+        moDateBenefits.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBenefits.getText()), true);
+        moRadDateHiring.setBooleanSettings(moRadDateHiring.getText(), true);
+        moRadDateBenefitsOld.setBooleanSettings(moRadDateBenefitsOld.getText(), false);
+        moRadDateOther.setBooleanSettings(moRadDateOther.getText(), false);
 
         moFields.addField(moKeyNewEmployer);
-        moFields.addField(moDateDate);
+        moFields.addField(moDateHiring);
+        moFields.addField(moDateBenefits);
+        moFields.addField(moRadDateHiring);
+        moFields.addField(moRadDateBenefitsOld);
+        moFields.addField(moRadDateOther);
 
         moFields.setFormButton(jbSave);
 
@@ -192,11 +370,36 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
         jbSave.setText("Aceptar");
     }
     
-    private void renderEmployee(final int[] employeePk) {
+    private void setDefaultValues() {
+        moDateHiring.setValue(miClient.getSession().getCurrentDate());
+        renderDateHiringLong();
+        
+        moRadDateHiring.setSelected(true);
+        itemStateChangedBenefits();
+    }
+    
+    private void renderEmployee(final int[] employeeKey) {
         try {
-            moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, employeePk);
-            jtfEmployee.setText(moEmployee.getXtaEmployeeName());
-            jtfEmployee.setCaretPosition(0);
+            moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, employeeKey);
+            
+            jtfEmployeeName.setText(moEmployee.getXtaEmployeeName());
+            jtfEmployeeName.setCaretPosition(0);
+            jtfEmployeeCode.setText(moEmployee.getNumber());
+            jtfEmployeeCode.setCaretPosition(0);
+            jtfDateBenefitsOld.setText(SLibUtils.DateFormatDate.format(moEmployee.getDateBenefits()));
+            jtfDateBenefitsOld.setCaretPosition(0);
+            jtfDateBenefitsOldLong.setText(SLibUtils.DateFormatDateLong.format(moEmployee.getDateBenefits()));
+            jtfDateBenefitsOldLong.setCaretPosition(0);
+            jtfDateLastHire.setText(SLibUtils.DateFormatDate.format(moEmployee.getDateLastHire()));
+            jtfDateLastHire.setCaretPosition(0);
+            jtfDateLastHireLong.setText(SLibUtils.DateFormatDateLong.format(moEmployee.getDateLastHire()));
+            jtfDateLastHireLong.setCaretPosition(0);
+            jtfDateLastDismissal.setText(moEmployee.getDateLastDismissal_n() == null ? "" : SLibUtils.DateFormatDate.format(moEmployee.getDateLastDismissal_n()));
+            jtfDateLastDismissal.setCaretPosition(0);
+            jtfDateLastDismissalLong.setText(moEmployee.getDateLastDismissal_n() == null ? "" : SLibUtils.DateFormatDateLong.format(moEmployee.getDateLastDismissal_n()));
+            jtfDateLastDismissalLong.setCaretPosition(0);
+            
+            setDefaultValues();
             
             if (moEmployee.isActive()) {
                 jtfWarning.setText(ERR_EMP_ACTTIVE);
@@ -211,14 +414,44 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
         }
     }
     
-    private void renderDateLong() {
-        Date date = moDateDate.getValue();
-        jtfDateLong.setText(date == null ? "" : SLibUtils.DateFormatDateLong.format(date));
-        jtfDateLong.setCaretPosition(0);
+    private void renderDateHiringLong() {
+        Date date = moDateHiring.getValue();
+        jtfDateHiringLong.setText(date == null ? "" : SLibUtils.DateFormatDateLong.format(date));
+        jtfDateHiringLong.setCaretPosition(0);
+        
+        itemStateChangedBenefits();
     }
     
-    private void focusLostDate() {
-        renderDateLong();
+    private void renderDateBenefitsLong() {
+        Date date = moDateBenefits.getValue();
+        jtfDateBenefitsLong.setText(date == null ? "" : SLibUtils.DateFormatDateLong.format(date));
+        jtfDateBenefitsLong.setCaretPosition(0);
+    }
+    
+    private void itemStateChangedBenefits() {
+        if (moRadDateHiring.isSelected()) {
+            moDateBenefits.setValue(moDateHiring.getValue());
+            
+            moDateBenefits.setEnabled(false);
+        }
+        else if (moRadDateBenefitsOld.isSelected()) {
+            moDateBenefits.setValue(moEmployee.getDateBenefits());
+            
+            moDateBenefits.setEnabled(false);
+        }
+        else {
+            moDateBenefits.setEnabled(true);
+        }
+        
+        renderDateBenefitsLong();
+    }
+    
+    private void focusLostDateHiring() {
+        renderDateHiringLong();
+    }
+
+    private void focusLostDateBenefits() {
+        renderDateBenefitsLong();
     }
 
     @Override
@@ -231,9 +464,9 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
         removeAllListeners();
         reloadCatalogues();
         
-        moKeyNewEmployer.resetField();
-        moDateDate.setValue(miClient.getSession().getCurrentDate());
-        renderDateLong();
+        moFields.resetFields();
+        
+        setDefaultValues();
         
         addAllListeners();
     }
@@ -281,13 +514,15 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
             }
             else if (miClient.showMsgBoxConfirm("¿Está seguro que desea realizar la siguiente sustitución patronal:\n"
                     + "empleado:\n"
-                    + jtfEmployee.getText() + "\n"
+                    + jtfEmployeeName.getText() + "\n"
                     + "patrón sustituto:\n"
                     + moKeyNewEmployer.getSelectedItem().getItem() + "\n"
                     + "fecha de alta:\n"
-                    + SLibUtils.DateFormatDate.format(moDateDate.getValue()) + " (" + SLibUtils.DateFormatDateLong.format(moDateDate.getValue()) + ")?\n"
+                    + SLibUtils.DateFormatDate.format(moDateHiring.getValue()) + " (" + SLibUtils.DateFormatDateLong.format(moDateHiring.getValue()) + ")\n"
+                    + "inicio de beneficios:\n"
+                    + SLibUtils.DateFormatDate.format(moDateBenefits.getValue()) + " (" + SLibUtils.DateFormatDateLong.format(moDateBenefits.getValue()) + ")?\n"
                     + WAR_NO_ROLLBACK) != JOptionPane.YES_OPTION) {
-                validation.setMessage("Favor de revisar los datos de la sustitución patronal.");
+                validation.setMessage("Favor de revisar y corregir los datos de la sustitución patronal.");
             }
         }
         
@@ -296,12 +531,20 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
 
     @Override
     public void addAllListeners() {
-        moDateDate.getComponent().addFocusListener(this);
+        moDateHiring.getComponent().addFocusListener(this);
+        moDateBenefits.getComponent().addFocusListener(this);
+        moRadDateHiring.addItemListener(this);
+        moRadDateBenefitsOld.addItemListener(this);
+        moRadDateOther.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        moDateDate.getComponent().removeFocusListener(this);
+        moDateHiring.getComponent().removeFocusListener(this);
+        moDateBenefits.getComponent().removeFocusListener(this);
+        moRadDateHiring.removeItemListener(this);
+        moRadDateBenefitsOld.removeItemListener(this);
+        moRadDateOther.removeItemListener(this);
     }
 
     @Override
@@ -371,10 +614,11 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
                     hrsEmployeeHireLog.setAuxFormerEmployerConnection(miClient.getSession().getStatement().getConnection()); // former employer DB connection (current DB connection in user session)
                     
                     moEmployee.setActive(true); // re-active this inactive employee
-                    moEmployee.setDateLastHire(moDateDate.getValue());
+                    moEmployee.setDateBenefits(moDateBenefits.getValue());
+                    moEmployee.setDateLastHire(moDateHiring.getValue());
                     moEmployee.setFkSourceCompanyId(moKeyNewEmployer.getValue()[0]);
                     
-                    moEmployee.setAuxHireLogDate(moDateDate.getValue());
+                    moEmployee.setAuxHireLogDate(moDateHiring.getValue());
                     moEmployee.setAuxHireLogNotes(getTitle().toUpperCase());
                     moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
                     moEmployee.setAuxHrsEmployeeHireLog(hrsEmployeeHireLog);
@@ -393,6 +637,17 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
     }
 
     @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
+            
+            if (field == moRadDateHiring || field == moRadDateBenefitsOld || field == moRadDateOther) {
+                itemStateChangedBenefits();
+            }
+        }
+    }
+
+    @Override
     public void focusGained(FocusEvent e) {
         
     }
@@ -401,8 +656,12 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Focu
     public void focusLost(FocusEvent e) {
         if (e.getSource() instanceof JFormattedTextField) {
             JFormattedTextField field = (JFormattedTextField) e.getSource();
-            if (field == moDateDate.getComponent()) {
-                focusLostDate();
+            
+            if (field == moDateHiring.getComponent()) {
+                focusLostDateHiring();
+            }
+            else if (field == moDateBenefits.getComponent()) {
+                focusLostDateBenefits();
             }
         }
     }

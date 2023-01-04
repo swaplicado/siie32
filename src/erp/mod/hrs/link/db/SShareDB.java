@@ -206,7 +206,7 @@ public class SShareDB {
         Statement st = conn.createStatement();
         ResultSet res = st.executeQuery(query);
 
-        lPositions = new ArrayList();
+        lPositions = new ArrayList<>();
         SPosition pos = null;
         while (res.next()) {
             pos = new SPosition();
@@ -284,7 +284,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lEmps = new ArrayList();
+            lEmps = new ArrayList<>();
             SEmployee emp = null;
             while (res.next()) {
                 emp = new SEmployee();
@@ -332,7 +332,7 @@ public class SShareDB {
      */
     private ArrayList<SEmployee> assignCompany(ArrayList<SEmployee> lEmps) throws SQLException, ClassNotFoundException, SConfigException {
         ArrayList<SCompany> companies = this.getDatabasesWithPayroll();
-        ArrayList<HashMap<Integer, Integer>> ids = new ArrayList();
+        ArrayList<HashMap<Integer, Integer>> ids = new ArrayList<>();
         for (SCompany company : companies) {
             ids.add(this.getEmployeesFromCompany(company));
         }
@@ -374,7 +374,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lEmpIds = new HashMap();
+            lEmpIds = new HashMap<>();
 
             while (res.next()) {
                 lEmpIds.put(res.getInt("id_emp"), company.getId_company());
@@ -434,7 +434,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lHolidays = new ArrayList();
+            lHolidays = new ArrayList<>();
 
             SHoliday hol = null;
             while (res.next()) {
@@ -499,7 +499,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lFDYs = new ArrayList();
+            lFDYs = new ArrayList<>();
 
             SFirstDayYear fdy = null;
             while (res.next()) {
@@ -539,7 +539,7 @@ public class SShareDB {
             return null;
         }
 
-        ArrayList<SAbsence> lAbss = new ArrayList();
+        ArrayList<SAbsence> lAbss = new ArrayList<>();
         for (SCompany db : dbs) {
             lAbss.addAll(this.getAbsences(lastSyncDate, db.getDatabase_nm()));
         }
@@ -594,7 +594,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lAbss = new ArrayList();
+            lAbss = new ArrayList<>();
 
             SAbsence abs = null;
             while (res.next()) {
@@ -682,7 +682,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lCuts = new ArrayList();
+            lCuts = new ArrayList<>();
 
             SPrepayCutCalendar cut = null;
             while (res.next()) {

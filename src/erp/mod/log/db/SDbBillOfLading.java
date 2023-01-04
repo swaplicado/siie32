@@ -1174,7 +1174,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
         seguros.getAttAseguraCarga().setString(moDataMerchandiseInsurer.getName());
         seguros.getAttPolizaCarga().setString(msMerchandiseInsurerPolicy);
-        seguros.getAttPrimaSeguro().setString(msPremium);
+        seguros.getAttPrimaSeguro().setDouble(SLibUtils.parseDouble(msPremium));
         
         // Remolques:
         

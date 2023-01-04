@@ -3294,18 +3294,18 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldBizPartner.setFieldValue(moBizPartner.getFkBizPartnerIdentityTypeId() == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? "" : moBizPartner.getBizPartner());
         
         bgOrgNamesPolicy.clearSelection();
-        switch (SLibUtilities.parseInt(moBizPartner.getBizPartnerFiscalPolicy())) {
-            case SDataBizPartner.CFD_ORG_NAMES_FULL_NAME:
-                jrbOrgNamesPolicyFullName.setSelected(true);
-                break;
-            case SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME:
-                jrbOrgNamesPolicyFiscalName.setSelected(true);
-                break;
-            default:
-                // nothing
-        }
-        moFieldBizPartnerFiscal.setFieldValue(moBizPartner.getBizPartnerFiscal());
-        moFieldBizPartnerCapitalRegime.setFieldValue(moBizPartner.getBizPartnerCapitalRegime());
+//        switch (SLibUtilities.parseInt(moBizPartner.getBizPartnerFiscalPolicy())) {
+//            case SDataBizPartner.CFD_ORG_NAMES_FULL_NAME:
+//                jrbOrgNamesPolicyFullName.setSelected(true);
+//                break;
+//            case SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME:
+//                jrbOrgNamesPolicyFiscalName.setSelected(true);
+//                break;
+//            default:
+//                // nothing
+//        }
+//        moFieldBizPartnerFiscal.setFieldValue(moBizPartner.getBizPartnerFiscal());
+//        moFieldBizPartnerCapitalRegime.setFieldValue(moBizPartner.getBizPartnerCapitalRegime());
         
         moFieldBizPartnerCommercial.setFieldValue(moBizPartner.getBizPartner().equals(moBizPartner.getBizPartnerCommercial()) ? "" : moBizPartner.getBizPartnerCommercial());
         moFieldFiscalId.setFieldValue(moBizPartner.getFiscalId());

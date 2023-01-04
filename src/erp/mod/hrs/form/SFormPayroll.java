@@ -1388,6 +1388,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         payroll.setTaxSubsidy(mbIsWithTaxSubsidy);
         payroll.setSsContribution(moBoolSsContribution.getValue());
         payroll.setFortnightStandard(moConfig.isFortnightStandard());
+        //payroll.setAccountingPartial(...); // value set outside this form in another user case
         //payroll.setAccounting(...); // value set outside this form in another user case
         //payroll.setClosed(moBoolClosed.getValue()); // value set outside this form in another user case
         

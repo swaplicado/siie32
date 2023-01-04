@@ -1258,12 +1258,12 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     }
                     if (arrRetencionDR.size() > 0) {
                         DElementRetencionesDR retenciones = new DElementRetencionesDR();
-                        retenciones.getEltRetencionDR().addAll(arrRetencionDR);
+                        retenciones.getEltRetencionDRs().addAll(arrRetencionDR);
                         impuestosDR.setEltRetencionesDR(retenciones);
                     }
                     if (arrTrasladoDR.size() > 0) {
                         DElementTrasladosDR traslados = new DElementTrasladosDR();
-                        traslados.getEltTrasladoDR().addAll(arrTrasladoDR);
+                        traslados.getEltTrasladoDRs().addAll(arrTrasladoDR);
                         impuestosDR.setEltTrasladosDR(traslados);
                     }
                     
@@ -1299,12 +1299,12 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 }
                 if (arrRetencionP.size() > 0) {
                     DElementRetencionesP retenciones = new DElementRetencionesP();
-                    retenciones.getEltRetencionP().addAll(arrRetencionP);
+                    retenciones.getEltRetencionPs().addAll(arrRetencionP);
                     impuestosP.setEltRetencionesP(retenciones);
                 }
                 if (arrTrasladoP.size() > 0) {
                     DElementTrasladosP traslados = new DElementTrasladosP();
-                    traslados.getEltTrasladoP().addAll(arrTrasladoP);
+                    traslados.getEltTrasladoPs().addAll(arrTrasladoP);
                     impuestosP.setEltTrasladosP(traslados);
                 }
                 

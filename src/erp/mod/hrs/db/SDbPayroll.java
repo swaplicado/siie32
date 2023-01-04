@@ -26,6 +26,8 @@ import sa.lib.gui.SGuiSession;
 public class SDbPayroll extends SDbRegistryUser {
     
     public static final int FIELD_CLOSE = FIELD_BASE + 1;
+    public static final int FIELD_ACCOUNTING = FIELD_BASE + 2;
+    public static final int FIELD_ACCOUNTING_GRADUAL = FIELD_BASE + 3;
 
     protected int mnPkPayrollId;
     protected int mnFiscalYear;
@@ -46,6 +48,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected boolean mbSsContribution;
     protected boolean mbFortnightStandard;
     protected boolean mbAccounting;
+    protected boolean mbAccountingGradual;
     protected boolean mbClosed;
     //protected boolean mbDeleted;
     protected int mnFkPaymentTypeId;
@@ -149,6 +152,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setSsContribution(boolean b) { mbSsContribution = b; }
     public void setFortnightStandard(boolean b) { mbFortnightStandard = b; }
     public void setAccounting(boolean b) { mbAccounting = b; }
+    public void setAccountingGradual(boolean b) { mbAccountingGradual = b; }
     public void setClosed(boolean b) { mbClosed = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
@@ -187,6 +191,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public boolean isSsContribution() { return mbSsContribution; }
     public boolean isFortnightStandard() { return mbFortnightStandard; }
     public boolean isAccounting() { return mbAccounting; }
+    public boolean isAccountingGradual() { return mbAccountingGradual; }
     public boolean isClosed() { return mbClosed; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
@@ -219,25 +224,12 @@ public class SDbPayroll extends SDbRegistryUser {
     public double getAuxTotalNet() { return mdAuxTotalEarnings - mdAuxTotalDeductions; }
     public String getAuxPaymentType() { return msAuxPaymentType; }
     
+    /**
+     * Compose name of payroll as payroll year and number number in format: 'yyyy' + " " + 'abbreviation of type of payment' + ". " + 'payroll number' + [", " + 'payroll notes'].
+     */
     @Override
     public String getName() {
-        String name = "";
-        
-        switch (mnFkPaymentTypeId) {
-            case SModSysConsts.HRSS_TP_PAY_WEE:
-                name = "SEM.";
-                break;
-            case SModSysConsts.HRSS_TP_PAY_FOR:
-                name = "QNA.";
-                break;
-            default:
-                name = "XXX.";
-                // do nothing
-        }
-        
-        name += " #" + SLibUtils.DecimalFormatCalendarMonth.format(mnNumber) + " " + SLibUtils.DecimalFormatCalendarMonth.format(mnPeriodYear) + ", " + msNotes;
-        
-        return name;
+        return composePayrollYearAndNumber() + (msNotes.isEmpty() ? "" : ", " + msNotes);
     }
     
     public boolean isPayrollNormal() { return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR; }
@@ -246,14 +238,32 @@ public class SDbPayroll extends SDbRegistryUser {
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }
     
+    /**
+     * Get count of active (not deleted) payroll receipts.
+     * @return Count of active (not deleted) payroll receipts.
+     */
+    public int getPayrollReceiptsCount() {
+        int count = 0;
+        
+        for (SDbPayrollReceipt pr : maChildPayrollReceipts) {
+            if (!pr.isDeleted()) {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+    
     public SDbPayrollReceipt getChildPayrollReceipt(final int[] key) {
         SDbPayrollReceipt payrollReceipt = null;
+        
         for (SDbPayrollReceipt pr : maChildPayrollReceipts) {
             if (SLibUtils.compareKeys(key, pr.getPrimaryKey())) {
                 payrollReceipt = pr;
                 break;
             }
         }
+        
         return payrollReceipt;
     }
     
@@ -279,36 +289,74 @@ public class SDbPayroll extends SDbRegistryUser {
         }
     }
     
-    public String getPaymentTypeAbbr() {
-        return getPaymentTypeAbbr(mnFkPaymentTypeId);
+    public String getPaymentType() {
+        return SDbPayroll.getPaymentType(mnFkPaymentTypeId);
     }
     
-    public static String getPaymentTypeAbbr(final int payrollTypeId) {
-        String abbr = "";
+    public String getPaymentTypeAbbr() {
+        return SDbPayroll.getPaymentTypeAbbr(mnFkPaymentTypeId);
+    }
+    
+    public static String getPaymentType(final int payrollTypeId) {
+        String type = "";
         
         switch (payrollTypeId) {
             case SModSysConsts.HRSS_TP_PAY_WEE:
-                abbr = SHrsFormerConsts.PAY_WEE_ABB;
+                type = SHrsFormerConsts.PAY_WEE;
                 break;
             case SModSysConsts.HRSS_TP_PAY_FOR:
-                abbr = SHrsFormerConsts.PAY_FOR_ABB;
+                type = SHrsFormerConsts.PAY_FOR;
                 break;
             default:
+                // nothing
         }
         
-        return abbr;
+        return type;
     }
 
+    public static String getPaymentTypeAbbr(final int payrollTypeId) {
+        String typeAbbr = "";
+        
+        switch (payrollTypeId) {
+            case SModSysConsts.HRSS_TP_PAY_WEE:
+                typeAbbr = SHrsFormerConsts.PAY_WEE_ABB;
+                break;
+            case SModSysConsts.HRSS_TP_PAY_FOR:
+                typeAbbr = SHrsFormerConsts.PAY_FOR_ABB;
+                break;
+            default:
+                // nothing
+        }
+        
+        return typeAbbr;
+    }
+
+    /**
+     * Compose payroll number in format: 'abbreviation of type of payment' + ". " + 'payroll number'.
+     */
+    public String composePayrollNumber() {
+        return getPaymentTypeAbbr(mnFkPaymentTypeId) + ". " + mnNumber;
+    }
+
+    /**
+     * Compose payroll year and number number in format: 'yyyy' + " " + 'abbreviation of type of payment' + ". " + 'payroll number'.
+     */
+    public String composePayrollYearAndNumber() {
+        return SLibUtils.DecimalFormatCalendarYear.format(mnPeriodYear) + " " + composePayrollNumber();
+    }
+
+    /**
+     * Compose payroll period in format: 'yyyy' + "-" + 'mm'.
+     */
     public String composePayrollPeriod() {
         return SLibUtils.DecimalFormatCalendarYear.format(mnPeriodYear) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnPeriod);
     }
 
-    public String composePayrollNumber() {
-        return getPaymentTypeAbbr(mnFkPaymentTypeId) + " " + mnNumber;
-    }
-
-    public String composePayrollYearAndNumber() {
-        return mnPeriodYear + " " + composePayrollNumber();
+    /**
+     * Compose payroll dates in format: 'dd/mm/yyyy' + "-" + 'dd/mm/yyyy'.
+     */
+    public String composePayrollDates() {
+        return SLibUtils.DateFormatDate.format(mtDateStart) + "-" + SLibUtils.DateFormatDate.format(mtDateEnd);
     }
 
     public static String composePayrollYearAndNumber(final SGuiSession session, final int payrollId) throws Exception {
@@ -360,6 +408,7 @@ public class SDbPayroll extends SDbRegistryUser {
         mbSsContribution = false;
         mbFortnightStandard = false;
         mbAccounting = false;
+        mbAccountingGradual = false;
         mbClosed = false;
         mbDeleted = false;
         mnFkPaymentTypeId = 0;
@@ -456,6 +505,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mbSsContribution = resultSet.getBoolean("p.b_ssc");
             mbFortnightStandard = resultSet.getBoolean("p.b_for_std");
             mbAccounting = resultSet.getBoolean("p.b_acc");
+            mbAccountingGradual = resultSet.getBoolean("p.b_acc_grad");
             mbClosed = resultSet.getBoolean("p.b_clo");
             mbDeleted = resultSet.getBoolean("p.b_del");
             mnFkPaymentTypeId = resultSet.getInt("p.fk_tp_pay");
@@ -540,6 +590,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     (mbSsContribution ? 1 : 0) + ", " +
                     (mbFortnightStandard ? 1 : 0) + ", " + 
                     (mbAccounting ? 1 : 0) + ", " + 
+                    (mbAccountingGradual ? 1 : 0) + ", " + 
                     (mbClosed ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkPaymentTypeId + ", " +
@@ -583,6 +634,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "b_ssc = " + (mbSsContribution ? 1 : 0) + ", " +
                     "b_for_std = " + (mbFortnightStandard ? 1 : 0) + ", " +
                     "b_acc = " + (mbAccounting ? 1 : 0) + ", " +
+                    "b_acc_grad = " + (mbAccountingGradual ? 1 : 0) + ", " +
                     "b_clo = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_pay = " + mnFkPaymentTypeId + ", " +
@@ -649,6 +701,7 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setSsContribution(this.isSsContribution());
         registry.setFortnightStandard(this.isFortnightStandard());
         registry.setAccounting(this.isAccounting());
+        registry.setAccountingGradual(this.isAccountingGradual());
         registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());
         registry.setFkPaymentTypeId(this.getFkPaymentTypeId());
@@ -745,11 +798,18 @@ public class SDbPayroll extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         msSql = "UPDATE " + getSqlTable() + " SET ";
+        
         switch (field) {
             case FIELD_CLOSE:
                 msSql += "b_clo = " + (Boolean) value + ", ";
                 msSql += "fk_usr_clo = " + (mnAuxFkUserCloseId == 0 ? SUtilConsts.USR_NA_ID : mnAuxFkUserCloseId) + ", ";
                 msSql += "ts_usr_clo = NOW() ";
+                break;
+            case FIELD_ACCOUNTING:
+                msSql += "b_acc = " + (Boolean) value + " ";
+                break;
+            case FIELD_ACCOUNTING_GRADUAL:
+                msSql += "b_acc_grad = " + (Boolean) value + " ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

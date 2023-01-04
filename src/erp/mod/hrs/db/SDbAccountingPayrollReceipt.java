@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDbAccountingPayrollEmployee extends SDbRegistryUser {
+public class SDbAccountingPayrollReceipt extends SDbRegistryUser {
 
     protected int mnPkPayrollId;
     protected int mnPkAccountingId;
@@ -27,8 +27,7 @@ public class SDbAccountingPayrollEmployee extends SDbRegistryUser {
     protected String msFkRecordRecordTypeId;
     protected int mnFkRecordNumberId;
 
-
-    public SDbAccountingPayrollEmployee() {
+    public SDbAccountingPayrollReceipt() {
         super(SModConsts.HRS_ACC_PAY_RCP);
     }
 
@@ -91,7 +90,7 @@ public class SDbAccountingPayrollEmployee extends SDbRegistryUser {
     @Override
     public String getSqlWhere(int[] pk) {
         return "WHERE id_pay = " + pk[0] + " AND "
-                + "id_acc = " + pk[1] + " "
+                + "id_acc = " + pk[1] + " AND "
                 + "id_emp = " + pk[2] + " ";
     }
 
@@ -174,8 +173,8 @@ public class SDbAccountingPayrollEmployee extends SDbRegistryUser {
     }
 
     @Override
-    public SDbAccountingPayrollEmployee clone() throws CloneNotSupportedException {
-        SDbAccountingPayrollEmployee registry = new SDbAccountingPayrollEmployee();
+    public SDbAccountingPayrollReceipt clone() throws CloneNotSupportedException {
+        SDbAccountingPayrollReceipt registry = new SDbAccountingPayrollReceipt();
 
         registry.setPkPayrollId(this.getPkPayrollId());
         registry.setPkAccountingId(this.getPkAccountingId());

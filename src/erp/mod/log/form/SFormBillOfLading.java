@@ -1485,6 +1485,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionAddFigures() {
         moFormTranspExtra.setValue(1, maTranspTranspExtra);
         moFormTranspExtra.setVisible(true);
