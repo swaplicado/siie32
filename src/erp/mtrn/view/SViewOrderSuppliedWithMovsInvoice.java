@@ -176,7 +176,7 @@ public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab i
             
             miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
         }
-    }
+    } 
     
     private void actionViewDps() {
         if (mjbViewDps.isEnabled()) {
@@ -290,14 +290,14 @@ public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab i
                 "SUM(f_orig_qty)- COALESCE(SUM(f_sup_orig_qty), 0) AS f_sup_orig_qty_pend, " +
                 "(((SUM(f_orig_qty) - COALESCE(SUM(f_sup_orig_qty), 0)) * 100 ) / SUM(f_orig_qty))/100 AS f_per_pend, " +
                 "(SELECT dt FROM trn_dps AS d WHERE d.id_year = (SELECT id_des_year FROM trn_dps_dps_supply AS s " +
-                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
-                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2)) AS dateFac, " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2 LIMIT 1) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2 LIMIT 1)) AS dateFac, " +
                 "(SELECT num FROM trn_dps AS d WHERE d.id_year = (SELECT id_des_year FROM trn_dps_dps_supply AS s " +
-                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
-                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2)) AS codeFac, " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2 LIMIT 1) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2 LIMIT 1)) AS codeFac, " +
                 "(SELECT num_ref FROM trn_dps AS d WHERE d.id_year = (SELECT id_des_year FROM trn_dps_dps_supply AS s " +
-                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
-                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2)) AS numFac " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2 LIMIT 1) AND d.id_doc = (SELECT id_des_doc FROM trn_dps_dps_supply AS s " +
+                "WHERE s.id_des_year = f_id_1 AND s.id_src_doc = f_id_2 LIMIT 1)) AS numFac " +
                 "FROM (SELECT de.id_year,de.id_doc,de.id_ety, d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
                 "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "dt.code AS f_dt_code, cb.code AS f_cb_code, b.id_bp, b.bp, bc.bp_key, bb.bpb, " +

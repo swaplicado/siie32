@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public abstract class SModConsts {
 
@@ -784,6 +784,9 @@ public abstract class SModConsts {
      */
 
     public static final int QLT_LOT_APR = 2073001;
+    public static final int QLT_TP_ANALYSIS = 2073010;
+    public static final int QLT_ANALYSIS = 2073011;
+    public static final int QLT_ANALYSIS_ITEM = 2073012;
     
     public static final HashMap<Integer, String> TablesMap = new HashMap<>();
 
@@ -1335,5 +1338,8 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ADV_SET, "hrs_adv_set");
         
         TablesMap.put(QLT_LOT_APR, "qlt_lot_apr");
+        TablesMap.put(QLT_TP_ANALYSIS, "qlt_tp_analysis");
+        TablesMap.put(QLT_ANALYSIS, "qlt_analysis");
+        TablesMap.put(QLT_ANALYSIS_ITEM, "qlt_analysis_item");
     }
 }

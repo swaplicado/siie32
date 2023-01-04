@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 208.0/ 2022-11-24
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Correción de vista pedidos de compras a surtir con factura (Bug)
+2) Corrección de modificación de facturas cuando tienen un surtido de almacén relacionado
+3) Corrección en la modificación de complementos de pago al dejarlos guardados sin documentos
+4) Corrección al momento de insertar mas un XML en las polizas contables
+5) Implementación de la función cambio ítem/referencia en una factura (Ordernes de compra)
+6) Implementación de la función cambio de ítem en todos los documentos relacionados (Ordenes de servicio)
+7) Implementación de la vista historial modificación facturas ítem/concepto
+8) Implementación de la vista historial modificación documentos
+9) Correción ruta descarga masiva CFDI
 SIIE 3.2 209.0/ 2023-01-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

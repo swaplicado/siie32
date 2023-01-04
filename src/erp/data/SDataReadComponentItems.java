@@ -18,7 +18,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín, Edwin Carmona
  */
 public abstract class SDataReadComponentItems {
 
@@ -1830,6 +1830,38 @@ public abstract class SDataReadComponentItems {
         return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
     }
 
+    private static java.lang.Object[] getSettingsCatQlt(int catalogue, erp.mcfg.data.SDataParamsErp paramsErp, java.lang.Object pk) {
+        int lenPk = 0;
+        int lenFk = 0;
+        boolean isPkOnlyInts = true;
+        boolean isFkOnlyInts = true;
+        boolean isComplementApplying = false;
+        java.lang.String sql = "";
+        java.lang.String text = "";
+
+        switch (catalogue) {
+            case SModConsts.QLT_TP_ANALYSIS:
+            case SDataConstants.QLT_TP_ANALYSIS:
+                lenPk = 1;
+                sql = "SELECT id_tp_analysis AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " WHERE b_del = 0 ORDER BY name ";
+                text = "tipo de análisis de laboratorio";
+                break;
+            case SModConsts.QLT_ANALYSIS:
+            case SDataConstants.QLT_ANALYSIS:
+                lenPk = 1;
+                sql = "SELECT id_analysis AS " + SDbConsts.FIELD_ID + "1, analysis_name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " WHERE b_del = 0 ORDER BY analysis_name ";
+                text = "análisis de laboratorio";
+                break;
+
+            default:
+                break;
+        }
+
+        return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
+    }
+    
     private static java.lang.Object[] getSettingsCatHrs(int catalogue, erp.mcfg.data.SDataParamsErp paramsErp, java.lang.Object pk) {
         int lenPk = 0;
         int lenFk = 0;
@@ -2013,6 +2045,9 @@ public abstract class SDataReadComponentItems {
         }
         else if (SDataUtilities.isCatalogueMfg(pnCatalogue)) {
             aoSettings = getSettingsCatMfg(pnCatalogue, poParamsErp, poPk);
+        }
+        else if (SDataUtilities.isCatalogueQlt(pnCatalogue)) {
+            aoSettings = getSettingsCatQlt(pnCatalogue, poParamsErp, poPk);
         }
         else if (SDataUtilities.isCatalogueHrs(pnCatalogue)) {
             aoSettings = getSettingsCatHrs(pnCatalogue, poParamsErp, poPk);

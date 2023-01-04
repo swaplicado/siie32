@@ -220,7 +220,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Claudio Peña, Edwin Carmona
  */
 public abstract class SDataUtilities {
 
@@ -3310,7 +3310,7 @@ public abstract class SDataUtilities {
     public static boolean isCatalogueQlt(int catalogue) {
         return catalogue >= SDataConstants.GLOBAL_CAT_QLT && catalogue < SDataConstants.GLOBAL_CAT_XXX ||
                 catalogue >= SDataConstants.MOD_QLT && catalogue < SDataConstants.MOD_XXX ||
-                catalogue >= SModConsts.QLT_LOT_APR && catalogue <= SModConsts.QLT_LOT_APR;
+                catalogue >= SModConsts.QLT_LOT_APR && catalogue <= SModConsts.QLT_ANALYSIS_ITEM;
     }
     
     /**

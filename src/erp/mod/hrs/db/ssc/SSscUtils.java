@@ -130,7 +130,7 @@ public abstract class SSscUtils {
                     + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
                     + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act  "
                     + "AND emp.dt_sal_ssc <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
-//                    + "and pr.id_emp = 5025 " // Renglón para pruebas por empleados, no remover
+                    + "and pr.id_emp = 5062 " // Renglón para pruebas por empleados, no remover
                     + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
