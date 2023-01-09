@@ -157,7 +157,7 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            if (mbIsRegistryNew) {
+            if (!mbIsRegistryNew) {
                 sql = "SELECT COUNT(*) "
                         + "FROM trn_dps_cfd_ety "
                         + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId;
@@ -234,6 +234,7 @@ public class SDataDpsCfdEntry extends erp.lib.data.SDataRegistry implements java
         clone.setConcept(msConcept);
         clone.setCfdProdServ(msCfdProdServ);
         clone.setCfdUnit(msCfdUnit);
+        clone.setTaxObject(msTaxObject);
         clone.setPredial(msPredial);
         clone.setXml(msXml);
 
