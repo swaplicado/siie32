@@ -181,12 +181,13 @@ public class SRowPayrollEmployee implements SGridRow {
                         value = mbActive;
                         break;
                     case 3:
-                        value = msEmployeeRecruitmentSchemaType;
-                        break;
-                    case 4:
                         value = SHrsUtils.getRecruitmentSchemaIcon(mnEmployeeRecruitmentSchemaTypeId);
                         break;
+                    case 4:
+                        value = msEmployeeRecruitmentSchemaType;
+                        break;
                     default:
+                        // nothing
                 }
                 break;
                 
@@ -218,6 +219,7 @@ public class SRowPayrollEmployee implements SGridRow {
                             value = msBankAccount;
                             break;
                         default:
+                            // nothing
                     }
                 }
                 else {
@@ -244,11 +246,13 @@ public class SRowPayrollEmployee implements SGridRow {
                             value = msBankAccount;
                             break;
                         default:
+                            // nothing
                     }
                 }
                 break;
                 
             default:
+                // nothing
         }
 
         return value;

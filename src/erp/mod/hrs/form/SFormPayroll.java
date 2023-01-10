@@ -123,7 +123,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private boolean mbIsReadOnly;
     private boolean mbIsCopyingPayroll;
     private boolean mbIsWithTaxSubsidy;
+    private boolean mbIsGoingToReceipts;
     private boolean mbAuxOpenRegAgain;
+    
     /**
      * Creates new form SFormPayroll
      * @param client
@@ -150,7 +152,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         bgViewEmployees = new javax.swing.ButtonGroup();
         jpMain = new javax.swing.JPanel();
         jtpPayroll = new javax.swing.JTabbedPane();
-        jpPayroll = new javax.swing.JPanel();
+        jpPayrollSettings = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -194,10 +196,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlPaysheetCustomType = new javax.swing.JLabel();
         moKeyPaysheetCustomType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel17 = new javax.swing.JPanel();
+        jlPaysheetType = new javax.swing.JLabel();
         moRadNormal = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel43 = new javax.swing.JPanel();
         moRadSpecial = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel45 = new javax.swing.JPanel();
         moRadExtraordinary = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel47 = new javax.swing.JPanel();
         jlRecruitmentSchemaType = new javax.swing.JLabel();
@@ -258,9 +259,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecTotalNet = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel37 = new javax.swing.JPanel();
         jbGoTabReceipts = new javax.swing.JButton();
+        jpPayrollReceipts = new javax.swing.JPanel();
         jpReceipts = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
-        jpControls = new javax.swing.JPanel();
+        jpReceiptsControls = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel39 = new javax.swing.JPanel();
         jlView = new javax.swing.JLabel();
@@ -275,38 +276,39 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel40 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jbReceiptCaptureEarnings = new javax.swing.JButton();
-        jbReceiptCaptureDeductions = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         jbLoadPrepayroll = new javax.swing.JButton();
-        jbClearPrepayroll = new javax.swing.JButton();
         jPanel33 = new javax.swing.JPanel();
+        jbReceiptCaptureDeductions = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jbClearPrepayroll = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
         jbAddPayrollBonus = new javax.swing.JButton();
-        jpAvailableEmployees = new javax.swing.JPanel();
+        jpReceiptsAvailableEmployees = new javax.swing.JPanel();
         jlTotalAvailables = new javax.swing.JLabel();
-        jpControlsReceipts = new javax.swing.JPanel();
+        jpReceiptsControlsReceipts = new javax.swing.JPanel();
         jPanel32 = new javax.swing.JPanel();
         jlDummy01 = new javax.swing.JLabel();
         jbReceiptAdd = new javax.swing.JButton();
         jbReceiptAddAll = new javax.swing.JButton();
         jbReceiptRemove = new javax.swing.JButton();
         jbReceiptRemoveAll = new javax.swing.JButton();
-        jpPayrollReceipts = new javax.swing.JPanel();
+        jpReceiptsPayrollReceipts = new javax.swing.JPanel();
         jlTotalSelected = new javax.swing.JLabel();
 
-        jpMain.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpMain.setLayout(new java.awt.BorderLayout());
 
-        jtpPayroll.setTabPlacement(javax.swing.JTabbedPane.LEFT);
         jtpPayroll.setAutoscrolls(true);
         jtpPayroll.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        jpPayroll.setLayout(new java.awt.BorderLayout());
+        jpPayrollSettings.setLayout(new java.awt.BorderLayout());
 
         jPanel41.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel41.setLayout(new java.awt.BorderLayout());
 
         jPanel7.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
 
-        jPanel6.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
 
         jPanel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -461,30 +463,26 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlPaysheetType.setText("Tipo nómina:*");
+        jlPaysheetType.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel17.add(jlPaysheetType);
+
         bgPayrollType.add(moRadNormal);
-        moRadNormal.setText("Es nómina normal");
-        moRadNormal.setPreferredSize(new java.awt.Dimension(200, 23));
+        moRadNormal.setText("Normal");
+        moRadNormal.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel17.add(moRadNormal);
 
-        jPanel6.add(jPanel17);
-
-        jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
         bgPayrollType.add(moRadSpecial);
-        moRadSpecial.setText("Es nómina especial");
-        moRadSpecial.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel43.add(moRadSpecial);
-
-        jPanel6.add(jPanel43);
-
-        jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        moRadSpecial.setText("Especial");
+        moRadSpecial.setPreferredSize(new java.awt.Dimension(85, 23));
+        jPanel17.add(moRadSpecial);
 
         bgPayrollType.add(moRadExtraordinary);
-        moRadExtraordinary.setText("Es nómina extraordinaria");
-        moRadExtraordinary.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel45.add(moRadExtraordinary);
+        moRadExtraordinary.setText("Extraordinaria");
+        moRadExtraordinary.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel17.add(moRadExtraordinary);
 
-        jPanel6.add(jPanel45);
+        jPanel6.add(jPanel17);
 
         jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -515,7 +513,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel7.add(jPanel6);
 
-        jPanel21.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
+        jPanel21.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -564,7 +562,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moBoolSsContribution.setText("Con cálculo de retención SS");
-        moBoolSsContribution.setPreferredSize(new java.awt.Dimension(300, 23));
+        moBoolSsContribution.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel19.add(moBoolSsContribution);
 
         jPanel21.add(jPanel19);
@@ -667,7 +665,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel41.add(jPanel7, java.awt.BorderLayout.NORTH);
 
-        jpPayroll.add(jPanel41, java.awt.BorderLayout.CENTER);
+        jpPayrollSettings.add(jPanel41, java.awt.BorderLayout.CENTER);
 
         jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Totales de la nómina:"));
         jPanel20.setLayout(new java.awt.BorderLayout(0, 5));
@@ -717,16 +715,16 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel20.add(jPanel38, java.awt.BorderLayout.NORTH);
 
-        jpPayroll.add(jPanel20, java.awt.BorderLayout.SOUTH);
+        jpPayrollSettings.add(jPanel20, java.awt.BorderLayout.SOUTH);
 
-        jtpPayroll.addTab("Nómina", jpPayroll);
+        jtpPayroll.addTab("Nómina", jpPayrollSettings);
 
-        jpReceipts.setLayout(new java.awt.BorderLayout());
+        jpPayrollReceipts.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de la nómina:"));
-        jPanel5.setLayout(new java.awt.BorderLayout(5, 5));
+        jpReceipts.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de la nómina:"));
+        jpReceipts.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jpControls.setLayout(new java.awt.BorderLayout());
+        jpReceiptsControls.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
@@ -778,7 +776,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel2.add(jPanel4);
 
-        jpControls.add(jPanel2, java.awt.BorderLayout.CENTER);
+        jpReceiptsControls.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel40.setPreferredSize(new java.awt.Dimension(550, 33));
         jPanel40.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
@@ -790,24 +788,33 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptCaptureEarnings.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel1.add(jbReceiptCaptureEarnings);
 
-        jbReceiptCaptureDeductions.setText("Capturar deducciones");
-        jbReceiptCaptureDeductions.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbReceiptCaptureDeductions.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel1.add(jbReceiptCaptureDeductions);
+        jLabel2.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel1.add(jLabel2);
 
         jbLoadPrepayroll.setText("Cargar prenómina");
         jbLoadPrepayroll.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbLoadPrepayroll.setPreferredSize(new java.awt.Dimension(110, 23));
+        jbLoadPrepayroll.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel1.add(jbLoadPrepayroll);
-
-        jbClearPrepayroll.setText("Quitar prenómina");
-        jbClearPrepayroll.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbClearPrepayroll.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel1.add(jbClearPrepayroll);
 
         jPanel40.add(jPanel1);
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbReceiptCaptureDeductions.setText("Capturar deducciones");
+        jbReceiptCaptureDeductions.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbReceiptCaptureDeductions.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel33.add(jbReceiptCaptureDeductions);
+
+        jLabel3.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel33.add(jLabel3);
+
+        jbClearPrepayroll.setText("Quitar prenómina");
+        jbClearPrepayroll.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbClearPrepayroll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel33.add(jbClearPrepayroll);
+
+        jLabel4.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel33.add(jLabel4);
 
         jbAddPayrollBonus.setText("Agregar bonos nómina");
         jbAddPayrollBonus.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -815,20 +822,20 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel40.add(jPanel33);
 
-        jpControls.add(jPanel40, java.awt.BorderLayout.EAST);
+        jpReceiptsControls.add(jPanel40, java.awt.BorderLayout.EAST);
 
-        jPanel5.add(jpControls, java.awt.BorderLayout.NORTH);
+        jpReceipts.add(jpReceiptsControls, java.awt.BorderLayout.NORTH);
 
-        jpAvailableEmployees.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados disponibles:"));
-        jpAvailableEmployees.setPreferredSize(new java.awt.Dimension(325, 100));
-        jpAvailableEmployees.setLayout(new java.awt.BorderLayout());
+        jpReceiptsAvailableEmployees.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados disponibles:"));
+        jpReceiptsAvailableEmployees.setPreferredSize(new java.awt.Dimension(375, 100));
+        jpReceiptsAvailableEmployees.setLayout(new java.awt.BorderLayout());
 
         jlTotalAvailables.setText("[number of available employees]");
-        jpAvailableEmployees.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
+        jpReceiptsAvailableEmployees.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
-        jPanel5.add(jpAvailableEmployees, java.awt.BorderLayout.LINE_START);
+        jpReceipts.add(jpReceiptsAvailableEmployees, java.awt.BorderLayout.LINE_START);
 
-        jpControlsReceipts.setLayout(new java.awt.BorderLayout());
+        jpReceiptsControlsReceipts.setLayout(new java.awt.BorderLayout());
 
         jPanel32.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
         jPanel32.add(jlDummy01);
@@ -857,22 +864,22 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptRemoveAll.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptRemoveAll);
 
-        jpControlsReceipts.add(jPanel32, java.awt.BorderLayout.PAGE_START);
+        jpReceiptsControlsReceipts.add(jPanel32, java.awt.BorderLayout.PAGE_START);
 
-        jPanel5.add(jpControlsReceipts, java.awt.BorderLayout.CENTER);
+        jpReceipts.add(jpReceiptsControlsReceipts, java.awt.BorderLayout.CENTER);
 
-        jpPayrollReceipts.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de nómina:"));
-        jpPayrollReceipts.setPreferredSize(new java.awt.Dimension(550, 100));
-        jpPayrollReceipts.setLayout(new java.awt.BorderLayout());
+        jpReceiptsPayrollReceipts.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de nómina:"));
+        jpReceiptsPayrollReceipts.setPreferredSize(new java.awt.Dimension(545, 100));
+        jpReceiptsPayrollReceipts.setLayout(new java.awt.BorderLayout());
 
         jlTotalSelected.setText("[number of selected employees]");
-        jpPayrollReceipts.add(jlTotalSelected, java.awt.BorderLayout.PAGE_END);
+        jpReceiptsPayrollReceipts.add(jlTotalSelected, java.awt.BorderLayout.PAGE_END);
 
-        jPanel5.add(jpPayrollReceipts, java.awt.BorderLayout.LINE_END);
+        jpReceipts.add(jpReceiptsPayrollReceipts, java.awt.BorderLayout.LINE_END);
 
-        jpReceipts.add(jPanel5, java.awt.BorderLayout.CENTER);
+        jpPayrollReceipts.add(jpReceipts, java.awt.BorderLayout.CENTER);
 
-        jtpPayroll.addTab("Recibos", jpReceipts);
+        jtpPayroll.addTab("Recibos", jpPayrollReceipts);
 
         jpMain.add(jtpPayroll, java.awt.BorderLayout.CENTER);
         jtpPayroll.getAccessibleContext().setAccessibleName("Configuración");
@@ -884,6 +891,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.ButtonGroup bgPayrollType;
     private javax.swing.ButtonGroup bgViewEmployees;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -921,12 +931,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
-    private javax.swing.JPanel jPanel43;
     private javax.swing.JPanel jPanel44;
-    private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
@@ -962,6 +969,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPaysheetCustomType;
+    private javax.swing.JLabel jlPaysheetType;
     private javax.swing.JLabel jlPeriod;
     private javax.swing.JLabel jlReceiptDays;
     private javax.swing.JLabel jlRecruitmentSchemaType;
@@ -980,13 +988,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlView;
     private javax.swing.JLabel jlWorkingDays;
     private javax.swing.JLabel jlYear;
-    private javax.swing.JPanel jpAvailableEmployees;
-    private javax.swing.JPanel jpControls;
-    private javax.swing.JPanel jpControlsReceipts;
     private javax.swing.JPanel jpMain;
-    private javax.swing.JPanel jpPayroll;
     private javax.swing.JPanel jpPayrollReceipts;
+    private javax.swing.JPanel jpPayrollSettings;
     private javax.swing.JPanel jpReceipts;
+    private javax.swing.JPanel jpReceiptsAvailableEmployees;
+    private javax.swing.JPanel jpReceiptsControls;
+    private javax.swing.JPanel jpReceiptsControlsReceipts;
+    private javax.swing.JPanel jpReceiptsPayrollReceipts;
     private javax.swing.JTextField jtfDefaultDateEnd;
     private javax.swing.JTextField jtfDefaultDateStart;
     private javax.swing.JTextField jtfPaymentType;
@@ -1139,10 +1148,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo régimen (empleado)"));
                 SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Tipo régimen (empleado)");
                 columnForm.setCellRenderer(new SGridCellRendererIconCircle());
                 gridColumnsForm.add(columnForm);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo régimen (empleado)"));
 
                 return gridColumnsForm;
             }
@@ -1150,7 +1159,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         moGridPaneEmployeesAvailable.setForm(null);
         moGridPaneEmployeesAvailable.setPaneFormOwner(null);
-        jpAvailableEmployees.add(moGridPaneEmployeesAvailable, BorderLayout.CENTER);
+        jpReceiptsAvailableEmployees.add(moGridPaneEmployeesAvailable, BorderLayout.CENTER);
 
         moGridPanePayrollReceipts = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_REC, SLibConsts.UNDEFINED, "Recibos de nómina", null) {
             @Override
@@ -1215,14 +1224,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         moGridPanePayrollReceipts.setForm(null);
         moGridPanePayrollReceipts.setPaneFormOwner(null);
-        jpPayrollReceipts.add(moGridPanePayrollReceipts, BorderLayout.CENTER);
+        jpReceiptsPayrollReceipts.add(moGridPanePayrollReceipts, BorderLayout.CENTER);
 
         /* 2020-02-21, Sergio Flores: Prevent from preserving user preferences of grids in this dialog.
         mvFormGrids.add(moGridPaneEmployeesAvailable);
         mvFormGrids.add(moGridPanePayrollReceipts);
         */
         
-        maEmployeesWithCurrentBonus = new ArrayList<Integer>();
+        maEmployeesWithCurrentBonus = new ArrayList<>();
     }
 
     private void showCounts() {
@@ -1646,6 +1655,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
 
     private void actionGoTabReceipts() {
+        mbIsGoingToReceipts = true; // yes!, believe it!, going to receipts!
         SGuiValidation validation = validateForm();
 
         if (!SGuiUtils.computeValidation(miClient, validation)) {
@@ -1779,9 +1789,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 rowReceipt.setHrsReceipt(hrsReceipt);
                 
                 if (recruitmentSchemaType != SModSysConsts.HRSS_TP_REC_SCHE_NA && recruitmentSchemaType != rowReceipt.getReceiptRecruitmentSchemaTypeId()) {
-                    SDbRegistry registry = miClient.getSession().readRegistry(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaType });
+                    String code = (String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaType }, SDbRegistry.FIELD_CODE);
+                    String name = (String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaType }, SDbRegistry.FIELD_NAME);
                     rowReceipt.setReceiptRecruitmentSchemaTypeId(recruitmentSchemaType);
-                    rowReceipt.setReceiptRecruitmentSchemaType(registry.getCode() + " - " + registry.getName());
+                    rowReceipt.setReceiptRecruitmentSchemaType(code + " - " + name);
                 }
 
                 moGridPanePayrollReceipts.addGridRow(rowReceipt);
@@ -2787,6 +2798,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         mbFirstActivation = true;
         mbIsReadOnly = false;
         mbIsWithTaxSubsidy = true;
+        mbIsGoingToReceipts = false;
         mbAuxOpenRegAgain = false;
         maPayrollReceiptsDeleted.clear();
         
@@ -2984,65 +2996,77 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         try {
             if (validation.isValid()) {
-                num = SHrsUtils.validatePayrollNumber(miClient.getSession(), moIntPeriodYear.getValue(), moIntNumber.getValue(), mnFormSubtype);
-                if (moIntNumber.getValue() > num) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlNumber) + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + num + ".");
-                    validation.setComponent(moIntNumber);
+                if (!mbIsGoingToReceipts && !mbIsReadOnly && moGridPanePayrollReceipts.getTable().getRowCount() == 0 && miClient.showMsgBoxConfirm("¡La nómina no tiene recibos!\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                    validation.setMessage("Crear los recibos de nómina que sean necesarios.");
+                    validation.setComponent(jbReceiptAdd);
                 }
-
-                if (validation.isValid()) {
-                    try {
-                        SLibTimeUtils.validatePeriod(moDateDateStart.getValue(), moDateDateEnd.getValue());
-                        SHrsUtils.validatePayrollDate(moConfig, moDateDateStart.getValue(), moDateDateEnd.getValue());
-                    }
-                    catch (Exception exception) {
-                        validation.setMessage(exception.getMessage());
-                    }
-
-                    if (validation.isValid()) {
-                        if (!SLibTimeUtils.isBelongingToPeriod(moDateDateStart.getValue(), mtDefaultDateStart, mtDefaultDateEnd)) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateStart.getText()) + "' "
-                                    + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateStart) + "', "
-                                    + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateEnd) + "'.");
-                            validation.setComponent(moDateDateStart);
-                        }
-                        else if (!SLibTimeUtils.isBelongingToPeriod((moDateDateEnd.getValue() != null ? moDateDateEnd.getValue() : mtDefaultDateEnd), mtDefaultDateStart, mtDefaultDateEnd)) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateEnd.getText()) + "' "
-                                    + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateStart) + "', "
-                                    + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateEnd) + "'.");
-                            validation.setComponent(moDateDateEnd);
-                        }
-                    }
+                else {
+                    mbIsGoingToReceipts = false; // not going to receipts any more!
                     
-                    if (validation.isValid()) {
-                        if (SLibTimeUtils.digestDate(moDateDateStart.getValue())[0] != moIntFiscalYear.getValue() &&
-                                SLibTimeUtils.digestDate(moDateDateEnd.getValue())[0] != moIntFiscalYear.getValue()) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlFiscalYear) + "' " +
-                                    SGuiConsts.ERR_MSG_FIELD_DATE_YEAR + "de al menos una de las fechas inicial o final.");
-                            validation.setComponent(moIntFiscalYear);
+                    // validate number of payroll:
+                    
+                    num = SHrsUtils.validatePayrollNumber(miClient.getSession(), moIntPeriodYear.getValue(), moIntNumber.getValue(), mnFormSubtype);
+                    
+                    if (moIntNumber.getValue() > num) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlNumber) + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + num + ".");
+                        validation.setComponent(moIntNumber);
+                    }
+                    else {
+                        // validate period of payroll:
+                        
+                        try {
+                            SLibTimeUtils.validatePeriod(moDateDateStart.getValue(), moDateDateEnd.getValue());
+                            SHrsUtils.validatePayrollDate(moConfig, moDateDateStart.getValue(), moDateDateEnd.getValue());
                         }
-                        else {
-                            ArrayList<SGuiField> fields = new ArrayList<>();
-                            fields.add(moDecMwzWage.getField());
-                            fields.add(moDecMwzReferenceWage.getField());
-                            fields.add(moDecUmaAmount.getField());
-                            fields.add(moDecUmiAmount.getField());
-                            
-                            for (SGuiField field : fields) {
-                                validation = field.validateField();
-                                if (!validation.isValid()) {
-                                    break;
+                        catch (Exception exception) {
+                            validation.setMessage(exception.getMessage());
+                        }
+
+                        if (validation.isValid()) {
+                            if (!SLibTimeUtils.isBelongingToPeriod(moDateDateStart.getValue(), mtDefaultDateStart, mtDefaultDateEnd)) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateStart.getText()) + "' "
+                                        + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateStart) + "', "
+                                        + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateEnd) + "'.");
+                                validation.setComponent(moDateDateStart);
+                            }
+                            else if (!SLibTimeUtils.isBelongingToPeriod((moDateDateEnd.getValue() != null ? moDateDateEnd.getValue() : mtDefaultDateEnd), mtDefaultDateStart, mtDefaultDateEnd)) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateEnd.getText()) + "' "
+                                        + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateStart) + "', "
+                                        + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "'" + SLibUtils.DateFormatDate.format(mtDefaultDateEnd) + "'.");
+                                validation.setComponent(moDateDateEnd);
+                            }
+                        }
+
+                        if (validation.isValid()) {
+                            if (SLibTimeUtils.digestDate(moDateDateStart.getValue())[0] != moIntFiscalYear.getValue() &&
+                                    SLibTimeUtils.digestDate(moDateDateEnd.getValue())[0] != moIntFiscalYear.getValue()) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlFiscalYear) + "' " +
+                                        SGuiConsts.ERR_MSG_FIELD_DATE_YEAR + "de al menos una de las fechas inicial o final.");
+                                validation.setComponent(moIntFiscalYear);
+                            }
+                            else {
+                                ArrayList<SGuiField> fields = new ArrayList<>();
+                                fields.add(moDecMwzWage.getField());
+                                fields.add(moDecMwzReferenceWage.getField());
+                                fields.add(moDecUmaAmount.getField());
+                                fields.add(moDecUmiAmount.getField());
+
+                                for (SGuiField field : fields) {
+                                    validation = field.validateField();
+                                    if (!validation.isValid()) {
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                    
-                    if (validation.isValid()) {
-                        if (!SHrsUtils.isPayrollUniquenessFullfilled(miClient.getSession(), 
-                                moRegistry.getPkPayrollId(), moIntPeriodYear.getValue(), moIntNumber.getValue(), 
-                                mnFormSubtype, this.getPaysheetTypeId(), moKeyPaysheetCustomType.getValue()[0])) {
-                            validation.setMessage("Ya existe una nómina del mismo año, número, periodicidad y tipo.");
-                            validation.setComponent(moKeyPaysheetCustomType);
+
+                        if (validation.isValid()) {
+                            if (!SHrsUtils.isPayrollUniquenessFullfilled(miClient.getSession(), 
+                                    moRegistry.getPkPayrollId(), moIntPeriodYear.getValue(), moIntNumber.getValue(), 
+                                    mnFormSubtype, this.getPaysheetTypeId(), moKeyPaysheetCustomType.getValue()[0])) {
+                                validation.setMessage("Ya existe una nómina del mismo año, número, periodicidad y tipo.");
+                                validation.setComponent(moKeyPaysheetCustomType);
+                            }
                         }
                     }
                 }
