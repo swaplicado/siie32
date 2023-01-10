@@ -834,21 +834,25 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel32.add(jlDummy01);
 
         jbReceiptAdd.setText(">");
+        jbReceiptAdd.setToolTipText("Agregar");
         jbReceiptAdd.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptAdd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptAdd);
 
         jbReceiptAddAll.setText(">>");
+        jbReceiptAddAll.setToolTipText("Agregar todos");
         jbReceiptAddAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptAddAll.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptAddAll);
 
         jbReceiptRemove.setText("<");
+        jbReceiptRemove.setToolTipText("Remover");
         jbReceiptRemove.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptRemove.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptRemove);
 
         jbReceiptRemoveAll.setText("<<");
+        jbReceiptRemoveAll.setToolTipText("Remover todos");
         jbReceiptRemoveAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptRemoveAll.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptRemoveAll);
@@ -1135,8 +1139,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Régimen contratación"));
-                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Régimen contratación");
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo régimen (empleado)"));
+                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Tipo régimen (empleado)");
                 columnForm.setCellRenderer(new SGridCellRendererIconCircle());
                 gridColumnsForm.add(columnForm);
 
@@ -1160,7 +1164,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
-                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Régimen contratación");
+                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Tipo régimen (recibo)");
                 columnForm.setCellRenderer(new SGridCellRendererIconCircle());
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total percepciones $"));
@@ -1738,16 +1742,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + ": (" + jlFilter.getToolTipText() + ")'.");
             moBoolFilterWages.requestFocusInWindow();
         }
-        else if (recruitmentSchemaTypesSet != null && !recruitmentSchemaTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemaTypeId())) {
+        else if (recruitmentSchemaTypesSet != null && !recruitmentSchemaTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getEmployeeRecruitmentSchemaTypeId())) {
             miClient.showMsgBoxInformation("¡No se agregó el empleado, no cumple con los filtros seleccionados!");
             moBoolFilterWages.requestFocusInWindow();
         }
         else {
             try {
                 int index = moGridPaneEmployeesAvailable.getTable().getSelectedRow();
+                int recruitmentSchemaType = moKeyRecruitmentSchemaType.getValue()[0];
                 SRowPayrollEmployee rowEmployee = (SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow();
                 SHrsReceipt hrsReceipt = moHrsPayroll.createHrsReceipt(
-                        rowEmployee.getPkEmployeeId(), moIntPeriodYear.getValue(), moIntPeriod.getValue(), moIntFiscalYear.getValue(), moDateDateStart.getValue(), moDateDateEnd.getValue(), moKeyRecruitmentSchemaType.getValue()[0]);
+                        rowEmployee.getPkEmployeeId(), moIntPeriodYear.getValue(), moIntPeriod.getValue(), moIntFiscalYear.getValue(), moDateDateStart.getValue(), moDateDateEnd.getValue(), recruitmentSchemaType);
 
                 // recover receipt if it was already deleted:
                 
@@ -1772,6 +1777,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 rowReceipt.setTotalEarnings(hrsReceipt.getTotalEarnings());
                 rowReceipt.setTotalDeductions(hrsReceipt.getTotalDeductions());
                 rowReceipt.setHrsReceipt(hrsReceipt);
+                
+                if (recruitmentSchemaType != SModSysConsts.HRSS_TP_REC_SCHE_NA && recruitmentSchemaType != rowReceipt.getReceiptRecruitmentSchemaTypeId()) {
+                    SDbRegistry registry = miClient.getSession().readRegistry(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaType });
+                    rowReceipt.setReceiptRecruitmentSchemaTypeId(recruitmentSchemaType);
+                    rowReceipt.setReceiptRecruitmentSchemaType(registry.getCode() + " - " + registry.getName());
+                }
 
                 moGridPanePayrollReceipts.addGridRow(rowReceipt);
                 moGridPanePayrollReceipts.renderGridRows();
@@ -1816,7 +1827,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         // select top row:
                         moGridPaneEmployeesAvailable.setSelectedGridRow(index);
 
-                        if (!recruitmentSchemaTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemaTypeId())) {
+                        if (!recruitmentSchemaTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getEmployeeRecruitmentSchemaTypeId())) {
                             index++; // skip current row and go next
                         }
                         else {

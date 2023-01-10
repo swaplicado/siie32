@@ -175,7 +175,7 @@ public class SHrsEmployeeHireLog {
                     int logId = 0;
                     String sql = "SELECT COALESCE(MAX(id_log), 0) + 1 "
                             + "FROM " + schema + "." + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " "
-                            + "WHERE id_emp = " + mnPkEmployeeId + " ";
+                            + "WHERE id_emp = " + mnPkEmployeeId + ";";
                     
                     ResultSet resultSet = statement.executeQuery(sql);
                     if (resultSet.next()) {
@@ -196,12 +196,12 @@ public class SHrsEmployeeHireLog {
                             mnFkUserUpdateId + ", " +
                             "NOW()" + ", " +
                             "NOW()" + " " +
-                            ")";
+                            ");";
 
                     statement.execute(sql);
 
                     // insert employee membership into current company:
-                    SHrsEmployeeUtils.insertMembership(statement, schema, mnPkEmployeeId, moSession.getUser().getPkUserId());
+                    SHrsEmployeeUtils.insertMembership(statement, schema, mnPkEmployeeId, moSession != null ? moSession.getUser().getPkUserId() : mnFkUserInsertId);
                 }
             }
             else {

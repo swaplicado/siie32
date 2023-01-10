@@ -1298,6 +1298,7 @@
                             <Component class="javax.swing.JButton" name="jbReceiptAdd">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="&gt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Agregar"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1309,6 +1310,7 @@
                             <Component class="javax.swing.JButton" name="jbReceiptAddAll">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Agregar todos"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1320,6 +1322,7 @@
                             <Component class="javax.swing.JButton" name="jbReceiptRemove">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="&lt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Remover"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1331,6 +1334,7 @@
                             <Component class="javax.swing.JButton" name="jbReceiptRemoveAll">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Remover todos"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>

@@ -524,8 +524,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     + "WHERE id_emp = " + mnPkEmployeeId + ";";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
-                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\n"
-                        + "Membresía del empleado.");
+                // do nothing; some long-ago dismissed employees do not have membership registry
             }
             else {
                 mnXtaMembershipRecruitmentSchemaTypeId = resultSet.getInt("fk_tp_rec_sche_n");

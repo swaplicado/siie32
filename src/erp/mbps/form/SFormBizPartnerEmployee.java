@@ -1813,7 +1813,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void windowActivate() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jtfFirstname.requestFocus();
+            jtfLastname1.requestFocus();
         }
     }
     

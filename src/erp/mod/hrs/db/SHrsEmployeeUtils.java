@@ -231,7 +231,7 @@ public abstract class SHrsEmployeeUtils {
                 sql = "INSERT INTO " + table + " VALUES ("
                         + employeeId + ", "
                         + "FALSE, " // activate registry by default
-                        + SModSysConsts.HRSS_TP_REC_SCHE_NA + ", " // set type of recruitment schema to NA
+                        + "NULL, " // set type of recruitment schema to NULL
                         + userId + ", "
                         + SUtilConsts.USR_NA_ID + ", "
                         + "NOW(), "
@@ -241,7 +241,7 @@ public abstract class SHrsEmployeeUtils {
             else {
                 sql = "UPDATE " + table + " SET "
                         + "b_del = FALSE, " // reactivate registry if necessary
-                        + "fk_tp_rec_sche_n = " + SModSysConsts.HRSS_TP_REC_SCHE_NA + ", " // reset type of recruitment schema to NA
+                        + "fk_tp_rec_sche_n = NULL, " // reset type of recruitment schema to NULL
                         + "fk_usr_upd = " + userId + ", "
                         + "ts_usr_upd = NOW() "
                         + "WHERE id_emp = " + employeeId + ";";

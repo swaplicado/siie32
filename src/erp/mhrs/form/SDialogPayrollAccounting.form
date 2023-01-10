@@ -326,9 +326,9 @@
                             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                               <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
                             </Property>
-                            <Property name="text" type="java.lang.String" value="Al seleccionar recibos con la opci&#xf3;n &apos;&gt;&gt;&apos; (Agregar todos)"/>
+                            <Property name="text" type="java.lang.String" value="S&#xf3;lo al seleccionar recibos con la opci&#xf3;n &apos;&gt;&gt;&apos; (Agregar todos)"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[300, 23]"/>
+                              <Dimension value="[350, 23]"/>
                             </Property>
                           </Properties>
                         </Component>

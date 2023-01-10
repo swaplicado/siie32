@@ -299,8 +299,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jpPaymentType.add(jcbBankFilter);
 
         jlBankFilterHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlBankFilterHint.setText("Al seleccionar recibos con la opción '>>' (Agregar todos)");
-        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(300, 23));
+        jlBankFilterHint.setText("Sólo al seleccionar recibos con la opción '>>' (Agregar todos)");
+        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(350, 23));
         jpPaymentType.add(jlBankFilterHint);
 
         jpJournalVoucher.add(jpPaymentType);

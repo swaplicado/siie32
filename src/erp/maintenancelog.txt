@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 209.1/ 2023-01-05
+Sergio Abraham FLORES GUTIÉRREZ/ Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a la lectura de empleados al modificar nóminas para pasar por alto la no existencia del registro de membresía en la empresa (empleados dados de baja o de otras empresas no cuentan con este registro).
+2) Corrección a la obtención del ID de usuario al insertar una entrada en la bitácora de altas y bajas al crear empleados.
+3) Corrección al registro (inserción) de cambios en el historial de partidas de documentos.
+
+================================================================================
 SIIE 3.2 209.0/ 2023-01-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

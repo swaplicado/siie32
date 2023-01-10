@@ -36,7 +36,6 @@ import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
-import erp.mod.hrs.db.SHrsUtils;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.redis.SLockUtils;
@@ -45,12 +44,8 @@ import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.awt.Cursor;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -60,11 +55,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.swing.JFileChooser;
 import net.sf.jasperreports.engine.JRExporter;
@@ -3586,7 +3578,7 @@ public abstract class STrnUtilities {
         ResultSet resultSet;
         Statement statement = null;
         String sql = "";
-        int etyHis = 0;
+        int etyHist = 0;
         
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
@@ -3598,11 +3590,10 @@ public abstract class STrnUtilities {
         resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
-                etyHis = resultSet.getInt("hist");
+                etyHist = resultSet.getInt("hist");
             }
             
-        return etyHis + 1;
-        
+        return etyHist + 1;
     }
     
     public static void insertDpsEtyHist(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
@@ -3612,22 +3603,21 @@ public abstract class STrnUtilities {
         
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
-            sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fk_fid_item_ref_n_old, fk_fid_item_ref_n_new, fid_usr_edit, ts_edit) "
-                        + "VALUES (" + pkYearId + ", "
-                        + "" + pkDocId + ", "
-                        + "" + moDpsEntry.getPkEntryId() + ", " 
-                        + "" + histEty + ", "
-                        + "'" + moDpsEntry.getConceptKey() + "', "
-                        + "'" + conceptKeyNew + "', "
-                        + "'" + moDpsEntry.getConcept() + "', "
-                        + "'" + conceptNew + "', "
-                        + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
-                        + "'" + itemRef + "', "
-                        + "" + miClient.getSession().getUser().getPkUserId() + ", "
-                        + " NOW()); ");
+        sql = "INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, fid_usr_edit, ts_edit) "
+                + "VALUES (" + pkYearId + ", "
+                + "" + pkDocId + ", "
+                + "" + moDpsEntry.getPkEntryId() + ", " 
+                + "" + histEty + ", "
+                + "'" + moDpsEntry.getConceptKey() + "', "
+                + "'" + conceptKeyNew + "', "
+                + "'" + moDpsEntry.getConcept() + "', "
+                + "'" + conceptNew + "', "
+                + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
+                + "'" + itemRef + "', "
+                + "" + miClient.getSession().getUser().getPkUserId() + ", "
+                + " NOW());";
        
         statement.executeUpdate(sql);
-        
     }
     
     public static void insertDpsEtyHistItem(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew, int dpsDoc [][]) throws SQLException {

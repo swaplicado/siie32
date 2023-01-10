@@ -174,9 +174,9 @@
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="(Aplica al seleccionar recibos disponibles en grupo)"/>
+                        <Property name="text" type="java.lang.String" value="S&#xf3;lo al seleccionar recibos con la opci&#xf3;n &apos;&gt;&gt;&apos; (Agregar todos)"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[250, 23]"/>
+                          <Dimension value="[350, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -199,7 +199,7 @@
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Recibos disponibles"/>
+                        <TitledBorder title="Recibos disponibles:"/>
                       </Border>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -275,6 +275,7 @@
                         <Component class="javax.swing.JButton" name="jbAdd">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="&gt;"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Agregar"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
                             </Property>
@@ -283,6 +284,7 @@
                         <Component class="javax.swing.JButton" name="jbAddAll">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Agregar todos"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
                             </Property>
@@ -291,6 +293,7 @@
                         <Component class="javax.swing.JButton" name="jbRemove">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="&lt;"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Remover"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
                             </Property>
@@ -299,6 +302,7 @@
                         <Component class="javax.swing.JButton" name="jbRemoveAll">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Remover todos"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
                             </Property>
@@ -312,7 +316,7 @@
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Recibos seleccionados"/>
+                        <TitledBorder title="Recibos seleccionados:"/>
                       </Border>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

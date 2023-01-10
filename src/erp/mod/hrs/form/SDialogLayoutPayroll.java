@@ -172,8 +172,8 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jPanel8.add(moKeyBankFilter);
 
         jlBankFilterHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlBankFilterHint.setText("(Aplica al seleccionar recibos disponibles en grupo)");
-        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(250, 23));
+        jlBankFilterHint.setText("Sólo al seleccionar recibos con la opción '>>' (Agregar todos)");
+        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel8.add(jlBankFilterHint);
 
         jPanel16.add(jPanel8);
@@ -182,7 +182,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
         jPanel9.setLayout(new java.awt.BorderLayout(5, 0));
 
-        jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos disponibles"));
+        jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos disponibles:"));
         jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(450, 100));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
@@ -208,18 +208,22 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jPanel12.add(jlDummy01);
 
         jbAdd.setText(">");
+        jbAdd.setToolTipText("Agregar");
         jbAdd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jbAdd);
 
         jbAddAll.setText(">>");
+        jbAddAll.setToolTipText("Agregar todos");
         jbAddAll.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jbAddAll);
 
         jbRemove.setText("<");
+        jbRemove.setToolTipText("Remover");
         jbRemove.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jbRemove);
 
         jbRemoveAll.setText("<<");
+        jbRemoveAll.setToolTipText("Remover todos");
         jbRemoveAll.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jbRemoveAll);
 
@@ -227,7 +231,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
         jPanel9.add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        jpReceiptSelect.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos seleccionados"));
+        jpReceiptSelect.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos seleccionados:"));
         jpReceiptSelect.setPreferredSize(new java.awt.Dimension(475, 100));
         jpReceiptSelect.setLayout(new java.awt.BorderLayout());
 

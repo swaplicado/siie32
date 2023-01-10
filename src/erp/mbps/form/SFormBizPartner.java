@@ -3294,18 +3294,18 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldBizPartner.setFieldValue(moBizPartner.getFkBizPartnerIdentityTypeId() == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? "" : moBizPartner.getBizPartner());
         
         bgOrgNamesPolicy.clearSelection();
-//        switch (SLibUtilities.parseInt(moBizPartner.getBizPartnerFiscalPolicy())) {
-//            case SDataBizPartner.CFD_ORG_NAMES_FULL_NAME:
-//                jrbOrgNamesPolicyFullName.setSelected(true);
-//                break;
-//            case SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME:
-//                jrbOrgNamesPolicyFiscalName.setSelected(true);
-//                break;
-//            default:
-//                // nothing
-//        }
-//        moFieldBizPartnerFiscal.setFieldValue(moBizPartner.getBizPartnerFiscal());
-//        moFieldBizPartnerCapitalRegime.setFieldValue(moBizPartner.getBizPartnerCapitalRegime());
+        switch (SLibUtilities.parseInt(moBizPartner.getBizPartnerFiscalPolicy())) {
+            case SDataBizPartner.CFD_ORG_NAMES_FULL_NAME:
+                jrbOrgNamesPolicyFullName.setSelected(true);
+                break;
+            case SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME:
+                jrbOrgNamesPolicyFiscalName.setSelected(true);
+                break;
+            default:
+                // nothing
+        }
+        moFieldBizPartnerFiscal.setFieldValue(moBizPartner.getBizPartnerFiscal());
+        moFieldBizPartnerCapitalRegime.setFieldValue(moBizPartner.getBizPartnerCapitalRegime());
         
         moFieldBizPartnerCommercial.setFieldValue(moBizPartner.getBizPartner().equals(moBizPartner.getBizPartnerCommercial()) ? "" : moBizPartner.getBizPartnerCommercial());
         moFieldFiscalId.setFieldValue(moBizPartner.getFiscalId());
@@ -3812,18 +3812,21 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                         jckIsCategoryDeleted.setText("Empresa eliminada");
                         mnParamBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CO;
                         break;
+                        
                     case SDataConstants.BPSX_BP_SUP:
                         setTitle("Proveedor");
                         jckIsCategoryDeleted.setText("Proveedor eliminado");
                         mnParamBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_SUP;
                         mbCanEditCredit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_CRED_CONFIG).HasRight;
                         break;
+                        
                     case SDataConstants.BPSX_BP_CUS:
                         setTitle("Cliente");
                         jckIsCategoryDeleted.setText("Cliente eliminado");
                         mnParamBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CUS;
                         mbCanEditCredit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_CRED_CONFIG).HasRight;
                         break;
+                        
                     default:
                         setTitle("Asociado de negocios");
                         jckIsCategoryDeleted.setText("Asociado de negocios eliminado");
