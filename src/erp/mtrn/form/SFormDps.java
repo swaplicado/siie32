@@ -4425,12 +4425,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                         else {
                             moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
-                                if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
-                                    moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
-                                }
+                            if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
+                                moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
                             }
                         }
                     }
+                }
                 
                 moFieldCfdiConfirmation.setFieldValue("");  // confirmation is unique, cannot be copied when document is being created
                 moFieldCfdiGblYear.setFieldValue(0);  // confirmation is unique, cannot be copied when document is being created
@@ -9810,7 +9810,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
                 // Validate tax regime receptor:
                 
-                if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL && jcbCfdiTaxRegimeReceptor.getSelectedIndex() <= 0) {
+                if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && jcbCfdiTaxRegimeReceptor.getSelectedIndex() <= 0) {
                     validation.setMessage("El regimén fiscal del receptor debe de tener un valor.");
                     validation.setComponent(jcbCfdiTaxRegimeReceptor);
                 }
