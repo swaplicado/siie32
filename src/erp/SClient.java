@@ -112,7 +112,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     public static final String APP_NAME = "SIIE 3.2";
     public static final String APP_RELEASE = "3.2 209.1"; // fecha release: 2023-01-09
-    public static final String APP_RELEASE = "3.2 209.1"; // fecha release: 2023-01-05
     public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
