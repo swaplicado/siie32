@@ -10,6 +10,7 @@ import cfd.ver3.DCfdVer3Utils;
 import cfd.ver3.cce11.DElementTipoDomicilioInt;
 import cfd.ver3.cce11.DElementTipoDomicilioNac;
 import cfd.ver4.DCfdVer4Utils;
+import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstantsSys;
 
 /**
@@ -443,6 +444,10 @@ public class SCfdDataBizPartner {
 
         if (mfVersion == DCfdConsts.CFDI_VER_33 || mfVersion == DCfdConsts.CFDI_VER_40) {
             receptor = new cfd.ver3.cce11.DElementReceptor();
+            
+            if (msBizPartnerRfc.equals(DCfdi40Catalogs.RfcGenericoExtranjero)) {
+                receptor.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
+            }
 
             receptor.setEltDomicilio(new DElementTipoDomicilioInt());
             receptor.getEltDomicilio().getAttCalle().setString(msBizPartnerStreet);

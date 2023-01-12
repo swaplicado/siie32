@@ -8783,6 +8783,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
                     }
+                    if (!validation.getIsError() && isCfdIntCommerceRequired()) {
+                        if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(DCfdi33Catalogs.CFDI_USO_POR_DEF) != 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + DCfdi33Catalogs.CFDI_USO_POR_DEF + ">.");
+                            validation.setComponent(jcbCfdiCfdiUsage);
+                            jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                        }
+                    }
                 }
             }
             
@@ -10243,11 +10250,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
                                         validation.setComponent(jcbFkIncotermId);
                                         jTabbedPane.setSelectedIndex(TAB_MKT);
-                                    }
-                                    else if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(DCfdi33Catalogs.CFDI_USO_POR_DEF) != 0) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + DCfdi33Catalogs.CFDI_USO_POR_DEF + ">.");
-                                        validation.setComponent(jcbCfdiCfdiUsage);
-                                        jTabbedPane.setSelectedIndex(TAB_CFD_XML);
                                     }
                                     else if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
                                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");

@@ -17,7 +17,7 @@ import cfd.ver33.DElementImpuestos;
 import cfd.ver40.DCfdi40Catalogs;
 import cfd.ver40.DElementInformacionGlobal;
 import com.finkok.facturacion.cancel.CancelSOAP;
-import com.finkok.stamp.AcuseRecepcionCFDI; 
+import com.finkok.stamp.AcuseRecepcionCFDI;
 import com.finkok.stamp.Incidencia;
 import com.finkok.stamp.IncidenciaArray;
 import com.finkok.stamp.StampSOAP;
@@ -4671,7 +4671,9 @@ public abstract class SCfdUtils implements Serializable {
 
         cfd.ver40.DElementReceptor elementReceptor = (cfd.ver40.DElementReceptor) receptorCfd.createRootElementReceptor();
         
-        if (isGlobal) elementReceptor.getAttDomicilioFiscalReceptor().setString(xmlCfdi.getComprobanteLugarExpedicion());
+        if (isGlobal || elementReceptor.getAttRfc().getString().equals(DCfdi40Catalogs.RfcGenericoExtranjero)) {
+            elementReceptor.getAttDomicilioFiscalReceptor().setString(xmlCfdi.getComprobanteLugarExpedicion());
+        }
         elementReceptor.getAttRegimenFiscalReceptor().setString(xmlCfdi.getReceptorRegimenFiscal());
         elementReceptor.getAttUsoCFDI().setString(xmlCfdi.getReceptorUsoCFDI());
         
