@@ -330,7 +330,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
                 receptor = comprobante.getEltReceptor().getAttNombre().getString() + " (" + comprobante.getEltReceptor().getAttRfc().getString() + ")";
             }
 
-            if (comprobante.getEltReceptor().getAttRfc().getString().equals(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId())) {
+            if (!comprobante.getEltReceptor().getAttRfc().getString().equals(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId())) {
                 validation.setMessage("¡El receptor '" + receptor + "' no corresponde a la empresa!");
             }
             else {
