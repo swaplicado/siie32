@@ -8858,6 +8858,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
                     }
+                    if (!validation.getIsError() && isCfdIntCommerceRequired()) {
+                        if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(DCfdi40Catalogs.ClaveUsoCfdiSinEfectosFiscales) != 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + DCfdi40Catalogs.ClaveUsoCfdiSinEfectosFiscales + ">.");
+                            validation.setComponent(jcbCfdiCfdiUsage);
+                            jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                        }
+                    }
                 }
             }
             

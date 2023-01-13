@@ -4671,10 +4671,11 @@ public abstract class SCfdUtils implements Serializable {
 
         cfd.ver40.DElementReceptor elementReceptor = (cfd.ver40.DElementReceptor) receptorCfd.createRootElementReceptor();
         
+        elementReceptor.getAttRegimenFiscalReceptor().setString(xmlCfdi.getReceptorRegimenFiscal());
         if (isGlobal || elementReceptor.getAttRfc().getString().equals(DCfdConsts.RFC_GEN_INT) || elementReceptor.getAttRfc().getString().equals(DCfdConsts.RFC_GEN_NAC)) {
             elementReceptor.getAttDomicilioFiscalReceptor().setString(xmlCfdi.getComprobanteLugarExpedicion());
+            elementReceptor.getAttRegimenFiscalReceptor().setString(DCfdi40Catalogs.CAT_REG_FISCAL_RECEPTOR_SIN_EFECTOS_FISC);
         }
-        elementReceptor.getAttRegimenFiscalReceptor().setString(xmlCfdi.getReceptorRegimenFiscal());
         elementReceptor.getAttUsoCFDI().setString(xmlCfdi.getReceptorUsoCFDI());
         
         if (hasIntCommerceComplement) {

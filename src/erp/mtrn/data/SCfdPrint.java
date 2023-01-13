@@ -32,12 +32,14 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCurrency;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
 import erp.mod.SModDataUtils;
 import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SBpsUtils;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
@@ -1218,14 +1220,54 @@ public class SCfdPrint {
 
         // Emisor:
 
+        int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltEmisor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idEmisor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
-        paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
         paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
 
         // Receptor:
 
+        int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idReceptor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
-        paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
         paramsMap.put("sFiscalId", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
         paramsMap.put("sRecRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltReceptor().getAttRegimenFiscalReceptor().getString()));
         paramsMap.put("sCfdUsoCFDI", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, comprobante.getEltReceptor().getAttUsoCFDI().getString()));
@@ -1599,14 +1641,54 @@ public class SCfdPrint {
         
         // Emisor:
         
+        int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltEmisor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idEmisor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
-        paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
         paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
         
         // Receptor:
         
+        int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idReceptor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sRecNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sRecNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sRecNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sRecNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
-        paramsMap.put("sRecNombre", comprobante.getEltReceptor().getAttNombre().getString());
         paramsMap.put("sRecDomicilioFiscal", comprobante.getEltReceptor().getAttDomicilioFiscalReceptor().getString());
         paramsMap.put("sRecResidenciaFiscal", comprobante.getEltReceptor().getAttResidenciaFiscal().getString());
         paramsMap.put("sRecNumRegIdTrib", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
@@ -3295,14 +3377,54 @@ public class SCfdPrint {
         
         // Emisor:
         
+        int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltEmisor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idEmisor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
-        paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
         paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
         
         // Receptor:
         
+        int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idReceptor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
-        paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
         paramsMap.put("sFiscalId", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
         paramsMap.put("sRecResidenciaFiscal", comprobante.getEltReceptor().getAttResidenciaFiscal().getString());
         paramsMap.put("sRecNumRegIdTrib", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
