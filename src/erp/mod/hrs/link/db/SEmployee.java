@@ -19,6 +19,7 @@ public class SEmployee {
     String admission_date;
     String leave_date;
     String dt_tp_pay;
+    String dt_bir;
     String benefit_date;
     String email;
     int company_id;
@@ -181,6 +182,12 @@ public class SEmployee {
     public void setIs_deleted(boolean is_deleted) {
         this.is_deleted = is_deleted;
     }
-    
-    
+
+    public String getDt_bir() {
+        return dt_bir;
+    }
+
+    public void setDt_bir(String dt_bir) {
+        this.dt_bir = dt_bir;
+    }
 }

@@ -281,6 +281,7 @@ public class SShareDB {
                 + "    bp.bp, "
                 + "    bp.lastname, "
                 + "    bp.firstname, "
+                + "    e.dt_bir, "
                 + "    e.dt_ben, "
                 + "    e.dt_hire, "
                 + "    e.dt_dis_n, "
@@ -326,8 +327,8 @@ public class SShareDB {
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
                 emp.benefit_date = res.getString("dt_ben");
+                emp.dt_bir = res.getString("dt_bir");
                 emp.dt_tp_pay = res.getString("dt_tp_pay");
-                emp.benefit_date = res.getString("dt_ben");
                 emp.email = res.getString("email_01");
                 emp.overtime_policy = res.getInt("overtime");
                 emp.checker_policy = res.getInt("checker_policy");
@@ -1419,5 +1420,58 @@ public class SShareDB {
         }
     
         return true;
+    }
+    
+    public ArrayList<SPlanVacations> getSPlanVactions(String strDate) throws SConfigException, ClassNotFoundException, SQLException {
+        
+        String mainDataBase = this.getMainDatabase();
+        
+        ArrayList<SPlanVacations> lPlanVac = null;
+        lPlanVac = new ArrayList();
+        SPlanVacations planVac = null;
+         
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", mainDataBase, "", "");
+            
+            String query = "";
+            query = "SELECT name AS nombre, dt_sta AS start,  id_ben AS id, fk_tp_pay_n AS pay "
+                                    + "FROM"
+                                    + " hrs_ben "
+                                    + "WHERE fk_ear = 101 "
+                                    + " AND b_del = 0;";
+                          
+            Statement stV = conn.createStatement();
+            ResultSet resV = stV.executeQuery(query);
+
+            if (resV.next()) {
+                planVac.setName(resV.getString("nombre"));
+                planVac.setWay_pay(resV.getInt("pay"));
+                
+                ArrayList<SPlanVacationsAux> lPlanVacAux = null;
+                lPlanVacAux = new ArrayList();
+                SPlanVacationsAux planVacAux = null;
+                
+                String queryAux = "";
+                queryAux = "SELECT ann AS aniversary, ben_day AS days "
+                                    + "FROM"
+                                    + " hrs_ben_row_aux "
+                                    + "WHERE id_ben = " + resV.getInt("id") +";";
+                
+                Statement stA = conn.createStatement();
+                ResultSet resA = stA.executeQuery(queryAux);
+                
+                if (resA.next()) {
+                    planVacAux.setYear(resA.getInt("aniversary"));
+                    planVacAux.setDays(resA.getInt("days"));  
+                    lPlanVacAux.add(planVacAux);
+                }
+                
+                planVac.setPlanVacationsAux(lPlanVacAux);
+                lPlanVac.add(planVac);
+                
+            }
+            
+        }
+        return lPlanVac;
     }
 }
