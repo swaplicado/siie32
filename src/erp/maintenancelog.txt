@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 209.3/ 2023-01-13
+Sergio Abraham FLORES GUTIÉRREZ/ Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adecuación captura nombre fiscal y régimen de capital de clientes y empresas.
+2) Adición de leyenda de embarque fuera del período de entregas al formato de impresión de contratos.
+3) Ajustes a validaciones propias del CFDI 4.0: domicilio fiscal del receptor en facturas a público en general; nodo global en facturas a público en general; uso de CFDI de facturas de exportación; etc.
+
+================================================================================
 SIIE 3.2 209.2/ 2023-01-10
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
