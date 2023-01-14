@@ -137,7 +137,7 @@ public abstract class STrnUtilities {
 
         sql = "SELECT id_lot FROM trn_lot " +
                 "WHERE b_del = 0 AND id_item = " + itemId + " AND id_unit = " + unitId + " AND " +
-                "lot = '" + lot + "' ";
+                "lot = '" + lot + "' "; 
 
         resulSet = client.getSession().getStatement().executeQuery(sql);
         if (resulSet.next()) {
@@ -1445,47 +1445,37 @@ public abstract class STrnUtilities {
         SDataBizPartnerBranchAddress oAddress = null;
 
         diog = (SDataDiog) SDataUtilities.readRegistry(client, SDataConstants.TRN_DIOG, key, SLibConstants.EXEC_MODE_VERBOSE);
-        String fileName = (".pdf");
-        
-        client.getFileChooser().setSelectedFile(new File(fileName));
-        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        oAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB_ADD, new int [] { diog.getFkCompanyBranchId(), 1}, SLibConstants.EXEC_MODE_SILENT);
 
-            try {
-            cursor = client.getFrame().getCursor();
-            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        try {
+        cursor = client.getFrame().getCursor();
+        client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-            map = client.createReportParams();
-            map.put("nPkYearId", diog.getPkYearId());
-            map.put("nPkDocId", diog.getPkDocId());
-            map.put("sCalle", oAddress.getStreet());
-            map.put("sNoExterior", oAddress.getStreetNumberExt());
-            map.put("sNoInterior", oAddress.getStreetNumberInt());
-            map.put("sColonia", oAddress.getNeighborhood());
-            map.put("sLocalidad", oAddress.getLocality());
-            map.put("sReferencia", oAddress.getReference());
-            map.put("sMunicipio", oAddress.getCounty());
-            map.put("sEstado", oAddress.getState());
-            map.put("sPais", oAddress.getDbmsDataCountry().getCountry());
-            map.put("sCodigoPostal", oAddress.getZipCode());
+        map = client.createReportParams();
+        map.put("nPkYearId", diog.getPkYearId());
+        map.put("nPkDocId", diog.getPkDocId());
+        map.put("sCalle", oAddress.getStreet());
+        map.put("sNoExterior", oAddress.getStreetNumberExt());
+        map.put("sNoInterior", oAddress.getStreetNumberInt());
+        map.put("sColonia", oAddress.getNeighborhood());
+        map.put("sLocalidad", oAddress.getLocality());
+        map.put("sReferencia", oAddress.getReference());
+        map.put("sMunicipio", oAddress.getCounty());
+        map.put("sEstado", oAddress.getState());
+        map.put("sPais", oAddress.getDbmsDataCountry().getCountry());
+        map.put("sCodigoPostal", oAddress.getZipCode());
 
-            jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DIOG, map);
-            JRExporter exporter = new JRPdfExporter();
-            exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, new FileOutputStream(file));
-            exporter.exportReport();
-            
-            }
-            catch (Exception e) {
-                SLibUtilities.renderException(STrnUtilities.class.getName(), e);
-            }
-        
-            finally {
-            client.getFrame().setCursor(cursor);
-            } 
+        jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DIOG, map);
+        jasperViewer = new JasperViewer(jasperPrint, false);
+        jasperViewer.setTitle("Impresión de entrada a almacén");
+        jasperViewer.setVisible(true);
+
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(STrnUtilities.class.getName(), e);
         }
     }
-    
+     
     public static String getMailToSendForOrder(final SClientInterface client, final int[] keyDoc) throws Exception {
         String mailToSend = "";
         SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
@@ -3578,7 +3568,7 @@ public abstract class STrnUtilities {
         ResultSet resultSet;
         Statement statement = null;
         String sql = "";
-        int etyHist = 0;
+        int etyHis = 0;
         
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
@@ -3590,34 +3580,46 @@ public abstract class STrnUtilities {
         resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
-                etyHist = resultSet.getInt("hist");
+                etyHis = resultSet.getInt("hist");
             }
             
-        return etyHist + 1;
+        return etyHis + 1;
+        
     }
     
     public static void insertDpsEtyHist(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
         Statement statement = null;
         String sql = "";
         int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
-        
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
-        sql = "INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, fid_usr_edit, ts_edit) "
-                + "VALUES (" + pkYearId + ", "
-                + "" + pkDocId + ", "
-                + "" + moDpsEntry.getPkEntryId() + ", " 
-                + "" + histEty + ", "
-                + "'" + moDpsEntry.getConceptKey() + "', "
-                + "'" + conceptKeyNew + "', "
-                + "'" + moDpsEntry.getConcept() + "', "
-                + "'" + conceptNew + "', "
-                + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
-                + "'" + itemRef + "', "
-                + "" + miClient.getSession().getUser().getPkUserId() + ", "
-                + " NOW());";
-       
+        int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
+        
+        sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
+                    + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
+                    + "VALUES (" + pkYearId + ", "
+                    + "" + pkDocId + ", "
+                    + "" + moDpsEntry.getPkEntryId() + ", " 
+                    + "" + histEty + ", "
+                    + "'" + moDpsEntry.getConceptKey() + "', "
+                    + "'" + conceptKeyNew + "', "
+                    + "'" + moDpsEntry.getConcept() + "', "
+                    + "'" + conceptNew + "', "
+                    + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
+                    + "'" + itemRef + "', "
+
+                    + "'" + moDpsEntry.getFkItemId()+ "', "
+                    + "'" + moDpsEntry.getFkItemId() + "', "
+                    + "'" + moDpsDoc[0][0] + "', "
+                    + "'" + moDpsDoc[0][1] + "', "
+                    + "'" + moDpsDoc[0][2] + "', "
+
+                    + "" + miClient.getSession().getUser().getPkUserId() + ", "
+                    + " NOW()); ");
+           
         statement.executeUpdate(sql);
+        
+        
     }
     
     public static void insertDpsEtyHistItem(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew, int dpsDoc [][]) throws SQLException {
@@ -3628,7 +3630,7 @@ public abstract class STrnUtilities {
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
         int dpsLength = dpsDoc.length;
-
+        
         for (int i = 0; i < dpsLength; i++) {
             sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
                     + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
@@ -4057,6 +4059,24 @@ public abstract class STrnUtilities {
 
         
        return dpsDoc;
+    }
+    
+    public static int[][] getDpsTpDps(SClientInterface miClient, int pkYearId, int pkDocId) throws SQLException {
+        ResultSet resultSet;
+        String sql = "";
+        int[][] dpsTpDoc = new int[1][3];
+        
+        sql  = "SELECT * FROM trn_dps WHERE id_year = " + pkYearId + " and id_doc = " + pkDocId + ";";
+        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        
+            while(resultSet.next()) {
+                dpsTpDoc[0][0] = resultSet.getInt("fid_ct_dps");
+                dpsTpDoc[0][1] = resultSet.getInt("fid_cl_dps");
+                dpsTpDoc[0][2] = resultSet.getInt("fid_tp_dps");
+            }
+            
+        return dpsTpDoc;
+        
     }
 
     public static int[][] getDpsRelatedIdPurchaseOrders(SClientInterface miClient, int pkYearId, int pkDocId) throws SQLException {

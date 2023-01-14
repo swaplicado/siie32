@@ -443,6 +443,10 @@ public class SCfdDataBizPartner {
 
         if (mfVersion == DCfdConsts.CFDI_VER_33 || mfVersion == DCfdConsts.CFDI_VER_40) {
             receptor = new cfd.ver3.cce11.DElementReceptor();
+            
+            if (msBizPartnerRfc.equals(DCfdConsts.RFC_GEN_INT)) {
+                receptor.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
+            }
 
             receptor.setEltDomicilio(new DElementTipoDomicilioInt());
             receptor.getEltDomicilio().getAttCalle().setString(msBizPartnerStreet);

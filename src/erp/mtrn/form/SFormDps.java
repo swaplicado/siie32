@@ -5732,9 +5732,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             case 1: // linked to commissions
                                 msg = "no puede ser posterior a la fecha de los documentos de comisiones.";
                                 break;
-                            case 2: // linked to DIOG's
-                                msg = "no puede ser posterior a la fecha del documento de inventarios: '" + (String) vParams.get(1) + "'.";
-                                break;
+                            // Deshabilitado, al momento de surtir inventarios por facturas/pedidos y editar el documento, lanzaba la validación
+                            // case 2: // linked to DIOG's
+                            //     msg = "no puede ser posterior a la fecha del documento de inventarios: '" + (String) vParams.get(1) + "'.";
+                            //     break;
                             case 3: // linked to shipments
                                 msg = "no puede ser posterior a la fecha del documento de embarque: '" + (String) vParams.get(1) + "'.";
                                 break;
@@ -8783,6 +8784,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
                     }
+                    if (!validation.getIsError() && isCfdIntCommerceRequired()) {
+                        if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(DCfdi33Catalogs.CFDI_USO_POR_DEF) != 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + DCfdi33Catalogs.CFDI_USO_POR_DEF + ">.");
+                            validation.setComponent(jcbCfdiCfdiUsage);
+                            jTabbedPane.setSelectedIndex(TAB_CFD_XML);
+                        }
+                    }
                 }
             }
             
@@ -8848,6 +8856,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'folio', p. ej., '" + xmlFolioTrimmed + "'.");
                                 }
                             }
+                        }
+                    }
+                    if (!validation.getIsError() && isCfdIntCommerceRequired()) {
+                        if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(DCfdi40Catalogs.ClaveUsoCfdiSinEfectosFiscales) != 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + DCfdi40Catalogs.ClaveUsoCfdiSinEfectosFiscales + ">.");
+                            validation.setComponent(jcbCfdiCfdiUsage);
+                            jTabbedPane.setSelectedIndex(TAB_CFD_XML);
                         }
                     }
                 }
@@ -10243,11 +10258,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
                                         validation.setComponent(jcbFkIncotermId);
                                         jTabbedPane.setSelectedIndex(TAB_MKT);
-                                    }
-                                    else if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(DCfdi33Catalogs.CFDI_USO_POR_DEF) != 0) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + DCfdi33Catalogs.CFDI_USO_POR_DEF + ">.");
-                                        validation.setComponent(jcbCfdiCfdiUsage);
-                                        jTabbedPane.setSelectedIndex(TAB_CFD_XML);
                                     }
                                     else if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
                                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
