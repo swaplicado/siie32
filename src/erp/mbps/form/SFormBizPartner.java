@@ -1802,6 +1802,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         return isSupplier() || isCustomer();
     }
     
+    private boolean applyOrgNamesPolicy() {
+        return isCompany() || isCustomer();
+    }
+    
+    private boolean enableOrgNamesPolicyControls() {
+        return applyOrgNamesPolicy() && mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE;
+    }
+    
     private String composeBizPartnerName() {
         String name = "";
 
@@ -1859,17 +1867,24 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 jftAlternativeId.setEnabled(false);
                 jtfBizPartner.setEnabled(true);
                 
-                boolean enableOrgNamesPolicy = isCustomer() && mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE;
-                jrbOrgNamesPolicyFullName.setEnabled(enableOrgNamesPolicy);
-                jrbOrgNamesPolicyFiscalName.setEnabled(enableOrgNamesPolicy);
+                boolean applyPolicy = applyOrgNamesPolicy();
+                boolean enablePolicyControls = enableOrgNamesPolicyControls();
+                
+                jrbOrgNamesPolicyFullName.setEnabled(enablePolicyControls);
+                jrbOrgNamesPolicyFiscalName.setEnabled(enablePolicyControls);
                 bgOrgNamesPolicy.clearSelection();
                 
-                if (enableOrgNamesPolicy) {
-                    bgOrgNamesPolicy.setSelected(jrbOrgNamesPolicyFullName.getModel(), true);
+                if (applyPolicy) {
+                    if (mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME) {
+                        jrbOrgNamesPolicyFiscalName.setSelected(true);
+                    }
+                    else {
+                        jrbOrgNamesPolicyFullName.setSelected(true);
+                    }
                 }
                 
-                jtfBizPartnerFiscal.setEnabled(isCustomer());
-                jtfBizPartnerCapitalRegime.setEnabled(isCustomer());
+                jtfBizPartnerFiscal.setEnabled(applyPolicy);
+                jtfBizPartnerCapitalRegime.setEnabled(applyPolicy);
 
                 moFieldAlternativeId.setMaskFormatter("");
             }
@@ -3531,7 +3546,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moBizPartner.setFirstname("");
             moBizPartner.setAlternativeId(""); // CURP
             
-            if (isCustomer()) {
+            if (applyOrgNamesPolicy()) {
                 if (mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE) {
                     moBizPartner.setBizPartnerFiscalPolicy("" + (jrbOrgNamesPolicyFiscalName.isSelected() ? SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME : SDataBizPartner.CFD_ORG_NAMES_FULL_NAME));
                 }
@@ -3656,7 +3671,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartnerCategory.setFkUserAnalystId_n(jcbFkUserAnalystId.getSelectedIndex() <= 0 ? 0 : moFieldFkUserAnalystId.getKeyAsIntArray()[0]);
         moBizPartnerCategory.setIsDeleted(moFieldIsCategoryDeleted.getBoolean());
 
-        moBizPartnerCategory.setDbmBizPartnerType(jcbFkBizPartnerTypeId.getSelectedItem().toString());
+        moBizPartnerCategory.setDbmBizPartnerType(jcbFkBizPartnerTypeId.getSelectedIndex() <= 0 ? "" : jcbFkBizPartnerTypeId.getSelectedItem().toString());
         moBizPartnerCategory.setDbmsCreditType(jcbFkCreditTypeId_n.getSelectedIndex() <= 0 ? "" : jcbFkCreditTypeId_n.getSelectedItem().toString());
         moBizPartnerCategory.setDbmsLanguage(jcbFkLanguageId_n.getSelectedIndex() <= 0 ? "" : readLanguageKey(moFieldFkLanguageId_n.getKeyAsIntArray()[0]));
         moBizPartnerCategory.setDbmsCurrency(jcbFkCurrencyId_n.getSelectedIndex() <= 0 ? "" : readCurrencyKey(moFieldFkCurrencyId_n.getKeyAsIntArray()[0]));
