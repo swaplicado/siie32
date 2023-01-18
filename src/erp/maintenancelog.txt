@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 209.4/ 2023-01-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención del nombre del empleado para la emisión e impresión de CFDI de nóminas.
+2) Adecuación a la captura del nombre fiscal y régimen de capital de clientes y empresas.
+
+================================================================================
 SIIE 3.2 209.3/ 2023-01-13
 Sergio Abraham FLORES GUTIÉRREZ/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Adecuación captura nombre fiscal y régimen de capital de clientes y empresas.
+1) Adecuación a la captura del nombre fiscal y régimen de capital de clientes y empresas.
 2) Adición de leyenda de embarque fuera del período de entregas al formato de impresión de contratos.
 3) Ajustes a validaciones propias del CFDI 4.0: domicilio fiscal del receptor en facturas a público en general; nodo global en facturas a público en general; uso de CFDI de facturas de exportación; etc.
 

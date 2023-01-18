@@ -98,6 +98,23 @@ public class SCfdPrint {
     }
     
     /**
+     * Get business partner name when available name is empty.
+     * @param client GUI client interface.
+     * @param availableName Availabe business partner name.
+     * @param bizPartnerId Business partner ID.
+     * @return  Business partner name.
+     */
+    private static String getBizPartnerName(final SClientInterface client, final String availableName, final int bizPartnerId) {
+        String name = availableName;
+        
+        if (name.isEmpty()) {
+            name = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.DESCRIPTION_NAME);
+        }
+        
+        return name;
+    }
+    
+    /**
      * Computes report.
      * @param cfd
      * @param reportType
@@ -1074,6 +1091,14 @@ public class SCfdPrint {
         computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap, printMode, 1);
     }
     
+    /**
+     * Prints CFDI 4.0.
+     * @param cfd CFD
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @param dps DPS
+     * @throws java.lang.Exception
+     * XXX 2018-01-12 (Sergio Flores): normalize these parameters because CFD is contained in DPS! WTF!
+     */
     public void printCfdi40(final erp.mtrn.data.SDataCfd cfd, final int printMode, final erp.mtrn.data.SDataDps dps) throws java.lang.Exception {
         // CFDI's header:
         
@@ -1746,6 +1771,7 @@ public class SCfdPrint {
         
         computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_CRP_20, paramsMap, printMode, 1);
     }
+    
     /**
      * Prints payroll CFDI 3.2 with complement 1.1.
      * @param cfd
@@ -2457,7 +2483,7 @@ public class SCfdPrint {
         
         paramsMap.put("sCfdMoneda", comprobante.getAttMoneda().getString());
         paramsMap.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
-        paramsMap.put("ReceptorNombre", receptor.getAttNombre().getString());
+        paramsMap.put("ReceptorNombre", getBizPartnerName(miClient, receptor.getAttNombre().getString(), cfd.getFkPayrollReceiptEmployeeId_n()));
         paramsMap.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
         paramsMap.put("nPkPayrollId", payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayroll.getPkPayrollId() : payroll.getPkPayrollId());
         paramsMap.put("NominaNumTipo", payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (formerPayroll.getNumber() + " " + formerPayroll.getType()) : (payroll.getNumber() + " " + payroll.getAuxPaymentType()));
@@ -2859,7 +2885,7 @@ public class SCfdPrint {
         
         paramsMap.put("sCfdMoneda", comprobante.getAttMoneda().getString());
         paramsMap.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
-        paramsMap.put("ReceptorNombre", receptor.getAttNombre().getString());
+        paramsMap.put("ReceptorNombre", getBizPartnerName(miClient, receptor.getAttNombre().getString(), cfd.getFkPayrollReceiptEmployeeId_n()));
         paramsMap.put("ReceptorRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, receptor.getAttRegimenFiscalReceptor().getString()));
         paramsMap.put("ReceptorDomicilioFiscal", receptor.getAttDomicilioFiscalReceptor().getString());
         paramsMap.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
@@ -3180,7 +3206,6 @@ public class SCfdPrint {
         
         computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_40, paramsMap, printMode, numCopies);
     }
-    
     
     /**
      * Prints bill of lading CFDI 3.3 with complement 2.0
