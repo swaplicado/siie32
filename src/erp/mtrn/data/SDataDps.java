@@ -66,9 +66,9 @@ import erp.mfin.data.SFinDpsTaxes;
 import erp.mfin.data.SFinMovementType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mqlt.data.SDpsQualityUtils;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
+import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import erp.mtrn.data.cfd.SAddendaUtils;
@@ -269,6 +269,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msDbmsCurrency;
     protected java.lang.String msDbmsCurrencyKey;
     protected java.lang.String msDbmsIncotermCode;
+    protected java.lang.String msDbmsAuthorizationStatusName;
 
     protected boolean mbAuxIsBeingCopied;
     protected boolean mbAuxIsFormerRecordAutomatic;
@@ -2025,6 +2026,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsCurrency(java.lang.String s) { msDbmsCurrency = s; }
     public void setDbmsCurrencyKey(java.lang.String s) { msDbmsCurrencyKey = s; }
     public void setDbmsIncotermCode(java.lang.String s) { msDbmsIncotermCode = s; }
+    public void setDbmsAuthorizationStatusName(java.lang.String s) { msDbmsAuthorizationStatusName = s; }
 
     public void setAuxIsBeingCopied(boolean b) { mbAuxIsBeingCopied = b; }
     public void setAuxIsFormerRecordAutomatic(boolean b) { mbAuxIsFormerRecordAutomatic = b; }
@@ -2058,6 +2060,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getDbmsCurrency() { return msDbmsCurrency; }
     public java.lang.String getDbmsCurrencyKey() { return msDbmsCurrencyKey; }
     public java.lang.String getDbmsIncotermCode() { return msDbmsIncotermCode; }
+    public java.lang.String getDbmsAuthorizationStatusName() { return msDbmsAuthorizationStatusName; }
 
     public boolean getAuxIsBeingCopied() { return mbAuxIsBeingCopied; }
     public boolean getAuxIsFormerRecordAutomatic() { return mbAuxIsFormerRecordAutomatic; }
@@ -2258,6 +2261,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msDbmsCurrency = "";
         msDbmsCurrencyKey = "";
         msDbmsIncotermCode = "";
+        msDbmsAuthorizationStatusName = "";
 
         mbAuxIsBeingCopied = false;
         mbAuxIsFormerRecordAutomatic = false;
@@ -2305,10 +2309,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         reset();
 
         try {
-            sSql = "SELECT d.*, c.cur, c.cur_key, i.code "
+            sSql = "SELECT d.*, c.cur, c.cur_key, i.code, st.st_dps_authorn "
                     + "FROM trn_dps AS d "
                     + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
                     + "INNER JOIN erp.logs_inc AS i ON d.fid_inc = i.id_inc "
+                    + "INNER JOIN erp.trns_st_dps_authorn AS st ON d.fid_st_dps_authorn = st.id_st_dps_authorn "
                     + "WHERE d.id_year = " + anKey[0] + " AND d.id_doc = " + anKey[1] + " ";
             oResultSet = statement.executeQuery(sSql);
             if (!oResultSet.next()) {
@@ -2441,6 +2446,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msDbmsCurrency = oResultSet.getString("c.cur");
                 msDbmsCurrencyKey = oResultSet.getString("c.cur_key");
                 msDbmsIncotermCode = oResultSet.getString("i.code");
+                msDbmsAuthorizationStatusName = oResultSet.getString("st.st_dps_authorn");
                 
                 computeXtaTotalCyAsText(statement);
                 createXtaDpsType();

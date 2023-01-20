@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 209.5/ 2023-01-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del status de autorización en la vista de pedidos y muestra cual es cuando el pedido no se puede imprimir.
+2) Ajuste por redondeo al cálculo el nodo ImpuetosP en el complemento de recepción de pagos.
+
+================================================================================
 SIIE 3.2 209.4/ 2023-01-18
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

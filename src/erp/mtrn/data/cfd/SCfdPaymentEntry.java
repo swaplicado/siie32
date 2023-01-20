@@ -810,8 +810,11 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         }
         
         for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
-            payTax.setBase(Math.floor(payTax.getBase() * 10 * 10) / 100); // truncar a 2 decimales 
-            payTax.setTax(Math.floor(payTax.getTax() * 10 * 10) / 100); // truncar a 2 decimales
+            // Isabel Servín 20/01/2023: Comentado al dar un error al momento de truncar, se opta por redondeo
+            //payTax.setBase(Math.floor(payTax.getBase() * 10 * 10) / 100); // truncar a 2 decimales 
+            //payTax.setTax(Math.floor(payTax.getTax() * 10 * 10) / 100); // truncar a 2 decimales
+            payTax.setBase(SLibUtils.round(payTax.getBase(), 2));
+            payTax.setTax(SLibUtils.round(payTax.getTax(), 2));
         }
         
         /*

@@ -534,6 +534,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsDoc || mbIsDocAdj) {
             aoTableColumns = new STableColumn[50];  // extra columns for accounting record and CFD info
         }
+        else if (mbIsOrd) {
+            aoTableColumns = new STableColumn[43];
+        }
         else {
             aoTableColumns = new STableColumn[42];
         }
@@ -620,6 +623,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave cliente", 50);
                 }
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal cliente", 75);
+            }
+            if (mbIsOrd) {
+                aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_status", "autorizado", STableConstants.WIDTH_ICON);
+                aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
             }
         }
 
@@ -1175,7 +1182,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         // order:
 
                         if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) && !dps.getIsAuthorized()) {
-                            miClient.showMsgBoxWarning("No se puede imprimir el documento porque:\n-No está autorizado.");
+                            miClient.showMsgBoxWarning("No se puede imprimir el documento porque su estatus es:\n-" + dps.getDbmsAuthorizationStatusName() + ".");
                         }
                         else {
                             try {
@@ -2162,7 +2169,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "bp.id_bp, bp.bp, bpc.bp_key, bpb.id_bpb, bpb.bpb, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, " +
                 "'" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
-                "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr ";
+                "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr, " +
+                "CASE d.fid_st_dps_authorn " +
+                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + " THEN " + STableConstants.ICON_ST_WAIT + " " +
+                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN " + STableConstants.ICON_ST_THUMBS_UP + " " +
+                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN " + STableConstants.ICON_ST_THUMBS_DOWN + " " +
+                "ELSE " + STableConstants.ICON_NULL + " END AS f_status ";
 
         if (mbIsDoc || mbIsDocAdj) {
             msSql += ", xu.usr, " +
