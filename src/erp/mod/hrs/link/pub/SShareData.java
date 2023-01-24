@@ -211,11 +211,26 @@ public class SShareData {
     
     /**
      * 
-     * @param startDate
+     * @param sJsonInc
      * @return 
      */
     public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         
         return SUtilsJSON.insertData(sJsonInc);
+    }
+    
+    /**
+     * 
+     * @param sJsonInc
+     * @return 
+     */
+    public String getMissingPhotos(int employees []) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        try {
+            return SUtilsJSON.missingPhotos(employees);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 }

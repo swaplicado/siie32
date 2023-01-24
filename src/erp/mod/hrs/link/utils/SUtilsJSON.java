@@ -229,4 +229,29 @@ public class SUtilsJSON {
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
             return jsonInString2;
     }
+    
+    /**
+     * Obtener las fotos faltantes para aplicación vacaciones
+     * 
+     * @param int employees[]
+     */
+    
+    public static String missingPhotos(int employees []) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+        
+        SPhotosResponse response = new SPhotosResponse();
+        SShareDB sDb = new SShareDB();
+        ArrayList<Integer> ids = new ArrayList();
+        for( int i = 0 ; employees.length > i ; i++ ){
+            ids.add(employees[i]);
+        }
+        
+        response.photos = sDb.getPhotosOfEmployees(ids);
+        
+        // Java objects to JSON string - pretty-print
+        String jsonPhotosString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
+        
+        return jsonPhotosString;
+    }
 }
