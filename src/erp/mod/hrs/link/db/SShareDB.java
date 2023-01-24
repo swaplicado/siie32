@@ -285,7 +285,7 @@ public class SShareDB {
                 + "    e.dt_ben, "
                 + "    e.dt_hire, "
                 + "    e.dt_dis_n, "
-                + "    e.dt_tp_pay, "
+//                + "    e.dt_tp_pay, "
                 + "    e.overtime, "
                 + "    e.checker_policy, "
                 + "    e.fk_tp_pay, "
@@ -1024,9 +1024,10 @@ public class SShareDB {
                             sqlV = "SELECT SUM(eff_day) AS _days_sched "
                                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
                                     + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
+                                    + "ext_req_id = 0 AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
-                                    + "ext_req_id IS NULL AND "
+                                    + "ext_req_id = 0 AND "
                                     + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
                                     + "NOT b_del;";
 
@@ -1047,7 +1048,7 @@ public class SShareDB {
                                     + " hrs_abs_cns.id_abs = hrs_abs.id_abs AND "
                                     + " hrs_abs_cns.id_emp = hrs_abs.id_emp "
                                     + "WHERE hrs_abs.id_emp = " + resV.getInt("_employee_id") + " AND "
-                                    + "ext_req_id IS NULL AND "
+                                    + "ext_req_id = 0 AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
                                     + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
@@ -1069,7 +1070,7 @@ public class SShareDB {
                                     + " hrs_abs_cns.id_abs = hrs_abs.id_abs AND "
                                     + " hrs_abs_cns.id_emp = hrs_abs.id_emp "
                                     + "WHERE hrs_abs.id_emp = " + resV.getInt("_employee_id") + " AND "
-                                    + "ext_req_id IS NOT NULL AND "
+                                    + "ext_req_id != 0 AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
                                     + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
@@ -1217,20 +1218,20 @@ public class SShareDB {
         }
             
         database.connect(
-                "localhost", // agregar esta constante a la configuración de CAP Link
+                "127.0.0.1", // agregar esta constante a la configuración de CAP Link
                 "3306", // agregar esta constante a la configuración de CAP Link
                 company, // agregar esta constante a la configuración de CAP Link
                 "root", // agregar esta constante a la configuración de CAP Link
                 "msroot"); // agregar esta constante a la configuración de CAP Link
         
         SGuiSession session = new SGuiSession(null);
-        JFrame frame = new JFrame();
+//        JFrame frame = new JFrame();
 
         SGuiClient client = new SGuiClient() {
 
             @Override
             public JFrame getFrame() {
-                return frame;
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
@@ -1373,7 +1374,7 @@ public class SShareDB {
         Date now = new Date();
         
         session.setSystemDate(now);
-        session.setCurrentDate(now);
+//        session.setCurrentDate(now);
         session.setUserTs(now);
         session.setDatabase(database);
     
@@ -1470,8 +1471,6 @@ public class SShareDB {
                 lPlanVac.add(planVac);
                 
             }
-            
-        }
         return lPlanVac;
     }
 }
