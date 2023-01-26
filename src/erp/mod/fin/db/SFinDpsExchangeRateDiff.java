@@ -154,22 +154,24 @@ public class SFinDpsExchangeRateDiff {
      * @param sysMoveTypeXxxKey Key of system movement typeSDataConstantsSys.FINS_CT_SYS_MOV_...
      * @return SQL query.
      */
-    private String composeQueryBizPartnersBalance(final int[] sysMoveTypeXxxKey) {
+    private String composeQueryBizPartnersBalance(final int bizPartnerCat, final int[] sysMoveTypeXxxKey) {
         String sql = "SELECT re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc, "
-                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bb.bpb, re.fid_cur, "
-                + "SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt "
-                + "FROM fin_rec AS r "
+                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bb.bpb, re.fid_cur, " 
+                + "SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt " 
+                + "FROM fin_rec AS r " 
                 + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr "
-                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.id_bpb = re.fid_bpb_n "
-                + "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc "
-                + "WHERE NOT r.b_del AND NOT re.b_del AND "
-                + "r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' AND "
-                + "re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxxKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxxKey[1] + " AND "
-                + "re.fid_cur <> " + mnLocalCurrency + " "
-                + "GROUP BY re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc, "
-                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bb.bpb, re.fid_cur "
+                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr " 
+                + "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = " + bizPartnerCat + " " 
+                + "INNER JOIN erp.bpsu_tp_bp AS btp ON bct.fid_ct_bp = btp.id_ct_bp AND bct.fid_tp_bp = btp.id_tp_bp " 
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.id_bpb = re.fid_bpb_n " 
+                + "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " 
+                + "WHERE NOT r.b_del AND NOT re.b_del " 
+                + "AND r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' " 
+                + "AND re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxxKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxxKey[1] + " " 
+                + "AND re.fid_cur <> " + mnLocalCurrency + " " 
+                + "GROUP BY re.fid_bp_nr, re.fid_bpb_n, re.fid_cur, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc " 
                 + "HAVING SUM(re.debit_cur - re.credit_cur) = 0 AND SUM(re.debit - re.credit) <> 0 " // documentos liquidados con diferencia en cambios
+                + "AND re.fid_dps_year_n IS NOT NULL " // Sólo documentos
                 + "ORDER BY b.bp_comm, bb.bpb, re.fid_bp_nr, re.fid_bpb_n, "
                 + "d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, "
                 + "re.fid_acc, re.fk_acc;";
@@ -562,23 +564,28 @@ public class SFinDpsExchangeRateDiff {
         
         int[] bizPartnerCategories = new int[] { 
             SDataConstantsSys.BPSS_CT_BP_SUP,
-            SDataConstantsSys.BPSS_CT_BP_CUS,
-            SDataConstantsSys.BPSS_CT_BP_CDR,
-            SDataConstantsSys.BPSS_CT_BP_DBR };
+            SDataConstantsSys.BPSS_CT_BP_CUS
+            };
         
         HashMap<Integer, int[]> sysMoveTypeXxxBizPartners = new HashMap<>(); // key = business partner category; value = key of system movement
         sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_SUP, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
         sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
-        sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_CDR, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR);
-        sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_DBR, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR);
+        
+        int sup = 0;
+        int cus = 0;
         
         for (int bizPartnerCategory : bizPartnerCategories) {
             anSysMoveTypeXxxKeyBizPartner = sysMoveTypeXxxBizPartners.get(bizPartnerCategory);
             
-            String sql = composeQueryBizPartnersBalance(anSysMoveTypeXxxKeyBizPartner);
+            String sql = composeQueryBizPartnersBalance(bizPartnerCategory, anSysMoveTypeXxxKeyBizPartner);
             resultSet = connection.createStatement().executeQuery(sql);
             
             while (resultSet.next()) {
+                switch (bizPartnerCategory) {
+                    case SDataConstantsSys.BPSS_CT_BP_SUP: sup++; break;
+                    case SDataConstantsSys.BPSS_CT_BP_CUS: cus++; break;
+                }
+                
                 // ajuste al saldo del documento:
                 
                 anDocumentKey = resultSet.getInt("re.fid_dps_year_n") == 0 ? null : new int[] { resultSet.getInt("re.fid_dps_year_n"), resultSet.getInt("re.fid_dps_doc_n") };
@@ -637,6 +644,7 @@ public class SFinDpsExchangeRateDiff {
                 }
             }
         }
+        miClient.showMsgBoxInformation("Se ajustaron " + (sup + cus) + " documentos:\n-" + sup + " de proveedores.\n-" + cus + " de clientes.");
     }
 
     /**

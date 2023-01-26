@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 209.6/ 2023-01-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en la revaluación de saldos de moneda extranjera y diferencias cambiarias.
+2) Ajuste en la impresión de facturas en receptores con RFC genérico.
+
+================================================================================
 SIIE 3.2 209.5/ 2023-01-20
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

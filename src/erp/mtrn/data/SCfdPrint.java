@@ -1272,7 +1272,11 @@ public class SCfdPrint {
         // Receptor:
 
         int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
-        if (idReceptor != 0) {
+        if (comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_NAC) || 
+                comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        else if (idReceptor != 0) {
             SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
             int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
             switch(value) {
@@ -1289,7 +1293,7 @@ public class SCfdPrint {
             }
         }
         else {
-            paramsMap.put("sRecNombreOpc", comprobante.getEltEmisor().getAttNombre().getString());
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
         }
         
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
@@ -1693,7 +1697,11 @@ public class SCfdPrint {
         // Receptor:
         
         int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
-        if (idReceptor != 0) {
+        if (comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_NAC) || 
+                comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            paramsMap.put("sRecNombre", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        else if (idReceptor != 0) {
             SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
             int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
             switch(value) {
@@ -1710,7 +1718,7 @@ public class SCfdPrint {
             }
         }
         else {
-            paramsMap.put("sRecNombre", comprobante.getEltEmisor().getAttNombre().getString());
+            paramsMap.put("sRecNombre", comprobante.getEltReceptor().getAttNombre().getString());
         }
         
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
@@ -3429,7 +3437,11 @@ public class SCfdPrint {
         // Receptor:
         
         int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
-        if (idReceptor != 0) {
+        if (comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_NAC) || 
+                comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        else if (idReceptor != 0) {
             SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
             int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
             switch(value) {
@@ -3446,7 +3458,7 @@ public class SCfdPrint {
             }
         }
         else {
-            paramsMap.put("sRecNombreOpc", comprobante.getEltEmisor().getAttNombre().getString());
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
         }
         
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
