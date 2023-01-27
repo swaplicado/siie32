@@ -328,7 +328,7 @@ public class SShareDB {
                 emp.leave_date = res.getString("dt_dis_n");
                 emp.benefit_date = res.getString("dt_ben");
                 emp.dt_bir = res.getString("dt_bir");
-                emp.dt_tp_pay = res.getString("dt_tp_pay");
+//                emp.dt_tp_pay = res.getString("dt_tp_pay");
                 emp.email = res.getString("email_01");
                 emp.overtime_policy = res.getInt("overtime");
                 emp.checker_policy = res.getInt("checker_policy");
