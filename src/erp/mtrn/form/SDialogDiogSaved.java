@@ -24,7 +24,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
@@ -78,6 +78,7 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
         jtfWarehouseDestinyCode = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jbPrintClose = new javax.swing.JButton();
+        jbSaveArchive = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -238,6 +239,12 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
         jbPrintClose.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel1.add(jbPrintClose);
 
+        jbSaveArchive.setText("Guardar");
+        jbSaveArchive.setActionCommand("Guardar");
+        jbSaveArchive.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbSaveArchive.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel1.add(jbSaveArchive);
+
         jbClose.setText("Cerrar");
         jbClose.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbClose.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -255,13 +262,14 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
 
     private void initComponentsExtra() {
         jbPrintClose.addActionListener(this);
+        jbSaveArchive.addActionListener(this);
         jbClose.addActionListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, SLibConstants.UNDEFINED);
     }
 
     private void windowActivated() {
-        if (mbFirstTime) {
+        if (mbFirstTime) { 
             mbFirstTime = false;
             jbClose.requestFocus();
         }
@@ -269,6 +277,11 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
 
     public void actionPrintClose() {
         STrnUtilities.printDiog(miClient, (int[]) moDiog.getPrimaryKey());
+        setVisible(false);
+    }
+    
+    public void actionSaveArchive() {
+        STrnUtilities.saveDiog(miClient, (int[]) moDiog.getPrimaryKey());
         setVisible(false);
     }
 
@@ -285,6 +298,7 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
     private javax.swing.JLabel jRef;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbPrintClose;
+    private javax.swing.JButton jbSaveArchive;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDiogType;
     private javax.swing.JLabel jlSeries;
@@ -363,6 +377,9 @@ public class SDialogDiogSaved extends javax.swing.JDialog implements java.awt.ev
 
             if (button == jbPrintClose) {
                 actionPrintClose();
+            }
+            else if (button == jbSaveArchive) {
+                actionSaveArchive();
             }
             else if (button == jbClose) {
                 actionClose();
