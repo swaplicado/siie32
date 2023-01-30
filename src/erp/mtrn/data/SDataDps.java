@@ -173,6 +173,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected double mdTaxRetainedCy_r;
     protected double mdTotalCy_r;
     protected double mdCommissionsCy_r;
+    protected java.lang.String msReqNum;
     protected java.lang.String msDriver;
     protected java.lang.String msPlate;
     protected java.lang.String msTicket;
@@ -1806,6 +1807,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setTaxRetainedCy_r(double d) { mdTaxRetainedCy_r = d; }
     public void setTotalCy_r(double d) { mdTotalCy_r = d; }
     public void setCommissionsCy_r(double d) { mdCommissionsCy_r = d; }
+    public void setReqNum(java.lang.String s) { msReqNum = s; }
     public void setDriver(java.lang.String s) { msDriver = s; }
     public void setPlate(java.lang.String s) { msPlate = s; }
     public void setTicket(java.lang.String s) { msTicket = s; }
@@ -1929,6 +1931,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public double getTaxRetainedCy_r() { return mdTaxRetainedCy_r; }
     public double getTotalCy_r() { return mdTotalCy_r; }
     public double getCommissionsCy_r() { return mdCommissionsCy_r; }
+    public java.lang.String getReqNum() { return msReqNum; }
     public java.lang.String getDriver() { return msDriver; }
     public java.lang.String getPlate() { return msPlate; }
     public java.lang.String getTicket() { return msTicket; }
@@ -2162,6 +2165,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mdTaxRetainedCy_r = 0;
         mdTotalCy_r = 0;
         mdCommissionsCy_r = 0;
+        msReqNum = "";
         msDriver = "";
         msPlate = "";
         msTicket = "";
@@ -2350,6 +2354,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mdTaxRetainedCy_r = oResultSet.getDouble("d.tax_retained_cur_r");
                 mdTotalCy_r = oResultSet.getDouble("d.tot_cur_r");
                 mdCommissionsCy_r = oResultSet.getDouble("d.comms_cur_r");
+                msReqNum = oResultSet.getString("d.req_num");
                 msDriver = oResultSet.getString("d.driver");
                 msPlate = oResultSet.getString("d.plate");
                 msTicket = oResultSet.getString("d.ticket");
@@ -2699,7 +2704,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2735,6 +2740,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setDouble(nParam++, mdTaxRetainedCy_r);
             oCallableStatement.setDouble(nParam++, mdTotalCy_r);
             oCallableStatement.setDouble(nParam++, mdCommissionsCy_r);
+            oCallableStatement.setString(nParam++, msReqNum);
             oCallableStatement.setString(nParam++, msDriver);
             oCallableStatement.setString(nParam++, msPlate);
             oCallableStatement.setString(nParam++, msTicket);

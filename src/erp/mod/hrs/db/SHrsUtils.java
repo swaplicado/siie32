@@ -2078,7 +2078,7 @@ public abstract class SHrsUtils {
                         buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
                     }
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
-                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 1));
+                    buffer += String.valueOf(SLibUtilities.textRepeat("1", 1));
                     buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
                     buffer += "0"; //(Week or reduced working day)
                     buffer += formatDateData.format(dateApplication); // (Movement date)
