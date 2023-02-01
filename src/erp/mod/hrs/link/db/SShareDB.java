@@ -1149,24 +1149,50 @@ public class SShareDB {
     }
     
     public boolean cheakIncidents (String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
-        SMySqlClass mdb = new SMySqlClass();
-        String empresas[]= new String[4];
-        ResultSet resultSet;
-        empresas[0] = "erp_aeth";
-        empresas[1] = "erp_amesa";
-        empresas[2] = "erp_otsa";
-        empresas[3] = "erp_th";
+//        SMySqlClass mdb = new SMySqlClass();
+//        String empresas[]= new String[4];
+//        ResultSet resultSet;
+//        empresas[0] = "erp_aeth";
+//        empresas[1] = "erp_amesa";
+//        empresas[2] = "erp_otsa";
+//        empresas[3] = "erp_th";
         
+        SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+        ResultSet resultSet;
+//        String empresas[]= new String[4];
+        int company = 0;
+        
+//        empresas[0] = "erp_aeth";
+//        empresas[1] = "erp_amesa";
+//        empresas[2] = "erp_otsa";
+//        empresas[3] = "erp_th";
+
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return false;
+        }
+        
+         JSONParser parser = new JSONParser();
+         JSONObject root;
         
         try {
             boolean isAvailable = false;
             String incidents = "";
-            JSONParser parser = new JSONParser();
-            JSONObject root = (JSONObject) parser.parse(sJsonInc);
+            root = (JSONObject) parser.parse(sJsonInc);
+            company = Integer.parseInt(root.get("company_id").toString());
+            String companies = "SELECT * "
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
+                                    + "WHERE id_co = " + company ;
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(companies);
+            if(!resultSet.next()){
+                return false;
+            } 
             
-            String company = empresas[Integer.parseInt(root.get("company_id").toString()) ];
-            
-            Connection conn = mdb.connect("", "", company, "", "");
+            conn = mdb.connect("", "", resultSet.getString("db"), "", "");
 
             if (conn == null) {
                 return false;
@@ -1180,7 +1206,7 @@ public class SShareDB {
                                     + "dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
                                     + "dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
                                     + "NOT b_del;";
-            Statement stCon = conn.createStatement();
+            stCon = conn.createStatement();
 
             resultSet = stCon.executeQuery(incidents);
             if (resultSet.next()) {
