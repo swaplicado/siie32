@@ -24,6 +24,7 @@ import sun.misc.BASE64Encoder;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import erp.mod.SModConsts;
+import static erp.mod.SModConsts.CFGU_CO;
 import erp.mod.SModSysConsts;
 import erp.mod.SModUtils;
 import erp.mod.SModuleHrs;
@@ -1197,14 +1198,21 @@ public class SShareDB {
     
     public boolean  setinIncidents(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+        ResultSet resultSet;
+//        String empresas[]= new String[4];
+        int company = 0;
         
-        String empresas[]= new String[4];
-        String company = "";
-        
-        empresas[0] = "erp_aeth";
-        empresas[1] = "erp_amesa";
-        empresas[2] = "erp_otsa";
-        empresas[3] = "erp_th";
+//        empresas[0] = "erp_aeth";
+//        empresas[1] = "erp_amesa";
+//        empresas[2] = "erp_otsa";
+//        empresas[3] = "erp_th";
+
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return false;
+        }
         
          boolean isAvailable = false;
          String incidents = "";
@@ -1212,15 +1220,26 @@ public class SShareDB {
          JSONObject root;
         try {
             root = (JSONObject) parser.parse(sJsonInc);
-            company = empresas[Integer.parseInt(root.get("company_id").toString()) ];
+            company = Integer.parseInt(root.get("company_id").toString());
+            String companies = "SELECT * "
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
+                                    + "WHERE id_co = " + company ;
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(companies);
+            if(!resultSet.next()){
+                return false;
+            } 
+            
         } catch (ParseException ex) {
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-            
+           
         database.connect(
                 "127.0.0.1", // agregar esta constante a la configuración de CAP Link
                 "3306", // agregar esta constante a la configuración de CAP Link
-                company, // agregar esta constante a la configuración de CAP Link
+                resultSet.getString("bd"), // agregar esta constante a la configuración de CAP Link
                 "root", // agregar esta constante a la configuración de CAP Link
                 "msroot"); // agregar esta constante a la configuración de CAP Link
         
