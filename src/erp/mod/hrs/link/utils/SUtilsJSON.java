@@ -28,6 +28,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -233,18 +237,27 @@ public class SUtilsJSON {
     /**
      * Obtener las fotos faltantes para aplicación vacaciones
      * 
-     * @param int employees[]
+     * @param employees
+     * @throws erp.mod.hrs.link.db.SConfigException
      */
     
-    public static String missingPhotos(int employees []) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
+    public static String missingPhotos(String employees) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
         
         SPhotosResponse response = new SPhotosResponse();
         SShareDB sDb = new SShareDB();
         ArrayList<Integer> ids = new ArrayList();
-        for( int i = 0 ; employees.length > i ; i++ ){
-            ids.add(employees[i]);
+        JSONParser parser = new JSONParser();
+        try {
+            //JSONObject root = (JSONObject) parser.parse(employees);
+            JSONArray root  = (JSONArray) parser.parse(employees);
+            for( int i = 0 ; root.size() > i ; i++ ){
+                ids.add(Integer.parseInt((root.get(i).toString())));
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+            return "";
         }
         
         response.photos = sDb.getPhotosOfEmployees(ids);

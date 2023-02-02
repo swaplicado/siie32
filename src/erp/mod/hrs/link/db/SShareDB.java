@@ -1192,7 +1192,7 @@ public class SShareDB {
                 return false;
             } 
             
-            conn = mdb.connect("", "", resultSet.getString("db"), "", "");
+            conn = mdb.connect("", "", resultSet.getString("bd"), "", "");
 
             if (conn == null) {
                 return false;

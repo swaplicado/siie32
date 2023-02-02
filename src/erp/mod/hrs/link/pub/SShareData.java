@@ -221,10 +221,10 @@ public class SShareData {
     
     /**
      * 
-     * @param sJsonInc
+     * @param employees
      * @return 
      */
-    public String getMissingPhotos(int employees []) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public String getMissingPhotos(String employees) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         
         try {
             return SUtilsJSON.missingPhotos(employees);
