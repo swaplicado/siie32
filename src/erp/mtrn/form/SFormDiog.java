@@ -130,7 +130,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mtrn.data.STrnStockMove moStockMoveEntry;
     private erp.mtrn.form.SDialogDpsStockSupply moDialogDpsStockSupply;
     private erp.mtrn.form.SDialogDpsStockReturn moDialogDpsStockReturn;
-    private erp.mtrn.form.SDialogDpsStockReturnWharehouse moDialogDpsStockReturnWharehouse;
+//    private erp.mtrn.form.SDialogDpsStockReturnWharehouse moDialogDpsStockReturnWharehouse;
     private erp.mtrn.form.SDialogProdOrderStockAssign moDialogProdOrderStockAssignForAssing;
     private erp.mtrn.form.SDialogProdOrderStockAssign moDialogProdOrderStockAssignForReturn;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForFinish;
@@ -881,7 +881,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         moPickerProdOrderDestiny = null;                       // instanciated when needed
         moDialogDpsStockSupply = null;                  // instanciated when needed
         moDialogDpsStockReturn = null;                  // instanciated when needed
-        moDialogDpsStockReturnWharehouse = null;                  // instanciated when needed
+//        moDialogDpsStockReturnWharehouse = null;                  // instanciated when needed
         moDialogProdOrderStockAssignForAssing = null;   // instanciated when needed
         moDialogProdOrderStockAssignForReturn = null;   // instanciated when needed
         moDialogProdOrderStockFinishForFinish = null;   // instanciated when needed
