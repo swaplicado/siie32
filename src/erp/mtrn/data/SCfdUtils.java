@@ -120,7 +120,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores, Isabel Servín, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Sergio Flores, Isabel Servín, Sergio Flores, Claudio Peña
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -6088,6 +6088,41 @@ public abstract class SCfdUtils implements Serializable {
         return cfdId;
     }
     
+    public static ArrayList<String> getIdDpsByCfd(final SClientInterface client, final int cfd) throws Exception {
+        ArrayList<String> idFac = new ArrayList<String>();
+        
+        String sql = "SELECT fid_dps_year_n, fid_dps_doc_n FROM trn_cfd WHERE id_cfd = " + cfd + ";";
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+
+        while (resultSet.next()) {
+            String mnYear = resultSet.getString("fid_dps_year_n");
+            String mnDoc = resultSet.getString("fid_dps_doc_n");
+            idFac.add(mnYear);
+            idFac.add(mnDoc);
+        }
+
+        return idFac;
+    }
+    
+    public static ArrayList<String> getSerNumByCfd(final SClientInterface client, final int cfd) throws Exception {
+        ArrayList<String> numDps = new ArrayList<String>();
+        ArrayList<String> cfdDps = new ArrayList<String>();
+        cfdDps = getIdDpsByCfd(client, cfd);
+        
+        String sql = "SELECT dt, CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num) AS f_num "
+                + "FROM trn_dps WHERE id_year = " + cfdDps.get(0) + " and  id_doc = " + cfdDps.get(1) + ";";
+        
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+
+        while (resultSet.next()) {
+            String mnYear = resultSet.getString("dt");
+            String mnDoc = resultSet.getString("f_num");
+            numDps.add(mnYear);
+            numDps.add(mnDoc);
+        }
+        
+        return numDps;
+    }
     /**
      * Check if company in current user session matches the Receptor in CFDI from file.
      * @param client GUI Client
