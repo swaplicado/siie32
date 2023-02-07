@@ -5,6 +5,7 @@
 
 package erp.mtrn.data;
 
+import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.gui.session.SSessionCustom;
@@ -1405,6 +1406,22 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         moDbmsDpsCfdEntry.setPkYearId(mnPkYearId);
                         moDbmsDpsCfdEntry.setPkDocId(mnPkDocId);
                         moDbmsDpsCfdEntry.setPkEntryId(mnPkEntryId);
+                        moDbmsDpsCfdEntry.save(connection);
+                    }
+                    else {
+                        String sql = "DELETE FROM trn_dps_cfd_ety " +
+                                "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + ";";
+                        statement.execute(sql);
+                        moDbmsDpsCfdEntry = new SDataDpsCfdEntry();
+                        moDbmsDpsCfdEntry.setPkYearId(mnPkYearId);
+                        moDbmsDpsCfdEntry.setPkDocId(mnPkDocId);
+                        moDbmsDpsCfdEntry.setPkEntryId(mnPkEntryId);
+                        if (!mvDbmsEntryTaxes.isEmpty()){
+                            moDbmsDpsCfdEntry.setTaxObject(DCfdi40Catalogs.ClaveObjetoImpSí);
+                        }
+                        else {
+                            moDbmsDpsCfdEntry.setTaxObject(DCfdi40Catalogs.ClaveObjetoImpNo);
+                        }
                         moDbmsDpsCfdEntry.save(connection);
                     }
                     

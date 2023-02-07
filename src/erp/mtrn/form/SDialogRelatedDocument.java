@@ -61,9 +61,8 @@ public class SDialogRelatedDocument extends javax.swing.JDialog implements erp.l
     
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForCfdiRelated;
     
-    private boolean bIsDpsInvoice;
+    private boolean bIsDpsAdj;
     private int[] manDpsClassKey;
-    private int[] manDpsClassPreviousKey;
     private int[] manFirstRelatedDpsKey;
     private String msRelatedDpsUuid;
     
@@ -110,7 +109,7 @@ public class SDialogRelatedDocument extends javax.swing.JDialog implements erp.l
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Validación masiva de estatus de CFDI");
+        setTitle("CFDI relacionados");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -268,7 +267,7 @@ public class SDialogRelatedDocument extends javax.swing.JDialog implements erp.l
         }
         
         moDialogPickerDpsForCfdiRelated.formReset();
-        moDialogPickerDpsForCfdiRelated.setFilterKey(new Object[] { bIsDpsInvoice ? manDpsClassKey : manDpsClassPreviousKey, new int[] { moDps.getFkBizPartnerId_r()} });
+        moDialogPickerDpsForCfdiRelated.setFilterKey(new Object[] { bIsDpsAdj && jcbCfdiRelationType.getSelectedIndex() == 7 ? manDpsClassKey : new int[] { moDps.getFkDpsCategoryId(), SDataConstantsSys.TRNS_CL_DPS_DOC } , new int[] { moDps.getFkBizPartnerId_r()} });
         moDialogPickerDpsForCfdiRelated.formRefreshOptionPane();
         moDialogPickerDpsForCfdiRelated.setFormVisible(true);
 
@@ -338,7 +337,7 @@ public class SDialogRelatedDocument extends javax.swing.JDialog implements erp.l
                 SRowRelatedDocument firstRow = (SRowRelatedDocument) moRelatedUuidPane.getTableRow(0);
                 if (firstRow.getFirstDocKey() == null) {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, 
-                            new int[] { SCfdUtils.getCfdIdByUuid(miClient, firstRow.getDocUuids().trim().split(",")[0]) }, SLibConstants.EXEC_MODE_VERBOSE);
+                            new int[] { SCfdUtils.getCfdIdByUuid(miClient, firstRow.getDocUuids().trim().split(",")[0]) }, SLibConstants.EXEC_MODE_SILENT);
                     firstRow.setFirstDocKey(new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() });
                     firstRow.setFirstDocUuid(cfd.getUuid());
                 }
@@ -418,9 +417,8 @@ public class SDialogRelatedDocument extends javax.swing.JDialog implements erp.l
         moRelatedUuidPane.clearTableRows();
         
         manDpsClassKey = new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId() }; 
-        manDpsClassPreviousKey = new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId() - 1 }; 
-        bIsDpsInvoice = SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, manDpsClassKey) ||
-                SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, manDpsClassKey);
+        bIsDpsAdj = SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ, manDpsClassKey) ||
+                SLibUtilities.compareKeys(SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ, manDpsClassKey);
         
         moTrnRelatedDocument = null;
         

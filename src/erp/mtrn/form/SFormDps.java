@@ -6873,6 +6873,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
 
                         moLastDpsSource = oDpsSource;
+                        
+                        if (moTrnRelatedDocument == null) moTrnRelatedDocument = new STrnCfdRelated();
+                        moTrnRelatedDocument.addRelatedDocument("07", oDpsSource.getDbmsDataCfd().getUuid());
+                        jtaCfdiRelated.setText(moTrnRelatedDocument.getAsString());
                     }
                 }
             }
@@ -10265,7 +10269,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 }
 
                                 if (!validation.getIsError()) {
-                                     if ((isCfdCfdiRelatedRequired() && jtaCfdiRelated.getText().isEmpty()) || applicationsCy > 0 ) {
+                                     if ((isCfdCfdiRelatedRequired() || applicationsCy != 0) && jtaCfdiRelated.getText().isEmpty()) {
                                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jbCfdiRelated.getText() + "'.");
                                         validation.setComponent(jbCfdiRelated);
                                         jTabbedPane.setSelectedIndex(TAB_CFD_XML);
