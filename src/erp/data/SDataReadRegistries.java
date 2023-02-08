@@ -127,7 +127,7 @@ public abstract class SDataReadRegistries {
         ResultSet resultSet = null;
         Statement statementAux = null;
         Object[] packet = null;
-        Vector<SDataRegistry> registries = new Vector<SDataRegistry>();
+        Vector<SDataRegistry> registries = new Vector<>();
 
         try {
             statementAux = statement.getConnection().createStatement();
@@ -198,7 +198,7 @@ public abstract class SDataReadRegistries {
     public static java.util.Vector<erp.lib.data.SDataRegistry> readRegistries(erp.client.SClientInterface client, int registryType, java.lang.Object filterKey) {
         SServerRequest request = null;
         SServerResponse response = null;
-        Vector<SDataRegistry> registries = new Vector<SDataRegistry>();
+        Vector<SDataRegistry> registries = new Vector<>();
 
         try {
             request = new SServerRequest(SServerConstants.REQ_REGS);
