@@ -969,10 +969,10 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
-            case SModConsts.HRS_EMP_LOG_SUA:
+            case SModConsts.HRSX_EMP_LOG_SUA:
                 view = new SViewEmployeeSua(miClient, "Bitácora empleados SUA");
                 break;
-            case SModConsts.HRS_EMP_LOG_IDSE:
+            case SModConsts.HRSX_EMP_LOG_IDSE:
                 view = new SViewEmployeeIdse(miClient, "Bitácora empleados IDSE");
                 break;
             case SModConsts.HRS_EMP_LOG_WAGE:
