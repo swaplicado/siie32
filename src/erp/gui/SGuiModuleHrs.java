@@ -990,10 +990,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatEmployeeSua) {
-                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SUA, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_EMP_LOG_SUA, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatEmployeeIdse) {
-                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_IDSE, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_EMP_LOG_IDSE, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatEarnings) {
                 miClient.getSession().showView(SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
