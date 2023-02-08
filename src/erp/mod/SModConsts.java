@@ -694,8 +694,9 @@ public abstract class SModConsts {
     public static final int HRS_EMP_LOG_HIRE = 2063081;
     public static final int HRS_EMP_LOG_WAGE = 2063082;
     public static final int HRS_EMP_LOG_SAL_SSC = 2063083;
-    public static final int HRS_EMP_LOG_SUA = 2063084;
-    public static final int HRS_EMP_LOG_IDSE = 2063085;
+    public static final int HRS_EMP_BEN = 2063151;
+    public static final int HRS_EMP_BEN_ANN = 2063152;
+    public static final int HRS_EMP_WAGE_FAC_ANN = 2063156;
     public static final int HRS_LOAN = 2063091;
     public static final int HRS_ABS = 2063101;
     public static final int HRS_ABS_CNS = 2063102;
@@ -742,6 +743,8 @@ public abstract class SModConsts {
     public static final int HRSX_EAR_SSC = 2064103;
     public static final int HRSX_PTU = 2064106;
     public static final int HRSX_IMPORT_CAP = 2064110;
+    public static final int HRSX_EMP_LOG_SUA = 2064161;
+    public static final int HRSX_EMP_LOG_IDSE = 2064162;
     
     public static final int HRSX_LAYOUT_SUA_HIRE = 1; // High worker
     public static final int HRSX_LAYOUT_SUA_DISMISS = 2; // Low worker
@@ -1315,6 +1318,9 @@ public abstract class SModConsts {
         TablesMap.put(HRS_EMP_LOG_HIRE, "hrs_emp_log_hire");
         TablesMap.put(HRS_EMP_LOG_WAGE, "hrs_emp_log_wage");
         TablesMap.put(HRS_EMP_LOG_SAL_SSC, "hrs_emp_log_sal_ssc");
+        TablesMap.put(HRS_EMP_BEN, "hrs_emp_ben");
+        TablesMap.put(HRS_EMP_BEN_ANN, "hrs_emp_ben_row");
+        TablesMap.put(HRS_EMP_WAGE_FAC_ANN, "hrs_emp_wage_fac");
         TablesMap.put(HRS_LOAN, "hrs_loan");
         TablesMap.put(HRS_ABS, "hrs_abs");
         TablesMap.put(HRS_ABS_CNS, "hrs_abs_cns");
