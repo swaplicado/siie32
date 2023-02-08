@@ -535,10 +535,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             aoTableColumns = new STableColumn[50];  // extra columns for accounting record and CFD info
         }
         else if (mbIsOrd) {
-            aoTableColumns = new STableColumn[43];
+            aoTableColumns = new STableColumn[44];
         }
         else {
-            aoTableColumns = new STableColumn[43];
+            aoTableColumns = new STableColumn[42];
         }
 
         i = 0;
