@@ -2490,7 +2490,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             jbAccountCashEdit.setEnabled(!isReadOnly);
         }
 
-        if (!moRecord.getPkRecordTypeId().equalsIgnoreCase(SDataConstantsSys.FINU_TP_REC_JOURNAL)) {
+        if (moRecord.getPkRecordTypeId().equals(SDataConstantsSys.FINU_TP_REC_JOURNAL)) {
             jckIsAdjustmentYearEnd.setEnabled(!isReadOnly);
             jckIsAdjustmentAudit.setEnabled(!isReadOnly);
         }
