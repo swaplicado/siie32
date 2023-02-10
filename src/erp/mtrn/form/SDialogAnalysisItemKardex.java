@@ -68,7 +68,7 @@ public class SDialogAnalysisItemKardex extends javax.swing.JDialog implements ja
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Tarjeta auxiliar de almacén");
+        setTitle("Análisis del ítem");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -96,7 +96,7 @@ public class SDialogAnalysisItemKardex extends javax.swing.JDialog implements ja
         jtfItem.setEditable(false);
         jtfItem.setText("TEXT");
         jtfItem.setFocusable(false);
-        jtfItem.setPreferredSize(new java.awt.Dimension(350, 23));
+        jtfItem.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel10.add(jtfItem);
 
         jPanel4.add(jPanel10);

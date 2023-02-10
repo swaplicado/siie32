@@ -79,7 +79,7 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Tarjeta auxiliar de almacén");
+        setTitle("Configuración del contrato");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -101,7 +101,7 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
         jtfBp.setEditable(false);
         jtfBp.setText("BP");
         jtfBp.setFocusable(false);
-        jtfBp.setPreferredSize(new java.awt.Dimension(350, 23));
+        jtfBp.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel10.add(jtfBp);
 
         jPanel4.add(jPanel10);
@@ -242,6 +242,9 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
         SFormUtilities.createActionMap(getRootPane(), this, "focusSeek", "seek", KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(getRootPane(), this, "actionExportCsv", "exportCsv", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(getRootPane(), this, "actionRefresh", "refresh", KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK);
+        
+        jdfDate.setEditable(false);
+        jdfDateDelivery.setEditable(false);
     }
 
     private void windowActivated() {
@@ -268,7 +271,7 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
         jtfDpsRef.setCaretPosition(0);
         
         jdfDate.setValue(oDps.getDate());
-        jdfDateDelivery.setValue(oDps.getDateDelivery_n());
+        jdfDateDelivery.setValue(oDps.getDateDocDelivery_n());
     }
 
     @SuppressWarnings("unchecked")
