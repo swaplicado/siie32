@@ -108,16 +108,21 @@ public class SSetExchangeRate {
         calendar.setTime(nextDay);
         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
-        for (Object day : bankNbDays) {
-            String bankNbDay = day.toString();
-            if (!SLibUtils.DbmsDateFormatDate.format(nextDay).equals(bankNbDay) && dayOfWeek != 7 && dayOfWeek != 1) {
-                isbankBussDay = true;
-            } 
-            else {
-                isbankBussDay = false;
-                break;
+        if (bankNbDays.size() > 0) {
+            for (Object day : bankNbDays) {
+                String bankNbDay = day.toString();
+                if (!SLibUtils.DbmsDateFormatDate.format(nextDay).equals(bankNbDay) && dayOfWeek != 7 && dayOfWeek != 1) {
+                    isbankBussDay = true;
+                } 
+                else {
+                    isbankBussDay = false;
+                    break;
+                }
             }
+        } else {
+            isbankBussDay = dayOfWeek != 7 && dayOfWeek != 1;
         }
+        
         return isbankBussDay;
     }
 
