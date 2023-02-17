@@ -50,7 +50,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_name", "Ítem", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "analysis_name", "Análisis", STableConstants.WIDTH_ITEM_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "type_name", "Tipo análisis", STableConstants.WIDTH_ITEM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "name", "Tipo análisis", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit_symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit_name", "Nombre unidad", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_min", "Aplica mín", STableConstants.WIDTH_BOOLEAN);
@@ -135,7 +135,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
                 + "    v.b_min, "
                 + "    v.b_max, "
                 + "    v.b_required, "
-                + "    CONCAT(ta.type_code, '-', ta.type_name) AS analysis_type, "
+                + "    CONCAT(ta.code, '-', ta.name) AS analysis_type, "
                 + "    i.id_item, "
                 + "    i.item, "
                 + "    i.item_key, "
@@ -143,7 +143,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
                 + "    i.name AS item_name, "
                 + "    i.code AS item_code, "
                 + "    i.name_short, "
-                + "    ta.type_name, "
+                + "    ta.name, "
                 + "    v.b_del, "
                 + "    v.fid_usr_new, "
                 + "    v.fid_usr_edit, "

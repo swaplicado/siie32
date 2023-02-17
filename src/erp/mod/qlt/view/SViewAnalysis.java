@@ -55,7 +55,7 @@ public class SViewAnalysis extends SGridPaneView implements ActionListener {
                 + "v.analysis_name AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.unit_symbol, "
                 + "v.unit_name, "
-                + "CONCAT(ta.type_code, '-', ta.type_name) AS analysis_type, "
+                + "CONCAT(ta.code, '-', ta.name) AS analysis_type, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "

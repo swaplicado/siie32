@@ -45,7 +45,7 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ety.orig_qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.unit", "Nombre unidad", STableConstants.WIDTH_ITEM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qta.type_name", "Tipo análisis", STableConstants.WIDTH_ITEM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qta.name", "Tipo análisis", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.analysis_name", "Análisis", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.unit_symbol", "Un. ana.", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.unit_name", "Nom. un. ana.", STableConstants.WIDTH_ITEM);
@@ -140,7 +140,7 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "    qa.analysis_name, "
                 + "    qa.unit_symbol, "
                 + "    qa.unit_name, "
-                + "    qta.type_name, "
+                + "    qta.name, "
                 + "    v.b_del, "
                 + "    v.fid_usr_new, "
                 + "    v.fid_usr_edit, "

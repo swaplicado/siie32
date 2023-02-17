@@ -193,17 +193,17 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
             
-            sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.type_name "
+            sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
                     + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
                     + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
-                    + "ON qa.fk_tp_analysis_id = qtp.id_analysis_type "
+                    + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
                     + "WHERE qa.id_analysis = " + mnFkAnalysisId;
             
             resultSetAux = statement.getConnection().createStatement().executeQuery(sql);
             if (resultSetAux.next()) {
                 msAnalysisName = resultSetAux.getString("analysis_name");
                 msAnalysisUnit = resultSetAux.getString("unit_symbol");
-                msAnalysisType = resultSetAux.getString("type_name");
+                msAnalysisType = resultSetAux.getString("name");
             }
         }
         catch (java.sql.SQLException e) {
