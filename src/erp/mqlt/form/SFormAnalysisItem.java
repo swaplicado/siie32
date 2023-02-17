@@ -92,7 +92,7 @@ public class SFormAnalysisItem extends javax.swing.JDialog implements erp.lib.fo
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Adquisición de timbres"); // NOI18N
+        setTitle("Análisis vs ítem"); // NOI18N
         setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {

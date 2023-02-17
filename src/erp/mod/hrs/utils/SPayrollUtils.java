@@ -8,6 +8,7 @@ package erp.mod.hrs.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.form.SFormPayroll;
@@ -304,7 +305,9 @@ public class SPayrollUtils {
                                         ArrayList<Integer> employeesIds, 
                                             ArrayList<Integer> bonus, 
                                                 Date payDay) throws SQLException {
-        String sqlEarnByBonus = "SELECT DISTINCT fk_ear FROM hrs_cond_ear WHERE NOT b_del AND fk_bonus = ";
+        String sqlEarnByBonus = "SELECT DISTINCT fk_ear FROM "
+                + SModConsts.TablesMap.get(SModConsts.HRS_COND_EAR) + " "
+                + "WHERE NOT b_del AND fk_bonus = ";
         
         final int scopeGbl = 1;
         final int scopeDpt = 2;
@@ -322,25 +325,29 @@ public class SPayrollUtils {
                         "    cear.amt, " +
                         "    cear.fk_ear " +
                         " FROM " +
-                        "    erp.hrsu_emp e " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " e " +
                         "  INNER JOIN " +
-                        "    erp.bpsu_bp bp ON e.id_emp = bp.id_bp " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " bp ON e.id_emp = bp.id_bp " +
                         "  INNER JOIN " +
-                        "    hrs_cond_ear cear ON cear.fk_ref = ";
+                        "    " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " mem ON e.id_emp = mem.id_emp " +
+                        "  INNER JOIN " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.HRS_COND_EAR) + " cear ON cear.fk_ref = ";
         
         String sql1 = "INNER JOIN" +
-                        " hrs_ear ear ON cear.fk_ear = ear.id_ear " +
+                        " " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " ear ON cear.fk_ear = ear.id_ear " +
                         " INNER JOIN " +
-                        " erp.hrss_bonus bonus ON cear.fk_bonus = bonus.id_bonus " +
+                        " " + SModConsts.TablesMap.get(SModConsts.HRSS_BONUS) + " bonus ON cear.fk_bonus = bonus.id_bonus " +
                         " WHERE " +
                         " cear.fk_ear = ";
         String sql2 =   "  AND cear.fk_scope = ";
         String sql3 =   "  AND cear.fk_bonus = ";
         
-        String sql4 =   "       AND cear.b_del = FALSE " +
-                        "        AND cear.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(payDay) + "' " +
-                        "        AND e.b_act = TRUE " +
-                        "        AND e.b_del = FALSE;";
+        String sql4 =   " AND cear.b_del = FALSE " +
+                        " AND cear.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(payDay) + "' " +
+                        " AND LENGTH(e.grocery_srv_acc) > 0 " +
+                        " AND mem.b_del = FALSE " +
+                        " AND e.b_act = TRUE " +
+                        " AND e.b_del = FALSE;";
         
         HashMap<Integer, ArrayList<SEarnConfiguration>> confDept = new HashMap<>();
         for (Integer bonu : bonus) {
@@ -491,7 +498,7 @@ public class SPayrollUtils {
      */
     private static HashMap<Integer, Integer> getEmployeesCheckerPolicy(SGuiClient client, ArrayList<Integer> lEmployees) {
         HashMap<Integer, Integer> employees = new HashMap<>();
-        String query = "SELECT id_emp, checker_policy FROM erp.hrsu_emp WHERE id_emp IN (";
+        String query = "SELECT id_emp, checker_policy FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " WHERE id_emp IN (";
         
         String emps = lEmployees.stream().map(Object::toString)
                                     .collect(Collectors.joining(","));

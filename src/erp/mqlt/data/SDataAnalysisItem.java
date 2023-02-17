@@ -9,7 +9,11 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.data.SDataConstants;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
+import sa.lib.SLibConsts;
+import sa.lib.db.SDbConsts;
 
 /**
  *
@@ -162,7 +166,7 @@ public class SDataAnalysisItem extends erp.lib.data.SDataRegistry implements jav
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
             
-            sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.type_name "
+            sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
                     + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
                     + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
                     + "ON qa.fk_tp_analysis_id = qtp.id_analysis_type "
@@ -172,7 +176,7 @@ public class SDataAnalysisItem extends erp.lib.data.SDataRegistry implements jav
             if (resultSetAux.next()) {
                 msAnalysisName = resultSetAux.getString("analysis_name");
                 msAnalysisUnit = resultSetAux.getString("unit_symbol");
-                msAnalysisType = resultSetAux.getString("type_name");
+                msAnalysisType = resultSetAux.getString("name");
             }
         }
         catch (java.sql.SQLException e) {
@@ -254,6 +258,62 @@ public class SDataAnalysisItem extends erp.lib.data.SDataRegistry implements jav
             SLibUtilities.printOutException(this, e);
         }
         
+        return mnLastDbActionResult;
+    }
+    
+    @Override
+    public int delete(java.sql.Connection connection) {
+        String sMsg = "No se puede eliminar el documento: ";
+        
+        try {
+            if (mbIsRegistryRequestDelete) {
+                // Set document as deleted:
+
+                if (mbIsDeleted) {
+                    mnDbmsErrorId = 1;
+                    msDbmsError = sMsg + "El documento ya está marcado como eliminado.";
+                    throw new Exception(msDbmsError);
+                }
+                else {
+                    mbIsDeleted = true;
+
+                    if (save(connection) == SLibConstants.DB_ACTION_SAVE_OK) {
+                        mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_OK;
+                    }
+                    else {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
+                    }
+                }
+            }
+            else {
+                // Revert registry deletion:
+                
+                if (!mbIsDeleted) {
+                    mnDbmsErrorId = 2;
+                    msDbmsError = sMsg + "El documento ya está desmarcado como eliminado.";
+                    throw new Exception(msDbmsError);
+                }
+                else {
+                    mbIsDeleted = false;
+
+                    if (save(connection) == SLibConstants.DB_ACTION_SAVE_OK) {
+                        mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_OK;
+                    }
+                    else {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
+                    }
+                }
+            }
+        }
+        catch (SQLException exception) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_ERROR;
+            SLibUtilities.printOutException(this, exception);
+        }
+        catch (Exception exception) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_ERROR;
+            SLibUtilities.printOutException(this, exception);
+        }
+
         return mnLastDbActionResult;
     }
     
