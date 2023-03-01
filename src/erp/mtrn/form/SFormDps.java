@@ -141,7 +141,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int TAB_CFD_ADD = 4; // CFD Addenda
     private static final int TAB_CFD_XML = 5; // CFD XML file
     private static final int CFDI_RELATED = 1; // Para obtener los CFDI relacionados
-    private static final String CFDI_RELATION_TYPE_01 = "01"; 
     
     private static final int UUID_FIRST_SECC_LENGHT = 8;
 
@@ -6875,7 +6874,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         moLastDpsSource = oDpsSource;
                         
                         if (moTrnRelatedDocument == null) moTrnRelatedDocument = new STrnCfdRelated();
-                        moTrnRelatedDocument.addRelatedDocument("07", oDpsSource.getDbmsDataCfd().getUuid());
+                        String relTp = DCfdi40Catalogs.REL_TP_NOTA_CREDITO;
+                        if (oDpsEntryAdjustment.getOperationsType() == SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) {
+                            relTp = DCfdi40Catalogs.REL_TP_ANTICIPO;
+                        }
+                        moTrnRelatedDocument.addRelatedDocument(relTp, oDpsSource.getDbmsDataCfd().getUuid());
                         jtaCfdiRelated.setText(moTrnRelatedDocument.getAsString());
                     }
                 }
@@ -7526,7 +7529,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         if (moTrnRelatedDocument == null) {
                                             moTrnRelatedDocument = new STrnCfdRelated();
                                         }
-                                        moTrnRelatedDocument.addRelatedDocument(CFDI_RELATION_TYPE_01, oDpsSource.getDbmsDataCfd().getUuid());
+                                        moTrnRelatedDocument.addRelatedDocument(adjustmentSubtypeKey[0] == 2 ? DCfdi40Catalogs.REL_TP_DEVOLUCIÓN : DCfdi40Catalogs.REL_TP_NOTA_CREDITO, oDpsSource.getDbmsDataCfd().getUuid());
                                         jtaCfdiRelated.setText(moTrnRelatedDocument.getAsString());
                                     }
                                 }              
@@ -10447,7 +10450,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldNumberSeries.setFieldValue(moDps.getNumberSeries());
         moFieldNumber.setFieldValue(moDps.getNumber());
         moFieldNumberReference.setFieldValue(moDps.getNumberReference());
-        moFieldReqNum.setFieldValue(moDps.getReqNum());
+//        moFieldReqNum.setFieldValue(moDps.getReqNum());
         
         if (areNumberSeriesBySystem()) {
             if (moDps.getIsRegistryNew()) {
@@ -10826,7 +10829,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setFkCarrierId_n(moFieldFkCarrierId_n.getKeyAsIntArray()[0]);
             moDps.setFkVehicleTypeId_n(moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0]);
             moDps.setFkVehicleId_n(moFieldFkVehicleId_n.getKeyAsIntArray()[0]);
-            moDps.setReqNum(moFieldReqNum.getString());
+//            moDps.setReqNum(moFieldReqNum.getString());
             
             //moDps.setFkSourceYearId_n(...
             //moDps.setFkSourceDocId_n(...

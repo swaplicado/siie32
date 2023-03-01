@@ -173,7 +173,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected double mdTaxRetainedCy_r;
     protected double mdTotalCy_r;
     protected double mdCommissionsCy_r;
-    protected java.lang.String msReqNum;
+    //protected java.lang.String msReqNum;
     protected java.lang.String msDriver;
     protected java.lang.String msPlate;
     protected java.lang.String msTicket;
@@ -1808,7 +1808,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setTaxRetainedCy_r(double d) { mdTaxRetainedCy_r = d; }
     public void setTotalCy_r(double d) { mdTotalCy_r = d; }
     public void setCommissionsCy_r(double d) { mdCommissionsCy_r = d; }
-    public void setReqNum(java.lang.String s) { msReqNum = s; }
+//    public void setReqNum(java.lang.String s) { msReqNum = s; }
     public void setDriver(java.lang.String s) { msDriver = s; }
     public void setPlate(java.lang.String s) { msPlate = s; }
     public void setTicket(java.lang.String s) { msTicket = s; }
@@ -1932,7 +1932,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public double getTaxRetainedCy_r() { return mdTaxRetainedCy_r; }
     public double getTotalCy_r() { return mdTotalCy_r; }
     public double getCommissionsCy_r() { return mdCommissionsCy_r; }
-    public java.lang.String getReqNum() { return msReqNum; }
+//    public java.lang.String getReqNum() { return msReqNum; }
     public java.lang.String getDriver() { return msDriver; }
     public java.lang.String getPlate() { return msPlate; }
     public java.lang.String getTicket() { return msTicket; }
@@ -2168,7 +2168,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mdTaxRetainedCy_r = 0;
         mdTotalCy_r = 0;
         mdCommissionsCy_r = 0;
-        msReqNum = "";
+//        msReqNum = "";
         msDriver = "";
         msPlate = "";
         msTicket = "";
@@ -2359,7 +2359,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mdTaxRetainedCy_r = oResultSet.getDouble("d.tax_retained_cur_r");
                 mdTotalCy_r = oResultSet.getDouble("d.tot_cur_r");
                 mdCommissionsCy_r = oResultSet.getDouble("d.comms_cur_r");
-                msReqNum = oResultSet.getString("d.req_num");
+//                msReqNum = oResultSet.getString("d.req_num");
                 msDriver = oResultSet.getString("d.driver");
                 msPlate = oResultSet.getString("d.plate");
                 msTicket = oResultSet.getString("d.ticket");
@@ -2710,7 +2710,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2746,7 +2746,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setDouble(nParam++, mdTaxRetainedCy_r);
             oCallableStatement.setDouble(nParam++, mdTotalCy_r);
             oCallableStatement.setDouble(nParam++, mdCommissionsCy_r);
-            oCallableStatement.setString(nParam++, msReqNum);
+//            oCallableStatement.setString(nParam++, msReqNum);
             oCallableStatement.setString(nParam++, msDriver);
             oCallableStatement.setString(nParam++, msPlate);
             oCallableStatement.setString(nParam++, msTicket);
@@ -6000,27 +6000,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         try {
             if (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
-                addenda = new cfd.ver3.DElementAddenda();
+                addenda = new cfd.ver4.DElementAddenda();
 
                 if (isDocumentSal() || isAdjustmentSal()) {
                     switch (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdTempCfdIvaPorcentaje));
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
