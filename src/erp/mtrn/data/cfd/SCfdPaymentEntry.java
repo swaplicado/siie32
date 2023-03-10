@@ -718,6 +718,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 }
             }
             
+            paymentEntryDoc.simplifyPayPaymentDocTaxesBase();
             paymentEntryDoc.calculatePayPaymentDocTaxesBase(paymentEntryDoc.PayPayment * paymentEntryDoc.ExchangeRate);
             
             if (EntryType == TYPE_FACTORING_FEE) {

@@ -54,7 +54,49 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
     public int AuxGridIndex;
     
+    public void simplifyPayPaymentDocTaxesBase() {
+        ArrayList<SDataReceiptPaymentPayDocTax> rppdt = new ArrayList<>();
+        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
+            boolean found = false;
+            for (SDataReceiptPaymentPayDocTax aux : rppdt) {
+                if (docTax.getRate() == aux.getRate() && docTax.getFactorCode().equals(aux.getFactorCode()) && docTax.getFkCfdTaxId()== aux.getFkCfdTaxId()) {
+                    aux.setTax(aux.getTax() + docTax.getTax());
+                    found = true;
+                }
+            }
+            if (!found) {
+                rppdt.add(docTax);
+            }
+        }
+        ReceiptPaymentPayDocTaxes = rppdt;
+    }
+    
     public void calculatePayPaymentDocTaxesBase(double pay) {
+        int mnRate0 = 0;
+        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
+            if (docTax.getRate() != 0) { 
+                docTax.setBase(SLibUtils.roundAmount(docTax.getTax()/docTax.getRate()));
+                if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // -
+                    pay -= docTax.getBase() + docTax.getTax();
+                }
+                else if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) { // +
+                    pay += docTax.getBase() + docTax.getTax();
+                }
+            }
+            else {
+                mnRate0++;
+            }
+        }
+        pay/=mnRate0;
+        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
+            if (docTax.getRate() == 0) { 
+                docTax.setBase(SLibUtils.roundAmount(pay));
+            }
+        }
+    }
+    
+    // Isabel Servín 10/03/2023: Comentado para preservar forma anterior de calcular la base
+    /*public void calculatePayPaymentDocTaxesBase(double pay) {
         for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
             if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // -
                 pay -= docTax.getTax();
@@ -66,7 +108,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
             docTax.setBase(SLibUtils.roundAmount(pay));
         }
-    }
+    }*/
     
     public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SThinDps thinDps, int entryNumber, int entryType, int installment, double balancePrev, double payment, double exchangeRate) {
         ParentPaymentEntry = parentPaymentEntry;
