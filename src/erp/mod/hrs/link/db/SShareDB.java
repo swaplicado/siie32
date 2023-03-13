@@ -857,7 +857,7 @@ public class SShareDB {
     
     public ArrayList<SEmployeeVacations> getEmployeeVacations(String strDate) throws SConfigException, ClassNotFoundException, SQLException {
         SMySqlClass mdb = new SMySqlClass();
-        String empresas[]= new String[4];
+        String empresas[]= new String[5];
         empresas[0] = "erp_aeth";
         empresas[1] = "erp_amesa";
         empresas[2] = "erp_otsa";
