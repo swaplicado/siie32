@@ -862,6 +862,7 @@ public class SShareDB {
         empresas[1] = "erp_amesa";
         empresas[2] = "erp_otsa";
         empresas[3] = "erp_th";
+        empresas[4] = "erp_sasa";
         
         ArrayList<SEmployeeVacations> lEmp = null;
         lEmp = new ArrayList();
