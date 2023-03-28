@@ -106,7 +106,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel19 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
-        jcbCompanyBranch = new javax.swing.JComboBox<>();
+        jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
         jrbByBizPartner = new javax.swing.JRadioButton();
         jrbBySalesAgent = new javax.swing.JRadioButton();
         jrbByItemGeneric = new javax.swing.JRadioButton();
@@ -114,16 +114,16 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel8 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlCrossWith = new javax.swing.JLabel();
-        jcbCrossWith = new javax.swing.JComboBox<>();
+        jcbCrossWith = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel14 = new javax.swing.JPanel();
         jlItemCategory = new javax.swing.JLabel();
-        jcbItemCategory = new javax.swing.JComboBox<>();
+        jcbItemCategory = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel12 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jckIsWithUnits = new javax.swing.JCheckBox();
         jPanel13 = new javax.swing.JPanel();
         jlUnitType = new javax.swing.JLabel();
-        jcbUnitType = new javax.swing.JComboBox<>();
+        jcbUnitType = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel17 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jckWithoutRelatedParty = new javax.swing.JCheckBox();
@@ -504,7 +504,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 areasFilter = "";
             }
             else {
-                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                areasFilter = " AND de.fid_func IN ( " + msFunctionalAreasIds + " ) ";
             }
         }
         
@@ -519,13 +519,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else {
             try {
                 if (jrbCurrencyDoc.isSelected()) {
-                    sSumStot = " COALESCE(SUM(e.stot_cur_r), 0.0) ";
+                    sSumStot = " COALESCE(SUM(de.stot_cur_r), 0.0) ";
                     sCurrency = jcbCurrency.getSelectedIndex() == 0 ? "TODAS" : jcbCurrency.getSelectedItem().toString();
                     nCurrency = moFieldCurrency.getKeyAsIntArray()[0];
-                    sqlCurrency = jcbCurrency.getSelectedIndex() == 0 ? "" : " doc.fid_cur = " + nCurrency + " AND ";
+                    sqlCurrency = jcbCurrency.getSelectedIndex() == 0 ? "" : " d.fid_cur = " + nCurrency + " AND ";
                 }
                 else {
-                    sSumStot = " COALESCE(SUM(e.stot_r), 0.0) ";
+                    sSumStot = " COALESCE(SUM(de.stot_r), 0.0) ";
                     sCurrency = miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency();
                     nCurrency = miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0];
                     sqlCurrency = "";
@@ -540,7 +540,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("nFidCtDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]);
                 map.put("nFidClDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]);
                 map.put("nFidTpDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]);
-                map.put("sSqlWhereCompanyBranch", jcbCompanyBranch.getSelectedIndex() <= 0 ? "" : " AND doc.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
+                map.put("sSqlWhereCompanyBranch", jcbCompanyBranch.getSelectedIndex() <= 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereCompanyBranchAdjRet", jcbCompanyBranch.getSelectedIndex() <= 0 ? "" : " AND r.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereCompanyBranchAdjDis", jcbCompanyBranch.getSelectedIndex() <= 0 ? "" : " AND d.fid_cob = " + moFieldCompanyBranch.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
@@ -902,29 +902,29 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         switch(n) {
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY:
-                columnsUnit = ", COALESCE(SUM(e.qty), 0) AS f_qty, " +
-                        "0 AS f_qty_r, COALESCE(SUM(e.qty), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.qty), 0), 0) AS f_avg_price ";
+                columnsUnit = ", COALESCE(SUM(de.qty), 0) AS f_qty, " +
+                        "0 AS f_qty_r, COALESCE(SUM(de.qty), 0) AS f_qty_net, " +
+                        "COALESCE(COALESCE(SUM(de.stot_r), 0) / COALESCE(SUM(de.qty), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN:
-                columnsUnit = ", COALESCE(SUM(e.len), 0) AS f_qty, " +
-                        "0 AS f_qty_r, COALESCE(SUM(e.len), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.len), 0), 0) AS f_avg_price ";
+                columnsUnit = ", COALESCE(SUM(de.len), 0) AS f_qty, " +
+                        "0 AS f_qty_r, COALESCE(SUM(de.len), 0) AS f_qty_net, " +
+                        "COALESCE(COALESCE(SUM(de.stot_r), 0) / COALESCE(SUM(de.len), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF:
-                columnsUnit = ", COALESCE(SUM(e.surf), 0) AS f_qty, " +
-                        "0 AS f_qty_r, COALESCE(SUM(e.surf), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.surf), 0), 0) AS f_avg_price ";
+                columnsUnit = ", COALESCE(SUM(de.surf), 0) AS f_qty, " +
+                        "0 AS f_qty_r, COALESCE(SUM(de.surf), 0) AS f_qty_net, " +
+                        "COALESCE(COALESCE(SUM(de.stot_r), 0) / COALESCE(SUM(de.surf), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL:
-                columnsUnit = ", COALESCE(SUM(e.vol), 0) AS f_qty, " +
-                        "0 AS f_qty_r, COALESCE(SUM(e.vol), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.vol), 0), 0) AS f_avg_price ";
+                columnsUnit = ", COALESCE(SUM(de.vol), 0) AS f_qty, " +
+                        "0 AS f_qty_r, COALESCE(SUM(de.vol), 0) AS f_qty_net, " +
+                        "COALESCE(COALESCE(SUM(de.stot_r), 0) / COALESCE(SUM(de.vol), 0), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS:
-                columnsUnit = ", COALESCE(SUM(e.mass), 0) AS f_qty, " +
-                        "0 AS f_qty_r, COALESCE(SUM(e.mass), 0) AS f_qty_net, " +
-                        "COALESCE(COALESCE(SUM(e.stot_r), 0) / COALESCE(SUM(e.mass), 0), 0) AS f_avg_price ";
+                columnsUnit = ", COALESCE(SUM(de.mass), 0) AS f_qty, " +
+                        "0 AS f_qty_r, COALESCE(SUM(de.mass), 0) AS f_qty_net, " +
+                        "COALESCE(COALESCE(SUM(de.stot_r), 0) / COALESCE(SUM(de.mass), 0), 0) AS f_avg_price ";
                 break;
             default:
                 break;
@@ -939,33 +939,33 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         switch(n) {
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY:
                 columns = ", 0 AS f_qty, " +
-                        "COALESCE(SUM(e.qty), 0) AS f_qty_r, " +
-                        "0 - COALESCE(SUM(e.qty), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.qty), 0)), 0) AS f_avg_price ";
+                        "COALESCE(SUM(de.qty), 0) AS f_qty_r, " +
+                        "0 - COALESCE(SUM(de.qty), 0) AS f_qty_net, " +
+                        "COALESCE((0 - COALESCE(SUM(de.stot_r), 0) / 0 - COALESCE(SUM(de.qty), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN:
                 columns = ", 0 AS f_qty, " +
-                        "COALESCE(SUM(e.len), 0) AS f_qty_r, " +
-                        "0 - COALESCE(SUM(e.len), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.len), 0)), 0) AS f_avg_price ";
+                        "COALESCE(SUM(de.len), 0) AS f_qty_r, " +
+                        "0 - COALESCE(SUM(de.len), 0) AS f_qty_net, " +
+                        "COALESCE((0 - COALESCE(SUM(de.stot_r), 0) / 0 - COALESCE(SUM(de.len), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_SURF:
                 columns = ", 0 AS f_qty, " +
-                        "COALESCE(SUM(e.surf), 0) AS f_qty_r, " +
-                        "0 - COALESCE(SUM(e.surf), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.surf), 0)), 0) AS f_avg_price ";
+                        "COALESCE(SUM(de.surf), 0) AS f_qty_r, " +
+                        "0 - COALESCE(SUM(de.surf), 0) AS f_qty_net, " +
+                        "COALESCE((0 - COALESCE(SUM(de.stot_r), 0) / 0 - COALESCE(SUM(de.surf), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_VOL:
                 columns = ", 0 AS f_qty, " +
-                        "COALESCE(SUM(e.vol), 0) AS f_qty_r, " +
-                        "0 - COALESCE(SUM(e.vol), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.vol), 0)), 0) AS f_avg_price ";
+                        "COALESCE(SUM(de.vol), 0) AS f_qty_r, " +
+                        "0 - COALESCE(SUM(de.vol), 0) AS f_qty_net, " +
+                        "COALESCE((0 - COALESCE(SUM(de.stot_r), 0) / 0 - COALESCE(SUM(de.vol), 0)), 0) AS f_avg_price ";
                 break;
             case SDataConstantsSys.TRNX_TP_UNIT_TOT_MASS:
                 columns = ", 0 AS f_qty, " +
-                        "COALESCE(SUM(e.mass), 0) AS f_qty_r, " +
-                        "0 - COALESCE(SUM(e.mass), 0) AS f_qty_net, " +
-                        "COALESCE((0 - COALESCE(SUM(e.stot_r), 0) / 0 - COALESCE(SUM(e.mass), 0)), 0) AS f_avg_price ";
+                        "COALESCE(SUM(de.mass), 0) AS f_qty_r, " +
+                        "0 - COALESCE(SUM(de.mass), 0) AS f_qty_net, " +
+                        "COALESCE((0 - COALESCE(SUM(de.stot_r), 0) / 0 - COALESCE(SUM(de.mass), 0)), 0) AS f_avg_price ";
                 break;
             default:
                 break;

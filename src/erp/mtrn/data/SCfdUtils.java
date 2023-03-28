@@ -4586,7 +4586,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         comprobante.getAttNoCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_40).getCertNumber());
         comprobante.getAttCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_40).getCertBase64());
-        if (!isGlobal) comprobante.getAttCondicionesDePago().setString(xmlCfdi.getComprobanteCondicionesPago());
+        if (!isGlobal && !xmlCfdi.getComprobanteTipoComprobante().equals("E")) comprobante.getAttCondicionesDePago().setString(xmlCfdi.getComprobanteCondicionesPago());
         comprobante.getAttSubTotal().setDouble(xmlCfdi.getComprobanteSubtotal());
         comprobante.getAttDescuento().setDouble(xmlCfdi.getComprobanteDescuento());
         comprobante.getAttMoneda().setString(xmlCfdi.getComprobanteMoneda());
@@ -4731,10 +4731,9 @@ public abstract class SCfdUtils implements Serializable {
                         if (impuesto.getTipoFactor().compareToIgnoreCase(DCfdi40Catalogs.FAC_TP_EXENTO) == 0) {
                             exemptTaxesAvailable = true;
                         }
-                        else {
-                            dTotalImptoTrasladado += impuesto.getImporte();
-                            impuestosTrasladados.getEltImpuestoTrasladados().add((cfd.ver40.DElementImpuestoTraslado) impuesto.createRootElementImpuesto40());
-                        }
+                        dTotalImptoTrasladado += impuesto.getImporte();
+                        impuestosTrasladados.getEltImpuestoTrasladados().add((cfd.ver40.DElementImpuestoTraslado) impuesto.createRootElementImpuesto40());
+                        
                         break;
                     default:
                         throw new Exception("Todos los tipos de impuestos deben ser conocidos (" + impuesto.getImpuestoTipo() + ").");
@@ -4756,11 +4755,9 @@ public abstract class SCfdUtils implements Serializable {
                     comprobante.setEltOpcImpuestos(new cfd.ver40.DElementImpuestos(comprobante));
                 }
                 
-                comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
-                if (exemptTaxesAvailable) {
-                    comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setCanBeZero(true);
+                if (!exemptTaxesAvailable) {
+                    comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
                 }
-                
                 if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
                     comprobante.getEltOpcImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
                 }

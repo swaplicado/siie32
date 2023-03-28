@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 209.8/ 2023-03-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Mejoramiento en el truncado para calcular el nodo pagosP de los CFDIs de recepción de pagos.
+2) Corrección en la generación de CFDI con impuesto IVA exento.
+3) Corrección al método read de la clase erp.mfin.data.SDataExchangeRate
+
+================================================================================
 SIIE 3.2 209.7/ 2023-03-10
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

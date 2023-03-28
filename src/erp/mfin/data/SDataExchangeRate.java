@@ -8,6 +8,8 @@ package erp.mfin.data;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.util.Date;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -90,7 +92,7 @@ public class SDataExchangeRate extends erp.lib.data.SDataRegistry implements jav
         reset();
 
         try {
-            sql = "SELECT * FROM fin_exc_rate WHERE id_cur = " + key[0] + " AND id_dt = '" + key[1] + "' ";
+            sql = "SELECT * FROM fin_exc_rate WHERE id_cur = " + (int) key[0] + " AND id_dt = '" + SLibUtils.DbmsDateFormatDate.format((Date) key[1]) + "' ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

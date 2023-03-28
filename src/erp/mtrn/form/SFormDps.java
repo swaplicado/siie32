@@ -10597,6 +10597,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (!moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor().isEmpty()) {
                     moFieldCfdiTaxRegimeRec.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
                 }
+                else {
+                    moFieldCfdiTaxRegimeRec.setFieldValue(moBizPartnerCategory.getTaxRegime());
+                }
                 
                 if (!moDps.getDbmsDataDpsCfd().getGlobalPeriodocity().isEmpty()) {
                     moFieldCfdiGblPeriodicity.setFieldValue(moDps.getDbmsDataDpsCfd().getGlobalPeriodocity());

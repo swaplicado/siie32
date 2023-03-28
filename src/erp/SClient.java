@@ -111,7 +111,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 209.7"; // fecha release: 2023-03-10
+    public static final String APP_RELEASE = "3.2 209.8"; // fecha release: 2023-03-28
     public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
