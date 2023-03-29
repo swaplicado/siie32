@@ -341,6 +341,7 @@ public class SFormIdentifiedCostCalculation extends SBeanForm implements ActionL
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Costo unitario lote $ ML"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo costo unitario"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Problema cálculo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Problema lote"));
                 
                 return gridColumnsForm;
             }
