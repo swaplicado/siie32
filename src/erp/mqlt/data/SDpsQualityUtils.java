@@ -76,7 +76,7 @@ public class SDpsQualityUtils {
 
                 ResultSet resultSetAux = session.getDatabase().getConnection().createStatement().executeQuery(sql);
                 if (resultSetAux.next()) {
-                    oEtyAnalysis.setAuxAnalysisName(resultSetAux.getString("name"));
+                    oEtyAnalysis.setAuxAnalysisName(resultSetAux.getString("analysis_name"));
                     oEtyAnalysis.setAuxAnalysisUnit(resultSetAux.getString("unit_symbol"));
                     oEtyAnalysis.setAuxAnalysisType(resultSetAux.getString("name"));
                 }

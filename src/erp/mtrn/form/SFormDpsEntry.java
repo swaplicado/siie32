@@ -56,6 +56,7 @@ import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
@@ -68,6 +69,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -75,6 +77,7 @@ import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -2678,21 +2681,26 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();                
+                DefaultTableCellRenderer f = new DefaultTableCellRenderer();
+                f.setHorizontalAlignment(JLabel.RIGHT);
+                f.setForeground(Color.BLUE);
                 SGridColumnForm column;
                 
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Orden captura", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Orden captura", 50);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Análisis", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Análisis", 200);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50);
                 columns.add(column);
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor mínimo", 100);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                column.setCellRenderer(f);
                 columns.add(column);
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor máximo", 100);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                column.setCellRenderer(f);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Requerido", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Requerido", 75);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
                 columns.add(column);
                 
