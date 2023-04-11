@@ -139,7 +139,7 @@ public class SCfdDataConcepto {
      * @param entry 
      */
     public void computeCfdImpuestosConceptos(final erp.mtrn.data.SDataDpsEntry entry) {
-        SCfdDataImpuesto impuestoXml = null;
+        SCfdDataImpuesto impuestoXml;
 
         try {
             for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {

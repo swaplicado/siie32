@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Sergio Flores, Adrián Avilés
+ * @author Sergio Flores, Adrián Avilés, Isabel Servín
  */
 public class SUtilClientSetup extends javax.swing.JFrame {
 
@@ -109,6 +109,10 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jpfRedisPassword2 = new javax.swing.JPasswordField();
         jlRedisPassword1Example2 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
+        jlTimeZone = new javax.swing.JLabel();
+        jtfTimeZone = new javax.swing.JTextField();
+        jlTimeZoneExample = new javax.swing.JLabel();
+        jPanel19 = new javax.swing.JPanel();
         jlTimestpamp = new javax.swing.JLabel();
         jtfTimestamp = new javax.swing.JTextField();
         jlTimestampExample = new javax.swing.JLabel();
@@ -132,7 +136,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jPanel3.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setPreferredSize(new java.awt.Dimension(485, 382));
-        jPanel4.setLayout(new java.awt.GridLayout(14, 0, 0, 3));
+        jPanel4.setLayout(new java.awt.GridLayout(15, 0, 0, 3));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -389,23 +393,40 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlTimeZone.setText("Time zone:*");
+        jlTimeZone.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jlTimeZone);
+
+        jtfTimeZone.setText("GMT-06:00");
+        jtfTimeZone.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jtfTimeZone);
+
+        jlTimeZoneExample.setForeground(java.awt.Color.gray);
+        jlTimeZoneExample.setText("(e.g GMT-06:00)");
+        jlTimeZoneExample.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlTimeZoneExample);
+
+        jPanel4.add(jPanel8);
+
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jlTimestpamp.setText("Last update:");
         jlTimestpamp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jlTimestpamp);
+        jPanel19.add(jlTimestpamp);
 
         jtfTimestamp.setEditable(false);
         jtfTimestamp.setText("01/01/2000 00:00:00 -0000");
         jtfTimestamp.setFocusable(false);
         jtfTimestamp.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel8.add(jtfTimestamp);
+        jPanel19.add(jtfTimestamp);
 
         jlTimestampExample.setForeground(java.awt.Color.gray);
         jlTimestampExample.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel8.add(jlTimestampExample);
+        jPanel19.add(jlTimestampExample);
 
-        jPanel4.add(jPanel8);
+        jPanel4.add(jPanel19);
 
-        jPanel3.add(jPanel4, java.awt.BorderLayout.NORTH);
+        jPanel3.add(jPanel4, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -440,7 +461,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(736, 489));
+        setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -494,6 +515,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -535,6 +557,8 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JLabel jlSeparatorClient;
     private javax.swing.JLabel jlSeparatorServer;
     private javax.swing.JLabel jlSystemMode;
+    private javax.swing.JLabel jlTimeZone;
+    private javax.swing.JLabel jlTimeZoneExample;
     private javax.swing.JLabel jlTimestampExample;
     private javax.swing.JLabel jlTimestpamp;
     private javax.swing.JPasswordField jpfDatabasePassword1;
@@ -553,6 +577,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
     private javax.swing.JTextField jtfErpInstance;
     private javax.swing.JTextField jtfErpRmiRegistryPort;
     private javax.swing.JTextField jtfRedisHost;
+    private javax.swing.JTextField jtfTimeZone;
     private javax.swing.JTextField jtfTimestamp;
     // End of variables declaration//GEN-END:variables
 
@@ -604,6 +629,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jtfRedisHost.setText("");
             jpfRedisPassword1.setText("");
             jpfRedisPassword2.setText("");
+            jtfTimeZone.setText("");
             jtfTimestamp.setText("");
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { SLibConsts.UNDEFINED });
         }
@@ -624,6 +650,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             jtfRedisHost.setText(moParamsApp.getRedisHost());
             jpfRedisPassword1.setText(moParamsApp.getRedisPswd());
             jpfRedisPassword2.setText(moParamsApp.getRedisPswd());
+            jtfTimeZone.setText(moParamsApp.getTimeZone());
             jtfTimestamp.setText(SLibUtils.DateFormatDatetimeTimeZone.format(moParamsApp.getTimestamp()));
             SGuiUtils.locateItem(jcbDatabaseType, new int[] { moParamsApp.getDatabaseType() });
         }
@@ -649,6 +676,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                     jtfRedisHost.getText().length() != 0 ||
                     jpfRedisPassword1.getPassword().length != 0 ||
                     jpfRedisPassword2.getPassword().length != 0 ||
+                    jtfTimeZone.getText().length() != 0 ||
                     jcbDatabaseType.getSelectedIndex() != 0) {
                 hasChanges = true;
             }
@@ -669,6 +697,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                     moParamsApp.getRedisHost().compareTo(jtfRedisHost.getText()) != 0 ||
                     moParamsApp.getRedisPswd().compareTo(new String(jpfRedisPassword1.getPassword())) != 0 ||
                     moParamsApp.getRedisPswd().compareTo(new String(jpfRedisPassword2.getPassword())) != 0 ||
+                    moParamsApp.getTimeZone().compareTo(jtfTimeZone.getText()) != 0 ||
                     moParamsApp.getDatabaseType() != ((SGuiItem) jcbDatabaseType.getSelectedItem()).getPrimaryKey()[0]) {
                 hasChanges = true;
             }
@@ -709,6 +738,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
         jtfDatabaseName.setText(SLibUtils.textTrim(jtfDatabaseName.getText()));
         jtfDatabaseUser.setText(SLibUtils.textTrim(jtfDatabaseUser.getText()));
         jtfRedisHost.setText(SLibUtils.textTrim(jtfRedisHost.getText()).toLowerCase());
+        jtfTimeZone.setText(SLibUtils.textTrim(jtfTimeZone.getText()).toUpperCase());
         
         if (!jrbModeServer.isSelected() && !jrbModeRedis.isSelected()) {
             JOptionPane.showMessageDialog(this, "A value must be provided for field '" + SGuiUtils.getLabelName(jlSystemMode) + "'.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
@@ -822,6 +852,10 @@ public class SUtilClientSetup extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Value for fields '" + SGuiUtils.getLabelName(jlRedisPassword1) + "' and '" + SGuiUtils.getLabelName(jlRedisPassword2) + "' must be the same.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
             jpfRedisPassword1.requestFocusInWindow();
         }
+        else if (jtfTimeZone.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Field '" + SGuiUtils.getLabelName(jlTimeZone) + "' cannot contain blank spaces.", SGuiConsts.MSG_BOX_WARNING, JOptionPane.WARNING_MESSAGE);
+            jtfTimeZone.requestFocusInWindow();
+        }
         else {
             try {
                 if (moParamsApp == null) {
@@ -842,6 +876,7 @@ public class SUtilClientSetup extends javax.swing.JFrame {
                 moParamsApp.setDatabaseType(((SGuiItem) jcbDatabaseType.getSelectedItem()).getPrimaryKey()[0]);
                 moParamsApp.setRedisHost(jtfRedisHost.getText());
                 moParamsApp.setRedisPswd(redisPassword1);
+                moParamsApp.setTimeZone(jtfTimeZone.getText());
                 moParamsApp.setWithSerever(jrbModeServer.isSelected());
                 if (moParamsApp.save()) {
                     save = true;

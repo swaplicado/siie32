@@ -528,74 +528,69 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
                 throw new Exception(msDbmsError);
             }
             else {
-                if (mnDbmsErrorId != 0) {
-                    throw new Exception(msDbmsError);
-                }
-                else {
-                    // Save aswell record entries:
+                // Save aswell record entries:
 
-                    for (SDataRecordEntry entry : mvDbmsRecordEntries) {
-                        if (entry.getIsRegistryNew() || entry.getIsRegistryEdited()) {
-                            entry.setPkYearId(mnPkYearId);
-                            entry.setPkPeriodId(mnPkPeriodId);
-                            entry.setPkBookkeepingCenterId(mnPkBookkeepingCenterId);
-                            entry.setPkRecordTypeId(msPkRecordTypeId);
-                            entry.setPkNumberId(mnPkNumberId);
-                            entry.setAuxDateCfd(mtDate);
+                for (SDataRecordEntry entry : mvDbmsRecordEntries) {
+                    if (entry.getIsRegistryNew() || entry.getIsRegistryEdited()) {
+                        entry.setPkYearId(mnPkYearId);
+                        entry.setPkPeriodId(mnPkPeriodId);
+                        entry.setPkBookkeepingCenterId(mnPkBookkeepingCenterId);
+                        entry.setPkRecordTypeId(msPkRecordTypeId);
+                        entry.setPkNumberId(mnPkNumberId);
+                        entry.setAuxDateCfd(mtDate);
 
-                            if (entry.getIsDeleted()) {
-                                entry.setSortingPosition(0);
-                            }
-                            else {
-                                entry.setSortingPosition(entry.getSortingPosition());
-                            }
-
-                            if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                            }
+                        if (entry.getIsDeleted()) {
+                            entry.setSortingPosition(0);
                         }
-                    }
-                    
-                    // Save XML associated:
-                
-                    for (SDataCfd cfd : maDbmsDataCfd) {
-                        cfd.setFkFinRecordYearId_n(mnPkYearId);
-                        cfd.setFkFinRecordPeriodId_n(mnPkPeriodId);
-                        cfd.setFkFinRecordBookkeepingCenterId_n(mnPkBookkeepingCenterId);
-                        cfd.setFkFinRecordRecordTypeId_n(msPkRecordTypeId);
-                        cfd.setFkFinRecordNumberId_n(mnPkNumberId);
-                        cfd.setFkRecordYearId_n(0);
-                        cfd.setFkRecordPeriodId_n(0);
-                        cfd.setFkRecordBookkeepingCenterId_n(0);
-                        cfd.setFkRecordRecordTypeId_n("");
-                        cfd.setFkRecordNumberId_n(0);
-                        cfd.setFkRecordEntryId_n(0);
-                        cfd.setTimestamp(mtDate);
-                        
-                        if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        else {
+                            entry.setSortingPosition(entry.getSortingPosition());
+                        }
+
+                        if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
                     }
-                    
-                    // Delete XML:
-                    
-                    for (SDataCfd cfd : maAuxDataCfdToDel) {
-                        cfd.setFkFinRecordYearId_n(0);
-                        cfd.setFkFinRecordPeriodId_n(0);
-                        cfd.setFkFinRecordBookkeepingCenterId_n(0);
-                        cfd.setFkFinRecordRecordTypeId_n("");
-                        cfd.setFkFinRecordNumberId_n(0);
-                        
-                        if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                        }
-                    }
-
-                    updateChecksLinks(connection);  // link check registries with corresponding record entries
-
-                    mbIsRegistryNew = false;
-                    mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
                 }
+
+                // Save XML associated:
+
+                for (SDataCfd cfd : maDbmsDataCfd) {
+                    cfd.setFkFinRecordYearId_n(mnPkYearId);
+                    cfd.setFkFinRecordPeriodId_n(mnPkPeriodId);
+                    cfd.setFkFinRecordBookkeepingCenterId_n(mnPkBookkeepingCenterId);
+                    cfd.setFkFinRecordRecordTypeId_n(msPkRecordTypeId);
+                    cfd.setFkFinRecordNumberId_n(mnPkNumberId);
+                    cfd.setFkRecordYearId_n(0);
+                    cfd.setFkRecordPeriodId_n(0);
+                    cfd.setFkRecordBookkeepingCenterId_n(0);
+                    cfd.setFkRecordRecordTypeId_n("");
+                    cfd.setFkRecordNumberId_n(0);
+                    cfd.setFkRecordEntryId_n(0);
+                    cfd.setTimestamp(mtDate);
+
+                    if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+
+                // Delete XML:
+
+                for (SDataCfd cfd : maAuxDataCfdToDel) {
+                    cfd.setFkFinRecordYearId_n(0);
+                    cfd.setFkFinRecordPeriodId_n(0);
+                    cfd.setFkFinRecordBookkeepingCenterId_n(0);
+                    cfd.setFkFinRecordRecordTypeId_n("");
+                    cfd.setFkFinRecordNumberId_n(0);
+
+                    if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+
+                updateChecksLinks(connection);  // link check registries with corresponding record entries
+
+                mbIsRegistryNew = false;
+                mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
         }
         catch (java.sql.SQLException e) {

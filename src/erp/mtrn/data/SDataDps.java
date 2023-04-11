@@ -5928,7 +5928,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 concepto.setValorUnitario(price);
                 concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
                 concepto.setDescuento(dpsEntry.getDiscountDocCy());
-                concepto.setObjetoImpuesto(dpsEntry.getDbmsDpsCfdEntry().getTaxObject());
+                concepto.setObjetoImpuesto(dpsEntry.getSubtotalCy_r() > 0 ? dpsEntry.getDbmsDpsCfdEntry().getTaxObject() : DCfdi40Catalogs.ClaveObjetoImpNo);
                 
                 concepto.computeCfdImpuestosConceptos(dpsEntry);
                 

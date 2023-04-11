@@ -33,7 +33,6 @@ import erp.gui.mod.xml.SXmlConfig;
 import erp.gui.mod.xml.SXmlModConsts;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.lib.gui.SGuiDatePicker;
@@ -111,7 +110,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 209.8"; // fecha release: 2023-03-28
+    public static final String APP_RELEASE = "3.2 209.11"; // fecha release: 2023-04-11
     public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -215,6 +214,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconArrowLeft;
     private ImageIcon moIconArrowRight;
     private ImageIcon moIconBizPartnerExport;
+    private ImageIcon moIconCal;
     private ImageIcon moIconModuleCfg;
     private ImageIcon moIconModuleFin;
     private ImageIcon moIconModulePur;
@@ -693,8 +693,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         mbLoggedIn = false;
 
         setExtendedState(Frame.MAXIMIZED_BOTH);
-        TimeZone.setDefault(SLibTimeUtilities.SysTimeZone); // XXX Fix this!: time zone must be set by configuration parameter
-
+        
         SBeanForm.OwnerFrame = this;
         SBeanFormDialog.OwnerFrame = this;
         SBeanFormProcess.OwnerFrame = this;
@@ -751,6 +750,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconArrowLeft = new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif"));
         moIconArrowRight = new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif"));
         moIconBizPartnerExport = new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_export.gif"));
+        moIconCal = new ImageIcon(getClass().getResource("/erp/img/gui_cal.gif"));
         moIconModuleCfg = new ImageIcon(getClass().getResource("/erp/img/icon_mod_cfg.png"));
         moIconModuleFin = new ImageIcon(getClass().getResource("/erp/img/icon_mod_fin.png"));
         moIconModulePur = new ImageIcon(getClass().getResource("/erp/img/icon_mod_pur.png"));
@@ -771,8 +771,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             showMsgBoxError(ERR_PARAMS_APP_READING);
             System.exit(-1);    // there is no way of connecting to an ERP Server
         }
-
-	TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone("GMT-06:00"));
+        
+        TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone(moParamsApp.getTimeZone()));
         SLibUtils.restoreDateFormats(zone);
         TimeZone.setDefault(zone);
         
@@ -2178,6 +2178,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_BP_EXPORT:
                 imageIcon = moIconBizPartnerExport;
+                break;
+            case SLibConstants.ICON_GUI_CAL:
+                imageIcon = moIconCal;
                 break;
             case SModConsts.MOD_CFG:
             case SModConsts.MOD_CFG_N:

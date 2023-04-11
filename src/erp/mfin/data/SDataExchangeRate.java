@@ -86,13 +86,21 @@ public class SDataExchangeRate extends erp.lib.data.SDataRegistry implements jav
     public int read(java.lang.Object pk, java.sql.Statement statement) {
         java.lang.Object[] key = (java.lang.Object[]) pk;
         java.lang.String sql = "";
+        java.lang.String sqlKey = "";
         java.sql.ResultSet resultSet = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
 
         try {
-            sql = "SELECT * FROM fin_exc_rate WHERE id_cur = " + (int) key[0] + " AND id_dt = '" + SLibUtils.DbmsDateFormatDate.format((Date) key[1]) + "' ";
+            if (key[1] instanceof Date) {
+                sqlKey = "'" + SLibUtils.DbmsDateFormatDate.format((Date) key[1]) + "' ";
+            } 
+            else {
+                sqlKey = "'" + key[1] + "' ";
+            }
+            
+            sql = "SELECT * FROM fin_exc_rate WHERE id_cur = " + (Integer) key[0] + " AND id_dt = " + sqlKey;
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);

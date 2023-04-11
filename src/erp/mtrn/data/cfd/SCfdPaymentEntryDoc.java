@@ -76,6 +76,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
             if (docTax.getRate() != 0) { 
                 docTax.setBase(SLibUtils.roundAmount(docTax.getTax()/docTax.getRate()));
+                docTax.setTax(SLibUtils.roundAmount(docTax.getBase()*docTax.getRate())); // Se vuelve a calcular el importe para evitar errores de variación
                 if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // -
                     pay -= docTax.getBase() + docTax.getTax();
                 }
@@ -87,28 +88,13 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
                 mnRate0++;
             }
         }
-        pay/=mnRate0;
+        pay /= mnRate0;
         for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
             if (docTax.getRate() == 0) { 
                 docTax.setBase(SLibUtils.roundAmount(pay));
             }
         }
     }
-    
-    // Isabel Servín 10/03/2023: Comentado para preservar forma anterior de calcular la base
-    /*public void calculatePayPaymentDocTaxesBase(double pay) {
-        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
-            if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // -
-                pay -= docTax.getTax();
-            }
-            else if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) { // +
-                pay += docTax.getTax();
-            }
-        }
-        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
-            docTax.setBase(SLibUtils.roundAmount(pay));
-        }
-    }*/
     
     public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SThinDps thinDps, int entryNumber, int entryType, int installment, double balancePrev, double payment, double exchangeRate) {
         ParentPaymentEntry = parentPaymentEntry;
