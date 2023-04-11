@@ -48,7 +48,6 @@ import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
 import erp.mtrn.form.SDialogPrintCfdiMasive;
-import erp.mtrn.form.SDialogUpdateDpsDate;
 import erp.mtrn.form.SDialogUpdateDpsDeliveryAddress;
 import erp.mtrn.form.SDialogUpdateDpsLogistics;
 import erp.mtrn.form.SDialogUpdateDpsReferenceComms;
@@ -136,7 +135,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mtrn.form.SDialogUpdateDpsDeliveryAddress moDialogUpdateDpsDlvryAddrss;
     private erp.mtrn.form.SDialogUpdateDpsSalesAgentComms moDialogUpdateDpsSalesAgentComms;
     private erp.mtrn.form.SDialogUpdateDpsLogistics moDialogUpdateDpsLogistics;
-    private erp.mtrn.form.SDialogUpdateDpsDate moDialogUpdateDpsDate;
     private erp.mtrn.form.SDialogUpdateDpsReferenceComms moDialogUpdateDpsRefCommissions;
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
@@ -423,7 +421,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moDialogUpdateDpsDlvryAddrss = new SDialogUpdateDpsDeliveryAddress(miClient);
         moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
         moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
-        moDialogUpdateDpsDate = new SDialogUpdateDpsDate(miClient);
         moDialogUpdateDpsRefCommissions = new SDialogUpdateDpsReferenceComms(miClient);
         moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
         moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
