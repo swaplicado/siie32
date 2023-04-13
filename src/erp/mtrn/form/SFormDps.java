@@ -9851,13 +9851,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
                 
-                // Validate tax regime receptor:
-                
-                if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && jcbCfdiTaxRegimeReceptor.getSelectedIndex() <= 0) {
-                    validation.setMessage("El regimén fiscal del receptor debe de tener un valor.");
-                    validation.setComponent(jcbCfdiTaxRegimeReceptor);
-                }
-                
                 // validate global data:
                 
                 if (!validation.getIsError()) {
@@ -10277,6 +10270,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         validation.setComponent(jbCfdiRelated);
                                         jTabbedPane.setSelectedIndex(TAB_CFD_XML);
                                      }
+                                }
+                                
+                                // Validate tax regime receptor:
+                                if (!validation.getIsError()) {
+                                    if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && jcbCfdiTaxRegimeReceptor.getSelectedIndex() <= 0) {
+                                        validation.setMessage("El regimén fiscal del receptor debe de tener un valor.");
+                                        validation.setComponent(jcbCfdiTaxRegimeReceptor);
+                                    }
                                 }
 
                                 // validate International Commerce settings:

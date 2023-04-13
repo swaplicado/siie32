@@ -2118,6 +2118,70 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
     
+    public int updateDpsDateAfrerSign(java.sql.Connection connection, Date newDate) {
+        String sql;
+        SDataRecord rec;
+        
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+        try {
+            sql = "UPDATE trn_dps SET dt = '" + SLibUtils.DbmsDateFormatDate.format(newDate) + "', " + 
+                    "dt_doc = '" + SLibUtils.DbmsDateFormatDate.format(newDate) + "', " +
+                    "dt_start_cred = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateStartCredit, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " +
+                    (mtDateShipment_n != null ? ", dt_shipment_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateShipment_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    (mtDateDelivery_n != null ? ", dt_delivery_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateDelivery_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    (mtDateDocLapsing_n != null ? ", dt_doc_lapsing_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateDocLapsing_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    (mtDateDocDelivery_n != null ? ", dt_doc_delivery_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateDocDelivery_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
+            connection.createStatement().execute(sql);
+            mbAuxIsFormerRecordAutomatic = false;
+            
+            if (SLibTimeUtilities.digestYearMonth(newDate)[1] != SLibTimeUtilities.digestYearMonth(mtDate)[1]) {
+                rec = new SDataRecord();
+                rec.read(moDbmsRecordKey, connection.createStatement());
+                rec.setIsDeleted(true);
+                if (rec.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                }
+
+                rec.setPkPeriodId(SLibTimeUtilities.digestYearMonth(newDate)[1]);
+                rec.setPkNumberId(0);
+                rec.setDate(newDate);
+                rec.setIsDeleted(false);
+                int pos = 1;
+                for (SDataRecordEntry ety : rec.getDbmsRecordEntries()) {
+                    if (!ety.getIsDeleted()) {
+                        ety.setPkEntryId(0);
+                        ety.setSortingPosition(pos);
+                        ety.setIsRegistryNew(true);
+                        pos++;
+                    }
+                }
+                if (rec.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                }
+                
+                moDbmsRecordKey = rec.getPrimaryKey();
+
+                sql = "UPDATE trn_dps_rec SET fid_rec_year = " + rec.getPkYearId() + ", " +
+                        "fid_rec_per = " + rec.getPkPeriodId() + ", " + 
+                        "fid_rec_bkc = " + rec.getPkBookkeepingCenterId() + ", " + 
+                        "fid_rec_tp_rec = '" + rec.getPkRecordTypeId() + "', " +
+                        "fid_rec_num = " + rec.getPkNumberId() + " " + 
+                        "WHERE id_dps_year = " + mnPkYearId + " " + 
+                        "AND id_dps_doc = " + mnPkDocId + ";";
+                connection.createStatement().execute(sql);
+            }
+            
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+        }
+        catch (Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            SLibUtilities.printOutException(this, e);
+        }
+        
+        return mnLastDbActionResult;
+    }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkYearId = ((int[]) pk)[0];

@@ -781,15 +781,14 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                     if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
                         if (payDocTax.getFkCfdTaxId() == payTax.getFkCfdTaxId()&&
                                 payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId()) {
-                            BigDecimal bd = new BigDecimal(String.valueOf((payDocTax.getBase() / paymentEntryDoc.ExchangeRate)));
-                            BigDecimal rounded = bd.setScale(2,RoundingMode.FLOOR);
-                            payTax.setBase(SLibUtils.roundAmount(payTax.getBase() + rounded.doubleValue()));
+                            BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
+                            BigDecimal docBase = new BigDecimal(String.valueOf(payDocTax.getBase()));
+                            BigDecimal docTax = new BigDecimal(String.valueOf(payDocTax.getTax()));
+                            BigDecimal base = new BigDecimal(String.valueOf(payTax.getBase()));
+                            BigDecimal tax = new BigDecimal(String.valueOf(payTax.getTax()));
                             
-                            bd = new BigDecimal(String.valueOf((payDocTax.getTax() / paymentEntryDoc.ExchangeRate)));
-                            rounded = bd.setScale(2,RoundingMode.FLOOR);
-                            payTax.setTax(SLibUtils.roundAmount(payTax.getTax() + rounded.doubleValue()));
-                            //payTax.setBase(payTax.getBase() + (payDocTax.getBase() / paymentEntryDoc.ExchangeRate));
-                            //payTax.setTax(payTax.getTax() + (payDocTax.getTax() / paymentEntryDoc.ExchangeRate));
+                            payTax.setBase(base.add(docBase.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
+                            payTax.setTax(tax.add(docTax.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
                             found = true;
                         }
                     }
@@ -798,28 +797,26 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                                 payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId() &&
                                 payDocTax.getRate() == payTax.getRate() &&
                                 payDocTax.getFactorCode().equals(payTax.getFactorCode())) {
-                            BigDecimal bd = new BigDecimal(String.valueOf((payDocTax.getBase() / paymentEntryDoc.ExchangeRate)));
-                            BigDecimal rounded = bd.setScale(2,RoundingMode.FLOOR);
-                            payTax.setBase(SLibUtils.roundAmount(payTax.getBase() + rounded.doubleValue()));
+                            BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
+                            BigDecimal docBase = new BigDecimal(String.valueOf(payDocTax.getBase()));
+                            BigDecimal docTax = new BigDecimal(String.valueOf(payDocTax.getTax()));
+                            BigDecimal base = new BigDecimal(String.valueOf(payTax.getBase()));
+                            BigDecimal tax = new BigDecimal(String.valueOf(payTax.getTax()));
                             
-                            bd = new BigDecimal(String.valueOf((payDocTax.getTax() / paymentEntryDoc.ExchangeRate)));
-                            rounded = bd.setScale(2,RoundingMode.FLOOR);
-                            payTax.setTax(SLibUtils.roundAmount(payTax.getTax() + rounded.doubleValue()));
+                            payTax.setBase(base.add(docBase.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
+                            payTax.setTax(tax.add(docTax.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
                             found = true;
                         }
                     }
                 }
                 if (!found) {
+                    BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
+                    BigDecimal base = new BigDecimal(String.valueOf(payDocTax.getBase()));
+                    BigDecimal tax = new BigDecimal(String.valueOf(payDocTax.getTax()));
+                    
                     SDataReceiptPaymentPayTax payTax = new SDataReceiptPaymentPayTax();
-                    //payTax.setBase(payDocTax.getBase() / paymentEntryDoc.ExchangeRate);
-                    //payTax.setTax(payDocTax.getTax() / paymentEntryDoc.ExchangeRate);
-                    BigDecimal bd = new BigDecimal(String.valueOf(payDocTax.getBase() / paymentEntryDoc.ExchangeRate));
-                    BigDecimal rounded = bd.setScale(2,RoundingMode.FLOOR);
-                    payTax.setBase(rounded.doubleValue());
-
-                    bd = new BigDecimal(String.valueOf(payDocTax.getTax() / paymentEntryDoc.ExchangeRate));
-                    rounded = bd.setScale(2,RoundingMode.FLOOR);
-                    payTax.setTax(rounded.doubleValue());
+                    payTax.setBase(base.divide(excRate, 12, RoundingMode.FLOOR).doubleValue());
+                    payTax.setTax(tax.divide(excRate, 12, RoundingMode.FLOOR).doubleValue());
                     
                     payTax.setFkCfdTaxId(payDocTax.getFkCfdTaxId());
                     payTax.setFkTaxTypeId(payDocTax.getFkTaxTypeId());
@@ -830,6 +827,16 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                     ReceiptPaymentPayTaxes.add(payTax);
                 }
             }
+        }
+        
+        for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
+            BigDecimal bd = new BigDecimal(String.valueOf(payTax.getBase()));
+            BigDecimal rounded = bd.setScale(2,RoundingMode.FLOOR);
+            payTax.setBase(rounded.doubleValue());
+            
+            bd = new BigDecimal(String.valueOf(payTax.getTax()));
+            rounded = bd.setScale(2,RoundingMode.FLOOR);
+            payTax.setTax(rounded.doubleValue());
         }
         
         /*
