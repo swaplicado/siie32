@@ -81,7 +81,7 @@ public class SDialogUpdateDpsDate extends javax.swing.JDialog implements erp.lib
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Actualización de fechas de entrega del documento");
+        setTitle("Actualización de fecha de un documento timbrado");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {

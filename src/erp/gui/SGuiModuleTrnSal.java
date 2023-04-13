@@ -428,7 +428,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsDelAck = new JMenu("Acuses de entrega de facturas");
         jmiDpsDelAckPend = new JMenuItem("Acuses de entrega de facturas pendientes");
         jmiDpsDelAckOk = new JMenuItem("Acuses de entrega de facturas listos");
-        jmiDpsUpdateDateLog = new JMenuItem("Registro de cambio de fecha de documentos timbrados");
+        jmiDpsUpdateDateLog = new JMenuItem("Registro de cambio de fecha de documentos");
         jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
         
         jmDpsDelAck.add(jmiDpsDelAckPend);
@@ -1580,7 +1580,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     
                 case SDataConstants.TRN_DPS_UPD_DT_LOG:
                     oViewClass = erp.mtrn.view.SViewDpsUpdateDateLog.class;
-                    sViewTitle = "Cambio fecha documentos timbrados";
+                    sViewTitle = "Cambio fecha docs.";
                     break;
                     
                 default:
