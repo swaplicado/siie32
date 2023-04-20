@@ -125,7 +125,7 @@ public class SSetExchangeRate {
         
         return isbankBussDay;
     }
-
+    
     /**
      * Revisa si el dia actual es un dia habil bancario.
      *
@@ -139,16 +139,53 @@ public class SSetExchangeRate {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        for (Object day : bankNbDays) {
-            String bankNbDay = day.toString();
-            if (!SLibUtils.DbmsDateFormatDate.format(date).equals(bankNbDay) && dayOfWeek != 7 && dayOfWeek != 1) {
-                bankBussDay = true;
-            } 
-            else {
-                bankBussDay = false;
-                break;
+        
+        if (bankNbDays.size() > 0) {
+            for (Object day : bankNbDays) {
+                String bankNbDay = day.toString();
+                if (!SLibUtils.DbmsDateFormatDate.format(date).equals(bankNbDay) && dayOfWeek != 7 && dayOfWeek != 1) {
+                    bankBussDay = true;
+                } 
+                else {
+                    bankBussDay = false;
+                    break;
+                }
             }
+        } else {
+            bankBussDay = dayOfWeek != 7 && dayOfWeek != 1;
+        }
+        
+        return bankBussDay;
+    }
+    
+    /**
+     * Revisa si el dia que se le manda es un dia habil bancario.
+     *
+     * @param date
+     * @param bankNbDays
+     * @return
+     */
+    public static boolean isDayBankBussDay(Date date, ArrayList bankNbDays) {
+        boolean bankBussDay = true;
+        
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        
+        if (bankNbDays.size() > 0) {
+            for (Object day : bankNbDays) {
+                String bankNbDay = day.toString();
+                if (!SLibUtils.DbmsDateFormatDate.format(date).equals(bankNbDay) && dayOfWeek != 7 && dayOfWeek != 1) {
+                    bankBussDay = true;
+                } 
+                else {
+                    bankBussDay = false;
+                    break;
+                }
+            }
+        } 
+        else {
+            bankBussDay = dayOfWeek != 7 && dayOfWeek != 1;
         }
         
         return bankBussDay;
@@ -190,39 +227,47 @@ public class SSetExchangeRate {
         ArrayList<String> exchangeRateDays = new ArrayList<>();
         boolean bankBussDay = false;
         boolean canSetDay = false;
-
-        while (!bankBussDay) {
-            if (isNextDayBankBussDay(date, calendar)) {
-
-                if (usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_INFORMAL) {
+        
+        if (usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_INFORMAL) {
+            while (!bankBussDay) {
+                if (isNextDayBankBussDay(date, calendar)) {
                     date = SLibTimeUtils.addDate(date, 0, 0, 1);
-                    canSetDay = true;
-                } 
-                else if (usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_BANXICO) {
-                    date = SLibTimeUtils.addDate(date, 0, 0, 1);
-                    canSetDay = false;
-                    usd_xrt_policy = SDataConstantsSys.USD_XRT_POLICY_INFORMAL;
-                } 
-                else {
-                    throw new Exception("La politica de tipo de cambio no es reconocida");
-                }
-
-                if (canSetDay) {
                     if (exchangeRateDays.isEmpty()) {
                         exchangeRateDays.add(SLibUtils.DbmsDateFormatDate.format(date));
                     } 
                     else {
                         bankBussDay = true;
                     }
-                }
-
-            } 
-            else {
-                date = SLibTimeUtils.addDate(date, 0, 0, 1);
-                if (!exchangeRateDays.isEmpty()) {
-                    exchangeRateDays.add(SLibUtils.DbmsDateFormatDate.format(date));
+                } 
+                else {
+                    date = SLibTimeUtils.addDate(date, 0, 0, 1);
+                    if (!exchangeRateDays.isEmpty()) {
+                        exchangeRateDays.add(SLibUtils.DbmsDateFormatDate.format(date));
+                    }
                 }
             }
+        } 
+        else if (usd_xrt_policy == SDataConstantsSys.USD_XRT_POLICY_BANXICO) {
+            while(!bankBussDay){
+                date = SLibTimeUtils.addDate(date, 0, 0, 1);
+                if(isDayBankBussDay(date, calendar)){
+                    date = SLibTimeUtils.addDate(date, 0, 0, 1);
+                    while(!bankBussDay){
+                        if(isDayBankBussDay(date, calendar)){
+                            exchangeRateDays.add(SLibUtils.DbmsDateFormatDate.format(date));
+                            bankBussDay = true;
+                            break;
+                        }
+                        else{
+                            exchangeRateDays.add(SLibUtils.DbmsDateFormatDate.format(date));
+                            date = SLibTimeUtils.addDate(date, 0, 0, 1);
+                        }
+                    }
+                }
+            }
+        } 
+        else {
+            throw new Exception("La politica de tipo de cambio no es reconocida");
         }
         
         return exchangeRateDays;
