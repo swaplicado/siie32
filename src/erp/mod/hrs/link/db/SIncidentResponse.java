@@ -5,19 +5,22 @@
  */
 package erp.mod.hrs.link.db;
 
+import java.util.ArrayList;
+
 
 /**
  *
  * @author Cesar Orozco
  */
 public class SIncidentResponse {
-    public static final int RESPONSE_OK = 200; 
+    public static final int RESPONSE_OK_AVA = 200;
+    public static final int RESPONSE_OK_INS = 300;
     public static final int RESPONSE_ERROR = 500;
     public static final int RESPONSE_OTHER_INC = 550;
     
     private int code;
     private String message;
-    private String info;
+    private ArrayList<SIncident> incidents; 
 
     public int getCode() {
         return code;
@@ -35,6 +38,12 @@ public class SIncidentResponse {
         this.message = message;
     }
     
+    public ArrayList getIncidents(){
+        return incidents;
+    }
     
-    
+    public void setIncidents(ArrayList<SIncident> incidents){
+        this.incidents = incidents;
+    }
+      
 }

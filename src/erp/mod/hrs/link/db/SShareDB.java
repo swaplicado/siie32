@@ -29,6 +29,11 @@ import erp.mod.SModSysConsts;
 import erp.mod.SModUtils;
 import erp.mod.SModuleHrs;
 import erp.mod.hrs.db.SDbAbsence;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_INS;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
+import erp.mod.hrs.link.utils.SIncidentsJSON;
 import erp.musr.data.SDataUser;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -1026,10 +1031,9 @@ public class SShareDB {
                             sqlV = "SELECT SUM(eff_day) AS _days_sched "
                                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
                                     + "WHERE id_emp = " + resV.getInt("_employee_id") + " AND "
-                                    + "ext_req_id = 0 AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
-                                    + "ext_req_id = 0 AND "
+                                    + "b_clo = 0 AND "
                                     + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
                                     + "NOT b_del;";
 
@@ -1050,7 +1054,7 @@ public class SShareDB {
                                     + " hrs_abs_cns.id_abs = hrs_abs.id_abs AND "
                                     + " hrs_abs_cns.id_emp = hrs_abs.id_emp "
                                     + "WHERE hrs_abs.id_emp = " + resV.getInt("_employee_id") + " AND "
-                                    + "ext_req_id = 0 AND "
+                                    + "b_clo = 0 AND "
                                     + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
                                     + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
                                     + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
@@ -1063,48 +1067,47 @@ public class SShareDB {
                             
                         // consumos de incidencias de solicitudes sistema Portal GH
                         
-                            sqlInc = "SELECT hrs_abs.ext_req_id AS application, hrs_abs.ben_year AS year, hrs_abs.ben_ann AS anniversary, hrs_abs_cns.eff_day AS consumed "
-                                    + "FROM"
-                                    + " hrs_abs_cns "
-                                    + "INNER JOIN"
-                                    + " hrs_abs "
-                                    + "ON"
-                                    + " hrs_abs_cns.id_abs = hrs_abs.id_abs AND "
-                                    + " hrs_abs_cns.id_emp = hrs_abs.id_emp "
-                                    + "WHERE hrs_abs.id_emp = " + resV.getInt("_employee_id") + " AND "
-                                    + "ext_req_id != 0 AND "
-                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
-                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
-                                    + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
-                                    + "NOT hrs_abs_cns.b_del AND NOT hrs_abs.b_del;"; 
+//                            sqlInc = "SELECT hrs_abs.ext_req_id AS application, hrs_abs.ben_year AS year, hrs_abs.ben_ann AS anniversary, hrs_abs_cns.eff_day AS consumed "
+//                                    + "FROM"
+//                                    + " hrs_abs_cns "
+//                                    + "INNER JOIN"
+//                                    + " hrs_abs "
+//                                    + "ON"
+//                                    + " hrs_abs_cns.id_abs = hrs_abs.id_abs AND "
+//                                    + " hrs_abs_cns.id_emp = hrs_abs.id_emp "
+//                                    + "WHERE hrs_abs.id_emp = " + resV.getInt("_employee_id") + " AND "
+//                                    + "ext_req_id != 0 AND "
+//                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
+//                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+//                                    + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
+//                                    + "NOT hrs_abs_cns.b_del AND NOT hrs_abs.b_del;"; 
                             
-                            resultSet = stCon.executeQuery(sqlInc);
-                            while (resultSet.next()) {
-                                incidents = new SDataIncidents();
-                                // agregar renglon de incidencia
-                                incidents.setId_breakdown(resultSet.getInt("application"));
-                                incidents.setAnniversary(anniversary);
-                                incidents.setYear(benefitYear);
-                                incidents.setDay_consumed(resultSet.getInt("consumed"));
-                                
-                                //sacar los días consumidos ligados al portal
-                                portal_consumed = portal_consumed + resultSet.getInt("consumed");
-                                
-                                //agregar el renglon de vacaciones en la lista
-                                lInc.add(incidents);
-                            }
+//                            resultSet = stCon.executeQuery(sqlInc);
+//                            while (resultSet.next()) {
+//                                incidents = new SDataIncidents();
+//                                // agregar renglon de incidencia
+//                                incidents.setId_breakdown(resultSet.getInt("application"));
+//                                incidents.setAnniversary(anniversary);
+//                                incidents.setYear(benefitYear);
+//                                incidents.setDay_consumed(resultSet.getInt("consumed"));
+//                                
+//                                //sacar los días consumidos ligados al portal
+//                                portal_consumed = portal_consumed + resultSet.getInt("consumed");
+//                                
+//                                //agregar el renglon de vacaciones en la lista
+//                                lInc.add(incidents);
+//                            }
                         // payed days and amount:
 
                         double payedDays = 0;
                         double payedAmount = 0;
 
-                        sqlV = "SELECT SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _amount "
+                        sqlV = "SELECT SUM(pre.unt_all) AS _days "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                                 + "WHERE pr.id_emp = " + resV.getInt("_employee_id") + " AND pre.fk_tp_ben = " + mnFormSubtype + " AND "
                                 + "pre.ben_year = " + benefitYear + " AND pre.ben_ann = " + anniversary + " AND "
-                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getDate("_cut_off")) + "' AND "
                                 + "NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del;";
                         resultSet = stCon.executeQuery(sqlV);
                         if (resultSet.next()) {
@@ -1112,20 +1115,18 @@ public class SShareDB {
 
                         }
 
-                        sqlV = "SELECT SUM(prd.unt_all) AS _days, SUM(prd.amt_r) AS _amount "
+                        sqlV = "SELECT SUM(prd.unt_all) AS _days "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                                 + "WHERE pr.id_emp = " + resV.getInt("_employee_id") + " AND prd.fk_tp_ben = " + mnFormSubtype + " AND "
                                 + "prd.ben_year = " + benefitYear + " AND prd.ben_ann = " + anniversary + " AND "
-                                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(resV.getDate("_cut_off")) + "' AND "
                                 + "NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del;";
                         resultSet = stCon.executeQuery(sqlV);
                         if (resultSet.next()) {
                             payedDays = (payedDays - resultSet.getDouble("_days")); // decrement days
                         }
                         programados_no_gozados = programados_no_gozados - consumed;
-                        payedDays = payedDays - portal_consumed;
                         if( payedDays < 0 ) { payedDays = 0; }
                         //insertar información de vacaciones por año y aniversario
                         vac.setVacation_programm(programados_no_gozados);
@@ -1138,7 +1139,6 @@ public class SShareDB {
                         resultSet.close();
                     }
                 emp.setRows(lVac);
-                emp.setIncidents(lInc);
                 lEmp.add(emp);
             }
             conn.close();
@@ -1149,37 +1149,31 @@ public class SShareDB {
         return lEmp;
     }
     
-    public boolean cheakIncidents (String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
-//        SMySqlClass mdb = new SMySqlClass();
-//        String empresas[]= new String[4];
-//        ResultSet resultSet;
-//        empresas[0] = "erp_aeth";
-//        empresas[1] = "erp_amesa";
-//        empresas[2] = "erp_otsa";
-//        empresas[3] = "erp_th";
+    public SIncidentResponse cheakIncidents (String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
         
-        SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         ResultSet resultSet;
-//        String empresas[]= new String[4];
         int company = 0;
-        
-//        empresas[0] = "erp_aeth";
-//        empresas[1] = "erp_amesa";
-//        empresas[2] = "erp_otsa";
-//        empresas[3] = "erp_th";
-
+        //conexión a bd
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
-
+        
+        //Creación de arraylist de incidencias si hay en las fechas que se envian.
+        ArrayList<SIncident> lIncidents = null;
+        lIncidents = new ArrayList();
+        //Creación del objeto respuesta.
+        SIncidentResponse objResponse = new SIncidentResponse();
+        
+        
         if (conn == null) {
-            return false;
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+            return objResponse;
         }
         
          JSONParser parser = new JSONParser();
          JSONObject root;
         
         try {
-            boolean isAvailable = false;
             String incidents = "";
             root = (JSONObject) parser.parse(sJsonInc);
             company = Integer.parseInt(root.get("company_id").toString());
@@ -1190,40 +1184,57 @@ public class SShareDB {
 
             resultSet = stCon.executeQuery(companies);
             if(!resultSet.next()){
-                return false;
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("El id de la empresa no corresponde con nuestros registros");
+                return objResponse;
             } 
             
             conn = mdb.connect("", "", resultSet.getString("bd"), "", "");
 
             if (conn == null) {
-                return false;
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+                return objResponse;
             }
             
-            incidents = "SELECT * "
-                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
-                                    + "WHERE id_emp = " + root.get("employee_id").toString() + " AND "
-                                    + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
-                                    + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND ( "
-                                    + "dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
-                                    + "dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
-                                    + "NOT b_del;";
+            incidents = "SELECT erp.hrsu_tp_abs.name AS nameTp, erp_aeth.hrs_abs.dt_sta AS ini, erp_aeth.hrs_abs.dt_end AS fin "
+                                    + "FROM erp." + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                                    + "INNER JOIN erp.hsu_tp_abs ON hrsu_tp_abs.id_tp_abs = hrs_abs.fk_tp_abs AND hrsu_tp_abs.id_cl_abs = hrs_abs.fk_cl_abs "
+                                    + "WHERE erp.id_emp = " + root.get("employee_id").toString() + " AND ( "
+                                    + "erp.dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
+                                    + "erp.dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
+                                    + "NOT erp.b_del;";
             stCon = conn.createStatement();
 
             resultSet = stCon.executeQuery(incidents);
             if (resultSet.next()) {
-                isAvailable = false;
+                objResponse.setCode(RESPONSE_OTHER_INC);
+                objResponse.setMessage("Existen incidencias para estas fechas");
+                resultSet.previous();
+                while(resultSet.next()){
+                    //Creación de objeto de incidencia.
+                    SIncident incident = new SIncident();
+                    incident.setName(resultSet.getString("nameTp"));
+                    incident.setIni(resultSet.getString("ini"));
+                    incident.setFin(resultSet.getString("fin"));
+                    
+                    lIncidents.add(incident);
+                }
             }else{
-                isAvailable = true;
+                objResponse.setCode(RESPONSE_OK_AVA);
+                objResponse.setMessage("Las fechas estan disponibles");
             }
             
-            return isAvailable;
+            return objResponse;
         } catch (ParseException ex) {
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage(SShareDB.class.getName());
+            return objResponse;
         }
     }
     
-    public boolean  setinIncidents(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
+    public SIncidentResponse setinIncidents(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         ResultSet resultSet;
 //        String empresas[]= new String[4];
@@ -1236,15 +1247,17 @@ public class SShareDB {
 
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
-
+        SIncidentResponse objResponse = new SIncidentResponse();
+        
         if (conn == null) {
-            return false;
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+            return objResponse;
         }
         
-         boolean isAvailable = false;
-         String incidents = "";
          JSONParser parser = new JSONParser();
          JSONObject root;
+         
         try {
             root = (JSONObject) parser.parse(sJsonInc);
             company = Integer.parseInt(root.get("company_id").toString());
@@ -1255,16 +1268,20 @@ public class SShareDB {
 
             resultSet = stCon.executeQuery(companies);
             if(!resultSet.next()){
-                return false;
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("El id de la empresa no corresponde con nuestros registros");
+                return objResponse;
             } 
             
         } catch (ParseException ex) {
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage(SShareDB.class.getName());
+            return objResponse;
         }
            
         database.connect(
-                "127.0.0.1", // agregar esta constante a la configuración de CAP Link
+                "192.168.1.233", // agregar esta constante a la configuración de CAP Link
                 "3306", // agregar esta constante a la configuración de CAP Link
                 resultSet.getString("bd"), // agregar esta constante a la configuración de CAP Link
                 "root", // agregar esta constante a la configuración de CAP Link
@@ -1460,13 +1477,19 @@ public class SShareDB {
             
         } catch (ParseException ex) {
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage(SShareDB.class.getName());
+            return objResponse;
         } catch (Exception ex) {
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage(SShareDB.class.getName());
+            return objResponse;
         }
-    
-        return true;
+        
+        objResponse.setCode(RESPONSE_OK_INS );
+        objResponse.setMessage("Se insertaron las incidencias correctamente");
+        return objResponse;
     }
     
     public ArrayList<SPlanVacations> getSPlanVactions(String strDate) throws SConfigException, ClassNotFoundException, SQLException {

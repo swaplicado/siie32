@@ -11,8 +11,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.mod.hrs.link.db.SShareDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.hrs.link.db.SConfigException;
+import erp.mod.hrs.link.db.SIncidentResponse;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
-import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_INS;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
 import erp.mod.hrs.link.pub.SShareData;
 import java.io.BufferedWriter;
@@ -209,29 +211,33 @@ public class SUtilsJSON {
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
             
             SIncidentsJSON objResponse = new SIncidentsJSON();
+            SIncidentResponse AvailableResponse = new SIncidentResponse();
             SShareDB sDb = new SShareDB();
             
-            // revisar si hay incidencias para esas fechas
-            boolean isAvailable = sDb.cheakIncidents(sJsonInc);
+            // objeto para leer el JSON
+            JSONParser parser = new JSONParser();
+            JSONObject root;
+            boolean toInsert = false;
+        try {
+            root = (JSONObject) parser.parse(sJsonInc);
+            toInsert = Boolean.parseBoolean(root.get("to_insert").toString());
+             // revisar si hay incidencias para esas fechas
+            AvailableResponse = sDb.cheakIncidents(sJsonInc);
             
-            if (isAvailable == false){
-                objResponse.response.setCode(RESPONSE_OTHER_INC);
-                objResponse.response.setMessage("hay una incidencia para esos días");
-            }else{
-                setinIncidents = sDb.setinIncidents(sJsonInc);
-                if(setinIncidents == true){
-                    objResponse.response.setCode(RESPONSE_OK);
-                    objResponse.response.setMessage("se ingreso correctamente la incidencia");  
-                }else{
-                    objResponse.response.setCode(RESPONSE_ERROR);
-                    objResponse.response.setMessage("Ocurrio un error al ingresar la incidencia");
-                }
+            if (toInsert == true) {
+                AvailableResponse = sDb.setinIncidents(sJsonInc);
             }
             
+            objResponse.response = AvailableResponse;
             
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
             return jsonInString2;
+        } catch (ParseException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+        }       
     }
     
     /**
