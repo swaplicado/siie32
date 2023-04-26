@@ -89,6 +89,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public String AuxConceptDocs;       // document numbers to be inserted in accounting concept
     public double AuxTotalPayments;
     public double AuxTotalPaymentsLocal;
+    public double AuxTotalPaymentsPac;
     public double AuxTotalLimMin;
     public double AuxTotalLimMax;
     public boolean AuxAllowTotalPaymentsLessThanAmount;
@@ -152,6 +153,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
      */
     public void computeTotalPayments() {
         AuxTotalPayments = 0;
+        AuxTotalPaymentsPac = 0;
         AuxTotalPaymentsLocal = 0;
         AuxTotalLimMin = 0;
         AuxTotalLimMax = 0;
@@ -162,12 +164,15 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             paymentEntryDoc.computePaymentAmounts();
             
             AuxTotalPayments = SLibUtils.roundAmount(AuxTotalPayments + paymentEntryDoc.PayPayment);
+            AuxTotalPaymentsPac = (new BigDecimal(String.valueOf(AuxTotalPaymentsPac)).add(new BigDecimal(String.valueOf(paymentEntryDoc.PayPaymentPac)))).doubleValue();
             AuxTotalPaymentsLocal = SLibUtils.roundAmount(AuxTotalPaymentsLocal + paymentEntryDoc.PayPaymentLocal);
             AuxTotalLimMin += paymentEntryDoc.PayPaymentLimMin; // sum without rounding!
             AuxTotalLimMax += paymentEntryDoc.PayPaymentLimMax; // sum without rounding!
             
             docsSet.add(paymentEntryDoc.ThinDps.getDpsNumber());
         }
+        
+        AuxTotalPaymentsPac = SLibUtils.roundAmount(AuxTotalPaymentsPac);
         
         AuxConceptDocs = "";
         for (String doc : docsSet) {

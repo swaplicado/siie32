@@ -2898,6 +2898,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_FIN_BPS_ACC_MOV_ORD:
                 name = "reps/fin_bps_acc_mov_ord.jasper";
                 break;    
+            case SDataConstantsSys.REP_FIN_EXC_DIFF:
+                name = "reps/fin_exc_diff.jasper";
+                break;
             case SDataConstantsSys.REP_FIN_CASH_BAL:
             case SDataConstantsSys.REP_FIN_BANK_BAL:
                 name = "reps/fin_cash_bal.jasper";

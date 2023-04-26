@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 210.1/ 2023-04-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la variante del reporte automático de ventas ítem - cliente para enviarse con la información del mes pasado.
+2) Ajuste en la forma de CFDI de pagos que muestra el cálculo del monto total del pago del PAC.
+3) Creación del reporte de movimientos por diferencias cambiarias.
+
+================================================================================
 SIIE 3.2 210.0/ 2023-04-13
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

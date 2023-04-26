@@ -3124,6 +3124,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         break; // se asume que sólo hay un impuesto trasladado
                                     }
                                 }
+                                if (aTaxesForAccountingArray.isEmpty()) {
+                                    aTaxesForAccountingArray.add(new TaxForAccounting(dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxBasicId(), dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxId()));
+                                }
                             }
                         }
                         
@@ -3186,6 +3189,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             }
                                             break; // se asume que sólo hay un impuesto trasladado
                                         }
+                                    }
+                                    if (taxForAccounting == null) {
+                                        taxForAccounting = aTaxesForAccountingArray.get(0);
                                     }
                                 }
                                 

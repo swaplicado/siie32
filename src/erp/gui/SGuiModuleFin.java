@@ -56,6 +56,7 @@ import erp.mfin.form.SDialogRepBizPartnerMove;
 import erp.mfin.form.SDialogRepBizPartnerStatement;
 import erp.mfin.form.SDialogRepDpsMonthReport;
 import erp.mfin.form.SDialogRepDpsPayment;
+import erp.mfin.form.SDialogRepExchangeRateDiff;
 import erp.mfin.form.SDialogRepFinMov;
 import erp.mfin.form.SDialogRepFinMovBankDayDet;
 import erp.mfin.form.SDialogRepGlobalStatement;
@@ -282,6 +283,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmRepAccMovs;
     private javax.swing.JMenuItem jmiRepAccMovsTax;
     private javax.swing.JMenuItem jmiRepAccMovsProfitLoss;
+    private javax.swing.JMenuItem jmiRepAccMovsExcDiff;
     private javax.swing.JMenu jmRepCashFlow;
     private javax.swing.JMenuItem jmiRepCashFlowPaysCus;
     private javax.swing.JMenuItem jmiRepCashFlowPaysSup;
@@ -677,6 +679,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepAccMovs = new JMenu("Movimientos contables de cuentas de sistema");
         jmiRepAccMovsTax = new JMenuItem("Movimientos contables de impuestos...");
         jmiRepAccMovsProfitLoss = new JMenuItem("Movimientos contables de pérdidas y ganancias...");
+        jmiRepAccMovsExcDiff = new JMenuItem("Movimientos contables de diferencias cambiarias...");
 
         jmRepCashFlow = new JMenu("Flujo de efectivo");
         jmiRepCashFlowPaysCus = new JMenuItem("Reporte de cobros por periodo...");
@@ -784,6 +787,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmRepAccMovs.add(jmiRepAccMovsTax);
         jmRepAccMovs.add(jmiRepAccMovsProfitLoss);
+        jmRepAccMovs.add(jmiRepAccMovsExcDiff);
         jmRep.add(jmRepAccMovs);
 
         jmRep.addSeparator();
@@ -964,6 +968,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBizPartnerAccMovsSup.addActionListener(this);
         jmiRepAccMovsTax.addActionListener(this);
         jmiRepAccMovsProfitLoss.addActionListener(this);
+        jmiRepAccMovsExcDiff.addActionListener(this);
         jmiRepCashFlowPaysCus.addActionListener(this);
         jmiRepCashFlowPaysSup.addActionListener(this);
         jmiQryCashFlowPaysCusSum.addActionListener(this);
@@ -2254,6 +2259,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepAccMovsProfitLoss) {
                 new SDialogRepFinMov(miClient, new Object[] { new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS, SDataConstantsSys.FINS_TP_ACC_SYS_NA } , SDataConstants.UNDEFINED }).setVisible(true);
+            }
+            else if (item == jmiRepAccMovsExcDiff) {
+                new SDialogRepExchangeRateDiff(miClient).setVisible(true);
             }
             else if (item == jmiRepCashFlowPaysCus) {
                 new SDialogRepDpsPayment(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);

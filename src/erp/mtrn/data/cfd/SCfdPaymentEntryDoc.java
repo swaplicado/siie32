@@ -8,6 +8,8 @@ package erp.mtrn.data.cfd;
 
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SThinDps;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import sa.lib.SLibUtils;
@@ -44,6 +46,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     public double ExchangeRate;     // to exchange original currency of document into currency of payment
     public double PayBalancePrev;   // in currency of payment
     public double PayPayment;       // in currency of payment
+    public double PayPaymentPac;    // in currency of payment
     public double PayBalancePend;   // in currency of payment
     
     public double PayPaymentLimMin; // minimum limit according to Official Input Guide for CFDI with payments complement.
@@ -158,11 +161,12 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
             // compute payment in terms of currency of payment:
             PayBalancePrev = SLibUtils.roundAmount(DocBalancePrev / ExchangeRate);
             PayPayment = SLibUtils.roundAmount(DocPayment / ExchangeRate);
+            PayPaymentPac = (new BigDecimal(String.valueOf(DocPayment)).divide(new BigDecimal(String.valueOf(ExchangeRate)), 12, RoundingMode.FLOOR)).doubleValue();
             PayBalancePend = SLibUtils.roundAmount(DocBalancePend / ExchangeRate);
             
             // compute minimum and maximum limits when totaling payment in terms of currency of payment due to rounding issues:
-            PayPaymentLimMin = (DocPayment - (Math.pow(10d, -2d) / 2d)) / (ExchangeRate + (Math.pow(10d, -2d) / 2d) - 0.0000000001);
-            PayPaymentLimMax = (DocPayment + (Math.pow(10d, -2d) / 2d) - 0.0000000001) / (ExchangeRate - (Math.pow(10d, -2d) / 2d));
+            PayPaymentLimMin = (DocPayment - (Math.pow(10d, -2d) / 2d)) / (ExchangeRate + (Math.pow(10d, -6d) / 2d) - 0.0000000001);
+            PayPaymentLimMax = (DocPayment + (Math.pow(10d, -2d) / 2d) - 0.0000000001) / (ExchangeRate - (Math.pow(10d, -6d) / 2d));
             
             // compute payment in local currency:
             if (ThinDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_MXN) {

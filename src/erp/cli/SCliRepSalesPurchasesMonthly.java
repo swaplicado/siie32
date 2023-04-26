@@ -21,6 +21,8 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.JExcelApiExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -33,20 +35,20 @@ import sa.lib.mail.SMailUtils;
 /**
  *
  * @author Isabel Servín
- * Envía el reporte de ventas Ítem - cliente los días entre semana y fines de semana solo que haya habido ventas.
+ * Envía el reporte de ventas Ítem - cliente de todo el mes pasado de fecha de la ejecución.
  */
-public class SCliRepSalesPurchases {
+public class SCliRepSalesPurchasesMonthly {
     public static final String ERR_ARGS_INVALID = "Argumentos inválidos.";
-    
-    // Entero devuelto con la función weekday() de MySql
-    private static final int SQL_SUNDAY = 6;
-    private static final int SQL_MONDAY = 0;
+    public static final String EXT_PDF = "pdf";
+    public static final String EXT_XLS = "xls";
     
     private static final int ARG_ID_COMPANIES_IDS = 0;
-    private static final int ARG_MAIL_TO = 1;
-    private static final int ARG_MAIL_BCC = 2;
+    private static final int ARG_FILE_TP = 1;
+    private static final int ARG_MAIL_TO = 2;
+    private static final int ARG_MAIL_BCC = 3;
     private static final String DEF_ID_COMPANIES_IDS = "2852;2217";
-    private static final String DEF_MAIL_TO = "gortiz@aeth.mx;sflores@swaplicado.com.mx;isabel.garcia@swaplicado.com.mx";
+    private static final String DEF_FILE_TP = "xls";
+    private static final String DEF_MAIL_TO = "ajuarez@aeth.mx;sflores@swaplicado.com.mx;isabel.garcia@swaplicado.com.mx";
     private static final String DEF_MAIL_BCC = "";
     
     private static String msSubject;
@@ -68,6 +70,7 @@ public class SCliRepSalesPurchases {
             SDbDatabase dbErp;
             
             String companiesIds = DEF_ID_COMPANIES_IDS;
+            String fileTp = DEF_FILE_TP;
             String mailTo = DEF_MAIL_TO;
             String mailBcc = DEF_MAIL_BCC;
 
@@ -75,9 +78,12 @@ public class SCliRepSalesPurchases {
                 companiesIds = args[ARG_ID_COMPANIES_IDS];
             }
             if (args.length >= 2) {
-                mailTo = args[ARG_MAIL_TO];
+                fileTp = args[ARG_FILE_TP];
             }
             if (args.length >= 3) {
+                mailTo = args[ARG_MAIL_TO];
+            }
+            if (args.length >= 4) {
                 mailBcc = args[ARG_MAIL_BCC];
             }
             
@@ -97,31 +103,29 @@ public class SCliRepSalesPurchases {
             
             createParamsValues(dbErp, new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(companiesIds, ";"))));
             
-            if (sendMail(dbErp)) {
-                msSubject = "[SIIE] Ventas netas item-cliente ";
-                File report = createPdfReport(dbErp); 
+            msSubject = "[SIIE] Ventas netas item-cliente ";
+            File report = createFileReport(dbErp, fileTp); 
 
-                SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "facturacion@aeth.mx", "NGkeu-wR9z*D", "facturacion@aeth.mx");
+            SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "facturacion@aeth.mx", "NGkeu-wR9z*D", "facturacion@aeth.mx");
 
-                ArrayList<String> recipientsTo = new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(mailTo, ";")));
+            ArrayList<String> recipientsTo = new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(mailTo, ";")));
 
-                ArrayList<String> recipientsBcc = null;
-                if (!mailBcc.isEmpty()) {
-                    recipientsBcc = new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(mailBcc, ";")));
-                }
-
-                SMail mail = new SMail(sender, SMailUtils.encodeSubjectUtf8(msSubject), composeMailBody(), recipientsTo);
-                if (recipientsBcc != null) {
-                    mail.getBccRecipients().addAll(recipientsBcc);
-                }
-
-                mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
-                mail.getAttachments().add(report);
-                mail.send();
-                System.out.println("Mail sent!");
-
-                dbErp.disconnect();
+            ArrayList<String> recipientsBcc = null;
+            if (!mailBcc.isEmpty()) {
+                recipientsBcc = new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(mailBcc, ";")));
             }
+
+            SMail mail = new SMail(sender, SMailUtils.encodeSubjectUtf8(msSubject), composeMailBody(), recipientsTo);
+            if (recipientsBcc != null) {
+                mail.getBccRecipients().addAll(recipientsBcc);
+            }
+
+            mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
+            mail.getAttachments().add(report);
+            mail.send();
+            System.out.println("Mail sent!");
+
+            dbErp.disconnect();
         }
         catch (Exception e) {
             SLibUtils.printException(SCliMailer.class.getName(), e);
@@ -129,58 +133,12 @@ public class SCliRepSalesPurchases {
         }
     }
     
-    private static boolean sendMail(SDbDatabase db) throws Exception {
-        String sql;
-        String sqlBody = "";
-        ResultSet resultSet;
-        ResultSet resultSetDay;
-        Date date = null;
-        
-        msBody = "";
-        
-        sql = "SELECT bd, " +
-                "(SELECT ADDDATE(NOW(), INTERVAL -1 DAY)) AS ini " +
-                "FROM erp.cfgu_co " + msSqlWhere;
-        resultSet = db.getConnection().createStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            sqlBody += (sqlBody.isEmpty() ? "" : "UNION ") +
-                    composeSqlBody(false, resultSet.getString("bd"), resultSet.getDate("ini"), null);
-            date = resultSet.getDate("ini");
-        }
-        
-        sql = "SELECT co, id_bp, bp, agt, igen, item_key, item, id_tp_bp, tp_bp, " +
-                "item AS f_group, " +
-                "SUM(f_stot_r) AS f_stot_r, SUM(f_adj_r) AS f_adj_r, SUM(f_adj_d) AS f_adj_d, SUM(f_stot_net) AS f_stot_net, " +
-                "SUM(f_qty) AS f_qty, SUM(f_qty_r) AS f_qty_r, SUM(f_qty_net) AS f_qty_net, COALESCE(SUM(f_stot_net) / SUM(f_qty_net), 0.0) AS f_avg_price, " +
-                "SUM(_st_xml) AS _st_xml " +
-                "FROM (" +
-                sqlBody + ") " + 
-                "AS t " + msSqlWhereParam + " " + 
-                "GROUP BY co, item, bp " +
-                "ORDER BY co, item, bp";
-        resultSet = db.getConnection().createStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            return true;
-        }
-        else {
-            sql = "SELECT WEEKDAY(NOW());";
-            resultSetDay = db.getConnection().createStatement().executeQuery(sql);
-            if (resultSetDay.next()) {
-                if (resultSetDay.getInt(1) != SQL_SUNDAY && resultSetDay.getInt(1) != SQL_MONDAY) {
-                    msBody = SLibUtils.textToHtml("No hubo facturas ni notas de crédito en la fecha " + SLibUtils.DateFormatDate.format(date));
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
-    private static File createPdfReport(SDbDatabase db) throws Exception {
-        HashMap<String, Object> map = new HashMap<>();
+    private static File createFileReport(SDbDatabase db, String fileTp) throws Exception {
+        File report = null;
+        OutputStream output;
         JasperPrint jasperPrint;
+        JRXlsExporter exporterXLS;
+        HashMap<String, Object> map = new HashMap<>();
         String sqlParam = "";
         String sql;
         ResultSet resultSet;
@@ -188,8 +146,8 @@ public class SCliRepSalesPurchases {
         Date dtEnd = null;
         
         sql = "SELECT bd, " +
-                "(SELECT DATE_ADD(DATE_ADD(LAST_DAY(ADDDATE(NOW(), INTERVAL -1 DAY)), INTERVAL 1 DAY),INTERVAL -1 MONTH)) AS ini, " +
-                "(SELECT ADDDATE(NOW(), INTERVAL -1 DAY)) AS fin " +
+                "(ADDDATE(ADDDATE(LAST_DAY(NOW()), INTERVAL 1 DAY), INTERVAL -2 MONTH)) AS ini, " +
+                "(LAST_DAY(ADDDATE(NOW(), INTERVAL -1 MONTH))) AS fin " +
                 "FROM erp.cfgu_co " + msSqlWhere;
         resultSet = db.getConnection().createStatement().executeQuery(sql);
         while (resultSet.next()) {
@@ -222,9 +180,28 @@ public class SCliRepSalesPurchases {
         JasperReport relatoriosJasper = (JasperReport)JRLoader.loadObject(fileTemplate);
         jasperPrint = JasperFillManager.fillReport(relatoriosJasper, map, db.getConnection());
         
-        File report = File.createTempFile("Ventas netas item - cliente ", ".pdf");
-        OutputStream output = new FileOutputStream(report); 
-        JasperExportManager.exportReportToPdfStream(jasperPrint, output); 
+        switch (fileTp) {
+            case EXT_PDF:
+                report = File.createTempFile("Ventas netas item - cliente ", ".pdf"); 
+                output = new FileOutputStream(report);
+                JasperExportManager.exportReportToPdfStream(jasperPrint, output);
+                break;
+                
+            case EXT_XLS:
+                exporterXLS = new JRXlsExporter();
+                report = File.createTempFile("Ventas netas item - cliente ", ".xls");
+                exporterXLS.setParameter(JExcelApiExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                exporterXLS.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS , Boolean.TRUE);
+                exporterXLS.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS , Boolean.TRUE);
+                exporterXLS.setParameter(JExcelApiExporterParameter.IGNORE_PAGE_MARGINS , Boolean.TRUE);
+                exporterXLS.setParameter(JExcelApiExporterParameter.IS_COLLAPSE_ROW_SPAN , Boolean.FALSE);
+                exporterXLS.setParameter(JExcelApiExporterParameter.IS_FONT_SIZE_FIX_ENABLED , Boolean.TRUE);
+                exporterXLS.setParameter(JExcelApiExporterParameter.JASPER_PRINT, jasperPrint);
+                exporterXLS.setParameter(JExcelApiExporterParameter.OUTPUT_FILE, report);
+                exporterXLS.setParameter(JExcelApiExporterParameter.CHARACTER_ENCODING, "UTF-8");
+                exporterXLS.exportReport();
+                break;
+        }
         
         return report;
     }
@@ -326,8 +303,8 @@ public class SCliRepSalesPurchases {
     
     private static String composeMailBody() {
         return "<html><body>" +
-                "<b>" + msBody + "</b>" + 
-                "<br>" + 
+                //"<b>" + msBody + "</b>" + 
+                //"<br>" + 
                 STrnUtilities.composeMailFooter("warning") +
                 "</body></html>";
     }
