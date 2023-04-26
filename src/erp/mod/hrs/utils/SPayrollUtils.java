@@ -99,9 +99,8 @@ public class SPayrollUtils {
             }
         }
         
-        HashMap<Integer, SBonusAux> empBonusList = SPayrollUtils.getWhoWinBonus(client, employeesToRequest, payType, dates[0], dates[1], companyKey);
-        
         if (bonus.contains(SPayrollBonusUtils.BONUS)) {
+            HashMap<Integer, SBonusAux> empBonusList = SPayrollUtils.getWhoWinBonus(client, employeesToRequest, payType, dates[0], dates[1], companyKey);
             for (Map.Entry<Integer, ArrayList<SEarnConfiguration>> entry : configuredEmployees.entrySet()) {
                 Integer idEmployee = entry.getKey();
                 ArrayList<SEarnConfiguration> earnList = entry.getValue();
@@ -129,14 +128,14 @@ public class SPayrollUtils {
             }
         }
         
-        if (!bonus.contains(SPayrollBonusUtils.PANTRY) && !bonus.contains(SPayrollBonusUtils.SUPER_BONUS)) {
+        if (!bonus.contains(SPayrollBonusUtils.PANTRY) && !bonus.contains(SPayrollBonusUtils.SUPER_BONUS) && !bonus.contains(SPayrollBonusUtils.PANTRY_FOREIGNERS)) {
             return configuredEmployees;
         }
         
         for (Map.Entry<Integer, ArrayList<SEarnConfiguration>> entry : configuredEmployees.entrySet()) {
             ArrayList<SEarnConfiguration> configs = entry.getValue();
             for (SEarnConfiguration oEarnConfiguration : configs) {
-                if (oEarnConfiguration.getIdBonus() == SPayrollBonusUtils.PANTRY) {
+                if (oEarnConfiguration.getIdBonus() == SPayrollBonusUtils.PANTRY || oEarnConfiguration.getIdBonus() == SPayrollBonusUtils.PANTRY_FOREIGNERS) {
                     String comments = "";
                     double hasPantry = 0d;
                     if (directEmployees.contains(entry.getKey())) {
@@ -146,7 +145,8 @@ public class SPayrollUtils {
                     else {
                         boolean withCurrentBonus = employeesWithCurBonus.contains(entry.getKey());
                         if (withCurrentBonus) {
-                            hasPantry = SPayrollBonusUtils.hasPantry(client, entry.getKey(), dtDate);
+                            hasPantry = SPayrollBonusUtils.hasPantry(client, entry.getKey(), dtDate, 
+                                        SPrepayrollUtils.isWithPreviousPayment(client.getSession(), oEarnConfiguration.getIdBonus()));
                         }
                     }
                     
@@ -347,7 +347,9 @@ public class SPayrollUtils {
                         " AND LENGTH(e.grocery_srv_acc) > 0 " +
                         " AND mem.b_del = FALSE " +
                         " AND e.b_act = TRUE " +
-                        " AND e.b_del = FALSE;";
+                        " AND e.b_del = FALSE " +
+                        " AND ((cear.for_uni = 1 AND e.b_uni) OR (cear.for_uni = 2 AND NOT e.b_uni) OR (cear.for_uni = 0)) " +
+                        " AND ((cear.fk_tp_pay_n = 1 AND e.fk_tp_pay = 1) OR (cear.fk_tp_pay_n = 2 AND e.fk_tp_pay = 2) OR (cear.fk_tp_pay_n IS NULL));";
         
         HashMap<Integer, ArrayList<SEarnConfiguration>> confDept = new HashMap<>();
         for (Integer bonu : bonus) {
@@ -480,8 +482,6 @@ public class SPayrollUtils {
                 }
             }
         }
-        
-        
         
         return confDept;
     }
