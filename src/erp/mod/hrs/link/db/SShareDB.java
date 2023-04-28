@@ -1197,9 +1197,9 @@ public class SShareDB {
                 return objResponse;
             }
             
-            incidents = "SELECT erp.hrsu_tp_abs.name AS nameTp, erp_aeth.hrs_abs.dt_sta AS ini, erp_aeth.hrs_abs.dt_end AS fin "
+            incidents = "SELECT erp.hrsu_tp_abs.name AS nameTp, hrs_abs.dt_sta AS ini, hrs_abs.dt_end AS fin "
                                     + "FROM erp." + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
-                                    + "INNER JOIN erp.hsu_tp_abs ON hrsu_tp_abs.id_tp_abs = hrs_abs.fk_tp_abs AND hrsu_tp_abs.id_cl_abs = hrs_abs.fk_cl_abs "
+                                    + "INNER JOIN erp.hsu_tp_abs ON erp.hrsu_tp_abs.id_tp_abs = hrs_abs.fk_tp_abs AND erp.hrsu_tp_abs.id_cl_abs = hrs_abs.fk_cl_abs "
                                     + "WHERE erp.id_emp = " + root.get("employee_id").toString() + " AND ( "
                                     + "erp.dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
                                     + "erp.dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
@@ -1467,8 +1467,8 @@ public class SShareDB {
                 insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
                 insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
                 insert.setExternarRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
-                insert.setFkAbsenceClassId(SModSysConsts.HRSU_TP_ABS_VAC[0]);
-                insert.setFkAbsenceTypeId(SModSysConsts.HRSU_TP_ABS_VAC[1]);
+                insert.setFkAbsenceClassId(Integer.parseInt(row.get("tp_abs").toString()));
+                insert.setFkAbsenceTypeId(Integer.parseInt(row.get("cl_abs").toString()));
                 insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
                            
                 insert.save(session);
