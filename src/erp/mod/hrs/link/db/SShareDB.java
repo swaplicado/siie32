@@ -1198,12 +1198,12 @@ public class SShareDB {
             }
             
             incidents = "SELECT erp.hrsu_tp_abs.name AS nameTp, hrs_abs.dt_sta AS ini, hrs_abs.dt_end AS fin "
-                                    + "FROM erp." + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
-                                    + "INNER JOIN erp.hsu_tp_abs ON erp.hrsu_tp_abs.id_tp_abs = hrs_abs.fk_tp_abs AND erp.hrsu_tp_abs.id_cl_abs = hrs_abs.fk_cl_abs "
-                                    + "WHERE erp.id_emp = " + root.get("employee_id").toString() + " AND ( "
-                                    + "erp.dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
-                                    + "erp.dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
-                                    + "NOT erp.b_del;";
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                                    + "INNER JOIN erp.hrsu_tp_abs ON erp.hrsu_tp_abs.id_tp_abs = hrs_abs.fk_tp_abs AND erp.hrsu_tp_abs.id_cl_abs = hrs_abs.fk_cl_abs "
+                                    + "WHERE hrs_abs.id_emp = " + root.get("employee_id").toString() + " AND ( "
+                                    + "hrs_abs.dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
+                                    + "hrs_abs.dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
+                                    + "NOT hrs_abs.b_del;";
             stCon = conn.createStatement();
 
             resultSet = stCon.executeQuery(incidents);
@@ -1281,7 +1281,7 @@ public class SShareDB {
         }
            
         database.connect(
-                "192.168.1.233", // agregar esta constante a la configuración de CAP Link
+                "127.0.0.1", // agregar esta constante a la configuración de CAP Link
                 "3306", // agregar esta constante a la configuración de CAP Link
                 resultSet.getString("bd"), // agregar esta constante a la configuración de CAP Link
                 "root", // agregar esta constante a la configuración de CAP Link
@@ -1467,8 +1467,8 @@ public class SShareDB {
                 insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
                 insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
                 insert.setExternarRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
-                insert.setFkAbsenceClassId(Integer.parseInt(row.get("tp_abs").toString()));
-                insert.setFkAbsenceTypeId(Integer.parseInt(row.get("cl_abs").toString()));
+                insert.setFkAbsenceClassId(Integer.parseInt(root.get("cl_abs").toString()));
+                insert.setFkAbsenceTypeId(Integer.parseInt(root.get("tp_abs").toString()));
                 insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
                            
                 insert.save(session);
