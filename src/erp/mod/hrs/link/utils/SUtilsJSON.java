@@ -224,7 +224,7 @@ public class SUtilsJSON {
              // revisar si hay incidencias para esas fechas
             AvailableResponse = sDb.cheakIncidents(sJsonInc);
             
-            if (toInsert == true) {
+            if (toInsert == true && AvailableResponse.getCode() == 200 ) {
                 AvailableResponse = sDb.setinIncidents(sJsonInc);
             }
             
