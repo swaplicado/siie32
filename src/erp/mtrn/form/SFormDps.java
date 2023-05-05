@@ -6874,9 +6874,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         moLastDpsSource = oDpsSource;
                         
                         if (moTrnRelatedDocument == null) moTrnRelatedDocument = new STrnCfdRelated();
-                        String relTp = DCfdi40Catalogs.REL_TP_NOTA_CREDITO;
+                        String relTp = DCfdi40Catalogs.ClaveTipoRelaciónNotaCrédito;
                         if (oDpsEntryAdjustment.getOperationsType() == SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) {
-                            relTp = DCfdi40Catalogs.REL_TP_ANTICIPO;
+                            relTp = DCfdi40Catalogs.ClaveTipoRelaciónAplicaciónAnticipo;
                         }
                         moTrnRelatedDocument.addRelatedDocument(relTp, oDpsSource.getDbmsDataCfd().getUuid());
                         jtaCfdiRelated.setText(moTrnRelatedDocument.getAsString());
@@ -7529,7 +7529,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         if (moTrnRelatedDocument == null) {
                                             moTrnRelatedDocument = new STrnCfdRelated();
                                         }
-                                        moTrnRelatedDocument.addRelatedDocument(adjustmentSubtypeKey[0] == 2 ? DCfdi40Catalogs.REL_TP_DEVOLUCIÓN : DCfdi40Catalogs.REL_TP_NOTA_CREDITO, oDpsSource.getDbmsDataCfd().getUuid());
+                                        moTrnRelatedDocument.addRelatedDocument(adjustmentSubtypeKey[0] == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? DCfdi40Catalogs.ClaveTipoRelaciónDevolución : DCfdi40Catalogs.ClaveTipoRelaciónNotaCrédito, oDpsSource.getDbmsDataCfd().getUuid());
                                         jtaCfdiRelated.setText(moTrnRelatedDocument.getAsString());
                                     }
                                 }              

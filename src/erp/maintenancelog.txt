@@ -1,4 +1,18 @@
 ================================================================================
+SIIE 3.2 213.0/ 2023-05-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de prestaciones de empleados.
+2) Implementación de factores de integración de salario diario de empleados.
+3) Replanteamiento de IVA exento y revisión de tasas de IVA retenido.
+
+================================================================================
+SIIE 3.2 211.0/ 2023-04-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de configuración de bonos por condición de sindicato y tipo de periodicidad de pago.
+
+================================================================================
 SIIE 3.2 210.1/ 2023-04-26
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -59,7 +73,9 @@ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Adición del status de autorización en la vista de pedidos y muestra cuándo el pedido no se puede imprimir.
 2) Ajuste por redondeo al cálculo del nodo ImpuetosP en el complemento de recepción de pagos.
-SIIE 3.2 209.?/ 2023-02-??
+
+================================================================================
+SIIE 3.2 209.5/ 2023-02-01
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección a condición para habilitar controles para ajustes en forma de captura de pólizas contables.
