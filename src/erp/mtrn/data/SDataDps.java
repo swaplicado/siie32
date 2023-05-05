@@ -66,9 +66,9 @@ import erp.mfin.data.SFinDpsTaxes;
 import erp.mfin.data.SFinMovementType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mqlt.data.SDpsQualityUtils;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
+import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import erp.mtrn.data.cfd.SAddendaUtils;
@@ -173,6 +173,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected double mdTaxRetainedCy_r;
     protected double mdTotalCy_r;
     protected double mdCommissionsCy_r;
+    //protected java.lang.String msReqNum;
     protected java.lang.String msDriver;
     protected java.lang.String msPlate;
     protected java.lang.String msTicket;
@@ -269,6 +270,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msDbmsCurrency;
     protected java.lang.String msDbmsCurrencyKey;
     protected java.lang.String msDbmsIncotermCode;
+    protected java.lang.String msDbmsAuthorizationStatusName;
 
     protected boolean mbAuxIsBeingCopied;
     protected boolean mbAuxIsFormerRecordAutomatic;
@@ -1806,6 +1808,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setTaxRetainedCy_r(double d) { mdTaxRetainedCy_r = d; }
     public void setTotalCy_r(double d) { mdTotalCy_r = d; }
     public void setCommissionsCy_r(double d) { mdCommissionsCy_r = d; }
+//    public void setReqNum(java.lang.String s) { msReqNum = s; }
     public void setDriver(java.lang.String s) { msDriver = s; }
     public void setPlate(java.lang.String s) { msPlate = s; }
     public void setTicket(java.lang.String s) { msTicket = s; }
@@ -1929,6 +1932,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public double getTaxRetainedCy_r() { return mdTaxRetainedCy_r; }
     public double getTotalCy_r() { return mdTotalCy_r; }
     public double getCommissionsCy_r() { return mdCommissionsCy_r; }
+//    public java.lang.String getReqNum() { return msReqNum; }
     public java.lang.String getDriver() { return msDriver; }
     public java.lang.String getPlate() { return msPlate; }
     public java.lang.String getTicket() { return msTicket; }
@@ -2025,6 +2029,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsCurrency(java.lang.String s) { msDbmsCurrency = s; }
     public void setDbmsCurrencyKey(java.lang.String s) { msDbmsCurrencyKey = s; }
     public void setDbmsIncotermCode(java.lang.String s) { msDbmsIncotermCode = s; }
+    public void setDbmsAuthorizationStatusName(java.lang.String s) { msDbmsAuthorizationStatusName = s; }
 
     public void setAuxIsBeingCopied(boolean b) { mbAuxIsBeingCopied = b; }
     public void setAuxIsFormerRecordAutomatic(boolean b) { mbAuxIsFormerRecordAutomatic = b; }
@@ -2058,6 +2063,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getDbmsCurrency() { return msDbmsCurrency; }
     public java.lang.String getDbmsCurrencyKey() { return msDbmsCurrencyKey; }
     public java.lang.String getDbmsIncotermCode() { return msDbmsIncotermCode; }
+    public java.lang.String getDbmsAuthorizationStatusName() { return msDbmsAuthorizationStatusName; }
 
     public boolean getAuxIsBeingCopied() { return mbAuxIsBeingCopied; }
     public boolean getAuxIsFormerRecordAutomatic() { return mbAuxIsFormerRecordAutomatic; }
@@ -2112,6 +2118,70 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
     
+    public int updateDpsDateAfrerSign(java.sql.Connection connection, Date newDate) {
+        String sql;
+        SDataRecord rec;
+        
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+        try {
+            sql = "UPDATE trn_dps SET dt = '" + SLibUtils.DbmsDateFormatDate.format(newDate) + "', " + 
+                    "dt_doc = '" + SLibUtils.DbmsDateFormatDate.format(newDate) + "', " +
+                    "dt_start_cred = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateStartCredit, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " +
+                    (mtDateShipment_n != null ? ", dt_shipment_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateShipment_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    (mtDateDelivery_n != null ? ", dt_delivery_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateDelivery_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    (mtDateDocLapsing_n != null ? ", dt_doc_lapsing_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateDocLapsing_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    (mtDateDocDelivery_n != null ? ", dt_doc_delivery_n = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.addDate(mtDateDocDelivery_n, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, (int)SLibTimeUtilities.getDaysDiff(newDate, mtDate))) + "' " : "" ) +
+                    "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
+            connection.createStatement().execute(sql);
+            mbAuxIsFormerRecordAutomatic = false;
+            
+            if (SLibTimeUtilities.digestYearMonth(newDate)[1] != SLibTimeUtilities.digestYearMonth(mtDate)[1]) {
+                rec = new SDataRecord();
+                rec.read(moDbmsRecordKey, connection.createStatement());
+                rec.setIsDeleted(true);
+                if (rec.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                }
+
+                rec.setPkPeriodId(SLibTimeUtilities.digestYearMonth(newDate)[1]);
+                rec.setPkNumberId(0);
+                rec.setDate(newDate);
+                rec.setIsDeleted(false);
+                int pos = 1;
+                for (SDataRecordEntry ety : rec.getDbmsRecordEntries()) {
+                    if (!ety.getIsDeleted()) {
+                        ety.setPkEntryId(0);
+                        ety.setSortingPosition(pos);
+                        ety.setIsRegistryNew(true);
+                        pos++;
+                    }
+                }
+                if (rec.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                }
+                
+                moDbmsRecordKey = rec.getPrimaryKey();
+
+                sql = "UPDATE trn_dps_rec SET fid_rec_year = " + rec.getPkYearId() + ", " +
+                        "fid_rec_per = " + rec.getPkPeriodId() + ", " + 
+                        "fid_rec_bkc = " + rec.getPkBookkeepingCenterId() + ", " + 
+                        "fid_rec_tp_rec = '" + rec.getPkRecordTypeId() + "', " +
+                        "fid_rec_num = " + rec.getPkNumberId() + " " + 
+                        "WHERE id_dps_year = " + mnPkYearId + " " + 
+                        "AND id_dps_doc = " + mnPkDocId + ";";
+                connection.createStatement().execute(sql);
+            }
+            
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+        }
+        catch (Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            SLibUtilities.printOutException(this, e);
+        }
+        
+        return mnLastDbActionResult;
+    }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkYearId = ((int[]) pk)[0];
@@ -2162,6 +2232,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mdTaxRetainedCy_r = 0;
         mdTotalCy_r = 0;
         mdCommissionsCy_r = 0;
+//        msReqNum = "";
         msDriver = "";
         msPlate = "";
         msTicket = "";
@@ -2258,6 +2329,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msDbmsCurrency = "";
         msDbmsCurrencyKey = "";
         msDbmsIncotermCode = "";
+        msDbmsAuthorizationStatusName = "";
 
         mbAuxIsBeingCopied = false;
         mbAuxIsFormerRecordAutomatic = false;
@@ -2305,10 +2377,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         reset();
 
         try {
-            sSql = "SELECT d.*, c.cur, c.cur_key, i.code "
+            sSql = "SELECT d.*, c.cur, c.cur_key, i.code, st.st_dps_authorn "
                     + "FROM trn_dps AS d "
                     + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
                     + "INNER JOIN erp.logs_inc AS i ON d.fid_inc = i.id_inc "
+                    + "INNER JOIN erp.trns_st_dps_authorn AS st ON d.fid_st_dps_authorn = st.id_st_dps_authorn "
                     + "WHERE d.id_year = " + anKey[0] + " AND d.id_doc = " + anKey[1] + " ";
             oResultSet = statement.executeQuery(sSql);
             if (!oResultSet.next()) {
@@ -2350,6 +2423,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mdTaxRetainedCy_r = oResultSet.getDouble("d.tax_retained_cur_r");
                 mdTotalCy_r = oResultSet.getDouble("d.tot_cur_r");
                 mdCommissionsCy_r = oResultSet.getDouble("d.comms_cur_r");
+//                msReqNum = oResultSet.getString("d.req_num");
                 msDriver = oResultSet.getString("d.driver");
                 msPlate = oResultSet.getString("d.plate");
                 msTicket = oResultSet.getString("d.ticket");
@@ -2441,6 +2515,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msDbmsCurrency = oResultSet.getString("c.cur");
                 msDbmsCurrencyKey = oResultSet.getString("c.cur_key");
                 msDbmsIncotermCode = oResultSet.getString("i.code");
+                msDbmsAuthorizationStatusName = oResultSet.getString("st.st_dps_authorn");
                 
                 computeXtaTotalCyAsText(statement);
                 createXtaDpsType();
@@ -2735,6 +2810,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setDouble(nParam++, mdTaxRetainedCy_r);
             oCallableStatement.setDouble(nParam++, mdTotalCy_r);
             oCallableStatement.setDouble(nParam++, mdCommissionsCy_r);
+//            oCallableStatement.setString(nParam++, msReqNum);
             oCallableStatement.setString(nParam++, msDriver);
             oCallableStatement.setString(nParam++, msPlate);
             oCallableStatement.setString(nParam++, msTicket);
@@ -3048,6 +3124,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         break; // se asume que sólo hay un impuesto trasladado
                                     }
                                 }
+                                if (aTaxesForAccountingArray.isEmpty()) {
+                                    aTaxesForAccountingArray.add(new TaxForAccounting(dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxBasicId(), dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxId()));
+                                }
                             }
                         }
                         
@@ -3110,6 +3189,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             }
                                             break; // se asume que sólo hay un impuesto trasladado
                                         }
+                                    }
+                                    if (taxForAccounting == null) {
+                                        taxForAccounting = aTaxesForAccountingArray.get(0);
                                     }
                                 }
                                 
@@ -5916,7 +5998,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 concepto.setValorUnitario(price);
                 concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
                 concepto.setDescuento(dpsEntry.getDiscountDocCy());
-                concepto.setObjetoImpuesto(dpsEntry.getDbmsDpsCfdEntry().getTaxObject());
+                concepto.setObjetoImpuesto(dpsEntry.getSubtotalCy_r() > 0 ? dpsEntry.getDbmsDpsCfdEntry().getTaxObject() : DCfdi40Catalogs.ClaveObjetoImpNo);
                 
                 concepto.computeCfdImpuestosConceptos(dpsEntry);
                 
@@ -5988,27 +6070,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         try {
             if (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
-                addenda = new cfd.ver3.DElementAddenda();
+                addenda = new cfd.ver4.DElementAddenda();
 
                 if (isDocumentSal() || isAdjustmentSal()) {
                     switch (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdTempCfdIvaPorcentaje));
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

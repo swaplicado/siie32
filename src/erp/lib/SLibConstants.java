@@ -111,6 +111,7 @@ public abstract class SLibConstants {
     public static final int ICON_ARROW_LEFT = 1503;
     public static final int ICON_ARROW_RIGHT = 1504;
     public static final int ICON_BP_EXPORT = 1505;
+    public static final int ICON_GUI_CAL = 1601;
 
     public static final int GUI_DATE_PICKER_DATE = 1;
     public static final int GUI_DATE_PICKER_DATE_PERIOD = 2;

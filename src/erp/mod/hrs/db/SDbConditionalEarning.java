@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -24,12 +25,14 @@ public class SDbConditionalEarning extends SDbRegistryUser {
     protected Date mtDateStart;
     protected double mdAmount;
     protected double mdPercentage;
+    protected int mnForUnion; // 0 no aplica, 1 sindicalizados, 2 no sindicalizados
     //protected boolean mbDeleted;
     //protected boolean mbSystem;
     protected int mnFkEarningId;
     protected int mnFkScopeId;
     protected int mnFkReferenceId;
     protected int mnFkBonusId;
+    protected int mnFkPaymentTypeId_n;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -83,11 +86,13 @@ public class SDbConditionalEarning extends SDbRegistryUser {
     public void setStartDate(Date t) { mtDateStart = t; }
     public void setAmount(double d) { mdAmount = d; }
     public void setPercentage(double d) { mdPercentage = d; }
+    public void setForUnion(int n) { mnForUnion = n; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkEarningId(int n) { mnFkEarningId = n; }
     public void setFkScopeId(int n) { mnFkScopeId = n; }
     public void setFkReferenceId(int n) { mnFkReferenceId = n; }
     public void setFkBonusId(int n) { mnFkBonusId = n; }
+    public void setFkPaymentTypeId_n(int n) { mnFkPaymentTypeId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -97,12 +102,14 @@ public class SDbConditionalEarning extends SDbRegistryUser {
     public Date getStartDate() { return mtDateStart; }
     public double getAmount() { return mdAmount; }
     public double getPercentage() { return mdPercentage; }
+    public int getForUnion() { return mnForUnion; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkEarningId() { return mnFkEarningId; }
     public int getFkScopeId() { return mnFkScopeId; }
     public int getFkReferenceId() { return mnFkReferenceId; }
     public int getFkBonusId() { return mnFkBonusId; }
+    public int getFkPaymentTypeId_n() { return mnFkPaymentTypeId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -124,14 +131,16 @@ public class SDbConditionalEarning extends SDbRegistryUser {
 
         mnPkConditionalEarningId = 0;
         mtDateStart = null;
-        mdAmount = 0;
-        mdPercentage = 0;
+        mdAmount = 0d;
+        mdPercentage = 0d;
+        mnForUnion = 0;
         mbDeleted = false;
         mbSystem = false;
         mnFkEarningId = 0;
         mnFkScopeId = 0;
         mnFkReferenceId = 0;
         mnFkBonusId = 0;
+        mnFkPaymentTypeId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -186,11 +195,13 @@ public class SDbConditionalEarning extends SDbRegistryUser {
             mtDateStart = resultSet.getDate("dt_sta");
             mdAmount = resultSet.getDouble("amt");
             mdPercentage = resultSet.getDouble("pct");
+            mnForUnion = resultSet.getInt("for_uni");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkEarningId = resultSet.getInt("fk_ear");
             mnFkScopeId = resultSet.getInt("fk_scope");
             mnFkReferenceId = resultSet.getInt("fk_ref");
             mnFkBonusId = resultSet.getInt("fk_bonus");
+            mnFkPaymentTypeId_n = resultSet.getInt("fk_tp_pay_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -230,11 +241,13 @@ public class SDbConditionalEarning extends SDbRegistryUser {
                     "'"+ SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
                     mdAmount + ", " + 
                     mdPercentage + ", " + 
+                    mnForUnion + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkEarningId + ", " + 
                     mnFkScopeId + ", " + 
                     mnFkReferenceId + ", " +
                     mnFkBonusId + ", " +
+                    (mnFkPaymentTypeId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkPaymentTypeId_n) + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
@@ -253,11 +266,13 @@ public class SDbConditionalEarning extends SDbRegistryUser {
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "amt = " + mdAmount + ", " +
                     "pct = " + mdPercentage + ", " +
+                    "for_uni = " + mnForUnion + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_ear = " + mnFkEarningId + ", " +
                     "fk_scope = " + mnFkScopeId + ", " +
                     "fk_ref = " + mnFkReferenceId + ", " +
                     "fk_bonus = " + mnFkBonusId + ", " +
+                    "fk_tp_pay_n = " + (mnFkPaymentTypeId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkPaymentTypeId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -279,12 +294,14 @@ public class SDbConditionalEarning extends SDbRegistryUser {
         registry.setStartDate(this.getStartDate());
         registry.setAmount(this.getAmount());
         registry.setPercentage(this.getPercentage());
+        registry.setForUnion(this.getForUnion());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkEarningId(this.getFkEarningId());
         registry.setFkScopeId(this.getFkScopeId());
         registry.setFkReferenceId(this.getFkReferenceId());
         registry.setFkBonusId(this.getFkBonusId());
+        registry.setFkPaymentTypeId_n(this.getFkPaymentTypeId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

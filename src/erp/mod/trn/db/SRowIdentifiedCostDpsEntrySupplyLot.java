@@ -59,6 +59,8 @@ public class SRowIdentifiedCostDpsEntrySupplyLot extends SRowIdentifiedCostDpsEn
     public double LotUnitCost;
     public String CostUnitType;
     public String CalculationIssue;
+    
+    public String LotSituationAux;
 
     public SRowIdentifiedCostDpsEntrySupplyLot(SDbIdentifiedCostCalculation.Supply supply) {
         super(supply);
@@ -101,6 +103,8 @@ public class SRowIdentifiedCostDpsEntrySupplyLot extends SRowIdentifiedCostDpsEn
         LotUnitCost = supply.LotCostUnit;
         CostUnitType = supply.CostUnitType;
         CalculationIssue = supply.CalculationIssue;
+        
+        LotSituationAux = supply.LotSituationAux;
     }
     
     public double getSupplyMovementRowLotSubtotal() {
@@ -195,6 +199,9 @@ public class SRowIdentifiedCostDpsEntrySupplyLot extends SRowIdentifiedCostDpsEn
                 break;
             case 14:
                 value = CalculationIssue;
+                break;
+            case 15:
+                value = LotSituationAux;
                 break;
             default:
                 // do nothing

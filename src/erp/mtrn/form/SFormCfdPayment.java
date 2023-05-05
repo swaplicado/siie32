@@ -58,6 +58,7 @@ import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -94,9 +95,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private boolean mbEditingPaymentEntry;
     private boolean mbEditingPaymentEntryDoc;
     private boolean mbDpsValidationFailed;
+    private ImageIcon moImgGreen;
+    private ImageIcon moImgWarning;
+    private ImageIcon moImgError;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private final erp.client.SClientInterface miClient;
-
+    
     private erp.mtrn.data.SDataCfdPayment moDataCfdPayment;
     private erp.mbps.data.SDataBizPartnerBranch moDataComBranch;
     private erp.mbps.data.SDataBizPartner moDataRecBizPartner;
@@ -306,11 +310,16 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayPaymentEntryOk = new javax.swing.JButton();
         jbPayPaymentEntryCancel = new javax.swing.JButton();
         jpVoucherTotals = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
         jlVouTotal = new javax.swing.JLabel();
         jtfVouTotalRo = new javax.swing.JTextField();
         jtfVouTotalCurRo = new javax.swing.JTextField();
         jtfVouTotalLocalRo = new javax.swing.JTextField();
         jtfVouTotalLocalCurRo = new javax.swing.JTextField();
+        jPanel18 = new javax.swing.JPanel();
+        jtfAccConceptPrefixRo = new javax.swing.JTextField();
+        jtfAccConceptDocsRo = new javax.swing.JTextField();
+        jbAccConceptDocsEdit = new javax.swing.JButton();
         jpDocuments = new javax.swing.JPanel();
         jpDocument = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
@@ -370,12 +379,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jlPayTotalPayments = new javax.swing.JLabel();
         jtfPayTotalPaymentsRo = new javax.swing.JTextField();
         jtfPayTotalPaymentsCurRo = new javax.swing.JTextField();
+        jtfPayTotalPaymentsPacRo = new javax.swing.JTextField();
+        jtfPayTotalPaymentsPacCurRo = new javax.swing.JTextField();
+        jlIcon = new javax.swing.JLabel();
         jtfPayTotalPaymentsLocalRo = new javax.swing.JTextField();
         jtfPayTotalPaymentsLocalCurRo = new javax.swing.JTextField();
         jpAccountingConcept = new javax.swing.JPanel();
-        jtfAccConceptPrefixRo = new javax.swing.JTextField();
-        jtfAccConceptDocsRo = new javax.swing.JTextField();
-        jbAccConceptDocsEdit = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -974,38 +983,61 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jpPayments.add(jpPayment, java.awt.BorderLayout.NORTH);
 
-        jpVoucherTotals.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jpVoucherTotals.setLayout(new java.awt.BorderLayout());
 
         jlVouTotal.setText("Total:");
         jlVouTotal.setPreferredSize(new java.awt.Dimension(50, 23));
-        jpVoucherTotals.add(jlVouTotal);
+        jPanel8.add(jlVouTotal);
 
         jtfVouTotalRo.setEditable(false);
         jtfVouTotalRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVouTotalRo.setText("999,999,999.99");
         jtfVouTotalRo.setFocusable(false);
         jtfVouTotalRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpVoucherTotals.add(jtfVouTotalRo);
+        jPanel8.add(jtfVouTotalRo);
 
         jtfVouTotalCurRo.setEditable(false);
         jtfVouTotalCurRo.setText("XXX");
         jtfVouTotalCurRo.setFocusable(false);
         jtfVouTotalCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpVoucherTotals.add(jtfVouTotalCurRo);
+        jPanel8.add(jtfVouTotalCurRo);
 
         jtfVouTotalLocalRo.setEditable(false);
         jtfVouTotalLocalRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVouTotalLocalRo.setText("999,999,999.99");
         jtfVouTotalLocalRo.setFocusable(false);
         jtfVouTotalLocalRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpVoucherTotals.add(jtfVouTotalLocalRo);
+        jPanel8.add(jtfVouTotalLocalRo);
 
         jtfVouTotalLocalCurRo.setEditable(false);
         jtfVouTotalLocalCurRo.setBackground(new java.awt.Color(255, 204, 204));
         jtfVouTotalLocalCurRo.setText("LOC");
         jtfVouTotalLocalCurRo.setFocusable(false);
         jtfVouTotalLocalCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpVoucherTotals.add(jtfVouTotalLocalCurRo);
+        jPanel8.add(jtfVouTotalLocalCurRo);
+
+        jpVoucherTotals.add(jPanel8, java.awt.BorderLayout.WEST);
+
+        jtfAccConceptPrefixRo.setEditable(false);
+        jtfAccConceptPrefixRo.setText("F");
+        jtfAccConceptPrefixRo.setToolTipText("Prefijo documentos concepto contable");
+        jtfAccConceptPrefixRo.setFocusable(false);
+        jtfAccConceptPrefixRo.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel18.add(jtfAccConceptPrefixRo);
+
+        jtfAccConceptDocsRo.setEditable(false);
+        jtfAccConceptDocsRo.setText("TEXT");
+        jtfAccConceptDocsRo.setToolTipText("<computed>");
+        jtfAccConceptDocsRo.setFocusable(false);
+        jtfAccConceptDocsRo.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel18.add(jtfAccConceptDocsRo);
+
+        jbAccConceptDocsEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbAccConceptDocsEdit.setToolTipText("Personalizar documentos concepto contable");
+        jbAccConceptDocsEdit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel18.add(jbAccConceptDocsEdit);
+
+        jpVoucherTotals.add(jPanel18, java.awt.BorderLayout.LINE_END);
 
         jpPayments.add(jpVoucherTotals, java.awt.BorderLayout.SOUTH);
 
@@ -1298,6 +1330,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayTotalPaymentsRo.setEditable(false);
         jtfPayTotalPaymentsRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayTotalPaymentsRo.setText("999,999,999.99");
+        jtfPayTotalPaymentsRo.setToolTipText("Pago en moneda original");
         jtfPayTotalPaymentsRo.setFocusable(false);
         jtfPayTotalPaymentsRo.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPaymentTotals.add(jtfPayTotalPaymentsRo);
@@ -1309,9 +1342,29 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayTotalPaymentsCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
         jpPaymentTotals.add(jtfPayTotalPaymentsCurRo);
 
+        jtfPayTotalPaymentsPacRo.setEditable(false);
+        jtfPayTotalPaymentsPacRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayTotalPaymentsPacRo.setText("999,999,999.99");
+        jtfPayTotalPaymentsPacRo.setToolTipText("Suma importes pagados PAC");
+        jtfPayTotalPaymentsPacRo.setFocusable(false);
+        jtfPayTotalPaymentsPacRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpPaymentTotals.add(jtfPayTotalPaymentsPacRo);
+        jtfPayTotalPaymentsPacRo.getAccessibleContext().setAccessibleDescription("Suma pagos");
+
+        jtfPayTotalPaymentsPacCurRo.setEditable(false);
+        jtfPayTotalPaymentsPacCurRo.setBackground(new java.awt.Color(204, 255, 204));
+        jtfPayTotalPaymentsPacCurRo.setText("PAC");
+        jtfPayTotalPaymentsPacCurRo.setFocusable(false);
+        jtfPayTotalPaymentsPacCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpPaymentTotals.add(jtfPayTotalPaymentsPacCurRo);
+
+        jlIcon.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpPaymentTotals.add(jlIcon);
+
         jtfPayTotalPaymentsLocalRo.setEditable(false);
         jtfPayTotalPaymentsLocalRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayTotalPaymentsLocalRo.setText("999,999,999.99");
+        jtfPayTotalPaymentsLocalRo.setToolTipText("Pago en pesos");
         jtfPayTotalPaymentsLocalRo.setFocusable(false);
         jtfPayTotalPaymentsLocalRo.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPaymentTotals.add(jtfPayTotalPaymentsLocalRo);
@@ -1324,27 +1377,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jpPaymentTotals.add(jtfPayTotalPaymentsLocalCurRo);
 
         jpAccountingConcept.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
-
-        jtfAccConceptPrefixRo.setEditable(false);
-        jtfAccConceptPrefixRo.setText("F");
-        jtfAccConceptPrefixRo.setToolTipText("Prefijo documentos concepto contable");
-        jtfAccConceptPrefixRo.setFocusable(false);
-        jtfAccConceptPrefixRo.setPreferredSize(new java.awt.Dimension(15, 23));
-        jpAccountingConcept.add(jtfAccConceptPrefixRo);
-
-        jtfAccConceptDocsRo.setEditable(false);
-        jtfAccConceptDocsRo.setText("TEXT");
-        jtfAccConceptDocsRo.setToolTipText("<computed>");
-        jtfAccConceptDocsRo.setFocusable(false);
-        jtfAccConceptDocsRo.setPreferredSize(new java.awt.Dimension(125, 23));
-        jpAccountingConcept.add(jtfAccConceptDocsRo);
-
         jpPaymentTotals.add(jpAccountingConcept);
-
-        jbAccConceptDocsEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbAccConceptDocsEdit.setToolTipText("Personalizar documentos concepto contable");
-        jbAccConceptDocsEdit.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpPaymentTotals.add(jbAccConceptDocsEdit);
 
         jpDocuments.add(jpPaymentTotals, java.awt.BorderLayout.SOUTH);
 
@@ -1577,6 +1610,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayAmountLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jtfVouTotalLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jtfPayTotalPaymentsLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+        
+        moImgGreen = new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_lig_gre.png"));
+        moImgWarning = new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png"));
+        moImgError = new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_st_annul.png"));
         
         try {
             moXmlCatalogs = new SCfdXmlCatalogs(miClient.getSession());
@@ -1970,6 +2007,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocPayPaymentCurRo.setText(payCurrencyKey);
         jtfDocPayBalancePendCurRo.setText(payCurrencyKey);
         jtfPayTotalPaymentsCurRo.setText(payCurrencyKey);
+        jtfPayTotalPaymentsPacCurRo.setText(payCurrencyKey);
         
         jtfDocExchangeRateCurRo.setText(docCurrencyKey.isEmpty() || payCurrencyKey.isEmpty() ? "" : docCurrencyKey + "/" + payCurrencyKey);
         
@@ -2118,12 +2156,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void computePayTotalPayments() {
         double total = 0;
         double totalLocal = 0;
+        double totalPac = 0;
         
         SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
         
         if (paymentEntry != null) {
             paymentEntry.computeTotalPayments();
             total = paymentEntry.AuxTotalPayments;
+            totalPac = paymentEntry.AuxTotalPaymentsPac;
             totalLocal = paymentEntry.AuxTotalPaymentsLocal;
         }
         
@@ -2132,6 +2172,24 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         // local currency:
         jtfPayTotalPaymentsLocalRo.setText(SLibUtils.getDecimalFormatAmount().format(totalLocal));
+        
+        // local currency Pac:
+        jtfPayTotalPaymentsPacRo.setText(SLibUtils.getDecimalFormatAmount().format(totalPac));
+        
+        if (SLibUtils.compareAmount(total, totalPac)) {
+            jlIcon.setIcon(moImgGreen);
+            jlIcon.setToolTipText("El monto total del pago y la suma de los importes de pago coinciden");
+        }
+        else {
+            if (total > totalPac) {
+                jlIcon.setIcon(moImgWarning);
+                jlIcon.setToolTipText("El monto total del pago es mayor a la suma de los importes de pago");
+            }
+            else {
+                jlIcon.setIcon(moImgError);
+                jlIcon.setToolTipText("El monto total del pago es menor a la suma de los importes de pago");
+            }
+        }
         
         // accounting documents:
         renderAccConceptDocs(paymentEntry);
@@ -3268,6 +3326,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 paymentEntry.PaymentEntryDocs.set(moPaymentEntryDoc.AuxGridIndex, moPaymentEntryDoc);
             }
             
+            paymentEntry.computeTotalPayments();
+            if (paymentEntry.AuxTotalPayments < paymentEntry.AuxTotalPaymentsPac) {
+                miClient.showMsgBoxWarning("ACLARACIÓN:\nPuede haber un error en la certificación de este comprobante debido a que en el pago seleccionado,\n"
+                            + "$" + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey
+                            + ", la suma de los importes pagados a los documentos relacionados, de acuendo al procedimiento de cálculo establecido por el PAC,\n"
+                            + "$" + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsPac) + " " + paymentEntry.CurrencyKey
+                            + ", es mayor por $" + SLibUtils.getDecimalFormatAmount().format(Math.abs(paymentEntry.AuxTotalPaymentsPac - paymentEntry.AuxTotalPayments)) + " al monto de pago.\n"
+                            + "Hay dos opciones:\n"
+                            + "a) Evitar este posible error de validación realizando un ajuste mínimo a alguno de los importes pagados a dichos documentos; o\n"
+                            + "b) Continuar, guardar tal cual el comprobante e intentar su certificación, la cual a fin de cuentas puede resultar exitosa.\n");
+            }
+            
             paymentEntry.AuxConceptDocsCustom = ""; // reset customized document numbers
             
             computePayTotalPayments();
@@ -3415,6 +3485,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfDocPayPaymentCurRo.setText("");
             jtfDocPayBalancePendCurRo.setText("");
             jtfPayTotalPaymentsCurRo.setText("");
+            jtfPayTotalPaymentsPacCurRo.setText("");
         }
         else {
             String payCurrencyKey = ((SFormComponentItem) jcbPayCurrency.getSelectedItem()).getComplement().toString();
@@ -3424,6 +3495,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfDocPayPaymentCurRo.setText(payCurrencyKey);
             jtfDocPayBalancePendCurRo.setText(payCurrencyKey);
             jtfPayTotalPaymentsCurRo.setText(payCurrencyKey);
+            jtfPayTotalPaymentsPacCurRo.setText(payCurrencyKey);
             
             if (miClient.getSession().getSessionCustom().isLocalCurrency(moFieldPayCurrency.getKeyAsIntArray())) {
                 moFieldPayExchangeRate.setFieldValue(1d);
@@ -3530,6 +3602,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
@@ -3556,6 +3629,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -3611,6 +3685,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlDocPayment;
     private javax.swing.JLabel jlDocPaymentMethod;
     private javax.swing.JLabel jlDocPaymentType;
+    private javax.swing.JLabel jlIcon;
     private javax.swing.JLabel jlPayAccount;
     private javax.swing.JLabel jlPayAccountDest;
     private javax.swing.JLabel jlPayAccountEntity;
@@ -3693,6 +3768,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfPayTotalPaymentsCurRo;
     private javax.swing.JTextField jtfPayTotalPaymentsLocalCurRo;
     private javax.swing.JTextField jtfPayTotalPaymentsLocalRo;
+    private javax.swing.JTextField jtfPayTotalPaymentsPacCurRo;
+    private javax.swing.JTextField jtfPayTotalPaymentsPacRo;
     private javax.swing.JTextField jtfPayTotalPaymentsRo;
     private javax.swing.JTextField jtfRecCfdRelatedNumberRo;
     private javax.swing.JTextField jtfRecCfdRelatedUuid;
@@ -3843,6 +3920,29 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         if (!validation.getIsError()) {
+            for (int i = 0; i <  moPaneGridPayments.getTableModel().getRowCount(); i++){
+                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getTableRow(i);
+                if (paymentEntry != null) {
+                    paymentEntry.computeTotalPayments();
+                    if (paymentEntry.AuxTotalPayments < paymentEntry.AuxTotalPaymentsPac){
+                        if (miClient.showMsgBoxConfirm("ACLARACIÓN:\nPuede haber un error en la certificación de este comprobante debido a que en el pago #" + (i + 1) + ",\n"
+                                + "$" + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey
+                                + ", la suma de los importes pagados a los documentos relacionados, de acuendo al procedimiento de cálculo establecido por el PAC,\n"
+                                + "$" + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsPac) + " " + paymentEntry.CurrencyKey
+                                + ", es mayor por $" + SLibUtils.getDecimalFormatAmount().format(Math.abs(paymentEntry.AuxTotalPaymentsPac - paymentEntry.AuxTotalPayments)) + " al monto de pago.\n"
+                                + "Hay dos opciones:\n"
+                                + "a) Evitar este posible error de validación realizando un ajuste mínimo a alguno de los importes pagados a dichos documentos; o\n"
+                                + "b) Continuar, guardar tal cual el comprobante e intentar su certificación, la cual a fin de cuentas puede resultar exitosa.\n"
+                                + "¿Está seguro de que desea continuar?") != JOptionPane.OK_OPTION) {
+                            validation.setMessage("Realizar un ajuste a los importes pagados.");
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!validation.getIsError()) {
             if (mbEditingPaymentEntry) {
                 validation.setMessage("La captura de un pago está en proceso.\n"
                         + "Se debe aceptar o cancelar antes de guardar este comprobante.");
@@ -3941,7 +4041,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                         + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + ",\n"
                                         + "es MAYOR que el monto del pago mismo, $"
                                         + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + ", "
-                                        + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".";
+                                        + "por $" + SLibUtils.getDecimalFormatAmount().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".";
 
                                 validation.setMessage(message);
                                 validation.setComponent(moPaneGridPayments.getTable());

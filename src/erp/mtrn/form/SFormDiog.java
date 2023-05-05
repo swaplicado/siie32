@@ -130,6 +130,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mtrn.data.STrnStockMove moStockMoveEntry;
     private erp.mtrn.form.SDialogDpsStockSupply moDialogDpsStockSupply;
     private erp.mtrn.form.SDialogDpsStockReturn moDialogDpsStockReturn;
+//    private erp.mtrn.form.SDialogDpsStockReturnWharehouse moDialogDpsStockReturnWharehouse;
     private erp.mtrn.form.SDialogProdOrderStockAssign moDialogProdOrderStockAssignForAssing;
     private erp.mtrn.form.SDialogProdOrderStockAssign moDialogProdOrderStockAssignForReturn;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForFinish;
@@ -880,6 +881,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         moPickerProdOrderDestiny = null;                       // instanciated when needed
         moDialogDpsStockSupply = null;                  // instanciated when needed
         moDialogDpsStockReturn = null;                  // instanciated when needed
+//        moDialogDpsStockReturnWharehouse = null;                  // instanciated when needed
         moDialogProdOrderStockAssignForAssing = null;   // instanciated when needed
         moDialogProdOrderStockAssignForReturn = null;   // instanciated when needed
         moDialogProdOrderStockFinishForFinish = null;   // instanciated when needed
@@ -1566,7 +1568,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     if (moDialogDpsStockSupply == null) {
                         moDialogDpsStockSupply = new SDialogDpsStockSupply(miClient);
                     }
-
+                    // lops trae aqui alñv moParamDpsSource
                     moDialogDpsStockSupply.formReset();
                     moDialogDpsStockSupply.setFormParams(moParamDpsSource, iog);
                     moDialogDpsStockSupply.setVisible(true);
@@ -1789,6 +1791,121 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             computeDocValue();
                         }
                     }
+                }
+                
+                else if (STrnUtilities.isIogTypeForDpsReturn(manParamIogTypeKey)) {
+//                    if (moDialogDpsStockReturnWharehouse == null) {
+//                        moDialogDpsStockReturnWharehouse = new SDialogDpsStockReturnWharehouse(miClient);
+//                    }
+//
+//                    moDialogDpsStockReturnWharehouse.formReset();
+//                    moDialogDpsStockReturnWharehouse.setFormParams(moParamDpsSource, iog);
+//                    moDialogDpsStockReturnWharehouse.setVisible(true);
+//                    
+//                    if (moDialogDpsStockReturnWharehouse.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+//                        stockReturnRows = moDialogDpsStockReturnWharehouse.obtainDpsStockReturnRows();
+//
+//                        for (int row = 0; row < stockReturnRows.size(); row++) {
+//                            stockReturnRow = stockReturnRows.get(row);
+//                            item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockReturnRow.getFkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+//
+//                            if (validateAppropriateWarehousesItem(item.getPkItemId())) {
+//                                stockReturnRowsAux.add(stockReturnRows.get(row));
+//                            }
+//                            else {
+//                                sItemsInappropriate += "  * '" + item.getKey() + " - " + item.getItem() + "'\n";
+//                            }
+//                        }
+//
+//                        if (sItemsInappropriate.length() > 0) {
+//                            miClient.showMsgBoxInformation("Los ítems:\n" + sItemsInappropriate + " no están configurados para el almacén '" +
+//                                    moWarehouseSource.getEntity() + "', código '" + moWarehouseSource.getCode() + "'.");
+//                        }
+//
+//                        for (int row = 0; row < stockReturnRowsAux.size(); row++) {
+//                            stockReturnRow = stockReturnRowsAux.get(row);
+//                            item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockReturnRow.getFkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+//
+//                            if (item.getIsLotApplying()) {
+//                                moDialogStockLots.formReset();
+//                                moDialogStockLots.setFormParams(mnParamIogCategoryId, year, stockReturnRow.getFkItemId(), stockReturnRow.getFkUnitId(),
+//                                        (int[]) moWarehouseSource.getPrimaryKey(), (int[]) (moDiog == null ? null : moDiog.getPrimaryKey()),
+//                                        stockReturnRow.getQuantityToReturn(), SLibConstants.FORM_STATUS_EDIT, mode, moParamDpsSource, moFieldDate.getDate());
+//                                moDialogStockLots.setCurrentEntry(row + 1, stockReturnRowsAux.size());
+//                                moDialogStockLots.setVisible(true);
+//
+//                                if (moDialogStockLots.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+//                                    add = false;
+//                                    break;
+//                                }
+//                            }
+//
+//                            dpsEntry = moParamDpsSource.getDbmsDpsEntry(stockReturnRow.getDpsAdjustmentEntryKey());
+//
+//                            iogEntry = new SDataDiogEntry();
+//                            iogEntry.setPkYearId(SLibConstants.UNDEFINED);
+//                            iogEntry.setPkDocId(SLibConstants.UNDEFINED);
+//                            iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
+//                            iogEntry.setQuantity(stockReturnRow.getQuantityToReturn());
+//                            iogEntry.setValueUnitary(dpsEntry.getPriceUnitaryReal_r());
+//                            iogEntry.setValue(SLibUtilities.round(iogEntry.getValueUnitary() * iogEntry.getQuantity(), decsQty));
+//                            iogEntry.setOriginalQuantity(stockReturnRow.getOriginalQuantityToReturn());
+//                            iogEntry.setOriginalValueUnitary(iogEntry.getOriginalQuantity() == 0 ? 0 : SLibUtilities.round(iogEntry.getValue() / iogEntry.getOriginalQuantity(), decsValUnit));
+//                            iogEntry.setSortingPosition(0);
+//                            iogEntry.setIsInventoriable(item.getIsInventoriable());
+//                            iogEntry.setIsDeleted(false);
+//                            iogEntry.setFkItemId(stockReturnRow.getFkItemId());
+//                            iogEntry.setFkUnitId(stockReturnRow.getFkUnitId());
+//                            iogEntry.setFkOriginalUnitId(stockReturnRow.getFkOriginalUnitId());
+//
+//                            iogEntry.setFkDpsYearId_n(stockReturnRow.getFkDpsYearId());
+//                            iogEntry.setFkDpsDocId_n(stockReturnRow.getFkDpsDocId());
+//                            iogEntry.setFkDpsEntryId_n(stockReturnRow.getFkDpsEntryId());
+//                            iogEntry.setFkDpsAdjustmentYearId_n(stockReturnRow.getPkDpsAdjustmentYearId());
+//                            iogEntry.setFkDpsAdjustmentDocId_n(stockReturnRow.getPkDpsAdjustmentDocId());
+//                            iogEntry.setFkDpsAdjustmentEntryId_n(stockReturnRow.getPkDpsAdjustmentEntryId());
+//                            iogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
+//                            iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
+//                            iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
+//                            iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+//
+//                            iogEntry.setFkUserNewId(1);
+//                            iogEntry.setFkUserEditId(1);
+//                            iogEntry.setFkUserDeleteId(1);
+//
+//                            iogEntry.setDbmsItem(stockReturnRow.getAuxItem());
+//                            iogEntry.setDbmsItemKey(stockReturnRow.getAuxItemKey());
+//                            iogEntry.setDbmsUnit(stockReturnRow.getAuxUnitSymbol());    // no unit name available in return row object
+//                            iogEntry.setDbmsUnitSymbol(stockReturnRow.getAuxUnitSymbol());
+//                            iogEntry.setDbmsOriginalUnit(stockReturnRow.getAuxOriginalUnitSymbol());    // no unit name available in return row object
+//                            iogEntry.setDbmsOriginalUnitSymbol(stockReturnRow.getAuxOriginalUnitSymbol());
+//
+//                            if (item.getIsLotApplying()) {
+//                                iogEntry.getAuxStockMoves().addAll(moDialogStockLots.getStockMoves());
+//                            }
+//                            else {
+//                                iogEntry.getAuxStockMoves().add(new STrnStockMove(new int[] { year, iogEntry.getFkItemId(), iogEntry.getFkUnitId(), SDataConstantsSys.TRNX_STK_LOT_DEF_ID, moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() }, iogEntry.getQuantity()));
+//                            }
+//
+//                            iogEntries.add(iogEntry);
+//                        }
+//
+//                        if (add) {
+//                            for (SDataDiogEntry e : iogEntries) {
+//                                moPaneDiogEntries.addTableRow(new SDataDiogEntryRow(e));
+//
+//                                if (moPaneDiogEntries.getTableGuiRowCount() == 1) {
+//                                    updateNoEntriesRelatedControls();    // if needed, inactivate production order controls
+//                                }
+//                            }
+//
+//                            moPaneDiogEntries.renderTableRows();
+//                            moPaneDiogEntries.setTableRowSelection(moPaneDiogEntries.getTableGuiRowCount() - 1);
+//
+//                            actionEntryClear();
+//                            computeDocValue();
+//                        }
+//                    }
                 }
                 else {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);

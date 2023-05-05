@@ -779,6 +779,9 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
         ArrayList<Supply> supplies = getSupplies(session.getStatement().getConnection(), externalDatabase);
         addCalculationLogEntry("Surtidos externos obtenidos: " + SLibUtils.DecimalFormatInteger.format(supplies.size()) + ".", true);
         
+        // Procesar lotes en nulo
+        supplies = STrnIdentifiedCostLotUtils.analizeLots(session.getStatement().getConnection(), externalDatabase, supplies);
+        
         int count = 0;
         for (Supply supply : supplies) {
             addCalculationLogEntry((++count) + ". " + supply.DocTypeCode + " #" + supply.getDpsNumber() + " " + SLibUtils.DateFormatDate.format(supply.DocDate) + " PK=" + supply.getDpsKeyAsString() + "; "
@@ -952,6 +955,8 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
         public String CostUnitType;
         public String CalculationIssue;
         
+        public String LotSituationAux;
+        
         public Supply() {
             reset();
         }
@@ -1022,6 +1027,8 @@ public class SDbIdentifiedCostCalculation extends SDbRegistryUser {
             LotCostUnit = 0;
             CostUnitType = "";
             CalculationIssue = "";
+            
+            LotSituationAux = "";
         }
         
         public int[] getDpsKey() {

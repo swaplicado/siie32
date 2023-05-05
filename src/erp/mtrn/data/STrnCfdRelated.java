@@ -23,7 +23,23 @@ public class STrnCfdRelated implements java.io.Serializable {
     public ArrayList<SRowRelatedDocument> getRelatedDocuments() { return moRelatedDocuments; }
     
     public void addRelatedDocument(String typeRelation, String uuid) {
-        moRelatedDocuments.add(new SRowRelatedDocument(typeRelation, uuid));
+        boolean found = false;
+        for(SRowRelatedDocument rd : moRelatedDocuments) {
+            if (rd.getRelationTypeId().equals(typeRelation) && !found) {
+                for (String u : rd.getDocUuids().trim().split(",")) {
+                    if (u.equals(uuid)) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                   rd.setDocUuids(rd.getDocUuids() + "," + uuid);
+                   found = true;
+                }
+            }
+        }
+        if (!found) {
+            moRelatedDocuments.add(new SRowRelatedDocument(typeRelation, uuid));
+        }
     }
     
     public String getAsString() {

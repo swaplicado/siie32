@@ -2472,12 +2472,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                                                         SLibConstants.EXEC_MODE_SILENT);
                 String sCompanyKey = company.getKey();
                 
-                if (dialog.getCurrentBonus() == SPayrollBonusUtils.PANTRY && ! maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
+                if (dialog.getCurrentBonus() == SPayrollBonusUtils.PANTRY && dialog.getWithPreviousPayments() && ! maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
                     miClient.showMsgBoxError("Debe agregar el pago de vales de despensa antes que la despensa en especie.");
                     return;
                 }
                 
-                if (dialog.getCurrentBonus() == SPayrollBonusUtils.SUPER_BONUS && ! maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
+                if (dialog.getCurrentBonus() == SPayrollBonusUtils.SUPER_BONUS && dialog.getWithPreviousPayments() && ! maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
                     miClient.showMsgBoxError("Debe agregar el pago de vales de despensa antes que el superbono.");
                     return;
                 }
@@ -2489,7 +2489,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
                     
                 HashMap<Integer, ArrayList<SEarnConfiguration>> list;
-//                list = SPayrollUtils.process(miClient, empIds, bonusIds, dates[0], dates[1], mnFormSubtype, sCompanyKey);
                 list = SPayrollUtils.getBonusPayments(miClient,
                                                         empIds, 
                                                         mnFormSubtype, 
@@ -2514,7 +2513,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 dialogB.setStartDate(SLibUtils.DbmsDateFormatDate.format(dates[0]));
                 dialogB.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
                 dialogB.setCutOffDay(moConfig.getPrePayrollWeeklyCutoffDayWeek());
-                dialogB.setBonus("Vales");
+                dialogB.setBonus(dialog.getCurrentBonusText());
                 dialogB.setBonusId(dialog.getCurrentBonus());
                 dialogB.setCompanyKey(sCompanyKey);
                 dialogB.initView();

@@ -2898,6 +2898,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_FIN_BPS_ACC_MOV_ORD:
                 name = "reps/fin_bps_acc_mov_ord.jasper";
                 break;    
+            case SDataConstantsSys.REP_FIN_EXC_DIFF:
+                name = "reps/fin_exc_diff.jasper";
+                break;
             case SDataConstantsSys.REP_FIN_CASH_BAL:
             case SDataConstantsSys.REP_FIN_BANK_BAL:
                 name = "reps/fin_cash_bal.jasper";
@@ -3099,6 +3102,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstantsSys.REP_TRN_CFDI_40:
                 name = "reps/trn_cfdi_40.jasper";
+                break;
+            case SDataConstantsSys.REP_TRN_CFDI_40_ENG:
+                name = "reps/trn_cfdi_40_ing.jasper";
                 break;
             case SDataConstantsSys.REP_TRN_CFDI_33_CRP_10:
                 name = "reps/trn_cfdi_33_crp_10.jasper";

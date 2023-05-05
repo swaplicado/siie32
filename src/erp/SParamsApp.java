@@ -36,6 +36,7 @@ public class SParamsApp implements java.io.Serializable {
     private String msDatabasePswd;
     private String msRedisHost;
     private String msRedisPswd;
+    private String msTimeZone;
     private Date mtTimestamp;
     private boolean mbWithServer;
     
@@ -57,6 +58,7 @@ public class SParamsApp implements java.io.Serializable {
         msDatabasePswd = "";
         msRedisHost = "";
         msRedisPswd = "";
+        msTimeZone = "";
         mtTimestamp = null;
         mbWithServer = false;
     }
@@ -74,6 +76,7 @@ public class SParamsApp implements java.io.Serializable {
     public void setDatabasePswd(String pswd) { msDatabasePswd = pswd; }
     public void setRedisHost(String redisHost) { msRedisHost = redisHost; }
     public void setRedisPswd(String redisPswd) { msRedisPswd = redisPswd; }
+    public void setTimeZone(String timeZone) { msTimeZone = timeZone; }
     public void setTimestamp(Date t) { mtTimestamp = t; }
     public void setWithSerever(boolean b) { mbWithServer = b; }
 
@@ -90,6 +93,7 @@ public class SParamsApp implements java.io.Serializable {
     public String getDatabasePswd() { return msDatabasePswd; }
     public String getRedisHost() { return msRedisHost; }
     public String getRedisPswd() { return msRedisPswd; }
+    public String getTimeZone() { return msTimeZone; }
     public Date getTimestamp() { return mtTimestamp; }
     public boolean getWithServer() { return mbWithServer; }
 
@@ -130,6 +134,7 @@ public class SParamsApp implements java.io.Serializable {
                 msDatabasePswd = temp.getDatabasePswd();
                 msRedisHost = temp.getRedisHost();
                 msRedisPswd = temp.getRedisPswd();
+                msTimeZone = temp.getTimeZone();
                 mtTimestamp = temp.getTimestamp();
                 mbWithServer = temp.getWithServer();
             }

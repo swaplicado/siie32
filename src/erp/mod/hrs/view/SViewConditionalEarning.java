@@ -57,6 +57,10 @@ public class SViewConditionalEarning extends SGridPaneView implements ActionList
                 + "ve.name AS ear_name, "
                 + "ta.name AS scope_name, "
                 + "bs.name AS bonus_name, "
+                + "IF (v.for_uni = " + 0 + ", 'NA', "
+                + "IF (v.for_uni = " + 1 + ", 'SÍ', "
+                + "'NO')) AS uni_name, "
+                + "IF (v.fk_tp_pay_n IS NULL, 'NA', tp.name) AS pay_type_name, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -71,6 +75,8 @@ public class SViewConditionalEarning extends SGridPaneView implements ActionList
                 + "v.fk_bonus = bs.id_bonus "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_ACC) + " AS ta ON "
                 + "v.fk_scope = ta.id_tp_acc "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON "
+                + "v.fk_tp_pay_n = tp.id_tp_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
@@ -89,6 +95,8 @@ public class SViewConditionalEarning extends SGridPaneView implements ActionList
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "bonus_name", "Bono"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "scope_name", "Ámbito"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ref_name", "Referencia"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "uni_name", "Sindicato"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay_type_name", "Per. pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.amt", "Monto $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_DISC, "v.pct", "Porcentaje"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));

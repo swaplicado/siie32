@@ -36,9 +36,9 @@ import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
-import erp.mqlt.data.SDpsQualityUtils;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
+import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfdEntry;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
@@ -56,6 +56,7 @@ import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
@@ -68,6 +69,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -75,6 +77,7 @@ import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -266,7 +269,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel4 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlFkItemId = new javax.swing.JLabel();
-        jcbFkItemId = new javax.swing.JComboBox<>();
+        jcbFkItemId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemId = new javax.swing.JButton();
         jbSetPrepayment = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
@@ -280,7 +283,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbItemBizPartnerDescription = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jlFkOriginalUnitId = new javax.swing.JLabel();
-        jcbFkOriginalUnitId = new javax.swing.JComboBox<>();
+        jcbFkOriginalUnitId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkOriginalUnitId = new javax.swing.JButton();
         jlPartNum = new javax.swing.JLabel();
         jtPartNum = new javax.swing.JTextField();
@@ -372,7 +375,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel35 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jlFkItemReferenceId_n = new javax.swing.JLabel();
-        jcbFkItemReferenceId_n = new javax.swing.JComboBox<>();
+        jcbFkItemReferenceId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemReferenceId_n = new javax.swing.JButton();
         jPanel40 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
@@ -392,7 +395,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel33 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jlFkTaxRegionId = new javax.swing.JLabel();
-        jcbFkTaxRegionId = new javax.swing.JComboBox<>();
+        jcbFkTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkTaxRegionId = new javax.swing.JButton();
         jckIsTaxesAutomaticApplying = new javax.swing.JCheckBox();
         jPanel34 = new javax.swing.JPanel();
@@ -466,7 +469,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel38 = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
-        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<>();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel43 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
         jtfDriver = new javax.swing.JTextField();
@@ -538,7 +541,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jradAccAdvanceBilled = new javax.swing.JRadioButton();
         jPanel62 = new javax.swing.JPanel();
         jlFkCashAccountId_n = new javax.swing.JLabel();
-        jcbFkCashAccountId_n = new javax.swing.JComboBox<>();
+        jcbFkCashAccountId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel64 = new javax.swing.JPanel();
         jlFkCashAccountId_n1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -572,7 +575,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfAddElektraOrder = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jlAddGenBarcode = new javax.swing.JLabel();
-        jcbAddGenBarcode = new javax.swing.JComboBox<>();
+        jcbAddGenBarcode = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel48 = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jPanel70 = new javax.swing.JPanel();
@@ -2678,21 +2681,26 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();                
+                DefaultTableCellRenderer f = new DefaultTableCellRenderer();
+                f.setHorizontalAlignment(JLabel.RIGHT);
+                f.setForeground(Color.BLUE);
                 SGridColumnForm column;
                 
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Orden captura", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Orden captura", 50);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Análisis", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Análisis", 200);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50);
                 columns.add(column);
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor mínimo", 100);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                column.setCellRenderer(f);
                 columns.add(column);
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor máximo", 100);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                column.setCellRenderer(f);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Requerido", 100);
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Requerido", 75);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
                 columns.add(column);
                 

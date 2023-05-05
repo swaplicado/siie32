@@ -6,6 +6,7 @@
 package erp.mqlt.view;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
@@ -33,17 +34,18 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
         
         addTaskBarUpperComponent(moTabFilterDeleted);
         
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[27];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[28];
 
         int i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo Doc.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.num", "Número", STableConstants.WIDTH_ITEM_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ety.concept_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ety.concept", "Concepto", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ety.orig_qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.unit", "Nombre unidad", STableConstants.WIDTH_ITEM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qta.type_name", "Tipo análisis", STableConstants.WIDTH_ITEM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qta.name", "Tipo análisis", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.analysis_name", "Análisis", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.unit_symbol", "Un. ana.", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.unit_name", "Nom. un. ana.", STableConstants.WIDTH_ITEM);
@@ -114,6 +116,7 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "    d.num, "
                 + "    d.num_ser, "
                 + "    d.num_ref, "
+                + "    dt.code, "
                 + "    ety.concept_key, "
                 + "    ety.concept, "
                 + "    ety.orig_qty, "
@@ -137,7 +140,7 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "    qa.analysis_name, "
                 + "    qa.unit_symbol, "
                 + "    qa.unit_name, "
-                + "    qta.type_name, "
+                + "    qta.name, "
                 + "    v.b_del, "
                 + "    v.fid_usr_new, "
                 + "    v.fid_usr_edit, "
@@ -159,6 +162,13 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "    " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " v ON d.id_year = v.fid_dps_year_n "
                 + "        AND d.id_doc = v.fid_dps_doc_n "
                 + "        AND ety.id_ety = v.fid_dps_ety_n "
+                + "         INNER JOIN " 
+                + "    " + SDataConstants.TablesMap.get(SDataConstants.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps "
+                + "         AND d.fid_cl_dps = dt.id_cl_dps "
+                + "         AND d.fid_tp_dps = dt.id_tp_dps "
+                + "         AND d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_EST[0] + " "
+                + "         AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1] + " "
+                + "         AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2] + " "
                 + "        INNER JOIN "
                 + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS_ITEM) + " ai ON v.fid_analysis_id = ai.id_analysis "
                 + "        AND v.fid_item_id = ai.id_item "

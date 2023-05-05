@@ -342,7 +342,7 @@ public class SCfdDataBizPartner {
             cfd.ver40.DElementReceptor receptor = new cfd.ver40.DElementReceptor();
 
             receptor.getAttRfc().setString(msBizPartnerRfc);
-            receptor.getAttNombre().setString(DCfdVer4Utils.formatAttributeValueAsText(msBizPartnerName));
+            receptor.getAttNombre().setString(msBizPartnerName);
             receptor.getAttDomicilioFiscalReceptor().setString(msBizPartnerZipCodeHq);
             
             if (mbIsCfdiWithIntCommerce) {

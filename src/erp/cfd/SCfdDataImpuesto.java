@@ -249,8 +249,10 @@ public class SCfdDataImpuesto implements DCfdTax {
                 impuestoTraslado.getAttBase().setDouble(mdBase);
                 impuestoTraslado.getAttImpuesto().setString(msImpuestoClave);
                 impuestoTraslado.getAttTipoFactor().setString(getFactorTypeSat(msTipoFactor));
-                impuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
-                impuestoTraslado.getAttImporte().setDouble(mdImporte);
+                if (!impuestoTraslado.getAttTipoFactor().getString().equals(DCfdi40Catalogs.FAC_TP_EXENTO)) {
+                    impuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
+                    impuestoTraslado.getAttImporte().setDouble(mdImporte);
+                }
                 
                 impuesto = impuestoTraslado;
                 break;

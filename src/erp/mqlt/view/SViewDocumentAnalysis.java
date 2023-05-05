@@ -6,11 +6,11 @@
 package erp.mqlt.view;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
-import erp.mod.SModConsts;
 import erp.mtrn.form.SDialogAnalysisDocumentKardex;
 import java.awt.Dimension;
 import javax.swing.JButton;
@@ -51,15 +51,18 @@ public class SViewDocumentAnalysis extends erp.lib.table.STableTab implements ja
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
         
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[6];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[9];
 
         i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Código", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt_doc", "Ítem", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo Doc.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num", "Num", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ser", "Serie", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ref", "Referencia", STableConstants.WIDTH_ITEM_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fceha", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt_doc", "Fecha Doc.", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Cliente", STableConstants.WIDTH_ITEM_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "concept_key", "Clave", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "concept", "Concepto", STableConstants.WIDTH_ITEM_2X);
         
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -127,19 +130,26 @@ public class SViewDocumentAnalysis extends erp.lib.table.STableTab implements ja
                 + "    v.num, "
                 + "    v.num_ser, "
                 + "    v.num_ref, "
+                + "    de.concept_key, "
+                + "    de.concept, "
+                + "    dt.code, "
                 + "    bp.bp, "
                 + "    bp.fiscal_id "
                 + "FROM "
-                + "    trn_dps AS v "
+                + "    " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS) + " AS v "
                 + "        INNER JOIN "
-                + "    trn_dps_ety AS de ON v.id_year = de.id_year "
-                + "        AND v.id_doc = de.id_doc "
+                + "    " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY) + " AS de ON v.id_year = de.id_year AND v.id_doc = de.id_doc "
+                + "         INNER JOIN " 
+                + "    " + SDataConstants.TablesMap.get(SDataConstants.TRNU_TP_DPS) + " AS dt ON v.fid_ct_dps = dt.id_ct_dps "
+                + "         AND v.fid_cl_dps = dt.id_cl_dps AND v.fid_tp_dps = dt.id_tp_dps "
+                + "         AND v.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_EST[0] + " AND v.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1] + " "
+                + "         AND v.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2] + " "
                 + "        INNER JOIN "
-                + "    trn_dps_ety_analysis AS dea ON de.id_year = dea.fid_dps_year_n "
+                + "     " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " AS dea ON de.id_year = dea.fid_dps_year_n "
                 + "        AND de.id_doc = dea.fid_dps_doc_n "
                 + "        AND de.id_ety = dea.fid_dps_ety_n "
                 + "        INNER JOIN "
-                + "    erp.bpsu_bp AS bp ON v.fid_bp_r = bp.id_bp "
+                + "     " + SDataConstants.TablesMap.get(SDataConstants.BPSU_BP) + " AS bp ON v.fid_bp_r = bp.id_bp "
                 + (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) + " "
                 + "GROUP BY v.id_year , v.id_doc";
                 

@@ -166,26 +166,25 @@ public class SValuationBalances {
      * @param sysMoveTypeXxx Type of movement.
      * @return SQL query.
      */
-    private String composeQueryBizPartnersBalance(final int[] sysMoveTypeXxx) {
-        String sql = "SELECT re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc, " 
+    private String composeQueryBizPartnersBalance(final int bizPartnerCat, final int[] sysMoveTypeXxx) {
+        String sql = "SELECT re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc, "
                 + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bb.bpb, re.fid_cur, " 
                 + "SUM(re.debit_cur) AS _dbt_cur, SUM(re.credit_cur) AS _cdt_cur, SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt " 
                 + "FROM fin_rec AS r " 
                 + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " 
-                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr " 
-                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.id_bpb = re.fid_bpb_n " 
+                + "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " 
+                + "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = " + bizPartnerCat + " "
+                + "INNER JOIN erp.bpsu_tp_bp AS btp ON bct.fid_ct_bp = btp.id_ct_bp AND bct.fid_tp_bp = btp.id_tp_bp " 
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON re.fid_bpb_n = bb.id_bpb " 
                 + "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " 
-                + "WHERE NOT r.b_del AND NOT re.b_del AND " 
-                + "r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' AND " 
-                + "re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxx[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxx[1] + " AND " 
-                + "re.fid_cur = " + mnCurrencyId + " " 
-                + "GROUP BY re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc, " 
-                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bb.bpb, re.fid_cur " 
+                + "WHERE r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' " 
+                + "AND NOT r.b_del AND NOT re.b_del " 
+                + "AND re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxx[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxx[1] + " " 
+                + "AND re.fid_cur = " + mnCurrencyId + " " 
+                + "GROUP BY re.fid_bp_nr, re.fid_bpb_n, re.fid_cur, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc " 
                 + "HAVING SUM(re.debit_cur - re.credit_cur) <> 0 " 
-                + "ORDER BY b.bp_comm, bb.bpb, re.fid_bp_nr, re.fid_bpb_n ,"
-                + "d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, "
-                + "re.fid_acc, re.fk_acc;";
-
+                + "ORDER BY b.bp_comm, bb.bpb, re.fid_bp_nr, re.fid_bpb_n ,d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc;";
+        
         return sql;
     }
     
@@ -558,24 +557,52 @@ public class SValuationBalances {
         // processing busines partners:
         
         int[] bizPartnerCategories = new int[] {
-            SDataConstantsSys.BPSS_CT_BP_SUP,
-            SDataConstantsSys.BPSS_CT_BP_CUS,
-            SDataConstantsSys.BPSS_CT_BP_CDR,
-            SDataConstantsSys.BPSS_CT_BP_DBR };
+            SDataConstantsSys.BPSS_CT_BP_SUP, // proveedores
+            SDataConstantsSys.BPSS_CT_BP_CUS, // clientes
+            SDataConstantsSys.BPSS_CT_BP_CDR, // acreedores
+            SDataConstantsSys.BPSS_CT_BP_DBR }; // deudores
         
         HashMap<Integer, int[]> sysMoveTypeXxxBizPartners = new HashMap<>();
         
         sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_SUP, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
         sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
-        sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_CDR, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR);
-        sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_DBR, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR);
+        sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_CDR, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR); 
+        sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_DBR, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR); 
+        
+        int docSup = 0;
+        int accSup = 0;
+        int docCus = 0;
+        int accCus = 0;
+        int cdr = 0;
+        int dbr = 0;
         
         for (int bizPartnerCategory : bizPartnerCategories) {
             anSysMovTypeXxxKeyBizPartner = sysMoveTypeXxxBizPartners.get(bizPartnerCategory);
-            sSql = composeQueryBizPartnersBalance(anSysMovTypeXxxKeyBizPartner);
+            sSql = composeQueryBizPartnersBalance(bizPartnerCategory, anSysMovTypeXxxKeyBizPartner);
             resultSet = connection.createStatement().executeQuery(sSql);
             
             while (resultSet.next()) {
+                switch (bizPartnerCategory) {
+                    case SDataConstantsSys.BPSS_CT_BP_SUP: 
+                        if (resultSet.getInt("fid_dps_year_n") == 0) {
+                            accSup++;
+                        }
+                        else {
+                            docSup++; 
+                        }
+                        break;
+                    case SDataConstantsSys.BPSS_CT_BP_CUS: 
+                        if (resultSet.getInt("fid_dps_year_n") == 0) {
+                            accCus++;
+                        }
+                        else {
+                            docCus++; 
+                        }
+                        break;
+                    case SDataConstantsSys.BPSS_CT_BP_CDR: cdr++; break;
+                    case SDataConstantsSys.BPSS_CT_BP_DBR: dbr++; break;
+                }
+                
                 isDebit = SLibUtils.belongsTo(bizPartnerCategory, new int[] { SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.BPSS_CT_BP_DBR });
                 
                 adDebitCredit = computeDebitCredit(resultSet.getDouble("_dbt_cur"), resultSet.getDouble("_cdt_cur"), 
@@ -613,12 +640,20 @@ public class SValuationBalances {
         sysMoveTypeXxxCashAccounts.put(SDataConstantsSys.FINS_CT_ACC_CASH_CASH, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH);
         sysMoveTypeXxxCashAccounts.put(SDataConstantsSys.FINS_CT_ACC_CASH_BANK, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK);
         
+        int cash = 0;
+        int bank = 0;
+        
         for (int cashAccountType : cashAccountTypes) {
             anSysMovTypeXxxKeyCashAccount = sysMoveTypeXxxCashAccounts.get(cashAccountType);
             sSql = composeQueryCashAccountsBalance(anSysMovTypeXxxKeyCashAccount);
             resultSet = connection.createStatement().executeQuery(sSql);
             
             while (resultSet.next()) {
+                switch (cashAccountType) {
+                    case SDataConstantsSys.FINS_CT_ACC_CASH_CASH: cash++; break;
+                    case SDataConstantsSys.FINS_CT_ACC_CASH_BANK: bank++; break;
+                }
+                
                 isDebit = true;
                 
                 adDebitCredit = computeDebitCredit(resultSet.getDouble("_dbt_cur"), resultSet.getDouble("_cdt_cur"), 
@@ -640,6 +675,9 @@ public class SValuationBalances {
                 }
             }
         }
+        miClient.showMsgBoxInformation("Se procesaron:\n-" + docSup + " documentos de proveedores.\n-" + accSup + " cuentas de proveedores.\n"
+                + "-" + docCus + " documentos de clientes.\n-" + accCus + " cuentas de clientes.\n"
+                + "-" + cdr + " cuentas de acreedores.\n-" + dbr + " cuentas de deudores.\n-" + cash + " cuentas de caja.\n-" + bank + " cuentas de bancos.");
     }           
     
     /**
