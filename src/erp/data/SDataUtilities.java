@@ -3103,6 +3103,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_CFDI_40:
                 name = "reps/trn_cfdi_40.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_CFDI_40_ENG:
+                name = "reps/trn_cfdi_40_ing.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_CFDI_33_CRP_10:
                 name = "reps/trn_cfdi_33_crp_10.jasper";
                 break;

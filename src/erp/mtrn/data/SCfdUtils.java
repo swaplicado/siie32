@@ -3096,6 +3096,68 @@ public abstract class SCfdUtils implements Serializable {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
     }
+    
+    private static void computePrintCfdEnglish(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, int printMode, int numberCopies) throws Exception {
+        SDataDps dps = null;
+        SDbBillOfLading bol = null;
+        SCfdParams params = null;
+        SCfdPrint cfdPrint = new SCfdPrint(client);
+
+        switch (cfd.getFkCfdTypeId()) {
+            case SDataConstantsSys.TRNS_TP_CFD_INV:
+                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                params = createCfdParams(client, dps);
+                dps.setAuxCfdParams(params);
+
+                switch (cfd.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                        cfdPrint.printCfdi40Eng(cfd, printMode, dps);
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+
+            case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                switch (cfd.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                        cfdPrint.printCfdi40_Crp20(client, cfd, printMode);
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+
+            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                switch (cfd.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                        if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                            // prevent from reading payroll multiple times because it is a really lengthy operation:
+                            SCfdUtils.retrieveDataSetForPayroll(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n()); // streamline payroll retrieval
+                            
+                            // proceed with CFD printing:
+                            cfdPrint.printPayrollReceipt40_12(cfd, printMode, numberCopies, payrollCfdVersion);
+                        }
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+            case SDataConstantsSys.TRNS_TP_CFD_BOL:
+                switch (cfd.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                        bol = new SDbBillOfLading();
+                        bol.read(client.getSession(), new int[]{ cfd.getFkBillOfLadingId_n() });
+                        cfdPrint.printBolReceip40_20(client, cfd, printMode, bol);
+                        break;
+                    default:
+                }
+                break;
+
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+    }
 
     /**
      * Print CFD.
@@ -3114,6 +3176,27 @@ public abstract class SCfdUtils implements Serializable {
         else {
             if (canPrintCfd(cfd, isCfdStorageInProcess)) {
                 computePrintCfd(client, cfd, payrollCfdVersion, printMode, numberCopies);
+            }
+        }
+    }
+    
+    /**
+     * Print CFD in english.
+     * @param client
+     * @param cfd
+     * @param payrollCfdVersion Supported constants: SCfdConsts.CFDI_PAYROLL_VER_OLD, SCfdConsts.CFDI_PAYROLL_VER_CUR or 0 when does not apply.
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @param numberCopies
+     * @param isCfdStorageInProcess Tell if CFD storage is in process.
+     * @throws Exception 
+     */
+    public static void printCfdEnglish(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, int printMode, int numberCopies, boolean isCfdStorageInProcess) throws Exception {
+        if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+        }
+        else {
+            if (canPrintCfd(cfd, isCfdStorageInProcess)) {
+                computePrintCfdEnglish(client, cfd, payrollCfdVersion, printMode, numberCopies);
             }
         }
     }
