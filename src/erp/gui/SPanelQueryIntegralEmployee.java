@@ -338,7 +338,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jLabel4.setPreferredSize(new java.awt.Dimension(20, 23));
         jPanel22.add(jLabel4);
 
-        jlDateBenefits.setText("Inicio beneficios:");
+        jlDateBenefits.setText("Inicio prestaciones:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel22.add(jlDateBenefits);
 
@@ -1139,8 +1139,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
                 "LEFT OUTER JOIN erp.locu_cty AS cty ON cty.id_cty = a.fid_cty_n " + 
                 "WHERE emp.b_del = 0 AND bp.b_del = 0" + (mnFilterPaymentTypeId != SLibConsts.UNDEFINED ? " AND emp.fk_tp_pay = " + mnFilterPaymentTypeId : "") + " " +
                 (mnFilterDepartamentId != SLibConsts.UNDEFINED ? " AND emp.fk_dep = " + mnFilterDepartamentId : "") + " " +
-                (mnFilterStatusEmployee != SLibConsts.UNDEFINED ? (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_ACT ? " AND emp.b_act = 1 " : (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_INA ? " AND emp.b_act = 0 " : "")) : "") + " " +
-                "AND bp.b_att_emp = 1 " +
+                (mnFilterStatusEmployee != SLibConsts.UNDEFINED ? (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_ACT ? " AND emp.b_act " : (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_INA ? " AND NOT emp.b_act " : "")) : "") + " " +
+                "AND bp.b_att_emp " +
                 "GROUP BY emp.id_emp " +
                 "ORDER BY bp.bp, emp.id_emp, pay.name ";
 

@@ -534,9 +534,10 @@ public abstract class SDataReadComponentItems {
                 lenPk = 1;
                 sql = "SELECT DISTINCT bp.id_bp AS f_id_1, bp.bp AS f_item " +
                         "FROM erp.bpsu_bp AS bp " +
-                        "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND bp.b_del = 0 " +
-                        "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp AND e.b_mfg_ope = 1 " +
+                        "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CDR + " " +
+                        "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp AND e.b_mfg_ope " +
                         "INNER JOIN hrs_emp_member AS em ON e.id_emp = em.id_emp " +
+                        "WHERE e.b_act AND NOT e.b_del AND NOT b.b_del " +
                         "ORDER BY bp.bp, bp.id_bp ";
                 text = "operador";
                 break;
@@ -1960,7 +1961,9 @@ public abstract class SDataReadComponentItems {
             case SModConsts.HRSU_DEP:
                 lenPk = 1;
                 sql = "SELECT id_dep AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " WHERE b_del = 0 ORDER BY name, id_dep ";
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY name, id_dep ";
                 text = "departamento";
                 break;
             case SModConsts.HRSU_POS:
@@ -1968,15 +1971,27 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_pos AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " "
                         + "WHERE b_del = 0 "
-                        + (pk != null ? " AND fk_dep = " + ((int) pk) : "") + " " 
+                        + (pk != null ? " AND fk_dep = " + (int) pk : "") + " " 
                         + "ORDER BY name, id_pos ";
                 text = "puesto";
                 break;
             case SModConsts.HRSU_SHT:
                 lenPk = 1;
                 sql = "SELECT id_sht AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " WHERE b_del = 0 ORDER BY name, id_sht ";
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY name, id_sht ";
                 text = "turno";
+                break;
+
+            case SModConsts.HRS_BEN:
+                lenPk = 1;
+                sql = "SELECT id_ben AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
+                        + "WHERE b_del = 0 "
+                        + (pk == null ? "" : "AND fk_tp_ben = " + (int) pk + " ")
+                        + "ORDER BY name, id_ben ";
+                text = "tabla prestaciones";
                 break;
 
             default:

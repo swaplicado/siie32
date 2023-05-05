@@ -154,9 +154,9 @@ public class SFormEmployeeSBC extends javax.swing.JDialog implements erp.lib.for
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Clave empleado"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Empleado", 250));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Inicio beneficios", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Número empleado"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 250));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Inicio prestaciones", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Antigüedad", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Periodo de pago", 60));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días vacaciones", 50));
@@ -233,7 +233,7 @@ public class SFormEmployeeSBC extends javax.swing.JDialog implements erp.lib.for
         try {
 
             sql = "SELECT bp.id_bp AS _emp_id, bp.bp AS _emp_name, e.num AS _emp_num, tp.name AS _pay_tp_name, " +
-                "e.dt_ben AS _emp_dt_ben, e.dt_ben AS inicio_beneficios, " +
+                "e.dt_ben AS _emp_dt_ben, e.dt_ben AS inicio_prestaciones, " +
                 "va.dt AS UltFec_SBC , va.sal_ssc as SBC_Actual, '2019-11-04' AS _p_dt_cutoff, " +
                 "@sen_raw:=ROUND(DATEDIFF('2019-11-04', e.dt_ben) / 365, 4) AS _sen_raw, " +
                 "@sen_as_years:=TIMESTAMPDIFF(YEAR, e.dt_ben, '2019-11-04') AS _sen_as_years, " +
@@ -400,7 +400,7 @@ public class SFormEmployeeSBC extends javax.swing.JDialog implements erp.lib.for
                 SRowEmployeeSBC row = new SRowEmployeeSBC(15);
                 row.setKeyEmpl(resultSet.getInt("_emp_num"));
                 row.setEmployee(resultSet.getString("_emp_name"));
-                row.setInitBen(resultSet.getDate("inicio_beneficios"));
+                row.setInitBen(resultSet.getDate("inicio_prestaciones"));
                 row.setAnti(resultSet.getDouble("_sen_as_years"));
                 row.setPeriod(resultSet.getString("_pay_tp_name"));
                 row.setDaysVac(resultSet.getInt("Dias_Vacaciones"));

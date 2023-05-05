@@ -2297,6 +2297,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         map.put("bShowDetailBackground", moSessionXXX.getParamsCompany().getIsReportsBackground());
         map.put("oDateFormat", SLibUtils.DateFormatDate);
         map.put("oDatetimeFormat", SLibUtils.DateFormatDatetime);
+        map.put("oDatetimeFormatIso", SLibUtils.IsoFormatDatetime);
         map.put("oTimeFormat", SLibUtils.DateFormatTime);
         map.put("oValueFormat", SLibUtils.getDecimalFormatAmount());
         map.put("sImageDir", moSessionXXX.getParamsCompany().getImagesDirectory());

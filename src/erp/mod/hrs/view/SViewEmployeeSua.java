@@ -43,7 +43,7 @@ public class SViewEmployeeSua extends SGridPaneView implements ActionListener{
 
 
     public SViewEmployeeSua(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_SUA, SLibConsts.UNDEFINED, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_EMP_LOG_SUA, SLibConsts.UNDEFINED, title);
         initComponentsCustom();
     }
     

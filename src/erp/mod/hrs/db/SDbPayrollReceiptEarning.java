@@ -35,8 +35,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected double mdAuxiliarAmount1;
     protected double mdAuxiliarAmount2;
     protected double mdAuxiliarValue;
-    protected int mnBenefitYear;
-    protected int mnBenefitAnniversary;
+    protected int mnBenefitsYear;
+    protected int mnBenefitsAnniversary;
     protected boolean mbAlternativeTaxCalculation;
     protected boolean mbTimeClockSourced;
     protected boolean mbUserEdited;
@@ -60,6 +60,11 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     
     protected SDbPayrollReceiptEarningComplement moChildEarningComplement;
 
+    /** Custom value for timestamp of user insertion to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    protected Date mtCustomTsUserInsert;
+    /** Custom value for timestamp of user update to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    protected Date mtCustomTsUserUpdate;
+    
     public SDbPayrollReceiptEarning() {
         super(SModConsts.HRS_PAY_RCP_EAR);
     }
@@ -82,8 +87,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void setAuxiliarAmount1(double d) { mdAuxiliarAmount1 = d; }
     public void setAuxiliarAmount2(double d) { mdAuxiliarAmount2 = d; }
     public void setAuxiliarValue(double d) { mdAuxiliarValue = d; }
-    public void setBenefitYear(int n) { mnBenefitYear = n; }
-    public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
+    public void setBenefitsYear(int n) { mnBenefitsYear = n; }
+    public void setBenefitsAnniversary(int n) { mnBenefitsAnniversary = n; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
     public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setUserEdited(boolean b) { mbUserEdited = b; }
@@ -105,6 +110,11 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     
     public void setChildEarningComplement(SDbPayrollReceiptEarningComplement o) { moChildEarningComplement = o; }
 
+    /** Set custom value for timestamp of user insertion to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public void setCustomTsUserInsert(Date t) { mtCustomTsUserInsert = t; }
+    /** Set custom value for timestamp of user update to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public void setCustomTsUserUpdate(Date t) { mtCustomTsUserUpdate = t; }
+    
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getPkMoveId() { return mnPkMoveId; }
@@ -119,8 +129,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public double getAuxiliarAmount1() { return mdAuxiliarAmount1; }
     public double getAuxiliarAmount2() { return mdAuxiliarAmount2; }
     public double getAuxiliarValue() { return mdAuxiliarValue; }
-    public int getBenefitYear() { return mnBenefitYear; }
-    public int getBenefitAnniversary() { return mnBenefitAnniversary; }
+    public int getBenefitsYear() { return mnBenefitsYear; }
+    public int getBenefitsAnniversary() { return mnBenefitsAnniversary; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
     public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isUserEdited() { return mbUserEdited; }
@@ -141,6 +151,11 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public SDbPayrollReceiptEarningComplement getChildEarningComplement() { return moChildEarningComplement; }
+    
+    /** Get custom value for timestamp of user insertion to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public Date getCustomTsUserInsert() { return mtCustomTsUserInsert; }
+    /** Get custom value for timestamp of user update to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public Date getCustomTsUserUpdate() { return mtCustomTsUserUpdate; }
     
     public int[] getLoanKey() { return new int[] { mnFkLoanEmployeeId_n, mnFkLoanLoanId_n }; }
 
@@ -174,8 +189,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mdAuxiliarAmount1 = 0;
         mdAuxiliarAmount2 = 0;
         mdAuxiliarValue = 0;
-        mnBenefitYear = 0;
-        mnBenefitAnniversary = 0;
+        mnBenefitsYear = 0;
+        mnBenefitsAnniversary = 0;
         mbAlternativeTaxCalculation = false;
         mbTimeClockSourced = false;
         mbUserEdited = false;
@@ -196,6 +211,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         moChildEarningComplement = null;
+        
+        mtCustomTsUserInsert = null;
+        mtCustomTsUserUpdate = null;
     }
 
     @Override
@@ -255,8 +273,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mdAuxiliarAmount1 = resultSet.getDouble("aux_amt1");
             mdAuxiliarAmount2 = resultSet.getDouble("aux_amt2");
             mdAuxiliarValue = resultSet.getDouble("aux_val");
-            mnBenefitYear = resultSet.getInt("ben_year");
-            mnBenefitAnniversary = resultSet.getInt("ben_ann");
+            mnBenefitsYear = resultSet.getInt("ben_year");
+            mnBenefitsAnniversary = resultSet.getInt("ben_ann");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
             mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbUserEdited = resultSet.getBoolean("b_usr");
@@ -328,8 +346,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     mdAuxiliarAmount1 + ", " + 
                     mdAuxiliarAmount2 + ", " + 
                     mdAuxiliarValue + ", " + 
-                    mnBenefitYear + ", " + 
-                    mnBenefitAnniversary + ", " + 
+                    mnBenefitsYear + ", " + 
+                    mnBenefitsAnniversary + ", " + 
                     (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     (mbTimeClockSourced ? 1 : 0) + ", " +
                     (mbUserEdited ? 1 : 0) + ", " + 
@@ -346,8 +364,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     mnFkOtherPaymentTypeId + ", " + 
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
-                    "NOW()" + ", " +
-                    "NOW()" + " " +
+                    (mtCustomTsUserInsert != null ? "'" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserInsert) + "'" : "NOW()") + ", " +
+                    (mtCustomTsUserUpdate != null ? "'" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserUpdate) + "'" : "NOW()") + " " +
                     ")";
         }
         else {
@@ -370,8 +388,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "aux_amt1 = " + mdAuxiliarAmount1 + ", " +
                     "aux_amt2 = " + mdAuxiliarAmount2 + ", " +
                     "aux_val = " + mdAuxiliarValue + ", " +
-                    "ben_year = " + mnBenefitYear + ", " +
-                    "ben_ann = " + mnBenefitAnniversary + ", " +
+                    "ben_year = " + mnBenefitsYear + ", " +
+                    "ben_ann = " + mnBenefitsAnniversary + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
@@ -388,8 +406,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "fk_tp_oth_pay = " + mnFkOtherPaymentTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                    //"ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + " " +
+                    (mtCustomTsUserInsert != null ? "ts_usr_ins = '" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserInsert) + "', " : "") + // if no custom timestamp provided, original one persists
+                    "ts_usr_upd = " + (mtCustomTsUserUpdate != null ? "'" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserUpdate) + "'": "NOW()") + " " +
                     getSqlWhere();
         }
 
@@ -427,8 +445,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setAuxiliarAmount1(this.getAuxiliarAmount1());
         registry.setAuxiliarAmount2(this.getAuxiliarAmount2());
         registry.setAuxiliarValue(this.getAuxiliarValue());
-        registry.setBenefitYear(this.getBenefitYear());
-        registry.setBenefitAnniversary(this.getBenefitAnniversary());
+        registry.setBenefitsYear(this.getBenefitsYear());
+        registry.setBenefitsAnniversary(this.getBenefitsAnniversary());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setUserEdited(this.isUserEdited());
@@ -449,6 +467,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setChildEarningComplement(this.getChildEarningComplement());
+
+        registry.setCustomTsUserInsert(this.getCustomTsUserInsert());
+        registry.setCustomTsUserUpdate(this.getCustomTsUserUpdate());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

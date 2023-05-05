@@ -1319,8 +1319,8 @@ public abstract class SModConsts {
         TablesMap.put(HRS_EMP_LOG_WAGE, "hrs_emp_log_wage");
         TablesMap.put(HRS_EMP_LOG_SAL_SSC, "hrs_emp_log_sal_ssc");
         TablesMap.put(HRS_EMP_BEN, "hrs_emp_ben");
-        TablesMap.put(HRS_EMP_BEN_ANN, "hrs_emp_ben_row");
-        TablesMap.put(HRS_EMP_WAGE_FAC_ANN, "hrs_emp_wage_fac");
+        TablesMap.put(HRS_EMP_BEN_ANN, "hrs_emp_ben_ann");
+        TablesMap.put(HRS_EMP_WAGE_FAC_ANN, "hrs_emp_wage_fac_ann");
         TablesMap.put(HRS_LOAN, "hrs_loan");
         TablesMap.put(HRS_ABS, "hrs_abs");
         TablesMap.put(HRS_ABS_CNS, "hrs_abs_cns");

@@ -47,7 +47,7 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
         setRowButtonsEnabled(false);
         
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
-        moFilterEmployee.initFilter(0); // disables status filter
+        moFilterEmployee.initFilter(SGridFilterPanelEmployee.EMP_STATUS_ACT);
         
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         
@@ -105,7 +105,7 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
@@ -121,10 +121,10 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(emp.b_act AND v.id_emp IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(NOT emp.b_act OR v.id_emp NOT IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
             }
@@ -145,6 +145,7 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
                 + "bp.bp, "
                 + "emp.num, "
                 + "emp.b_act, "
+                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE mem.id_emp = v.id_emp AND NOT mem.b_del) AS _member, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -172,7 +173,8 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "bp.bp", "Empleado", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "emp.num", "Clave", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_member", "Membresía", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Fecha alta"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts_hire", "Notas alta", 200));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_dis_n", "Fecha baja"));

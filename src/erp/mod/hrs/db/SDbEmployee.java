@@ -7,6 +7,7 @@ package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.utils.SAnniversary;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -315,6 +316,10 @@ public class SDbEmployee extends SDbRegistryUser {
         return SLibUtils.textTrim(msLastname1 + (msLastname1.isEmpty() ? "" : " ") + msLastname2);
     }
     
+    public SAnniversary createAnniversary(final Date today) {
+        return new SAnniversary(mtDateBenefits, today);
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkEmployeeId = pk[0];
@@ -499,7 +504,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-
+            
             mbOldActive = mbActive;
             
             // employee's names, fiscal and legal ID:
@@ -694,6 +699,8 @@ public class SDbEmployee extends SDbRegistryUser {
         }
         
         session.getStatement().execute(msSql);
+        
+        // process hiring or dismissing:
 
         if (mbRegistryNew || mbActive != mbOldActive) {
             SHrsEmployeeHireLog hrsEmployeeHireLog = moAuxHrsEmployeeHireLog != null ? moAuxHrsEmployeeHireLog : new SHrsEmployeeHireLog(session); // spreads log entries to all sibling companies
@@ -802,7 +809,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.mbOldActive = this.mbOldActive;
-
+        
         registry.setXtaEmployeeName(this.getXtaEmployeeName());
         registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());
         registry.setXtaEmployeeRfc(this.getXtaEmployeeRfc());
@@ -816,6 +823,46 @@ public class SDbEmployee extends SDbRegistryUser {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    @Override
+    public Object readField(final Statement statement, final int[] pk, final int field) throws SQLException, Exception {
+        Object value = null;
+        ResultSet resultSet = null;
+
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.READ_ERROR;
+
+        msSql = "SELECT ";
+
+        switch (field) {
+            case FIELD_NAME:
+                msSql += "bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " WHERE id_bp = " + pk[0] + ";";
+                break;
+            case FIELD_CODE:
+                msSql += "num FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " WHERE id_emp = " + pk[0] + ";";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+
+        resultSet = statement.executeQuery(msSql);
+        if (!resultSet.next()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+        }
+        else {
+            switch (field) {
+                case FIELD_NAME:
+                case FIELD_CODE:
+                    value = resultSet.getString(1);
+                    break;
+                default:
+            }
+        }
+
+        mnQueryResultId = SDbConsts.READ_OK;
+        return value;
     }
 
     @Override

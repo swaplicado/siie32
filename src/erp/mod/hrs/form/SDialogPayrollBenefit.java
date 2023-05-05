@@ -155,7 +155,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateBenefit.setText("Inicio beneficios:");
+        jlDateBenefit.setText("Inicio prestaciones:");
         jlDateBenefit.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel12.add(jlDateBenefit);
         jPanel12.add(moDateBenefitDate);

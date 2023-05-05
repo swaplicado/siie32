@@ -50,7 +50,7 @@ public abstract class SHrsCfdUtils {
      * @return <code>true</code> if type of contract is for employment.
      */
     public static boolean isTypeContractForEmployment(final String tipoContrato) {
-        return tipoContrato.compareTo(DCfdi40Catalogs.ClaveTipoContratoModalidadTrabajoComision) <= 0;
+        return tipoContrato.compareTo(DCfdi40Catalogs.ClaveTipoContratoModalidadTrabajoComisión) <= 0;
     }
     
     /**
@@ -59,10 +59,10 @@ public abstract class SHrsCfdUtils {
      * @return <code>true</code> if type of recruitment schema is for employment.
      */
     public static boolean isTypeRecruitmentSchemaForEmployment(final String tipoRegimenContratación) {
-        return tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenSueldos) || 
-                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenJubilados) || 
-                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenPensionados) || 
-                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenJubiladosOPensionados);
+        return tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenSueldos) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenJubilados) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenPensionados) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenJubiladosOPensionados);
     }
     
     /**
@@ -420,7 +420,7 @@ public abstract class SHrsCfdUtils {
                     "pri.dt_pay, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, " +
                     "TIMESTAMPDIFF(DAY, pr.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                     "tcon.code AS f_emp_cont_tp, twkd.code AS f_emp_jorn_tp, tpay.code AS f_emp_pay, pr.sal_ssc AS f_emp_sal_bc, trsk.code AS f_emp_risk, " +
-                    "IF(emp.b_uni, '" + DCfdi40Catalogs.TxtSí + "', '" + DCfdi40Catalogs.TxtNo + "') AS f_emp_union, " +
+                    "IF(emp.b_uni, '" + DCfdi40Catalogs.TextoSí + "', '" + DCfdi40Catalogs.TextoNo + "') AS f_emp_union, " +
                     "NOW() AS f_emp_date_edit " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay " +

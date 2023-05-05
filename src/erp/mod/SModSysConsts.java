@@ -912,6 +912,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_OTH_PAY_FOOD = 6;               // Food
     public static final int HRSS_TP_OTH_PAY_TAX_ADJ_TAX_SUB = 7;    // Tax Adjusted by Tax Subsidy
     public static final int HRSS_TP_OTH_PAY_TAX_SUB_UNDUE = 8;      // Tax Subsidy Undue (improper)
+    public static final int HRSS_TP_OTH_PAY_REF_LOAN_HOME = 9;      // Refund home loan
     public static final int HRSS_TP_OTH_PAY_OTH = 999;              // Other payments
 
     public static final int HRSS_TP_DED_COMP_AMT = 1;           // Amount
@@ -928,6 +929,8 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DED_SSC = 1;            // Social Security
     public static final int HRSS_TP_DED_TAX = 2;            // Tax
     public static final int HRSS_TP_DED_DIS = 6;            // Disability
+    public static final int HRSS_TP_DED_LOAN_HOME = 10;     // Home loan
+    public static final int HRSS_TP_DED_LOAN_CONS = 11;     // Consumer loan
     public static final int HRSS_TP_DED_ABS = 20;           // Absenteeism
     public static final int HRSS_TP_DED_TAX_SUB_ADJ = 107;  // Tax Subsidy Adjustent
 
@@ -1035,6 +1038,8 @@ public abstract class SModSysConsts {
 
     public static final int HRSU_SHT_NA = 1; // Not applicable
 
+    public static final int HRS_BEN_ND = 0; // Not defined
+    
     public static final int HRS_AUT_GBL = 1;
     public static final int HRS_AUT_EMP = 2;
     

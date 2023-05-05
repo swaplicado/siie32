@@ -28,9 +28,12 @@ import erp.mod.hrs.db.SDbDepartment;
 import erp.mod.hrs.db.SDbDepartmentCostCenter;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SDbEmployeeBenefitTables;
+import erp.mod.hrs.db.SDbEmployeeBenefitTablesAnnum;
 import erp.mod.hrs.db.SDbEmployeeDismissalType;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SDbEmployeeType;
+import erp.mod.hrs.db.SDbEmployeeWageFactorAnnum;
 import erp.mod.hrs.db.SDbEmployeeWageLog;
 import erp.mod.hrs.db.SDbEmployeeWageSscBaseLog;
 import erp.mod.hrs.db.SDbFirstDayYear;
@@ -116,6 +119,7 @@ import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
 import erp.mod.hrs.view.SViewDepartmentCostCenter;
 import erp.mod.hrs.view.SViewEarning;
+import erp.mod.hrs.view.SViewEmployeeBenefitTables;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
 import erp.mod.hrs.view.SViewEmployeeHireLogByPeriod;
@@ -504,6 +508,15 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_EMP_LOG_SAL_SSC:
                 registry = new SDbEmployeeWageSscBaseLog();
                 break;
+            case SModConsts.HRS_EMP_BEN:
+                registry = new SDbEmployeeBenefitTables();
+                break;
+            case SModConsts.HRS_EMP_BEN_ANN:
+                registry = new SDbEmployeeBenefitTablesAnnum();
+                break;
+            case SModConsts.HRS_EMP_WAGE_FAC_ANN:
+                registry = new SDbEmployeeWageFactorAnnum();
+                break;
             case SModConsts.HRS_LOAN:
                 registry = new SDbLoan();
                 break;
@@ -832,7 +845,7 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_ear AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
-                        + (params != null && params.getKey() != null ? " AND fk_tp_ben = " + params.getKey()[0] : "") + " "
+                        + (params != null && params.getKey() != null ? "AND fk_tp_ben = " + params.getKey()[0] : "") + " "
                         + "ORDER BY " + SDbConsts.FIELD_ITEM + ", id_ear ";
                 break;
             case SModConsts.HRS_DED:
@@ -840,8 +853,16 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_ded AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
-                        + (params != null && params.getKey() != null ? " AND fk_tp_ben = " + params.getKey()[0] : "") + " " 
+                        + (params != null && params.getKey() != null ? "AND fk_tp_ben = " + params.getKey()[0] : "") + " " 
                         + "ORDER BY " + SDbConsts.FIELD_ITEM + ", id_ded ";
+                break;
+            case SModConsts.HRS_BEN:
+                settings = new SGuiCatalogueSettings("Prestación", 1);
+                sql = "SELECT id_ben AS " + SDbConsts.FIELD_ID + "1, CONCAT(name, ' - ', code) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + (subtype == 0 ? "" : "AND fk_tp_ben = " + subtype) + " " 
+                        + "ORDER BY " + SDbConsts.FIELD_ITEM + ", id_ben ";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -980,6 +1001,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_EMP_LOG_SAL_SSC:
                 view = new SViewEmployeeWageSscBaseLog(miClient, "Bitácora salarios base cotización");
+                break;
+            case SModConsts.HRS_EMP_BEN:
+                view = new SViewEmployeeBenefitTables(miClient, "Prestaciones empleados");
                 break;
             case SModConsts.HRS_ABS:
                 view = new SViewAbsence(miClient, "Incidencias");

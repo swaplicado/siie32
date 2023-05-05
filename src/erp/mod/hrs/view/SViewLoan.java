@@ -161,7 +161,7 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
             
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
@@ -177,10 +177,10 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(emp.b_act AND v.id_emp IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(NOT emp.b_act OR v.id_emp NOT IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
             }
@@ -194,10 +194,10 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS))== null ? null : ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_OPEN) {
-                sqlHaving = "HAVING v.b_clo = 0 AND ((v.fk_tp_loan NOT IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal <> 0.0) OR v.fk_tp_loan IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ")) ";
+                sqlHaving = "HAVING NOT v.b_clo AND ((v.fk_tp_loan NOT IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal <> 0.0) OR v.fk_tp_loan IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ")) ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_CLO) {
-                sqlHaving = "HAVING v.b_clo = 1 OR (v.fk_tp_loan NOT IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal = 0.0) ";
+                sqlHaving = "HAVING v.b_clo OR (v.fk_tp_loan NOT IN (" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal = 0.0) ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_ALL) {
                 sqlHaving = "";
@@ -230,6 +230,9 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "v.pay_per_amt, "
                 + "v.fk_tp_loan, "
                 + "bp.bp, "
+                + "emp.num, "
+                + "emp.b_act, "
+                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE mem.id_emp = v.id_emp AND NOT mem.b_del) AS _member, "
                 + "vt.name, "
                 + "vtp.name, "
                 + "v.b_clo, "
@@ -280,7 +283,10 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado", 250));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "emp.num", "Clave", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_member", "Membresía", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo crédito préstamo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, SDbConsts.FIELD_NAME, "Número crédito préstamo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vtp.name", "Tipo pago"));

@@ -149,16 +149,16 @@ public class SHrsPayroll {
         if (hrsBenefitBase == null) {
             payrollReceiptEarning.setFactorAmount(earning.getUnitsFactor());
             //...
-            payrollReceiptEarning.setBenefitYear(0);
-            payrollReceiptEarning.setBenefitAnniversary(0);
+            payrollReceiptEarning.setBenefitsYear(0);
+            payrollReceiptEarning.setBenefitsAnniversary(0);
             //...
             payrollReceiptEarning.setFkBenefitTypeId(earning.getFkBenefitTypeId());
         }
         else {
             payrollReceiptEarning.setFactorAmount(hrsBenefitBase.getFactorAmount());
             //...
-            payrollReceiptEarning.setBenefitYear(hrsBenefitBase.getBenefitYear());
-            payrollReceiptEarning.setBenefitAnniversary(hrsBenefitBase.getBenefitAnn());
+            payrollReceiptEarning.setBenefitsYear(hrsBenefitBase.getBenefitYear());
+            payrollReceiptEarning.setBenefitsAnniversary(hrsBenefitBase.getBenefitAnn());
             //...
             payrollReceiptEarning.setFkBenefitTypeId(hrsBenefitBase.getBenefitTypeId());
         }
@@ -218,8 +218,8 @@ public class SHrsPayroll {
         payrollReceiptDeduction.setAmountSystem_r(amount);
         payrollReceiptDeduction.setAmount_r(amount);
         /*
-        payrollReceiptDeduction.setBenefitYear(...);
-        payrollReceiptDeduction.setBenefitAnniversary(...);
+        payrollReceiptDeduction.setBenefitsYear(...);
+        payrollReceiptDeduction.setBenefitsAnniversary(...);
         payrollReceiptDeduction.setUserEdited(...);
         */
         payrollReceiptDeduction.setAutomatic(isAutomatic);

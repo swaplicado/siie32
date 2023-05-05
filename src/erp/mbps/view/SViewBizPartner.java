@@ -212,11 +212,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 break;
                 
             case SDataConstants.BPSX_BP_EMP:
-                aoTableColumns = new STableColumn[62];
+                aoTableColumns = new STableColumn[63];
                 break;
                 
             case SDataConstants.BPSX_BP_EMP_CON_EXP:
-                aoTableColumns = new STableColumn[23];
+                aoTableColumns = new STableColumn[24];
                 break;
                 
             default:
@@ -335,9 +335,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             case SDataConstants.BPSX_BP_EMP:
             case SDataConstants.BPSX_BP_EMP_CON_EXP:
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Nombre empleado", 250);
-                aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave empleado", 50);
+                aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Número empleado", 50);
                 aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
                 msOrderKey = "bp.bp, bp.id_bp ";
                 
@@ -382,7 +382,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_age", "Edad empleado", STableConstants.WIDTH_NUM_SMALLINT);
         }
         if (mbIsViewEmployees) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_ben", "Inicio beneficios", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sc.co_key", "Membresía", 35);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_ben", "Inicio prestaciones", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_sen", "Antigüedad", STableConstants.WIDTH_NUM_SMALLINT);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_hire", "Última alta", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_dis_n", "Última baja", STableConstants.WIDTH_DATE);
@@ -803,7 +804,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_del = 0 ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_del = 0 " + (mbIsViewEmployees ? "AND e.b_del = 0 " : "");
                 sqlCategoryWhere = " AND bp_ct.b_del = 0 ";
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
@@ -815,34 +816,34 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
         switch(mnTabTypeAux01) {
             case SDataConstants.BPSX_BP_CO:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_co ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_co ";
                 break;
             case SDataConstants.BPSX_BP_SUP:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_sup ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_sup ";
                 break;
             case SDataConstants.BPSX_BP_CUS:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_cus ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_cus ";
                 break;
             case SDataConstants.BPSX_BP_CDR:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_cdr ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_cdr ";
                 break;
             case SDataConstants.BPSX_BP_DBR:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_dbr ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_dbr ";
                 break;
             case SDataConstants.BPSU_BP:
                 break;
             case SDataConstants.BPSX_BP_ATT_CARR:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_car ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_att_car ";
                 break;
             case SDataConstants.BPSX_BP_ATT_SAL_AGT:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_sal_agt ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_att_sal_agt ";
                 break;
             case SDataConstants.BPSX_BP_ATT_BANK:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_bank ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_att_bank ";
                 break;
             case SDataConstants.BPSX_BP_EMP:
             case SDataConstants.BPSX_BP_EMP_CON_EXP:
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_emp ";
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "bp.b_att_emp ";
                 break;
             default:
         }
@@ -854,10 +855,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "(SELECT MAX(dt) FROM trn_dps WHERE b_del = 0 AND fid_bp_r = bp.id_bp AND fid_ct_dps IN(" + SDataConstantsSys.TRNS_CT_DPS_PUR + ", " + SDataConstantsSys.TRNS_CT_DPS_SAL + ") AND " +
                 "fid_cl_dps IN(" + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + ", " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + ")) AS f_last_trans, " +
                 (!mbIsViewEmployees ? "" :
-                "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, IF(" + mbHasRightEmpWage + ", e.sal, 0) AS f_sal, IF(" + mbHasRightEmpWage + ", e.dt_sal, NULL) AS f_dt_sal, IF(" + mbHasRightEmpWage + ", e.wage, 0) AS f_wage, " +
+                "e.num AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, IF(" + mbHasRightEmpWage + ", e.sal, 0) AS f_sal, IF(" + mbHasRightEmpWage + ", e.dt_sal, NULL) AS f_dt_sal, IF(" + mbHasRightEmpWage + ", e.wage, 0) AS f_wage, " +
                 "IF(" + mbHasRightEmpWage + ", e.dt_wage, NULL) AS f_dt_wage, IF(" + mbHasRightEmpWage + ", e.sal_ssc, 0) AS f_sal_ssc, IF(" + mbHasRightEmpWage + ", e.dt_sal_ssc, NULL) AS f_dt_sal_ssc, e.wrk_hrs_day, e.con_exp_n, e.bank_acc, e.grocery_srv_acc, e.b_mfg_ope, e.b_act, e.b_uni, " +
                 "CASE e.overtime WHEN " + SHrsConsts.OVERTIME_NEVER + " THEN '" + SHrsConsts.TXT_OVERTIME_NEVER + "' WHEN " + SHrsConsts.OVERTIME_ALLWAYS + " THEN '" + SHrsConsts.TXT_OVERTIME_ALLWAYS + "' WHEN " + SHrsConsts.OVERTIME_SOMETIMES + " THEN '" + SHrsConsts.TXT_OVERTIME_SOMETIMES + "' END AS _overtime, " +
-                "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, emrshe.name, risk.name, bank.name, gsrv.name, " +
+                "sc.co_key, pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, emrshe.name, risk.name, bank.name, gsrv.name, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_sen, " +
                 "DATEDIFF(e.con_exp_n, CURDATE()) AS _con_val, " +
@@ -880,6 +881,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "LEFT OUTER JOIN erp.cfgu_lan AS l ON bp_ct.fid_lan_n = l.id_lan ") +
                 (!mbIsViewEmployees ? "" :
                 "LEFT OUTER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp " +
+                "LEFT OUTER JOIN erp.cfgu_co AS sc ON e.fk_src_com = sc.id_co " +
                 "LEFT OUTER JOIN erp.hrss_tp_pay AS pay ON e.fk_tp_pay = pay.id_tp_pay " +
                 "LEFT OUTER JOIN erp.hrss_tp_sal AS sal ON e.fk_tp_sal = sal.id_tp_sal " +
                 "LEFT OUTER JOIN erp.hrsu_tp_emp AS emp ON e.fk_tp_emp = emp.id_tp_emp " +
@@ -895,7 +897,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "LEFT OUTER JOIN erp.hrss_tp_work_day AS wrktp ON e.fk_tp_work_day = wrktp.id_tp_work_day " +
                 "LEFT OUTER JOIN erp.hrss_bank AS bank ON e.fk_bank_n = bank.id_bank " +
                 "LEFT OUTER JOIN erp.hrss_grocery_srv AS gsrv ON e.fk_grocery_srv = gsrv.id_grocery_srv ") +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) + sqlBizPartner + 
+                (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere) + sqlBizPartner + 
                 (mnFilterPaymentTypeId == 0 ? "" : "AND e.fk_tp_pay = " + mnFilterPaymentTypeId + " ") +
                 (mnFilterDepartamentId == 0 ? "" : "AND e.fk_dep = " + mnFilterDepartamentId + " ") +
                 (mnFilterStatusEmployee == 0 ? "" : (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_ACT ? "AND e.b_act = 1 " : (mnFilterStatusEmployee == SGridFilterPanelEmployee.EMP_STATUS_INA ? "AND e.b_act = 0 " : ""))) +

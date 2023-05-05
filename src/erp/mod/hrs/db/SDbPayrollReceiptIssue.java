@@ -351,6 +351,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         return registry;
     }
     
+    @Override
     public Object readField(final Statement statement, final int[] pk, final int field) throws SQLException, Exception {
         Object value = null;
         ResultSet resultSet = null;

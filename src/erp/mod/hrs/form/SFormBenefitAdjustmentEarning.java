@@ -296,8 +296,8 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         moKeyEmployee.setValue(new int[] { idEmployee });
         moKeyBenefitType.setValue(new int[] { moRegistry.getFkBenefitTypeId() });
-        jsAnniversary.setValue((Integer) moRegistry.getBenefitAnniversary() == 0 ? (Integer) 1 : (Integer) moRegistry.getBenefitAnniversary());
-        moIntBenefitYear.setValue(moRegistry.getBenefitYear());
+        jsAnniversary.setValue((Integer) moRegistry.getBenefitsAnniversary() == 0 ? (Integer) 1 : (Integer) moRegistry.getBenefitsAnniversary());
+        moIntBenefitYear.setValue(moRegistry.getBenefitsYear());
         moDateDate.setValue(earningComplement.getDate());
         moDecDaysToPay.setValue(moRegistry.getUnitsAlleged());
         moCurPayment.getField().setValue(moRegistry.getAmount_r());
@@ -328,8 +328,8 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         registry.setAmount_r(moCurPayment.getField().getValue());
         registry.setAutomatic(true);
         registry.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());
-        registry.setBenefitAnniversary((Integer) jsAnniversary.getValue());
-        registry.setBenefitYear(moIntBenefitYear.getValue());
+        registry.setBenefitsAnniversary((Integer) jsAnniversary.getValue());
+        registry.setBenefitsYear(moIntBenefitYear.getValue());
         registry.setFkEarningTypeId(earning.getFkEarningTypeId());
         registry.setFkEarningId(earning.getPkEarningId());
         registry.setFkBonusId(SModSysConsts.HRSS_BONUS_NA);

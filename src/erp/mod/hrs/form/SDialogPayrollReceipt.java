@@ -247,7 +247,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         moTextNumber.setEditable(false);
         moTextNumber.setText("TEXT");
-        moTextNumber.setToolTipText("Clave empleado");
+        moTextNumber.setToolTipText("Número empleado");
         moTextNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(moTextNumber);
@@ -354,7 +354,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moDecSalary.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel29.add(moDecSalary);
 
-        jlDateBenefits.setText("Inicio beneficios:");
+        jlDateBenefits.setText("Prestaciones:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel29.add(jlDateBenefits);
 

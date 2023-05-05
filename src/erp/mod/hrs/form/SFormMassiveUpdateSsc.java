@@ -273,9 +273,9 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
             public ArrayList<SGridColumnForm> createGridColumns() {
                 SGridColumnForm column = null;
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Empleado", 250));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Clave empleado"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Inicio beneficios", 75));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 250));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Número empleado"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Inicio prestaciones", 75));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Antigüedad final periodo", 50));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Período pago", 60));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días vacaciones", 50));

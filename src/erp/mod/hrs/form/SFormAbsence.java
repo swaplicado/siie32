@@ -160,7 +160,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateBenefits.setText("Inicio beneficios:");
+        jlDateBenefits.setText("Inicio prestaciones:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jlDateBenefits);
 

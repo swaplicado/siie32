@@ -6,6 +6,7 @@
 package erp.lib.data;
 
 import erp.lib.SLibConstants;
+import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -35,7 +36,7 @@ public abstract class SDataRegistry implements java.io.Serializable {
     public SDataRegistry(int registryType) {
         mnRegistryType = registryType;
         mlRegistryTimeout = 1000 * 60 * 15;  // 15 min
-        mvRegistryComplements = new Vector<Object>();
+        mvRegistryComplements = new Vector<>();
 
         resetRegistry();
     }
@@ -129,5 +130,58 @@ public abstract class SDataRegistry implements java.io.Serializable {
     public int process(java.sql.Connection connection) {
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         return mnLastDbActionResult;
+    }
+    
+    /**
+     * Backup and clear non-serializable instance attributes, each identified by its "name".
+     * @return Map of non-serializable instance attributes, each identified by its "name".
+     */
+    public HashMap<String, Object> backupNonSerializableMembers() {
+        HashMap<String, Object> map = null;
+        
+        if (moPostSaveTarget != null || moPostSaveMethod != null || maoPostSaveMethodArgs != null) {
+            map = new HashMap<>();
+            
+            if (moPostSaveTarget != null) {
+                map.put("moPostSaveTarget", moPostSaveTarget);
+                moPostSaveTarget = null;
+            }
+            
+            if (moPostSaveMethod != null) {
+                map.put("moPostSaveMethod", moPostSaveMethod);
+                moPostSaveMethod = null;
+            }
+            
+            if (maoPostSaveMethodArgs != null) {
+                map.put("maoPostSaveMethodArgs", maoPostSaveMethodArgs);
+                maoPostSaveMethodArgs = null;
+            }
+        }
+        
+        return map;
+    }
+    
+    /**
+     * Restore non-serializable instance attributes, each identified by its "name".
+     * @param map Map of non-serializable instance attributes, each identified by its "name".
+     */
+    public void restoreNonSerializableMembers(final HashMap<String, Object> map) {
+        for (String key : map.keySet()) {
+            Object member = map.get(key);
+            
+            switch (key) {
+                case "moPostSaveTarget":
+                    moPostSaveTarget = (java.lang.Object) member;
+                    break;
+                case "moPostSaveMethod":
+                    moPostSaveMethod = (java.lang.reflect.Method) member;
+                    break;
+                case "maoPostSaveMethodArgs":
+                    maoPostSaveMethodArgs = (java.lang.Object[]) member;
+                    break;
+                default:
+                    // nothing
+            }
+        }
     }
 }

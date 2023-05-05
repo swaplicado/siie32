@@ -4417,7 +4417,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
                 if (moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
                     if (mbIsDpsAdjustment) {
-                        moFieldCfdiCfdiUsage.setFieldValue(DCfdi40Catalogs.ClaveUsoCfdiDevDescBon);
+                        moFieldCfdiCfdiUsage.setFieldValue(DCfdi40Catalogs.ClaveUsoCfdiDevolucionesDescuentos);
                     }
                     else {
                         if (isCfdIntCommerceRequired()) {
@@ -4453,7 +4453,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         else {
             if (mbIsDpsAdjustment) {
-                moFieldCfdiCfdiUsage.setFieldValue(DCfdi40Catalogs.ClaveUsoCfdiDevDescBon);
+                moFieldCfdiCfdiUsage.setFieldValue(DCfdi40Catalogs.ClaveUsoCfdiDevolucionesDescuentos);
             }
             else {
                 if (isCfdIntCommerceRequired()) {
@@ -10582,7 +10582,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 
                 if (moDps.getIsRegistryNew() && isCfdCfdiRelatedRequired()) {
-                    moFieldCfdiCfdiUsage.setFieldValue(DCfdi40Catalogs.ClaveUsoCfdiDevDescBon);
+                    moFieldCfdiCfdiUsage.setFieldValue(DCfdi40Catalogs.ClaveUsoCfdiDevolucionesDescuentos);
                 }
                 else if (!moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
                     moFieldCfdiCfdiUsage.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdiUsage());
@@ -10922,8 +10922,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     dpsCfd.setCfdCceSubdivision("" + moFieldCfdCceSubdivision.getInteger());
                     dpsCfd.setCfdCceTipoCambioUsd(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
                     dpsCfd.setCfdCceTotalUsd(DCfdUtils.AmountFormat.format(moFieldCfdCceTotalUsd.getDouble()));
-                    dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionAplica);
-                    if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(DCfdi40Catalogs.TRNS_CFD_CAT_CTY_GRP_UE) == 0) {
+                    dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
+                    if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(DCfdi40Catalogs.AgrupaciónPaísesUE) == 0) {
                         dpsCfd.setCfdCceNumeroExportadorConfiable(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter());
                     }
                     dpsCfd.setCfdCceIncoterm(jcbFkIncotermId.getSelectedIndex() <= 0 ? "" : ((SFormComponentItem) jcbFkIncotermId.getSelectedItem()).getComplement().toString());

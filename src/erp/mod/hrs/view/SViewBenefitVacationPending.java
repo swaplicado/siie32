@@ -317,7 +317,7 @@ public class SViewBenefitVacationPending extends SGridPaneView implements Action
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_active", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_payment_type", "Período pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "_department", "Departamento"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_benefits", "Inicio beneficios"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_benefits", "Inicio prestaciones"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_dismiss", "Última baja"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_cut_off", "Corte"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_seniority", "Antigüedad años", 50));

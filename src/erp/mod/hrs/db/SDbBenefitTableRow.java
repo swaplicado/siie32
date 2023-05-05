@@ -15,7 +15,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbBenefitTableRow extends SDbRegistryUser implements SGridRow {
 
@@ -218,6 +218,7 @@ public class SDbBenefitTableRow extends SDbRegistryUser implements SGridRow {
                 value = mdBenefitBonusPercentage;
                 break;
             default:
+                // nothing
         }
 
         return value;

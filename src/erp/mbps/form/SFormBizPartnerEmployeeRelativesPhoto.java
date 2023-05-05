@@ -163,7 +163,7 @@ public class SFormBizPartnerEmployeeRelativesPhoto extends javax.swing.JDialog i
     }
 
     private void actionShowFileImagePhoto() {
-        jlData.setText("Nombre: "+ msName + "   Clave: " + moEmployee.getNumber());
+        jlData.setText("Nombre: "+ msName + "   Número: " + moEmployee.getNumber());
         if (moEmployee.getXtaImageIconPhoto_n() != null) {
             jlImgPhoto.setIcon(moEmployee.getXtaImageIconPhoto_n());
             jlImgPhoto.setText("");

@@ -6,8 +6,8 @@ package erp.mtrn.data;
 
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
-import cfd.ver3.DCfdVer3Consts;
 import cfd.ver33.DCfdi33Consts;
+import cfd.ver4.DCfdVer4Consts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
@@ -38,17 +38,6 @@ public class SCfdUtilsHandler {
      */
     public SCfdUtilsHandler(SClientInterface client) {
         miClient = client;
-    }
-    
-    /**
-     * Devuelve los CFDI relacionados del CFDI.
-     * NOTA: Al parecer sólo funciona si el emisor del CFDI es la empresa de la sesión de usuario.
-     * @param cfd CFDI.
-     * @return
-     * @throws Exception
-     */
-    public ArrayList<CfdiRelated> getCfdiRelated(final SDataCfd cfd) throws Exception {
-        return getCfdiRelated(cfd.getFkCfdTypeId(), cfd.getDocXmlRfcEmi(), cfd.getUuid());
     }
     
     /**
@@ -205,8 +194,9 @@ public class SCfdUtilsHandler {
             String rfcReceptor = comprobante.getEltReceptor().getAttRfc().getString();
             double total = comprobante.getAttTotal().getDouble();
             String sello = comprobante.getAttSello().getString();
+            String uuid = tfd.getAttUUID().getString();
             
-            return getCfdiSatStatus(cfdType, version, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total, sello);
+            return getCfdiSatStatus(cfdType, version, rfcEmisor, rfcReceptor, uuid, total, sello);
         }
         
         return null;
@@ -228,8 +218,9 @@ public class SCfdUtilsHandler {
             String rfcReceptor = comprobante.getEltReceptor().getAttRfc().getString();
             double total = comprobante.getAttTotal().getDouble();
             String sello = comprobante.getAttSello().getString();
+            String uuid = tfd.getAttUUID().getString();
             
-            return getCfdiSatStatus(cfdType, version, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total, sello);
+            return getCfdiSatStatus(cfdType, version, rfcEmisor, rfcReceptor, uuid, total, sello);
         }
         
         return null;
@@ -261,7 +252,7 @@ public class SCfdUtilsHandler {
         else if (version == DCfdConsts.CFDI_VER_33 || version == DCfdConsts.CFDI_VER_40) {
             DecimalFormat decimalFormat33 = new DecimalFormat("#." + SLibUtils.textRepeat("#", 6)); // max decimals for total according to XSD of CFDI 3.3
             
-            data += "?id=" + (uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", DCfdVer3Consts.LEN_UUID) : uuid); // UUID length hyphens included
+            data += "?id=" + (uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", DCfdVer4Consts.LEN_UUID) : uuid); // UUID length hyphens included
             data += "&re=" + (rfcEmisor == null || rfcEmisor.isEmpty() ? SLibUtils.textRepeat("X", DCfdConsts.LEN_RFC_PER) : rfcEmisor.replaceAll("&", "&amp;")); // some fiscal ID contains character '&', and must be encoded
             data += "&rr=" + (rfcReceptor == null || rfcReceptor.isEmpty() ? SLibUtils.textRepeat("X", DCfdConsts.LEN_RFC_PER) : rfcReceptor.replaceAll("&", "&amp;")); // some fiscal ID contains character '&', and must be encoded
             data += "&tt=" + decimalFormat33.format(SLibUtils.roundAmount(total));
@@ -371,6 +362,7 @@ public class SCfdUtilsHandler {
             message += "Estatus CFDI: [" + CfdiStatus + "]\n";
             message += "Estatus cancelación: [" + CancelStatus + "]\n";
             message += composeCfdiRelated();
+            
             return message;
         }
         

@@ -5,6 +5,8 @@
 package erp.mod.hrs.view;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -44,6 +46,12 @@ public class SViewBenefitTable extends SGridPaneView {
                 + "v.code AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt_sta, "
+                + "v.dt_end_n, "
+                + "CASE "
+                + "WHEN v.uni = '" + SHrsConsts.CODE_UNION_NO + "' THEN '" + SHrsConsts.TXT_UNION_NO + "' "
+                + "WHEN v.uni = '" + SHrsConsts.CODE_UNION_YES + "' THEN '" + SHrsConsts.TXT_UNION_YES + "' "
+                + "WHEN v.uni = '' THEN '" + SHrsConsts.TXT_INDISTINCT + "' "
+                + "ELSE '?' END AS _uni, "
                 + "v.fk_tp_pay_n, "
                 + "vt.name, "
                 + "ear.name, "
@@ -69,8 +77,9 @@ public class SViewBenefitTable extends SGridPaneView {
                 + "v.fk_ded_n = ded.id_ded "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS pay ON "
                 + "v.fk_tp_pay_n = pay.id_tp_pay "
-                + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY vt.name, v.fk_tp_pay_n, pay.name, v.dt_sta, v.name, v.code, v.id_ben ";
+                + "WHERE v.id_ben <> " + SModSysConsts.HRS_BEN_ND + " " // exclude 'not defined' option
+                + (sql.isEmpty() ? "" : "AND ") + sql
+                + "ORDER BY vt.name, v.fk_tp_ben, pay.name, v.fk_tp_pay_n, v.uni, v.dt_sta, v.dt_end_n, v.name, v.code, v.id_ben ";
     }
 
     @Override
@@ -79,7 +88,9 @@ public class SViewBenefitTable extends SGridPaneView {
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", SGridConsts.COL_TITLE_TYPE + " prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay.name", "Período pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_uni", "Situación sindical"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "Inicio vigencia"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_end_n", "Fin vigencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ear.name", "Percepción"));

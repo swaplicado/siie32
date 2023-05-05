@@ -42,7 +42,7 @@ public class SViewEmployeeIdse extends SGridPaneView implements ActionListener{
 
 
     public SViewEmployeeIdse(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_IDSE, SLibConsts.UNDEFINED, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_EMP_LOG_IDSE, SLibConsts.UNDEFINED, title);
         initComponentsCustom();
     }
     

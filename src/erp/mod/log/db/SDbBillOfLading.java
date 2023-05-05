@@ -440,7 +440,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
             mnAuxCfdId = resultSet.getInt("id_cfd");
-            msAuxCfdExportation = !mbInternationalBol ? DCfdi40Catalogs.ClaveExportacionNoAplica : DCfdi40Catalogs.ClaveExportacionAplica;
+            msAuxCfdExportation = !mbInternationalBol ? DCfdi40Catalogs.ClaveExportacionNoAplica : DCfdi40Catalogs.ClaveExportacionDefinitivaA1;
             
             mbRegistryNew = false;
         }
@@ -990,7 +990,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Encabezado:
         
         DElementCartaPorte ccp = new DElementCartaPorte();
-        ccp.getAttTransInternac().setString(mbInternationalBol ? DCfdi40Catalogs.TxtSí : DCfdi40Catalogs.TxtNo);
+        ccp.getAttTransInternac().setString(mbInternationalBol ? DCfdi40Catalogs.TextoSí : DCfdi40Catalogs.TextoNo);
         if (mbInternationalBol) {
             ccp.getAttEntradaSalidaMerc().setString(msInputOutputBol);
             ccp.getAttViaEntradaSalida().setString(msInputOutputWay);
@@ -1007,8 +1007,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             
             if (location.getXtaIsOrigin()) {
                 origen = new DElementUbicacion();
-                origen.getAttTipoUbicacion().setString(DCfdi40Catalogs.ClaveOrigen);
-                origen.getAttIDUbicacion().setString(DCfdi40Catalogs.PrefijoClaveOrigen + location.getDataBizPartnerBranchAddress().getAddressCode());
+                origen.getAttTipoUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónOrigen);
+                origen.getAttIDUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónOrigenPrefijoId + location.getDataBizPartnerBranchAddress().getAddressCode());
                 if (location.getDataBizPartner().getFiscalId().isEmpty()) {
                     origen.getAttNumRegIdTrib().setString(location.getDataBizPartner().getFiscalId());
                     origen.getAttNombreRemitenteDestinatario().setString(location.getDataBizPartner().getBizPartner());
@@ -1041,8 +1041,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
             
             if (location.getXtaIsDestination()) {
                 destino = new DElementUbicacion();
-                destino.getAttTipoUbicacion().setString(DCfdi40Catalogs.ClaveDestino);
-                destino.getAttIDUbicacion().setString(DCfdi40Catalogs.PrefijoClaveDestino + location.getDataBizPartnerBranchAddress().getAddressCode());
+                destino.getAttTipoUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónDestino);
+                destino.getAttIDUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónDestinoPrefijoId + location.getDataBizPartnerBranchAddress().getAddressCode());
                 if (location.getDataBizPartner().getFiscalId().isEmpty()) {
                     destino.getAttNumRegIdTrib().setString(location.getDataBizPartner().getFiscalId());
                     destino.getAttNombreRemitenteDestinatario().setString(location.getDataBizPartner().getBizPartner());
@@ -1122,8 +1122,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                     for (SDbBolMerchandiseQuantity de : qtyDe) {
                         if (de.getQuantity() > 0) {
                             DElementCantidadTransporta elementTransp = new DElementCantidadTransporta();
-                            elementTransp.getAttIDOrigen().setString(DCfdi40Catalogs.PrefijoClaveOrigen + or.getDataOriginBizPartnerBranchAddress().getAddressCode());
-                            elementTransp.getAttIDDestino().setString(DCfdi40Catalogs.PrefijoClaveDestino + de.getDataDestinationBizPartnerBranchAddress().getAddressCode());
+                            elementTransp.getAttIDOrigen().setString(DCfdi40Catalogs.CcpUbicaciónOrigenPrefijoId + or.getDataOriginBizPartnerBranchAddress().getAddressCode());
+                            elementTransp.getAttIDDestino().setString(DCfdi40Catalogs.CcpUbicaciónDestinoPrefijoId + de.getDataDestinationBizPartnerBranchAddress().getAddressCode());
                             if (or.getQuantity() > de.getQuantity()) {
                                 or.setQuantity(or.getQuantity() - de.getQuantity());                                
                                 elementTransp.getAttCantidad().setDouble(de.getQuantity());
@@ -1201,7 +1201,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         ArrayList<DElementTiposFigura> figuras = ccp.getEltFiguraTransporte().getEltTiposFigura();
         DElementTiposFigura chofer = new DElementTiposFigura();
-        chofer.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveChofer);
+        chofer.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteChofer);
         chofer.getAttNumLicencia().setString(moBolTransportationMode.getDataDriver().getDriverLicense()); 
         if (!moBolTransportationMode.getDataDriver().getFiscalId().isEmpty()) {
             chofer.getAttRFCFigura().setString(moBolTransportationMode.getDataDriver().getFiscalId());
@@ -1217,7 +1217,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         if (moBolTransportationMode.getDataOwner1().getPkBolPersonId() != 0) {
             DElementTiposFigura propietario = new DElementTiposFigura();
-            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClavePropietario);
+            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransportePropietario);
             if (!moBolTransportationMode.getDataOwner1().getFiscalId().isEmpty()) {
                 propietario.getAttRFCFigura().setString(moBolTransportationMode.getDataOwner1().getFiscalId());
             }
@@ -1237,7 +1237,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         if (moBolTransportationMode.getDataOwner2().getPkBolPersonId() != 0) {
             DElementTiposFigura propietario = new DElementTiposFigura();
-            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClavePropietario);
+            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransportePropietario);
             if (!moBolTransportationMode.getDataOwner2().getFiscalId().isEmpty()) {
                 propietario.getAttRFCFigura().setString(moBolTransportationMode.getDataOwner2().getFiscalId());
             }
@@ -1257,7 +1257,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         if (moBolTransportationMode.getDataLessor1().getPkBolPersonId() != 0) {
             DElementTiposFigura arrendador = new DElementTiposFigura();
-            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveArrendador);
+            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteArrendador);
             if (!moBolTransportationMode.getDataLessor1().getFiscalId().isEmpty()) {
                 arrendador.getAttRFCFigura().setString(moBolTransportationMode.getDataLessor1().getFiscalId());
             }
@@ -1277,7 +1277,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         if (moBolTransportationMode.getDataLessor2().getPkBolPersonId() != 0) {
             DElementTiposFigura arrendador = new DElementTiposFigura();
-            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveArrendador);
+            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteArrendador);
             if (!moBolTransportationMode.getDataLessor2().getFiscalId().isEmpty()) {
                 arrendador.getAttRFCFigura().setString(moBolTransportationMode.getDataLessor2().getFiscalId());
             }
@@ -1295,7 +1295,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         if (moBolTransportationMode.getDataNotified().getPkBolPersonId() != 0) {
             DElementTiposFigura notificado = new DElementTiposFigura();
-            notificado.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveNotificado);
+            notificado.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteNotificado);
             if (!moBolTransportationMode.getDataNotified().getFiscalId().isEmpty()) {
                 notificado.getAttRFCFigura().setString(moBolTransportationMode.getDataNotified().getFiscalId());
             }
@@ -1319,8 +1319,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 figura.getAttResidenciaFiscalFigura().setString(tme.getBolPerson().getDataCountry().getCountryCode());
             }
             figura.getAttNumLicencia().setString(tme.getBolPerson().getDriverLicense());
-            if (!figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveNotificado) &&
-                    !figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveChofer)) {
+            if (!figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveFiguraTransporteNotificado) &&
+                    !figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveFiguraTransporteChofer)) {
                 ArrayList<DElementPartesTransporte> partesTransporte = figura.getEltPartesTransporte();
                 DElementPartesTransporte parte = new DElementPartesTransporte();
                 parte.getAttParteTransporte().setString(tme.getTransportationPart());

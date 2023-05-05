@@ -8,6 +8,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbBenefitTableRow;
+import erp.mod.hrs.db.SHrsConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,7 +64,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel3 = new javax.swing.JPanel();
+        bgUnionized = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
@@ -76,6 +77,9 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         jPanel4 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
+        jPanel19 = new javax.swing.JPanel();
+        jlDateEnd = new javax.swing.JLabel();
+        moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel16 = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
         jlBenefitType = new javax.swing.JLabel();
@@ -89,6 +93,12 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         jPanel14 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
+        jlPaymentTypeHelp = new javax.swing.JLabel();
+        jPanel20 = new javax.swing.JPanel();
+        jlUnionized = new javax.swing.JLabel();
+        moRadNonUnionized = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadUnionized = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadAll = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
@@ -112,15 +122,13 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la tabla:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel15.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel15.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlCode);
-
-        moTextCode.setText("sBeanFieldText1");
         jPanel5.add(moTextCode);
 
         jPanel15.add(jPanel5);
@@ -131,7 +139,6 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlName);
 
-        moTextName.setText("sBeanFieldText1");
         moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel13.add(moTextName);
 
@@ -146,9 +153,18 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel15.add(jPanel4);
 
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateEnd.setText("Fin vigencia:");
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jlDateEnd);
+        jPanel19.add(moDateDateEnd);
+
+        jPanel15.add(jPanel19);
+
         jPanel2.add(jPanel15, java.awt.BorderLayout.WEST);
 
-        jPanel16.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel16.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -193,14 +209,42 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         moKeyPaymentType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel14.add(moKeyPaymentType);
 
+        jlPaymentTypeHelp.setForeground(javax.swing.UIManager.getDefaults().getColor("textInactiveText"));
+        jlPaymentTypeHelp.setText("(Ayuda período pago)");
+        jlPaymentTypeHelp.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel14.add(jlPaymentTypeHelp);
+
         jPanel16.add(jPanel14);
+
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlUnionized.setText("Situación sindical:");
+        jlUnionized.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel20.add(jlUnionized);
+
+        bgUnionized.add(moRadNonUnionized);
+        moRadNonUnionized.setText("Confianza");
+        moRadNonUnionized.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel20.add(moRadNonUnionized);
+
+        bgUnionized.add(moRadUnionized);
+        moRadUnionized.setText("Sindicalizado");
+        moRadUnionized.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel20.add(moRadUnionized);
+
+        bgUnionized.add(moRadAll);
+        moRadAll.setText("Indistinto");
+        moRadAll.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel20.add(moRadAll);
+
+        jPanel16.add(jPanel20);
 
         jPanel2.add(jPanel16, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle de la tabla:"));
-        jPanel6.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel6.setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
@@ -266,7 +310,9 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgUnionized;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -277,8 +323,9 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -293,13 +340,17 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
     private javax.swing.JLabel jlBenefitDays;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlDeduction;
     private javax.swing.JLabel jlEarning;
     private javax.swing.JLabel jlMonths;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlPaymentType;
+    private javax.swing.JLabel jlPaymentTypeHelp;
+    private javax.swing.JLabel jlUnionized;
     private javax.swing.JPanel jpGrid;
+    private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitBonusPercentage;
     private sa.lib.gui.bean.SBeanFieldInteger moIntBenefitDays;
@@ -308,20 +359,27 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeduction;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadAll;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadNonUnionized;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadUnionized;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 720, 450);
+        SGuiUtils.setWindowBounds(this, 800, 500);
 
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 5);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
+        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), false);
         moKeyBenefitType.setKeySettings(miClient, SGuiUtils.getLabelName(jlBenefitType.getText()), true);
         moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning.getText()), true);
         moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeduction.getText()), false);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
+        moRadNonUnionized.setBooleanSettings(moRadNonUnionized.getText(), false);
+        moRadUnionized.setBooleanSettings(moRadUnionized.getText(), false);
+        moRadAll.setBooleanSettings(moRadAll.getText(), true);
         moIntMonths.setIntegerSettings(SGuiUtils.getLabelName(jlMonths), SGuiConsts.GUI_TYPE_INT, false);
         moIntBenefitDays.setIntegerSettings(SGuiUtils.getLabelName(jlBenefitDays), SGuiConsts.GUI_TYPE_INT, false);
         moDecBenefitBonusPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitBonusPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
@@ -329,17 +387,21 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
         moFields.addField(moDateDateStart);
+        moFields.addField(moDateDateEnd);
         moFields.addField(moKeyBenefitType);
         moFields.addField(moKeyEarning);
         moFields.addField(moKeyDeduction);
         moFields.addField(moKeyPaymentType);
+        moFields.addField(moRadNonUnionized);
+        moFields.addField(moRadUnionized);
+        moFields.addField(moRadAll);
         moFields.addField(moIntMonths);
         moFields.addField(moIntBenefitDays);
         moFields.addField(moDecBenefitBonusPercentage);
 
         moFields.setFormButton(jbRowAdd);
 
-        moGridTableRows = new SGridPaneForm(miClient, SModConsts.HRS_BEN_ROW, SLibConsts.UNDEFINED, "Renglones tabla") {
+        moGridTableRows = new SGridPaneForm(miClient, SModConsts.HRS_BEN_ROW, SLibConsts.UNDEFINED, "Detalle de la tabla") {
 
             @Override
             public void initGrid() {
@@ -390,6 +452,15 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
             moIntBenefitDays.setEditable(true);
             moKeyEarning.setEnabled(false);
             moKeyDeduction.setEnabled(false);
+        }
+    }
+    
+    private void itemStateKeyPaymentType() {
+        if (moKeyPaymentType.getSelectedIndex() <= 0) {
+            jlPaymentTypeHelp.setText("(Aplica a todos)");
+        }
+        else {
+            jlPaymentTypeHelp.setText("(Aplica sólo a " + ((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, moKeyPaymentType.getValue(), SDbRegistry.FIELD_NAME)).toLowerCase() + ")");
         }
     }
     
@@ -503,20 +574,24 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
     @Override
     public void addAllListeners() {
-        moKeyBenefitType.addItemListener(this);
         jbRowAdd.addActionListener(this);
         jbRowUp.addActionListener(this);
         jbRowDown.addActionListener(this);
         jbRowRemove.addActionListener(this);
+        
+        moKeyBenefitType.addItemListener(this);
+        moKeyPaymentType.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        moKeyBenefitType.removeItemListener(this);
         jbRowAdd.removeActionListener(this);
         jbRowUp.removeActionListener(this);
         jbRowDown.removeActionListener(this);
         jbRowRemove.removeActionListener(this);
+        
+        moKeyBenefitType.removeItemListener(this);
+        moKeyPaymentType.removeItemListener(this);
     }
 
     @Override
@@ -529,8 +604,6 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        Vector<SGridRow> rows = new Vector<SGridRow>();
-
         moRegistry = (SDbBenefitTable) registry;
 
         mnFormResult = SLibConsts.UNDEFINED;
@@ -551,11 +624,25 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         moTextCode.setValue(moRegistry.getCode());
         moTextName.setValue(moRegistry.getName());
         moDateDateStart.setValue(moRegistry.getDateStart());
+        moDateDateEnd.setValue(moRegistry.getDateEnd_n());
         moKeyBenefitType.setValue(new int[] { moRegistry.getFkBenefitTypeId() });
         moKeyEarning.setValue(new int[] { moRegistry.getFkEarningId() });
         moKeyDeduction.setValue(new int[] { moRegistry.getFkDeductionId_n() });
         moKeyPaymentType.setValue(new int[] { moRegistry.getFkPaymentTypeId_n() });
+        itemStateKeyPaymentType();
+        
+        if (moRegistry.getUnionized().equals(SHrsConsts.CODE_UNION_NO)) {
+            moRadNonUnionized.setSelected(true);
+        }
+        else if (moRegistry.getUnionized().equals(SHrsConsts.CODE_UNION_YES)) {
+            moRadUnionized.setSelected(true);
+        }
+        else {
+            moRadAll.setSelected(true);
+        }
 
+        Vector<SGridRow> rows = new Vector<>();
+        
         for (SDbBenefitTableRow row : moRegistry.getChildRows()) {
             rows.add(row);
         }
@@ -582,6 +669,8 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         registry.setCode(moTextCode.getValue());
         registry.setName(moTextName.getValue());
         registry.setDateStart(moDateDateStart.getValue());
+        registry.setDateEnd_n(moDateDateEnd.getValue());
+        registry.setUnionized(moRadNonUnionized.isSelected() ? SHrsConsts.CODE_UNION_NO : (moRadUnionized.isSelected() ? SHrsConsts.CODE_UNION_YES : ""));
         registry.setFkBenefitTypeId(moKeyBenefitType.getValue()[0]);
         registry.setFkEarningId(moKeyEarning.getValue()[0]);
         registry.setFkDeductionId_n(moKeyDeduction.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyDeduction.getValue()[0]);
@@ -637,6 +726,9 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
             if (comboBox == moKeyBenefitType) {
                 itemStateKeyBenefitType();
+            }
+            else if (comboBox == moKeyPaymentType) {
+                itemStateKeyPaymentType();
             }
         }
     }

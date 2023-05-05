@@ -123,7 +123,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
         jPanel21.add(jtfEmployeeName);
 
         jtfEmployeeCode.setEditable(false);
-        jtfEmployeeCode.setToolTipText("Clave empleado");
+        jtfEmployeeCode.setToolTipText("Número empleado");
         jtfEmployeeCode.setFocusable(false);
         jtfEmployeeCode.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel21.add(jtfEmployeeCode);
@@ -132,7 +132,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
 
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateBenefitsOld.setText("Inicio beneficios:");
+        jlDateBenefitsOld.setText("Inicio prestaciones:");
         jlDateBenefitsOld.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel23.add(jlDateBenefitsOld);
 
@@ -238,7 +238,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBenefits.setText("Beneficios...");
+        jlBenefits.setText("Prestaciones...");
         jlBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlBenefits);
 
@@ -260,7 +260,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateBenefits.setText("Inicio beneficios:*");
+        jlDateBenefits.setText("Inicio prestaciones:*");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlDateBenefits);
         jPanel28.add(moDateBenefits);
@@ -519,7 +519,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
                     + moKeyNewEmployer.getSelectedItem().getItem() + "\n"
                     + "fecha de alta:\n"
                     + SLibUtils.DateFormatDate.format(moDateHiring.getValue()) + " (" + SLibUtils.DateFormatDateLong.format(moDateHiring.getValue()) + ")\n"
-                    + "inicio de beneficios:\n"
+                    + "inicio de prestaciones:\n"
                     + SLibUtils.DateFormatDate.format(moDateBenefits.getValue()) + " (" + SLibUtils.DateFormatDateLong.format(moDateBenefits.getValue()) + ")?\n"
                     + WAR_NO_ROLLBACK) != JOptionPane.YES_OPTION) {
                 validation.setMessage("Favor de revisar y corregir los datos de la sustitución patronal.");

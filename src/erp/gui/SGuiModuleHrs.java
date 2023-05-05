@@ -107,6 +107,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     
     private javax.swing.JMenu jmBen;
     private javax.swing.JMenuItem jmiBenAbsence;
+    private javax.swing.JMenuItem jmiBenBenefitTables;
     private javax.swing.JMenuItem jmiBenBenefitVacPend;
     private javax.swing.JMenuItem jmiBenBenefitVac;
     private javax.swing.JMenuItem jmiBenBenefitBonVac;
@@ -298,6 +299,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmBen = new JMenu("Prestaciones");
         jmiBenAbsence = new JMenuItem("Incidencias");
+        jmiBenBenefitTables = new JMenuItem("Prestaciones empleados");
         jmiBenBenefitVacPend = new JMenuItem("Vacaciones pendientes");
         jmiBenBenefitVac = new JMenuItem("Control de vacaciones");
         jmiBenBenefitBonVac = new JMenuItem("Control de prima vacacional");
@@ -310,6 +312,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmBen.add(jmiBenAbsence);
         jmBen.addSeparator();
+        jmBen.add(jmiBenBenefitTables);
         jmBen.add(jmiBenBenefitVacPend);
         jmBen.addSeparator();
         jmBen.add(jmiBenBenefitVac);
@@ -500,6 +503,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatAbsenceClass.addActionListener(this);
         
         jmiBenAbsence.addActionListener(this);
+        jmiBenBenefitTables.addActionListener(this);
         jmiBenBenefitVacPend.addActionListener(this);
         jmiBenBenefitVac.addActionListener(this);
         jmiBenBenefitBonVac.addActionListener(this);
@@ -628,6 +632,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmBen.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
         jmiBenAbsence.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
+        jmiBenBenefitTables.setEnabled(hasRightPay);
         jmiBenBenefitVacPend.setEnabled(hasRightPay);
         jmiBenBenefitVac.setEnabled(hasRightPay);
         jmiBenBenefitBonVac.setEnabled(hasRightPay);
@@ -1049,6 +1054,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiBenAbsence) {
                 miClient.getSession().showView(SModConsts.HRS_ABS, SLibConsts.UNDEFINED, null);
             }
+            else if (item == jmiBenBenefitTables) {
+                miClient.getSession().showView(SModConsts.HRS_EMP_BEN, SLibConsts.UNDEFINED, null);
+            }
             else if (item == jmiBenBenefitVacPend) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_VAC_PEND, SLibConsts.UNDEFINED, null);
             }
@@ -1210,8 +1218,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRSX_PTU, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiRepAnnexAF02) {
-                SDialogLayoutAF02 sDialogLayoutAF02 = new SDialogLayoutAF02((SGuiClient) miClient, "Layout AF02");
-                sDialogLayoutAF02.setFormVisible(true);
+                new SDialogLayoutAF02((SGuiClient) miClient, "Layout AF02").setFormVisible(true);
             }
             else if (item == jmiRepPositions) {
                 new SDialogRepHrsPos((SGuiClient) miClient, "Reporte de posiciones y vacantes").setFormVisible(true);

@@ -190,7 +190,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
 
         if (isViewReceipts) {
             moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
-            moFilterEmployee.initFilter(0); // status filter is not required!
+            moFilterEmployee.initFilter(0); // status filter not required, but type-of-payment filter remains available
             
             getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         }
