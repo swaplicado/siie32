@@ -29,6 +29,7 @@ import cfd.ext.soriana.DElementArticulos;
 import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
 import cfd.ver2.DAttributeOptionTipoDeComprobante;
+import cfd.ver3.cce11.DCce11Catalogs;
 import cfd.ver3.cce11.DElementDescripcionesEspecificas;
 import cfd.ver3.clf10.DElementLeyenda;
 import cfd.ver3.clf10.DElementLeyendasFiscales;
@@ -72,6 +73,7 @@ import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import erp.mtrn.data.cfd.SAddendaUtils;
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -5376,8 +5378,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     double quantityCustoms = SLibUtils.round(dpsEntry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
                     mercancia.getAttCantidadAduana().setDouble(quantityCustoms);
                     mercancia.getAttUnidadAduana().setString(customsUnit);
-                    mercancia.getAttValorUnitarioAduana().setDouble(SLibUtils.roundAmount(valueUsd / quantityCustoms));
-                    mercancia.getAttValorDolares().setDouble(valueUsd);
+                    if (customsUnit.equals(DCce11Catalogs.UA_SERV)) {
+                        mercancia.getAttValorUnitarioAduana().setDouble(0.0);
+                        mercancia.getAttValorDolares().setDouble(0.0);
+                        comercioExterior.getAttTotalUSD().setDouble(
+                                new BigDecimal(String.valueOf(comercioExterior.getAttTotalUSD().getDouble())).subtract(
+                                new BigDecimal(String.valueOf(valueUsd))).doubleValue());
+                    }
+                    else {
+                        mercancia.getAttValorUnitarioAduana().setDouble(SLibUtils.roundAmount(valueUsd / quantityCustoms));
+                        mercancia.getAttValorDolares().setDouble(valueUsd);
+                    }
                     
                     // add node DescripcionesEspecificas if necessary, that is, if item of DPS entry has been set with a valid brand:
                     if (dpsEntry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && dpsEntry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
