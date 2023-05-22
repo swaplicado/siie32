@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 213.1/ 2023-05-22
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la funcionalidad para descargar todos los CFDIs de nóminas de un periodo.
+2) Mejora en el proceso de envío de CFDIs de nóminas.
+3) Eliminación de los archivos en disco de los CFDIs de nóminas después de ser enviados por correo.
+
+================================================================================
 SIIE 3.2 213.0/ 2023-05-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

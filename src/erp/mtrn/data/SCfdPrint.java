@@ -123,9 +123,10 @@ public class SCfdPrint {
      * @param copies
      * @throws Exception 
      */
-    private void computeReport(final erp.mtrn.data.SDataCfd cfd, final int reportType, final Map<String, Object> map, final int printMode, final int copies) throws Exception {
+    private void computeReport(final erp.mtrn.data.SDataCfd cfd, final int reportType, final Map<String, Object> map, final int printMode, final int copies, final String path) throws Exception {
         JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, reportType, map);
-
+        String sPdfFileName;
+        
         switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
@@ -134,8 +135,14 @@ public class SCfdPrint {
                 break;
                 
             case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+                sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
                 sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+                
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE_PATH:
+                sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+                sPdfFileName = path + "/" + sPdfFileName + ".pdf";
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
                 
@@ -419,7 +426,7 @@ public class SCfdPrint {
         map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFD, map, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFD, map, printMode, 1, null);
     }
 
     /**
@@ -686,7 +693,7 @@ public class SCfdPrint {
         map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI, map, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI, map, printMode, 1, null);
     }
     
     /**
@@ -1088,7 +1095,7 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap, printMode, 1, null);
     }
     
     /**
@@ -1533,7 +1540,7 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40, paramsMap, printMode, 1, null);
     }
     
     /**
@@ -1978,7 +1985,7 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_ENG, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_ENG, paramsMap, printMode, 1, null);
     }
     
     /**
@@ -2069,7 +2076,7 @@ public class SCfdPrint {
         // Provide XML for temporary tables and data for printing in method erp.server.SSessionServer.requestFillReport():
         paramsMap.put("xml", cfd.getDocXml());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, paramsMap, printMode, 1, null);
     }
     
     /**
@@ -2222,7 +2229,7 @@ public class SCfdPrint {
         // Provide XML for temporary tables and data for printing in method erp.server.SSessionServer.requestFillReport():
         paramsMap.put("xml", cfd.getDocXml());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_CRP_20, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_CRP_20, paramsMap, printMode, 1, null);
     }
     
     /**
@@ -2516,7 +2523,7 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies, null);
     }
     
     /**
@@ -2847,7 +2854,7 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies, null);
     }
     
     /**
@@ -2855,12 +2862,13 @@ public class SCfdPrint {
      * @param cfd
      * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
      * @param numCopies
+     * @param path
      * @param payrollCfdVersion Supported constants: SCfdConsts.CFDI_PAYROLL_VER_OLD or SCfdConsts.CFDI_PAYROLL_VER_CUR.
      * @throws java.lang.Exception 
      */
     @Deprecated
     @SuppressWarnings("deprecation")
-    public void printPayrollReceipt33_12(final SDataCfd cfd, final int printMode, final int numCopies, final int payrollCfdVersion) throws java.lang.Exception {
+    public void printPayrollReceipt33_12(final SDataCfd cfd, final int printMode, final int numCopies, final String path, final int payrollCfdVersion) throws java.lang.Exception {
         String sql = "";
         SDataFormerPayroll formerPayroll = null;
         SDataFormerPayrollEmp formerPayrollEmp = null;
@@ -3251,7 +3259,7 @@ public class SCfdPrint {
         
         paramsMap.put("sSelloCfdiUltDig", sello.isEmpty() ? SLibUtils.textRepeat("0", DCfdi33Consts.STAMP_LAST_CHARS) : sello.substring(sello.length() - DCfdi33Consts.STAMP_LAST_CHARS, sello.length()));
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, paramsMap, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, paramsMap, printMode, numCopies, path);
     }
     
     /**
@@ -3259,10 +3267,11 @@ public class SCfdPrint {
      * @param cfd
      * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
      * @param numCopies
+     * @param path 
      * @param payrollCfdVersion Supported constants: SCfdConsts.CFDI_PAYROLL_VER_OLD or SCfdConsts.CFDI_PAYROLL_VER_CUR.
      * @throws java.lang.Exception 
      */
-    public void printPayrollReceipt40_12(final SDataCfd cfd, final int printMode, final int numCopies, final int payrollCfdVersion) throws java.lang.Exception {
+    public void printPayrollReceipt40_12(final SDataCfd cfd, final int printMode, final int numCopies, final String path, final int payrollCfdVersion) throws java.lang.Exception {
         String sql = "";
         SDataFormerPayroll formerPayroll = null;
         SDataFormerPayrollEmp formerPayrollEmp = null;
@@ -3657,7 +3666,7 @@ public class SCfdPrint {
         
         paramsMap.put("sSelloCfdiUltDig", sello.isEmpty() ? SLibUtils.textRepeat("0", DCfdi40Consts.STAMP_LAST_CHARS) : sello.substring(sello.length() - DCfdi40Consts.STAMP_LAST_CHARS, sello.length()));
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_40, paramsMap, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_40, paramsMap, printMode, numCopies, path);
     }
     
     /**
@@ -4117,6 +4126,6 @@ public class SCfdPrint {
         map.put("sCfdiSelloSAT", nodeChild.getTextContent());
         map.put("nPkCfdId", cfd.getPkCfdId());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_ACK_CAN, map, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_ACK_CAN, map, printMode, 1, null);
     }
 }

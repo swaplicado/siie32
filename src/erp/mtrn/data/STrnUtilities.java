@@ -58,12 +58,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import javax.mail.MessagingException;
-import javax.swing.JFileChooser;
-import net.sf.jasperreports.engine.JRExporter;
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -1986,6 +1982,17 @@ public abstract class STrnUtilities {
                     
                     File pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
                     
+                    if (!pdfFile.exists() && cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                        // crear el pdf en caso de ser de nómina
+                        SCfdPrint cfdPrint = new SCfdPrint(client);
+                        if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                            cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, SLibConsts.UNDEFINED, null, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        }
+                        else if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_40) {
+                            cfdPrint.printPayrollReceipt40_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, SLibConsts.UNDEFINED, null, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        }
+                        pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
+                    }
                     if (!pdfFile.exists()) {
                         throw new SMailException("El archivo PDF no existe.");
                     }
@@ -1998,6 +2005,13 @@ public abstract class STrnUtilities {
                     
                     if (!isCancelled) {
                         xmlFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
+                        if (!xmlFile.exists() && cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                            // crear el xml en caso de ser de nómina
+                            xmlFile.createNewFile();
+                            try (FileWriter fw = new FileWriter(xmlFile)) {
+                                fw.write(cfd.getDocXml());
+                            }
+                        }
                         if (!xmlFile.exists()) {
                             throw new SMailException("El archivo XML no existe.");
                         }
@@ -2024,6 +2038,12 @@ public abstract class STrnUtilities {
 
                     mail.send();
                     send = true;
+                    
+                    if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                        pdfFile.delete();
+                        xmlFile.delete();
+                    }
+                    
                     SCfdUtils.insertCfdSendLog(client, cfd, mails, false);
                 }
             }
