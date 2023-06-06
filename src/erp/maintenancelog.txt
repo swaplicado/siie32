@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 213.2/ 2023-06-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del filtro en la vista de días inhábiles bancarios.
+2) Creación de la forma para copiar los días inhábiles bancarios de años pasados al año actual.
+3) Adición del Incoterm DPU en la lista de los incoterms multimodales.
+4) Nuevo filtro en la forma de DPS para evitar cambiar un DPS de periodo cuando este ya tenga pagos realizados.
+
+================================================================================
 SIIE 3.2 213.1/ 2023-05-22
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

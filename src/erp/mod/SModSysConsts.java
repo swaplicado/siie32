@@ -800,6 +800,7 @@ public abstract class SModSysConsts {
     public static final int LOGS_INC_DDU = 22;
     public static final int LOGS_INC_DES = 23;
     public static final int LOGS_INC_DEQ = 24;
+    public static final int LOGS_INC_DPU = 25;
     public static final int LOGS_INC_LAB = 101;
     
     public static final int LOGS_TP_BOL_PERSON_DRI = 1; // Driver

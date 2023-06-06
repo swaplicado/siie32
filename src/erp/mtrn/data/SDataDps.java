@@ -920,14 +920,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     private boolean testDeletion(java.sql.Connection poConnection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
         int i = 0;
         int[] anPeriodKey = null;
-        double dAuxBalance = 0;
-        double dAuxBalanceCy = 0;
         String sSql = "";
         String sMsg = psMsg;
         String sMsgAux = "";
         Statement oStatement = null;
         ResultSet oResultSet = null;
-        DecimalFormat oDecimalFormat = new DecimalFormat("$ #,##0.00");
+        
         CallableStatement oCallableStatement = null;
 
         if (pnAction == SDbConsts.ACTION_DELETE && mbIsDeleted) {
@@ -1009,48 +1007,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
 
             if (isDocument() && !isPrepaymentOnly()) {
-                // Check that document's balance is equal to document's value:
-
-                i = 1;
-                anPeriodKey = SLibTimeUtilities.digestYearMonth(mtDate);
-                oCallableStatement = poConnection.prepareCall("{ CALL trn_dps_bal(?, ?, ?, ?, ?, ?) }");
-                oCallableStatement.setInt(i++, mnPkYearId);
-                oCallableStatement.setInt(i++, mnPkDocId);
-                oCallableStatement.setInt(i++, getAccSysTypeIdBizPartnerXXX());
-                oCallableStatement.registerOutParameter(i++, java.sql.Types.DECIMAL);
-                oCallableStatement.registerOutParameter(i++, java.sql.Types.DECIMAL);
-                oCallableStatement.registerOutParameter(i++, java.sql.Types.SMALLINT);
-                oCallableStatement.execute();
-
-                double dBalance = oCallableStatement.getDouble(i - 3);
-                double dBalanceCy = oCallableStatement.getDouble(i - 2);
-
-                if (isDocumentPur()) {
-                    dBalance *= -1d;
-                    dBalanceCy *= -1d;
-                }
-
-                // Add prepayments, when positive, to document balance obtained from system (when negative, it means that prepayments are applied to document, and document balance must remain as obtained):
-                
-                double dPrepayments = obtainAmountPrepayments(AMT_PRE_PAY);
-                double dPrepaymentsCy = obtainAmountPrepayments(AMT_PRE_PAY_CY);
-
-                dAuxBalance = SLibUtils.roundAmount(dBalance + (dPrepayments <= 0 ? 0 : dPrepayments));
-                dAuxBalanceCy = SLibUtils.roundAmount(dBalanceCy + (dPrepaymentsCy <= 0 ? 0 : dPrepaymentsCy));
-                
-                if (dAuxBalance != mdTotal_r) {
-                    mnDbmsErrorId = 101;
-                    msDbmsError = sMsg + "¡El saldo del documento en la moneda local, " + oDecimalFormat.format(dAuxBalance) + ", " +
-                            "es distinto al total del mismo, " + oDecimalFormat.format(mdTotal_r) + "!";
-                    throw new Exception(msDbmsError);
-                }
-
-                if (dAuxBalanceCy != mdTotalCy_r) {
-                    mnDbmsErrorId = 101;
-                    msDbmsError = sMsg + "¡El saldo del documento en la moneda del documento, " + oDecimalFormat.format(dAuxBalanceCy) + ", " +
-                            "es distinto al total del mismo, " + oDecimalFormat.format(mdTotalCy_r) + "!";
-                    throw new Exception(msDbmsError);
-                }
+                validateDocBalance(poConnection, sMsg);
             }
 
             oStatement = poConnection.createStatement();
@@ -1622,6 +1579,55 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     /*
      * Public functions
      */
+    
+    public void validateDocBalance(java.sql.Connection poConnection, java.lang.String psMsg) throws Exception {
+        // Check that document's balance is equal to document's value:
+        CallableStatement oCallableStatement;
+        DecimalFormat oDecimalFormat = new DecimalFormat("$ #,##0.00");
+        double dAuxBalance;
+        double dAuxBalanceCy;
+        String sMsg = psMsg;
+        
+        int i = 1;
+        oCallableStatement = poConnection.prepareCall("{ CALL trn_dps_bal(?, ?, ?, ?, ?, ?) }");
+        oCallableStatement.setInt(i++, mnPkYearId);
+        oCallableStatement.setInt(i++, mnPkDocId);
+        oCallableStatement.setInt(i++, getAccSysTypeIdBizPartnerXXX());
+        oCallableStatement.registerOutParameter(i++, java.sql.Types.DECIMAL);
+        oCallableStatement.registerOutParameter(i++, java.sql.Types.DECIMAL);
+        oCallableStatement.registerOutParameter(i++, java.sql.Types.SMALLINT);
+        oCallableStatement.execute();
+
+        double dBalance = oCallableStatement.getDouble(i - 3);
+        double dBalanceCy = oCallableStatement.getDouble(i - 2);
+
+        if (isDocumentPur()) {
+            dBalance *= -1d;
+            dBalanceCy *= -1d;
+        }
+
+        // Add prepayments, when positive, to document balance obtained from system (when negative, it means that prepayments are applied to document, and document balance must remain as obtained):
+
+        double dPrepayments = obtainAmountPrepayments(AMT_PRE_PAY);
+        double dPrepaymentsCy = obtainAmountPrepayments(AMT_PRE_PAY_CY);
+
+        dAuxBalance = SLibUtils.roundAmount(dBalance + (dPrepayments <= 0 ? 0 : dPrepayments));
+        dAuxBalanceCy = SLibUtils.roundAmount(dBalanceCy + (dPrepaymentsCy <= 0 ? 0 : dPrepaymentsCy));
+
+        if (dAuxBalance != mdTotal_r) {
+            mnDbmsErrorId = 101;
+            msDbmsError = sMsg + "¡El saldo del documento en la moneda local, " + oDecimalFormat.format(dAuxBalance) + ", " +
+                    "es distinto al total del mismo, " + oDecimalFormat.format(mdTotal_r) + "!";
+            throw new Exception(msDbmsError);
+        }
+
+        if (dAuxBalanceCy != mdTotalCy_r) {
+            mnDbmsErrorId = 101;
+            msDbmsError = sMsg + "¡El saldo del documento en la moneda del documento, " + oDecimalFormat.format(dAuxBalanceCy) + ", " +
+                    "es distinto al total del mismo, " + oDecimalFormat.format(mdTotalCy_r) + "!";
+            throw new Exception(msDbmsError);
+        }
+    }
 
     public int[] getAccMvtSubclassKeyBizPartner() {
         int[] moveSubclassKey = null;

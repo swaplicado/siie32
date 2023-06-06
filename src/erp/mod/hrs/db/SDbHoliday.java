@@ -218,44 +218,19 @@ public class SDbHoliday extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
-   
-    public static boolean finYearExists(SGuiSession session, int pkYearId) throws SQLException {
-        boolean notYearExists = false;
-        String mySql = "SELECT * FROM fin_year WHERE id_year = " + pkYearId + " AND NOT b_closed AND NOT b_del;";
-        Statement statement = session.getStatement().getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery(mySql);
-        if (resultSet.next()) {
-            return notYearExists = true;
-        } 
-        else {
-            return notYearExists;
-        }
-    }
     
     public static boolean existHolidaysInCurrentYear(SGuiSession session, int pkYearId) throws SQLException {
-        boolean notHolidaysExists = false;
         String mySql = "SELECT * FROM hrs_hol WHERE id_hdy = " + pkYearId + " AND NOT b_del;";
         Statement statement = session.getStatement().getConnection().createStatement();
         ResultSet resultSet = statement.executeQuery(mySql);
-        if (resultSet.next()) {
-            return notHolidaysExists = true;
-        } 
-        else {
-            return notHolidaysExists;
-        }
+        return resultSet.next();
     }
     
     public static boolean existHolidaysToCopy(SGuiSession session, int pkYearCopy) throws SQLException {
-        boolean notHolidaysExistsCopy = false;
         String mySql = "SELECT * FROM hrs_hol WHERE id_hdy = " + pkYearCopy + " AND NOT b_del;";
         Statement statement = session.getStatement().getConnection().createStatement();
         ResultSet resultSet = statement.executeQuery(mySql);
-        if (resultSet.next()) {
-            return notHolidaysExistsCopy = true;
-        }
-        else {
-            return notHolidaysExistsCopy;
-        }
+        return resultSet.next();
     }
     
     public static Date validateDate(int currentYear, Date dt) throws ParseException {
