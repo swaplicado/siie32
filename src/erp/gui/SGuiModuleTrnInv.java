@@ -137,6 +137,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintUserToolMaintProv;
     private javax.swing.JMenuItem jmiMaintArea;
     
+    private javax.swing.JMenu jmMenuReq;
+    private javax.swing.JMenuItem jmiReqReq;
+    
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
     private javax.swing.JMenuItem jmiStkStockValueCost;
@@ -248,7 +251,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPurOrderSupplies.addActionListener(this);
         jmiDpsPurOrderSuppliesInvoice.addActionListener(this);
 
-        jmMenuDpsPurRet = new JMenu("Devoluciones compras");
+        jmMenuDpsPurRet = new JMenu("Devs. compras");
         jmiDpsPurReturnPend = new JMenuItem("Compras por devolver");
         jmiDpsPurReturnPendEty = new JMenuItem("Compras por devolver a detalle");
         jmiDpsPurReturned = new JMenuItem("Compras devueltas");
@@ -282,7 +285,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsSalSuppliedEntry.addActionListener(this);
         jmiDpsSalOrderSupply.addActionListener(this);
 
-        jmMenuDpsSalRet = new JMenu("Devoluciones ventas");
+        jmMenuDpsSalRet = new JMenu("Devs. ventas");
         jmiDpsSalReturnPend = new JMenuItem("Ventas por devolver");
         jmiDpsSalReturnPendEntry = new JMenuItem("Ventas por devolver a detalle");
         jmiDpsSalReturned = new JMenuItem("Ventas devueltas");
@@ -474,6 +477,13 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserToolMaintProv.addActionListener(this);
         jmiMaintArea.addActionListener(this);
         
+        jmMenuReq = new JMenu("Requisiciones");
+        jmiReqReq = new JMenuItem("Requisiciones");
+        
+        jmMenuReq.add(jmiReqReq);
+        
+        jmiReqReq.addActionListener(this);
+        
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
         jmiStkStockValueCost = new JMenuItem("Existencias valor ítem");
@@ -634,6 +644,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserContractorSupv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintUserToolMaintProv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintArea.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
+        jmMenuReq.setEnabled(true);
+        jmiReqReq.setEnabled(true);
         jmMenuStk.setEnabled(hasRightStock);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1247,7 +1259,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmMenuCat, jmMenuDpsPurSup, jmMenuDpsPurRet, jmMenuDpsSalSup, jmMenuDpsSalRet, jmMenuMfg, jmMenuIog, jmMenuMaint, jmMenuStk, jmMenuRep };
+        return new JMenu[] { jmMenuCat, jmMenuDpsPurSup, jmMenuDpsPurRet, jmMenuDpsSalSup, jmMenuDpsSalRet, jmMenuMfg, jmMenuIog, jmMenuMaint, jmMenuReq, jmMenuStk, jmMenuRep };
     }
 
     @Override
@@ -1487,6 +1499,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiMaintArea) {
                 miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqReq) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);
