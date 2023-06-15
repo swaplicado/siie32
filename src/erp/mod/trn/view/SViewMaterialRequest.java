@@ -118,6 +118,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                         String reason = "";
                         if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
                             reason = JOptionPane.showInputDialog("Ingrese motivo de rechazo:");
+                            if (reason == null) {
+                                return;
+                            }
                         }
                         String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
                                                                                     iAction,
