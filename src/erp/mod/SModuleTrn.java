@@ -23,6 +23,7 @@ import erp.mod.trn.db.SDbMaintConfig;
 import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
+import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormFunctionalAreaBudgets;
@@ -33,6 +34,7 @@ import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
 import erp.mod.trn.form.SFormMaintUser;
 import erp.mod.trn.form.SFormMaintUserSupervisor;
+import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewCurrencyBalance;
@@ -51,6 +53,7 @@ import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMaintUser;
 import erp.mod.trn.view.SViewMaintUserSupervisor;
+import erp.mod.trn.view.SViewMaterialRequest;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewValCost;
@@ -89,6 +92,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaintUser moFormMaintUserToolMaintProv;
     private SFormMaintUserSupervisor moFormMaintUserSupv;
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
+    private SFormMaterialRequest moFormMaterialRequest;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -184,6 +188,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_COST_IDENT_LOT:
                 registry = new SDbIdentifiedCostLot();
+                break;
+            case SModConsts.TRN_MAT_REQ:
+                registry = new SDbMaterialRequest();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -348,6 +355,9 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAINT_USER_SUPV:
                 view = new SViewMaintUserSupervisor(miClient, "Mantto. - Residentes contratistas");
                 break;
+            case SModConsts.TRN_MAT_REQ:
+                view = new SViewMaterialRequest(miClient, "Requisiciones");
+                break;
             case SModConsts.TRN_ITEM_COST:
                 view = new SViewItemCost(miClient, "Costos de ítems");
                 break;
@@ -446,6 +456,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");
                 form = moFormFunctionalAreaBudgets;
+                break;
+            case SModConsts.TRN_MAT_REQ:
+                if (moFormMaterialRequest == null) moFormMaterialRequest = new SFormMaterialRequest(miClient, "Requisición");
+                form = moFormMaterialRequest;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

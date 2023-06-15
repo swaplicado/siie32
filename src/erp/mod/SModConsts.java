@@ -79,6 +79,7 @@ public abstract class SModConsts {
     public static final int CFGS_TP_DBMS = 1011009;
     public static final int CFGS_TP_MMS = 1011010;
     public static final int CFGS_TP_MOD = 1011011;
+    public static final int CFGS_TP_AUTH = 1011020;
 
     public static final int CFGU_CUR = 1012001;
     public static final int CFGU_CO = 1012002;
@@ -89,6 +90,8 @@ public abstract class SModConsts {
     public static final int CFGU_CERT = 1013001;
     public static final int CFGU_FUNC = 1013011;
     public static final int CFGU_SHIFT = 1013021;
+    public static final int CFGU_AUTH = 1013031;
+    public static final int CFGU_AUTH_STEP = 1013032;
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
@@ -817,6 +820,7 @@ public abstract class SModConsts {
         TablesMap.put(CFGS_TP_DBMS, "erp.cfgs_tp_dbms");
         TablesMap.put(CFGS_TP_MMS, "erp.cfgs_tp_mms");
         TablesMap.put(CFGS_TP_MOD, "erp.cfgs_tp_mod");
+        TablesMap.put(CFGS_TP_AUTH, "erp.cfgs_tp_auth");
 
         TablesMap.put(CFGU_CUR, "erp.cfgu_cur");
         TablesMap.put(CFGU_CO, "erp.cfgu_co");
@@ -827,6 +831,8 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_CERT, "cfgu_cert");
         TablesMap.put(CFGU_FUNC, "cfgu_func");
         TablesMap.put(CFGU_SHIFT, "cfgu_shift");
+        TablesMap.put(CFGU_AUTH, "cfgu_auth");
+        TablesMap.put(CFGU_AUTH_STEP, "cfgu_auth_step");
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");

@@ -11,8 +11,8 @@ import erp.mod.cfg.db.SDbCurrency;
 import erp.mod.cfg.db.SDbFunctionalArea;
 import erp.mod.cfg.db.SDbLanguage;
 import erp.mod.cfg.db.SDbShift;
-import erp.mod.cfg.form.SFormFunctionalArea;
-import erp.mod.cfg.view.SViewFunctionalArea;
+import erp.mod.cfg.form.*;
+import erp.mod.cfg.view.*;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -182,6 +182,9 @@ public class SModuleCfg extends SGuiModule {
         switch (type) {
             case SModConsts.CFGU_FUNC:
                 view = new SViewFunctionalArea(miClient, "Áreas funcionales");
+                break;
+            case SModConsts.CFGU_AUTH_STEP:
+                view = new SViewAuthorizations(miClient, "Autorizaciones");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

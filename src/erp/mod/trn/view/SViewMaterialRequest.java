@@ -4,15 +4,26 @@
  */
 package erp.mod.trn.view;
 
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.trn.form.SDialogAuthorizationCardex;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
+import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -20,11 +31,13 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Edwin Carmona
  */
-public class SViewMaterialRequest extends SGridPaneView {
+public class SViewMaterialRequest extends SGridPaneView implements ActionListener {
 
-    private final SGridFilterDatePeriod moFilterDatePeriod;
+    private JButton jbAuthCardex;
+    private SGridFilterDatePeriod moFilterDatePeriod;
+    private SDialogAuthorizationCardex moDialogAuthCardex;
     
     /**
      * @param client GUI client.
@@ -32,17 +45,56 @@ public class SViewMaterialRequest extends SGridPaneView {
      */
     public SViewMaterialRequest(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, title, null);
+        initComponents();
+    }
+    
+    private void initComponents() {
         setRowButtonsEnabled(true);
+        
+        jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver entregas mensuales", this);
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Entregas mensuales partida del contrato");
+    }
+    
+    private void actionCardex() {
+        int[] key = null;
+        
+        if (jbAuthCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                        moDialogAuthCardex.setFormParams(SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ), key);
+                        moDialogAuthCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
     
     @Override
     public void prepareSqlQuery() {
         String where = "";
         Object filter;
+        
+        moPaneSettings = new SGridPaneSettings(1);
 
         moPaneSettings.setDeletedApplying(true);
         moPaneSettings.setUserInsertApplying(true);
@@ -68,11 +120,26 @@ public class SViewMaterialRequest extends SGridPaneView {
                 + "v.b_clo_prov, "
                 + "pe.name AS prov_ent, "
                 + "rp.name AS req_pty, "
-                + "srm.name AS status, "
+                + "smr.name AS status, "
                 + "ur.usr AS usr_req, "
                 + "bmu.bp AS contractor, "
                 + "ce.name AS cons_ent, "
                 + "cse.name AS cons_subent, "
+                + "CASE "
+                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 1 THEN 'AUTORIZADO' "
+                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 2 THEN 'RECHAZADO' "
+                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 3 THEN 'PENDIENTE' "
+                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 4 THEN 'EN AUTORIZACIÓN' "
+                + "ELSE '---' "
+                + "END AS auth_status, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_clo_prov, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -99,15 +166,15 @@ public class SViewMaterialRequest extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS ce ON "
                 + "v.fk_ent_mat_cons_ent = ce.id_mat_cons_ent "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " AS cse ON "
-                + "v.fk_subent_mat_cons_ent = cse.id_mat_cons_ent AND v.fk_subent_mat_cons_sunent = cse.id_mat_cons_subent "
+                + "v.fk_subent_mat_cons_ent_n = cse.id_mat_cons_ent AND v.fk_subent_mat_cons_subent_n = cse.id_mat_cons_subent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
-                + "v.fk_usr_clo_prov = ui.id_usr "
+                + "v.fk_usr_clo_prov = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (where.isEmpty() ? "" : "WHERE " + where)
-                + "ORDER BY v.num, v.id_dvy ";
+                + "ORDER BY v.dt, v.num ";
     }
 
     @Override
@@ -124,8 +191,9 @@ public class SViewMaterialRequest extends SGridPaneView {
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cons_subent", "Subent. consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_pty", "Prioridad req."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "b_clo_prov", SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "status", "Estatus"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "auth_status", "Estatus aut"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "b_clo_prov", "Cerrado surtido"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_clo", "Usr cerrado"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_usr_clo_prov", "Usr TS cerrado"));
@@ -133,7 +201,6 @@ public class SViewMaterialRequest extends SGridPaneView {
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_UPD_NAME, SGridConsts.COL_TITLE_USER_UPD_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_UPD_TS, SGridConsts.COL_TITLE_USER_UPD_TS));
-        
         
         return columns;
     }
@@ -149,5 +216,17 @@ public class SViewMaterialRequest extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.TRN_MAT_CONS_SUBENT);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+        moSuscriptionsSet.add(SModConsts.CFGU_AUTH_STEP);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+
+            if (button == jbAuthCardex) {
+                actionCardex();
+            }
+        }
     }
 }

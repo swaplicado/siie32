@@ -604,18 +604,18 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 640, 400);
         
-        moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem), true);
-        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
-        moCurCost.setCompoundFieldSettings(miClient);
-        moCurCost.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCost), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
-        
-        moFields.addField(moKeyItem);
-        moFields.addField(moDateDateStart);
-        moFields.addField(moCurCost.getField());
-
-        moFields.setFormButton(jbSave);
-        
-        jbPickItem.addActionListener(this);
+//        moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem), true);
+//        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
+//        moCurCost.setCompoundFieldSettings(miClient);
+//        moCurCost.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCost), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
+//        
+//        moFields.addField(moKeyItem);
+//        moFields.addField(moDateDateStart);
+//        moFields.addField(moCurCost.getField());
+//
+//        moFields.setFormButton(jbSave);
+//        
+//        jbPickItem.addActionListener(this);
     }
     
     private SGuiValidation validateRegistryUnicity() {
@@ -624,10 +624,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         
         if (moRegistry.isRegistryNew()) {
             try {
-                String sql = "SELECT b_del FROM trn_item_cost " +
-                    "WHERE fk_item = " + moKeyItem.getValue()[0] + " " +
-                    "AND fk_unit = " + moDataUnit.getPkUnitId() + " " +
-                    "AND dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "';";
+                String sql = "SELECT b_del FROM trn_item_cost " 
+//                    "WHERE fk_item = " + moKeyItem.getValue()[0] + " " +
+//                    "AND fk_unit = " + moDataUnit.getPkUnitId() + " " +
+//                    "AND dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "';"
+                        ;
 
                 ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
                 if (resultSet.next()) {
@@ -655,7 +656,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
             if (key != null) {
                 if (key[0] != SLibConsts.UNDEFINED) {
-                    moKeyItem.setValue(new int[] { key[0] });
+//                    moKeyItem.setValue(new int[] { key[0] });
                 }
             }
         }
@@ -663,18 +664,18 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     
     private void itemStateChangedItem() {
         try {
-            if(moKeyItem.getSelectedIndex() <= 0) {
-                moDataUnit = null;
-                
-                moUnit.setValue("");
-            }
-            else {
-                SDataItem item = (SDataItem) SDataUtilities.readRegistry((SClientInterface) miClient,
-                                SDataConstants.ITMU_ITEM, moKeyItem.getValue(), SLibConstants.EXEC_MODE_SILENT);
-                moDataUnit = item.getDbmsDataUnit();
-                
-                moUnit.setValue(moDataUnit.getUnit());
-            }
+//            if(moKeyItem.getSelectedIndex() <= 0) {
+//                moDataUnit = null;
+//                
+//                moUnit.setValue("");
+//            }
+//            else {
+//                SDataItem item = (SDataItem) SDataUtilities.readRegistry((SClientInterface) miClient,
+//                                SDataConstants.ITMU_ITEM, moKeyItem.getValue(), SLibConstants.EXEC_MODE_SILENT);
+//                moDataUnit = item.getDbmsDataUnit();
+//                
+//                moUnit.setValue(moDataUnit.getUnit());
+//            }
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -683,62 +684,62 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     
     @Override
     public void addAllListeners() {
-        moKeyItem.addItemListener(this);
+//        moKeyItem.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        moKeyItem.removeItemListener(this); 
+//        moKeyItem.removeItemListener(this); 
     }
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyItem, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+//        miClient.getSession().populateCatalogue(moKeyItem, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbItemCost) registry;
-
-        mnFormResult = SLibConsts.UNDEFINED;
-        mbFirstActivation = true;
-
-        removeAllListeners();
-        reloadCatalogues();
-
-        if (moRegistry.isRegistryNew()) {
-            moRegistry.initPrimaryKey();
-            moRegistry.setDateStart(miClient.getSession().getCurrentDate());
-            jtfRegistryKey.setText("");
-        }
-        else {
-            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
-        }
-
-        moKeyItem.setValue(new int[] { moRegistry.getFkItemId() });
-        itemStateChangedItem();
-        moDateDateStart.setValue(moRegistry.getDateStart());
-        moCurCost.getField().setValue(moRegistry.getCost());
-        
-        setFormEditable(true);
-
-        if (moRegistry.isRegistryNew()) { }
+//        moRegistry = (SDbItemCost) registry;
+//
+//        mnFormResult = SLibConsts.UNDEFINED;
+//        mbFirstActivation = true;
+//
+//        removeAllListeners();
+//        reloadCatalogues();
+//
+//        if (moRegistry.isRegistryNew()) {
+//            moRegistry.initPrimaryKey();
+//            moRegistry.setDateStart(miClient.getSession().getCurrentDate());
+//            jtfRegistryKey.setText("");
+//        }
+//        else {
+//            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
+//        }
+//
+//        moKeyItem.setValue(new int[] { moRegistry.getFkItemId() });
+//        itemStateChangedItem();
+//        moDateDateStart.setValue(moRegistry.getDateStart());
+//        moCurCost.getField().setValue(moRegistry.getCost());
+//        
+//        setFormEditable(true);
+//
+//        if (moRegistry.isRegistryNew()) { }
 
         addAllListeners();
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbItemCost registry = (SDbItemCost) moRegistry.clone();
+//        SDbItemCost registry = (SDbItemCost) moRegistry.clone();
+//
+//        if (registry.isRegistryNew()) {}
+//        
+//        moRegistry.setFkItemId(moKeyItem.getValue()[0]);
+//        moRegistry.setFkUnitId(moDataUnit.getPkUnitId());
+//        moRegistry.setDateStart(moDateDateStart.getValue());
+//        moRegistry.setCost(moCurCost.getField().getValue());
 
-        if (registry.isRegistryNew()) {}
-        
-        moRegistry.setFkItemId(moKeyItem.getValue()[0]);
-        moRegistry.setFkUnitId(moDataUnit.getPkUnitId());
-        moRegistry.setDateStart(moDateDateStart.getValue());
-        moRegistry.setCost(moCurCost.getField().getValue());
-
-        return registry;
+        return null;
     }
 
     @Override
@@ -756,9 +757,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
-            if (button == jbPickItem) {
-                actionPerformedPickItem();
-            }
+//            if (button == jbPickItem) {
+//                actionPerformedPickItem();
+//            }
         }
     }
 
@@ -766,9 +767,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() instanceof SBeanFieldKey) {
             SBeanFieldKey field = (SBeanFieldKey) e.getSource();
-            if (field == moKeyItem) {
-                itemStateChangedItem();
-            }
+//            if (field == moKeyItem) {
+//                itemStateChangedItem();
+//            }
         }
     }
 
