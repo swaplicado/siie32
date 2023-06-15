@@ -502,6 +502,9 @@ public class SDbAuthStep extends SDbRegistryUser implements SGridRow {
             case 6:
                 value = msAuxStepUsername;
                 break;
+            case 7:
+                value = msComments;
+                break;
             default:
                 break;
         }

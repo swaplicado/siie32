@@ -116,6 +116,7 @@ public class SDialogAuthorizationCardex extends SBeanFormDialog implements ListS
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Rechazado", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha rechazo", 125));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Usuario", 150));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 250));
 
                 return gridColumnsForm;
             }

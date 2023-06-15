@@ -44,8 +44,8 @@ public class SAuthorizationUtils {
      */
     public static final int AUTH_STATUS_AUTHORIZED = 1;
     public static final int AUTH_STATUS_REJECTED = 2;
-    public static final int AUTH_STATUS_NO_AUTHORIZED = 3;
-    public static final int AUTH_STATUS_NOT_FOUND = 4;
+    public static final int AUTH_STATUS_PENDING = 3;
+    public static final int AUTH_STATUS_AUTHORIZING = 4;
     
     /**
      * Constantes de tipo de autorización
@@ -54,12 +54,19 @@ public class SAuthorizationUtils {
     public static final int AUTH_TYPE_DPS = 2;
     
     /**
+     * Constantes de acción sobre recursos
+     */
+    public static final int AUTH_ACTION_AUTHORIZE = 1;
+    public static final int AUTH_ACTION_REJECT = 2;
+    
+    /**
      * Determina si un recurso está autorizado o no.
      * Si lo está devuelve true, si devuelve false NO significa que esté rechazado.
      * 
      * @param session
      * @param authorizationType
      * @param pk
+     * 
      * @return 
      */
     public static boolean isAuthorized(SGuiSession session, final int authorizationType, final Object pk) {
@@ -128,7 +135,7 @@ public class SAuthorizationUtils {
                     lStatus.add(new SAuthStatus(AUTH_STATUS_REJECTED, res.getString("rej_user")));
                 }
                 else {
-                    lStatus.add(new SAuthStatus(AUTH_STATUS_NO_AUTHORIZED, res.getString("step_user")));
+                    lStatus.add(new SAuthStatus(AUTH_STATUS_PENDING, res.getString("step_user")));
                 }
             }
             
@@ -144,17 +151,19 @@ public class SAuthorizationUtils {
     }
     
     /**
-     * Petición de autorización de recurso.
+     * Petición de autorización o rechazo de recurso.
      * Si el proceso ha sido exitoso devuelve un Strin vacío, si ha ocurrido un error el 
      * String explicará lo que ha sucedido
      * 
      * @param session
+     * @param action
      * @param authorizationType
      * @param pk
      * @param userId
+     * 
      * @return 
      */
-    public static String authorizeResource(SGuiSession session, final int authorizationType, final Object pk, final int userId) {
+    public static String authOrRejResource(SGuiSession session, final int action, final int authorizationType, final Object pk, final int userId, String reasonRej) {
         String condPk = "";
         switch(authorizationType) {
             case AUTH_TYPE_MAT_REQUEST:
@@ -178,7 +187,12 @@ public class SAuthorizationUtils {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
             
             if (res.next()) {
-                return SAuthorizationUtils.authorizeById(session, res.getInt("id_auth_step"));
+                if (action == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
+                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_auth_step"));
+                }
+                else {
+                    return SAuthorizationUtils.rejectById(session, res.getInt("id_auth_step"), reasonRej);
+                }
             }
             else {
                 return "No se encontró la autorización para el usuario recibido.";
@@ -201,6 +215,7 @@ public class SAuthorizationUtils {
      * 
      * @param session
      * @param idAuthStep
+     * 
      * @return 
      */
     public static String authorizeById(SGuiSession session, final int idAuthStep) {
@@ -240,7 +255,7 @@ public class SAuthorizationUtils {
                         lStatus.add(new SAuthStatus(AUTH_STATUS_REJECTED, resRows.getString("rej_user")));
                     }
                     else {
-                        lStatus.add(new SAuthStatus(AUTH_STATUS_NO_AUTHORIZED, resRows.getString("step_user")));
+                        lStatus.add(new SAuthStatus(AUTH_STATUS_PENDING, resRows.getString("step_user")));
                     }
                 }
                 
@@ -264,6 +279,7 @@ public class SAuthorizationUtils {
                 oStep.setDateTimeRejected_n(null);
                 oStep.setFkUserRejId_n(0);
                 oStep.setRejected(false);
+                oStep.setComments("");
                 
                 oStep.save(session);
         }
@@ -282,9 +298,10 @@ public class SAuthorizationUtils {
      * 
      * @param session
      * @param idAuthStep
+     * 
      * @return 
      */
-    public static String rejectById(SGuiSession session, final int idAuthStep) {
+    public static String rejectById(SGuiSession session, final int idAuthStep, String reasonRej) {
         SDbAuthStep oStep = new SDbAuthStep();
         try {
             oStep.read(session, new int[] { idAuthStep });
@@ -339,6 +356,7 @@ public class SAuthorizationUtils {
                 oStep.setDateTimeRejected_n(new Date());
                 oStep.setFkUserRejId_n(session.getUser().getPkUserId());
                 oStep.setRejected(true);
+                oStep.setComments(reasonRej);
                 
                 oStep.save(session);
         }
@@ -357,6 +375,7 @@ public class SAuthorizationUtils {
      * @param session
      * @param authorizationType
      * @param pk
+     * 
      * @throws Exception 
      */
     public static void processAuthorizations(SGuiSession session, final int authorizationType, final Object pk) throws Exception {
@@ -398,6 +417,7 @@ public class SAuthorizationUtils {
      * 
      * @param session
      * @param authorizationType
+     * 
      * @return 
      */
     private static ArrayList<SDbAuthConfiguration> getConfigurationsOfType(SGuiSession session, final int authorizationType) {
@@ -435,6 +455,7 @@ public class SAuthorizationUtils {
      * @param session
      * @param oCfg
      * @param condPk
+     * 
      * @return 
      */
     private static boolean applyCfg(SGuiSession session, SDbAuthConfiguration oCfg, final String condPk) {
@@ -497,6 +518,7 @@ public class SAuthorizationUtils {
      * 
      * @param oCfg
      * @param pk
+     * 
      * @return 
      */
     private static SDbAuthStep createStepFromCfg(SDbAuthConfiguration oCfg, final Object pk) {
@@ -554,6 +576,7 @@ public class SAuthorizationUtils {
      * 
      * @param session
      * @param oStep
+     * 
      * @return 
      */
     private static boolean stepExists(SGuiSession session, SDbAuthStep oStep) {
@@ -597,6 +620,7 @@ public class SAuthorizationUtils {
      * @param session
      * @param authorizationType
      * @param pk
+     * 
      * @return 
      */
     public static ArrayList<SDbAuthStep> getResourceAuthSteps(SGuiSession session, final int authorizationType, final Object pk) {

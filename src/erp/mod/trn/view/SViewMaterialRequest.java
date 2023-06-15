@@ -15,7 +15,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -36,6 +38,8 @@ import sa.lib.gui.SGuiDate;
 public class SViewMaterialRequest extends SGridPaneView implements ActionListener {
 
     private JButton jbAuthCardex;
+    private JButton jbAuthorize;
+    private JButton jbReject;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogAuthorizationCardex moDialogAuthCardex;
     
@@ -52,8 +56,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         setRowButtonsEnabled(true);
         
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver entregas mensuales", this);
+        jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
+        jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -87,6 +95,50 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 }
             }
         }
+    }
+    
+    private void actionAuthorizeOrRejectResource(final int iAction) {
+        if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (gridRow.isRowSystem()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        String reason = "";
+                        if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
+                            reason = JOptionPane.showInputDialog("Ingrese motivo de rechazo:");
+                        }
+                        String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
+                                                                                    iAction,
+                                                                                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
+                                                                                    gridRow.getRowPrimaryKey(),
+                                                                                    miClient.getSession().getUser().getPkUserId(),
+                                                                                    reason);
+                        if (response.length() > 0) {
+                                miClient.showMsgBoxError(response);
+                        }
+                        else {
+                            miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 
+                                    " con éxito");
+                            miClient.getSession().notifySuscriptors(mnGridType);
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
     }
     
     @Override
@@ -126,19 +178,19 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "ce.name AS cons_ent, "
                 + "cse.name AS cons_subent, "
                 + "CASE "
-                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 1 THEN 'AUTORIZADO' "
-                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 2 THEN 'RECHAZADO' "
-                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 3 THEN 'PENDIENTE' "
-                + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = 4 THEN 'EN AUTORIZACIÓN' "
-                + "ELSE '---' "
+                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " THEN 'AUTORIZADO' "
+                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_REJECTED + " THEN 'RECHAZADO' "
+                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_PENDING + " THEN 'PENDIENTE' "
+                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZING + " THEN 'EN AUTORIZACIÓN' "
+                    + "ELSE '---' "
                 + "END AS auth_status, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_clo_prov, "
@@ -226,6 +278,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
 
             if (button == jbAuthCardex) {
                 actionCardex();
+            }
+            else if (button == jbAuthorize) {
+                actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_AUTHORIZE);
+            }
+            else if (button == jbReject) {
+                actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_REJECT);
             }
         }
     }
