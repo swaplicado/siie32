@@ -4,7 +4,6 @@
  */
 package erp.mod.trn.view;
 
-import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
