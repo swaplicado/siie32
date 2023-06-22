@@ -101,6 +101,120 @@ public class SAuthorizationUtils {
     }
     
     /**
+     * Retorna el estatus del recurso recibido
+     * 
+     * @param session
+     * @param authorizationType
+     * @param pk
+     * 
+     * @return puede ser: AUTH_STATUS_AUTHORIZED, AUTH_STATUS_REJECTED, AUTH_STATUS_PENDING, AUTH_STATUS_AUTHORIZING
+     */
+    public static int getAuthStatus(SGuiSession session, final int authorizationType, final Object pk) {
+        String condPk = "";
+        switch(authorizationType) {
+            case AUTH_TYPE_MAT_REQUEST:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " ";
+                break;
+                
+            case AUTH_TYPE_DPS:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " AND res_pk_n2_n = " + ((int[]) pk)[1] + " ";
+                break;
+        }
+        
+        String query = "SELECT " +
+                        "    COUNT(*) AS n_rows " +
+                        "FROM " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " AS cas " +
+                        "        LEFT JOIN " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON cas.fk_usr_auth_n = ua.id_usr " +
+                        "        LEFT JOIN " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON cas.fk_usr_rej_n = ur.id_usr " +
+                        "        LEFT JOIN " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS us ON cas.fk_usr_step = us.id_usr " +
+                        "WHERE " +
+                        "    NOT cas.b_del AND cas.b_req " + " AND " + condPk;
+        
+        try {
+            /*
+            * Query TODOS
+            **********************************************************************************************************
+            */
+            ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(query);
+            
+            int allSteps = 0; 
+            if (res.next()) {
+                allSteps = res.getInt("n_rows");
+            }
+            
+            if (allSteps == 0) {
+                return AUTH_STATUS_AUTHORIZED;
+            }
+            
+            /*
+            * Query RECHAZADOS
+            **********************************************************************************************************
+            */
+            String queryRej = query + " AND cas.b_rej";
+            
+            ResultSet resRej = session.getDatabase().getConnection().createStatement().executeQuery(queryRej);
+            
+            int rejSteps = 0; 
+            if (resRej.next()) {
+                rejSteps = res.getInt("n_rows");
+            }
+            
+            if (rejSteps > 0) {
+                return AUTH_STATUS_REJECTED;
+            }
+            
+            /*
+            * Query AUTORIZADOS
+            **********************************************************************************************************
+            */
+            String queryAuth = query + " AND cas.b_auth";
+            
+            ResultSet resAuth = session.getDatabase().getConnection().createStatement().executeQuery(queryAuth);
+            
+            int authSteps = 0; 
+            if (resAuth.next()) {
+                authSteps = res.getInt("n_rows");
+            }
+            
+            if (authSteps == allSteps) {
+                return AUTH_STATUS_AUTHORIZED;
+            }
+            
+            /*
+            * Query PENDIENTES
+            **********************************************************************************************************
+            */
+            String queryPending = query + " AND NOT b_auth AND NOT b_rej";
+            
+            ResultSet resPending = session.getDatabase().getConnection().createStatement().executeQuery(queryPending);
+            
+            int pendingSteps = 0; 
+            if (resPending.next()) {
+                pendingSteps = res.getInt("n_rows");
+            }
+            
+            if (pendingSteps == allSteps) {
+                return AUTH_STATUS_PENDING;
+            }
+            
+            /*
+            * DEFAULT
+            **********************************************************************************************************
+            */
+            return AUTH_STATUS_AUTHORIZING;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return AUTH_STATUS_AUTHORIZING;
+    }
+    
+    /**
      * Devuelve una lista de los estatus de autorización del recurso y tipo de autorización.
      * Estos estatus son solamente de los pasos REQUERIDOS.
      * 

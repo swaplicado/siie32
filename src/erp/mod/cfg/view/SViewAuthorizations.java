@@ -102,9 +102,11 @@ public class SViewAuthorizations extends SGridPaneView implements ActionListener
 
         msSql = "SELECT " +
                     "    CASE " +
-                    "        WHEN v.fk_auth_type = " + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + " THEN 'F-REQUIS' " +
-                    "        WHEN v.fk_auth_type = " + SAuthorizationUtils.AUTH_TYPE_DPS + " " +
-                    "        THEN " +
+                    "        WHEN v.fk_auth_type = " + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + " THEN " +
+                    "             (SELECT LPAD(tmq.num, 6, '0') AS num_req " +
+                    "                FROM " + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + " AS tmq " +
+                    "               WHERE tmq.id_mat_req = v.res_pk_n1_n) " +
+                    "        WHEN v.fk_auth_type = " + SAuthorizationUtils.AUTH_TYPE_DPS + " THEN " +
                     "            (SELECT  " +
                     "                    CONCAT(t.dt_doc, ' ', t.num_ser, ' ', t.num, ' ', t.num_ref) " +
                     "                FROM " +
