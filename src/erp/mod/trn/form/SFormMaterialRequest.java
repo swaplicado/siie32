@@ -4,36 +4,40 @@
  */
 package erp.mod.trn.form;
 
-import erp.client.SClientInterface;
-import erp.data.SDataConstants;
-import erp.data.SDataUtilities;
-import erp.lib.SLibConstants;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
-import erp.mod.trn.db.SDbItemCost;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
+import erp.mod.trn.db.SDbMaterialRequestEntryNote;
 import erp.mod.trn.db.SDbMaterialRequestNote;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Vector;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridColumnForm;
+import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridPaneFormOwner;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiFields;
 import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
-import sa.lib.gui.bean.SBeanFieldKey;
 
 /**
  *
@@ -45,14 +49,23 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private SDbMaterialRequest moRegistry;
     private ArrayList<SDbMaterialRequestEntry> maMatReqEntries;
     private ArrayList<SDbMaterialRequestNote> maMatReqNotes;
+    private SGridPaneForm moGridMatReqList;
+    private boolean isEtyNew;
+    private int mnStatusAuthId;
+    
+    private SGuiFields moFieldsEty;
+    private SDataItem moItemEty;
+    
+    private JButton jbSaveAndSend;
 
     /**
      * Creates new form SFormItemCost
      * @param client
      * @param title
+     * @param type
      */
-    public SFormMaterialRequest(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, title);
+    public SFormMaterialRequest(SGuiClient client, String title, int type) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, title);
         initComponents();
         initComponentsCustom();
     }
@@ -106,12 +119,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jlPriReq = new javax.swing.JLabel();
         moKeyPriReq = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel26 = new javax.swing.JPanel();
-        moBoolClosed = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moTextUsrClo = new sa.lib.gui.bean.SBeanFieldText();
-        moTe = new sa.lib.gui.bean.SBeanFieldText();
+        jlReqStatus = new javax.swing.JLabel();
+        moTextReqStatus = new sa.lib.gui.bean.SBeanFieldText();
         jPanel27 = new javax.swing.JPanel();
-        jLabel8 = new javax.swing.JLabel();
-        sBeanFieldText4 = new sa.lib.gui.bean.SBeanFieldText();
         jpReqNotes = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jlReqNotes = new javax.swing.JLabel();
@@ -119,49 +129,63 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpEntry = new javax.swing.JPanel();
         jpEtyCapture = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
+        jlItem = new javax.swing.JLabel();
+        jlDescription = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
-        sBeanFieldText6 = new sa.lib.gui.bean.SBeanFieldText();
-        sBeanFieldText7 = new sa.lib.gui.bean.SBeanFieldText();
-        jbFkOriginalUnitId = new javax.swing.JButton();
-        sBeanFieldBoolean3 = new sa.lib.gui.bean.SBeanFieldBoolean();
-        sBeanFieldText8 = new sa.lib.gui.bean.SBeanFieldText();
+        moTextItemCode = new sa.lib.gui.bean.SBeanFieldText();
+        moTextItemName = new sa.lib.gui.bean.SBeanFieldText();
+        jbPickItem = new javax.swing.JButton();
+        moBoolNewItem = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moTextItemDescription = new sa.lib.gui.bean.SBeanFieldText();
         jPanel12 = new javax.swing.JPanel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
+        jlPresentation = new javax.swing.JLabel();
+        jlFactConv = new javax.swing.JLabel();
+        jlQty = new javax.swing.JLabel();
+        jlUnit = new javax.swing.JLabel();
+        jlConsDays = new javax.swing.JLabel();
+        jlConsEntEty = new javax.swing.JLabel();
+        jlConsSubentEty = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
-        sBeanFieldKey7 = new sa.lib.gui.bean.SBeanFieldKey();
-        sBeanFieldDecimal1 = new sa.lib.gui.bean.SBeanFieldDecimal();
-        sBeanFieldDecimal2 = new sa.lib.gui.bean.SBeanFieldDecimal();
-        sBeanFieldKey10 = new sa.lib.gui.bean.SBeanFieldKey();
-        sBeanFieldInteger2 = new sa.lib.gui.bean.SBeanFieldInteger();
-        sBeanFieldKey8 = new sa.lib.gui.bean.SBeanFieldKey();
-        sBeanFieldKey9 = new sa.lib.gui.bean.SBeanFieldKey();
+        moKeyPresentation = new sa.lib.gui.bean.SBeanFieldKey();
+        moDecFactConv = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moDecQty = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
+        moIntConsDays = new sa.lib.gui.bean.SBeanFieldInteger();
+        moKeyConsEntEty = new sa.lib.gui.bean.SBeanFieldKey();
+        moKeyConsSubentEty = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel20 = new javax.swing.JPanel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
+        jlDateReqEty = new javax.swing.JLabel();
+        jlPriEty = new javax.swing.JLabel();
+        jlEtyNotes = new javax.swing.JLabel();
         jPanel25 = new javax.swing.JPanel();
-        sBeanFieldDate3 = new sa.lib.gui.bean.SBeanFieldDate();
-        sBeanFieldKey11 = new sa.lib.gui.bean.SBeanFieldKey();
-        sBeanFieldText9 = new sa.lib.gui.bean.SBeanFieldText();
+        moDateReqEty = new sa.lib.gui.bean.SBeanFieldDate();
+        moKeyPriEty = new sa.lib.gui.bean.SBeanFieldKey();
+        moTextEtyNotes = new sa.lib.gui.bean.SBeanFieldText();
         jpEtyButtons = new javax.swing.JPanel();
         jpEtyButtons2 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
-        jButton4 = new javax.swing.JButton();
+        jbNewEty = new javax.swing.JButton();
         jPanel22 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
+        jbRegisterEty = new javax.swing.JButton();
         jPanel23 = new javax.swing.JPanel();
-        jButton5 = new javax.swing.JButton();
+        jbEditEty = new javax.swing.JButton();
         jPanel24 = new javax.swing.JPanel();
-        jpCfdiConcepts = new javax.swing.JPanel();
+        jbDeleteEty = new javax.swing.JButton();
+        jpTable = new javax.swing.JPanel();
         jpEntries = new javax.swing.JPanel();
+        jpValidate = new javax.swing.JPanel();
+        jpEstados = new javax.swing.JPanel();
+        jlAuthStatus = new javax.swing.JLabel();
+        moTextAuthStatus = new sa.lib.gui.bean.SBeanFieldText();
+        jbAuth = new javax.swing.JButton();
+        jbDisauth = new javax.swing.JButton();
+        jlspace = new javax.swing.JLabel();
+        jlProvStatus = new javax.swing.JLabel();
+        moTextProvStatus = new sa.lib.gui.bean.SBeanFieldText();
+        moBoolProvClosed = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jlPurStatus = new javax.swing.JLabel();
+        moTextPurStatus = new sa.lib.gui.bean.SBeanFieldText();
+        moBoolPurClosed = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
@@ -170,9 +194,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpRequest.setBorder(javax.swing.BorderFactory.createTitledBorder("Requisición:"));
         jpRequest.setLayout(new java.awt.BorderLayout());
 
-        jpReq1.setLayout(new java.awt.GridLayout(4, 0));
+        jpReq1.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlProvEnt.setText("Ent. suministro:*");
         jlProvEnt.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -183,7 +207,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq1.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNumber.setText("Folio:*");
         jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -194,7 +218,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq1.add(jPanel5);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Fecha:*");
         jlDate.setToolTipText("");
@@ -204,7 +228,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq1.add(jPanel7);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlUsrReq.setText("Solicitante:*");
         jlUsrReq.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -219,7 +243,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq2.setLayout(new java.awt.GridLayout(4, 0));
 
-        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlContractor.setText("Contratista:");
         jlContractor.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -230,25 +254,28 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq2.add(jPanel14);
 
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlReference.setText("Referencia:");
         jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlReference);
 
+        moTextReferecnce.setEnabled(false);
         moTextReferecnce.setPreferredSize(new java.awt.Dimension(73, 23));
         jPanel15.add(moTextReferecnce);
 
         jbImport.setText("Importar");
+        jbImport.setEnabled(false);
         jbImport.setPreferredSize(new java.awt.Dimension(79, 23));
         jPanel15.add(jbImport);
 
         moBoolImport.setText("Importado");
+        moBoolImport.setEnabled(false);
         jPanel15.add(moBoolImport);
 
         jpReq2.add(jPanel15);
 
-        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlConsEnt.setText("Ent. consumo:*");
         jlConsEnt.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -259,7 +286,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq2.add(jPanel16);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlConsSubent.setText("Subent. cons.:");
         jlConsSubent.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -274,7 +301,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq3.setLayout(new java.awt.GridLayout(4, 0));
 
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateReq.setText("Fecha requerida:");
         jlDateReq.setToolTipText("");
@@ -284,7 +311,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq3.add(jPanel1);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPriReq.setText("Prioridad req.:*");
         jlPriReq.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -295,28 +322,20 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReq3.add(jPanel6);
 
-        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolClosed.setText("Cerrado");
-        jPanel26.add(moBoolClosed);
+        jlReqStatus.setText("Estatus req.:");
+        jlReqStatus.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel26.add(jlReqStatus);
 
-        moTextUsrClo.setPreferredSize(new java.awt.Dimension(95, 23));
-        jPanel26.add(moTextUsrClo);
-
-        moTe.setPreferredSize(new java.awt.Dimension(95, 23));
-        jPanel26.add(moTe);
+        moTextReqStatus.setEditable(false);
+        moTextReqStatus.setEnabled(false);
+        moTextReqStatus.setPreferredSize(new java.awt.Dimension(197, 23));
+        jPanel26.add(moTextReqStatus);
 
         jpReq3.add(jPanel26);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jLabel8.setText("Estatus:");
-        jLabel8.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.add(jLabel8);
-
-        sBeanFieldText4.setPreferredSize(new java.awt.Dimension(197, 23));
-        jPanel27.add(sBeanFieldText4);
-
         jpReq3.add(jPanel27);
 
         jpRequest.add(jpReq3, java.awt.BorderLayout.EAST);
@@ -344,117 +363,122 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpEtyCapture.setLayout(new java.awt.GridLayout(6, 0));
 
         jPanel9.setPreferredSize(new java.awt.Dimension(636, 23));
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel13.setText("Ítem:*");
-        jLabel13.setPreferredSize(new java.awt.Dimension(550, 23));
-        jPanel9.add(jLabel13);
+        jlItem.setText("Ítem:*");
+        jlItem.setPreferredSize(new java.awt.Dimension(550, 23));
+        jPanel9.add(jlItem);
 
-        jLabel14.setText("Descripción:");
-        jPanel9.add(jLabel14);
+        jlDescription.setText("Descripción:");
+        jPanel9.add(jlDescription);
 
         jpEtyCapture.add(jPanel9);
 
         jPanel11.setPreferredSize(new java.awt.Dimension(902, 23));
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        sBeanFieldText6.setPreferredSize(new java.awt.Dimension(73, 23));
-        jPanel11.add(sBeanFieldText6);
+        moTextItemCode.setPreferredSize(new java.awt.Dimension(73, 23));
+        jPanel11.add(moTextItemCode);
 
-        sBeanFieldText7.setPreferredSize(new java.awt.Dimension(340, 23));
-        jPanel11.add(sBeanFieldText7);
+        moTextItemName.setEditable(false);
+        moTextItemName.setEnabled(false);
+        moTextItemName.setPreferredSize(new java.awt.Dimension(340, 23));
+        jPanel11.add(moTextItemName);
 
-        jbFkOriginalUnitId.setText("...");
-        jbFkOriginalUnitId.setToolTipText("Seleccionar unidad");
-        jbFkOriginalUnitId.setFocusable(false);
-        jbFkOriginalUnitId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel11.add(jbFkOriginalUnitId);
+        jbPickItem.setText("...");
+        jbPickItem.setToolTipText("Seleccionar unidad");
+        jbPickItem.setFocusable(false);
+        jbPickItem.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbPickItem);
 
-        sBeanFieldBoolean3.setText("Nuevo ítem");
-        jPanel11.add(sBeanFieldBoolean3);
+        moBoolNewItem.setText("Nuevo ítem");
+        jPanel11.add(moBoolNewItem);
 
-        sBeanFieldText8.setPreferredSize(new java.awt.Dimension(340, 23));
-        jPanel11.add(sBeanFieldText8);
+        moTextItemDescription.setEnabled(false);
+        moTextItemDescription.setPreferredSize(new java.awt.Dimension(340, 23));
+        jPanel11.add(moTextItemDescription);
 
         jpEtyCapture.add(jPanel11);
 
         jPanel12.setPreferredSize(new java.awt.Dimension(890, 23));
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel15.setText("Presentación:");
-        jLabel15.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jLabel15);
+        jlPresentation.setText("Presentación:*");
+        jlPresentation.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(jlPresentation);
 
-        jLabel16.setText("Fact. conv.:");
-        jLabel16.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jLabel16);
+        jlFactConv.setText("Fact. conv.:");
+        jlFactConv.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlFactConv);
 
-        jLabel17.setText("Cant. req.:");
-        jLabel17.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jLabel17);
+        jlQty.setText("Cant. req.:*");
+        jlQty.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlQty);
 
-        jLabel18.setText("Unidad:");
-        jLabel18.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jLabel18);
+        jlUnit.setText("Unidad:*");
+        jlUnit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlUnit);
 
-        jLabel19.setText("Días consumo:");
-        jLabel19.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jLabel19);
+        jlConsDays.setText("Días consumo:");
+        jlConsDays.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlConsDays);
 
-        jLabel20.setText("Enditad consumo:");
-        jLabel20.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jLabel20);
+        jlConsEntEty.setText("Enditad consumo:");
+        jlConsEntEty.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(jlConsEntEty);
 
-        jLabel21.setText("Subentidad consumo:");
-        jLabel21.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jLabel21);
+        jlConsSubentEty.setText("Subentidad consumo:");
+        jlConsSubentEty.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(jlConsSubentEty);
 
         jpEtyCapture.add(jPanel12);
 
         jPanel13.setPreferredSize(new java.awt.Dimension(890, 23));
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        sBeanFieldKey7.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel13.add(sBeanFieldKey7);
-        jPanel13.add(sBeanFieldDecimal1);
-        jPanel13.add(sBeanFieldDecimal2);
-        jPanel13.add(sBeanFieldKey10);
-        jPanel13.add(sBeanFieldInteger2);
+        moKeyPresentation.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(moKeyPresentation);
 
-        sBeanFieldKey8.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel13.add(sBeanFieldKey8);
+        moDecFactConv.setEnabled(false);
+        jPanel13.add(moDecFactConv);
+        jPanel13.add(moDecQty);
+        jPanel13.add(moKeyUnit);
+        jPanel13.add(moIntConsDays);
 
-        sBeanFieldKey9.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel13.add(sBeanFieldKey9);
+        moKeyConsEntEty.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(moKeyConsEntEty);
+
+        moKeyConsSubentEty.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(moKeyConsSubentEty);
 
         jpEtyCapture.add(jPanel13);
 
         jPanel20.setPreferredSize(new java.awt.Dimension(375, 23));
-        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel22.setText("Fecha requerida:");
-        jLabel22.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel20.add(jLabel22);
+        jlDateReqEty.setText("Fecha requerida:");
+        jlDateReqEty.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel20.add(jlDateReqEty);
 
-        jLabel27.setText("Prioridad:");
-        jLabel27.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel20.add(jLabel27);
+        jlPriEty.setText("Prioridad:");
+        jlPriEty.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel20.add(jlPriEty);
 
-        jLabel23.setText("Notas:");
-        jLabel23.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel20.add(jLabel23);
+        jlEtyNotes.setText("Notas:");
+        jlEtyNotes.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel20.add(jlEtyNotes);
 
         jpEtyCapture.add(jPanel20);
 
         jPanel25.setPreferredSize(new java.awt.Dimension(903, 28));
-        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        jPanel25.add(sBeanFieldDate3);
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel25.add(moDateReqEty);
 
-        sBeanFieldKey11.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel25.add(sBeanFieldKey11);
+        moKeyPriEty.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel25.add(moKeyPriEty);
 
-        sBeanFieldText9.setPreferredSize(new java.awt.Dimension(630, 23));
-        jPanel25.add(sBeanFieldText9);
+        moTextEtyNotes.setPreferredSize(new java.awt.Dimension(630, 23));
+        jPanel25.add(moTextEtyNotes);
 
         jpEtyCapture.add(jPanel25);
 
@@ -464,23 +488,28 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpEtyButtons2.setLayout(new java.awt.GridLayout(4, 0));
 
-        jButton4.setText("Registrar");
-        jButton4.setPreferredSize(new java.awt.Dimension(85, 23));
-        jPanel21.add(jButton4);
+        jbNewEty.setText("Nuevo");
+        jbNewEty.setPreferredSize(new java.awt.Dimension(85, 23));
+        jPanel21.add(jbNewEty);
 
         jpEtyButtons2.add(jPanel21);
 
-        jButton3.setText("Editar");
-        jButton3.setPreferredSize(new java.awt.Dimension(85, 23));
-        jPanel22.add(jButton3);
+        jbRegisterEty.setText("Registrar");
+        jbRegisterEty.setPreferredSize(new java.awt.Dimension(85, 23));
+        jPanel22.add(jbRegisterEty);
 
         jpEtyButtons2.add(jPanel22);
 
-        jButton5.setText("Eliminar");
-        jButton5.setPreferredSize(new java.awt.Dimension(85, 23));
-        jPanel23.add(jButton5);
+        jbEditEty.setText("Editar");
+        jbEditEty.setPreferredSize(new java.awt.Dimension(85, 23));
+        jPanel23.add(jbEditEty);
 
         jpEtyButtons2.add(jPanel23);
+
+        jbDeleteEty.setText("Eliminar");
+        jbDeleteEty.setPreferredSize(new java.awt.Dimension(85, 23));
+        jPanel24.add(jbDeleteEty);
+
         jpEtyButtons2.add(jPanel24);
 
         jpEtyButtons.add(jpEtyButtons2, java.awt.BorderLayout.NORTH);
@@ -491,34 +520,72 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpRegistry.add(jpCaptureArea, java.awt.BorderLayout.NORTH);
 
-        jpCfdiConcepts.setLayout(new java.awt.BorderLayout(0, 5));
+        jpTable.setLayout(new java.awt.BorderLayout(0, 5));
 
         jpEntries.setName(""); // NOI18N
         jpEntries.setLayout(new java.awt.BorderLayout());
-        jpCfdiConcepts.add(jpEntries, java.awt.BorderLayout.CENTER);
+        jpTable.add(jpEntries, java.awt.BorderLayout.CENTER);
 
-        jpRegistry.add(jpCfdiConcepts, java.awt.BorderLayout.CENTER);
+        jpRegistry.add(jpTable, java.awt.BorderLayout.CENTER);
+
+        jpValidate.setLayout(new java.awt.BorderLayout());
+
+        jpEstados.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlAuthStatus.setText("Autorización:");
+        jpEstados.add(jlAuthStatus);
+
+        moTextAuthStatus.setEnabled(false);
+        moTextAuthStatus.setPreferredSize(new java.awt.Dimension(110, 23));
+        jpEstados.add(moTextAuthStatus);
+
+        jbAuth.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_st_thumbs_up.png"))); // NOI18N
+        jbAuth.setToolTipText("Autorizar");
+        jbAuth.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEstados.add(jbAuth);
+
+        jbDisauth.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_st_thumbs_down.png"))); // NOI18N
+        jbDisauth.setToolTipText("Rechazar");
+        jbDisauth.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEstados.add(jbDisauth);
+
+        jlspace.setPreferredSize(new java.awt.Dimension(10, 23));
+        jpEstados.add(jlspace);
+
+        jlProvStatus.setText("Suministro:");
+        jpEstados.add(jlProvStatus);
+
+        moTextProvStatus.setEnabled(false);
+        moTextProvStatus.setPreferredSize(new java.awt.Dimension(110, 23));
+        jpEstados.add(moTextProvStatus);
+
+        moBoolProvClosed.setText("Terminado");
+        moBoolProvClosed.setToolTipText("Cerrado para suministro");
+        moBoolProvClosed.setEnabled(false);
+        moBoolProvClosed.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpEstados.add(moBoolProvClosed);
+
+        jlPurStatus.setText("Compras:");
+        jpEstados.add(jlPurStatus);
+
+        moTextPurStatus.setEnabled(false);
+        moTextPurStatus.setPreferredSize(new java.awt.Dimension(110, 23));
+        jpEstados.add(moTextPurStatus);
+
+        moBoolPurClosed.setText("Terminado");
+        moBoolPurClosed.setToolTipText("Cerrado para suministro");
+        moBoolPurClosed.setEnabled(false);
+        moBoolPurClosed.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpEstados.add(moBoolPurClosed);
+
+        jpValidate.add(jpEstados, java.awt.BorderLayout.CENTER);
+
+        jpRegistry.add(jpValidate, java.awt.BorderLayout.PAGE_END);
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -543,23 +610,46 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbFkOriginalUnitId;
+    private javax.swing.JButton jbAuth;
+    private javax.swing.JButton jbDeleteEty;
+    private javax.swing.JButton jbDisauth;
+    private javax.swing.JButton jbEditEty;
     private javax.swing.JButton jbImport;
+    private javax.swing.JButton jbNewEty;
+    private javax.swing.JButton jbPickItem;
+    private javax.swing.JButton jbRegisterEty;
+    private javax.swing.JLabel jlAuthStatus;
+    private javax.swing.JLabel jlConsDays;
     private javax.swing.JLabel jlConsEnt;
+    private javax.swing.JLabel jlConsEntEty;
     private javax.swing.JLabel jlConsSubent;
+    private javax.swing.JLabel jlConsSubentEty;
     private javax.swing.JLabel jlContractor;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDateReq;
+    private javax.swing.JLabel jlDateReqEty;
+    private javax.swing.JLabel jlDescription;
+    private javax.swing.JLabel jlEtyNotes;
+    private javax.swing.JLabel jlFactConv;
+    private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlNumber;
+    private javax.swing.JLabel jlPresentation;
+    private javax.swing.JLabel jlPriEty;
     private javax.swing.JLabel jlPriReq;
     private javax.swing.JLabel jlProvEnt;
+    private javax.swing.JLabel jlProvStatus;
+    private javax.swing.JLabel jlPurStatus;
+    private javax.swing.JLabel jlQty;
     private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlReqNotes;
+    private javax.swing.JLabel jlReqStatus;
+    private javax.swing.JLabel jlUnit;
     private javax.swing.JLabel jlUsrReq;
+    private javax.swing.JLabel jlspace;
     private javax.swing.JPanel jpCaptureArea;
-    private javax.swing.JPanel jpCfdiConcepts;
     private javax.swing.JPanel jpEntries;
     private javax.swing.JPanel jpEntry;
+    private javax.swing.JPanel jpEstados;
     private javax.swing.JPanel jpEtyButtons;
     private javax.swing.JPanel jpEtyButtons2;
     private javax.swing.JPanel jpEtyCapture;
@@ -569,81 +659,311 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JPanel jpReq3;
     private javax.swing.JPanel jpReqNotes;
     private javax.swing.JPanel jpRequest;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolClosed;
+    private javax.swing.JPanel jpTable;
+    private javax.swing.JPanel jpValidate;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolImport;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolNewItem;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolProvClosed;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolPurClosed;
     private sa.lib.gui.bean.SBeanFieldDate moDate;
     private sa.lib.gui.bean.SBeanFieldDate moDateReq;
+    private sa.lib.gui.bean.SBeanFieldDate moDateReqEty;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecFactConv;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecQty;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntConsDays;
     private sa.lib.gui.bean.SBeanFieldInteger moIntNumber;
     private sa.lib.gui.bean.SBeanFieldKey moKeyConsEnt;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyConsEntEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyConsSubent;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyConsSubentEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyContractor;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPresentation;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPriEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPriReq;
     private sa.lib.gui.bean.SBeanFieldKey moKeyProvEnt;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyUnit;
     private sa.lib.gui.bean.SBeanFieldKey moKeyUsrReq;
-    private sa.lib.gui.bean.SBeanFieldText moTe;
+    private sa.lib.gui.bean.SBeanFieldText moTextAuthStatus;
+    private sa.lib.gui.bean.SBeanFieldText moTextEtyNotes;
+    private sa.lib.gui.bean.SBeanFieldText moTextItemCode;
+    private sa.lib.gui.bean.SBeanFieldText moTextItemDescription;
+    private sa.lib.gui.bean.SBeanFieldText moTextItemName;
+    private sa.lib.gui.bean.SBeanFieldText moTextProvStatus;
+    private sa.lib.gui.bean.SBeanFieldText moTextPurStatus;
     private sa.lib.gui.bean.SBeanFieldText moTextReferecnce;
     private sa.lib.gui.bean.SBeanFieldText moTextReqNotes;
-    private sa.lib.gui.bean.SBeanFieldText moTextUsrClo;
-    private sa.lib.gui.bean.SBeanFieldBoolean sBeanFieldBoolean3;
-    private sa.lib.gui.bean.SBeanFieldDate sBeanFieldDate3;
-    private sa.lib.gui.bean.SBeanFieldDecimal sBeanFieldDecimal1;
-    private sa.lib.gui.bean.SBeanFieldDecimal sBeanFieldDecimal2;
-    private sa.lib.gui.bean.SBeanFieldInteger sBeanFieldInteger2;
-    private sa.lib.gui.bean.SBeanFieldKey sBeanFieldKey10;
-    private sa.lib.gui.bean.SBeanFieldKey sBeanFieldKey11;
-    private sa.lib.gui.bean.SBeanFieldKey sBeanFieldKey7;
-    private sa.lib.gui.bean.SBeanFieldKey sBeanFieldKey8;
-    private sa.lib.gui.bean.SBeanFieldKey sBeanFieldKey9;
-    private sa.lib.gui.bean.SBeanFieldText sBeanFieldText4;
-    private sa.lib.gui.bean.SBeanFieldText sBeanFieldText6;
-    private sa.lib.gui.bean.SBeanFieldText sBeanFieldText7;
-    private sa.lib.gui.bean.SBeanFieldText sBeanFieldText8;
-    private sa.lib.gui.bean.SBeanFieldText sBeanFieldText9;
+    private sa.lib.gui.bean.SBeanFieldText moTextReqStatus;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 1024, 671);
         
-//        moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem), true);
-//        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
-//        moCurCost.setCompoundFieldSettings(miClient);
-//        moCurCost.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCost), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
-//        
-//        moFields.addField(moKeyItem);
-//        moFields.addField(moDateDateStart);
-//        moFields.addField(moCurCost.getField());
-//
-//        moFields.setFormButton(jbSave);
-//        
-//        jbPickItem.addActionListener(this);
+        moFieldsEty = new SGuiFields();
+        
+        moKeyProvEnt.setKeySettings(miClient, SGuiUtils.getLabelName(jlProvEnt), true);
+        moIntNumber.setIntegerSettings(SGuiUtils.getLabelName(jlNumber), SGuiConsts.GUI_TYPE_INT, true);
+        moDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate), true);
+        moKeyUsrReq.setKeySettings(miClient, SGuiUtils.getLabelName(jlUsrReq), true);
+        moKeyContractor.setKeySettings(miClient, SGuiUtils.getLabelName(jlContractor), false);
+        moTextReferecnce.setTextSettings(SGuiUtils.getLabelName(jlReference), 25, 0);
+        moKeyConsEnt.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsEnt), true);
+        moKeyConsSubent.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsSubent), false);
+        moDateReq.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateReq), false);
+        moKeyPriReq.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriReq), true);
+        moTextReqStatus.setTextSettings(SGuiUtils.getLabelName(jlReqStatus), 100, 0);
+        moTextReqNotes.setTextSettings(SGuiUtils.getLabelName(jlReqNotes), 500, 0);
+        
+        moTextItemCode.setTextSettings(SGuiUtils.getLabelName(jlItem), 500, 1);
+        moTextItemName.setTextSettings(SGuiUtils.getLabelName(jlItem), 500, 1);
+        moBoolNewItem.setBooleanSettings(SGuiUtils.getLabelName(moBoolNewItem.getText()), false);
+        moTextItemDescription.setTextSettings(SGuiUtils.getLabelName(jlDescription), 500, 1);
+        moKeyPresentation.setKeySettings(miClient, SGuiUtils.getLabelName(jlPresentation), true);
+        moDecFactConv.setDecimalSettings(SGuiUtils.getLabelName(jlFactConv), SGuiConsts.GUI_TYPE_DEC, false);
+        moDecQty.setDecimalSettings(SGuiUtils.getLabelName(jlQty), SGuiConsts.GUI_TYPE_DEC, true);
+        moKeyUnit.setKeySettings(miClient, SGuiUtils.getLabelName(jlUnit), true);
+        moIntConsDays.setIntegerSettings(SGuiUtils.getLabelName(jlConsDays), SGuiConsts.GUI_TYPE_INT, false);
+        moKeyConsEntEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsEntEty), false);
+        moKeyConsSubentEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsSubentEty), false);
+        moDateReqEty.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateReqEty), false);
+        moKeyPriEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriEty), false);
+        
+        moTextAuthStatus.setTextSettings(SGuiUtils.getLabelName(jlAuthStatus), 500, 0);
+        moTextProvStatus.setTextSettings(SGuiUtils.getLabelName(jlProvStatus), 500, 0);
+        moBoolProvClosed.setBooleanSettings(SGuiUtils.getLabelName(moBoolProvClosed.getText()), false);
+        moTextPurStatus.setTextSettings(SGuiUtils.getLabelName(jlPurStatus), 500, 0);
+        moBoolPurClosed.setBooleanSettings(SGuiUtils.getLabelName(moBoolPurClosed.getText()), false);
+
+        moFields.addField(moKeyProvEnt);
+        moFields.addField(moIntNumber); 
+        moFields.addField(moDate);
+        moFields.addField(moKeyUsrReq);
+        moFields.addField(moKeyContractor);
+        moFields.addField(moTextReferecnce);
+        moFields.addField(moKeyConsEnt);
+        moFields.addField(moKeyConsSubent);
+        moFields.addField(moDateReq);
+        moFields.addField(moKeyPriReq);
+        moFields.addField(moBoolProvClosed);
+        moFields.addField(moTextReqStatus);
+        moFields.addField(moTextReqNotes);
+        
+        moFieldsEty.addField(moTextItemCode);
+        moFieldsEty.addField(moTextItemName);
+        moFieldsEty.addField(moBoolNewItem);
+        moFieldsEty.addField(moTextItemDescription);
+        moFieldsEty.addField(moKeyPresentation);
+        moFieldsEty.addField(moDecFactConv);
+        moFieldsEty.addField(moDecQty);
+        moFieldsEty.addField(moKeyUnit);
+        moFieldsEty.addField(moIntConsDays);
+        moFieldsEty.addField(moKeyConsEntEty);
+        moFieldsEty.addField(moKeyConsSubentEty);
+        moFieldsEty.addField(moDateReqEty);
+        moFieldsEty.addField(moKeyPriEty);
+
+        moFields.setFormButton(jbSave);
+        
+        moGridMatReqList = new SGridPaneForm(miClient, SModConsts.TRN_MAT_REQ_ETY, SLibConsts.UNDEFINED, "Ítems") {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+                
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código ítem"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Cantidad"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Nuevo ítem"));
+                
+                return columns;
+            }
+        };
+        
+        moGridMatReqList.setPaneFormOwner(this);
+        mvFormGrids.add(moGridMatReqList);
+        jpEntries.add(moGridMatReqList, BorderLayout.CENTER);
+        
+        jbSaveAndSend = new JButton();
+        jbSaveAndSend.setText("Guardar y mandar solicitud");
+        jbSaveAndSend.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpCommandRight.remove(jbCancel);
+        jpCommandRight.add(jbSaveAndSend);
+        jpCommandRight.add(jbCancel);
+        
     }
     
-    private SGuiValidation validateRegistryUnicity() {
-        SGuiValidation validation = new SGuiValidation();
-        validation.setValid(true);
+    private void populateMatReqEntries() throws Exception {
+        int i = 0;
+        Vector<SGridRow> vRows = new Vector<>();
+        if (maMatReqEntries.size() > 0) {
+            for (SDbMaterialRequestEntry ety : maMatReqEntries) {
+                ety.setAuxRowId(i++);
+            }
+            vRows.addAll(maMatReqEntries);
+        }
+        moGridMatReqList.populateGrid(vRows, this); 
+    }
+    
+    private void enableReqControls(boolean enable) {
+        moKeyProvEnt.setEnabled(enable);
+        moIntNumber.setEnabled(enable);
+        moDate.setEnabled(enable);
+        moKeyUsrReq.setEnabled(enable);
+        moKeyContractor.setEnabled(enable);
+        moKeyConsEnt.setEnabled(enable);
+        moKeyConsSubent.setEnabled(enable);
+        moDateReq.setEnabled(enable);
+        moKeyPriReq.setEnabled(enable);
+        moBoolProvClosed.setEnabled(enable);
+        moTextReqNotes.setEnabled(enable);
         
-        if (moRegistry.isRegistryNew()) {
-            try {
-                String sql = "SELECT b_del FROM trn_item_cost " 
-//                    "WHERE fk_item = " + moKeyItem.getValue()[0] + " " +
-//                    "AND fk_unit = " + moDataUnit.getPkUnitId() + " " +
-//                    "AND dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "';"
-                        ;
+        jbNewEty.setEnabled(enable);
+        jbRegisterEty.setEnabled(enable);
+        jbEditEty.setEnabled(enable);
+        jbDeleteEty.setEnabled(enable);
+        
+        jbSave.setEnabled(enable);
+        jbSaveAndSend.setEnabled(enable);
+    }
+    
+    private void clearEntryControls() {
+        moTextItemCode.setValue("");
+        moTextItemName.setValue("");
+        moTextItemDescription.setValue("");
+        moBoolNewItem.setValue(false);
+        moKeyPresentation.setSelectedIndex(0);
+        moDecFactConv.setValue(0.0);
+        moDecQty.setValue(0.0);
+        moKeyUnit.setSelectedIndex(0);
+        moIntConsDays.setValue(0);
+        moKeyConsEntEty.setSelectedIndex(0);
+        moKeyConsSubentEty.setSelectedIndex(0);
+        moDateReqEty.setValue(null);
+        moKeyPriEty.setSelectedIndex(0);
+        moTextEtyNotes.setValue("");
+    }
+    
+    private void enableEntryControls(boolean enable) {
+        moTextItemCode.setEnabled(enable);
+        jbPickItem.setEnabled(enable);
+        moBoolNewItem.setEnabled(enable);
+        moTextItemDescription.setEnabled(!enable ? enable : moBoolNewItem.getValue());
+        moKeyPresentation.setEnabled(enable);
+        moDecFactConv.setEnabled(enable);
+        moDecQty.setEnabled(enable);
+        moKeyUnit.setEnabled(enable);
+        moIntConsDays.setEnabled(enable);
+        moKeyConsEntEty.setEnabled(enable);
+        moKeyConsSubentEty.setEnabled(enable);
+        moDateReqEty.setEnabled(enable);
+        moKeyPriEty.setEnabled(enable);
+        moTextEtyNotes.setEnabled(enable);
+    }
+    
+    private void setComponetsEntryData(SDbMaterialRequestEntry ety) {
+        if (ety != null) {
+            moItemEty = ety.getDataItem();
 
-                ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-                if (resultSet.next()) {
-                    validation.setMessage("Ya existe un registro para este ítem, unidad y fecha." +
-                            (resultSet.getBoolean("b_del") ? "\nEl registro en cuestión está eliminado." : ""));
+            moTextItemCode.setValue(moItemEty.getCode());
+            moTextItemName.setValue(moItemEty.getName());
+            moBoolNewItem.setValue(ety.isNewItem());
+            moKeyPresentation.setValue(new int[] { ety.getFkMatPresentationId_n() });
+            moDecFactConv.setValue(ety.getFactorConvertion());
+            moDecQty.setValue(ety.getQuantity());
+            moKeyUnit.setValue(new int[] { ety.getFkUnitId() });
+            moIntConsDays.setValue(ety.getCosnsumptionEstimated());
+            moKeyConsEntEty.setValue(new int[] { ety.getFkEntMatConsumptionEntityId_n() });
+            moKeyConsSubentEty.setValue(new int[] { ety.getFkSubentMatConsumptionEntityId_n(), ety.getFkSubentMatConsumptionSubentityId_n() });
+            moDateReqEty.setValue(ety.getDateRequest_n());
+            moKeyPriEty.setValue(new int[] { ety.getFkMatRequestPriorityId_n()});
+            moTextItemDescription.setValue("");
+            moTextEtyNotes.setValue("");
+            
+            for (SDbMaterialRequestEntryNote note : ety.getChildNotes()) {
+                if (note.getIsDescription()) {
+                    moTextItemDescription.setValue(note.getNotes());
+                }
+                else {
+                    moTextEtyNotes.setValue(note.getNotes());
                 }
             }
-            catch (Exception e) {
-                miClient.showMsgBoxError(e.getMessage());
+            enableEntryControls(false);
+        }
+    }
+    
+    private SDbMaterialRequestEntry setEtyValues(SDbMaterialRequestEntry ety) {
+        ety.setDateRequest_n(moDateReqEty.getValue());
+        ety.setQuantity(moDecQty.getValue());
+        ety.setFactorConvertion(moDecFactConv.getValue());
+        ety.setCosnsumptionEstimated(moIntConsDays.getValue());
+        ety.setNewItem(moBoolNewItem.getValue());
+        ety.setFkItemId(moItemEty.getPkItemId());
+        ety.setFkUnitId(moKeyUnit.getValue()[0]);
+        ety.setFkMatPresentationId_n(moKeyPresentation.getSelectedIndex() == 0 ? 0 : moKeyPresentation.getValue()[0]);
+        ety.setFkMatRequestPriorityId_n(moKeyPriEty.getSelectedIndex() == 0 ? 0 : moKeyPriEty.getValue()[0]);
+        ety.setFkEntMatConsumptionEntityId_n(moKeyConsEntEty.getSelectedIndex() == 0 ? 0 : moKeyConsEntEty.getValue()[0]);
+        ety.setFkSubentMatConsumptionEntityId_n(moKeyConsSubentEty.getSelectedIndex() == 0 ? 0 : moKeyConsSubentEty.getValue()[0]);
+        ety.setFkSubentMatConsumptionSubentityId_n(moKeyConsSubentEty.getSelectedIndex() == 0 ? 0 : moKeyConsSubentEty.getValue()[1]);
+        ety.setDataItem(moItemEty);
+        
+        if (moBoolNewItem.getValue()) {
+            SDbMaterialRequestEntryNote note = new SDbMaterialRequestEntryNote();
+            note.setNotes(moTextItemDescription.getValue());
+            note.setIsDescription(true);
+            ety.getChildNotes().add(note);
+        }
+        
+        if (!moTextEtyNotes.getValue().isEmpty()) {
+            SDbMaterialRequestEntryNote note = new SDbMaterialRequestEntryNote();
+            note.setNotes(moTextEtyNotes.getValue());
+            note.setIsDescription(false);
+            ety.getChildNotes().add(note);
+        }
+        
+        return ety;
+    }
+    
+    private void stateChangeNewItem() {
+        try {
+            moTextItemDescription.setEnabled(moBoolNewItem.getValue());
+            moTextItemCode.setEnabled(!moBoolNewItem.getValue());
+            if (moBoolNewItem.getValue()) {
+                String sql = "SELECT param_value FROM cfg_param WHERE id_param = 52;";
+                ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                if (resultSet.next()) {
+                    moItemEty = new SDataItem();
+                    moItemEty.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
+                    moTextItemCode.setValue(moItemEty.getCode());
+                    moTextItemName.setValue(moItemEty.getName());
+                    moKeyUnit.setValue(new int[] { moItemEty.getFkUnitId() } );
+                }
             }
         }
-        return validation;
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
     }
-
-    private void actionPerformedPickItem() {
+    
+    private void stateChangePresentation() {
+        try {
+            if (moKeyPresentation.getSelectedIndex() > 0) {
+                String sql = "SELECT fact_conv FROM erp.trnu_mat_pres WHERE id_mat_pres = " + moKeyPresentation.getValue()[0] + " ";
+                ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                if (resultSet.next()) {
+                    moDecFactConv.setValue(resultSet.getDouble(1));
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void actionPickItem() {
         int[] key;
         SGuiOptionPicker picker;
 
@@ -655,101 +975,242 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             key = (int[]) picker.getOption();
 
             if (key != null) {
-                if (key[0] != SLibConsts.UNDEFINED) {
-//                    moKeyItem.setValue(new int[] { key[0] });
-                }
+                moItemEty = new SDataItem();
+                moItemEty.read(key, miClient.getSession().getStatement());
+                moTextItemCode.setValue(moItemEty.getCode());
+                moTextItemName.setValue(moItemEty.getName());
+                moKeyUnit.setValue(new int[] { moItemEty.getFkUnitId() } );
             }
         }
     }
     
-    private void itemStateChangedItem() {
+    private void actionNew() {
+        isEtyNew = true;
+        clearEntryControls();
+        enableEntryControls(true);
+    }
+    
+    private void actionRegister() {
         try {
-//            if(moKeyItem.getSelectedIndex() <= 0) {
-//                moDataUnit = null;
-//                
-//                moUnit.setValue("");
-//            }
-//            else {
-//                SDataItem item = (SDataItem) SDataUtilities.readRegistry((SClientInterface) miClient,
-//                                SDataConstants.ITMU_ITEM, moKeyItem.getValue(), SLibConstants.EXEC_MODE_SILENT);
-//                moDataUnit = item.getDbmsDataUnit();
-//                
-//                moUnit.setValue(moDataUnit.getUnit());
-//            }
+            SGuiValidation validation = moFieldsEty.validateFields();
+            
+            if (validation.isValid()) {
+                if (isEtyNew) {
+                    SDbMaterialRequestEntry ety = new SDbMaterialRequestEntry();
+                    ety = setEtyValues(ety);
+                    maMatReqEntries.add(ety);
+                }
+                else {
+                    int rowId = ((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getAuxRowId();
+                    for (SDbMaterialRequestEntry ety : maMatReqEntries) {
+                        if (ety.getAuxRowId() == rowId) {
+                            setEtyValues(ety);
+                        }
+                    }
+                }
+                
+                populateMatReqEntries();
+                enableEntryControls(false);
+            }
+            else {
+                miClient.showMsgBoxInformation(validation.getMessage());
+            }
         }
         catch (Exception e) {
-            SLibUtils.showException(this, e);
+            miClient.showMsgBoxError(e.getMessage());
         }
     }
     
+    private void actionEditEty() {
+        isEtyNew = false;
+        enableEntryControls(true);
+    }
+    
+    private void actionDeleteEty() {
+        try {
+            ArrayList<SDbMaterialRequestEntry> aux = new ArrayList<>();
+            int rowId = ((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getAuxRowId();
+            for (SDbMaterialRequestEntry ety : maMatReqEntries) {
+                if (ety.getAuxRowId() != rowId) {
+                    aux.add(ety);
+                }
+            }
+            maMatReqEntries = aux;
+            populateMatReqEntries();
+            enableEntryControls(false);
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void actionSave(int statusAuth) {
+        mnStatusAuthId = statusAuth;
+        super.actionSave();
+    }
+
     @Override
     public void addAllListeners() {
-//        moKeyItem.addItemListener(this);
+        jbImport.addActionListener(this);
+        jbPickItem.addActionListener(this);
+        jbNewEty.addActionListener(this);
+        jbRegisterEty.addActionListener(this);
+        jbEditEty.addActionListener(this);
+        jbDeleteEty.addActionListener(this);
+        jbAuth.addActionListener(this);
+        jbDisauth.addActionListener(this);
+        jbSave.addActionListener(this);
+        jbSaveAndSend.addActionListener(this);
+        moBoolNewItem.addItemListener(this);
+        moKeyPresentation.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-//        moKeyItem.removeItemListener(this); 
+        jbImport.removeActionListener(this);
+        jbPickItem.removeActionListener(this);
+        jbNewEty.removeActionListener(this);
+        jbRegisterEty.removeActionListener(this);
+        jbEditEty.removeActionListener(this);
+        jbDeleteEty.removeActionListener(this);
+        jbAuth.removeActionListener(this);
+        jbDisauth.removeActionListener(this);
+        jbSave.removeActionListener(this);
+        jbSaveAndSend.removeActionListener(this);
+        moBoolNewItem.removeItemListener(this);
+        moKeyPresentation.removeItemListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-//        miClient.getSession().populateCatalogue(moKeyItem, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyProvEnt, SModConsts.TRN_MAT_PROV_ENT, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyUsrReq, SModConsts.USRU_USR, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyContractor, SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR, null);
+        miClient.getSession().populateCatalogue(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyPriReq, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyPresentation, SModConsts.TRNU_MAT_PRES, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyUnit, SModConsts.ITMU_UNIT, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyConsEntEty, SModConsts.TRN_MAT_CONS_ENT, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyConsSubentEty, SModConsts.TRN_MAT_CONS_SUBENT, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyPriEty, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-//        moRegistry = (SDbItemCost) registry;
-//
-//        mnFormResult = SLibConsts.UNDEFINED;
-//        mbFirstActivation = true;
-//
-//        removeAllListeners();
-//        reloadCatalogues();
-//
-//        if (moRegistry.isRegistryNew()) {
-//            moRegistry.initPrimaryKey();
-//            moRegistry.setDateStart(miClient.getSession().getCurrentDate());
-//            jtfRegistryKey.setText("");
-//        }
-//        else {
-//            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
-//        }
-//
-//        moKeyItem.setValue(new int[] { moRegistry.getFkItemId() });
-//        itemStateChangedItem();
-//        moDateDateStart.setValue(moRegistry.getDateStart());
-//        moCurCost.getField().setValue(moRegistry.getCost());
-//        
-//        setFormEditable(true);
-//
-//        if (moRegistry.isRegistryNew()) { }
+        moRegistry = (SDbMaterialRequest) registry;
 
+        mnFormResult = SLibConsts.UNDEFINED;
+        mbFirstActivation = true;
+
+        removeAllListeners();
+        reloadCatalogues();
+        clearEntryControls();
+
+        if (moRegistry.isRegistryNew()) {
+            moRegistry.initPrimaryKey();
+            moRegistry.setDate(miClient.getSession().getCurrentDate());
+            jtfRegistryKey.setText("");
+        }
+        else {
+            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
+        }
+
+        moKeyProvEnt.setValue(new int[] { moRegistry.getFkMatProvisionEntityId() });
+        moIntNumber.setValue(moRegistry.getNumber());
+        moDate.setValue(moRegistry.getDate());
+        moKeyUsrReq.setValue(new int[] { moRegistry.getFkUserRequesterId() });
+        moKeyContractor.setValue(new int[] { moRegistry.getFkContractorId_n() });
+        moTextReferecnce.setValue(moRegistry.getReference());
+        moTextReferecnce.setValue(moRegistry.getReference());
+        moBoolImport.setValue(moRegistry.isExternalSystem());
+        moKeyConsEnt.setValue(new int[] { moRegistry.getFkEntMatConsumptionEntityId() });
+        moKeyConsSubent.setValue(new int[] { moRegistry.getFkSubentMatConsumptionEntityId_n(), moRegistry.getFkSubentMatConsumptionSubentityId_n() });
+        moDateReq.setValue(moRegistry.getDateRequest_n());
+        moKeyPriReq.setValue(new int[] { moRegistry.getFkMatRequestPriorityId() });
+        moTextReqStatus.setValue(moRegistry.getAuxReqStatus());
+        
+        moBoolProvClosed.setValue(moRegistry.isCloseProvision());
+        moBoolPurClosed.setValue(moRegistry.isClosePurchase());
+        
+        maMatReqNotes = moRegistry.getChildNotes();
+        maMatReqEntries = moRegistry.getChildEntries();
+        
+        if (maMatReqNotes.size() > 0) {
+            moTextReqNotes.setValue(maMatReqNotes.get(0).getNotes());
+        }
+        else {
+            moTextReqNotes.setValue("");
+        }
+        
+        setFormEditable(true);
+
+        if (moRegistry.isRegistryNew()) { 
+            enableReqControls(true);
+        }
+        else if (moRegistry.getFkMatRequestStatusId() != SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW) {
+            enableReqControls(false);
+        }
+        else enableReqControls(true);
+        
+        moTextAuthStatus.setValue(moRegistry.getAuxAuthStatus());
+
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND) {
+            jbSave.setEnabled(false);
+            jbSaveAndSend.setEnabled(false);
+        }
+        
         addAllListeners();
+        populateMatReqEntries();
+        enableEntryControls(false);
+        
+        isEtyNew = false;
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-//        SDbItemCost registry = (SDbItemCost) moRegistry.clone();
-//
-//        if (registry.isRegistryNew()) {}
-//        
-//        moRegistry.setFkItemId(moKeyItem.getValue()[0]);
-//        moRegistry.setFkUnitId(moDataUnit.getPkUnitId());
-//        moRegistry.setDateStart(moDateDateStart.getValue());
-//        moRegistry.setCost(moCurCost.getField().getValue());
+        SDbMaterialRequest registry = (SDbMaterialRequest) moRegistry.clone();
 
-        return null;
+        if (registry.isRegistryNew()) {
+            registry.setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_MPS_NA);
+            registry.setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_MPS_NA);
+        }
+        
+        registry.setNumber(moIntNumber.getValue());
+        registry.setDate(moDate.getValue());
+        registry.setDateRequest_n(moDateReq.getValue());
+        registry.setReference(moTextReferecnce.getValue());
+        registry.setExternalSystem(moBoolImport.getValue());
+        registry.setExternalSystemId("");
+        registry.setCloseProvision(moBoolProvClosed.getValue());
+        registry.setFkMatProvisionEntityId(moKeyProvEnt.getValue()[0]);
+        registry.setFkMatRequestPriorityId(moKeyPriReq.getValue()[0]);
+        registry.setFkMatRequestStatusId(mnStatusAuthId);
+        registry.setFkUserRequesterId(moKeyUsrReq.getValue()[0]);
+        registry.setFkContractorId_n(moKeyContractor.getSelectedIndex() == 0 ? 0 : moKeyContractor.getValue()[0]);
+        registry.setFkEntMatConsumptionEntityId(moKeyConsEnt.getValue()[0]);
+        registry.setFkSubentMatConsumptionEntityId_n(moKeyConsSubent.getSelectedIndex() == 0 ? 0 : moKeyConsSubent.getValue()[0]);
+        registry.setFkSubentMatConsumptionSubentityId_n(moKeyConsSubent.getSelectedIndex() == 0 ? 0 : moKeyConsSubent.getValue()[1]);
+        
+        registry.getChildNotes().clear();
+        if (!moTextReqNotes.getValue().isEmpty()) {
+            SDbMaterialRequestNote note = new SDbMaterialRequestNote();
+            note.setNotes(moTextReqNotes.getValue());
+            registry.getChildNotes().add(note);
+        }
+        
+        registry.getChildEntries().clear();
+        for (SDbMaterialRequestEntry ety : maMatReqEntries) {
+            registry.getChildEntries().add(ety);
+        }
+        
+        return registry;
     }
 
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
-        if (validation.isValid()) {
-            validation = validateRegistryUnicity();
-        }
-
         return validation;
     }
 
@@ -757,20 +1218,45 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
-//            if (button == jbPickItem) {
-//                actionPerformedPickItem();
-//            }
+            if (button == jbPickItem) {
+                actionPickItem();
+            }
+            else if (button == jbNewEty) {
+                actionNew();
+            }
+            else if (button == jbRegisterEty) {
+                actionRegister();
+            }
+            else if (button == jbEditEty) {
+                actionEditEty();
+            }
+            else if (button == jbDeleteEty) {
+                actionDeleteEty();
+            }
+            else if (button == jbSave) {
+                actionSave(SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW);
+            }
+            else if (button == jbSaveAndSend) {
+                actionSave(SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH);
+            }
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof SBeanFieldKey) {
-            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
-//            if (field == moKeyItem) {
-//                itemStateChangedItem();
-//            }
+        if (e.getSource() instanceof JCheckBox) {
+            JCheckBox checkBox = (JCheckBox) e.getSource();
+            if (checkBox == moBoolNewItem) {
+                stateChangeNewItem();
+            }
         }
+        else if (e.getSource() instanceof JComboBox) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            if (comboBox == moKeyPresentation) {
+                stateChangePresentation();
+            }
+        }
+        
     }
 
     @Override
@@ -790,6 +1276,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (!e.getValueIsAdjusting()) {
+            setComponetsEntryData((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow());
+        }
     }
 }

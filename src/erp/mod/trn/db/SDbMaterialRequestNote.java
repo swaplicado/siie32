@@ -76,7 +76,7 @@ public class SDbMaterialRequestNote extends SDbRegistryUser {
         
         mnPkNotesId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_nts), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_nts), 0) + 1 FROM " + getSqlTable() + " WHERE id_mat_req = " + mnPkMatRequestId + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkNotesId = resultSet.getInt(1);

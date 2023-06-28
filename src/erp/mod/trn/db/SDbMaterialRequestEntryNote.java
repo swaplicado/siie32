@@ -23,6 +23,8 @@ public class SDbMaterialRequestEntryNote extends SDbRegistryUser {
     protected int mnPkEntryId;
     protected int mnPkNotesId;
     protected String msNotes;
+    
+    protected boolean mbIsDescription;
 
     public SDbMaterialRequestEntryNote() {
         super(SModConsts.TRN_MAT_REQ_ETY_NTS);
@@ -32,11 +34,15 @@ public class SDbMaterialRequestEntryNote extends SDbRegistryUser {
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setPkNotesId(int n) { mnPkNotesId = n; }
     public void setNotes(String s) { msNotes = s; }
+    
+    public void setIsDescription(boolean b) { mbIsDescription = b; }
 
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
     public int getPkNotesId() { return mnPkNotesId; }
     public String getNotes() { return msNotes; }
+    
+    public boolean getIsDescription() { return mbIsDescription; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -58,6 +64,8 @@ public class SDbMaterialRequestEntryNote extends SDbRegistryUser {
         mnPkEntryId = 0;
         mnPkNotesId = 0;
         msNotes = null;
+        
+        mbIsDescription = false;
     }
 
     @Override
@@ -85,7 +93,8 @@ public class SDbMaterialRequestEntryNote extends SDbRegistryUser {
         
         mnPkNotesId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_nts), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_nts), 0) + 1 FROM " + getSqlTable() + " "
+                + "WHERE id_mat_req = " + mnPkMatRequestId + " AND id_ety = " + mnPkEntryId + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkNotesId = resultSet.getInt(1);
@@ -111,6 +120,8 @@ public class SDbMaterialRequestEntryNote extends SDbRegistryUser {
             mnPkNotesId = resultSet.getInt("id_nts");
             msNotes = resultSet.getString("notes");
 
+            mbIsDescription = mnPkNotesId == 0;
+            
             mbRegistryNew = false;
         }
         
@@ -131,7 +142,7 @@ public class SDbMaterialRequestEntryNote extends SDbRegistryUser {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkMatRequestId + ", " + 
                     mnPkEntryId + ", " + 
-                    mnPkNotesId + ", " + 
+                    (mbIsDescription ? 0 + ", " : mnPkNotesId + ", ") + 
                     "'" + msNotes + "' " + 
                     ")";
         }
@@ -160,6 +171,7 @@ public class SDbMaterialRequestEntryNote extends SDbRegistryUser {
         registry.setPkNotesId(this.getPkNotesId());
         registry.setNotes(this.getNotes());
 
+        registry.setIsDescription(this.getIsDescription());
         registry.setRegistryNew(this.isRegistryNew());
         
         return registry;

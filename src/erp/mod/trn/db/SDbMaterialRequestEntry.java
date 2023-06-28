@@ -5,7 +5,9 @@
  */
 package erp.mod.trn.db;
 
+import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,13 +17,14 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
+import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
  * @author Isabel Servín
  */
-public class SDbMaterialRequestEntry extends SDbRegistryUser {
+public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow, Serializable {
     
     protected int mnPkMatRequestId;
     protected int mnPkEntryId;
@@ -40,6 +43,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
     protected int mnFkSubentMatConsumptionSubentityId_n;
     
     protected ArrayList<SDbMaterialRequestEntryNote> maChildNotes;
+    
+    protected int mnAuxRowId;
+    
+    protected SDataItem moDataItem;
 
     public SDbMaterialRequestEntry() {
         super(SModConsts.TRN_MAT_REQ_ETY);
@@ -60,6 +67,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
     public void setFkEntMatConsumptionEntityId_n(int n) { mnFkEntMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionEntityId_n(int n) { mnFkSubentMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionSubentityId_n(int n) { mnFkSubentMatConsumptionSubentityId_n = n; }
+    
+    public void setDataItem(SDataItem o) { moDataItem = o; }
+    
+    public void setAuxRowId(int n) { mnAuxRowId = n; }
 
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
@@ -78,6 +89,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
     public int getFkSubentMatConsumptionSubentityId_n() { return mnFkSubentMatConsumptionSubentityId_n; }
     
     public ArrayList<SDbMaterialRequestEntryNote> getChildNotes() { return maChildNotes; }
+    
+    public int getAuxRowId() { return mnAuxRowId; }
+    
+    public SDataItem getDataItem() { return moDataItem; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -111,6 +126,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
         mnFkSubentMatConsumptionSubentityId_n = 0;
         
         maChildNotes = new ArrayList<>();
+        
+        mnAuxRowId = 0;
+        
+        moDataItem = null;
     }
 
     @Override
@@ -134,7 +153,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
         
         mnPkEntryId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_ety), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_ety), 0) + 1 FROM " + getSqlTable() + " WHERE id_mat_req = " + mnPkMatRequestId + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkEntryId = resultSet.getInt(1);
@@ -146,7 +165,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
         ResultSet resultSet;
         Statement statement;
         SDbMaterialRequestEntryNote note;
-        
+                
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
@@ -187,6 +206,13 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
                 note = new SDbMaterialRequestEntryNote();
                 note.read(session, new int[] { mnPkMatRequestId, mnPkEntryId, resultSet.getInt(1) });
                 maChildNotes.add(note);
+            }
+            
+            // Read ítem:
+            
+            if (mnFkItemId != 0) {
+                moDataItem = new SDataItem();
+                moDataItem.read(new int[] { mnFkItemId }, statement);
             }
 
             mbRegistryNew = false;
@@ -287,10 +313,67 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser {
         for (SDbMaterialRequestEntryNote note : this.getChildNotes()) {
             registry.getChildNotes().add(note);
         }
+        
+        registry.setDataItem(this.getDataItem());
+        registry.setAuxRowId(this.getAuxRowId());
 
         registry.setRegistryNew(this.isRegistryNew());
         
         return registry;
+    }
+
+    @Override
+    public int[] getRowPrimaryKey() {
+        return new int[] { mnPkMatRequestId, mnPkEntryId };
+    }
+
+    @Override
+    public String getRowCode() {
+        return "";
+    }
+
+    @Override
+    public String getRowName() {
+        return "";
+    }
+
+    @Override
+    public boolean isRowSystem() {
+        return false;
+    }
+
+    @Override
+    public boolean isRowDeletable() {
+        return true;
+    }
+
+    @Override
+    public boolean isRowEdited() {
+        return isRowEdited();
+    }
+
+    @Override
+    public void setRowEdited(boolean edited) {
+        setRegistryEdited(edited);
+    }
+
+    @Override
+    public Object getRowValueAt(int row) {
+        Object value = null;
+        
+        switch (row) {
+            case 0: value = moDataItem.getCode(); break;
+            case 1: value = moDataItem.getName(); break;
+            case 2: value = mdQuantity; break;
+            case 3: value = mbNewItem; break;
+        }
+        
+        return value;
+    }
+
+    @Override
+    public void setRowValueAt(Object value, int col) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

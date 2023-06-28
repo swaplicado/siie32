@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.lib.gui.SGuiSession;
@@ -46,6 +47,15 @@ public class SAuthorizationUtils {
     public static final int AUTH_STATUS_REJECTED = 2;
     public static final int AUTH_STATUS_PENDING = 3;
     public static final int AUTH_STATUS_AUTHORIZING = 4;
+    
+    public static final HashMap<Integer, String> AUTH_STATUS_DESC = new HashMap<>();
+    
+    static {
+        AUTH_STATUS_DESC.put(AUTH_STATUS_AUTHORIZED, "Autorizado");
+        AUTH_STATUS_DESC.put(AUTH_STATUS_REJECTED, "Rechazado");
+        AUTH_STATUS_DESC.put(AUTH_STATUS_PENDING, "Pendiente");
+        AUTH_STATUS_DESC.put(AUTH_STATUS_AUTHORIZING, "En autorización");
+    }
     
     /**
      * Constantes de tipo de autorización

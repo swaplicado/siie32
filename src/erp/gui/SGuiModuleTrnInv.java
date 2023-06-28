@@ -138,7 +138,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintArea;
     
     private javax.swing.JMenu jmMenuReq;
-    private javax.swing.JMenuItem jmiReqReq;
+    private javax.swing.JMenuItem jmiReqAll;
+    private javax.swing.JMenuItem jmiReqPend;
     
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
@@ -478,11 +479,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintArea.addActionListener(this);
         
         jmMenuReq = new JMenu("Requisiciones");
-        jmiReqReq = new JMenuItem("Requisiciones");
+        jmiReqAll = new JMenuItem("Todas mis requisiciones");
+        jmiReqPend = new JMenuItem("Requisiciones pendientes");
         
-        jmMenuReq.add(jmiReqReq);
+        jmMenuReq.add(jmiReqAll);
+        jmMenuReq.add(jmiReqPend);
         
-        jmiReqReq.addActionListener(this);
+        jmiReqAll.addActionListener(this);
+        jmiReqPend.addActionListener(this);
         
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
@@ -645,7 +649,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserToolMaintProv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintArea.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmMenuReq.setEnabled(true);
-        jmiReqReq.setEnabled(true);
+        jmiReqAll.setEnabled(true);
+        jmiReqPend.setEnabled(true);
         jmMenuStk.setEnabled(hasRightStock);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1500,8 +1505,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiMaintArea) {
                 miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiReqReq) {
+            else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqPend) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);

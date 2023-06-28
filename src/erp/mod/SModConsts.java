@@ -350,6 +350,8 @@ public abstract class SModConsts {
     public static final int TRNS_CFD_CAT = 2021201;
     public static final int TRNS_TP_MAINT_MOV = 2021301;
     public static final int TRNS_ST_MAT_REQ = 2021302;
+    public static final int TRNS_ST_MAT_PROV = 2021303;
+    public static final int TRNS_ST_MAT_PUR = 2021304;
 
     public static final int TRNU_DPS_NAT = 2022001;
     public static final int TRNU_TP_DPS = 2022002;
@@ -471,6 +473,7 @@ public abstract class SModConsts {
     public static final int TRNX_INT_CUS_QRY = 2024053;     // integral query customers
     public static final int TRNX_INT_SUP_QRY = 2024054;     // integral query provider
     public static final int TRNX_ACC_PEND = 2024071;        // accounts pending: receivable accounts & payable accounts
+    public static final int TRNX_MAT_REQ_PEND = 2024072;        // material requisitions pending supply
     public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_FUNC_EXPENSES = 2024336;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
@@ -1055,6 +1058,8 @@ public abstract class SModConsts {
         TablesMap.put(TRNS_CFD_CAT, "erp.trns_cfd_cat");
         TablesMap.put(TRNS_TP_MAINT_MOV, "erp.trns_tp_maint_mov");
         TablesMap.put(TRNS_ST_MAT_REQ, "erp.trns_st_mat_req");
+        TablesMap.put(TRNS_ST_MAT_PROV, "erp.trns_st_mat_prov");
+        TablesMap.put(TRNS_ST_MAT_PUR, "erp.trns_st_mat_pur");
 
         TablesMap.put(TRNU_DPS_NAT, "erp.trnu_dps_nat");
         TablesMap.put(TRNU_TP_DPS, "erp.trnu_tp_dps");

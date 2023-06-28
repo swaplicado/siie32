@@ -8,6 +8,7 @@ package erp.mod;
 import erp.mod.usr.db.SDbUser;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
+import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiCatalogueSettings;
@@ -20,7 +21,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Isabel Servín
  */
 public class SModuleUsr extends SGuiModule {
 
@@ -51,7 +52,29 @@ public class SModuleUsr extends SGuiModule {
 
     @Override
     public SGuiCatalogueSettings getCatalogueSettings(final int type, final int subtype, final SGuiParams params) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String sql = "";
+        String sqlWhere = "";
+        String name = "";
+        SGuiCatalogueSettings settings = null;
+        
+        switch (type) {
+            case SModConsts.USRU_USR:
+                settings = new SGuiCatalogueSettings("Usuarios", 1);
+                sql = "SELECT id_usr AS " + SDbConsts.FIELD_ID + "1, "
+                        + "usr AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY usr ";
+                break;
+                default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        if (settings != null) {
+            settings.setSql(sql);
+        }
+
+        return settings;
     }
 
     @Override

@@ -54,6 +54,7 @@ import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMaintUser;
 import erp.mod.trn.view.SViewMaintUserSupervisor;
 import erp.mod.trn.view.SViewMaterialRequest;
+import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewValCost;
@@ -87,12 +88,12 @@ public class SModuleTrn extends SGuiModule {
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
     private SFormItemCost moFormItemCost;
+    private SFormMaterialRequest moFormMaterialReq;
     private SFormMaintUser moFormMaintUserEmployee;
     private SFormMaintUser moFormMaintUserContractor;
     private SFormMaintUser moFormMaintUserToolMaintProv;
     private SFormMaintUserSupervisor moFormMaintUserSupv;
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
-    private SFormMaterialRequest moFormMaterialRequest;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -190,6 +191,7 @@ public class SModuleTrn extends SGuiModule {
                 registry = new SDbIdentifiedCostLot();
                 break;
             case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRNX_MAT_REQ_PEND:
                 registry = new SDbMaterialRequest();
                 break;
             default:
@@ -221,6 +223,20 @@ public class SModuleTrn extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
                         + "ORDER BY id_tp_dps_ann ";
+                break;
+            case SModConsts.TRNU_MAT_REQ_PTY:
+                settings = new SGuiCatalogueSettings("Prioridad", 1);
+                sql = "SELECT id_mat_req_pty AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_mat_req_pty";
+                break;
+            case SModConsts.TRNU_MAT_PRES:
+                settings = new SGuiCatalogueSettings("Presentación", 1);
+                sql = "SELECT id_mat_pres AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name";
                 break;
             case SModConsts.TRN_MAINT_AREA:
                 settings = new SGuiCatalogueSettings("Área de mantenimiento", 1);
@@ -258,6 +274,27 @@ public class SModuleTrn extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del AND fk_maint_user_n = " + params.getKey()[0] + " "
                         + "ORDER BY name, id_maint_user_supv ";
+                break;
+            case SModConsts.TRN_MAT_PROV_ENT:
+                settings = new SGuiCatalogueSettings("Entidad de suministro", 1);
+                sql = "SELECT id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name";
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT:
+                settings = new SGuiCatalogueSettings("Entidad de consumo", 1);
+                sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name";
+                break;
+            case SModConsts.TRN_MAT_CONS_SUBENT:
+                settings = new SGuiCatalogueSettings("Subentidad de consumo", 2);
+                sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -374,6 +411,9 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_ACC_PEND:
                 view = new SViewAccountsPending(miClient, subtype, (subtype == SModSysConsts.BPSS_CT_BP_CUS ? "CXC" : "CXP"));
                 break;
+            case SModConsts.TRNX_MAT_REQ_PEND:
+                view = new SViewMaterialRequestPending(miClient, "Requisiciones pendientes");
+                break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 view = new SViewFunctionalAreaBudgets(miClient, "Presupuestos mensuales gastos");
                 break;
@@ -453,13 +493,14 @@ public class SModuleTrn extends SGuiModule {
                 if (moFormItemCost == null) moFormItemCost = new SFormItemCost(miClient, "Costos de ítems");
                 form = moFormItemCost;
                 break;
+            case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRNX_MAT_REQ_PEND:
+                if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                form = moFormMaterialReq;
+                break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");
                 form = moFormFunctionalAreaBudgets;
-                break;
-            case SModConsts.TRN_MAT_REQ:
-                if (moFormMaterialRequest == null) moFormMaterialRequest = new SFormMaterialRequest(miClient, "Requisición");
-                form = moFormMaterialRequest;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
