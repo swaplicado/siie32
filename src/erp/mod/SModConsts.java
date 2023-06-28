@@ -418,6 +418,7 @@ public abstract class SModConsts {
     public static final int TRN_STK_SEG = 2023061;
     public static final int TRN_STK_SEG_WHS = 2023062;
     public static final int TRN_STK_SEG_WHS_ETY = 2023063;
+    public static final int TRN_STK_SEG_X = 2023065;
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;

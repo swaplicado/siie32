@@ -13,6 +13,8 @@ import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
@@ -20,7 +22,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Edwin Carmona, Sergio Flores, Edwin Carmona
  */
 public abstract class STrnStockSegregationUtils {
     
@@ -57,7 +59,12 @@ public abstract class STrnStockSegregationUtils {
                 case SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD:
                     segregation = populateSegregationFromProdOrder(client, reference);
                     segregation = STrnStockSegregationUtils.validateStock(client, segregation);
-                    break;                                                                          
+                    break;
+                    
+                case SDataConstantsSys.TRNS_TP_STK_SEG_REQ_MAT:
+                    segregation = populateSegregationFromProdOrder(client, reference);
+                    segregation = STrnStockSegregationUtils.validateStock(client, segregation);
+                    break;
             }
             
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
@@ -147,7 +154,7 @@ public abstract class STrnStockSegregationUtils {
         if (segregation.getPkStockSegregationId() == SLibConstants.UNDEFINED) {
             segregation.setFkStockSegregationTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
             segregation.setFkReference1Id(productionOrder.getPkYearId());
-            segregation.setFkReference2Id(productionOrder.getPkOrdId());
+            segregation.setFkReference2Id_n(productionOrder.getPkOrdId());
             segregation.setFkUserEditId(client.getSession().getUser().getPkUserId());
             segregation.setFkUserNewId(client.getSession().getUser().getPkUserId());
             segregation.setFkUserDeleteId(client.getSession().getUser().getPkUserId());
@@ -220,7 +227,16 @@ public abstract class STrnStockSegregationUtils {
         
         sql = "SELECT id_stk_seg " +
                 "FROM trn_stk_seg " +
-                "WHERE fid_ref_1 = " + reference[0] + " AND fid_ref_2 = " + reference[1] + " AND fid_tp_stk_seg = " + segregationType +"; ";
+                "WHERE fid_ref_1 = " + reference[0];
+        
+        if (reference.length > 1) {
+            sql += " AND fid_ref_2_n = " + reference[1];
+        }
+        else {
+            sql += " AND fid_ref_2_n IS NULL";
+        }
+        
+        sql += " AND fid_tp_stk_seg = " + segregationType +"; ";
         
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
@@ -256,6 +272,7 @@ public abstract class STrnStockSegregationUtils {
      * 
      * @param client
      * @param oStockMoveParams contains the attributes needed for the filter.
+     * @param iogKey_n
      * @return The STrnStock object containing the values obtained.
      * @throws Exception 
      */
@@ -522,5 +539,46 @@ public abstract class STrnStockSegregationUtils {
         }
         
         return isValidYear;
-    }  
+    }
+    
+    public static void saveSegregations(SGuiSession session, ArrayList<SDataStockSegregationWarehouseEntry> lSegEtys, final int idSegregation, final int[] pkWhs, final int idMatReq) throws SQLException, Exception {
+        int nIdSegregation = idSegregation;
+        if (idSegregation == 0) {
+            SDataStockSegregation oSeg = new SDataStockSegregation();
+            oSeg.setExpirationDate_n(null);
+            oSeg.setDeleted(false);
+            oSeg.setFkStockSegregationTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_REQ_MAT);
+            oSeg.setFkReference1Id(idMatReq);
+            oSeg.setFkReference2Id_n(0);
+            
+            oSeg.save(session.getDatabase().getConnection());
+            
+            if (oSeg.getLastDbActionResult() ==SLibConstants.DB_ACTION_SAVE_OK) {
+                nIdSegregation = oSeg.getPkStockSegregationId();
+            }
+            else {
+                throw new Exception("Error al guardar la segregación.");
+            }
+        }
+        
+        SDataStockSegregationWarehouse oSegWhs = new SDataStockSegregationWarehouse();
+        oSegWhs.read(new int[] { nIdSegregation, pkWhs[0] }, session.getDatabase().getConnection().createStatement());
+        if (oSegWhs.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_ERROR) {
+            oSegWhs = new SDataStockSegregationWarehouse();
+            oSegWhs.setPkStockSegregationId(nIdSegregation);
+            oSegWhs.setPkWarehouseId(pkWhs[1]);
+            oSegWhs.setFkCompanyBranchId(pkWhs[0]);
+            oSegWhs.setFkWarehouseId(pkWhs[1]);
+            
+            oSegWhs.save(session.getDatabase().getConnection());
+            
+            if (oSegWhs.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_ERROR) {
+                throw new Exception("Error al guardar la segregación.");
+            }
+        }
+        
+        for (SDataStockSegregationWarehouseEntry oSegEty : lSegEtys) {
+            oSegEty.save(session.getDatabase().getConnection());
+        }
+    }
 }

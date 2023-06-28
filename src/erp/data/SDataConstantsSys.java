@@ -1158,6 +1158,7 @@ public abstract class SDataConstantsSys {
 
     public static final int TRNS_TP_STK_SEG_SHIP = 1;       // shipment
     public static final int TRNS_TP_STK_SEG_MFG_ORD = 2;    // manufacturing order
+    public static final int TRNS_TP_STK_SEG_REQ_MAT = 3;    // Material request
 
     public static final int TRNS_TP_STK_SEG_INC = 1;    // increment
     public static final int TRNS_TP_STK_SEG_DEC = 2;    // decrement

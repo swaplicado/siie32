@@ -7,6 +7,7 @@ package erp.mod.trn.view;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
+import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -39,8 +40,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbAuthCardex;
     private JButton jbAuthorize;
     private JButton jbReject;
+    private JButton jbSegregate;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogAuthorizationCardex moDialogAuthCardex;
+    private SDialogMaterialRequestSegregation moDialogSegregations;
     
     /**
      * @param client GUI client.
@@ -57,15 +60,18 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver entregas mensuales", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
+        jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Entregas mensuales partida del contrato");
+        moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
+        moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
     }
     
     private void actionCardex() {
@@ -98,49 +104,79 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     
     private void actionAuthorizeOrRejectResource(final int iAction) {
         if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
             else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        String reason = "";
-                        if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
-                            reason = JOptionPane.showInputDialog("Ingrese motivo de rechazo:");
-                            if (reason == null) {
-                                return;
-                            }
-                        }
-                        String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
-                                                                                    iAction,
-                                                                                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
-                                                                                    gridRow.getRowPrimaryKey(),
-                                                                                    miClient.getSession().getUser().getPkUserId(),
-                                                                                    reason);
-                        if (response.length() > 0) {
-                                miClient.showMsgBoxError(response);
-                        }
-                        else {
-                            miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 
-                                    " con éxito");
-                            miClient.getSession().notifySuscriptors(mnGridType);
+                try {
+                    String reason = "";
+                    if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
+                        reason = JOptionPane.showInputDialog("Ingrese motivo de rechazo:");
+                        if (reason == null) {
+                            return;
                         }
                     }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
+                    String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
+                                                                                iAction,
+                                                                                SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
+                                                                                gridRow.getRowPrimaryKey(),
+                                                                                miClient.getSession().getUser().getPkUserId(),
+                                                                                reason);
+                    if (response.length() > 0) {
+                            miClient.showMsgBoxError(response);
                     }
+                    else {
+                        miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 
+                                " con éxito");
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
                 }
             }
+        }
+    }
+    
+    private void actionSegregateFree() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                    moDialogSegregations.setFormParams(key);
+                    moDialogSegregations.setVisible(true);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
     }
     
     @Override
@@ -287,6 +323,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbReject) {
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_REJECT);
+            }
+            else if (button == jbSegregate) {
+                actionSegregateFree();
             }
         }
     }

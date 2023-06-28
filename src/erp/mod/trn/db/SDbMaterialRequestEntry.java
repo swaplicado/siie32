@@ -91,7 +91,6 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public ArrayList<SDbMaterialRequestEntryNote> getChildNotes() { return maChildNotes; }
     
     public int getAuxRowId() { return mnAuxRowId; }
-    
     public SDataItem getDataItem() { return moDataItem; }
 
     @Override
@@ -128,7 +127,6 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         maChildNotes = new ArrayList<>();
         
         mnAuxRowId = 0;
-        
         moDataItem = null;
     }
 
