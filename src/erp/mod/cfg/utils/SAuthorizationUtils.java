@@ -96,14 +96,16 @@ public class SAuthorizationUtils {
         String sql = QUERY_AUTHS + " AND cas.fk_auth_type = " + authorizationType + " AND " + condPk;
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
-            
+            boolean authBySteps = false;
             while(res.next()) {
                 if (! res.getBoolean("b_auth")) {
                     return false;
                 }
+                
+                authBySteps = true;
             }
             
-            return true;
+            return authBySteps;
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
