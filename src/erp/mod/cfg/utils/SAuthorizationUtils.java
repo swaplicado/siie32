@@ -47,6 +47,7 @@ public class SAuthorizationUtils {
     public static final int AUTH_STATUS_REJECTED = 2;
     public static final int AUTH_STATUS_PENDING = 3;
     public static final int AUTH_STATUS_AUTHORIZING = 4;
+    public static final int AUTH_STATUS_NA = 10;
     
     public static final HashMap<Integer, String> AUTH_STATUS_DESC = new HashMap<>();
     
@@ -55,6 +56,7 @@ public class SAuthorizationUtils {
         AUTH_STATUS_DESC.put(AUTH_STATUS_REJECTED, "Rechazado");
         AUTH_STATUS_DESC.put(AUTH_STATUS_PENDING, "Pendiente");
         AUTH_STATUS_DESC.put(AUTH_STATUS_AUTHORIZING, "En autorización");
+        AUTH_STATUS_DESC.put(AUTH_STATUS_NA, "No aplica");
     }
     
     /**
@@ -117,7 +119,7 @@ public class SAuthorizationUtils {
      * @param authorizationType
      * @param pk
      * 
-     * @return puede ser: AUTH_STATUS_AUTHORIZED, AUTH_STATUS_REJECTED, AUTH_STATUS_PENDING, AUTH_STATUS_AUTHORIZING
+     * @return puede ser: AUTH_STATUS_AUTHORIZED, AUTH_STATUS_REJECTED, AUTH_STATUS_PENDING, AUTH_STATUS_AUTHORIZING, AUTH_STATUS_NA
      */
     public static int getAuthStatus(SGuiSession session, final int authorizationType, final Object pk) {
         String condPk = "";
@@ -157,7 +159,7 @@ public class SAuthorizationUtils {
             }
             
             if (allSteps == 0) {
-                return AUTH_STATUS_AUTHORIZED;
+                return AUTH_STATUS_NA;
             }
             
             /*
