@@ -709,7 +709,7 @@ public class SAuthorizationUtils {
      */
     private static boolean stepExists(SGuiSession session, SDbAuthStep oStep) {
         String sql = "SELECT '1' AS cfg_exists "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " AS cas "
                 + "WHERE NOT b_del AND "
                     + "fk_auth_type = " + oStep.getFkAuthTypeId() + " AND "
                     + "fk_usr_step = " + oStep.getFkUserStepId() + " AND "

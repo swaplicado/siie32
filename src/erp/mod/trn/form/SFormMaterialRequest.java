@@ -4,9 +4,12 @@
  */
 package erp.mod.trn.form;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mod.trn.db.SDbMaterialRequestEntryNote;
@@ -14,6 +17,8 @@ import erp.mod.trn.db.SDbMaterialRequestNote;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
@@ -22,6 +27,8 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibConsts;
@@ -44,7 +51,7 @@ import sa.lib.gui.SGuiValidation;
  * @author Isabel Servín
  * 
  */
-public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements SGridPaneFormOwner, ActionListener, ListSelectionListener, ItemListener {
+public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements SGridPaneFormOwner, ActionListener, ListSelectionListener, ItemListener, FocusListener {
 
     private SDbMaterialRequest moRegistry;
     private ArrayList<SDbMaterialRequestEntry> maMatReqEntries;
@@ -177,8 +184,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpEstados = new javax.swing.JPanel();
         jlAuthStatus = new javax.swing.JLabel();
         moTextAuthStatus = new sa.lib.gui.bean.SBeanFieldText();
-        jbAuth = new javax.swing.JButton();
-        jbDisauth = new javax.swing.JButton();
+        jbAuthorize = new javax.swing.JButton();
+        jbReject = new javax.swing.JButton();
         jlspace = new javax.swing.JLabel();
         jlProvStatus = new javax.swing.JLabel();
         moTextProvStatus = new sa.lib.gui.bean.SBeanFieldText();
@@ -539,15 +546,17 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moTextAuthStatus.setPreferredSize(new java.awt.Dimension(110, 23));
         jpEstados.add(moTextAuthStatus);
 
-        jbAuth.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_st_thumbs_up.png"))); // NOI18N
-        jbAuth.setToolTipText("Autorizar");
-        jbAuth.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpEstados.add(jbAuth);
+        jbAuthorize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_st_thumbs_up.png"))); // NOI18N
+        jbAuthorize.setToolTipText("Autorizar");
+        jbAuthorize.setEnabled(false);
+        jbAuthorize.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEstados.add(jbAuthorize);
 
-        jbDisauth.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_st_thumbs_down.png"))); // NOI18N
-        jbDisauth.setToolTipText("Rechazar");
-        jbDisauth.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpEstados.add(jbDisauth);
+        jbReject.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_st_thumbs_down.png"))); // NOI18N
+        jbReject.setToolTipText("Rechazar");
+        jbReject.setEnabled(false);
+        jbReject.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEstados.add(jbReject);
 
         jlspace.setPreferredSize(new java.awt.Dimension(10, 23));
         jpEstados.add(jlspace);
@@ -610,14 +619,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbAuth;
+    private javax.swing.JButton jbAuthorize;
     private javax.swing.JButton jbDeleteEty;
-    private javax.swing.JButton jbDisauth;
     private javax.swing.JButton jbEditEty;
     private javax.swing.JButton jbImport;
     private javax.swing.JButton jbNewEty;
     private javax.swing.JButton jbPickItem;
     private javax.swing.JButton jbRegisterEty;
+    private javax.swing.JButton jbReject;
     private javax.swing.JLabel jlAuthStatus;
     private javax.swing.JLabel jlConsDays;
     private javax.swing.JLabel jlConsEnt;
@@ -818,7 +827,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyConsSubent.setEnabled(enable);
         moDateReq.setEnabled(enable);
         moKeyPriReq.setEnabled(enable);
-        moBoolProvClosed.setEnabled(enable);
         moTextReqNotes.setEnabled(enable);
         
         jbNewEty.setEnabled(enable);
@@ -975,13 +983,33 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             key = (int[]) picker.getOption();
 
             if (key != null) {
-                moItemEty = new SDataItem();
-                moItemEty.read(key, miClient.getSession().getStatement());
-                moTextItemCode.setValue(moItemEty.getCode());
-                moTextItemName.setValue(moItemEty.getName());
-                moKeyUnit.setValue(new int[] { moItemEty.getFkUnitId() } );
+                assignItem(key);
             }
         }
+    }
+    
+    private void actionItemCode() {
+        try {
+            String sql = "SELECT id_item FROM erp.itmu_item WHERE code = '" + moTextItemCode.getValue() + "' ";
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                assignItem(new int[] { resultSet.getInt(1) });
+            }
+            else {
+                miClient.showMsgBoxInformation("No hay ningún ítem con el código ingresado.");
+            }
+        }
+        catch(Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void assignItem(int[] key) {
+        moItemEty = new SDataItem();
+        moItemEty.read(key, miClient.getSession().getStatement());
+        moTextItemCode.setValue(moItemEty.getCode());
+        moTextItemName.setValue(moItemEty.getName());
+        moKeyUnit.setValue(new int[] { moItemEty.getFkUnitId() } );
     }
     
     private void actionNew() {
@@ -1048,6 +1076,34 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         mnStatusAuthId = statusAuth;
         super.actionSave();
     }
+    
+    private void actionAuthorizeOrRejectResource(final int iAction) {
+        try {
+            String reason = "";
+            if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
+                reason = JOptionPane.showInputDialog("Ingrese motivo de rechazo:");
+                if (reason == null) {
+                    return;
+                }
+            }
+            String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
+                                                                        iAction,
+                                                                        SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
+                                                                        moRegistry.getPrimaryKey(),
+                                                                        miClient.getSession().getUser().getPkUserId(),
+                                                                        reason);
+            if (response.length() > 0) {
+                    miClient.showMsgBoxError(response);
+            }
+            else {
+                miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 
+                        " con éxito");
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
 
     @Override
     public void addAllListeners() {
@@ -1057,12 +1113,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbRegisterEty.addActionListener(this);
         jbEditEty.addActionListener(this);
         jbDeleteEty.addActionListener(this);
-        jbAuth.addActionListener(this);
-        jbDisauth.addActionListener(this);
+        jbAuthorize.addActionListener(this);
+        jbReject.addActionListener(this);
         jbSave.addActionListener(this);
         jbSaveAndSend.addActionListener(this);
         moBoolNewItem.addItemListener(this);
         moKeyPresentation.addItemListener(this);
+        moTextItemCode.addFocusListener(this);
     }
 
     @Override
@@ -1073,12 +1130,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbRegisterEty.removeActionListener(this);
         jbEditEty.removeActionListener(this);
         jbDeleteEty.removeActionListener(this);
-        jbAuth.removeActionListener(this);
-        jbDisauth.removeActionListener(this);
+        jbAuthorize.removeActionListener(this);
+        jbReject.removeActionListener(this);
         jbSave.removeActionListener(this);
         jbSaveAndSend.removeActionListener(this);
         moBoolNewItem.removeItemListener(this);
         moKeyPresentation.removeItemListener(this);
+        moTextItemCode.removeFocusListener(this);
     }
 
     @Override
@@ -1111,15 +1169,16 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moRegistry.initPrimaryKey();
             moRegistry.setDate(miClient.getSession().getCurrentDate());
             jtfRegistryKey.setText("");
+            moKeyUsrReq.setValue(new int[] { miClient.getSession().getUser().getPkUserId() });
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
+            moKeyUsrReq.setValue(new int[] { moRegistry.getFkUserRequesterId() });
         }
 
         moKeyProvEnt.setValue(new int[] { moRegistry.getFkMatProvisionEntityId() });
         moIntNumber.setValue(moRegistry.getNumber());
         moDate.setValue(moRegistry.getDate());
-        moKeyUsrReq.setValue(new int[] { moRegistry.getFkUserRequesterId() });
         moKeyContractor.setValue(new int[] { moRegistry.getFkContractorId_n() });
         moTextReferecnce.setValue(moRegistry.getReference());
         moTextReferecnce.setValue(moRegistry.getReference());
@@ -1154,10 +1213,15 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         else enableReqControls(true);
         
         moTextAuthStatus.setValue(moRegistry.getAuxAuthStatus());
-
+        
         if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND) {
             jbSave.setEnabled(false);
             jbSaveAndSend.setEnabled(false);
+        }
+        
+        if (!moRegistry.isRegistryNew()) {
+            jbAuthorize.setEnabled(((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight);
+            jbReject.setEnabled(((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight);
         }
         
         addAllListeners();
@@ -1239,6 +1303,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             else if (button == jbSaveAndSend) {
                 actionSave(SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH);
             }
+            else if (button == jbAuthorize) {
+                actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_AUTHORIZE);
+            }
+            else if (button == jbReject) {
+                actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_REJECT);
+            }
         }
     }
 
@@ -1278,6 +1348,22 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
             setComponetsEntryData((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow());
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof JTextField) {
+            JTextField textField = (JTextField) e.getSource();
+            
+            if (textField == moTextItemCode) {
+                actionItemCode();
+            }
         }
     }
 }

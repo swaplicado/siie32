@@ -209,6 +209,13 @@ public class SModuleTrn extends SGuiModule {
         SGuiCatalogueSettings settings = null;
 
         switch (type) {
+            case SModConsts.TRNS_ST_MAT_REQ:
+                settings = new SGuiCatalogueSettings("Estatus de requisición", 1);
+                sql = "SELECT id_st_mat_req AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_st_mat_req ";
+                break;
             case SModConsts.TRNU_TP_DPS:
                 settings = new SGuiCatalogueSettings("Tipo de documento", 3);
                 sql = "SELECT id_ct_dps AS " + SDbConsts.FIELD_ID + "1, id_cl_dps AS " + SDbConsts.FIELD_ID + "2, id_tp_dps AS " + SDbConsts.FIELD_ID + "3, "
@@ -393,7 +400,20 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewMaintUserSupervisor(miClient, "Mantto. - Residentes contratistas");
                 break;
             case SModConsts.TRN_MAT_REQ:
-                view = new SViewMaterialRequest(miClient, "Requisiciones");
+                switch(subtype) {
+                    case SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW:
+                        view = new SViewMaterialRequest(miClient, subtype, "Mis req. nuevas");
+                        break;
+                    case SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH:
+                        view = new SViewMaterialRequest(miClient, subtype, "Mis req. x autorizar");
+                        break;
+                    case SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV:
+                        view = new SViewMaterialRequest(miClient, subtype, "Mis req. en proceso");
+                        break;
+                    default:
+                        view = new SViewMaterialRequest(miClient, subtype, "Mis requicisiones");
+                        break;
+                }
                 break;
             case SModConsts.TRN_ITEM_COST:
                 view = new SViewItemCost(miClient, "Costos de ítems");

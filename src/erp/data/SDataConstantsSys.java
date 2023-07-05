@@ -306,6 +306,11 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_MFG_FG_DEV = 105056;
     public static final int PRV_INV_MFG_CON = 105057;
     public static final int PRV_INV_MAINT = 105058;
+    public static final int PRV_INV_REQ_MAT_PET = 105059;
+    public static final int PRV_INV_REQ_MAT_REV = 105060;
+    public static final int PRV_INV_REQ_MAT_PROV = 105061;
+    public static final int PRV_INV_REQ_MAT_PUR = 105062;
+    public static final int PRV_INV_REQ_MAT_ADM = 105063;
     public static final int PRV_INV_REP = 105901;
 
     public static final int PRV_MKT_CUS_CFG = 106001;

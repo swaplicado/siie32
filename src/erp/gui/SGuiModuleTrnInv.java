@@ -138,6 +138,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintArea;
     
     private javax.swing.JMenu jmMenuReq;
+    private javax.swing.JMenuItem jmiReqNew;
+    private javax.swing.JMenuItem jmiReqTbAuth;
+    private javax.swing.JMenuItem jmiReqTbProcc;
     private javax.swing.JMenuItem jmiReqAll;
     private javax.swing.JMenuItem jmiReqPend;
     
@@ -211,6 +214,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMfgCon = false;
         boolean hasRightMaint = false;
         int levelRightMaint = 0;
+        boolean hasRightMatReqPet = false;
+        boolean hasRightMatReqRev = false;
+        boolean hasRightMatReqProv = false;
+        boolean hasRightMatReqPur = false;
+        boolean hasRightMatReqAdm = false;
 
         jmMenuCat = new JMenu("Catálogos");
         jmiCatStockLot = new JMenuItem("Lotes");
@@ -346,7 +354,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMfgConsumePend.addActionListener(this);
         jmiMfgConsumePendEntry.addActionListener(this);
         jmiMfgConsumed.addActionListener(this);
-        jmiMfgConsumedEntry.addActionListener(this);    
+        jmiMfgConsumedEntry.addActionListener(this);
 
         jmMenuIog = new JMenu("Docs. inventarios");
         jmiIogStock = new JMenuItem("Docs. inventarios");
@@ -479,12 +487,23 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintArea.addActionListener(this);
         
         jmMenuReq = new JMenu("Requisiciones");
+        jmiReqNew = new JMenuItem("Mis requisiciones nuevas");
+        jmiReqTbAuth = new JMenuItem("Mis requisiciones por autorizar");
+        jmiReqTbProcc = new JMenuItem("Mis requisiciones en proceso (suministro o compras)");
         jmiReqAll = new JMenuItem("Todas mis requisiciones");
         jmiReqPend = new JMenuItem("Requisiciones pendientes");
         
+        jmMenuReq.add(jmiReqNew);
+        jmMenuReq.add(jmiReqTbAuth);
+        jmMenuReq.add(jmiReqTbProcc);
         jmMenuReq.add(jmiReqAll);
+        jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqPend);
         
+        jmiReqNew.addActionListener(this);
+        jmiReqTbAuth.addActionListener(this);
+        jmiReqTbProcc.addActionListener(this);
+        jmiReqNew.addActionListener(this);
         jmiReqAll.addActionListener(this);
         jmiReqPend.addActionListener(this);
         
@@ -589,7 +608,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMfgCon = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MFG_CON).HasRight;
         hasRightMaint = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MAINT).HasRight;
         levelRightMaint = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_MAINT);
-
+        hasRightMatReqPet = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PET).HasRight;
+        hasRightMatReqRev = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
+        hasRightMatReqProv = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
+        hasRightMatReqPur = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
+        hasRightMatReqAdm = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADM).HasRight;
+        
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
         jmMenuDpsPurSup.setEnabled(hasRightInPur);
         jmMenuDpsPurRet.setEnabled(hasRightOutPur);
@@ -648,9 +672,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserContractorSupv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintUserToolMaintProv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintArea.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
-        jmMenuReq.setEnabled(true);
-        jmiReqAll.setEnabled(true);
-        jmiReqPend.setEnabled(true);
+        jmMenuReq.setEnabled(hasRightMatReqPet || hasRightMatReqRev || hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqNew.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqTbAuth.setEnabled(hasRightMatReqPet || hasRightMatReqRev || hasRightMatReqAdm);
+        jmiReqTbProcc.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqAll.setEnabled(hasRightMatReqPet || hasRightMatReqRev || hasRightMatReqAdm);
+        jmiReqPend.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
         jmMenuStk.setEnabled(hasRightStock);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1504,6 +1531,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiMaintArea) {
                 miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqNew) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW, null);
+            }
+            else if (item == jmiReqTbAuth) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH, null);
+            }
+            else if (item == jmiReqTbProcc) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV, null);
             }
             else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, null);

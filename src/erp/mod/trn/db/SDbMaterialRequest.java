@@ -6,6 +6,7 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,11 +60,17 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     
     protected ArrayList<SDbMaterialRequestNote> maChildNotes;
     protected ArrayList<SDbMaterialRequestEntry> maChildEntries;
-    
+   
     protected String msAuxReqStatus;
     protected String msAuxAuthStatus;
     protected String msAuxProvStatus;
     protected String msAuxPurStatus;
+    
+    protected int mnAuxReqStatusIdOld;
+    protected int mnAuxReqAuthStatusId;
+    protected int mnAuxReqAuthStatusIdOld;
+    protected int mnAuxReqProvStatusIdOld;
+    protected int mnAuxReqPurStatusIdOld;
     
     protected String msAuxAuthUser;
     
@@ -108,6 +115,12 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxProvStatus(String s) { msAuxProvStatus = s; }
     public void setAuxPurStatus(String s) { msAuxPurStatus = s; }
     
+    public void setAuxReqStatusIdOld(int n) { mnAuxReqStatusIdOld = n; }
+    public void setAuxReqAuthStatusId(int n) { mnAuxReqAuthStatusId = n; }
+    public void setAuxReqAuthStatusIdOld(int n) { mnAuxReqAuthStatusIdOld = n; }
+    public void setAuxReqProvStatusIdOld(int n) { mnAuxReqProvStatusIdOld = n; }
+    public void setAuxReqPurStatusIdOld(int n) { mnAuxReqPurStatusIdOld = n; }
+    
     public void setAuxLastProvClosedSta(boolean b) { mbAuxLastProvClosedSta = b; }
     public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
     
@@ -147,9 +160,26 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public String getAuxAuthStatus() { return msAuxAuthStatus; }
     public String getAuxProvStatus() { return msAuxProvStatus; }
     public String getAuxPurStatus() { return msAuxPurStatus; }
+
+    public int getAuxReqStatusIdOld() { return mnAuxReqStatusIdOld; }
+    public int getAuxReqAuthStatusId() { return mnAuxReqAuthStatusId; }
+    public int getAuxReqAuthStatusIdOld() { return mnAuxReqAuthStatusIdOld; }
+    public int getAuxReqProvStatusIdOld() { return mnAuxReqProvStatusIdOld; }
+    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; } 
     
     public boolean getAuxLastProvClosedSta() { return mbAuxLastProvClosedSta; }
     public boolean getAuxLastPurClosedSta() { return mbAuxLastPurClosedSta; }
+    
+    private void saveLog(SGuiSession session) throws Exception {
+        SDbMaterialRequestStatusLog log = new SDbMaterialRequestStatusLog();
+        log.setPkMatRequestId(mnPkMatRequestId);
+        log.setFkMatRequestStatusId(mnFkMatRequestStatusId);
+        log.setFkMatRequestStatusAuthId(mnAuxReqAuthStatusId);
+        log.setFkMatProvisionStatusId(mnFkMatProvisionStatusId);
+        log.setFkMatPurchaseStatusId(mnFkMatPurchaseStatusId);
+        log.setRegistryNew(true);
+        log.save(session);
+    }
     
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -201,6 +231,13 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         msAuxAuthStatus = "";
         msAuxProvStatus = "";
         msAuxPurStatus = "";
+        
+        mnAuxReqStatusIdOld = 0;
+        mnAuxReqAuthStatusId = SAuthorizationUtils.AUTH_STATUS_NA; // Las autorizaciones trabajan de manera independiente, por lo cual es necesario iniciar en NA
+        mnAuxReqAuthStatusIdOld = 0;
+        mnAuxReqProvStatusIdOld = 0;
+        mnAuxReqPurStatusIdOld = 0;
+        
         mbAuxLastProvClosedSta = false;
         mbAuxLastPurClosedSta = false;
     }
@@ -344,8 +381,14 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                 msAuxPurStatus = resultSet.getString(1);
             }
             
-            msAuxAuthStatus = SAuthorizationUtils.AUTH_STATUS_DESC.get(SAuthorizationUtils.getAuthStatus(session, 
-                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[] { mnPkMatRequestId } )).toUpperCase();
+            mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, 
+                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[] { mnPkMatRequestId } );
+            msAuxAuthStatus = SAuthorizationUtils.AUTH_STATUS_DESC.get(mnAuxReqAuthStatusId).toUpperCase();
+            
+            mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
+            mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
+            mnAuxReqProvStatusIdOld = mnFkMatProvisionStatusId;
+            mnAuxReqPurStatusIdOld = mnFkMatPurchaseStatusId;
             
             mbRegistryNew = false;
         }
@@ -478,6 +521,33 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             entry.save(session);
         }
         
+        // Guardar bitacora de cambios de estado
+        
+        if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqProvStatusIdOld != mnFkMatProvisionStatusId
+                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId) {
+            saveLog(session);
+        }
+        
+        // Si el estatus de requisición esta "En autorización"
+        if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH) {
+            SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
+            
+            // Si el estatus de autorización esta "Autorizado" o "NA", y el estatus de requisición esta "En autorización", este pasa a "En suministro"
+            mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
+            mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
+            if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_AUTHORIZED || mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_NA){
+                mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV;
+                msSql = "UPDATE " + getSqlTable() + " SET " + 
+                        "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 
+                        getSqlWhere();
+                session.getStatement().execute(msSql);
+            }
+            if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId) {
+                saveLog(session);
+            }
+        }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -526,6 +596,13 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setAuxReqStatus(this.getAuxReqStatus());
         registry.setAuxProvStatus(this.getAuxProvStatus());
         registry.setAuxPurStatus(this.getAuxPurStatus());
+        
+        registry.setAuxReqStatusIdOld(this.getAuxReqStatusIdOld());
+        registry.setAuxReqAuthStatusId(this.getAuxReqAuthStatusId());
+        registry.setAuxReqAuthStatusIdOld(this.getAuxReqAuthStatusIdOld());
+        registry.setAuxReqProvStatusIdOld(this.getAuxReqProvStatusIdOld());
+        registry.setAuxReqPurStatusIdOld(this.getAuxReqPurStatusIdOld());
+        
         registry.setAuxLastProvClosedSta(this.getAuxLastProvClosedSta());
         registry.setAuxLastPurClosedSta(this.getAuxLastPurClosedSta());
         
