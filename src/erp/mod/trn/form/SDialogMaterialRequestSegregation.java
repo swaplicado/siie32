@@ -6,7 +6,6 @@ package erp.mod.trn.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
-import erp.gui.session.SSessionCustom;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
@@ -27,6 +26,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibConsts;
@@ -39,7 +39,6 @@ import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiFieldKeyGroup;
-import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
@@ -84,8 +83,11 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         jlNumber = new javax.swing.JLabel();
         moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
         jPanel12 = new javax.swing.JPanel();
-        jlBizPartner = new javax.swing.JLabel();
-        moTextBizPartner = new sa.lib.gui.bean.SBeanFieldText();
+        jlRequest = new javax.swing.JLabel();
+        moTextRequest = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel15 = new javax.swing.JPanel();
+        jlEntity = new javax.swing.JLabel();
+        moTextEntity = new sa.lib.gui.bean.SBeanFieldText();
         jPanel6 = new javax.swing.JPanel();
         jPanel30 = new javax.swing.JPanel();
         jlWarehouseCompanyBranch = new javax.swing.JLabel();
@@ -108,7 +110,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         jpSegRows = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Entregas mensuales del contrato");
+        setTitle("Apartados de la requisición de materiales");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -119,7 +121,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
         jpBenefit.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Partida apreciada:"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Requisición de materiales:"));
         jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -136,19 +138,31 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setText("Cliente:");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jlBizPartner);
+        jlRequest.setText("Solicita:");
+        jlRequest.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel12.add(jlRequest);
 
-        moTextBizPartner.setText("sBeanFieldText2");
-        moTextBizPartner.setPreferredSize(new java.awt.Dimension(340, 23));
-        jPanel12.add(moTextBizPartner);
+        moTextRequest.setText("sBeanFieldText2");
+        moTextRequest.setPreferredSize(new java.awt.Dimension(340, 23));
+        jPanel12.add(moTextRequest);
 
         jPanel4.add(jPanel12);
 
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEntity.setText("Entidad:");
+        jlEntity.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel15.add(jlEntity);
+
+        moTextEntity.setText("sBeanFieldText2");
+        moTextEntity.setPreferredSize(new java.awt.Dimension(340, 23));
+        jPanel15.add(moTextEntity);
+
+        jPanel4.add(jPanel15);
+
         jpBenefit.add(jPanel4, java.awt.BorderLayout.WEST);
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Total partida contrato:"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Almacén para apartados:"));
         jPanel6.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -251,6 +265,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
@@ -261,8 +276,9 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
     private javax.swing.JButton jbReleaseAll;
     private javax.swing.JButton jbSegregate;
     private javax.swing.JButton jbSegregateAll;
-    private javax.swing.JLabel jlBizPartner;
+    private javax.swing.JLabel jlEntity;
     private javax.swing.JLabel jlNumber;
+    private javax.swing.JLabel jlRequest;
     private javax.swing.JLabel jlWarehouseCompanyBranch;
     private javax.swing.JLabel jlWarehouseEntity;
     private javax.swing.JPanel jpBenefit;
@@ -272,8 +288,9 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
     private javax.swing.JPanel jpSegregationRows;
     private sa.lib.gui.bean.SBeanFieldKey moKeyWarehouseCompanyBranch;
     private sa.lib.gui.bean.SBeanFieldKey moKeyWarehouseEntity;
-    private sa.lib.gui.bean.SBeanFieldText moTextBizPartner;
+    private sa.lib.gui.bean.SBeanFieldText moTextEntity;
     private sa.lib.gui.bean.SBeanFieldText moTextNumber;
+    private sa.lib.gui.bean.SBeanFieldText moTextRequest;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -283,7 +300,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         jbCancel.setEnabled(false);
 
         moTextNumber.setTextSettings(SGuiUtils.getLabelName(jlNumber), 150);
-        moTextBizPartner.setTextSettings(SGuiUtils.getLabelName(jlBizPartner), 150);
+        moTextRequest.setTextSettings(SGuiUtils.getLabelName(jlRequest), 150);
         moKeyWarehouseCompanyBranch.setKeySettings(miClient, SGuiUtils.getLabelName(jlWarehouseCompanyBranch), false);
         moKeyWarehouseEntity.setKeySettings(miClient, SGuiUtils.getLabelName(jlWarehouseEntity), false);
         
@@ -292,14 +309,10 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         
         moFieldKeyEntityGroup = new SGuiFieldKeyGroup(miClient);
 
-        moGridMatReqEty = new SGridPaneForm(miClient, SModConsts.TRN_MAT_REQ_ETY, SLibConsts.UNDEFINED, "Renglones de la requisición") {
+        moGridMatReqEty = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_ETY_ROW, SLibConsts.UNDEFINED, "Renglones de la requisición") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
-                
-//                JButton jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver entregas mensuales", this);
-//        
-//                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
             }
             
             @Override
@@ -312,7 +325,6 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Requeridas"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Apartadas"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Existencias"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Libres"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Por apartar"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Cant actual");
                 col.setEditable(true);
@@ -337,6 +349,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Ítem"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Almacén"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Liberado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Apartado"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "A liberar");
                 col.setEditable(true);
@@ -348,7 +361,8 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         jpSegRows.add(moGridSegregationRows, BorderLayout.CENTER);
         
         moTextNumber.setEditable(false);
-        moTextBizPartner.setEditable(false);
+        moTextRequest.setEditable(false);
+        moTextEntity.setEditable(false);
         
         mnSegregationId = 0;
         
@@ -357,20 +371,25 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
     }
     
     private void loadEntryMatRequestSelected() {
-        SDbMaterialRequestEntry oMaterialRequestEntry = null;
+        SMaterialRequestEntryRow oMaterialRequestEntry = null;
         
-        oMaterialRequestEntry = (SDbMaterialRequestEntry) moGridMatReqEty.getSelectedGridRow();
+        oMaterialRequestEntry = (SMaterialRequestEntryRow) moGridMatReqEty.getSelectedGridRow();
 
         if (oMaterialRequestEntry != null) {
             showSegregationEntries(oMaterialRequestEntry);
         }
     }
 
+    /**
+     * Mostrar registros en la tabla superior
+     */
     @SuppressWarnings("unchecked")
     private void showMaterialRequestEntries() {
         Vector<SGridRow> rows = new Vector<>();
 
         try {
+            moGridMatReqEty.clearGrid();
+            
             mlMaterialRequestEntries = moMaterialRequest.getChildEntries();
             for (SDbMaterialRequestEntry oMaterialRequestEntry : mlMaterialRequestEntries) {
                 STrnStockMove params = new STrnStockMove();
@@ -381,10 +400,20 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 params.setPkWarehouseId(moKeyWarehouseEntity.getSelectedIndex() > 0 ? moKeyWarehouseEntity.getValue()[1] : 0);
                 STrnStock oStock = STrnStockSegregationUtils.getAllStock((SClientInterface) miClient, params);
                 
-                SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow();
+                SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
+                                                                            oMaterialRequestEntry.getFkItemId(), 
+                                                                            oMaterialRequestEntry.getFkUnitId());
+                oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
+                oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());
-                oRow.setAuxSegregated(oStock.getSegregatedStock());
-                oRow.setAuxStock(oStock.getAvailableStock());
+                oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
+                
+                params.setPkCompanyBranchId(0);
+                params.setPkWarehouseId(0);
+                params.setSegregationId(mnSegregationId);
+                STrnStock oReqSeg = STrnStockSegregationUtils.getStockSegregated((SClientInterface) miClient, params);
+                
+                oRow.setAuxSegregated(oReqSeg.getSegregatedStock());
                 
                 rows.add(oRow);
             }
@@ -398,12 +427,25 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         }
     }
     
-    private void showSegregationEntries(SDbMaterialRequestEntry oMaterialRequestEntry) {
+    /**
+     * Mostrar renglones de la tabla
+     * @param oMaterialRequestEntry 
+     */
+    private void showSegregationEntries(SMaterialRequestEntryRow oMaterialRequestEntry) {
         Vector<SGridRow> rows = new Vector<>();
 
         try {
-            ArrayList<SDataStockSegregationWarehouseEntry> etys = SMaterialRequestUtils.getSegregationEtysOfMaterialRequest(miClient.getSession(), oMaterialRequestEntry.getPkMatRequestId(), oMaterialRequestEntry.getPkEntryId());
+            ArrayList<SDataStockSegregationWarehouseEntry> etys = SMaterialRequestUtils.getSegregationEtysOfMaterialRequest(miClient.getSession(), 
+                                                                                                                        oMaterialRequestEntry.getPkMatRequestId(), 
+                                                                                                                        oMaterialRequestEntry.getPkEntryId(),
+                                                                                                                        oMaterialRequestEntry.getFkItemId(), 
+                                                                                                                        oMaterialRequestEntry.getFkUnitId());
+            
             for (SDataStockSegregationWarehouseEntry ety : etys) {
+                ety.setAuxItemCode(oMaterialRequestEntry.getAuxItemCode());
+                ety.setAuxItemName(oMaterialRequestEntry.getAuxItemName());
+                ety.setAuxUnitCode(oMaterialRequestEntry.getAuxUnitCode());
+
                 rows.add(ety);
             }
 
@@ -416,14 +458,18 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         }
     }
     
+    /**
+     * Mostrar encabezado de requisición
+     */
     private void initMaterialRequestData() {
         try {
-            moTextNumber.setValue("");
+            moTextNumber.setValue(moMaterialRequest.getNumber() + "");
             /*
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
             moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDocLapsing_n()));
             */
-            moTextBizPartner.setValue("");
+            moTextRequest.setValue(moMaterialRequest.getAuxConsEntName());
+            moTextEntity.setValue(moMaterialRequest.getAuxProvEntName());
 
             showMaterialRequestEntries();
         }
@@ -432,6 +478,30 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         }
     }
     
+    /**
+     * Apartar todo
+     */
+    private void actionSegregateAll() {
+        if (moKeyWarehouseEntity.getSelectedIndex() == 0 || moKeyWarehouseCompanyBranch.getSelectedIndex() == 0) {
+            miClient.showMsgBoxWarning("Debe seleccionar un almacén.");
+            moKeyWarehouseCompanyBranch.requestFocus();
+            return;
+        }
+        
+        SMaterialRequestEntryRow oMatReqRow;
+        for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
+            oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
+            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSegregated() > 0) {
+                oMatReqRow.setAuxToSegregate(oMatReqRow.getQuantity() - oMatReqRow.getAuxSegregated());
+            }
+        }
+        
+        this.actionSegregate();
+    }
+    
+    /**
+     * Segregar
+     */
     private void actionSegregate() {
         if (moKeyWarehouseEntity.getSelectedIndex() == 0 || moKeyWarehouseCompanyBranch.getSelectedIndex() == 0) {
             miClient.showMsgBoxWarning("Debe seleccionar un almacén.");
@@ -445,11 +515,21 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
             if (oMatReqRow.getAuxToSegregate() > 0) {
                 dToSegregate += oMatReqRow.getAuxToSegregate();
+                
+                if (oMatReqRow.getAuxToSegregate() > oMatReqRow.getAuxStock()) {
+                    miClient.showMsgBoxWarning("No puede apartar más de lo que hay en existencia.");
+                    return;
+                }
+                if (oMatReqRow.getAuxToSegregate() > (oMatReqRow.getQuantity() - oMatReqRow.getAuxSegregated())) {
+                    miClient.showMsgBoxWarning("No puede apartar más de lo que hay disponible.");
+                    return;
+                }
             }
         }
         
         if (dToSegregate == 0d) {
             miClient.showMsgBoxWarning("No hay nada que apartar.");
+            return;
         }
         
         ArrayList<SDataStockSegregationWarehouseEntry> lSegregations = new ArrayList<>();
@@ -459,6 +539,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             if (oMatReqRow.getAuxToSegregate() > 0) {
                 oSegEty = new SDataStockSegregationWarehouseEntry();
                 oSegEty.setPkStockSegregationId(mnSegregationId);
+                oSegEty.setPkCompanyBranchId(moKeyWarehouseEntity.getValue()[0]);
                 oSegEty.setPkWarehouseId(moKeyWarehouseEntity.getValue()[1]);
                 oSegEty.setQuantityIncrement(oMatReqRow.getAuxToSegregate());
                 oSegEty.setQuantityDecrement(0d);
@@ -474,11 +555,96 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         }
         
         try {
-            STrnStockSegregationUtils.saveSegregations(miClient.getSession(), lSegregations, mnSegregationId, moKeyWarehouseEntity.getValue(), moMaterialRequest.getPkMatRequestId());
+            mnSegregationId = STrnStockSegregationUtils.saveSegregations(miClient.getSession(),
+                                                                            lSegregations,
+                                                                            mnSegregationId,
+                                                                            moMaterialRequest.getPkMatRequestId());
         }
         catch (Exception ex) {
             Logger.getLogger(SDialogMaterialRequestSegregation.class.getName()).log(Level.SEVERE, null, ex);
+            miClient.showMsgBoxError(ex.getMessage());
         }
+        
+        showMaterialRequestEntries();
+    }
+    
+    /**
+     * Liberar todo
+     */
+    private void actionReleaseAll() {
+        SDataStockSegregationWarehouseEntry oSegEntry;
+        for (int i = 0; i < moGridSegregationRows.getTable().getRowCount(); i++) {
+            oSegEntry = (SDataStockSegregationWarehouseEntry) moGridSegregationRows.getGridRow(i);
+            
+            if (oSegEntry.getFkStockSegregationMovementTypeId() == SDataConstantsSys.TRNS_TP_STK_SEG_INC) {
+                oSegEntry.setAuxToRelease(oSegEntry.getQuantityIncrement());
+            }
+        }
+        
+        this.actionRelease();
+    }
+    
+    /**
+     * Liberar
+     */
+    private void actionRelease() {
+        SDataStockSegregationWarehouseEntry oSegEntry;
+        double dToRelease = 0;
+        for (int i = 0; i < moGridSegregationRows.getTable().getRowCount(); i++) {
+            oSegEntry = (SDataStockSegregationWarehouseEntry) moGridSegregationRows.getGridRow(i);
+            dToRelease += oSegEntry.getAuxToRelease();
+            
+            if (oSegEntry.getAuxToRelease() > oSegEntry.getQuantityIncrement()) {
+                miClient.showMsgBoxWarning("No se puede liberar más de lo que hay apartado en el renglón.");
+                return;
+            }
+            
+            if (oSegEntry.getAuxToRelease() > 0 && oSegEntry.getQuantityDecrement() > 0) {
+                miClient.showMsgBoxWarning("No se puede liberar nada de este renglón.");
+                return;
+            }
+        }
+        
+        if (dToRelease == 0d) {
+            miClient.showMsgBoxWarning("No hay nada para liberar.");
+            return;
+        }
+        
+        ArrayList<SDataStockSegregationWarehouseEntry> lReleases = new ArrayList<>();
+        SDataStockSegregationWarehouseEntry oSegEty;
+        for (int i = 0; i < moGridSegregationRows.getTable().getRowCount(); i++) {
+            oSegEntry = (SDataStockSegregationWarehouseEntry) moGridSegregationRows.getGridRow(i);
+            
+            if (oSegEntry.getAuxToRelease() > 0) {
+                oSegEty = new SDataStockSegregationWarehouseEntry();
+                oSegEty.setPkStockSegregationId(mnSegregationId);
+                oSegEty.setPkCompanyBranchId(oSegEntry.getPkCompanyBranchId());
+                oSegEty.setPkWarehouseId(oSegEntry.getPkWarehouseId());
+                oSegEty.setQuantityIncrement(0d);
+                oSegEty.setQuantityDecrement(oSegEntry.getAuxToRelease());
+                oSegEty.setFkStockSegregationMovementTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_DEC);
+                oSegEty.setFkYearId(miClient.getSession().getCurrentYear());
+                oSegEty.setFkItemId(oSegEntry.getFkItemId());
+                oSegEty.setFkUnitId(oSegEntry.getFkUnitId());
+                oSegEty.setFkMatRequestId_n(oSegEntry.getFkMatRequestId_n());
+                oSegEty.setFkMatRequestEtyId_n(oSegEntry.getFkMatRequestEtyId_n());
+                
+                lReleases.add(oSegEty);
+            }
+        }
+        
+        try {
+            mnSegregationId = STrnStockSegregationUtils.saveSegregations(miClient.getSession(), 
+                                                                            lReleases, 
+                                                                            mnSegregationId,
+                                                                            moMaterialRequest.getPkMatRequestId());
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SDialogMaterialRequestSegregation.class.getName()).log(Level.SEVERE, null, ex);
+            miClient.showMsgBoxError(ex.getMessage());
+        }
+        
+        showMaterialRequestEntries();
     }
     
     public void setFormParams(final int[] pk) {
@@ -490,13 +656,16 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             Logger.getLogger(SDialogMaterialRequestSegregation.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        jlBizPartner.setText("");
+        jlRequest.setText("");
         initMaterialRequestData();
     }
     
     @Override
     public void addAllListeners() {
         jbSegregate.addActionListener(this);
+        jbRelease.addActionListener(this);
+        jbSegregateAll.addActionListener(this);
+        jbReleaseAll.addActionListener(this);
         
         moKeyWarehouseCompanyBranch.addItemListener(this);
         moKeyWarehouseEntity.addItemListener(this);
@@ -505,6 +674,9 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
     @Override
     public void removeAllListeners() {
         jbSegregate.removeActionListener(this);
+        jbRelease.removeActionListener(this);
+        jbSegregateAll.removeActionListener(this);
+        jbReleaseAll.removeActionListener(this);
         
         moKeyWarehouseCompanyBranch.removeItemListener(this);
         moKeyWarehouseEntity.removeItemListener(this);
@@ -513,10 +685,8 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
     @Override
     public void reloadCatalogues() {
         moFieldKeyEntityGroup.initGroup();
-        moFieldKeyEntityGroup.addFieldKey(moKeyWarehouseCompanyBranch, SModConsts.BPSU_BPB, SLibConsts.UNDEFINED, new SGuiParams(new int[] { miClient.getSession().getConfigCompany().getCompanyId() }));
-        moFieldKeyEntityGroup.addFieldKey(moKeyWarehouseEntity, SModConsts.CFGU_COB_ENT, SLibConsts.UNDEFINED,
-                new SGuiParams(new int[] { ((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey()[0],
-                    SModSysConsts.CFGS_CT_ENT_WH }));
+        moFieldKeyEntityGroup.addFieldKey(moKeyWarehouseCompanyBranch, SModConsts.BPSU_BPB, miClient.getSession().getConfigCompany().getCompanyId(), null);
+        moFieldKeyEntityGroup.addFieldKey(moKeyWarehouseEntity, SModConsts.CFGU_COB_ENT, SModSysConsts.CFGS_CT_ENT_WH, null);
         moFieldKeyEntityGroup.populateCatalogues();
     }
 
@@ -556,7 +726,13 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        
+        if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
+            JComboBox comboBox = (JComboBox)  e.getSource();
+
+            if (comboBox == moKeyWarehouseEntity) {
+                showMaterialRequestEntries();
+            }
+         }
     }
 
     @Override
@@ -566,6 +742,15 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
             if (button == jbSegregate) {
                 actionSegregate();
+            }
+            else if (button == jbRelease) {
+                actionRelease();
+            }
+            else if (button == jbSegregateAll) {
+                actionSegregateAll();
+            }
+            else if (button == jbReleaseAll) {
+                actionReleaseAll();
             }
         }
     }

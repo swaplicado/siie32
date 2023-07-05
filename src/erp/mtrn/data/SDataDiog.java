@@ -11,6 +11,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataBookkeepingNumber;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -307,16 +308,16 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             ResultSet resSeg = null;
 
             String sqlStockSegregation = "SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) AS f_seg_qty " +
-                    "FROM trn_stk_seg_whs AS swhs " +
-                    "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " AS swhs " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_cob = wety.id_cob AND swhs.id_whs = wety.id_whs " +
                     "WHERE fid_year = " + diogEty.getPkYearId() + " AND fid_item = " + diogEty.getFkItemId() + " AND fid_unit = " + diogEty.getFkOriginalUnitId() + " ";
 
             if (companyBranchId != 0) {
-                sqlStockSegregation += "AND swhs.fid_cob = " + companyBranchId + " ";
+                sqlStockSegregation += "AND swhs.id_cob = " + companyBranchId + " ";
             }
 
             if (warehouseId != 0) {
-                sqlStockSegregation += "AND swhs.fid_whs = " + warehouseId + " ";
+                sqlStockSegregation += "AND swhs.id_whs = " + warehouseId + " ";
             }
 
             if (segregationStkId != 0) {

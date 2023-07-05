@@ -47,11 +47,23 @@ public class SMaterialRequestUtils {
         return null;
     }
     
-    public static ArrayList<SDataStockSegregationWarehouseEntry> getSegregationEtysOfMaterialRequest(SGuiSession session, final int idMaterialRequest, final int idEty) {
-        String query = "SELECT id_stk_seg, id_whs, id_ety "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " "
-                + "WHERE fid_mat_req_n = " + idMaterialRequest + " "
-                + "AND fid_mat_req_ety_n = " + idEty + ";";
+    public static ArrayList<SDataStockSegregationWarehouseEntry> getSegregationEtysOfMaterialRequest(SGuiSession session, final int idMaterialRequest, final int idMatEty, final int idItem, final int idUnit) {
+        String query = "SELECT  " +
+                        "id_cob, " +
+                        "id_whs, " +
+                        "SUM(qty_inc) - SUM(qty_dec) AS qty, " +
+                        "fid_tp_stk_seg_mov, " +
+                        "fid_year, " +
+                        "fid_item, " +
+                        "fid_unit " +
+                        "FROM " +
+                        " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " " +
+                        "WHERE " +
+                        "fid_mat_req_n = " + idMaterialRequest + " " +
+                        "AND fid_item = " + idItem + " " +
+                        "AND fid_unit = " + idUnit + " " +
+                        "GROUP BY id_cob , id_whs , fid_year , fid_item , fid_unit " +
+                        "HAVING qty <> 0;";
         
         try {
             ArrayList<SDataStockSegregationWarehouseEntry> etys = new ArrayList<>();
@@ -59,7 +71,27 @@ public class SMaterialRequestUtils {
             SDataStockSegregationWarehouseEntry oStkSegEty;
             while (res.next()) {
                 oStkSegEty = new SDataStockSegregationWarehouseEntry();
-                oStkSegEty.read(new int[] { res.getInt("id_stk_seg"), res.getInt("id_whs"), res.getInt("id_ety") }, session.getDatabase().getConnection().createStatement());
+                
+                oStkSegEty.setPkCompanyBranchId(res.getInt("id_cob"));
+                oStkSegEty.setPkWarehouseId(res.getInt("id_whs"));
+                if (res.getDouble("qty") > 0d) {
+                    oStkSegEty.setQuantityIncrement(res.getDouble("qty"));
+                    oStkSegEty.setQuantityDecrement(0d);
+                    oStkSegEty.setFkStockSegregationMovementTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_INC);
+                }
+                else {
+                    oStkSegEty.setQuantityIncrement(0d);
+                    oStkSegEty.setQuantityDecrement(res.getDouble("qty"));
+                    oStkSegEty.setFkStockSegregationMovementTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_DEC);
+                }
+                oStkSegEty.setFkItemId(res.getInt("fid_item"));
+                oStkSegEty.setFkUnitId(res.getInt("fid_unit"));
+                oStkSegEty.setFkYearId(res.getInt("fid_year"));
+                oStkSegEty.setFkMatRequestId_n(idMaterialRequest);
+                oStkSegEty.setFkMatRequestEtyId_n(idMatEty);
+                
+                oStkSegEty.readAuxs(session.getStatement());
+                
                 etys.add(oStkSegEty);
             }
             

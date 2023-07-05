@@ -3,6 +3,7 @@ package erp.mtrn.data;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mod.SModConsts;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -17,9 +18,8 @@ import sa.lib.db.SDbConsts;
 public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     protected int mnPkStockSegregationId;
+    protected int mnPkCompanyBranchId;
     protected int mnPkWarehouseId;
-    protected int mnFkCompanyBranchId;
-    protected int mnFkWarehouseId;
 
     protected ArrayList<SDataStockSegregationWarehouseEntry> maChildEntries;
     
@@ -30,27 +30,25 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
     }
 
     public void setPkStockSegregationId(int n) { mnPkStockSegregationId = n; }
+    public void setPkCompanyBranchId(int n) { mnPkCompanyBranchId = n; }
     public void setPkWarehouseId(int n) { mnPkWarehouseId = n; }
-    public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
-    public void setFkWarehouseId(int n) { mnFkWarehouseId = n; }
 
     public int getPkStockSegregationId() { return mnPkStockSegregationId; }
+    public int getPkCompanyBranchId() { return mnPkCompanyBranchId; }
     public int getPkWarehouseId() { return mnPkWarehouseId; }
-    public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
-    public int getFkWarehouseId() { return mnFkWarehouseId; }
     
     private ArrayList<SDataStockSegregationWarehouseEntry> readEntries(final Statement statement) throws Exception {
         String sql;
         ResultSet resultSet = null;
         ArrayList<SDataStockSegregationWarehouseEntry> entries = new ArrayList<>();
 
-        sql = "SELECT id_ety FROM trn_stk_seg_whs_ety " 
+        sql = "SELECT id_ety FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " " 
                 + getSqlWhere()
                 + "ORDER BY id_ety; ";
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
             SDataStockSegregationWarehouseEntry ety = new SDataStockSegregationWarehouseEntry();
-            ety.read(new int[] { mnPkStockSegregationId, mnPkWarehouseId, resultSet.getInt(1) }, statement.getConnection().createStatement());
+            ety.read(new int[] { mnPkStockSegregationId, mnPkCompanyBranchId, mnPkWarehouseId, resultSet.getInt(1) }, statement.getConnection().createStatement());
             entries.add(ety);
         }
         
@@ -59,7 +57,7 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
     
     private void deleteEntries(final Connection connection) throws Exception {
         String sql;
-        sql = "DELETE FROM trn_stk_seg_whs_ety " + getSqlWhere();
+        sql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " " + getSqlWhere();
         
         connection.createStatement().execute(sql);
     }
@@ -67,11 +65,11 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
     public ArrayList<SDataStockSegregationWarehouseEntry> getChildEntries() { return maChildEntries; }
 
     public String getSqlWhere() {
-        return "WHERE id_stk_seg = " + mnPkStockSegregationId + " AND id_whs = " + mnPkWarehouseId + " ";
+        return "WHERE id_stk_seg = " + mnPkStockSegregationId + " AND id_cob = " + mnPkCompanyBranchId + " AND id_whs = " + mnPkWarehouseId + " ";
     }
     
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_stk_seg = " + pk[0] + " AND id_whs = " + pk[1] + " ";
+        return "WHERE id_stk_seg = " + pk[0] +" AND id_cob = " + pk[1] + " AND id_whs = " + pk[2] + " ";
     }
     
     @Override
@@ -80,7 +78,7 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
         
         try {
             this.deleteEntries(connection);
-            sql = "DELETE FROM trn_stk_seg_whs " + getSqlWhere();
+            sql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " " + getSqlWhere();
             connection.createStatement().execute(sql);
             
             mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_OK;
@@ -101,15 +99,15 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
     @Override
     public void setPrimaryKey(Object pk) {
         mnPkStockSegregationId = ((int[]) pk)[0];
-        mnPkWarehouseId = ((int[]) pk)[1];
+        mnPkCompanyBranchId = ((int[]) pk)[1];
+        mnPkWarehouseId = ((int[]) pk)[2];
     }
 
     @Override
     public void reset() {
         mnPkStockSegregationId = 0;
+        mnPkCompanyBranchId = 0;
         mnPkWarehouseId = 0;
-        mnFkCompanyBranchId = 0;
-        mnFkWarehouseId = 0;
 
         maChildEntries.clear();
     }
@@ -124,16 +122,15 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
         reset();
 
         try {
-            sql = "SELECT * FROM trn_stk_seg_whs " + getSqlWhere(key);
+            sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " " + getSqlWhere(key);
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
             else {
                 mnPkStockSegregationId = resultSet.getInt("id_stk_seg");
+                mnPkCompanyBranchId = resultSet.getInt("id_cob");
                 mnPkWarehouseId = resultSet.getInt("id_whs");
-                mnFkCompanyBranchId = resultSet.getInt("fid_cob");
-                mnFkWarehouseId = resultSet.getInt("fid_whs");
 
                 // Read aswell child registries:
 
@@ -161,18 +158,14 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
     @Override
     public int save(Connection connection) {
         String sql;
-        
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         
-
         try {
             if (mbIsRegistryNew) {
-
-                sql = "INSERT INTO trn_stk_seg_whs VALUES (" +
-                        mnPkStockSegregationId + ", " + 
-                        mnPkWarehouseId + ", " + 
-                        mnFkCompanyBranchId + ", " + 
-                        mnFkWarehouseId +
+                sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " VALUES (" +
+                            mnPkStockSegregationId + ", " + 
+                            mnPkCompanyBranchId + ", " + 
+                            mnPkWarehouseId +
                         ")";
 
                 connection.createStatement().execute(sql);
@@ -183,6 +176,7 @@ public class SDataStockSegregationWarehouse extends erp.lib.data.SDataRegistry i
                 // d) save new child registries:
                 for (SDataStockSegregationWarehouseEntry ety : maChildEntries) {
                     ety.setPkStockSegregationId(mnPkStockSegregationId);
+                    ety.setPkCompanyBranchId(mnPkCompanyBranchId);
                     ety.setPkWarehouseId(mnPkWarehouseId);
                     ety.setIsRegistryNew(true);
                     ety.save(connection);

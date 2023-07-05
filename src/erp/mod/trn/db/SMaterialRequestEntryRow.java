@@ -5,6 +5,13 @@
  */
 package erp.mod.trn.db;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.mitm.data.SDataItem;
+import erp.mitm.data.SDataUnit;
+import javax.swing.JOptionPane;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -20,15 +27,37 @@ public class SMaterialRequestEntryRow implements SGridRow {
     protected int mnFkItemId;
     protected int mnFkUnitId;
     
+    protected String msAuxItemCode;
+    protected String msAuxItemName;
+    protected String msAuxUnitCode;
     protected double mdAuxSegregated;
     protected double mdAuxStock;
     protected double mdAuxToSegregate;
+    protected boolean mbAuxBulk;
+    
+    SClientInterface miClient;
+    
+    public SMaterialRequestEntryRow(SClientInterface client, final int fkItem, final int fkUnit) {
+        miClient = client;
+        mnFkItemId = fkItem;
+        mnFkUnitId = fkUnit;
+        
+        this.readAuxs();
+    }
+    
+    private void readAuxs() {
+        SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { mnFkItemId }, SLibConstants.EXEC_MODE_VERBOSE);
+        SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { mnFkUnitId }, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        msAuxItemCode = item.getKey();
+        msAuxItemName = item.getName();
+        msAuxUnitCode = unit.getSymbol();
+        mbAuxBulk = item.getIsBulk();
+    }
     
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setQuantity(double d) { mdQuantity = d; }
-    public void setFkItemId(int n) { mnFkItemId = n; }
-    public void setFkUnitId(int n) { mnFkUnitId = n; }
 
     public void setAuxSegregated(double mdAuxSegregated) { this.mdAuxSegregated = mdAuxSegregated; }
     public void setAuxStock(double mdAuxStock) { this.mdAuxStock = mdAuxStock; }
@@ -39,6 +68,10 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public double getQuantity() { return mdQuantity; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
+    
+    public String getAuxItemCode() { return msAuxItemCode; }
+    public String getAuxItemName() { return msAuxItemName; }
+    public String getAuxUnitCode() { return msAuxUnitCode; }
     public double getAuxSegregated() { return mdAuxSegregated; }
     public double getAuxStock() { return mdAuxStock; }
     public double getAuxToSegregate() { return mdAuxToSegregate; }
@@ -84,13 +117,13 @@ public class SMaterialRequestEntryRow implements SGridRow {
         
         switch(col) {
             case 0:
-                value = "Codigo";
+                value = msAuxItemCode;
                 break;
             case 1:
-                value = "Item";
+                value = msAuxItemName;
                 break;
             case 2:
-                value = "Unidad";
+                value = msAuxUnitCode;
                 break;
             case 3:
                 value = mdQuantity;
@@ -125,10 +158,20 @@ public class SMaterialRequestEntryRow implements SGridRow {
             case 6:
                 break;
             case 7:
-                mdAuxToSegregate = (double) value;
+                if (SMaterialRequestEntryRow.hasDecimals((double) value) && !mbAuxBulk) {
+                    JOptionPane.showMessageDialog(null, "El ítem no es a granel.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                else {
+                    mdAuxToSegregate = (double) value;
+                }
                 break;
             default:
         }
     }
     
+    // Método para validar si un double tiene decimales o es un entero
+    public static boolean hasDecimals(double number) {
+        // Comparamos el número con su versión truncada y redondeada
+        return number != Math.floor(number) || number != Math.ceil(number);
+    }
 }

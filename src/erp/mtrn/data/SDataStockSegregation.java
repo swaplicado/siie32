@@ -74,14 +74,14 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
         ResultSet resultSet = null;
         ArrayList<SDataStockSegregationWarehouse> entries = new ArrayList<>();
 
-        sql = "SELECT id_whs "
-                + "FROM trn_stk_seg_whs " 
+        sql = "SELECT id_cob, id_whs "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " " 
                 + getSqlWhere()
-                + "ORDER BY id_whs;";
+                + "ORDER BY id_cob, id_whs;";
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
             SDataStockSegregationWarehouse segregationWarehouse = new SDataStockSegregationWarehouse();
-            segregationWarehouse.read(new int[] { mnPkStockSegregationId, resultSet.getInt(1) }, statement.getConnection().createStatement());
+            segregationWarehouse.read(new int[] { mnPkStockSegregationId, resultSet.getInt("id_cob"), resultSet.getInt("id_whs") }, statement.getConnection().createStatement());
             entries.add(segregationWarehouse);
         }
         
@@ -158,7 +158,7 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
         reset();
 
         try {
-            sql = "SELECT * FROM trn_stk_seg " + getSqlWhere(key);
+            sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG) + " " + getSqlWhere(key);
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
@@ -211,7 +211,7 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
                 mbDeleted = false;
                 mnFkUserEditId = SUtilConsts.USR_NA_ID;
 
-                sql = "INSERT INTO trn_stk_seg VALUES (" +
+                sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG) + " VALUES (" +
                         mnPkStockSegregationId + ", " + 
                         (mtExpirationDate_n != null ? ("'" + SLibUtils.DbmsDateFormatDate.format(mtExpirationDate_n) + "'") : ("null")) + ", " + 
                         (mbDeleted ? 1 : 0) + ", " + 
@@ -228,7 +228,7 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
                 
             }
             else {
-                sql = "UPDATE trn_stk_seg SET " +
+                sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG) + " SET " +
                         "id_stk_seg = " + mnPkStockSegregationId + ", " +
                         "dt_exp_n = " + (mtExpirationDate_n != null ? ("'" + SLibUtils.DbmsDateFormatDate.format(mtExpirationDate_n) + "'") : ("null")) + ", " + 
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +

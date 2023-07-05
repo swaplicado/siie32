@@ -71,6 +71,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnAuxReqAuthStatusIdOld;
     protected int mnAuxReqProvStatusIdOld;
     protected int mnAuxReqPurStatusIdOld;
+    protected String msAuxProvEntName;
+    protected String msAuxConsEntName;
     
     protected String msAuxAuthUser;
     
@@ -114,6 +116,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxAuthStatus(String s) { msAuxAuthStatus = s; }
     public void setAuxProvStatus(String s) { msAuxProvStatus = s; }
     public void setAuxPurStatus(String s) { msAuxPurStatus = s; }
+    public void setAuxProvEntName(String s) { msAuxProvEntName = s; }
+    public void setAuxConsEntName(String s) { msAuxConsEntName = s; }
     
     public void setAuxReqStatusIdOld(int n) { mnAuxReqStatusIdOld = n; }
     public void setAuxReqAuthStatusId(int n) { mnAuxReqAuthStatusId = n; }
@@ -166,6 +170,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getAuxReqAuthStatusIdOld() { return mnAuxReqAuthStatusIdOld; }
     public int getAuxReqProvStatusIdOld() { return mnAuxReqProvStatusIdOld; }
     public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; } 
+    
+    public String getAuxProvEntName() { return msAuxProvEntName; }
+    public String getAuxConsEntName() { return msAuxConsEntName; }
     
     public boolean getAuxLastProvClosedSta() { return mbAuxLastProvClosedSta; }
     public boolean getAuxLastPurClosedSta() { return mbAuxLastPurClosedSta; }
@@ -238,6 +245,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnAuxReqProvStatusIdOld = 0;
         mnAuxReqPurStatusIdOld = 0;
         
+        msAuxProvEntName = "";
+        msAuxConsEntName = "";
         mbAuxLastProvClosedSta = false;
         mbAuxLastPurClosedSta = false;
     }
@@ -389,6 +398,29 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
             mnAuxReqProvStatusIdOld = mnFkMatProvisionStatusId;
             mnAuxReqPurStatusIdOld = mnFkMatPurchaseStatusId;
+            
+            // Read Requisition area
+            msSql = "SELECT name " + 
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " " +
+                    "WHERE id_mat_prov_ent = " + mnFkMatProvisionEntityId + " ";
+            
+            resultSet = statement.executeQuery(msSql);
+            if (resultSet.next()) {
+                msAuxProvEntName = resultSet.getString(1);
+            }
+            
+            // Read consume area
+            msSql = "SELECT name " + 
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " " +
+                    "WHERE id_mat_cons_ent = " + mnFkEntMatConsumptionEntityId + " ";
+            
+            resultSet = statement.executeQuery(msSql);
+            if (resultSet.next()) {
+                msAuxConsEntName = resultSet.getString(1);
+            }
+            
+            msAuxAuthStatus = SAuthorizationUtils.AUTH_STATUS_DESC.get(SAuthorizationUtils.getAuthStatus(session, 
+                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[] { mnPkMatRequestId } )).toUpperCase();
             
             mbRegistryNew = false;
         }
