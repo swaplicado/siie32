@@ -556,7 +556,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         }
         
         // Si el estatus de requisición esta "En autorización"
-        if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH) {
+        if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_AUTH) {
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
             SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
             mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
@@ -564,11 +564,11 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
             // Si el estatus de autorización esta "Autorizado" o "NA", y el estatus de requisición esta "En autorización", este pasa a "En suministro"
             if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_AUTHORIZED || mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_NA){
-                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV; 
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV; 
             }
             // Si el estatus de autorización esta "Rechazado", y el estatus de requisición esta "En autorización", este pasa a "Cancelado"
             else if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_REJECTED) {
-                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_MRS_CAN;
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_CAN;
             }
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 

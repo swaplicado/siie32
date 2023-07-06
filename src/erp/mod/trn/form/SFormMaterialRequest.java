@@ -1211,7 +1211,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         if (moRegistry.isRegistryNew()) { 
             enableReqControls(true);
         }
-        else if (moRegistry.getFkMatRequestStatusId() != SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW) {
+        else if (moRegistry.getFkMatRequestStatusId() != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
             enableReqControls(false);
         }
         else enableReqControls(true);
@@ -1240,8 +1240,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         SDbMaterialRequest registry = (SDbMaterialRequest) moRegistry.clone();
 
         if (registry.isRegistryNew()) {
-            registry.setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_MPS_NA);
-            registry.setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_MPS_NA);
+            registry.setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_NA);
+            registry.setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_NA);
         }
         
         registry.setNumber(moIntNumber.getValue());
@@ -1302,10 +1302,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 actionDeleteEty();
             }
             else if (button == jbSave) {
-                actionSave(SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW);
+                actionSave(SModSysConsts.TRNS_ST_MAT_REQ_NEW);
             }
             else if (button == jbSaveAndSend) {
-                actionSave(SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH);
+                actionSave(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
             }
             else if (button == jbAuthorize) {
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_AUTHORIZE);

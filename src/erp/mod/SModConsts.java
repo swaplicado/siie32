@@ -80,6 +80,7 @@ public abstract class SModConsts {
     public static final int CFGS_TP_MMS = 1011010;
     public static final int CFGS_TP_MOD = 1011011;
     public static final int CFGS_TP_AUTH = 1011020;
+    public static final int CFGS_ST_AUTHORN = 1011021;
 
     public static final int CFGU_CUR = 1012001;
     public static final int CFGU_CO = 1012002;
@@ -350,9 +351,8 @@ public abstract class SModConsts {
     public static final int TRNS_CFD_CAT = 2021201;
     public static final int TRNS_TP_MAINT_MOV = 2021301;
     public static final int TRNS_ST_MAT_REQ = 2021302;
-    public static final int TRNS_ST_MAT_AUTH = 2021303;
-    public static final int TRNS_ST_MAT_PROV = 2021304;
-    public static final int TRNS_ST_MAT_PUR = 2021305;
+    public static final int TRNS_ST_MAT_PROV = 2021303;
+    public static final int TRNS_ST_MAT_PUR = 2021304;
 
     public static final int TRNU_DPS_NAT = 2022001;
     public static final int TRNU_TP_DPS = 2022002;
@@ -828,6 +828,7 @@ public abstract class SModConsts {
         TablesMap.put(CFGS_TP_MMS, "erp.cfgs_tp_mms");
         TablesMap.put(CFGS_TP_MOD, "erp.cfgs_tp_mod");
         TablesMap.put(CFGS_TP_AUTH, "erp.cfgs_tp_auth");
+        TablesMap.put(CFGS_ST_AUTHORN, "erp.cfgs_st_authorn");
 
         TablesMap.put(CFGU_CUR, "erp.cfgu_cur");
         TablesMap.put(CFGU_CO, "erp.cfgu_co");
@@ -1062,7 +1063,6 @@ public abstract class SModConsts {
         TablesMap.put(TRNS_CFD_CAT, "erp.trns_cfd_cat");
         TablesMap.put(TRNS_TP_MAINT_MOV, "erp.trns_tp_maint_mov");
         TablesMap.put(TRNS_ST_MAT_REQ, "erp.trns_st_mat_req");
-        TablesMap.put(TRNS_ST_MAT_AUTH, "erp.trns_st_mat_auth");
         TablesMap.put(TRNS_ST_MAT_PROV, "erp.trns_st_mat_prov");
         TablesMap.put(TRNS_ST_MAT_PUR, "erp.trns_st_mat_pur");
 

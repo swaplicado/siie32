@@ -68,7 +68,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         hasAuthRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
         
-        jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver entregas mensuales", this);
+        jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Kardex de autorizaciones", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
@@ -97,7 +97,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
         
         
-        if (mnGridSubtype != SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW) {
+        if (mnGridSubtype != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
             jbRowNew.setEnabled(false);
             jbRowCopy.setEnabled(false);
             jbRowDisable.setEnabled(false);
@@ -236,14 +236,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
         
         switch (mnGridSubtype) {
-            case SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW:
-                where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW + " ";
+            case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
+                where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
                 break;
-            case SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH:
-                where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH + " ";
+            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
+                where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " ";
                 break;
-            case SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV:
-                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV + " OR v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_MRS_PUR + ") " ;
+            case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
+                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " OR v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") " ;
                 break;
             default:
                 filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();

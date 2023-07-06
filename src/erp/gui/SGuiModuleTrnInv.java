@@ -1533,13 +1533,13 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiReqNew) {
-                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW, null);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_NEW, null);
             }
             else if (item == jmiReqTbAuth) {
-                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH, null);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_AUTH, null);
             }
             else if (item == jmiReqTbProcc) {
-                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV, null);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNS_ST_MAT_REQ_PROV, null);
             }
             else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, null);

@@ -401,13 +401,13 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_REQ:
                 switch(subtype) {
-                    case SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW:
+                    case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
                         view = new SViewMaterialRequest(miClient, subtype, "Mis req. nuevas");
                         break;
-                    case SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH:
+                    case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
                         view = new SViewMaterialRequest(miClient, subtype, "Mis req. x autorizar");
                         break;
-                    case SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV:
+                    case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
                         view = new SViewMaterialRequest(miClient, subtype, "Mis req. en proceso");
                         break;
                     default:

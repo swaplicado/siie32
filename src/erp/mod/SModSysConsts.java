@@ -688,21 +688,21 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT = 252;    // out status of tools maintenance
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
     
-    public static final int TRNS_ST_MAT_REQ_MRS_NEW = 1; // new
-    public static final int TRNS_ST_MAT_REQ_MRS_AUTH = 2; // in authorization
-    public static final int TRNS_ST_MAT_REQ_MRS_PROV = 3; // in provision
-    public static final int TRNS_ST_MAT_REQ_MRS_PUR = 4; // in purchase
-    public static final int TRNS_ST_MAT_REQ_MRS_CAN = 9; // cancelled
+    public static final int TRNS_ST_MAT_REQ_NEW = 1; // new
+    public static final int TRNS_ST_MAT_REQ_AUTH = 2; // in authorization
+    public static final int TRNS_ST_MAT_REQ_PROV = 3; // in provision
+    public static final int TRNS_ST_MAT_REQ_PUR = 4; // in purchase
+    public static final int TRNS_ST_MAT_REQ_CAN = 9; // cancelled
     
-    public static final int TRNS_ST_MAT_PROV_MPS_NA = 1; // na
-    public static final int TRNS_ST_MAT_PROV_MPS_TBP = 2; // to be process
-    public static final int TRNS_ST_MAT_PROV_MPS_PROC = 3; // in process
-    public static final int TRNS_ST_MAT_PROV_MPS_DONE = 9; // done
+    public static final int TRNS_ST_MAT_PROV_NA = 1; // not applicable
+    public static final int TRNS_ST_MAT_PROV_PEND = 2; // pending
+    public static final int TRNS_ST_MAT_PROV_PROC = 3; // processing
+    public static final int TRNS_ST_MAT_PROV_DONE = 9; // done
 
-    public static final int TRNS_ST_MAT_PUR_MPS_NA = 1; // na
-    public static final int TRNS_ST_MAT_PUR_MPS_TBP = 2; // to be process
-    public static final int TRNS_ST_MAT_PUR_MPS_PROC = 3; // in process
-    public static final int TRNS_ST_MAT_PUR_MPS_DONE = 9; // done
+    public static final int TRNS_ST_MAT_PUR_NA = 1; // not applicable
+    public static final int TRNS_ST_MAT_PUR_PEND = 2; // pending
+    public static final int TRNS_ST_MAT_PUR_PROC = 3; // processing
+    public static final int TRNS_ST_MAT_PUR_DONE = 9; // done
     
     public static final int TRNX_TP_MAINT_MOV_PART = 1;    // Part
     public static final int TRNX_TP_MAINT_MOV_TOOL = 2;    // Tool

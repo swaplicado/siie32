@@ -50,6 +50,8 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_stk_out.gif")), "Suministrar", this);
         mjbClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
         mjbOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));
+        mjbClose.setToolTipText("Cerrar para suministro");
+        mjbOpen.setToolTipText("Abrir para suministro");
         mjbClose.setSize(23, 23);
         mjbOpen.setSize(23, 23);
         
@@ -94,7 +96,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 "OR get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
                 ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " +
                 SAuthorizationUtils.AUTH_STATUS_NA + ") ";
-        where += "AND fk_st_mat_req >= " + SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV + " ";
+        where += "AND fk_st_mat_req >= " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " ";
         
         msSql = "SELECT v.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.num AS " + SDbConsts.FIELD_CODE + ", "

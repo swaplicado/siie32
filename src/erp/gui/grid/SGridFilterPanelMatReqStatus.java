@@ -127,16 +127,16 @@ public class SGridFilterPanelMatReqStatus extends JPanel implements SGridFilter,
         int status = (int) value;
         
         switch (status) {
-            case SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW:
-                moKeyStatusReq.setValue(new int[] {SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW} );
+            case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
+                moKeyStatusReq.setValue(new int[] {SModSysConsts.TRNS_ST_MAT_REQ_NEW} );
                 moKeyStatusReq.setEnabled(false);
                 break;
-            case SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH:
-                moKeyStatusReq.setValue(new int[] {SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH} );
+            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
+                moKeyStatusReq.setValue(new int[] {SModSysConsts.TRNS_ST_MAT_REQ_AUTH} );
                 moKeyStatusReq.setEnabled(false);
                 break;
-            case SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV:
-                moKeyStatusReq.setValue(new int[] {SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV} );
+            case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
+                moKeyStatusReq.setValue(new int[] {SModSysConsts.TRNS_ST_MAT_REQ_PROV} );
                 moKeyStatusReq.setEnabled(false);
                 break;
             default:
