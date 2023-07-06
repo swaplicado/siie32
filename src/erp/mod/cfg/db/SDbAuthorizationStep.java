@@ -166,12 +166,12 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_auth_step = " + mnPkAuthorizationStepId + " ";
+        return "WHERE id_authorn_step = " + mnPkAuthorizationStepId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_auth_step = " + pk[0] + " ";
+        return "WHERE id_authorn_step = " + pk[0] + " ";
     }
 
     @Override
@@ -180,7 +180,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
 
         mnPkAuthorizationStepId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_auth_step), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_authorn_step), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkAuthorizationStepId = resultSet.getInt(1);
@@ -291,7 +291,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-//                        "id_auth_step = " + mnPkAuthorizationStepId + ", " +
+//                        "id_authorn_step = " + mnPkAuthorizationStepId + ", " +
                         "res_tab_name_n = " + (msResourceTableName_n != null ? ("'" + msResourceTableName_n + "'") : "null") + ", " +
                         "res_pk_n1_n = " + (mnResourcePkNum1_n > 0 ? ("" + mnResourcePkNum1_n + "") : "null") + ", " +
                         "res_pk_n2_n = " + (mnResourcePkNum2_n > 0 ? ("" + mnResourcePkNum2_n + "") : "null") + ", " +
