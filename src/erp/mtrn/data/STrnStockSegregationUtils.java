@@ -9,6 +9,7 @@ import erp.lib.SLibConstants;
 import erp.mitm.data.SDataItem;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModConsts;
+import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -593,5 +594,24 @@ public abstract class STrnStockSegregationUtils {
         }
 
         throw new Exception("Error al guardar la segregación.");
+    }
+    
+    public static boolean hasSegregationsRefs(final java.sql.Connection connection, ArrayList<SDbMaterialRequestEntry> lMatReqEtys) throws SQLException {
+        ResultSet result = null;
+        String sqlStkSeg = "SELECT id_stk_seg "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " AS wety "
+                + "WHERE ";
+            
+        String sqlEtys;
+        for (SDbMaterialRequestEntry oMREty : lMatReqEtys) {
+            sqlEtys = sqlStkSeg + "fid_mat_req_n = " + oMREty.getPkMatRequestId() + " AND fid_mat_req_ety_n = " + oMREty.getPkEntryId() + ";";
+            result = connection.createStatement().executeQuery(sqlEtys);
+            
+            if (result.next()) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
