@@ -6,8 +6,8 @@
 package erp.mod.cfg.utils;
 
 import erp.mod.SModConsts;
-import erp.mod.cfg.db.SDbAuthConfiguration;
-import erp.mod.cfg.db.SDbAuthStep;
+import erp.mod.cfg.db.SDbAuthorizationPath;
+import erp.mod.cfg.db.SDbAuthorizationStep;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,11 +30,11 @@ public class SAuthorizationUtils {
     private static final String QUERY_AUTHS = "SELECT " +
             "    cas.*, ua.usr AS auth_user, ur.usr AS rej_user, us.usr AS step_user " +
             "FROM " +
-            "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " AS cas " +
+            "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS cas " +
             "        LEFT JOIN " +
-            "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON cas.fk_usr_auth_n = ua.id_usr " +
+            "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON cas.fk_usr_authorn_n = ua.id_usr " +
             "        LEFT JOIN " +
-            "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON cas.fk_usr_rej_n = ur.id_usr " +
+            "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON cas.fk_usr_reject_n = ur.id_usr " +
             "        LEFT JOIN " +
             "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS us ON cas.fk_usr_step = us.id_usr " +
             "WHERE " +
@@ -93,12 +93,12 @@ public class SAuthorizationUtils {
                 break;
         }
         
-        String sql = QUERY_AUTHS + " AND cas.fk_auth_type = " + authorizationType + " AND " + condPk;
+        String sql = QUERY_AUTHS + " AND cas.fk_tp_authorn = " + authorizationType + " AND " + condPk;
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
             boolean authBySteps = false;
             while(res.next()) {
-                if (! res.getBoolean("b_auth")) {
+                if (! res.getBoolean("b_authorn")) {
                     return false;
                 }
                 
@@ -138,11 +138,11 @@ public class SAuthorizationUtils {
         String query = "SELECT " +
                         "    COUNT(*) AS n_rows " +
                         "FROM " +
-                        "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " AS cas " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS cas " +
                         "        LEFT JOIN " +
-                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON cas.fk_usr_auth_n = ua.id_usr " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON cas.fk_usr_authorn_n = ua.id_usr " +
                         "        LEFT JOIN " +
-                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON cas.fk_usr_rej_n = ur.id_usr " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON cas.fk_usr_reject_n = ur.id_usr " +
                         "        LEFT JOIN " +
                         "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS us ON cas.fk_usr_step = us.id_usr " +
                         "WHERE " +
@@ -168,7 +168,7 @@ public class SAuthorizationUtils {
             * Query RECHAZADOS
             **********************************************************************************************************
             */
-            String queryRej = query + " AND cas.b_rej";
+            String queryRej = query + " AND cas.b_reject";
             
             ResultSet resRej = session.getDatabase().getConnection().createStatement().executeQuery(queryRej);
             
@@ -185,7 +185,7 @@ public class SAuthorizationUtils {
             * Query AUTORIZADOS
             **********************************************************************************************************
             */
-            String queryAuth = query + " AND cas.b_auth";
+            String queryAuth = query + " AND cas.b_authorn";
             
             ResultSet resAuth = session.getDatabase().getConnection().createStatement().executeQuery(queryAuth);
             
@@ -202,7 +202,7 @@ public class SAuthorizationUtils {
             * Query PENDIENTES
             **********************************************************************************************************
             */
-            String queryPending = query + " AND NOT b_auth AND NOT b_rej";
+            String queryPending = query + " AND NOT b_authorn AND NOT b_reject";
             
             ResultSet resPending = session.getDatabase().getConnection().createStatement().executeQuery(queryPending);
             
@@ -251,15 +251,15 @@ public class SAuthorizationUtils {
         }
         
         ArrayList<SAuthStatus> lStatus = new ArrayList<>();
-        String sql = QUERY_AUTHS + " AND cas.fk_auth_type = " + authorizationType + " AND " + condPk;
+        String sql = QUERY_AUTHS + " AND cas.fk_tp_authorn = " + authorizationType + " AND " + condPk;
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
             
             while(res.next()) {
-                if (res.getBoolean("b_auth")) {
+                if (res.getBoolean("b_authorn")) {
                     lStatus.add(new SAuthStatus(AUTH_STATUS_AUTHORIZED, res.getString("auth_user")));
                 }
-                else if (res.getBoolean("b_rej")) {
+                else if (res.getBoolean("b_reject")) {
                     lStatus.add(new SAuthStatus(AUTH_STATUS_REJECTED, res.getString("rej_user")));
                 }
                 else {
@@ -305,9 +305,9 @@ public class SAuthorizationUtils {
         }
         
         String sql = "SELECT * "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
                 + "WHERE NOT b_del AND "
-                    + "fk_auth_type = " + authorizationType + " AND "
+                    + "fk_tp_authorn = " + authorizationType + " AND "
                     + "fk_usr_step = " + userId + " AND "
                     + condPk + ";";
         
@@ -316,10 +316,10 @@ public class SAuthorizationUtils {
             
             if (res.next()) {
                 if (action == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
-                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_auth_step"));
+                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_authorn_step"));
                 }
                 else {
-                    return SAuthorizationUtils.rejectById(session, res.getInt("id_auth_step"), reasonRej);
+                    return SAuthorizationUtils.rejectById(session, res.getInt("id_authorn_step"), reasonRej);
                 }
             }
             else {
@@ -347,7 +347,7 @@ public class SAuthorizationUtils {
      * @return 
      */
     public static String authorizeById(SGuiSession session, final int idAuthStep) {
-        SDbAuthStep oStep = new SDbAuthStep();
+        SDbAuthorizationStep oStep = new SDbAuthorizationStep();
         try {
             oStep.read(session, new int[] { idAuthStep });
             
@@ -359,27 +359,22 @@ public class SAuthorizationUtils {
             }
             
             String rowsQuery = QUERY_AUTHS + " AND "
-                        + "cas.fk_auth_type = " + oStep.getFkAuthTypeId() + " AND "
-                        + "NOT cas.b_auth AND "
+                        + "cas.fk_tp_authorn = " + oStep.getFkAuthorizationTypeId() + " AND "
+                        + "NOT cas.b_authorn AND "
                         + "cas.lev <= " + oStep.getUserLevel() + " AND "
                         + "cas.res_tab_name_n " + (oStep.getResourceTableName_n() == null ? "IS NULL" : " = '" + oStep.getResourceTableName_n() + "'") + " AND "
-                        + "cas.res_pk_n1_n " + (oStep.getResourcePkNum1_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum1_n() + "'") + " AND "
-                        + "cas.res_pk_n2_n " + (oStep.getResourcePkNum2_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum2_n() + "'") + " AND "
-                        + "cas.res_pk_n3_n " + (oStep.getResourcePkNum3_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum3_n() + "'") + " AND "
-                        + "cas.res_pk_n4_n " + (oStep.getResourcePkNum4_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum4_n() + "'") + " AND "
-                        + "cas.res_pk_n5_n " + (oStep.getResourcePkNum5_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum5_n() + "'") + " AND "
-                        + "cas.res_pk_n6_n " + (oStep.getResourcePkNum6_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum6_n() + "'") + " AND "
-                        + "cas.res_pk_n7_n " + (oStep.getResourcePkNum7_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum7_n() + "'") + " AND "
-                        + "cas.res_pk_n8_n " + (oStep.getResourcePkNum8_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum8_n() + "'") + " AND "
-                        + "cas.res_pk_n9_n " + (oStep.getResourcePkNum9_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum9_n() + "'") + " AND "
-                        + "cas.res_pk_n10_n " + (oStep.getResourcePkNum10_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum10_n() + "'") + " AND "
-                        + "cas.id_auth_step <> " + oStep.getPkStepId() + " "
+                        + "cas.res_pk_n1_n " + (oStep.getResourcePkNum1_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum1_n() + "") + " AND "
+                        + "cas.res_pk_n2_n " + (oStep.getResourcePkNum2_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum2_n() + "") + " AND "
+                        + "cas.res_pk_n3_n " + (oStep.getResourcePkNum3_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum3_n() + "") + " AND "
+                        + "cas.res_pk_n4_n " + (oStep.getResourcePkNum4_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum4_n() + "") + " AND "
+                        + "cas.res_pk_n5_n " + (oStep.getResourcePkNum5_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum5_n() + "") + " AND "
+                        + "cas.id_authorn_step <> " + oStep.getPkAuthorizationStepId() + " "
                         + ";";
                 
                 ArrayList<SAuthStatus> lStatus = new ArrayList<>();
                 ResultSet resRows = session.getDatabase().getConnection().createStatement().executeQuery(rowsQuery);
                 while (resRows.next()) {
-                    if (resRows.getBoolean("b_rej")) {
+                    if (resRows.getBoolean("b_reject")) {
                         lStatus.add(new SAuthStatus(AUTH_STATUS_REJECTED, resRows.getString("rej_user")));
                     }
                     else {
@@ -402,10 +397,10 @@ public class SAuthorizationUtils {
                 }
                 
                 oStep.setDateTimeAuthorized_n(new Date());
-                oStep.setFkUserAuthId_n(session.getUser().getPkUserId());
+                oStep.setFkUserAuthorizationId_n(session.getUser().getPkUserId());
                 oStep.setAuthorized(true);
                 oStep.setDateTimeRejected_n(null);
-                oStep.setFkUserRejId_n(0);
+                oStep.setFkUserRejectId_n(0);
                 oStep.setRejected(false);
                 oStep.setComments("");
                 
@@ -430,7 +425,7 @@ public class SAuthorizationUtils {
      * @return 
      */
     public static String rejectById(SGuiSession session, final int idAuthStep, String reasonRej) {
-        SDbAuthStep oStep = new SDbAuthStep();
+        SDbAuthorizationStep oStep = new SDbAuthorizationStep();
         try {
             oStep.read(session, new int[] { idAuthStep });
             
@@ -442,27 +437,22 @@ public class SAuthorizationUtils {
             }
             
             String rowsQuery = QUERY_AUTHS + " AND "
-                        + "cas.fk_auth_type = " + oStep.getFkAuthTypeId() + " AND "
-                        + "cas.b_auth AND "
+                        + "cas.fk_tp_authorn = " + oStep.getFkAuthorizationTypeId() + " AND "
+                        + "cas.b_authorn AND "
                         + "cas.lev > " + oStep.getUserLevel() + " AND "
                         + "cas.res_tab_name_n " + (oStep.getResourceTableName_n() == null ? "IS NULL" : " = '" + oStep.getResourceTableName_n() + "'") + " AND "
-                        + "cas.res_pk_n1_n " + (oStep.getResourcePkNum1_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum1_n() + "'") + " AND "
-                        + "cas.res_pk_n2_n " + (oStep.getResourcePkNum2_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum2_n() + "'") + " AND "
-                        + "cas.res_pk_n3_n " + (oStep.getResourcePkNum3_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum3_n() + "'") + " AND "
-                        + "cas.res_pk_n4_n " + (oStep.getResourcePkNum4_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum4_n() + "'") + " AND "
-                        + "cas.res_pk_n5_n " + (oStep.getResourcePkNum5_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum5_n() + "'") + " AND "
-                        + "cas.res_pk_n6_n " + (oStep.getResourcePkNum6_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum6_n() + "'") + " AND "
-                        + "cas.res_pk_n7_n " + (oStep.getResourcePkNum7_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum7_n() + "'") + " AND "
-                        + "cas.res_pk_n8_n " + (oStep.getResourcePkNum8_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum8_n() + "'") + " AND "
-                        + "cas.res_pk_n9_n " + (oStep.getResourcePkNum9_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum9_n() + "'") + " AND "
-                        + "cas.res_pk_n10_n " + (oStep.getResourcePkNum10_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum10_n() + "'") + " AND "
-                        + "cas.id_auth_step <> " + oStep.getPkStepId() + " "
+                        + "cas.res_pk_n1_n " + (oStep.getResourcePkNum1_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum1_n() + "") + " AND "
+                        + "cas.res_pk_n2_n " + (oStep.getResourcePkNum2_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum2_n() + "") + " AND "
+                        + "cas.res_pk_n3_n " + (oStep.getResourcePkNum3_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum3_n() + "") + " AND "
+                        + "cas.res_pk_n4_n " + (oStep.getResourcePkNum4_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum4_n() + "") + " AND "
+                        + "cas.res_pk_n5_n " + (oStep.getResourcePkNum5_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum5_n() + "") + " AND "
+                        + "cas.id_authorn_step <> " + oStep.getPkAuthorizationStepId() + " "
                         + ";";
                 
                 ArrayList<SAuthStatus> lStatus = new ArrayList<>();
                 ResultSet resRows = session.getDatabase().getConnection().createStatement().executeQuery(rowsQuery);
                 while (resRows.next()) {
-                    if (resRows.getBoolean("b_auth")) {
+                    if (resRows.getBoolean("b_authorn")) {
                         lStatus.add(new SAuthStatus(AUTH_STATUS_AUTHORIZED, resRows.getString("auth_user")));
                     }
                 }
@@ -479,10 +469,10 @@ public class SAuthorizationUtils {
                 }
                 
                 oStep.setDateTimeAuthorized_n(null);
-                oStep.setFkUserAuthId_n(0);
+                oStep.setFkUserAuthorizationId_n(0);
                 oStep.setAuthorized(false);
                 oStep.setDateTimeRejected_n(new Date());
-                oStep.setFkUserRejId_n(session.getUser().getPkUserId());
+                oStep.setFkUserRejectId_n(session.getUser().getPkUserId());
                 oStep.setRejected(true);
                 oStep.setComments(reasonRej);
                 
@@ -507,33 +497,33 @@ public class SAuthorizationUtils {
      * @throws Exception 
      */
     public static void processAuthorizations(SGuiSession session, final int authorizationType, final Object pk) throws Exception {
-        ArrayList<SDbAuthConfiguration> lCfgs = SAuthorizationUtils.getConfigurationsOfType(session, authorizationType);
+        ArrayList<SDbAuthorizationPath> lCfgs = SAuthorizationUtils.getConfigurationsOfType(session, authorizationType);
         String condPk = "";
-        ArrayList<SDbAuthStep> lSteps = new ArrayList<>();
+        ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
         switch(authorizationType) {
             case AUTH_TYPE_MAT_REQUEST:
                 condPk = "id_mat_req = " + ((int[]) pk)[0];
-                for (SDbAuthConfiguration oCfg : lCfgs) {
+                for (SDbAuthorizationPath oCfg : lCfgs) {
                     if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglón de autorización
-                        SDbAuthStep oStep = SAuthorizationUtils.createStepFromCfg(oCfg, pk);
+                        SDbAuthorizationStep oStep = SAuthorizationUtils.createStepFromCfg(oCfg, pk);
                         lSteps.add(oStep);
                     }
                 }
                 break;
             case AUTH_TYPE_DPS:
                 condPk = "id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " ";
-                for (SDbAuthConfiguration oCfg : lCfgs) {
+                for (SDbAuthorizationPath oCfg : lCfgs) {
                     if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglón de autorización
-                        SDbAuthStep oStep = SAuthorizationUtils.createStepFromCfg(oCfg, pk);
+                        SDbAuthorizationStep oStep = SAuthorizationUtils.createStepFromCfg(oCfg, pk);
                         lSteps.add(oStep);
                     }
                 }
                 break;
         }
         
-        for (SDbAuthStep oStep : lSteps) {
+        for (SDbAuthorizationStep oStep : lSteps) {
             if (! SAuthorizationUtils.stepExists(session, oStep)) {
                 oStep.save(session);
             }
@@ -548,20 +538,20 @@ public class SAuthorizationUtils {
      * 
      * @return 
      */
-    private static ArrayList<SDbAuthConfiguration> getConfigurationsOfType(SGuiSession session, final int authorizationType) {
-        String sql = "SELECT id_auth "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH) + " "
-                + "WHERE NOT b_del AND fk_auth_type = " + authorizationType + " "
+    private static ArrayList<SDbAuthorizationPath> getConfigurationsOfType(SGuiSession session, final int authorizationType) {
+        String sql = "SELECT id_authorn_path "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_PATH) + " "
+                + "WHERE NOT b_del AND fk_tp_authorn = " + authorizationType + " "
                 + "ORDER BY lev ASC;";
         
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
             
-            ArrayList<SDbAuthConfiguration> lCfgs = new ArrayList<>();
-            SDbAuthConfiguration cfgItem;
+            ArrayList<SDbAuthorizationPath> lCfgs = new ArrayList<>();
+            SDbAuthorizationPath cfgItem;
             while(res.next()) {
-                cfgItem = new SDbAuthConfiguration();
-                cfgItem.read(session, new int[]{ res.getInt("id_auth") });
+                cfgItem = new SDbAuthorizationPath();
+                cfgItem.read(session, new int[]{ res.getInt("id_authorn_path") });
                 lCfgs.add(cfgItem);
             }
             
@@ -586,24 +576,24 @@ public class SAuthorizationUtils {
      * 
      * @return 
      */
-    private static boolean applyCfg(SGuiSession session, SDbAuthConfiguration oCfg, final String condPk) {
-        if (oCfg.getTableName_n() == null) {
+    private static boolean applyCfg(SGuiSession session, SDbAuthorizationPath oCfg, final String condPk) {
+        if (oCfg.getCondictionTableName() == null) {
             return true;
         }
-        if (oCfg.getConditionField_n() == null) {
+        if (oCfg.getConditionField() == null) {
             return false;
         }
-        if (oCfg.getConditionOperator_n() == null) {
+        if (oCfg.getConditionOperator() == null) {
             return false;
         }
-        if (oCfg.getConditionValue_n() == null) {
+        if (oCfg.getConditionValue() == null) {
             return false;
         }
         
-        String query = "SELECT '1' AS apply_cfg FROM " + oCfg.getTableName_n() + " WHERE " + condPk + " AND ";
-        query += oCfg.getConditionField_n();
+        String query = "SELECT '1' AS apply_cfg FROM " + oCfg.getCondictionTableName() + " WHERE " + condPk + " AND ";
+        query += oCfg.getConditionField();
         
-        switch(oCfg.getConditionOperator_n()) {
+        switch(oCfg.getConditionOperator()) {
             case "=":
                 query += " = ";
                 break;
@@ -627,7 +617,7 @@ public class SAuthorizationUtils {
                 return false;
         }
         
-        query += oCfg.getConditionValue_n();
+        query += oCfg.getConditionValue();
         
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(query);
@@ -642,37 +632,32 @@ public class SAuthorizationUtils {
     }
     
     /**
-     * Crea un registro SDbAuthStep a partir de SDbAuthConfiguration aplicando la llave primaria.
+     * Crea un registro SDbAuthorizationStep a partir de SDbAuthorizationPath aplicando la llave primaria.
      * 
      * @param oCfg
      * @param pk
      * 
      * @return 
      */
-    private static SDbAuthStep createStepFromCfg(SDbAuthConfiguration oCfg, final Object pk) {
-        SDbAuthStep oStep = new SDbAuthStep();
+    private static SDbAuthorizationStep createStepFromCfg(SDbAuthorizationPath oCfg, final Object pk) {
+        SDbAuthorizationStep oStep = new SDbAuthorizationStep();
         
-        oStep.setResourcePkNum1_n(null);
-        oStep.setResourcePkNum2_n(null);
-        oStep.setResourcePkNum3_n(null);
-        oStep.setResourcePkNum4_n(null);
-        oStep.setResourcePkNum5_n(null);
-        oStep.setResourcePkNum6_n(null);
-        oStep.setResourcePkNum7_n(null);
-        oStep.setResourcePkNum8_n(null);
-        oStep.setResourcePkNum9_n(null);
-        oStep.setResourcePkNum10_n(null);
+        oStep.setResourcePkNum1_n(0);
+        oStep.setResourcePkNum2_n(0);
+        oStep.setResourcePkNum3_n(0);
+        oStep.setResourcePkNum4_n(0);
+        oStep.setResourcePkNum5_n(0);
                 
-        switch(oCfg.getFkAuthTypeId()) {
+        switch(oCfg.getFkAuthorizationTypeId()) {
             case AUTH_TYPE_MAT_REQUEST:
                 oStep.setResourceTableName_n("trn_mat_req");
-                oStep.setResourcePkNum1_n("" + ((int[]) pk)[0]);
+                oStep.setResourcePkNum1_n(((int[]) pk)[0]);
                 oStep.setResourcePkLength(1);
                 break;
             case AUTH_TYPE_DPS:
                 oStep.setResourceTableName_n("trn_dps");
-                oStep.setResourcePkNum1_n("" + ((int[]) pk)[0]);
-                oStep.setResourcePkNum2_n("" + ((int[]) pk)[1]);
+                oStep.setResourcePkNum1_n(((int[]) pk)[0]);
+                oStep.setResourcePkNum2_n(((int[]) pk)[1]);
                 oStep.setResourcePkLength(2);
                 break;
             default:
@@ -688,11 +673,11 @@ public class SAuthorizationUtils {
         oStep.setRequired(oCfg.isRequired());
         oStep.setDeleted(false);
         oStep.setSystem(false);
-        oStep.setFkAuthTypeId(oCfg.getFkAuthTypeId());
-        oStep.setFkCfgAuthId_n(oCfg.getPkConfigurationId());
-        oStep.setFkUserStepId(oCfg.getFkUserAuthId());
-        oStep.setFkUserAuthId_n(0);
-        oStep.setFkUserRejId_n(0);
+        oStep.setFkAuthorizationTypeId(oCfg.getFkAuthorizationTypeId());
+        oStep.setFkAuthorizationPathId_n(oCfg.getPkAuthorizationPathId());
+        oStep.setFkUserStepId(oCfg.getFkUserAuthorizationId());
+        oStep.setFkUserAuthorizationId_n(0);
+        oStep.setFkUserRejectId_n(0);
                 
         return oStep;
     }
@@ -707,24 +692,19 @@ public class SAuthorizationUtils {
      * 
      * @return 
      */
-    private static boolean stepExists(SGuiSession session, SDbAuthStep oStep) {
+    private static boolean stepExists(SGuiSession session, SDbAuthorizationStep oStep) {
         String sql = "SELECT '1' AS cfg_exists "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " AS cas "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS cas "
                 + "WHERE NOT b_del AND "
-                    + "fk_auth_type = " + oStep.getFkAuthTypeId() + " AND "
+                    + "fk_tp_authorn = " + oStep.getFkAuthorizationTypeId() + " AND "
                     + "fk_usr_step = " + oStep.getFkUserStepId() + " AND "
                     + "cas.lev = " + oStep.getUserLevel() + " AND "
                     + "cas.res_tab_name_n " + (oStep.getResourceTableName_n() == null ? "IS NULL" : " = '" + oStep.getResourceTableName_n() + "'") + " AND "
-                    + "cas.res_pk_n1_n " + (oStep.getResourcePkNum1_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum1_n() + "'") + " AND "
-                    + "cas.res_pk_n2_n " + (oStep.getResourcePkNum2_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum2_n() + "'") + " AND "
-                    + "cas.res_pk_n3_n " + (oStep.getResourcePkNum3_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum3_n() + "'") + " AND "
-                    + "cas.res_pk_n4_n " + (oStep.getResourcePkNum4_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum4_n() + "'") + " AND "
-                    + "cas.res_pk_n5_n " + (oStep.getResourcePkNum5_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum5_n() + "'") + " AND "
-                    + "cas.res_pk_n6_n " + (oStep.getResourcePkNum6_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum6_n() + "'") + " AND "
-                    + "cas.res_pk_n7_n " + (oStep.getResourcePkNum7_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum7_n() + "'") + " AND "
-                    + "cas.res_pk_n8_n " + (oStep.getResourcePkNum8_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum8_n() + "'") + " AND "
-                    + "cas.res_pk_n9_n " + (oStep.getResourcePkNum9_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum9_n() + "'") + " AND "
-                    + "cas.res_pk_n10_n " + (oStep.getResourcePkNum10_n() == null ? "IS NULL" : " = '" + oStep.getResourcePkNum10_n() + "'") + ";";
+                    + "cas.res_pk_n1_n " + (oStep.getResourcePkNum1_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum1_n() + "") + " AND "
+                    + "cas.res_pk_n2_n " + (oStep.getResourcePkNum2_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum2_n() + "") + " AND "
+                    + "cas.res_pk_n3_n " + (oStep.getResourcePkNum3_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum3_n() + "") + " AND "
+                    + "cas.res_pk_n4_n " + (oStep.getResourcePkNum4_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum4_n() + "") + " AND "
+                    + "cas.res_pk_n5_n " + (oStep.getResourcePkNum5_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum5_n() + "") + ";";
         
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
@@ -751,7 +731,7 @@ public class SAuthorizationUtils {
      * 
      * @return 
      */
-    public static ArrayList<SDbAuthStep> getResourceAuthSteps(SGuiSession session, final int authorizationType, final Object pk) {
+    public static ArrayList<SDbAuthorizationStep> getResourceAuthSteps(SGuiSession session, final int authorizationType, final Object pk) {
         String condPk = "";
         switch(authorizationType) {
             case AUTH_TYPE_MAT_REQUEST:
@@ -764,19 +744,19 @@ public class SAuthorizationUtils {
         }
         
         
-        String sql = "SELECT id_auth_step "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTH_STEP) + " "
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
                 + "WHERE NOT b_del AND "
-                    + "fk_auth_type = " + authorizationType + " AND "
+                    + "fk_tp_authorn = " + authorizationType + " AND "
                     + condPk + " ORDER BY lev ASC;";
         
-        ArrayList<SDbAuthStep> lSteps = new ArrayList<>();
+        ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
-            SDbAuthStep oStep;
+            SDbAuthorizationStep oStep;
             while (res.next()) {
-                oStep = new SDbAuthStep();
-                oStep.read(session, new int[] { res.getInt("id_auth_step") });
+                oStep = new SDbAuthorizationStep();
+                oStep.read(session, new int[] { res.getInt("id_authorn_step") });
                 lSteps.add(oStep);
             }
             

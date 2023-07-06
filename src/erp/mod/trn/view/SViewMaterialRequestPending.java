@@ -90,11 +90,11 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
         }
         
-        where += (where.isEmpty() ? "" : "AND ") + "(get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
-                ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " +
+        where += (where.isEmpty() ? "" : "AND ") + "(f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
+                ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = " +
                 SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " " +
-                "OR get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
-                ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " +
+                "OR f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
+                ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = " +
                 SAuthorizationUtils.AUTH_STATUS_NA + ") ";
         where += "AND fk_st_mat_req >= " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " ";
         
@@ -195,7 +195,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         moSuscriptionsSet.add(SModConsts.TRN_MAT_CONS_SUBENT);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
-        moSuscriptionsSet.add(SModConsts.CFGU_AUTH_STEP);
+        moSuscriptionsSet.add(SModConsts.CFGU_AUTHORN_STEP);
     }
 
     @Override

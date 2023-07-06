@@ -183,7 +183,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
-    private void actionSegregateFree() {
+    private void actionSegregateOrRelease() {
         if (jtTable.getSelectedRowCount() != 1) {
             miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
         }
@@ -278,18 +278,18 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "ce.name AS cons_ent, "
                 + "cse.name AS cons_subent, "
                 + "CASE "
-                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "WHEN f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " THEN 'AUTORIZADO' "
-                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " THEN 'AUTORIZADO' "
+                    + "WHEN f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_REJECTED + " THEN 'RECHAZADO' "
-                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_REJECTED + " THEN 'RECHAZADO' "
+                    + "WHEN f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_PENDING + " THEN 'PENDIENTE' "
-                    + "WHEN get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                    + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_PENDING + " THEN 'PENDIENTE' "
+                    + "WHEN f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                    + "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZING + " THEN 'EN AUTORIZACIÓN' "
+                    + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZING + " THEN 'EN AUTORIZACIÓN' "
                     + "ELSE '---' "
                 + "END AS auth_status, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
@@ -382,7 +382,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moSuscriptionsSet.add(SModConsts.TRN_MAT_CONS_SUBENT);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
-        moSuscriptionsSet.add(SModConsts.CFGU_AUTH_STEP);
+        moSuscriptionsSet.add(SModConsts.CFGU_AUTHORN_STEP);
     }
 
     @Override
@@ -400,7 +400,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_REJECT);
             }
             else if (button == jbSegregate) {
-                actionSegregateFree();
+                actionSegregateOrRelease();
             }
         }
     }

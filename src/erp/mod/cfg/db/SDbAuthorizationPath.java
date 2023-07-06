@@ -22,61 +22,61 @@ import sa.lib.SLibUtils;
  *
  * @author Edwin Carmona
  */
-public class SDbAuthConfiguration extends SDbRegistryUser {
+public class SDbAuthorizationPath extends SDbRegistryUser {
 
-    protected int mnPkConfigurationId;
-    protected String msTableName_n;
-    protected String msConditionField_n;
-    protected String msConditionOperator_n;
-    protected String msConditionValue_n;
+    protected int mnPkAuthorizationPathId;
+    protected String msConditionTableName;
+    protected String msConditionField;
+    protected String msConditionOperator;
+    protected String msConditionValue;
     protected int mnUserLevel;
     protected Date mtDateStart;
     protected Date mtDateEnd;
     protected boolean mbRequired;
 //    protected boolean mbDeleted;
 //    protected boolean mbSystem;
-    protected int mnFkAuthTypeId;
-    protected int mnFkUserAuthId;
+    protected int mnFkAuthorizationTypeId;
+    protected int mnFkUserAuthorizationId;
 //    protected int mnFkUserInsertId;
 //    protected int mnFkUserUpdateId;
 //    protected Date mtTsUserInsert;
 //    protected Date mtTsUserUpdate;
 
-    public SDbAuthConfiguration() {
-        super(SModConsts.CFGU_AUTH);
+    public SDbAuthorizationPath() {
+        super(SModConsts.CFGU_AUTHORN_PATH);
     }
     
-    public void setPkConfigurationId(int n) { mnPkConfigurationId = n; }
-    public void setTableName_n(String s) { msTableName_n = s; }
-    public void setConditionField_n(String s) { msConditionField_n = s; }
-    public void setConditionOperator_n(String s) { msConditionOperator_n = s; }
-    public void setConditionValue_n(String s) { msConditionValue_n = s; }
+    public void setPkAuthorizationPathId(int n) { mnPkAuthorizationPathId = n; }
+    public void setConditionTableName(String s) { msConditionTableName = s; }
+    public void setConditionField(String s) { msConditionField = s; }
+    public void setConditionOperator(String s) { msConditionOperator = s; }
+    public void setConditionValue(String s) { msConditionValue = s; }
     public void setUserLevel(int n) { mnUserLevel = n; }
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
     public void setRequired(boolean b) { mbRequired = b; }
 //    public void setDeleted(boolean b) { mbDeleted = b; }
 //    public void setSystem(boolean b) { mbSystem = b; }
-    public void setFkAuthTypeId(int n) { mnFkAuthTypeId = n; }
-    public void setFkUserAuthId(int n) { mnFkUserAuthId = n; }
+    public void setFkAuthorizationTypeId(int n) { mnFkAuthorizationTypeId = n; }
+    public void setFkUserAuthorizationId(int n) { mnFkUserAuthorizationId = n; }
 //    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
 //    public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
 //    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
 //    public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public int getPkConfigurationId() { return mnPkConfigurationId; }
-    public String getTableName_n() { return msTableName_n; }
-    public String getConditionField_n() { return msConditionField_n; }
-    public String getConditionOperator_n() { return msConditionOperator_n; }
-    public String getConditionValue_n() { return msConditionValue_n; }
+    public int getPkAuthorizationPathId() { return mnPkAuthorizationPathId; }
+    public String getCondictionTableName() { return msConditionTableName; }
+    public String getConditionField() { return msConditionField; }
+    public String getConditionOperator() { return msConditionOperator; }
+    public String getConditionValue() { return msConditionValue; }
     public int getUserLevel() { return mnUserLevel; }
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
     public boolean isRequired() { return mbRequired; }
 //    public boolean isDeleted() { return mbDeleted; }
 //    public boolean isSystem() { return mbSystem; }
-    public int getFkAuthTypeId() { return mnFkAuthTypeId; }
-    public int getFkUserAuthId() { return mnFkUserAuthId; }
+    public int getFkAuthorizationTypeId() { return mnFkAuthorizationTypeId; }
+    public int getFkUserAuthorizationId() { return mnFkUserAuthorizationId; }
 //    public int getFkUserInsertId() { return mnFkUserInsertId; }
 //    public int getFkUserUpdateId() { return mnFkUserUpdateId; }
 //    public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -84,31 +84,31 @@ public class SDbAuthConfiguration extends SDbRegistryUser {
 
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkConfigurationId = pk[0];
+        mnPkAuthorizationPathId = pk[0];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkConfigurationId };
+        return new int[] { mnPkAuthorizationPathId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkConfigurationId = 0;
-        msTableName_n = "";
-        msConditionField_n = "";
-        msConditionOperator_n = "";
-        msConditionValue_n = "";
+        mnPkAuthorizationPathId = 0;
+        msConditionTableName = "";
+        msConditionField = "";
+        msConditionOperator = "";
+        msConditionValue = "";
         mnUserLevel = 0;
         mtDateStart = null;
         mtDateEnd = null;
         mbRequired = false;
         mbDeleted = false;
         mbSystem = false;
-        mnFkAuthTypeId = 0;
-        mnFkUserAuthId = 0;
+        mnFkAuthorizationTypeId = 0;
+        mnFkUserAuthorizationId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -122,24 +122,24 @@ public class SDbAuthConfiguration extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_auth = " + mnPkConfigurationId + " ";
+        return "WHERE id_authorn_path = " + mnPkAuthorizationPathId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_auth = " + pk[0] + " ";
+        return "WHERE id_authorn_path = " + pk[0] + " ";
     }
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet = null;
 
-        mnPkConfigurationId = 0;
+        mnPkAuthorizationPathId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_auth), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_authorn_path), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkConfigurationId = resultSet.getInt(1);
+            mnPkAuthorizationPathId = resultSet.getInt(1);
         }
     }
 
@@ -157,19 +157,19 @@ public class SDbAuthConfiguration extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkConfigurationId = resultSet.getInt("id_auth");
-            msTableName_n = resultSet.getString("cond_tab_name_n");
-            msConditionField_n = resultSet.getString("cond_field");
-            msConditionOperator_n = resultSet.getString("cond_operator");
-            msConditionValue_n = resultSet.getString("cond_value");
+            mnPkAuthorizationPathId = resultSet.getInt("id_authorn_path");
+            msConditionTableName = resultSet.getString("cond_tab_name");
+            msConditionField = resultSet.getString("cond_field");
+            msConditionOperator = resultSet.getString("cond_operator");
+            msConditionValue = resultSet.getString("cond_value");
             mnUserLevel = resultSet.getInt("lev");
             mtDateStart = resultSet.getDate("dt_sta");
             mtDateEnd = resultSet.getDate("dt_end_n");
             mbRequired = resultSet.getBoolean("b_req");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
-            mnFkAuthTypeId = resultSet.getInt("fk_auth_type");
-            mnFkUserAuthId = resultSet.getInt("fk_usr_auth");
+            mnFkAuthorizationTypeId = resultSet.getInt("fk_auth_type");
+            mnFkUserAuthorizationId = resultSet.getInt("fk_usr_auth");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -194,19 +194,19 @@ public class SDbAuthConfiguration extends SDbRegistryUser {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkConfigurationId + ", " + 
-                    "'" + msTableName_n + "', " + 
-                    "'" + msConditionField_n + "', " + 
-                    "'" + msConditionOperator_n + "', " + 
-                    "'" + msConditionValue_n + "', " + 
+                    mnPkAuthorizationPathId + ", " + 
+                    "'" + msConditionTableName + "', " + 
+                    "'" + msConditionField + "', " + 
+                    "'" + msConditionOperator + "', " + 
+                    "'" + msConditionValue + "', " + 
                     mnUserLevel + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " + 
                     (mbRequired ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
-                    mnFkAuthTypeId + ", " + 
-                    mnFkUserAuthId + ", " + 
+                    mnFkAuthorizationTypeId + ", " + 
+                    mnFkUserAuthorizationId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -217,22 +217,22 @@ public class SDbAuthConfiguration extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    "id_auth = " + mnPkConfigurationId + ", " +
-                    "cond_tab_name_n = '" + msTableName_n + "', " +
-                    "cond_field = '" + msConditionField_n + "', " +
-                    "cond_operator = '" + msConditionOperator_n + "', " +
-                    "cond_value = '" + msConditionValue_n + "', " +
+//                    "id_authorn_path = " + mnPkAuthorizationPathId + ", " +
+                    "cond_tab_name = '" + msConditionTableName + "', " +
+                    "cond_field = '" + msConditionField + "', " +
+                    "cond_operator = '" + msConditionOperator + "', " +
+                    "cond_value = '" + msConditionValue + "', " +
                     "lev = " + mnUserLevel + ", " +
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "dt_end_n = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
                     "b_req = " + (mbRequired ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                    "fk_auth_type = " + mnFkAuthTypeId + ", " +
-                    "fk_usr_auth = " + mnFkUserAuthId + ", " +
-                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
+                    "fk_auth_type = " + mnFkAuthorizationTypeId + ", " +
+                    "fk_usr_auth = " + mnFkUserAuthorizationId + ", " +
+//                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                    "ts_usr_ins = " + "NOW()" + ", " +
+//                    "ts_usr_ins = " + "NOW()" + ", " +
                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
@@ -244,21 +244,21 @@ public class SDbAuthConfiguration extends SDbRegistryUser {
 
     @Override
     public SDbRegistry clone() throws CloneNotSupportedException {
-        SDbAuthConfiguration registry = new SDbAuthConfiguration();
+        SDbAuthorizationPath registry = new SDbAuthorizationPath();
 
-        registry.setPkConfigurationId(this.getPkConfigurationId());
-        registry.setTableName_n(this.getTableName_n());
-        registry.setConditionField_n(this.getConditionField_n());
-        registry.setConditionOperator_n(this.getConditionOperator_n());
-        registry.setConditionValue_n(this.getConditionValue_n());
+        registry.setPkAuthorizationPathId(this.getPkAuthorizationPathId());
+        registry.setConditionTableName(this.getCondictionTableName());
+        registry.setConditionField(this.getConditionField());
+        registry.setConditionOperator(this.getConditionOperator());
+        registry.setConditionValue(this.getConditionValue());
         registry.setUserLevel(this.getUserLevel());
         registry.setDateStart(this.getDateStart());
         registry.setDateEnd(this.getDateEnd());
         registry.setRequired(this.isRequired());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
-        registry.setFkAuthTypeId(this.getFkAuthTypeId());
-        registry.setFkUserAuthId(this.getFkUserAuthId());
+        registry.setFkAuthorizationTypeId(this.getFkAuthorizationTypeId());
+        registry.setFkUserAuthorizationId(this.getFkUserAuthorizationId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
@@ -280,10 +280,10 @@ public class SDbAuthConfiguration extends SDbRegistryUser {
 
         switch (field) {
             case SDbRegistry.FIELD_CODE:
-                msSql += "cty_abbr ";
+                msSql += "cond_tab_name ";
                 break;
             case SDbRegistry.FIELD_NAME:
-                msSql += "cty ";
+                msSql += "cond_value ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

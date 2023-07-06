@@ -183,7 +183,7 @@ public class SModuleCfg extends SGuiModule {
             case SModConsts.CFGU_FUNC:
                 view = new SViewFunctionalArea(miClient, "Áreas funcionales");
                 break;
-            case SModConsts.CFGU_AUTH_STEP:
+            case SModConsts.CFGU_AUTHORN_STEP:
                 view = new SViewAuthorizations(miClient, "Autorizaciones");
                 break;
             default:

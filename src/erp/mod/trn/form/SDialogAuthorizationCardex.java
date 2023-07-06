@@ -5,7 +5,7 @@
 package erp.mod.trn.form;
 
 import erp.mod.SModConsts;
-import erp.mod.cfg.db.SDbAuthStep;
+import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 public class SDialogAuthorizationCardex extends SBeanFormDialog implements ListSelectionListener{
     
     protected SGridPaneForm moGridAuthSteps;
-    protected ArrayList<SDbAuthStep> mlSteps;
+    protected ArrayList<SDbAuthorizationStep> mlSteps;
 
     /**
      * Creates new form SDialogAuthorizationCardex
@@ -39,7 +39,7 @@ public class SDialogAuthorizationCardex extends SBeanFormDialog implements ListS
      * @param title
      */
     public SDialogAuthorizationCardex(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGU_AUTH_STEP, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGU_AUTHORN_STEP, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -99,7 +99,7 @@ public class SDialogAuthorizationCardex extends SBeanFormDialog implements ListS
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
 
-        moGridAuthSteps = new SGridPaneForm(miClient, SModConsts.CFGU_AUTH_STEP, SLibConsts.UNDEFINED, "Autorizaciones") {
+        moGridAuthSteps = new SGridPaneForm(miClient, SModConsts.CFGU_AUTHORN_STEP, SLibConsts.UNDEFINED, "Autorizaciones") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -128,7 +128,7 @@ public class SDialogAuthorizationCardex extends SBeanFormDialog implements ListS
     private void showAuthSteps() {
         Vector<SGridRow> rows = new Vector<>();
 
-        for (SDbAuthStep oStep : mlSteps) {
+        for (SDbAuthorizationStep oStep : mlSteps) {
             rows.add(oStep);
         }
         
@@ -138,7 +138,7 @@ public class SDialogAuthorizationCardex extends SBeanFormDialog implements ListS
     }
     
     public void setFormParams(final int authType, final String tableName, final int[] pk) {
-        ArrayList<SDbAuthStep> lSteps = SAuthorizationUtils.getResourceAuthSteps(miClient.getSession(), authType, pk);
+        ArrayList<SDbAuthorizationStep> lSteps = SAuthorizationUtils.getResourceAuthSteps(miClient.getSession(), authType, pk);
         this.mlSteps = lSteps;
         showAuthSteps();
     }

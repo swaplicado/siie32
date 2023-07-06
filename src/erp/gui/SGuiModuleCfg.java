@@ -741,7 +741,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                  miClient.getSession().showView(SModConsts.CFGU_FUNC, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCfgAuthSteps) {
-                 miClient.getSession().showView(SModConsts.CFGU_AUTH_STEP, SLibConsts.UNDEFINED, null);
+                 miClient.getSession().showView(SModConsts.CFGU_AUTHORN_STEP, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCfgSystemNotes) {
                 showView(SDataConstants.TRN_SYS_NTS);
