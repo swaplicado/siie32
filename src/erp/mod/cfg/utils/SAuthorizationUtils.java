@@ -361,7 +361,7 @@ public class SAuthorizationUtils {
             String rowsQuery = QUERY_AUTHS + " AND "
                         + "cas.fk_tp_authorn = " + oStep.getFkAuthorizationTypeId() + " AND "
                         + "NOT cas.b_authorn AND "
-                        + "cas.lev <= " + oStep.getUserLevel() + " AND "
+                        + "cas.lev < " + oStep.getUserLevel() + " AND "
                         + "cas.res_tab_name_n " + (oStep.getResourceTableName_n() == null ? "IS NULL" : " = '" + oStep.getResourceTableName_n() + "'") + " AND "
                         + "cas.res_pk_n1_n " + (oStep.getResourcePkNum1_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum1_n() + "") + " AND "
                         + "cas.res_pk_n2_n " + (oStep.getResourcePkNum2_n() == 0 ? "IS NULL" : " = " + oStep.getResourcePkNum2_n() + "") + " AND "

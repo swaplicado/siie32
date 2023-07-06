@@ -300,19 +300,19 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                         "res_pk_n5_n = " + (mnResourcePkNum5_n > 0 ? ("" + mnResourcePkNum5_n + "") : "null") + ", " +
                         "res_pk_len = " + mnResourcePkLength + ", " +
                         "lev = " + mnUserLevel + ", " +
-                        "dt_time_auth_n = " + (mtDateTimeAuthorized_n != null ? ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeAuthorized_n) + "'") : "NULL") + ", " +
-                        "dt_time_rej_n = " + (mtDateTimeRejected_n != null ? ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeRejected_n) + "'") : "NULL") + ", " +
+                        "dt_time_authorn_n = " + (mtDateTimeAuthorized_n != null ? ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeAuthorized_n) + "'") : "NULL") + ", " +
+                        "dt_time_reject_n = " + (mtDateTimeRejected_n != null ? ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeRejected_n) + "'") : "NULL") + ", " +
                         "comments = '" + msComments + "', " +
-                        "b_auth = " + (mbAuthorized ? 1 : 0) + ", " +
-                        "b_rej = " + (mbRejected ? 1 : 0) + ", " +
+                        "b_authorn = " + (mbAuthorized ? 1 : 0) + ", " +
+                        "b_reject = " + (mbRejected ? 1 : 0) + ", " +
                         "b_req = " + (mbRequired ? 1 : 0) + ", " +
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                         "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                        "fk_auth_type = " + mnFkAuthorizationTypeId + ", " +
-                        "fk_auth_cfg_n = " + (mnFkAuthorizationPathId_n == 0 ? "null" : mnFkAuthorizationPathId_n) + ", " +
+                        "fk_tp_authorn = " + mnFkAuthorizationTypeId + ", " +
+                        "fk_authorn_path_n = " + (mnFkAuthorizationPathId_n == 0 ? "null" : mnFkAuthorizationPathId_n) + ", " +
                         "fk_usr_step = " + mnFkUserStepId + ", " +
-                        "fk_usr_auth_n = " + (mnFkUserAuthorizationId_n == 0 ? "null" : mnFkUserAuthorizationId_n) + ", " +
-                        "fk_usr_rej_n = " + (mnFkUserRejectId_n == 0 ? "null" : mnFkUserRejectId_n) + ", " +
+                        "fk_usr_authorn_n = " + (mnFkUserAuthorizationId_n == 0 ? "null" : mnFkUserAuthorizationId_n) + ", " +
+                        "fk_usr_reject_n = " + (mnFkUserRejectId_n == 0 ? "null" : mnFkUserRejectId_n) + ", " +
 //                        "fk_usr_ins = " + mnFkUserInsertId + ", " +
                         "fk_usr_upd = " + mnFkUserUpdateId + ", " +
 //                        "ts_usr_ins = " + "NOW()" + ", " +
