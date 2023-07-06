@@ -10,6 +10,7 @@ import erp.gui.grid.SGridFilterPanelMatReqStatus;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import java.awt.event.ActionEvent;
@@ -77,10 +78,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
         
-        jbAuthCardex.setEnabled(false);
+        jbAuthCardex.setEnabled(true);
         jbAuthorize.setEnabled(hasAuthRight);
         jbReject.setEnabled(hasAuthRight);
-        jbSegregate.setEnabled(false);
+        jbSegregate.setEnabled(hasAuthRight);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -94,6 +95,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
+        
+        
+        if (mnGridSubtype != SModSysConsts.TRNS_ST_MAT_REQ_MRS_NEW) {
+            jbRowNew.setEnabled(false);
+            jbRowCopy.setEnabled(false);
+            jbRowDisable.setEnabled(false);
+            jbRowDelete.setEnabled(false);
+        }
     }
     
     private void actionCardex() {
@@ -149,10 +158,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                             return;
                         }
                     }
+                    SDbMaterialRequest req = new SDbMaterialRequest();
+                    req.read(miClient.getSession(), gridRow.getRowPrimaryKey());
                     String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
                                                                                 iAction,
                                                                                 SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
-                                                                                gridRow.getRowPrimaryKey(),
+                                                                                req.getPrimaryKey(),
                                                                                 miClient.getSession().getUser().getPkUserId(),
                                                                                 reason);
                     if (response.length() > 0) {
@@ -161,6 +172,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     else {
                         miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 
                                 " con éxito");
+                        req.save(miClient.getSession());
                         miClient.getSession().notifySuscriptors(mnGridType);
                     }
                 }

@@ -174,7 +174,7 @@ public class SAuthorizationUtils {
             
             int rejSteps = 0; 
             if (resRej.next()) {
-                rejSteps = res.getInt("n_rows");
+                rejSteps = resRej.getInt("n_rows");
             }
             
             if (rejSteps > 0) {
@@ -191,7 +191,7 @@ public class SAuthorizationUtils {
             
             int authSteps = 0; 
             if (resAuth.next()) {
-                authSteps = res.getInt("n_rows");
+                authSteps = resAuth.getInt("n_rows");
             }
             
             if (authSteps == allSteps) {
@@ -208,7 +208,7 @@ public class SAuthorizationUtils {
             
             int pendingSteps = 0; 
             if (resPending.next()) {
-                pendingSteps = res.getInt("n_rows");
+                pendingSteps = resPending.getInt("n_rows");
             }
             
             if (pendingSteps == allSteps) {

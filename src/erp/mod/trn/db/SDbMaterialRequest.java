@@ -492,6 +492,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             else if (!mbCloseProvision) {
                 mnFkUserClosePurchaseId = SUtilConsts.USR_NA_ID;
             }
+            mnFkMatRequestStatusId = mnFkMatRequestStatusId == 0 ? mnAuxReqStatusIdOld : mnFkMatRequestStatusId;
             
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     //"id_mat_req = " + mnPkMatRequestId + ", " +
@@ -540,41 +541,40 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         
         // Save entries:
         
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY_NTS) + " " + 
-                "WHERE id_mat_req = " + mnPkMatRequestId + " ";
-        session.getStatement().execute(msSql);
-        
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " " + 
-                "WHERE id_mat_req = " + mnPkMatRequestId + " ";
-        session.getStatement().execute(msSql);
         for (SDbMaterialRequestEntry entry : maChildEntries) {
             entry.setPkMatRequestId(mnPkMatRequestId);
-            entry.setRegistryNew(true);
             entry.save(session);
         }
         
         // Guardar bitacora de cambios de estado
         
+        mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
+        mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
         if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqProvStatusIdOld != mnFkMatProvisionStatusId
-                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId) {
+                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId) {
             saveLog(session);
         }
         
         // Si el estatus de requisición esta "En autorización"
         if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_MRS_AUTH) {
-            SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
-            
-            // Si el estatus de autorización esta "Autorizado" o "NA", y el estatus de requisición esta "En autorización", este pasa a "En suministro"
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
+            SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
             mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
+            
+            mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
+            // Si el estatus de autorización esta "Autorizado" o "NA", y el estatus de requisición esta "En autorización", este pasa a "En suministro"
             if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_AUTHORIZED || mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_NA){
-                mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
-                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV;
-                msSql = "UPDATE " + getSqlTable() + " SET " + 
-                        "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 
-                        getSqlWhere();
-                session.getStatement().execute(msSql);
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_MRS_PROV; 
             }
+            // Si el estatus de autorización esta "Rechazado", y el estatus de requisición esta "En autorización", este pasa a "Cancelado"
+            else if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_REJECTED) {
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_MRS_CAN;
+            }
+            msSql = "UPDATE " + getSqlTable() + " SET " + 
+                    "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 
+                    getSqlWhere();
+            session.getStatement().execute(msSql);
+            
             if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId) {
                 saveLog(session);
             }

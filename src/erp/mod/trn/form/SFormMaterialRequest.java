@@ -58,7 +58,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private ArrayList<SDbMaterialRequestNote> maMatReqNotes;
     private SGridPaneForm moGridMatReqList;
     private boolean isEtyNew;
-    private int mnStatusAuthId;
+    private int mnStatusReqId;
     
     private SGuiFields moFieldsEty;
     private SDataItem moItemEty;
@@ -879,7 +879,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moTextItemCode.setValue(moItemEty.getCode());
             moTextItemName.setValue(moItemEty.getName());
             moBoolNewItem.setValue(ety.isNewItem());
-            moKeyPresentation.setValue(new int[] { ety.getFkMatPresentationId_n() });
+            moKeyPresentation.setValue(new int[] { ety.getFkMatPresentationId() });
             moDecFactConv.setValue(ety.getFactorConvertion());
             moDecQty.setValue(ety.getQuantity());
             moKeyUnit.setValue(new int[] { ety.getFkUnitId() });
@@ -911,7 +911,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         ety.setNewItem(moBoolNewItem.getValue());
         ety.setFkItemId(moItemEty.getPkItemId());
         ety.setFkUnitId(moKeyUnit.getValue()[0]);
-        ety.setFkMatPresentationId_n(moKeyPresentation.getSelectedIndex() == 0 ? 0 : moKeyPresentation.getValue()[0]);
+        ety.setFkMatPresentationId(moKeyPresentation.getSelectedIndex() == 0 ? 0 : moKeyPresentation.getValue()[0]);
         ety.setFkMatRequestPriorityId_n(moKeyPriEty.getSelectedIndex() == 0 ? 0 : moKeyPriEty.getValue()[0]);
         ety.setFkEntMatConsumptionEntityId_n(moKeyConsEntEty.getSelectedIndex() == 0 ? 0 : moKeyConsEntEty.getValue()[0]);
         ety.setFkSubentMatConsumptionEntityId_n(moKeyConsSubentEty.getSelectedIndex() == 0 ? 0 : moKeyConsSubentEty.getValue()[0]);
@@ -1026,12 +1026,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 if (isEtyNew) {
                     SDbMaterialRequestEntry ety = new SDbMaterialRequestEntry();
                     ety = setEtyValues(ety);
+                    ety.setRegistryNew(true);
                     maMatReqEntries.add(ety);
                 }
                 else {
                     int rowId = ((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getAuxRowId();
                     for (SDbMaterialRequestEntry ety : maMatReqEntries) {
                         if (ety.getAuxRowId() == rowId) {
+                            ety.setRegistryNew(false);
                             setEtyValues(ety);
                         }
                     }
@@ -1072,8 +1074,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         }
     }
     
-    private void actionSave(int statusAuth) {
-        mnStatusAuthId = statusAuth;
+    private void actionSave(int statusReq) {
+        mnStatusReqId = statusReq;
         super.actionSave();
     }
     
@@ -1098,6 +1100,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             else {
                 miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 
                         " con éxito");
+                jbSave.setEnabled(true);
+                super.actionSave();
             }
         }
         catch (Exception e) {
@@ -1249,7 +1253,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         registry.setCloseProvision(moBoolProvClosed.getValue());
         registry.setFkMatProvisionEntityId(moKeyProvEnt.getValue()[0]);
         registry.setFkMatRequestPriorityId(moKeyPriReq.getValue()[0]);
-        registry.setFkMatRequestStatusId(mnStatusAuthId);
+        registry.setFkMatRequestStatusId(mnStatusReqId);
         registry.setFkUserRequesterId(moKeyUsrReq.getValue()[0]);
         registry.setFkContractorId_n(moKeyContractor.getSelectedIndex() == 0 ? 0 : moKeyContractor.getValue()[0]);
         registry.setFkEntMatConsumptionEntityId(moKeyConsEnt.getValue()[0]);

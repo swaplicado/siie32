@@ -36,7 +36,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     //protected boolean mbDeleted;
     protected int mnFkItemId;
     protected int mnFkUnitId;
-    protected int mnFkMatPresentationId_n;
+    protected int mnFkMatPresentationId;
     protected int mnFkMatRequestPriorityId_n;
     protected int mnFkEntMatConsumptionEntityId_n;
     protected int mnFkSubentMatConsumptionEntityId_n;
@@ -62,7 +62,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
-    public void setFkMatPresentationId_n(int n) { mnFkMatPresentationId_n = n; }
+    public void setFkMatPresentationId(int n) { mnFkMatPresentationId = n; }
     public void setFkMatRequestPriorityId_n(int n) { mnFkMatRequestPriorityId_n = n; }
     public void setFkEntMatConsumptionEntityId_n(int n) { mnFkEntMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionEntityId_n(int n) { mnFkSubentMatConsumptionEntityId_n = n; }
@@ -82,7 +82,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public boolean isDeleted() { return mbDeleted; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
-    public int getFkMatPresentationId_n() { return mnFkMatPresentationId_n; }
+    public int getFkMatPresentationId() { return mnFkMatPresentationId; }
     public int getFkMatRequestPriorityId_n() { return mnFkMatRequestPriorityId_n; }
     public int getFkEntMatConsumptionEntityId_n() { return mnFkEntMatConsumptionEntityId_n; }
     public int getFkSubentMatConsumptionEntityId_n() { return mnFkSubentMatConsumptionEntityId_n; }
@@ -118,7 +118,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mbDeleted = false;
         mnFkItemId = 0;
         mnFkUnitId = 0;
-        mnFkMatPresentationId_n = 0;
+        mnFkMatPresentationId = 0;
         mnFkMatRequestPriorityId_n = 0;
         mnFkEntMatConsumptionEntityId_n = 0;
         mnFkSubentMatConsumptionEntityId_n = 0;
@@ -184,7 +184,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkItemId = resultSet.getInt("fk_item");
             mnFkUnitId = resultSet.getInt("fk_unit");
-            mnFkMatPresentationId_n = resultSet.getInt("fk_mat_pres");
+            mnFkMatPresentationId = resultSet.getInt("fk_mat_pres");
             mnFkMatRequestPriorityId_n = resultSet.getInt("fk_mat_req_pty_n");
             mnFkEntMatConsumptionEntityId_n = resultSet.getInt("fk_ent_mat_cons_ent_n");
             mnFkSubentMatConsumptionEntityId_n = resultSet.getInt("fk_subent_mat_cons_ent_n");
@@ -241,7 +241,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkItemId + ", " + 
                     mnFkUnitId + ", " + 
-                    (mnFkMatPresentationId_n == 0 ? "NULL, " : mnFkMatPresentationId_n + ", ") + 
+                    mnFkMatPresentationId + ", " + 
                     (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") + 
                     (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") + 
                     (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") + 
@@ -262,7 +262,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_item = " + mnFkItemId + ", " +
                     "fk_unit = " + mnFkUnitId + ", " +
-                    "fk_mat_pres_n = " + (mnFkMatPresentationId_n == 0 ? "NULL, " : mnFkMatPresentationId_n + ", ") +
+                    "fk_mat_pres = " + mnFkMatPresentationId + ", " +
                     "fk_mat_req_pty_n = " + (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") +
                     "fk_ent_mat_cons_ent_n = " + (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") +
                     "fk_subent_mat_cons_ent_n = " + (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") +
@@ -302,7 +302,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         registry.setDeleted(this.isDeleted());
         registry.setFkItemId(this.getFkItemId());
         registry.setFkUnitId(this.getFkUnitId());
-        registry.setFkMatPresentationId_n(this.getFkMatPresentationId_n());
+        registry.setFkMatPresentationId(this.getFkMatPresentationId());
         registry.setFkMatRequestPriorityId_n(this.getFkMatRequestPriorityId_n());
         registry.setFkEntMatConsumptionEntityId_n(this.getFkEntMatConsumptionEntityId_n());
         registry.setFkSubentMatConsumptionEntityId_n(this.getFkSubentMatConsumptionEntityId_n());
