@@ -168,8 +168,8 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
             mbRequired = resultSet.getBoolean("b_req");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
-            mnFkAuthorizationTypeId = resultSet.getInt("fk_auth_type");
-            mnFkUserAuthorizationId = resultSet.getInt("fk_usr_auth");
+            mnFkAuthorizationTypeId = resultSet.getInt("fk_tp_authorn");
+            mnFkUserAuthorizationId = resultSet.getInt("fk_usr_authorn");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -228,8 +228,8 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
                     "b_req = " + (mbRequired ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                    "fk_auth_type = " + mnFkAuthorizationTypeId + ", " +
-                    "fk_usr_auth = " + mnFkUserAuthorizationId + ", " +
+                    "fk_tp_authorn = " + mnFkAuthorizationTypeId + ", " +
+                    "fk_usr_authorn = " + mnFkUserAuthorizationId + ", " +
 //                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
 //                    "ts_usr_ins = " + "NOW()" + ", " +
