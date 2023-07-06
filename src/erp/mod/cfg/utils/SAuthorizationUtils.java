@@ -43,20 +43,20 @@ public class SAuthorizationUtils {
     /**
      * Constates de estatus de autorización
      */
-    public static final int AUTH_STATUS_AUTHORIZED = 1;
-    public static final int AUTH_STATUS_REJECTED = 2;
-    public static final int AUTH_STATUS_PENDING = 3;
-    public static final int AUTH_STATUS_AUTHORIZING = 4;
-    public static final int AUTH_STATUS_NA = 10;
-    
+    public static final int AUTH_STATUS_NA = 1;
+    public static final int AUTH_STATUS_PENDING = 2;
+    public static final int AUTH_STATUS_IN_PROCESS = 3;
+    public static final int AUTH_STATUS_AUTHORIZED = 4;
+    public static final int AUTH_STATUS_REJECTED = 5;
+        
     public static final HashMap<Integer, String> AUTH_STATUS_DESC = new HashMap<>();
     
     static {
+        AUTH_STATUS_DESC.put(AUTH_STATUS_NA, "No aplica");
+        AUTH_STATUS_DESC.put(AUTH_STATUS_PENDING, "Pendiente");
+        AUTH_STATUS_DESC.put(AUTH_STATUS_IN_PROCESS, "En proceso");
         AUTH_STATUS_DESC.put(AUTH_STATUS_AUTHORIZED, "Autorizado");
         AUTH_STATUS_DESC.put(AUTH_STATUS_REJECTED, "Rechazado");
-        AUTH_STATUS_DESC.put(AUTH_STATUS_PENDING, "Pendiente");
-        AUTH_STATUS_DESC.put(AUTH_STATUS_AUTHORIZING, "En autorización");
-        AUTH_STATUS_DESC.put(AUTH_STATUS_NA, "No aplica");
     }
     
     /**
@@ -121,7 +121,7 @@ public class SAuthorizationUtils {
      * @param authorizationType
      * @param pk
      * 
-     * @return puede ser: AUTH_STATUS_AUTHORIZED, AUTH_STATUS_REJECTED, AUTH_STATUS_PENDING, AUTH_STATUS_AUTHORIZING, AUTH_STATUS_NA
+     * @return puede ser: AUTH_STATUS_AUTHORIZED, AUTH_STATUS_REJECTED, AUTH_STATUS_PENDING, AUTH_STATUS_IN_PROCESS, AUTH_STATUS_NA
      */
     public static int getAuthStatus(SGuiSession session, final int authorizationType, final Object pk) {
         String condPk = "";
@@ -219,13 +219,13 @@ public class SAuthorizationUtils {
             * DEFAULT
             **********************************************************************************************************
             */
-            return AUTH_STATUS_AUTHORIZING;
+            return AUTH_STATUS_IN_PROCESS;
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return AUTH_STATUS_AUTHORIZING;
+        return AUTH_STATUS_IN_PROCESS;
     }
     
     /**

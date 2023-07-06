@@ -289,7 +289,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_PENDING + " THEN 'PENDIENTE' "
                     + "WHEN f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
-                    + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZING + " THEN 'EN AUTORIZACIÓN' "
+                    + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + " THEN 'EN PROCESO' "
                     + "ELSE '---' "
                 + "END AS auth_status, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
