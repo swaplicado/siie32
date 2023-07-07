@@ -3,6 +3,8 @@ SIIE 3.2 214.0/ 2023-07-07
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Puesta a punto de captura de percepciones de prestaciones a partir del nuevo esquema de control de prestaciones por empleado.
+
+================================================================================
 SIIE 3.2 213.2/ 2023-06-06
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
