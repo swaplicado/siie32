@@ -5569,7 +5569,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean hasDpsAdjustmentsAsAdjButIsEditable() {
         return (!(mbHasDpsLinksAsSrc || mbHasDpsLinksAsDes) && (mbHasDpsAdjustmentsAsDoc || mbHasDpsAdjustmentsAsAdj)) && !mbHasIogSupplies && !mbHasShipments && !mbHasCommissions;
     }
-
+    
     private boolean canEditEntry(erp.mtrn.data.SDataDpsEntry entry) {
         boolean can = true;
 
@@ -8458,6 +8458,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 case SModSysConsts.LOGS_INC_DAF:
                 case SModSysConsts.LOGS_INC_DDU:
                 case SModSysConsts.LOGS_INC_DDP:
+                case SModSysConsts.LOGS_INC_DPU:
                     filterTypeSpot = new int[] { SModSysConsts.LOGS_TP_SPOT_PLA };
                     break;
                 case SModSysConsts.LOGS_INC_DAT:
@@ -8846,7 +8847,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             else {
                 int cfdId = SCfdUtils.getCfdIdByUuid(miClient, msXmlUuid);
                 if (cfdId != 0 && moDps.getDbmsDataCfd() != null && cfdId != moDps.getDbmsDataCfd().getPkCfdId()) {
-                    ArrayList<String> numDps = new ArrayList<String>();
+                    ArrayList<String> numDps;
                     numDps = SCfdUtils.getSerNumByCfd(miClient, cfdId);
                     validation.setMessage(message + "su UUID, '" + msXmlUuid + "', ya existe en la base de datos con fecha.\nCon fecha: " + numDps.get(0) + " y con el folio: " + numDps.get(1) + "");
                 }
@@ -10011,8 +10012,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     case SModSysConsts.LOGS_INC_DAT:
                                     case SModSysConsts.LOGS_INC_DAP:
                                     case SModSysConsts.LOGS_INC_DAF:
-                                    case SModSysConsts.LOGS_INC_DDU:
+                                    case SModSysConsts.LOGS_INC_DDU:       
                                     case SModSysConsts.LOGS_INC_DDP:
+                                    case SModSysConsts.LOGS_INC_DPU:    
                                         if (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_MOT_NA) {
                                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkModeOfTransportationTypeId.getText() + "'.");
                                             validation.setComponent(jcbFkModeOfTransportationTypeId);
@@ -10058,6 +10060,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                         double prepaymentsCy = mdPrepaymentsCy;
                         double applicationsCy = 0;
+                        
+                        // check document's balance
+                        
+                        try {
+                            if (mbIsDpsInvoice && SLibTimeUtils.digestMonth(moDps.getDate())[1] != SLibTimeUtils.digestMonth(moFieldDate.getDate())[1]) {
+                                moDps.validateDocBalance(miClient.getSession().getDatabase().getConnection(), "No se puede cambiar el periodo del documento: ");
+                            }
+                        }
+                        catch (Exception e) {
+                            validation.setMessage(e.getMessage());
+                            validation.setComponent(jftDate);
+                        }
 
                         // check prepayments:
 

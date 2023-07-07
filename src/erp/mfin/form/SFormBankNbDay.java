@@ -5,7 +5,6 @@
  */
 package erp.mfin.form;
 
-import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormField;
@@ -31,11 +30,12 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldNameDay;
     private erp.lib.form.SFormField moFieldIsDeleted;
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     private erp.mfin.data.SDataBankNbDay moBankNbDay;
     
     /**
      * Creates new form SFormBankNbDayV2
+     * @param client
      */
     public SFormBankNbDay(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
@@ -124,11 +124,12 @@ public class SFormBankNbDay extends javax.swing.JDialog implements erp.lib.form.
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(81, 32));
+        jbOk.setPreferredSize(new java.awt.Dimension(81, 23));
         jPanel2.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
+        jbCancel.setPreferredSize(new java.awt.Dimension(81, 23));
         jPanel2.add(jbCancel);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);

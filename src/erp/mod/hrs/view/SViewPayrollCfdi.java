@@ -25,6 +25,7 @@ import erp.mod.hrs.db.SHrsPayrollAnnul;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogFormerPayrollDate;
 import erp.mod.hrs.form.SDialogPrintOrderPayroll;
+import erp.mod.hrs.form.SDialogSaveCfdi;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
@@ -81,6 +82,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
     private JButton jbRestoreCfdiCancelAck;
     private JButton jbDeactivateControlFlags;
     private JButton jbGetCfdiStatus;
+    private JButton jbSaveAllCfdi;
 
     private SDialogAnnulCfdi moDialogAnnulCfdi;
     private SDialogFormerPayrollDate moDialogFormerPayrollDate;
@@ -135,6 +137,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         jbRestoreCfdiCancelAck = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")), "Insertar PDF del acuse de cancelación del CFDI de nómina", this);
         jbDeactivateControlFlags = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias de timbrado o cancelación del CFDI de nómina", this);
         jbGetCfdiStatus = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query.gif")), "Consultar estatus SAT del CFDI", this);
+        jbSaveAllCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Descargar CFDIs de nóminas", this);
 
         switch (mnGridSubtype) {
             case SModConsts.VIEW_SC_SUM:
@@ -151,6 +154,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 jbRestoreCfdiCancelAck.setEnabled(false);
                 jbDeactivateControlFlags.setEnabled(false);
                 jbGetCfdiStatus.setEnabled(false);
+                jbSaveAllCfdi.setEnabled(true);
                 break;
                 
             case SModConsts.VIEW_SC_DET:
@@ -167,6 +171,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 jbRestoreCfdiCancelAck.setEnabled(true);
                 jbDeactivateControlFlags.setEnabled(true);
                 jbGetCfdiStatus.setEnabled(true);
+                jbSaveAllCfdi.setEnabled(false);
                 break;
                 
             default:
@@ -187,6 +192,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreCfdiCancelAck);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDeactivateControlFlags);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetCfdiStatus);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSaveAllCfdi);
 
         if (isViewReceipts) {
             moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
@@ -852,6 +858,17 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         }
     }
     
+    private void actionSaveAllCfdi() {
+        if (jbSaveAllCfdi.isEnabled()) {
+            try {
+                SDialogSaveCfdi save = new SDialogSaveCfdi(miClient, "Descargar CFDIs de nóminas");
+                save.setVisible(true);
+            } catch (Exception e) {
+                miClient.showMsgBoxError(e.getMessage());
+            }
+        }
+    }
+    
     private void actionDeactivateControlFlags() {
         if (jbDeactivateControlFlags.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -1359,6 +1376,9 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             }
             else if (button == jbGetCfdiStatus) {
                 actionGetCfdiStatus();
+            }
+            else if (button == jbSaveAllCfdi) {
+                actionSaveAllCfdi();
             }
         }
     }

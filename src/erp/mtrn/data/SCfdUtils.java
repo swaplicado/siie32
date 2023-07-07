@@ -3060,7 +3060,7 @@ public abstract class SCfdUtils implements Serializable {
                             SCfdUtils.retrieveDataSetForPayroll(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n()); // streamline payroll retrieval
                             
                             // proceed with CFD printing:
-                            cfdPrint.printPayrollReceipt33_12(cfd, printMode, numberCopies, payrollCfdVersion);
+                            cfdPrint.printPayrollReceipt33_12(cfd, printMode, numberCopies, null, payrollCfdVersion);
                         }
                         break;
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
@@ -3069,7 +3069,7 @@ public abstract class SCfdUtils implements Serializable {
                             SCfdUtils.retrieveDataSetForPayroll(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n()); // streamline payroll retrieval
                             
                             // proceed with CFD printing:
-                            cfdPrint.printPayrollReceipt40_12(cfd, printMode, numberCopies, payrollCfdVersion);
+                            cfdPrint.printPayrollReceipt40_12(cfd, printMode, numberCopies, null, payrollCfdVersion);
                         }
                         break;
                     default:
@@ -3136,7 +3136,7 @@ public abstract class SCfdUtils implements Serializable {
                             SCfdUtils.retrieveDataSetForPayroll(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n()); // streamline payroll retrieval
                             
                             // proceed with CFD printing:
-                            cfdPrint.printPayrollReceipt40_12(cfd, printMode, numberCopies, payrollCfdVersion);
+                            cfdPrint.printPayrollReceipt40_12(cfd, printMode, numberCopies, null, payrollCfdVersion);
                         }
                         break;
                     default:

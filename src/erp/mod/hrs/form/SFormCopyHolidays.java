@@ -4,6 +4,8 @@
  */
 package erp.mod.hrs.form;
 
+import erp.client.SClientInterface;
+import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbHoliday;
 import java.sql.ResultSet;
@@ -28,6 +30,8 @@ public class SFormCopyHolidays extends SBeanForm {
 
     /**
      * Creates new form SFormCopyHolidays
+     * @param client
+     * @param title
      */
     public SFormCopyHolidays(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_HOL, SLibConsts.UNDEFINED, title);
@@ -144,7 +148,7 @@ public class SFormCopyHolidays extends SBeanForm {
     public SDbRegistry getRegistry() throws Exception {
         SDbHoliday registry = new SDbHoliday();
 
-        if(SDbHoliday.finYearExists(miClient.getSession(), miClient.getSession().getCurrentYear())) {
+        if(SFinUtilities.finYearExists((SClientInterface) miClient, miClient.getSession().getCurrentYear())) {
             if(!SDbHoliday.existHolidaysInCurrentYear(miClient.getSession(), miClient.getSession().getCurrentYear())) {
                 if(SDbHoliday.existHolidaysToCopy(miClient.getSession(), moIntYear.getValue())) {
                     String mySql = "SELECT id_hdy, id_hol, code, name, dt FROM hrs_hol WHERE id_hdy = " + moIntYear.getValue() + " AND NOT b_del;";

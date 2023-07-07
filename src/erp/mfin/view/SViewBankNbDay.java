@@ -15,7 +15,13 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mfin.form.SFormCopyBankNbDays;
+import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
+import sa.lib.grid.SGridUtils;
 
 /**
  *
@@ -23,8 +29,11 @@ import sa.gui.util.SUtilConsts;
  */
 public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.event.ActionListener{
 
+    private JButton jbCopyNbDays;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
+    
+    private SFormCopyBankNbDays moFormCopyBankNbDays;
     
     public SViewBankNbDay(SClientInterface client, String tabTitle) {
         super(client, tabTitle, SDataConstants.FINU_BANK_NB_DAY);
@@ -36,12 +45,16 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
         int levelRightEdit = SDataConstantsSys.UNDEFINED;
 
         moTabFilterDeleted = new STabFilterDeleted(this);
-        moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
+        moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR);
 
+        jbCopyNbDays = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link_rev.gif")), "Copiar días inhábiles bancarios de años anteriores", this);
+        
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jbCopyNbDays);
 
         STableField[] aoKeyFields = new STableField[1];
         STableColumn[] aoTableColumns = new STableColumn[7];
@@ -76,9 +89,25 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
         
         populateTable();
     }
+    
+    private void actionCopyNbDays() {
+       if (jbCopyNbDays.isEnabled()) {
+            try {
+                moFormCopyBankNbDays = new SFormCopyBankNbDays(miClient);
+                moFormCopyBankNbDays.setVisible(true);
+                createSqlQuery();
+                populateTable();
+                
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }    
+    }
 
     @Override
     public void createSqlQuery() {
+        int year;
         String sqlWhere = "";
         STableSetting setting = null;
         
@@ -86,6 +115,10 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "b.b_del = FALSE ";
+            }
+            if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
+                year = ((int[]) setting.getSetting())[0];
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND " ) + "YEAR(b.nb_day) = " + year + " ";
             }
         }
         
@@ -97,7 +130,7 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
                 "b.fid_usr_edit = ue.id_usr " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere);
     }
-
+    
     @Override
     public void actionNew() {
         if (jbNew.isEnabled()) {
@@ -123,4 +156,21 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+
+            if (button == jbNew) {
+                actionNew();
+            }
+            else if (button == jbEdit) {
+                actionEdit();
+            }
+            else if (button == jbCopyNbDays) {
+                actionCopyNbDays();
+            }
+        }
+    }
 }
