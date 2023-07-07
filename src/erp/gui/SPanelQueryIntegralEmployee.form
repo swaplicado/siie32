@@ -2,7 +2,9 @@
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Component class="javax.swing.ButtonGroup" name="gpbFilter">
+    <Component class="javax.swing.ButtonGroup" name="bgFilter">
+    </Component>
+    <Component class="javax.swing.ButtonGroup" name="bgSalary">
     </Component>
   </NonVisualComponents>
   <AuxValues>
@@ -69,7 +71,7 @@
                 <Component class="javax.swing.JToggleButton" name="jtbStatusEmployeeActive">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                      <ComponentRef name="gpbFilter"/>
+                      <ComponentRef name="bgFilter"/>
                     </Property>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/erp/img/icon_std_po_act_off.gif"/>
@@ -82,7 +84,7 @@
                 <Component class="javax.swing.JToggleButton" name="jtbStatusEmployeeInactive">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                      <ComponentRef name="gpbFilter"/>
+                      <ComponentRef name="bgFilter"/>
                     </Property>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/erp/img/icon_std_po_ina_off.gif"/>
@@ -95,7 +97,7 @@
                 <Component class="javax.swing.JToggleButton" name="jtbStatusEmployeeAll">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                      <ComponentRef name="gpbFilter"/>
+                      <ComponentRef name="bgFilter"/>
                     </Property>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/erp/img/switch_filter_off.gif"/>
@@ -126,9 +128,12 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JLabel" name="jlTotalAvailables">
+            <Component class="javax.swing.JLabel" name="jlEmployeesAvailable">
               <Properties>
                 <Property name="text" type="java.lang.String" value="n"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[100, 23]"/>
+                </Property>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
@@ -197,10 +202,10 @@
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                               <Font name="Tahoma" size="11" style="1"/>
                             </Property>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[310, 23]"/>
+                              <Dimension value="[445, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -224,7 +229,7 @@
                         <Component class="javax.swing.JTextField" name="jtfFiscalId">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
@@ -242,7 +247,7 @@
                         <Component class="javax.swing.JTextField" name="jtfAlternativeId">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[150, 23]"/>
@@ -251,7 +256,7 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlSocialSecurityNumber">
                           <Properties>
-                            <Property name="horizontalAlignment" type="int" value="4"/>
+                            <Property name="horizontalAlignment" type="int" value="0"/>
                             <Property name="text" type="java.lang.String" value="NSS:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[50, 23]"/>
@@ -261,7 +266,7 @@
                         <Component class="javax.swing.JTextField" name="jtfSocialSecurityNumber">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
@@ -288,17 +293,10 @@
                         <Component class="javax.swing.JFormattedTextField" name="jftDateBirth">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>
+                            <Property name="text" type="java.lang.String" value="01/01/2001"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jLabel4">
-                          <Properties>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[20, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -313,10 +311,36 @@
                         <Component class="javax.swing.JFormattedTextField" name="jftDateBenefits">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>
+                            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                              <Color blue="ff" green="ff" red="cc" type="rgb"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="01/01/2001"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlAnniversary">
+                          <Properties>
+                            <Property name="horizontalAlignment" type="int" value="0"/>
+                            <Property name="text" type="java.lang.String" value="Aniv. actual:"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[100, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JTextField" name="jtfAnniversary">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="false"/>
+                            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                              <Color blue="ff" green="ff" red="cc" type="rgb"/>
+                            </Property>
+                            <Property name="horizontalAlignment" type="int" value="11"/>
+                            <Property name="text" type="java.lang.String" value="0"/>
+                            <Property name="focusable" type="boolean" value="false"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[50, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -340,17 +364,10 @@
                         <Component class="javax.swing.JFormattedTextField" name="jftDateLastHire">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>
+                            <Property name="text" type="java.lang.String" value="01/01/2001"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jLabel7">
-                          <Properties>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[20, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -365,7 +382,7 @@
                         <Component class="javax.swing.JFormattedTextField" name="jftDateLastDismissal_n">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>
+                            <Property name="text" type="java.lang.String" value="01/01/2001"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
@@ -393,17 +410,17 @@
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                             <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="0.0000"/>
+                            <Property name="text" type="java.lang.String" value="0.00"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[85, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JFormattedTextField" name="jftDateChangeSalary">
+                        <Component class="javax.swing.JFormattedTextField" name="jftSalaryLastChange">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>
+                            <Property name="text" type="java.lang.String" value="01/01/2001"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
@@ -414,7 +431,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Sueldo mensual:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[105, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -422,17 +439,17 @@
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                             <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="0.0000"/>
+                            <Property name="text" type="java.lang.String" value="0.00"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[85, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JFormattedTextField" name="jftDateChangeWage">
+                        <Component class="javax.swing.JFormattedTextField" name="jftWageLastChange">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>
+                            <Property name="text" type="java.lang.String" value="01/01/2001"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
@@ -460,20 +477,39 @@
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                             <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="0.0000"/>
+                            <Property name="text" type="java.lang.String" value="0.00"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[85, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JFormattedTextField" name="jftDateChangeSalarySscBase">
+                        <Component class="javax.swing.JFormattedTextField" name="jftSalarySscBaseLastChange">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>
+                            <Property name="text" type="java.lang.String" value="01/01/2001"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[75, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlSalaryBase">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Salario base:"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[105, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JTextField" name="jtfSalaryBase">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="false"/>
+                            <Property name="horizontalAlignment" type="int" value="11"/>
+                            <Property name="text" type="java.lang.String" value="0.00"/>
+                            <Property name="focusable" type="boolean" value="false"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[85, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -497,7 +533,7 @@
                         <Component class="javax.swing.JTextField" name="jtfBank">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
@@ -506,7 +542,7 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlBankAccount">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Cuenta bancaria:"/>
+                            <Property name="text" type="java.lang.String" value=" Cuenta bancaria:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -515,10 +551,10 @@
                         <Component class="javax.swing.JTextField" name="jtfBankAccount">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[200, 23]"/>
+                              <Dimension value="[235, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -542,7 +578,7 @@
                         <Component class="javax.swing.JTextField" name="jtfSex">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
@@ -551,7 +587,7 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlMarital">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Estado civil:"/>
+                            <Property name="text" type="java.lang.String" value=" Estado civil:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -560,7 +596,7 @@
                         <Component class="javax.swing.JTextField" name="jtfMarital">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
@@ -569,19 +605,19 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlFkBloodType">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Grupo sangu&#xed;neo:"/>
+                            <Property name="text" type="java.lang.String" value="Tipo sangre:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[75, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jtfBloodType">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[75, 23]"/>
+                              <Dimension value="[50, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -605,7 +641,7 @@
                         <Component class="javax.swing.JTextField" name="jtfEducationType">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
@@ -614,7 +650,7 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlMwzType">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="&#xc1;rea geogr&#xe1;fica:"/>
+                            <Property name="text" type="java.lang.String" value=" &#xc1;rea geogr&#xe1;fica:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -623,7 +659,7 @@
                         <Component class="javax.swing.JTextField" name="jtfMwzType">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
@@ -632,9 +668,9 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlWorkingHoursDay">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Horas jornada:"/>
+                            <Property name="text" type="java.lang.String" value=" Hrs. jornada:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 23]"/>
+                              <Dimension value="[75, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -692,52 +728,103 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                         <Property name="columns" type="int" value="1"/>
-                        <Property name="rows" type="int" value="6"/>
+                        <Property name="rows" type="int" value="7"/>
                         <Property name="verticalGap" type="int" value="3"/>
                       </Layout>
                       <SubComponents>
-                        <Container class="javax.swing.JPanel" name="jPanel26">
+                        <Container class="javax.swing.JPanel" name="jPanel30">
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                             <Property name="alignment" type="int" value="0"/>
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlCutoff">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Fecha corte:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCutoff">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="ff" green="ff" red="cc" type="rgb"/>
+                                </Property>
+                                <Property name="text" type="java.lang.String" value="01/01/2001"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlSeniorityDays1">
+                              <Properties>
+                                <Property name="horizontalAlignment" type="int" value="0"/>
+                                <Property name="text" type="java.lang.String" value="D&#xed;as a&#xf1;o:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="jtfCurrentYearDays">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="ff" green="ff" red="cc" type="rgb"/>
+                                </Property>
+                                <Property name="horizontalAlignment" type="int" value="11"/>
+                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[50, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                             <Component class="javax.swing.JLabel" name="jlSeniority">
                               <Properties>
+                                <Property name="horizontalAlignment" type="int" value="0"/>
                                 <Property name="text" type="java.lang.String" value="Antig&#xfc;edad:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[75, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfSeniority">
+                            <Component class="javax.swing.JTextField" name="jtfSeniorityYears">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
+                                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="ff" green="ff" red="cc" type="rgb"/>
+                                </Property>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
                                 <Property name="text" type="java.lang.String" value="0"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[50, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlSeniorityYear">
+                            <Component class="javax.swing.JLabel" name="jlSeniorityYears">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="a&#xf1;os"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JTextField" name="jtfSeniorityDays">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
+                                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="ff" green="ff" red="cc" type="rgb"/>
+                                </Property>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
                                 <Property name="text" type="java.lang.String" value="0"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[50, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -745,7 +832,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="d&#xed;as"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[60, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -758,56 +845,42 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlDummy">
+                            <Component class="javax.swing.JLabel" name="jlBenefitType">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[75, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlBenefit">
+                            <Component class="javax.swing.JLabel" name="jlBenefitValue">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Prestaci&#xf3;n"/>
+                                <Property name="text" type="java.lang.String" value="Prest. aniv. actual"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[120, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlDummy1">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JLabel" name="jlBenefitProp">
+                            <Component class="javax.swing.JLabel" name="jlBenefitPropPart">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Parte prop."/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlProportional">
+                            <Component class="javax.swing.JLabel" name="jlBenefitPropValue">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Proporcional"/>
+                                <Property name="text" type="java.lang.String" value="Prest. proporcional"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[120, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlDummy2">
+                            <Component class="javax.swing.JLabel" name="jlBenefitPropPay">
                               <Properties>
+                                <Property name="text" type="java.lang.String" value="Pago proporcional"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JLabel" name="jlPaymentProp">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="Pago prop."/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[120, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -820,7 +893,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlAnnualBonus">
+                            <Component class="javax.swing.JLabel" name="jlAnnBon">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Gratif. anual:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -828,71 +901,71 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAnnualBonusBenefit">
+                            <Component class="javax.swing.JTextField" name="jtfAnnBonDays">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.0"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlAnnualBonusBenefit">
+                            <Component class="javax.swing.JLabel" name="jlAnnBonDays1">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="d&#xed;as"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAnnualBonusPropPer">
+                            <Component class="javax.swing.JTextField" name="jtfAnnBonPropPart">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0 %"/>
+                                <Property name="text" type="java.lang.String" value="0.00000000"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAnnualBonusProp">
+                            <Component class="javax.swing.JTextField" name="jtfAnnBonPropDays">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.000"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlAnnualBonusProp">
+                            <Component class="javax.swing.JLabel" name="jlAnnBonDays2">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="d&#xed;as"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAnnualBonusPayProp">
+                            <Component class="javax.swing.JTextField" name="jtfAnnBonPropPay">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlAnnualBonusPayProp">
+                            <Component class="javax.swing.JLabel" name="jlAnnBonCur">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="CUR"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -905,7 +978,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlVacations">
+                            <Component class="javax.swing.JLabel" name="jlVac">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Vacaciones:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -913,71 +986,71 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfVacationsBenefit">
+                            <Component class="javax.swing.JTextField" name="jtfVacDays">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.0"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlVacationsBenefit">
+                            <Component class="javax.swing.JLabel" name="jlVacDays1">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="d&#xed;as"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfVacationsPropPer">
+                            <Component class="javax.swing.JTextField" name="jtfVacPropPart">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0 %"/>
+                                <Property name="text" type="java.lang.String" value="0.00000000"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfVacationsProp">
+                            <Component class="javax.swing.JTextField" name="jtfVacPropDays">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.000"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlVacationsProp">
+                            <Component class="javax.swing.JLabel" name="jlVacDays2">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="d&#xed;as"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfVacationsPayProp">
+                            <Component class="javax.swing.JTextField" name="jtfVacPropPay">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlVacationsPayProp">
+                            <Component class="javax.swing.JLabel" name="jlVacCur">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="CUR"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -990,7 +1063,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlVacationsBonus">
+                            <Component class="javax.swing.JLabel" name="jlVacBon">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Prima vac.:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -998,40 +1071,40 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfVacationsBonusBenefit">
+                            <Component class="javax.swing.JTextField" name="jtfVacBonPct">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0 %"/>
+                                <Property name="text" type="java.lang.String" value="0.00 %"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlDummy3">
+                            <Component class="javax.swing.JLabel" name="jlDummy1">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[215, 23]"/>
+                                  <Dimension value="[245, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfVacationsBonusPayProp">
+                            <Component class="javax.swing.JTextField" name="jtfVacBonPropPay">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlVacationsBonusPayProp">
+                            <Component class="javax.swing.JLabel" name="jlVacBonCur">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="CUR"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -1056,13 +1129,64 @@
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
                                 <Property name="focusable" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[85, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlSettlementCur">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="CUR"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[30, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlDummy2">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[130, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jWageMinimum">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Salario m&#xed;nimo:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[75, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="javax.swing.JTextField" name="jtfWageMinimum">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                                <Property name="horizontalAlignment" type="int" value="11"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[85, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlWageMinimumCur">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="CUR"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[30, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel2">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
                             <Component class="javax.swing.JLabel" name="jlIndemnification">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Liquidaci&#xf3;n:"/>
@@ -1075,10 +1199,10 @@
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -1090,7 +1214,7 @@
                                 <Property name="text" type="java.lang.String" value="RV"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Renuncia voluntaria"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -1098,14 +1222,14 @@
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlDisL">
+                            <Component class="javax.swing.JLabel" name="jlIndemnificationDisL">
                               <Properties>
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                                   <Color blue="6d" green="6d" red="6d" type="rgb"/>
@@ -1113,7 +1237,7 @@
                                 <Property name="text" type="java.lang.String" value="DJ"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Despido justificado"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[30, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -1121,14 +1245,14 @@
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
-                                <Property name="text" type="java.lang.String" value="0"/>
+                                <Property name="text" type="java.lang.String" value="0.00"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[85, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlDicL">
+                            <Component class="javax.swing.JLabel" name="jlIndemnificationDicL">
                               <Properties>
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                                   <Color blue="6d" green="6d" red="6d" type="rgb"/>
@@ -1137,6 +1261,29 @@
                                 <Property name="toolTipText" type="java.lang.String" value="Despido injustificado"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[25, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JRadioButton" name="jrbSalaryBase">
+                              <Properties>
+                                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                                  <ComponentRef name="bgSalary"/>
+                                </Property>
+                                <Property name="text" type="java.lang.String" value="SB"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[40, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JRadioButton" name="jrbSalarySscBase">
+                              <Properties>
+                                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                                  <ComponentRef name="bgSalary"/>
+                                </Property>
+                                <Property name="selected" type="boolean" value="true"/>
+                                <Property name="text" type="java.lang.String" value="SBC"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[50, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

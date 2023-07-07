@@ -488,7 +488,7 @@ public abstract class SSscUtils {
         return daysCalendarPeriod;
     }
     
-    public static boolean leapYear (final int year) {
+    public static boolean leapYear(final int year) {
         GregorianCalendar calendar = new GregorianCalendar();
         boolean bLeapYear = false;
         
@@ -498,7 +498,7 @@ public abstract class SSscUtils {
         return bLeapYear;
     }
     
-     public static int getEmployeeAntiquity(final Date dateBenefits, final Date dateCutoff) {
+    public static int getEmployeeAntiquity(final Date dateBenefits, final Date dateCutoff) {
        String yearAnti = String.valueOf(SHrsUtils.getEmployeeSeniority(dateBenefits, dateCutoff));
        String monthAnti = String.valueOf(SHrsUtils.getEmployeeSeniorityAntMonth(dateBenefits, dateCutoff));
        String antiquityCompleteResult = yearAnti + "." + monthAnti;

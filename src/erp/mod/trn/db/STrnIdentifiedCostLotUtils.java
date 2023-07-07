@@ -93,7 +93,7 @@ public class STrnIdentifiedCostLotUtils {
                 + "    l.lot = '" + lot + "' AND NOT l.is_deleted "
                 + "ORDER BY l.created_at DESC;";
         
-        ArrayList<SIdentifiedAuxLot> lLots = new ArrayList();
+        ArrayList<SIdentifiedAuxLot> lLots = new ArrayList<>();
         try {
             ResultSet res = conn.createStatement().executeQuery(sqlLot);
             SIdentifiedAuxLot oLotAux;

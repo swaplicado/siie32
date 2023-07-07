@@ -27,7 +27,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Adrián Avilés
+ * @author Sergio Flores, Adrián Avilés, Sergio Flores
  */
 public abstract class SGuiModule {
 
@@ -38,7 +38,6 @@ public abstract class SGuiModule {
     protected java.lang.Object moLastSavedPrimaryKey;
     protected erp.lib.data.SDataRegistry moRegistry;
     protected erp.lib.form.SFormInterface miForm;
-    protected java.awt.Cursor moCursor;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected java.util.Vector<sa.lib.srv.SSrvLock> mvIndependentLocks;
     */
@@ -78,7 +77,6 @@ public abstract class SGuiModule {
         moLastSavedPrimaryKey = null;
         moRegistry = null;
         miForm = null;
-        moCursor = null;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro     
         mvIndependentLocks.clear();
         */
@@ -95,15 +93,11 @@ public abstract class SGuiModule {
     }
 
     protected void setFrameWaitCursor() {
-        moCursor = miClient.getFrame().getCursor();
-        miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
     }
 
     protected void restoreFrameCursor() {
-        if (moCursor == null || moCursor.getType() == Cursor.WAIT_CURSOR) {
-            moCursor = new Cursor(Cursor.DEFAULT_CURSOR);
-        }
-        miClient.getFrame().setCursor(moCursor);
+        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     @SuppressWarnings("unchecked")
@@ -149,6 +143,8 @@ public abstract class SGuiModule {
                 constructor = viewClass.getConstructor(classParams);
             }
             catch (java.lang.NoSuchMethodException e) {
+                SLibUtils.printException(this, e);
+                
                 // Last chance to identify view class construtor:
 
                 classParams = new Class[] { erp.client.SClientInterface.class, java.lang.String.class, int.class, int.class, int.class };
@@ -156,7 +152,7 @@ public abstract class SGuiModule {
 
                 constructor = viewClass.getConstructor(classParams);
             }
-
+            
             miClient.getTabbedPane().addTab(viewTitle, (java.awt.Component) constructor.newInstance(instanceParams));
             miClient.getTabbedPane().setTabComponentAt(count, new STableTabComponent(miClient.getTabbedPane(), miClient.getImageIcon(mnModuleType)));
             miClient.getTabbedPane().setSelectedIndex(count);

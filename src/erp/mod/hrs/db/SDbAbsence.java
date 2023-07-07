@@ -582,16 +582,16 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                 value = mnEffectiveDays;
                 break;
             case 6:
-                value = msDisRisk;
+                value = mnAuxPendingDays;
                 break;
             case 7:
-                value = msDisSequel;
+                value = msDisRisk;
                 break;
             case 8:
-                value = msDisControl;
+                value = msDisSequel;
                 break;
             case 9:
-                value = mnAuxPendingDays;
+                value = msDisControl;
                 break;
             default:
         }

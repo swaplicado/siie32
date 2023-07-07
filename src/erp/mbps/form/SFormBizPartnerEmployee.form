@@ -1681,7 +1681,7 @@
                       <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlFkCatalogueBloodTypeTypeId">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Grupo sangu&#xed;neo:*"/>
+                            <Property name="text" type="java.lang.String" value="Tipo sangre:*"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
@@ -2387,6 +2387,7 @@
                           <Font name="Tahoma" size="11" style="1"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="TEXT"/>
+                        <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero empleado"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -3438,6 +3439,7 @@
                           <Font name="Tahoma" size="11" style="1"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="TEXT"/>
+                        <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero empleado"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>

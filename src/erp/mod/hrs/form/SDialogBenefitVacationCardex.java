@@ -8,10 +8,12 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbEmployee;
-import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.db.SRowBenefitCardex;
 import erp.mod.hrs.db.SRowBenefitDetailCardex;
+import erp.mod.hrs.utils.SAnniversary;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -20,12 +22,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
@@ -42,27 +44,25 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Sergio Flores
  */
-public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListener, ItemListener, ListSelectionListener {
+public class SDialogBenefitVacationCardex extends SBeanFormDialog implements ActionListener, ItemListener, ListSelectionListener {
     
     private SDbEmployee moEmployee;
-    private Date mtDateCutoff;
-    private int mnSeniorityYears;
-    private int mnSeniorityDays;
-    private int mnBenefitsTableId;
+    private Date mtCutOff;
+    private SAnniversary moAnniversary;
     private double mdDailyPayment;
     private SGridPaneForm moGridBenefitSummary;
     private SGridPaneForm moGridBenefitDetail;
 
     /**
-     * Creates new form SDialogBenefitCardex
+     * Creates new form SDialogBenefitVacationCardex
      * @param client GUI client.
      * @param formSubtype Type of benefit. SModSysConsts.HRSS_TP_BEN_...
      * @param title Title of dialog.
      */
-    public SDialogBenefitCardex(SGuiClient client, int formSubtype, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_BEN_MOV, formSubtype, title);
+    public SDialogBenefitVacationCardex(SGuiClient client, int formSubtype, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_EMP_BEN, formSubtype, title);
         initComponents();
         initComponentsCustom();
     }
@@ -289,10 +289,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         moTextDateBenefits.setTextSettings(SGuiUtils.getLabelName(jlDateBenefits.getText()), 25);
         moIntSeniorityYears.setIntegerSettings(SGuiUtils.getLabelName(jlSeniorityYears), SGuiConsts.GUI_TYPE_INT, false);
         moIntSeniorityDays.setIntegerSettings(SGuiUtils.getLabelName(jlSeniorityDays), SGuiConsts.GUI_TYPE_INT, false);
-        moDecSeniorityProp.setDecimalSettings(SGuiUtils.getLabelName(jlSeniorityProp), SGuiConsts.GUI_TYPE_DEC_PER, false);
-        moDecSeniorityProp.setDecimalFormat(SLibUtils.DecimalFormatPercentage4D);
+        moDecSeniorityProp.setDecimalSettings(SGuiUtils.getLabelName(jlSeniorityProp), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false); // 8 decs.
         
-        moGridBenefitSummary = new SGridPaneForm(miClient, SModConsts.HRSX_BEN_SUM, SLibConsts.UNDEFINED, "Prestación por aniversario") {
+        moGridBenefitSummary = new SGridPaneForm(miClient, SModConsts.HRS_EMP_BEN_ANN, SModConsts.HRS_EMP_BEN, "Prestación por aniversario") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -334,7 +333,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
 
         jpBenefitSummary.add(moGridBenefitSummary, BorderLayout.CENTER);
         
-        moGridBenefitDetail = new SGridPaneForm(miClient, SModConsts.HRSX_BEN_DET, SLibConsts.UNDEFINED, "Detalle prestación") {
+        moGridBenefitDetail = new SGridPaneForm(miClient, SModConsts.HRS_EMP_BEN_ANN, SModConsts.HRS_PAY_RCP, "Detalle prestación") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -371,140 +370,99 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         moKeyCompany.setEnabled(false);
     }
     
-    private double getSeniorityProp() {
-        return (mnSeniorityDays <= SHrsConsts.YEAR_DAYS ? mnSeniorityDays : SHrsConsts.YEAR_DAYS) / (double) SHrsConsts.YEAR_DAYS;
-    }
-    
     private String getDbmsSchema() {
-        String database = "";
+        String squema = "";
         
         if (moKeyCompany.getSelectedIndex() > 0) {
-            database = ((String) moKeyCompany.getSelectedItem().getComplement()) + ".";
+            squema = ((String) moKeyCompany.getSelectedItem().getComplement()) + ".";
         }
         
-        return database;
+        return squema;
     }
     
-    private int getVacationDays(final Statement statement, final int anniversary) throws Exception {
-        int days = 0;
-        String dbmsSchema = getDbmsSchema();
+    /**
+     * Get map of vacation days up to top anniversary.
+     * @param statement DBMS statement.
+     * @param anniversaryTop top anniversary.
+     * @return
+     * @throws Exception 
+     */
+    private HashMap<Integer, Integer> createVacationDaysMap(final Statement statement, final int anniversaryTop) throws Exception {
+        String schema = getDbmsSchema();
+        HashMap<Integer, Integer> vacationDays = new HashMap<>();
         
-        String sql = "SELECT benr.id_ben, benr.id_row, benr.mon, benr.ben_day, benr.ben_bon_per "
-                + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS ben "
-                + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS benr ON benr.id_ben = ben.id_ben "
-                + "WHERE ben.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
-                + "benr.mon >= (" + SHrsConsts.YEAR_MONTHS + " * " + anniversary + ") AND "
-                + "ben.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
-                + "NOT ben.b_del "
-                + "ORDER BY benr.id_ben, benr.id_row "
-                + "LIMIT 1;";
+        String sql = "SELECT id_ann, ben_day "
+                + "FROM " + schema + SModConsts.TablesMap.get(SModConsts.HRS_EMP_BEN_ANN) + " "
+                + "WHERE eba.id_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " "
+                + "AND eba.id_emp = " + moEmployee.getPkEmployeeId() + " AND eba.id_ann <= " + anniversaryTop + " "
+                + "ORDER BY eba.id_ann";
 
         try (ResultSet resultSet = statement.executeQuery(sql)) {
-            if (resultSet.next()) {
-                days = resultSet.getInt("benr.ben_day");
+            while (resultSet.next()) {
+                vacationDays.put(resultSet.getInt("id_ann"), resultSet.getInt("ben_day"));
             }
         }
         
-        return days;
+        return vacationDays;
     }
 
     @SuppressWarnings("unchecked")
     private void showBenefitCardex() {
-        Vector<SGridRow> rows = new Vector<>();
-
         try {
-            try (Statement statementBonus = miClient.getSession().getStatement().getConnection().createStatement()) {
+            String schema = getDbmsSchema();
+            Vector<SGridRow> rows = new Vector<>();
+            HashMap<Integer, Integer> vacationDays = null;
+            
+            try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement()) {
                 // proceed adding 1 to show current anniversary, eventhough elapsed partially:
                 
-                int benefitsYear = moEmployee.getBenefitsYear();
-                String dbmsSchema = getDbmsSchema();
+                int anniversaryTop = moAnniversary.getElapsedYears() + 1;
+                int anniversary = anniversaryTop;
+                int benefitsYearStart = moAnniversary.getPeriodStart().getYear();
                 
-                for (int anniversary = mnSeniorityYears + 1; anniversary >= 1; anniversary--) {
-                    String sql;
-                    ResultSet resultSet;
-                    
-                    int benefitYear = benefitsYear + anniversary - 1;
+                if (mnFormSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
+                    vacationDays = createVacationDaysMap(statement, anniversaryTop);
+                }
+                
+                String sql = "SELECT eba.id_ann, eba.ben_day, eba.ben_bon_per, t.* "
+                        + "FROM " + schema + SModConsts.TablesMap.get(SModConsts.HRS_EMP_BEN_ANN) + " AS eba "
+                        + "LEFT OUTER JOIN ("
+                        + SHrsUtils.composeQueryForBenefitPayments(schema, moEmployee.getPkEmployeeId(), moEmployee.getDateBenefits(), mnFormSubtype)
+                        + ") AS t ON t.ben_ann = eba.id_ann "
+                        + "WHERE eba.id_emp = " + moEmployee.getPkEmployeeId() + " AND eba.id_tp_ben = " + mnFormSubtype + " "
+                        + "AND eba.id_ann <= " + anniversaryTop + " "
+                        + "ORDER BY eba.id_ann DESC;";
+                
+                ResultSet resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    int benefitsYear = benefitsYearStart + anniversary - 1;
                     
                     SRowBenefitCardex row = new SRowBenefitCardex(mnFormSubtype);
-                    row.setBenefitYear(benefitYear);
+                    row.setBenefitYear(benefitsYear);
                     row.setBenefitAnniversary(anniversary);
-                    row.setProportional(anniversary == mnSeniorityYears + 1 ? getSeniorityProp() : 1.0);
+                    row.setProportional(anniversary == anniversaryTop ? moAnniversary.getCurrentAnniversaryPropPartForBenefits() : 1.0);
                     
-                    sql = "SELECT benr.id_ben, benr.id_row, benr.mon, benr.ben_day, benr.ben_bon_per "
-                            + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS ben "
-                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS benr ON benr.id_ben = ben.id_ben "
-                            + "WHERE ben.id_ben = " + mnBenefitsTableId + " AND ben.fk_tp_ben = " + mnFormSubtype + " AND "
-                            + "benr.mon >= (" + SHrsConsts.YEAR_MONTHS + " * " + anniversary + ") AND "
-                            + "ben.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
-                            + "NOT ben.b_del "
-                            + "LIMIT 1;";
-                    resultSet = miClient.getSession().getStatement().executeQuery(sql);
-                    if (resultSet.next()) {
-                        if (mnFormSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                            row.setBenefitBonusPct(resultSet.getDouble("benr.ben_bon_per"));
-                            row.setBenefitDays(getVacationDays(statementBonus, anniversary));
-                        }
-                        else {
-                            row.setBenefitBonusPct(1);
-                            row.setBenefitDays(resultSet.getInt("benr.ben_day"));
-                        }
+                    if (mnFormSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
+                        row.setBenefitBonusPct(resultSet.getDouble("eba.ben_bon_per"));
+                        row.setBenefitDays(vacationDays.get(anniversary));
                     }
+                    else {
+                        row.setBenefitBonusPct(1.0);
+                        row.setBenefitDays(resultSet.getInt("eba.ben_day"));
+                    }
+
+                    row.setBenefitDaysPayed(resultSet.getDouble("t._days"));
+                    row.setBenefitAmount(row.getBenefitDays() * row.getBenefitBonusPct() * mdDailyPayment);
+                    row.setBenefitAmountPayed(SLibUtils.roundAmount(resultSet.getDouble("t._pymt")));
                     
                     // scheduled days (only for vacations):
-                    
+
                     if (mnFormSubtype == SModSysConsts.HRSS_TP_BEN_VAC) {
-                        sql = "SELECT SUM(eff_day) AS _days_sched "
-                                + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
-                                + "WHERE id_emp = " + moEmployee.getPkEmployeeId() + " AND "
-                                + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
-                                + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
-                                + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
-                                + "NOT b_del;";
-                        resultSet = miClient.getSession().getStatement().executeQuery(sql);
-                        if (resultSet.next()) {
-                            row.setBenefitDaysScheduled(resultSet.getDouble(1));
-                        }
+                        row.setBenefitDaysScheduled(SHrsUtils.getVacationScheduledDays(miClient.getSession(), moEmployee, anniversary, benefitsYear, 0));
                     }
-                    
-                    // payed days and amount:
-                    
-                    double payedDays = 0;
-                    double payedAmount = 0;
-                    
-                    sql = "SELECT SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _amount "
-                            + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
-                            + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND pre.fk_tp_ben = " + mnFormSubtype + " AND "
-                            + "pre.ben_year = " + benefitYear + " AND pre.ben_ann = " + anniversary + " AND "
-                            + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
-                            + "NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del;";
-                    resultSet = miClient.getSession().getStatement().executeQuery(sql);
-                    if (resultSet.next()) {
-                        payedDays = resultSet.getDouble("_days");
-                        payedAmount = resultSet.getDouble("_amount");
-                    }
-                    
-                    sql = "SELECT SUM(prd.unt_all) AS _days, SUM(prd.amt_r) AS _amount "
-                            + "FROM " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                            + "INNER JOIN " + dbmsSchema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
-                            + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND prd.fk_tp_ben = " + mnFormSubtype + " AND "
-                            + "prd.ben_year = " + benefitYear + " AND prd.ben_ann = " + anniversary + " AND "
-                            + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
-                            + "NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del;";
-                    resultSet = miClient.getSession().getStatement().executeQuery(sql);
-                    if (resultSet.next()) {
-                        payedDays = (payedDays - resultSet.getDouble("_days")); // decrement days
-                        payedAmount = (SLibUtils.roundAmount(payedAmount - resultSet.getDouble("_amount"))); // decrement amount
-                    }
-                    
-                    row.setBenefitDaysPayed(payedDays);
-                    row.setBenefitAmount(row.getBenefitDays() * row.getBenefitBonusPct() * mdDailyPayment);
-                    row.setBenefitAmountPayed(payedAmount);
 
                     rows.add(row);
-                    resultSet.close();
+                    anniversary--;
                 }
             }
 
@@ -523,6 +481,8 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         ResultSet resultSet = null;
 
         try {
+            getContentPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            
             sql = "SELECT IF(p.id_pay = 0, rcp_ear_cmp.dt, p.dt_end) f_dt, p.per_year, p.per AS f_period, IF(p.id_pay = 0, '', tp_pay.name) AS f_tp_pay, p.num AS f_num, IF(p.id_pay = 0, NULL, p.dt_sta) AS f_dt_sta, IF(p.id_pay = 0,NULL, p.dt_end) AS f_dt_end, rcp_ear.id_pay, rcp_ear.id_emp, rcp_ear.id_mov, rcp_ear.unt_all AS f_unt, rcp_ear.amt_r AS f_amt, " +
                     "rcp_ear.ts_usr_ins AS ts_usr_ins, rcp_ear.ts_usr_upd AS ts_usr_upd, ui.usr AS f_usr_ins, uu.usr AS f_usr_upd " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
@@ -566,6 +526,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
+        finally {
+            getContentPane().setCursor(Cursor.getDefaultCursor());
+        }
     }
 
     /**
@@ -594,28 +557,25 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         }
     }
     
-    public void setFormParams(final int employeeId, final int seniorityYears, final int seniorityDays, final int benefitsTableId, final Date dateCutoff) {
+    public void setFormParams(final int employeeId, final Date cutOff) {
         removeAllListeners();
         
         SDbConfig config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         
         moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
+        mtCutOff = cutOff;
+        moAnniversary = new SAnniversary(moEmployee.getDateBenefits(), cutOff);
         mdDailyPayment = moEmployee.getEffectiveSalary(config.isFortnightStandard());
-        
-        mnSeniorityYears = seniorityYears;
-        mnSeniorityDays = seniorityDays;
-        mnBenefitsTableId = benefitsTableId;
-        mtDateCutoff = dateCutoff;
         
         moTextEmployeeName.setValue(moEmployee.getXtaEmployeeName());
         moTextEmployeeNumber.setValue(moEmployee.getNumber());
         moDecDailyPayment.setValue(mdDailyPayment);
         moTextBenefitType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_BEN, new int[] { mnFormSubtype }, SDbRegistryUser.FIELD_NAME));
-        moTextDateCutoff.setValue(SLibUtils.DateFormatDate.format(mtDateCutoff));
+        moTextDateCutoff.setValue(SLibUtils.DateFormatDate.format(mtCutOff));
         moTextDateBenefits.setValue(SLibUtils.DateFormatDate.format(moEmployee.getDateBenefits()));
-        moIntSeniorityYears.setValue(mnSeniorityYears);
-        moIntSeniorityDays.setValue(mnSeniorityDays);
-        moDecSeniorityProp.setValue(getSeniorityProp());
+        moIntSeniorityYears.setValue(moAnniversary.getElapsedYears());
+        moIntSeniorityDays.setValue(moAnniversary.getElapsedYearDaysForBenefits());
+        moDecSeniorityProp.setValue(moAnniversary.getCurrentAnniversaryPropPartForBenefits());
         
         showBenefitCardex();
         addAllListeners();

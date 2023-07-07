@@ -113,10 +113,10 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JSpinner" name="jsAnniversary">
+                <Component class="javax.swing.JSpinner" name="jsBenefitAnniversary">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[100, 23]"/>
+                      <Dimension value="[75, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -124,7 +124,7 @@
                   <Properties>
                     <Property name="toolTipText" type="java.lang.String" value="A&#xf1;o aniversario"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[75, 23]"/>
+                      <Dimension value="[50, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -161,7 +161,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDaysToPay">
+                <Component class="javax.swing.JLabel" name="jlAdjustmentDays">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="D&#xed;as ajuste:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -169,7 +169,37 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecDaysToPay">
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecAdjustmentDays">
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlAdjustmentDays1">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="(Para aumentar: valor positivo. Para disminuir: valor negativo.)"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[325, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel16">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlFactorAmount">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Factor monto:*"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecFactorAmount">
                 </Component>
               </SubComponents>
             </Container>
@@ -180,7 +210,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlTotalAmount">
+                <Component class="javax.swing.JLabel" name="jlAdjustmentAmount">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Monto ajuste:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -188,7 +218,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurPayment">
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurAdjustmentAmount">
                 </Component>
               </SubComponents>
             </Container>
@@ -201,7 +231,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlNotes">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Notas:"/>
+                    <Property name="text" type="java.lang.String" value="Notas ajuste:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
@@ -209,9 +239,9 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextNotes">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
+                    <Property name="text" type="java.lang.String" value="TEXT"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[300, 23]"/>
+                      <Dimension value="[400, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

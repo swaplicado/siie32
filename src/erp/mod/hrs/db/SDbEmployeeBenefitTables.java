@@ -20,12 +20,14 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * Employee benefit tables.
+ * Check <code>erp.mod.hrs.db.SHrsBenefitUtils</code> for convenience methods for managing benefit tables.
  * @author Sergio Flores
  */
 public class SDbEmployeeBenefitTables extends SDbRegistryUser {
     
-    public static final int ANNUMS = 50;
+    /** Número máximo de años para tablas de prestaciones. */
+    public static final int MAX_ANNUMS = 50;
 
     protected int mnPkEmployeeId;
     protected int mnPkBenefitsId;
@@ -166,14 +168,8 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
         return count;
     }
     
-    private Exception createBenefitAnnumsCountException(final SGuiSession session, final int benefitType, final int count) {
-        return new Exception("La tabla de prestaciones '" + (String) session.readField(SModConsts.HRSS_TP_BEN, new int[] { benefitType }, SDbRegistry.FIELD_NAME) + "' "
-                + "de '" + (String) session.readField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbRegistry.FIELD_NAME) + "' "
-                + "tiene " + count + " aniversarios, pero se requieren " + ANNUMS + ".");
-    }
-    
     private void checkBenefitTablesAnnums(final SGuiSession session) throws Exception {
-        int[] benefitTypes = SHrsBenefitTablesUtils.createBenefitTypes();
+        int[] benefitTypes = SHrsBenefitUtils.createBenefitTypes();
         int[] benefitTables = new int[] { mnFkBenefitAnnualBonusId, mnFkBenefitVacationId, mnFkBenefitVacationBonusId };
         
         for (int type = 0; type < benefitTypes.length; type++) {
@@ -183,7 +179,7 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
                 // benefit table not set:
                 
                 if (count != 0) {
-                    throw createBenefitAnnumsCountException(session, benefitTypes[type], 0);
+                    throw SHrsBenefitUtils.createBenefitAnnumsCountException(session, mnPkEmployeeId, benefitTypes[type], count, 0);
                 }
             }
             else {
@@ -191,10 +187,10 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
                 
                 if (count == 0) {
                     SDbBenefitTable benefitTable = (SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { benefitTables[type] });
-                    maChildAnnums.addAll(benefitTable.createBenefitAnnums(ANNUMS));
+                    maChildAnnums.addAll(benefitTable.createBenefitAnnums(MAX_ANNUMS));
                 }
-                else if (count != ANNUMS) {
-                    throw createBenefitAnnumsCountException(session, benefitTypes[type], ANNUMS);
+                else if (count != MAX_ANNUMS) {
+                    throw SHrsBenefitUtils.createBenefitAnnumsCountException(session, mnPkEmployeeId, benefitTypes[type], count, MAX_ANNUMS);
                 }
             }
         }
@@ -202,25 +198,25 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
     
     /**
      * Get all benefit annums of requested benefit type.
-     * @param session GUI user session.
+     * @param session GUI user session (for retrieving name of benefit type for exceptions).
      * @param benefitType Benefit type. Options defined in SModSysConsts.HRSS_TP_BEN_...
      * @return Array of benefit annums of requested benefit type.
-     * @throws Exception Exception thrown if number of benefit annums differs from ANNUMS.
+     * @throws Exception Exception thrown if number of benefit annums differs from MAX_ANNUMS.
      */
     public ArrayList<SDbEmployeeBenefitTablesAnnum> getBenefitAnnums(final SGuiSession session, final int benefitType) throws Exception {
-        ArrayList<SDbEmployeeBenefitTablesAnnum> rows = new ArrayList<>();
+        ArrayList<SDbEmployeeBenefitTablesAnnum> benefitAnnums = new ArrayList<>();
         
         for (SDbEmployeeBenefitTablesAnnum child : maChildAnnums) {
             if (child.getPkBenefitTypeId() == benefitType) {
-                rows.add(child);
+                benefitAnnums.add(child);
             }
         }
         
-        if (rows.size() != ANNUMS) {
-            throw createBenefitAnnumsCountException(session, benefitType, rows.size());
+        if (benefitAnnums.size() != MAX_ANNUMS) {
+            throw SHrsBenefitUtils.createBenefitAnnumsCountException(session, mnPkEmployeeId, benefitType, benefitAnnums.size(), MAX_ANNUMS);
         }
         
-        return rows;
+        return benefitAnnums;
     }
     
     /**
@@ -265,9 +261,9 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
         boolean compute = true;
         
         if (!computeWithoutCheckingCompleteness) {
-            int[] benefitTypes = SHrsBenefitTablesUtils.createBenefitTypes();
+            int[] benefitTypes = SHrsBenefitUtils.createBenefitTypes();
             for (int benefitType : benefitTypes) {
-                if (countBenefitAnnums(benefitType) != ANNUMS) {
+                if (countBenefitAnnums(benefitType) != MAX_ANNUMS) {
                     compute = false;
                     break;
                 }
@@ -281,13 +277,13 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
 
             maChildWageFactors.clear();
 
-            for (int annum = 1; annum <= ANNUMS; annum++) {
+            for (int annum = 1; annum <= MAX_ANNUMS; annum++) {
                 SDbEmployeeWageFactorAnnum wageFactor = new SDbEmployeeWageFactorAnnum();
                 wageFactor.setPkEmployeeId(mnPkEmployeeId);
                 wageFactor.setPkAnnumId(annum);
                 wageFactor.setAnnualBonusDays(annualBonusAnnums.get(annum - 1).getBenefitDays());
                 wageFactor.setVacationDays(vacationAnnums.get(annum - 1).getBenefitDays());
-                wageFactor.setVacationBonusPercentage(vacationBonusAnnums.get(annum - 1).getBenefitBonusPercentage());
+                wageFactor.setVacationBonusPct(vacationBonusAnnums.get(annum - 1).getBenefitBonusPct());
                 wageFactor.computeWageFactor();
                 maChildWageFactors.add(wageFactor);
             }
@@ -301,14 +297,14 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
      * @param session GUI user session.
      * @param benefitType Benefit type. Options defined in SModSysConsts.HRSS_TP_BEN_...
      * @param benefitTable Benefit table.
-     * @param startingAnniversary Starting anniversary, from to 1 to ANNUMS.
+     * @param startingAnniversary Starting anniversary, from to 1 to MAX_ANNUMS.
      * @throws java.lang.Exception
      */
     public void assignBenefitTable(final SGuiSession session, final int benefitType, final int benefitTable, final int startingAnniversary) throws Exception {
-        if (startingAnniversary < 1 || startingAnniversary > ANNUMS) {
+        if (startingAnniversary < 1 || startingAnniversary > MAX_ANNUMS) {
             throw new Exception("Para '" + (String) session.readField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbRegistry.FIELD_NAME) + "' "
                     + "se está solicitando realizar la asignación a partir del aniversario " + startingAnniversary+ ".\n"
-                    + "El rango valido de aniversarios es de 1 a " + ANNUMS + ".");
+                    + "El rango valido de aniversarios es de 1 a " + MAX_ANNUMS + ".");
         }
         else {
             // get benefit annums for required benefit table only once:
@@ -325,7 +321,7 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
             
             if (newBenefitAnnums == null) {
                 SDbBenefitTable reqBenefitTable = (SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { benefitTable });
-                newBenefitAnnums = reqBenefitTable.createBenefitAnnums(ANNUMS);
+                newBenefitAnnums = reqBenefitTable.createBenefitAnnums(MAX_ANNUMS);
                 
                 if (PreserveGlobalBenefitAnnumsMap) {
                     GlobalBenefitAnnumsMap.put(benefitTable, newBenefitAnnums);
@@ -348,7 +344,7 @@ public class SDbEmployeeBenefitTables extends SDbRegistryUser {
             else {
                 ArrayList<SDbEmployeeBenefitTablesAnnum> curBenefitAnnums = getBenefitAnnums(session, benefitType);
                 
-                for (int index = startingAnniversary - 1; index < ANNUMS; index++) {
+                for (int index = startingAnniversary - 1; index < MAX_ANNUMS; index++) {
                     maChildAnnums.set(maChildAnnums.indexOf(curBenefitAnnums.get(index)), newBenefitAnnums.get(index));
                 }
             }

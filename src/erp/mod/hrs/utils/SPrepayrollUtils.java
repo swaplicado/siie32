@@ -252,10 +252,6 @@ public class SPrepayrollUtils {
             cons.setAuxIsClockSourced(true);
             cons.setParentAbsence(abs);
             
-            cons.setAuxNumber(abs.getNumber());
-            cons.setAuxDateStart(abs.getDateStart());
-            cons.setAuxDateEnd(abs.getDateEnd());
-            
             consms.add(cons);
         }
         

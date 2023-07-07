@@ -112,7 +112,7 @@ import erp.mod.hrs.view.SViewAutomaticEarnings;
 import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
-import erp.mod.hrs.view.SViewBenefitVacationPending;
+import erp.mod.hrs.view.SViewBenefitVacationStatus;
 import erp.mod.hrs.view.SViewConditionalEarning;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
@@ -1066,8 +1066,8 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
-            case SModConsts.HRSX_BEN_VAC_PEND:
-                view = new SViewBenefitVacationPending(miClient, "Vacaciones pendientes");
+            case SModConsts.HRSX_BEN_VAC_STAT:
+                view = new SViewBenefitVacationStatus(miClient, "Estatus vacaciones");
                 break;
             case SModConsts.HRS_ACC_EAR:
                     switch (subtype) {

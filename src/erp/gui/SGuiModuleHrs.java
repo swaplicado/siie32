@@ -31,7 +31,6 @@ import erp.mod.hrs.form.SDialogRepHrsEarningsDeductionsFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPayrollTax;
 import erp.mod.hrs.form.SDialogRepHrsPayrollWageSalaryFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPos;
-import erp.mod.hrs.form.SDialogRepVacationsFileCsv;
 import erp.mod.hrs.form.SFormCalculateNetGrossAmount;
 import erp.mod.hrs.view.SViewEmployeeHireLogByPeriod;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
@@ -79,9 +78,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     
     private javax.swing.JMenu jmCat;
     private javax.swing.JMenuItem jmiCatEmployee;
-    private javax.swing.JMenuItem jmiCatEmployeeRelatives;
+    private javax.swing.JMenuItem jmiCatEmployeePersonalInfo;
+    private javax.swing.JMenuItem jmiCatEmployeeContractsExp;
     private javax.swing.JMenuItem jmiCatEmployeeIntegral;
-    private javax.swing.JMenuItem jmiCatEmployeeContractExp;
     private javax.swing.JMenuItem jmiCatEmployeeHireLog;
     private javax.swing.JMenuItem jmiCatEmployeeWageLog;
     private javax.swing.JMenuItem jmiCatEmployeeSscBaseLog;
@@ -108,7 +107,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmBen;
     private javax.swing.JMenuItem jmiBenAbsence;
     private javax.swing.JMenuItem jmiBenBenefitTables;
-    private javax.swing.JMenuItem jmiBenBenefitVacPend;
+    private javax.swing.JMenuItem jmiBenBenefitVacStat;
     private javax.swing.JMenuItem jmiBenBenefitVac;
     private javax.swing.JMenuItem jmiBenBenefitBonVac;
     private javax.swing.JMenuItem jmiBenBenefitBonAnn;
@@ -165,7 +164,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepPayrollTax;
     private javax.swing.JMenuItem jmiRepPayrollWageSalaryFileCsv;
     private javax.swing.JMenuItem jmiRepPayrollEarDedFileCsv;
-    private javax.swing.JMenuItem jmiRepVacationsFileCsv;
     private javax.swing.JMenuItem jmiRepEmployeeActive;
     private javax.swing.JMenuItem jmiRepHireLogByPeriodActive;
     private javax.swing.JMenuItem jmiRepHireLogByPeriodInactive;
@@ -238,9 +236,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmCat = new JMenu("Catálogos");
         jmiCatEmployee = new JMenuItem("Empleados");
-        jmiCatEmployeeRelatives = new JMenuItem("Datos personales de empleados");
+        jmiCatEmployeePersonalInfo = new JMenuItem("Datos personales de empleados");
+        jmiCatEmployeeContractsExp = new JMenuItem("Terminación de contratos de empleados");
         jmiCatEmployeeIntegral = new JMenuItem("Consulta integral de empleados");
-        jmiCatEmployeeContractExp = new JMenuItem("Consulta terminación contratos empleados");
         jmiCatEmployeeHireLog = new JMenuItem("Bitácora de altas y bajas");
         jmiCatEmployeeWageLog = new JMenuItem("Bitácora de sueldos y salarios");
         jmiCatEmployeeSscBaseLog = new JMenuItem("Bitácora de salarios base de cotización");
@@ -265,9 +263,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatAbsenceClass = new JMenuItem("Clases de incidencia");
 
         jmCat.add(jmiCatEmployee);
-        jmCat.add(jmiCatEmployeeRelatives);
+        jmCat.add(jmiCatEmployeePersonalInfo);
+        jmCat.add(jmiCatEmployeeContractsExp);
         jmCat.add(jmiCatEmployeeIntegral);
-        jmCat.add(jmiCatEmployeeContractExp);
         jmCat.addSeparator();
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
@@ -299,8 +297,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmBen = new JMenu("Prestaciones");
         jmiBenAbsence = new JMenuItem("Incidencias");
-        jmiBenBenefitTables = new JMenuItem("Prestaciones empleados");
-        jmiBenBenefitVacPend = new JMenuItem("Vacaciones pendientes");
+        jmiBenBenefitTables = new JMenuItem("Prestaciones de empleados");
+        jmiBenBenefitVacStat = new JMenuItem("Estatus de vacaciones");
         jmiBenBenefitVac = new JMenuItem("Control de vacaciones");
         jmiBenBenefitBonVac = new JMenuItem("Control de prima vacacional");
         jmiBenBenefitBonAnn = new JMenuItem("Control de gratificación anual");
@@ -313,7 +311,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmBen.add(jmiBenAbsence);
         jmBen.addSeparator();
         jmBen.add(jmiBenBenefitTables);
-        jmBen.add(jmiBenBenefitVacPend);
+        jmBen.add(jmiBenBenefitVacStat);
         jmBen.addSeparator();
         jmBen.add(jmiBenBenefitVac);
         jmBen.add(jmiBenBenefitBonVac);
@@ -425,7 +423,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas...");
         jmiRepPayrollWageSalaryFileCsv = new JMenuItem("Archivo CSV para declaración informativa de sueldos y salarios...");
         jmiRepPayrollEarDedFileCsv = new JMenuItem("Archivo CSV de percepciones y deducciones en el ejercicio...");
-        jmiRepVacationsFileCsv = new JMenuItem("Archivo CSV de vacaciones pendientes...");
         jmiRepEmployeeActive = new JMenuItem("Reporte de empleados activos por período...");
         jmiRepHireLogByPeriodActive = new JMenuItem("Consulta de altas por período");
         jmiRepHireLogByPeriodInactive = new JMenuItem("Consulta de bajas por período");
@@ -441,7 +438,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.addSeparator();
         jmRep.add(jmiRepPayrollWageSalaryFileCsv);
         jmRep.add(jmiRepPayrollEarDedFileCsv);
-        jmRep.add(jmiRepVacationsFileCsv);
         jmRep.addSeparator();
         jmRep.add(jmiRepEmployeeActive);
         jmRep.add(jmiRepHireLogByPeriodActive);
@@ -476,9 +472,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgConfig.addActionListener(this);
         
         jmiCatEmployee.addActionListener(this);
-        jmiCatEmployeeRelatives.addActionListener(this);
+        jmiCatEmployeePersonalInfo.addActionListener(this);
+        jmiCatEmployeeContractsExp.addActionListener(this);
         jmiCatEmployeeIntegral.addActionListener(this);
-        jmiCatEmployeeContractExp.addActionListener(this);
         jmiCatEmployeeHireLog.addActionListener(this);
         jmiCatEmployeeWageLog.addActionListener(this);
         jmiCatEmployeeSscBaseLog.addActionListener(this);
@@ -504,7 +500,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmiBenAbsence.addActionListener(this);
         jmiBenBenefitTables.addActionListener(this);
-        jmiBenBenefitVacPend.addActionListener(this);
+        jmiBenBenefitVacStat.addActionListener(this);
         jmiBenBenefitVac.addActionListener(this);
         jmiBenBenefitBonVac.addActionListener(this);
         jmiBenBenefitBonAnn.addActionListener(this);
@@ -554,7 +550,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollTax.addActionListener(this);
         jmiRepPayrollWageSalaryFileCsv.addActionListener(this);
         jmiRepPayrollEarDedFileCsv.addActionListener(this);
-        jmiRepVacationsFileCsv.addActionListener(this);
         jmiRepEmployeeActive.addActionListener(this);
         jmiRepHireLogByPeriodActive.addActionListener(this);
         jmiRepHireLogByPeriodInactive.addActionListener(this);
@@ -600,9 +595,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmCat.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage || hasRightEmpData || hasRightAuxHrs);
         jmiCatEmployee.setEnabled(hasRightEmp || hasRightAuxHrs || hasRightEmpWage);
-        jmiCatEmployeeRelatives.setEnabled(hasRightEmp || hasRightAuxHrs || hasRightEmpData);
+        jmiCatEmployeePersonalInfo.setEnabled(hasRightEmp || hasRightAuxHrs || hasRightEmpData);
+        jmiCatEmployeeContractsExp.setEnabled(hasRightEmp || hasRightAuxHrs);
         jmiCatEmployeeIntegral.setEnabled(hasRightEmp);
-        jmiCatEmployeeContractExp.setEnabled(hasRightEmp || hasRightAuxHrs);
         jmiCatEmployeeHireLog.setEnabled(hasRightEmp || hasRightAuxHrs);
         jmiCatEmployeeWageLog.setEnabled(hasRightEmp || hasRightEmpWage);
         jmiCatEmployeeSscBaseLog.setEnabled(hasRightEmp || hasRightEmpWage);
@@ -629,14 +624,15 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         boolean hasRightPay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight;
         boolean hasRightPayWeek = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_WEE).HasRight;
         boolean hasRightPayFortnight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_FOR).HasRight;
+        boolean hasRightAbsence = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_ABS).HasRight;
         
-        jmBen.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
-        jmiBenAbsence.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
+        jmBen.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs || hasRightAbsence);
+        jmiBenAbsence.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs || hasRightAbsence);
         jmiBenBenefitTables.setEnabled(hasRightPay);
-        jmiBenBenefitVacPend.setEnabled(hasRightPay);
-        jmiBenBenefitVac.setEnabled(hasRightPay);
-        jmiBenBenefitBonVac.setEnabled(hasRightPay);
-        jmiBenBenefitBonAnn.setEnabled(hasRightPay);
+        jmiBenBenefitVacStat.setEnabled(hasRightPay);
+        jmiBenBenefitVac.setEnabled(/*hasRightPay*/false);
+        jmiBenBenefitBonVac.setEnabled(/*hasRightPay*/false);
+        jmiBenBenefitBonAnn.setEnabled(/*hasRightPay*/false);
         jmiBenBenefitAdjustmentEar.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight);
         jmiBenLoan.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
         jmiBenLoanAdjustmentEar.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
@@ -704,7 +700,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPayrollTax.setEnabled(hasRightEmpWage);
         jmiRepPayrollWageSalaryFileCsv.setEnabled(hasRightEmpWage);
         jmiRepPayrollEarDedFileCsv.setEnabled(hasRightEmpWage);
-        jmiRepVacationsFileCsv.setEnabled(hasRightReports);
         jmiRepEmployeeActive.setEnabled(hasRightReports);
         jmiRepHireLogByPeriodActive.setEnabled(hasRightReports);
         jmiRepHireLogByPeriodInactive.setEnabled(hasRightReports);
@@ -976,14 +971,14 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatEmployee) {
                 miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_EMP);
             }
-            else if (item == jmiCatEmployeeRelatives) {
+            else if (item == jmiCatEmployeePersonalInfo) {
                 miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_EMP_REL);
+            }
+            else if (item == jmiCatEmployeeContractsExp) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_EMP_CON_EXP);
             }
             else if (item == jmiCatEmployeeIntegral) {
                 showPanelQueryIntegralEmployee(SModConsts.HRSX_EMP_INT);
-            }
-            else if (item == jmiCatEmployeeContractExp) {
-                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_EMP_CON_EXP);
             }
             else if (item == jmiCatEmployeeHireLog) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_HIRE, SLibConsts.UNDEFINED, null);
@@ -1057,8 +1052,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiBenBenefitTables) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_BEN, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiBenBenefitVacPend) {
-                miClient.getSession().showView(SModConsts.HRSX_BEN_VAC_PEND, SLibConsts.UNDEFINED, null);
+            else if (item == jmiBenBenefitVacStat) {
+                miClient.getSession().showView(SModConsts.HRSX_BEN_VAC_STAT, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiBenBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
@@ -1201,9 +1196,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepPayrollEarDedFileCsv) {
                 new SDialogRepHrsEarningsDeductionsFileCsv((SGuiClient) miClient, "Archivo CSV de percepciones y deducciones en el ejercicio").setFormVisible(true);
-            }
-            else if (item == jmiRepVacationsFileCsv) {
-                new SDialogRepVacationsFileCsv((SGuiClient) miClient, "Archivo CSV de vacaciones pendientes").setFormVisible(true);
             }
             else if (item == jmiRepEmployeeActive) {
                 new SDialogRepHrsActiveEmployees((SGuiClient) miClient, "Reporte de empleados activos por período").setFormVisible(true);

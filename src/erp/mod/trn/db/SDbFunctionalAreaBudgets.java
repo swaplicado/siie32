@@ -58,7 +58,7 @@ public class SDbFunctionalAreaBudgets extends SDbRegistryUser {
         
         String sql = "SELECT id_func "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " "
-                + "WHERE id_func <> " + SModSysConsts.CFGU_FUNC_NON + " "
+                + "WHERE id_func <> " + SModSysConsts.CFGU_FUNC_NA + " "
                 + "ORDER BY name, id_func;";
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {

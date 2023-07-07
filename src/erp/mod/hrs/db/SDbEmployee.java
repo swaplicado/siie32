@@ -14,8 +14,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import org.joda.time.LocalDate;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -261,7 +263,46 @@ public class SDbEmployee extends SDbRegistryUser {
     public SHrsEmployeeHireLog getAuxHrsEmployeeHireLog() { return moAuxHrsEmployeeHireLog; }
     
     /**
-     * Gets effective salary.
+     * Get base calendar year of benefits.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @return 
+     */
+    public int getBenefitsYear() {
+        return SLibTimeUtils.digestYear(mtDateBenefits)[0];
+    }
+    
+    /**
+     * Get calendar year for given anniversary.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @param anniversary Anniversary.
+     * @return Calendar year for given anniversary.
+     */
+    public int getAnniversaryYear(final int anniversary) {
+        return getBenefitsYear() + (anniversary - 1);
+    }
+    
+    /**
+     * Get anniversary date for given anniversary.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @param anniversary Anniversary.
+     * @return Anniversary date for given anniversary.
+     */
+    public Date getAnniversaryDate(final int anniversary) {
+        return new LocalDate(mtDateBenefits).plusYears(anniversary - 1).toDate();
+    }
+    
+    /**
+     * Create <code>SAnniversary</code> from date of benefits.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @param cutoff Cutoff date (e.g., today).
+     * @return Composed lastname.
+     */    
+    public SAnniversary createAnniversary(final Date cutoff) {
+        return new SAnniversary(mtDateBenefits, cutoff);
+    }
+    
+    /**
+     * Get effective salary.
      * Mirrored in erp.mbps.data.SDataEmployee.
      * @param isFortnightStandard Flag that indicates if fortnights are allways fixed to 15 days.
      * @return Effective salary.
@@ -281,7 +322,7 @@ public class SDbEmployee extends SDbRegistryUser {
     }
     
     /**
-     * Gets settlement salary.
+     * Get settlement salary.
      * Mirrored in erp.mbps.data.SDataEmployee.
      * @return Settlement salary.
      */
@@ -299,16 +340,7 @@ public class SDbEmployee extends SDbRegistryUser {
     }
     
     /**
-     * Gets effective type of recruitment schema.
-     * If available, that one set in employee's membership, otherwise actual employee's type of recruitment schema.
-     * @return Effective type of recruitment schema.
-     */
-    public int getEffectiveRecruitmentSchemaTypeId() {
-        return mnXtaMembershipRecruitmentSchemaTypeId != 0 ? mnXtaMembershipRecruitmentSchemaTypeId : mnFkRecruitmentSchemaTypeId;
-    }
-    
-    /**
-     * Composes lastname.
+     * Compose lastname.
      * Mirrored in erp.mbps.data.SDataEmployee.
      * @return Composed lastname.
      */    
@@ -316,8 +348,14 @@ public class SDbEmployee extends SDbRegistryUser {
         return SLibUtils.textTrim(msLastname1 + (msLastname1.isEmpty() ? "" : " ") + msLastname2);
     }
     
-    public SAnniversary createAnniversary(final Date today) {
-        return new SAnniversary(mtDateBenefits, today);
+    /**
+     * Get effective type of recruitment schema.
+     * If available, that one set in employee's membership, otherwise actual employee's type of recruitment schema.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @return Effective type of recruitment schema.
+     */
+    public int getEffectiveRecruitmentSchemaTypeId() {
+        return mnXtaMembershipRecruitmentSchemaTypeId != 0 ? mnXtaMembershipRecruitmentSchemaTypeId : mnFkRecruitmentSchemaTypeId;
     }
     
     @Override

@@ -110,7 +110,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 213.0"; // fecha release: 2023-05-05
+    public static final String APP_RELEASE = "3.2 214.0"; // fecha release: 2023-07-07
     public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -507,7 +507,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginCompanyBranch.setToolTipText("Sucursal de la empresa actual");
         jtfLoginCompanyBranch.setFocusable(false);
         jtfLoginCompanyBranch.setOpaque(false);
-        jtfLoginCompanyBranch.setPreferredSize(new java.awt.Dimension(150, 20));
+        jtfLoginCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 20));
         jpStatus.add(jtfLoginCompanyBranch);
 
         jtfLoginEntityCh.setEditable(false);
@@ -517,7 +517,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityCh.setToolTipText("Cuenta de efectivo actual");
         jtfLoginEntityCh.setFocusable(false);
         jtfLoginEntityCh.setOpaque(false);
-        jtfLoginEntityCh.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityCh.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityCh);
 
         jtfLoginEntityWh.setEditable(false);
@@ -527,7 +527,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityWh.setToolTipText("Almacén actual");
         jtfLoginEntityWh.setFocusable(false);
         jtfLoginEntityWh.setOpaque(false);
-        jtfLoginEntityWh.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityWh.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityWh);
 
         jtfLoginEntityPlt.setEditable(false);
@@ -537,7 +537,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityPlt.setToolTipText("Planta actual");
         jtfLoginEntityPlt.setFocusable(false);
         jtfLoginEntityPlt.setOpaque(false);
-        jtfLoginEntityPlt.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityPlt.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityPlt);
 
         jtfLoginEntityPos.setEditable(false);
@@ -547,7 +547,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityPos.setToolTipText("Punto de venta actual");
         jtfLoginEntityPos.setFocusable(false);
         jtfLoginEntityPos.setOpaque(false);
-        jtfLoginEntityPos.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityPos.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityPos);
 
         jbSession.setBackground(java.awt.Color.black);
@@ -583,15 +583,15 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jlAppRelease.setForeground(new java.awt.Color(0, 153, 153));
         jlAppRelease.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jlAppRelease.setText("RELEASE");
-        jlAppRelease.setPreferredSize(new java.awt.Dimension(100, 20));
+        jlAppRelease.setText("3.2 000.0");
+        jlAppRelease.setPreferredSize(new java.awt.Dimension(60, 20));
         jPanel4.add(jlAppRelease);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/swap_logo_9.jpg"))); // NOI18N
         jLabel1.setToolTipText("www.swaplicado.com.mx");
         jPanel4.add(jLabel1);
 
-        jPanel3.add(jPanel4, java.awt.BorderLayout.LINE_END);
+        jPanel3.add(jPanel4, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
@@ -1642,7 +1642,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SParamsApp getParamsApp() {
         return moParamsApp;
     }
-
+    
     @Override
     public SSessionXXX getSessionXXX() {
         return moSessionXXX;

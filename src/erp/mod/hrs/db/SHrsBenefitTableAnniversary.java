@@ -11,20 +11,20 @@ package erp.mod.hrs.db;
 public class SHrsBenefitTableAnniversary {
 
     protected int mnBenefitId;
-    protected int mnBenefitAnn;
+    protected int mnAnniversary;
     protected double mdValue; // can be days or bonus percentage
 
-    public SHrsBenefitTableAnniversary(int benefitId, int benefitAnn, double value) {
+    public SHrsBenefitTableAnniversary(int benefitId, int anniversary, double value) {
         mnBenefitId = benefitId;
-        mnBenefitAnn = benefitAnn;
+        mnAnniversary = anniversary;
         mdValue = value;
     }
 
     public void setBenefitId(int n) { mnBenefitId = n; }
-    public void setBenefitAnn(int n) { mnBenefitAnn = n; }
+    public void setAnniversary(int n) { mnAnniversary = n; }
     public void setValue(double d) { mdValue = d; }
 
     public int getBenefitId() { return mnBenefitId; }
-    public int getBenefitAnn() { return mnBenefitAnn; }
+    public int getAnniversary() { return mnAnniversary; }
     public double getValue() { return mdValue; }
 }

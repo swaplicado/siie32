@@ -136,7 +136,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         int column = 0;
-        STableColumn[] aoTableColumns = new STableColumn[77];
+        STableColumn[] aoTableColumns = new STableColumn[78];
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Nombre empleado", 250);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Número empleado", 50);
         aoTableColumns[column++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
@@ -172,7 +172,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_par_shh", "Socio/accionista", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_rel_pty", "Parte relacionada", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "csex.name", "Sexo empleado", 75);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cblo.name", "Grupo sanguíneo empleado", 75);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cblo.name", "Tipo sangre empleado", 75);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cedu.name", "Escolaridad empleado", 75);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cmar.name", "Estado civil empleado", 75);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_pho", "Foto", STableConstants.WIDTH_BOOLEAN);

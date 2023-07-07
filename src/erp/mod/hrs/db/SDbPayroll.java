@@ -470,7 +470,6 @@ public class SDbPayroll extends SDbRegistryUser {
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         Statement statement = null;
         ResultSet resultSet = null;
-        SDbPayrollReceipt payrollReceipt = null;
 
         initRegistry();
         initQueryMembers();
@@ -539,7 +538,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "WHERE pr.id_pay = " + mnPkPayrollId + "; ";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
-                payrollReceipt = new SDbPayrollReceipt();
+                SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
                 payrollReceipt.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
                 maChildPayrollReceipts.add(payrollReceipt);
             }

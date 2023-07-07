@@ -659,7 +659,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="opaque" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[150, 20]"/>
+                  <Dimension value="[125, 20]"/>
                 </Property>
               </Properties>
             </Component>
@@ -677,7 +677,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="opaque" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[50, 20]"/>
+                  <Dimension value="[40, 20]"/>
                 </Property>
               </Properties>
             </Component>
@@ -695,7 +695,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="opaque" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[50, 20]"/>
+                  <Dimension value="[40, 20]"/>
                 </Property>
               </Properties>
             </Component>
@@ -713,7 +713,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="opaque" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[50, 20]"/>
+                  <Dimension value="[40, 20]"/>
                 </Property>
               </Properties>
             </Component>
@@ -731,7 +731,7 @@
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="opaque" type="boolean" value="false"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[50, 20]"/>
+                  <Dimension value="[40, 20]"/>
                 </Property>
               </Properties>
             </Component>
@@ -796,7 +796,7 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-              <BorderConstraints direction="After"/>
+              <BorderConstraints direction="East"/>
             </Constraint>
           </Constraints>
 
@@ -808,9 +808,9 @@
                   <Color blue="99" green="99" red="0" type="rgb"/>
                 </Property>
                 <Property name="horizontalAlignment" type="int" value="11"/>
-                <Property name="text" type="java.lang.String" value="RELEASE"/>
+                <Property name="text" type="java.lang.String" value="3.2 000.0"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[100, 20]"/>
+                  <Dimension value="[60, 20]"/>
                 </Property>
               </Properties>
             </Component>

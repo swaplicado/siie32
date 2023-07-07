@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín, Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín, Edwin Carmona, Sergio Flores
  */
 public abstract class SModConsts {
 
@@ -733,6 +733,7 @@ public abstract class SModConsts {
     public static final int HRSX_BEN_SUM = 2064052;
     public static final int HRSX_BEN_DET = 2064053;
     public static final int HRSX_BEN_VAC_PEND = 2064056;
+    public static final int HRSX_BEN_VAC_STAT = 2064057;
     public static final int HRSX_EMP_INT = 2064061; // employees integral query
     public static final int HRSX_EMP_CON_EXP = 2064066; // employees contract expiration
     public static final int HRSX_EMP_LOG_HIRE_BY_PER = 2064069; // hire and dismisss query by period

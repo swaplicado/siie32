@@ -12,6 +12,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEmployeeHireLog;
+import erp.mod.hrs.utils.SAnniversary;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -25,8 +26,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
 import javax.imageio.ImageIO;
+import org.joda.time.LocalDate;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 
@@ -329,7 +332,46 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public javax.swing.ImageIcon getXtaImageIconSignature_n() { return moXtaImageIconSignature_n; }
     
     /**
-     * Gets effective salary.
+     * Get base calendar year of benefits.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @return 
+     */
+    public int getBenefitsYear() {
+        return SLibTimeUtils.digestYear(mtDateBenefits)[0];
+    }
+    
+    /**
+     * Get calendar year for given anniversary.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @param anniversary Anniversary.
+     * @return Calendar year for given anniversary.
+     */
+    public int getAnniversaryYear(final int anniversary) {
+        return getBenefitsYear() + (anniversary - 1);
+    }
+    
+    /**
+     * Get anniversary date for given anniversary.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @param anniversary Anniversary.
+     * @return Anniversary date for given anniversary.
+     */
+    public Date getAnniversaryDate(final int anniversary) {
+        return new LocalDate(mtDateBenefits).plusYears(anniversary - 1).toDate();
+    }
+    
+    /**
+     * Create <code>SAnniversary</code> from date of benefits.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @param cutoff Cutoff date (e.g., today).
+     * @return Composed lastname.
+     */    
+    public SAnniversary createAnniversary(final Date cutoff) {
+        return new SAnniversary(mtDateBenefits, cutoff);
+    }
+    
+    /**
+     * Get effective salary.
      * Mirrored in erp.mod.hrs.db.SDbEmployee.
      * @param isFortnightStandard Flag that indicates if fortnights are allways fixed to 15 days.
      * @return Effective salary.
@@ -349,7 +391,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     }
     
     /**
-     * Gets settlement salary.
+     * Get settlement salary.
      * Mirrored in erp.mod.hrs.db.SDbEmployee.
      * @return Settlement salary.
      */
@@ -367,7 +409,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     }
     
     /**
-     * Composes lastname.
+     * Compose lastname.
      * Mirrored in erp.mod.hrs.db.SDbEmployee.
      * @return Composed lastname.
      */    
@@ -375,6 +417,16 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         return SLibUtils.textTrim(msLastname1 + (msLastname1.isEmpty() ? "" : " ") + msLastname2);
     }
 
+    /**
+     * Get effective type of recruitment schema.
+     * If available, that one set in employee's membership, otherwise actual employee's type of recruitment schema.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @return Effective type of recruitment schema.
+     */
+    public int getEffectiveRecruitmentSchemaTypeId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
     @Override
     public void setPrimaryKey(Object pk) {
         mnPkEmployeeId = ((int[]) pk)[0];

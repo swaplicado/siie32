@@ -22,7 +22,7 @@ public class SDbEmployeeWageFactorAnnum extends SDbRegistryUser {
     protected int mnPkAnnumId;
     protected int mnAnnualBonusDays;
     protected int mnVacationDays;
-    protected double mdVacationBonusPercentage;
+    protected double mdVacationBonusPct;
     protected double mdTotalAnnualDays;
     protected double mdWageFactor;
     protected int mnFkUserId;
@@ -36,7 +36,7 @@ public class SDbEmployeeWageFactorAnnum extends SDbRegistryUser {
     public void setPkAnnumId(int n) { mnPkAnnumId = n; }
     public void setAnnualBonusDays(int n) { mnAnnualBonusDays = n; }
     public void setVacationDays(int n) { mnVacationDays = n; }
-    public void setVacationBonusPercentage(double d) { mdVacationBonusPercentage = d; }
+    public void setVacationBonusPct(double d) { mdVacationBonusPct = d; }
     public void setTotalAnnualDays(double d) { mdTotalAnnualDays = d; }
     public void setWageFactor(double d) { mdWageFactor = d; }
     public void setFkUserId(int n) { mnFkUserId = n; }
@@ -46,14 +46,14 @@ public class SDbEmployeeWageFactorAnnum extends SDbRegistryUser {
     public int getPkAnnumId() { return mnPkAnnumId; }
     public int getAnnualBonusDays() { return mnAnnualBonusDays; }
     public int getVacationDays() { return mnVacationDays; }
-    public double getVacationBonusPercentage() { return mdVacationBonusPercentage; }
+    public double getVacationBonusPct() { return mdVacationBonusPct; }
     public double getTotalAnnualDays() { return mdTotalAnnualDays; }
     public double getWageFactor() { return mdWageFactor; }
     public int getFkUserId() { return mnFkUserId; }
     public Date getTsUser() { return mtTsUser; }
     
     public void computeWageFactor() {
-        mdTotalAnnualDays = SHrsConsts.YEAR_DAYS + (mnVacationDays * mdVacationBonusPercentage) + mnAnnualBonusDays;
+        mdTotalAnnualDays = SHrsConsts.YEAR_DAYS + (mnVacationDays * mdVacationBonusPct) + mnAnnualBonusDays;
         mdWageFactor = mdTotalAnnualDays / SHrsConsts.YEAR_DAYS;
     }
 
@@ -76,7 +76,7 @@ public class SDbEmployeeWageFactorAnnum extends SDbRegistryUser {
         mnPkAnnumId = 0;
         mnAnnualBonusDays = 0;
         mnVacationDays = 0;
-        mdVacationBonusPercentage = 0;
+        mdVacationBonusPct = 0;
         mdTotalAnnualDays = 0;
         mdWageFactor = 0;
         mnFkUserId = 0;
@@ -134,7 +134,7 @@ public class SDbEmployeeWageFactorAnnum extends SDbRegistryUser {
             mnPkAnnumId = resultSet.getInt("id_ann");
             mnAnnualBonusDays = resultSet.getInt("ann_bon_day");
             mnVacationDays = resultSet.getInt("vac_day");
-            mdVacationBonusPercentage = resultSet.getDouble("vac_bon_per");
+            mdVacationBonusPct = resultSet.getDouble("vac_bon_per");
             mdTotalAnnualDays = resultSet.getDouble("tot_ann_day");
             mdWageFactor = resultSet.getDouble("wage_fac");
             mnFkUserId = resultSet.getInt("fk_usr");
@@ -160,7 +160,7 @@ public class SDbEmployeeWageFactorAnnum extends SDbRegistryUser {
                     mnPkAnnumId + ", " + 
                     mnAnnualBonusDays + ", " + 
                     mnVacationDays + ", " + 
-                    mdVacationBonusPercentage + ", " + 
+                    mdVacationBonusPct + ", " + 
                     mdTotalAnnualDays + ", " + 
                     mdWageFactor + ", " + 
                     mnFkUserId + ", " + 
@@ -184,7 +184,7 @@ public class SDbEmployeeWageFactorAnnum extends SDbRegistryUser {
         registry.setPkAnnumId(this.getPkAnnumId());
         registry.setAnnualBonusDays(this.getAnnualBonusDays());
         registry.setVacationDays(this.getVacationDays());
-        registry.setVacationBonusPercentage(this.getVacationBonusPercentage());
+        registry.setVacationBonusPct(this.getVacationBonusPct());
         registry.setTotalAnnualDays(this.getTotalAnnualDays());
         registry.setWageFactor(this.getWageFactor());
         registry.setFkUserId(this.getFkUserId());

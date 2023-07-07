@@ -10,7 +10,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeBenefitTables;
-import erp.mod.hrs.db.SHrsBenefitTablesUtils;
+import erp.mod.hrs.db.SHrsBenefitUtils;
 import erp.mod.hrs.db.SRowBenefitTablesMassiveAssignation;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -995,7 +995,7 @@ public class SDialogBenefitTablesMassiveAssignation extends SBeanFormDialog impl
             try {
                 SGuiUtils.setCursorWait(miClient);
                 
-                if (SHrsBenefitTablesUtils.computeMassiveAssignation(miClient.getSession(), benefitType, moKeyBenefitTable.getValue()[0], rows)) {
+                if (SHrsBenefitUtils.computeMassiveAssignation(miClient.getSession(), benefitType, moKeyBenefitTable.getValue()[0], rows)) {
                     SGuiUtils.setCursorDefault(miClient);
                     
                     miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);

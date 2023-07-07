@@ -8,8 +8,6 @@ package erp.mod.hrs.db.ssc;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SHrsUtils;
-import static erp.mod.hrs.db.ssc.SSscUtils.getEmployeeAntiquity;
-import static erp.mod.hrs.db.ssc.SSscUtils.getEmployeeDailyIncome;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
@@ -206,7 +204,7 @@ public class SRowEmployeeSsc implements SGridRow {
                     value = moEmployee.getDateBenefits();
                     break;
                 case 3:
-                    value = getEmployeeAntiquity(moEmployee.getDateBenefits(), mtPeriodEnd);
+                    value = SSscUtils.getEmployeeAntiquity(moEmployee.getDateBenefits(), mtPeriodEnd);
                     break;
                 case 4:
                     value = moSession.readField(SModConsts.HRSS_TP_PAY, new int[] { moEmployee.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME);
@@ -224,12 +222,11 @@ public class SRowEmployeeSsc implements SGridRow {
                     value = mdSscFactor;
                     break;
                 case 9:
-                     {
-                        try {
-                            value = getEmployeeDailyIncome(moSession, mnYearPay, mnMonthStartPay, mnMonthEndPay, moEmployee.getFkPaymentTypeId(), moEmployee.getPkEmployeeId());//
-                        } catch (Exception ex) {
-                            Logger.getLogger(SRowEmployeeSsc.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                    try {
+                        value = SSscUtils.getEmployeeDailyIncome(moSession, mnYearPay, mnMonthStartPay, mnMonthEndPay, moEmployee.getFkPaymentTypeId(), moEmployee.getPkEmployeeId());//
+                    }
+                    catch (Exception ex) {
+                        Logger.getLogger(SRowEmployeeSsc.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     break;
                 case 10:

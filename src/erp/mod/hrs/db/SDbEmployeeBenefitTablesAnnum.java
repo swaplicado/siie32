@@ -23,7 +23,7 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
     protected int mnPkBenefitTypeId;
     protected int mnPkAnnumId;
     protected int mnBenefitDays;
-    protected double mdBenefitBonusPercentage;
+    protected double mdBenefitBonusPct;
     protected int mnFkBenefitId;
     protected int mnFkUserId;
     protected Date mtTsUser;
@@ -36,7 +36,7 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
     public void setPkBenefitTypeId(int n) { mnPkBenefitTypeId = n; }
     public void setPkAnnumId(int n) { mnPkAnnumId = n; }
     public void setBenefitDays(int n) { mnBenefitDays = n; }
-    public void setBenefitBonusPercentage(double d) { mdBenefitBonusPercentage = d; }
+    public void setBenefitBonusPct(double d) { mdBenefitBonusPct = d; }
     public void setFkBenefitId(int n) { mnFkBenefitId = n; }
     public void setFkUserId(int n) { mnFkUserId = n; }
     public void setTsUser(Date t) { mtTsUser = t; }
@@ -45,12 +45,17 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
     public int getPkBenefitTypeId() { return mnPkBenefitTypeId; }
     public int getPkAnnumId() { return mnPkAnnumId; }
     public int getBenefitDays() { return mnBenefitDays; }
-    public double getBenefitBonusPercentage() { return mdBenefitBonusPercentage; }
+    public double getBenefitBonusPct() { return mdBenefitBonusPct; }
     public int getFkBenefitId() { return mnFkBenefitId; }
     public int getFkUserId() { return mnFkUserId; }
     public Date getTsUser() { return mtTsUser; }
     
-    public double getBenefit() {
+    /**
+     * Get normalized benefit.
+     * That is 'benefit days' when type of benefit is 'annual bonus' or 'vacation', and 'benefit bonus percentage' when type of benefit is 'vacation bonus'.
+     * @return Normalized benefit.
+     */
+    public double getNormalizedBenefit() {
         double benefit = 0;
         
         switch (mnPkBenefitTypeId) {
@@ -59,7 +64,7 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
                 benefit = mnBenefitDays;
                 break;
             case SModSysConsts.HRSS_TP_BEN_VAC_BON:
-                benefit = mdBenefitBonusPercentage;
+                benefit = mdBenefitBonusPct;
                 break;
             default:
                 // nothing
@@ -88,7 +93,7 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
         mnPkBenefitTypeId = 0;
         mnPkAnnumId = 0;
         mnBenefitDays = 0;
-        mdBenefitBonusPercentage = 0;
+        mdBenefitBonusPct = 0;
         mnFkBenefitId = 0;
         mnFkUserId = 0;
         mtTsUser = null;
@@ -148,7 +153,7 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
             mnPkBenefitTypeId = resultSet.getInt("id_tp_ben");
             mnPkAnnumId = resultSet.getInt("id_ann");
             mnBenefitDays = resultSet.getInt("ben_day");
-            mdBenefitBonusPercentage = resultSet.getDouble("ben_bon_per");
+            mdBenefitBonusPct = resultSet.getDouble("ben_bon_per");
             mnFkBenefitId = resultSet.getInt("fk_ben");
             mnFkUserId = resultSet.getInt("fk_usr");
             mtTsUser = resultSet.getTimestamp("ts_usr");
@@ -173,7 +178,7 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
                     mnPkBenefitTypeId + ", " + 
                     mnPkAnnumId + ", " + 
                     mnBenefitDays + ", " + 
-                    mdBenefitBonusPercentage + ", " + 
+                    mdBenefitBonusPct + ", " + 
                     mnFkBenefitId + ", " + 
                     mnFkUserId + ", " + 
                     "NOW()" + " " + 
@@ -196,7 +201,7 @@ public class SDbEmployeeBenefitTablesAnnum extends SDbRegistryUser {
         registry.setPkBenefitTypeId(this.getPkBenefitTypeId());
         registry.setPkAnnumId(this.getPkAnnumId());
         registry.setBenefitDays(this.getBenefitDays());
-        registry.setBenefitBonusPercentage(this.getBenefitBonusPercentage());
+        registry.setBenefitBonusPct(this.getBenefitBonusPct());
         registry.setFkBenefitId(this.getFkBenefitId());
         registry.setFkUserId(this.getFkUserId());
         registry.setTsUser(this.getTsUser());

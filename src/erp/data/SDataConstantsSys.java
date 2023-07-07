@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  * 
  */
 public abstract class SDataConstantsSys {
@@ -354,6 +354,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_PAY_OC = 109007;
     public static final int PRV_HRS_PAY_WEE = 109011;
     public static final int PRV_HRS_PAY_FOR = 109012;
+    public static final int PRV_HRS_ABS = 109016;
     public static final int PRV_HRS_AUX_HRS = 109021;
     public static final int PRV_HRS_EMP_PERS_DATA = 109091;
     public static final int PRV_HRS_EMP_VARIABLE_EARNINGS = 109092;

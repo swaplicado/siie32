@@ -5,6 +5,7 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.utils.SAnniversary;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -27,16 +28,18 @@ public class SHrsReceipt {
 
     private SHrsPayroll moHrsPayroll;
     private SHrsEmployee moHrsEmployee;
+    private SHrsBenefitsManager moHrsBenefitsManager;
     private SDbPayrollReceipt moPayrollReceipt;
     private final ArrayList<SDbAbsenceConsumption> maAbsenceConsumptions;
     private final ArrayList<SHrsReceiptEarning> maHrsReceiptEarnings;
     private final ArrayList<SHrsReceiptDeduction> maHrsReceiptDeductions;
     private final ArrayList<SHrsBenefit> maHrsBenefits;
-    private ArrayList<SDbAbsence> absencesFromClock;
+    private ArrayList<SDbAbsence> maAbsencesFromClock;
 
-    public SHrsReceipt() {
-        moHrsPayroll = null;
+    public SHrsReceipt(final SHrsPayroll hrsPayroll) {
+        moHrsPayroll = hrsPayroll;
         moHrsEmployee = null;
+        moHrsBenefitsManager = null;
         moPayrollReceipt = null;
         maAbsenceConsumptions = new ArrayList<>();
         maHrsReceiptEarnings = new ArrayList<>();
@@ -47,6 +50,15 @@ public class SHrsReceipt {
     /*
      * Private methods
      */
+
+    /**
+     * Initialize, if not already instantiated, benefits manager for current employee, if any.
+     */
+    private void initHrsBenefitsManager() throws Exception {
+        if (moHrsBenefitsManager == null && moHrsEmployee != null) {
+            moHrsBenefitsManager = new SHrsBenefitsManager(moHrsPayroll.getHrsPayrollDataProvider().getSession(), moHrsEmployee.getEmployee().getPkEmployeeId(), moHrsPayroll.getPayroll().getPkPayrollId());
+        }
+    }
 
     /**
      * Compute all earnings of this receipt.
@@ -121,29 +133,27 @@ public class SHrsReceipt {
                         // estimate exemption proposed and exemption limit:
                         if (moPayrollReceipt.getEffectiveSalary(payroll.isFortnightStandard()) <= payroll.getMwzWage()) { // salary cannot never be less than minimum wage, but just in case
                             exemption = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzPercentage() * payrollReceiptEarning.getAmount_r());
-                            exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzLimit() * payroll.getUmaAmount()); // formerly minimum wage was used
+                            exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzLimit() * payroll.getUmaAmount()); // formerly minimum wage was used, now UMA
                         }
                         else {
                             exemption = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzPercentage() * payrollReceiptEarning.getAmount_r());
-                            exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzLimit() * payroll.getUmaAmount()); // formerly minimum wage was used
+                            exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzLimit() * payroll.getUmaAmount()); // formerly minimum wage was used, now UMA
                         }
                         break;
 
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL: // Minimum Wage Global
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_EVT: // Minimum Wage Event
                         // estimate exemption proposed and exemption limit:
-                        exemption = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount()); // formerly minimum wage was used
+                        exemption = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount()); // formerly minimum wage was used, now UMA
                         exemptionLimit = exemption;
                         break;
 
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_SEN: // Minimum Wage Seniority
                         // compute exact seniority:
-                        int years = moHrsEmployee.getSeniority();
-                        int yearDays = (int) SLibTimeUtils.getDaysDiff(payroll.getDateEnd(), SLibTimeUtils.addDate(moHrsEmployee.getEmployee().getDateBenefits(), years, 0, 0));
-                        double seniority = (double) years + ((double) yearDays / SHrsConsts.YEAR_DAYS);
+                        SAnniversary anniversary = moHrsEmployee.getEmployee().createAnniversary(payroll.getDateEnd());
 
                         // estimate exemption proposed and exemption limit:
-                        exemption = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount() * seniority); // formerly minimum wage was used
+                        exemption = SLibUtils.roundAmount(earning.getExemptionMwz() * payroll.getUmaAmount() * anniversary.getElapsedYearsPlusPartForBenefits()); // formerly minimum wage was used, now UMA
                         exemptionLimit = exemption;
                         break;
 
@@ -371,11 +381,11 @@ public class SHrsReceipt {
         if (computeTax) {
             // Validate configuration of deduction for tax:
 
-            if (moHrsPayroll.getConfig().getFkDeductionTaxId_n() == 0) {
+            if (moHrsPayroll.getModuleConfig().getFkDeductionTaxId_n() == 0) {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Deducción de impuesto)");
             }
 
-            deductionTax = moHrsPayroll.getDeduction(moHrsPayroll.getConfig().getFkDeductionTaxId_n());
+            deductionTax = moHrsPayroll.getDeduction(moHrsPayroll.getModuleConfig().getFkDeductionTaxId_n());
             if (deductionTax == null) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Deducción de impuesto)");
             }
@@ -395,11 +405,11 @@ public class SHrsReceipt {
 
             // Validate configuration of earning for subsidy:
 
-            if (moHrsPayroll.getConfig().getFkEarningTaxSubsidyId_n() == 0) {
+            if (moHrsPayroll.getModuleConfig().getFkEarningTaxSubsidyId_n() == 0) {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Percepción de subsidio para el empleo)");
             }
 
-            earningSubsidy = moHrsPayroll.getEarning(moHrsPayroll.getConfig().getFkEarningTaxSubsidyId_n());
+            earningSubsidy = moHrsPayroll.getEarning(moHrsPayroll.getModuleConfig().getFkEarningTaxSubsidyId_n());
             if (earningSubsidy == null) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Percepción de subsidio para el empleo)");
             }
@@ -419,11 +429,11 @@ public class SHrsReceipt {
 
             // Validate configuration of earning for compensated subsidy:
 
-            if (moHrsPayroll.getConfig().getFkEarningTaxSubsidyCompensatedId_n() == 0) {
+            if (moHrsPayroll.getModuleConfig().getFkEarningTaxSubsidyCompensatedId_n() == 0) {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Percepción de subsidio para el empleo compensado)");
             }
 
-            earningSubsidyOtherPayment = moHrsPayroll.getEarning(moHrsPayroll.getConfig().getFkEarningTaxSubsidyCompensatedId_n());
+            earningSubsidyOtherPayment = moHrsPayroll.getEarning(moHrsPayroll.getModuleConfig().getFkEarningTaxSubsidyCompensatedId_n());
             if (earningSubsidyOtherPayment == null) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Percepción de subsidio para el empleo compensado)");
             }
@@ -591,7 +601,7 @@ public class SHrsReceipt {
         
         // Prepare net tax: if positive = tax; if negative = subsidy:
         
-        boolean isTaxNet = moHrsPayroll.getConfig().isTaxNet(); // convenience variable
+        boolean isTaxNet = moHrsPayroll.getModuleConfig().isTaxNet(); // convenience variable
         double taxNet = isTaxNet ? SLibUtils.roundAmount(payrollTaxAssessed - payrollSubsidyAssessed) : 0;
         
         // Prepare removal or update of previous tax receipt deduction, if any:
@@ -612,7 +622,7 @@ public class SHrsReceipt {
                 // prepare for update or removal of existing tax deduction:
                 hrsReceiptDeductionTaxOld = hrsReceiptDeduction;
                 
-                if (payrollReceiptDeduction.isUserEdited() || !payrollReceiptDeduction.isAutomatic() || payrollReceiptDeduction.getFkDeductionId() != moHrsPayroll.getConfig().getFkDeductionTaxId_n()) {
+                if (payrollReceiptDeduction.isUserEdited() || !payrollReceiptDeduction.isAutomatic() || payrollReceiptDeduction.getFkDeductionId() != moHrsPayroll.getModuleConfig().getFkDeductionTaxId_n()) {
                     // user edited tax:
                     isUserTax = true;
                     userTax = payrollReceiptDeduction.getAmount_r();
@@ -831,11 +841,11 @@ public class SHrsReceipt {
         if (payroll.isSsContribution() && !moPayrollReceipt.isAssimilated()) {  // assimilables are not elegible for SS contribution
             // Validate configuration of SS contribution:
 
-            if (moHrsPayroll.getConfig().getFkDeductionSsContributionId_n() == 0) {
+            if (moHrsPayroll.getModuleConfig().getFkDeductionSsContributionId_n() == 0) {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de retención de SS)");
             }
 
-            SDbDeduction deductionSsc = moHrsPayroll.getDeduction(moHrsPayroll.getConfig().getFkDeductionSsContributionId_n());
+            SDbDeduction deductionSsc = moHrsPayroll.getDeduction(moHrsPayroll.getModuleConfig().getFkDeductionSsContributionId_n());
             if (deductionSsc == null) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Configuración de retención de SS)");
             }
@@ -991,19 +1001,20 @@ public class SHrsReceipt {
      * Public methods
      */
 
-    public void setHrsPayroll(SHrsPayroll o) { moHrsPayroll = o; }
     public void setHrsEmployee(SHrsEmployee o) { moHrsEmployee = o; }
+    public void setHrsBenefitsManager(SHrsBenefitsManager o) { moHrsBenefitsManager = o; }
     public void setPayrollReceipt(SDbPayrollReceipt o)  { moPayrollReceipt = o; }
-    public void setAbsencesFromClock(ArrayList<SDbAbsence> absencesFromClock) { this.absencesFromClock = absencesFromClock;}
+    public void setAbsencesFromClock(ArrayList<SDbAbsence> absencesFromClock) { maAbsencesFromClock = absencesFromClock;}
 
     public SHrsPayroll getHrsPayroll() { return moHrsPayroll; }
     public SHrsEmployee getHrsEmployee() { return moHrsEmployee; }
+    public SHrsBenefitsManager getHrsBenefitsManager() { try { initHrsBenefitsManager(); } catch (Exception e) { SLibUtils.printException(this, e); } return moHrsBenefitsManager; }
     public SDbPayrollReceipt getPayrollReceipt()  { return moPayrollReceipt; }
     public ArrayList<SDbAbsenceConsumption> getAbsenceConsumptions() { return maAbsenceConsumptions; }
     public ArrayList<SHrsReceiptEarning> getHrsReceiptEarnings() { return maHrsReceiptEarnings; }
     public ArrayList<SHrsReceiptDeduction> getHrsReceiptDeductions() { return maHrsReceiptDeductions; }
     public ArrayList<SHrsBenefit> getHrsBenefits() { return maHrsBenefits; }
-    public ArrayList<SDbAbsence> getAbsencesFromClock() { return absencesFromClock; }
+    public ArrayList<SDbAbsence> getAbsencesFromClock() { return maAbsencesFromClock; }
 
     @SuppressWarnings("unchecked")
     public void renumberHrsReceiptEarnings() {
@@ -1265,35 +1276,35 @@ public class SHrsReceipt {
         return totalDeductions;
     }
     
-    public double getBenefitValue(final int benefitType, final int benefitAnn, final int benefitYear) {
+    public double getBenefitValue(final int benefitType, final int benefitAnniversary, final int benefitYear) {
         double value = 0;
-
+        
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-            if (SLibUtils.compareKeys(new int[] { benefitType, benefitAnn, benefitYear }, new int[] { hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId(), 
+            if (SLibUtils.compareKeys(new int[] { benefitType, benefitAnniversary, benefitYear }, new int[] { hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId(), 
                 hrsReceiptEarning.getPayrollReceiptEarning().getBenefitsAnniversary(), hrsReceiptEarning.getPayrollReceiptEarning().getBenefitsYear() })) {
                 value += hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged();
             }
         }
-
+        
         return value;
     }
     
-    public double getBenefitAmount(final int benefitType, final int benefitAnn, final int benefitYear) {
+    public double getBenefitAmount(final int benefitType, final int benefitAnniversary, final int benefitYear) {
         double amount = 0;
-
+        
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-            if (SLibUtils.compareKeys(new int[] { benefitType, benefitAnn, benefitYear }, new int[] { hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId(), 
+            if (SLibUtils.compareKeys(new int[] { benefitType, benefitAnniversary, benefitYear }, new int[] { hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId(), 
                 hrsReceiptEarning.getPayrollReceiptEarning().getBenefitsAnniversary(), hrsReceiptEarning.getPayrollReceiptEarning().getBenefitsYear() })) {
                 amount += hrsReceiptEarning.getPayrollReceiptEarning().getAmount_r();
             }
         }
-
+        
         return amount;
     }
     
-    public double calculateBenefit(final SDbEarning earningBenefit, SHrsEmployeeDays hrsEmployeeDays, final double days, final double percentage) {
-        double units = hrsEmployeeDays.computeEarningUnits(days, earningBenefit);
-        return SLibUtils.roundAmount(units * moPayrollReceipt.getPaymentDaily() * (earningBenefit.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? percentage : 1d));
+    public double calculateBenefit(final SDbEarning benefitEarning, SHrsEmployeeDays hrsEmployeeDays, final double benefitDays, final double vacationBonusPct) {
+        double units = hrsEmployeeDays.computeEarningUnits(benefitDays, benefitEarning);
+        return SLibUtils.roundAmount(units * moPayrollReceipt.getPaymentDaily() * (benefitEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? vacationBonusPct : 1d));
     }
     
     public SDbAbsenceConsumption createAbsenceConsumption(final SDbAbsence absence, final Date dateStart, final Date dateEnd, final int effectiveDays) throws Exception {
@@ -1302,7 +1313,7 @@ public class SHrsReceipt {
         }
         
         SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
-
+        
         absenceConsumption.setPkEmployeeId(absence.getPkEmployeeId());
         absenceConsumption.setPkAbsenceId(absence.getPkAbsenceId());
         absenceConsumption.setPkConsumptionId(absence.getActualNextConsumptionId(moHrsEmployee));
@@ -1495,7 +1506,7 @@ public class SHrsReceipt {
         
         boolean found = false;
         double daysToBePaid = 0;
-        SDbEarning earningNormal = moHrsPayroll.getEarning(moHrsPayroll.getConfig().getFkEarningEarningId_n());
+        SDbEarning earningNormal = moHrsPayroll.getEarning(moHrsPayroll.getModuleConfig().getFkEarningEarningId_n());
         
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
             // locate earning of ordinary wages and salaries, and compute days to be paid:
@@ -1671,10 +1682,10 @@ public class SHrsReceipt {
     }
     
     public SHrsReceipt clone() throws CloneNotSupportedException {
-       SHrsReceipt clone = new SHrsReceipt();
+       SHrsReceipt clone = new SHrsReceipt(this.getHrsPayroll());
 
-       clone.setHrsPayroll(this.getHrsPayroll());
-       clone.setHrsEmployee(this.getHrsEmployee());
+       clone.setHrsEmployee(this.getHrsEmployee()); // same instance, don't clone
+       clone.setHrsBenefitsManager(this.getHrsBenefitsManager()); // same instance, don't clone
        clone.setPayrollReceipt(this.getPayrollReceipt().clone());
 
        for (SDbAbsenceConsumption absenceConsumption : this.getAbsenceConsumptions()) {
@@ -1702,7 +1713,6 @@ public class SHrsReceipt {
        }
 
        clone.getHrsPayroll().replaceHrsReceipt(clone, false);
-       clone.getHrsEmployee().setHrsReceipt(clone);
 
        return clone;
     }

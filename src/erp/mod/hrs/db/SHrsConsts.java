@@ -85,6 +85,11 @@ public class SHrsConsts {
     public static final int PPAYROLL_POL_LIMITED_DATA = 2;
     public static final int PPAYROLL_POL_OTHER_DATA = 3;
     
+    /** Cómputo de prestaciones: por año calendario. */
+    public static final int BEN_COMP_CALENDAR_YEAR = 1;
+    /** Cómputo de prestaciones: por aniversario. */
+    public static final int BEN_COMP_ANNIVERSARY = 2;
+    
     public static final String TXT_ACTIVE_NO = "Inactivo";
     public static final String TXT_ACTIVE_YES = "Activo";
     public static final String TXT_INDISTINCT = "Indistinto";

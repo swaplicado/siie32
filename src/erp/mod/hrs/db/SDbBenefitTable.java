@@ -124,7 +124,7 @@ public class SDbBenefitTable extends SDbRegistryUser {
                 benefitAnnum.setPkBenefitTypeId(mnFkBenefitTypeId);
                 benefitAnnum.setPkAnnumId(curAnnum);
                 benefitAnnum.setBenefitDays(row.getBenefitDays());
-                benefitAnnum.setBenefitBonusPercentage(row.getBenefitBonusPercentage());
+                benefitAnnum.setBenefitBonusPct(row.getBenefitBonusPercentage());
                 benefitAnnum.setFkBenefitId(mnPkBenefitId);
                 //benefitAnnum.setFkUserId(...);
                 //benefitAnnum.setTsUser(...);

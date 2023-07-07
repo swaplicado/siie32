@@ -37,7 +37,7 @@ public class SRowBenefitTablesMassiveAssignation implements SGridRow {
         mnBenefitType = benefitType;
         mnUpdateMode = updateMode;
         moEmployee = employee;
-        moCurrentBenefitTables = SHrsBenefitTablesUtils.getCurrentBenefitTables(session, employee.getPkEmployeeId());
+        moCurrentBenefitTables = SHrsBenefitUtils.getCurrentBenefitTables(session, employee.getPkEmployeeId());
         moAnniversary = moEmployee.createAnniversary(today);
     }
     
@@ -54,7 +54,7 @@ public class SRowBenefitTablesMassiveAssignation implements SGridRow {
     }
     
     public int getAssignationAnniversary() {
-        return mnUpdateMode == UPDATE_MODE_BENEFITS ? 1 : moAnniversary.getEligibleAnniversary();
+        return mnUpdateMode == UPDATE_MODE_BENEFITS ? 1 : moAnniversary.getCurrentAnniversary();
     }
 
     @Override
@@ -110,11 +110,11 @@ public class SRowBenefitTablesMassiveAssignation implements SGridRow {
                 break;
                 
             case 3:
-                value = moAnniversary.getAnniversaryCurr().toDate();
+                value = moAnniversary.getCurrentAnniversaryDate().toDate();
                 break;
                 
             case 4:
-                value = moAnniversary.isAnniversaryCurrTurned();
+                value = moAnniversary.isCurrentAnniversaryTurned();
                 break;
                 
             case 5:
@@ -122,15 +122,15 @@ public class SRowBenefitTablesMassiveAssignation implements SGridRow {
                 break;
                 
             case 6:
-                value = moAnniversary.getElapsedDaysForBenefits();
+                value = moAnniversary.getElapsedYearDaysForBenefits();
                 break;
                 
             case 7:
-                value = moAnniversary.getOngoingAnniversary();
+                value = moAnniversary.getCurrentAnniversary();
                 break;
                 
             case 8:
-                value = moAnniversary.getOngoingAnniversaryPropForBenefits();
+                value = moAnniversary.getCurrentAnniversaryPropPartForBenefits();
                 break;
                 
             case 9:

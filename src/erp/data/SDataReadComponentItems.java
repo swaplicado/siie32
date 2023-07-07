@@ -18,7 +18,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín, Edwin Carmona
+ * @author Sergio Flores, Claudio Peña, Isabel Servín, Edwin Carmona, Sergio Flores
  */
 public abstract class SDataReadComponentItems {
 
@@ -537,7 +537,7 @@ public abstract class SDataReadComponentItems {
                         "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CDR + " " +
                         "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp AND e.b_mfg_ope " +
                         "INNER JOIN hrs_emp_member AS em ON e.id_emp = em.id_emp " +
-                        "WHERE e.b_act AND NOT e.b_del AND NOT b.b_del " +
+                        "WHERE e.b_act AND NOT e.b_del AND NOT bp.b_del " +
                         "ORDER BY bp.bp, bp.id_bp ";
                 text = "operador";
                 break;

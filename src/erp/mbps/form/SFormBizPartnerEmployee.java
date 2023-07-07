@@ -36,7 +36,7 @@ import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbEmployeeBenefitTables;
 import erp.mod.hrs.db.SDbEmployeeBenefitTablesAnnum;
 import erp.mod.hrs.db.SDbEmployeeWageFactorAnnum;
-import erp.mod.hrs.db.SHrsBenefitTablesUtils;
+import erp.mod.hrs.db.SHrsBenefitUtils;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEmployeeUtils;
 import erp.mod.hrs.db.SHrsUtils;
@@ -1361,7 +1361,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkCatalogueBloodTypeTypeId.setText("Grupo sanguíneo:*");
+        jlFkCatalogueBloodTypeTypeId.setText("Tipo sangre:*");
         jlFkCatalogueBloodTypeTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jlFkCatalogueBloodTypeTypeId);
 
@@ -1677,6 +1677,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfBenEmpNumber.setEditable(false);
         jtfBenEmpNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfBenEmpNumber.setText("TEXT");
+        jtfBenEmpNumber.setToolTipText("Número empleado");
         jtfBenEmpNumber.setFocusable(false);
         jtfBenEmpNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jpBenefitsEmployee1.add(jtfBenEmpNumber);
@@ -2165,6 +2166,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfFacEmpNumber.setEditable(false);
         jtfFacEmpNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfFacEmpNumber.setText("TEXT");
+        jtfFacEmpNumber.setToolTipText("Número empleado");
         jtfFacEmpNumber.setFocusable(false);
         jtfFacEmpNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jpWageFactorsEmployee1.add(jtfFacEmpNumber);
@@ -2994,7 +2996,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             
             if (moEmployeeBenefitTables != null) {
                 try {
-                    int yearBenefits = SLibTimeUtils.digestYear(moEmployee.getDateBenefits())[0];
+                    int yearBenefits = moEmployee.getBenefitsYear();
                     HashMap<Integer, String> benefitNames = new HashMap<>();
                     HashMap<Integer, String> userNames = new HashMap<>();
                     ArrayList<SDbEmployeeBenefitTablesAnnum> annums = moEmployeeBenefitTables.getBenefitAnnums(null, benefitType);
@@ -3015,7 +3017,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         pane.addTableRow(new SRowEmployeeBenefit(
                                 annum.getPkAnnumId(),
                                 yearBenefits + (annum.getPkAnnumId() - 1),
-                                annum.getBenefit(),
+                                annum.getNormalizedBenefit(),
                                 annum.getFkBenefitId(),
                                 benefitName,
                                 annum.getFkUserId(),
@@ -3037,7 +3039,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moWageFactorsPane.clearTableRows();
         
         if (moEmployeeBenefitTables != null) {
-            int yearBenefits = SLibTimeUtils.digestYear(moEmployee.getDateBenefits())[0];
+            int yearBenefits = moEmployee.getBenefitsYear();
             HashMap<Integer, String> userNames = new HashMap<>();
             
             for (SDbEmployeeWageFactorAnnum factor : moEmployeeBenefitTables.getChildWageFactors()) {
@@ -3051,7 +3053,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         factor.getPkAnnumId(),
                         yearBenefits + (factor.getPkAnnumId() - 1),
                         factor.getVacationDays(),
-                        factor.getVacationBonusPercentage(),
+                        factor.getVacationBonusPct(),
                         factor.getAnnualBonusDays(),
                         factor.getFkUserId(),
                         userName,
@@ -3064,7 +3066,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     }
 
     private void renderBenefitsAndWageFactors() {
-        for (int benefitType : SHrsBenefitTablesUtils.createBenefitTypes()) {
+        for (int benefitType : SHrsBenefitUtils.createBenefitTypes()) {
             restoreBenTableLastSettings(benefitType);
             renderBenefits(benefitType);
         }
@@ -3390,8 +3392,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + SGuiUtils.getLabelName(jlVacTable) + "'."); // note that all these set of labels have the same text!
             fieldBenTable.getComponent().requestFocusInWindow();
         }
-        else if ((int) jAnniversary.getValue() < 1 || (int) jAnniversary.getValue() > SDbEmployeeBenefitTables.ANNUMS) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + SGuiUtils.getLabelName(jlVacSeniorityStart) + "': de 1 a " + SDbEmployeeBenefitTables.ANNUMS + "."); // note that all these set of labels have the same text!
+        else if ((int) jAnniversary.getValue() < 1 || (int) jAnniversary.getValue() > SDbEmployeeBenefitTables.MAX_ANNUMS) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + SGuiUtils.getLabelName(jlVacSeniorityStart) + "': de 1 a " + SDbEmployeeBenefitTables.MAX_ANNUMS + "."); // note that all these set of labels have the same text!
             jAnniversary.requestFocusInWindow();
         }
         else if (isFirstTimeUpdate && (int) jAnniversary.getValue() != 1) {
@@ -3673,8 +3675,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jBenefitsDate.setText(SLibUtils.DateFormatDate.format(benefits));
         jCutOffDate.setText(SLibUtils.DateFormatDate.format(miClient.getSession().getSystemDate()));
         jSeniorityYears.setText("" + anniversary.getElapsedYears());
-        jSeniorityDays.setText("" + anniversary.getElapsedDaysForBenefits());
-        jSeniorityProp.setText(SLibUtils.DecimalFormatValue8D.format(anniversary.getOngoingAnniversaryPropForBenefits()));
+        jSeniorityDays.setText("" + anniversary.getElapsedYearDaysForBenefits());
+        jSeniorityProp.setText(SLibUtils.DecimalFormatValue8D.format(anniversary.getCurrentAnniversaryPropPartForBenefits()));
         
         jEmpName.setCaretPosition(0);
         jEmpNumber.setCaretPosition(0);
@@ -4666,7 +4668,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         // Benefit tables of employee:
         
         try {
-            moEmployeeBenefitTables = SHrsBenefitTablesUtils.getCurrentBenefitTables(((SGuiClient) miClient).getSession(), moEmployee.getPkEmployeeId());
+            moEmployeeBenefitTables = SHrsBenefitUtils.getCurrentBenefitTables(((SGuiClient) miClient).getSession(), moEmployee.getPkEmployeeId());
             renderBenefitsAndWageFactors();
         }
         catch (Exception e) {

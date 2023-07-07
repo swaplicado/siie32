@@ -9611,7 +9611,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
         moFieldFkDpsNatureId.setFieldValue(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
         if (!isApplingFunctionalAreas()) {
-            moFieldFkFunctionalAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NON });
+            moFieldFkFunctionalAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NA });
         }
         else if ((jcbFkFunctionalAreaId.getItemCount() - 1) == 1) {
             jcbFkFunctionalAreaId.setSelectedIndex(1);
@@ -10810,7 +10810,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //moDps.setFkSalesAgentBizPartnerId_n(...
 
             moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
-            moDps.setFkFunctionalAreaId(jcbFkFunctionalAreaId.getSelectedIndex() > 0 ? moFieldFkFunctionalAreaId.getKeyAsIntArray()[0] : SModSysConsts.CFGU_FUNC_NON);
+            moDps.setFkFunctionalAreaId(jcbFkFunctionalAreaId.getSelectedIndex() > 0 ? moFieldFkFunctionalAreaId.getKeyAsIntArray()[0] : SModSysConsts.CFGU_FUNC_NA);
             moDps.setFkDpsNatureId(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
             moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
             moDps.setFkSalesAgentId_n(mnSalesAgentId_n);
