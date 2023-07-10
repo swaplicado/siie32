@@ -836,11 +836,11 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         
         for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
             BigDecimal bd = new BigDecimal(String.valueOf(payTax.getBase()));
-            BigDecimal rounded = bd.setScale(2,RoundingMode.FLOOR);
+            BigDecimal rounded = bd.setScale(2,RoundingMode.HALF_UP);
             payTax.setBase(rounded.doubleValue());
             
             bd = new BigDecimal(String.valueOf(payTax.getTax()));
-            rounded = bd.setScale(2,RoundingMode.FLOOR);
+            rounded = bd.setScale(2,RoundingMode.HALF_UP);
             payTax.setTax(rounded.doubleValue());
         }
         
