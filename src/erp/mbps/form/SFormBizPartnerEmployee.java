@@ -2996,7 +2996,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             
             if (moEmployeeBenefitTables != null) {
                 try {
-                    int yearBenefits = moEmployee.getBenefitsYear();
+                    int yearBenefits = SLibTimeUtils.digestYear(moFieldDateBenefits.getDate())[0];
                     HashMap<Integer, String> benefitNames = new HashMap<>();
                     HashMap<Integer, String> userNames = new HashMap<>();
                     ArrayList<SDbEmployeeBenefitTablesAnnum> annums = moEmployeeBenefitTables.getBenefitAnnums(null, benefitType);
@@ -3039,7 +3039,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moWageFactorsPane.clearTableRows();
         
         if (moEmployeeBenefitTables != null) {
-            int yearBenefits = moEmployee.getBenefitsYear();
+            int yearBenefits = SLibTimeUtils.digestYear(moFieldDateBenefits.getDate())[0];
             HashMap<Integer, String> userNames = new HashMap<>();
             
             for (SDbEmployeeWageFactorAnnum factor : moEmployeeBenefitTables.getChildWageFactors()) {
@@ -3368,18 +3368,30 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     }
     
     private void computeBenModify(final int benefitType, final SFormField fieldBenTable, final JSpinner jAnniversary, final JButton jModify, final JButton jUpdate, final JButton jCancel, final boolean focusRequired) {
-        fieldBenTable.getComponent().setEnabled(true);
-        jAnniversary.setEnabled(true);
+        if (moFieldDateBenefits.getDate() == null) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + SGuiUtils.getLabelName(jlDateBenefits) + "'.");
+            jTabbedPane.setSelectedIndex(TAB_DATA_EMP);
+            jftDateBenefits.requestFocusInWindow();
+        }
+        else if (jcbFkPaymentType.getSelectedIndex() <= 0) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + SGuiUtils.getLabelName(jlFkPaymentType) + "'.");
+            jTabbedPane.setSelectedIndex(TAB_DATA_EMP);
+            jcbFkPaymentType.requestFocusInWindow();
+        }
+        else {
+            fieldBenTable.getComponent().setEnabled(true);
+            jAnniversary.setEnabled(moEmployee != null); // new employees cannot choose anniversary
 
-        jbVacModify.setEnabled(false);
-        jbVacBonModify.setEnabled(false);
-        jbAnnBonModify.setEnabled(false);
-        
-        jUpdate.setEnabled(true);
-        jCancel.setEnabled(true);
+            jbVacModify.setEnabled(false);
+            jbVacBonModify.setEnabled(false);
+            jbAnnBonModify.setEnabled(false);
 
-        if (focusRequired) {
-           fieldBenTable.getComponent().requestFocusInWindow();
+            jUpdate.setEnabled(true);
+            jCancel.setEnabled(true);
+
+            if (focusRequired) {
+               fieldBenTable.getComponent().requestFocusInWindow();
+            }
         }
     }
 
@@ -4103,6 +4115,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moBizPartner = null;
         moBizPartnerBranch = null;
         moEmployee = null;
+        moEmployeeBenefitTables = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();

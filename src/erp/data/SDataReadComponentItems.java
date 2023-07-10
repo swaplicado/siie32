@@ -1896,7 +1896,7 @@ public abstract class SDataReadComponentItems {
                 lenPk = 1;
                 sql = "SELECT id_tp_pay AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " WHERE b_del = 0 ORDER BY sort ";
-                text = "periodo pago";
+                text = "período pago";
                 break;
             case SModConsts.HRSS_TP_SAL:
                 lenPk = 1;
