@@ -107,15 +107,16 @@ public class SDialogAuthorizationCardex extends SBeanFormDialog implements ListS
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Nivel", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Requerido", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Usuario", 150));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Autorizado", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha autorización", 125));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Usuario autorización", 150));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Rechazado", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha rechazo", 125));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Usuario", 150));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 250));
 
                 return gridColumnsForm;

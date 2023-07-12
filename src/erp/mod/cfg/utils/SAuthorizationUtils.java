@@ -8,6 +8,7 @@ package erp.mod.cfg.utils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -288,6 +290,7 @@ public class SAuthorizationUtils {
      * @param authorizationType
      * @param pk
      * @param userId
+     * @param reasonRej
      * 
      * @return 
      */
@@ -405,6 +408,8 @@ public class SAuthorizationUtils {
                 oStep.setComments("");
                 
                 oStep.save(session);
+                
+                SAuthorizationUtils.doAfterAuthorization(session, oStep);
         }
         catch (Exception ex) {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
@@ -506,8 +511,7 @@ public class SAuthorizationUtils {
                 for (SDbAuthorizationPath oCfg : lCfgs) {
                     if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglón de autorización
-                        SDbAuthorizationStep oStep = SAuthorizationUtils.createStepFromCfg(oCfg, pk);
-                        lSteps.add(oStep);
+                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
                     }
                 }
                 break;
@@ -515,9 +519,8 @@ public class SAuthorizationUtils {
                 condPk = "id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " ";
                 for (SDbAuthorizationPath oCfg : lCfgs) {
                     if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
-                        // Crear renglón de autorización
-                        SDbAuthorizationStep oStep = SAuthorizationUtils.createStepFromCfg(oCfg, pk);
-                        lSteps.add(oStep);
+                        // Crear renglones de autorización
+                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
                     }
                 }
                 break;
@@ -542,6 +545,8 @@ public class SAuthorizationUtils {
         String sql = "SELECT id_authorn_path "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_PATH) + " "
                 + "WHERE NOT b_del AND fk_tp_authorn = " + authorizationType + " "
+                + "AND (('" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' BETWEEN dt_sta AND dt_end_n) OR "
+                + "(dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' AND dt_end_n IS NULL)) "
                 + "ORDER BY lev ASC;";
         
         try {
@@ -639,47 +644,62 @@ public class SAuthorizationUtils {
      * 
      * @return 
      */
-    private static SDbAuthorizationStep createStepFromCfg(SDbAuthorizationPath oCfg, final Object pk) {
-        SDbAuthorizationStep oStep = new SDbAuthorizationStep();
-        
-        oStep.setResourcePkNum1_n(0);
-        oStep.setResourcePkNum2_n(0);
-        oStep.setResourcePkNum3_n(0);
-        oStep.setResourcePkNum4_n(0);
-        oStep.setResourcePkNum5_n(0);
-                
-        switch(oCfg.getFkAuthorizationTypeId()) {
-            case AUTH_TYPE_MAT_REQUEST:
-                oStep.setResourceTableName_n("trn_mat_req");
-                oStep.setResourcePkNum1_n(((int[]) pk)[0]);
-                oStep.setResourcePkLength(1);
-                break;
-            case AUTH_TYPE_DPS:
-                oStep.setResourceTableName_n("trn_dps");
-                oStep.setResourcePkNum1_n(((int[]) pk)[0]);
-                oStep.setResourcePkNum2_n(((int[]) pk)[1]);
-                oStep.setResourcePkLength(2);
-                break;
-            default:
-                return null;
+    private static ArrayList<SDbAuthorizationStep> createStepFromCfg(Connection connection, SDbAuthorizationPath oCfg, final Object pk) {
+        ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
+        ArrayList<Integer> lUsers = SAuthorizationUtils.getUsersOfAutorizationNode(connection, oCfg.getFkNodeAuthorizationId());
+        int nGroup = 0;
+        if (oCfg.isNodeAll() || lUsers.size() > 1) {
+            nGroup = SAuthorizationUtils.getNewAuthorizationGrouper(connection);
         }
         
-        oStep.setUserLevel(oCfg.getUserLevel());
-        oStep.setDateTimeAuthorized_n(null);
-        oStep.setDateTimeRejected_n(null);
-        oStep.setComments("");
-        oStep.setAuthorized(false);
-        oStep.setRejected(false);
-        oStep.setRequired(oCfg.isRequired());
-        oStep.setDeleted(false);
-        oStep.setSystem(false);
-        oStep.setFkAuthorizationTypeId(oCfg.getFkAuthorizationTypeId());
-        oStep.setFkAuthorizationPathId_n(oCfg.getPkAuthorizationPathId());
-        oStep.setFkUserStepId(oCfg.getFkUserAuthorizationId());
-        oStep.setFkUserAuthorizationId_n(0);
-        oStep.setFkUserRejectId_n(0);
-                
-        return oStep;
+        for (Integer userId : lUsers) {
+            SDbAuthorizationStep oStep = new SDbAuthorizationStep();
+
+            oStep.setResourcePkNum1_n(0);
+            oStep.setResourcePkNum2_n(0);
+            oStep.setResourcePkNum3_n(0);
+            oStep.setResourcePkNum4_n(0);
+            oStep.setResourcePkNum5_n(0);
+
+            switch(oCfg.getFkAuthorizationTypeId()) {
+                case AUTH_TYPE_MAT_REQUEST:
+                    oStep.setResourceTableName_n("trn_mat_req");
+                    oStep.setResourcePkNum1_n(((int[]) pk)[0]);
+                    oStep.setResourcePkLength(1);
+                    break;
+                case AUTH_TYPE_DPS:
+                    oStep.setResourceTableName_n("trn_dps");
+                    oStep.setResourcePkNum1_n(((int[]) pk)[0]);
+                    oStep.setResourcePkNum2_n(((int[]) pk)[1]);
+                    oStep.setResourcePkLength(2);
+                    break;
+                default:
+                    return null;
+            }
+
+            oStep.setUserLevel(oCfg.getUserLevel());
+            oStep.setDateTimeAuthorized_n(null);
+            oStep.setDateTimeRejected_n(null);
+            oStep.setComments("");
+            oStep.setAuthorizationGrouper_n(nGroup);
+            oStep.setUserAuthorizationsNode_n(oCfg.getNodeAuthorizationUsers());
+            oStep.setAllUsers(oCfg.isNodeAll());
+            oStep.setAuthorized(false);
+            oStep.setRejected(false);
+            oStep.setRequired(oCfg.isRequired());
+            oStep.setDeleted(false);
+            oStep.setSystem(false);
+            oStep.setFkAuthorizationTypeId(oCfg.getFkAuthorizationTypeId());
+            oStep.setFkAuthorizationPathId_n(oCfg.getPkAuthorizationPathId());
+            oStep.setFkUserStepId(userId);
+            oStep.setFkNodeStepId_n(oCfg.getFkNodeAuthorizationId());
+            oStep.setFkUserAuthorizationId_n(0);
+            oStep.setFkUserRejectId_n(0);
+
+            lSteps.add(oStep);
+        }
+        
+        return lSteps;
     }
     
     /**
@@ -743,7 +763,6 @@ public class SAuthorizationUtils {
                 break;
         }
         
-        
         String sql = "SELECT id_authorn_step "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
                 + "WHERE NOT b_del AND "
@@ -770,6 +789,249 @@ public class SAuthorizationUtils {
         }
         
         return new ArrayList<>();
+    }
+    
+    /**
+     * Obtiene los ID de los usuarios asignados al nodo de autorización recibido.
+     * 
+     * @param connection
+     * @param idNode
+     * 
+     * @return 
+     */
+    public static ArrayList<Integer> getUsersOfAutorizationNode(Connection connection, final int idNode) {
+        String sql = "SELECT canu.id_authorn_user "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_NODE_USR) + " AS canu "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " uu ON canu.id_authorn_user = uu.id_usr "
+                + "WHERE canu.id_authorn_node = " + idNode + " AND NOT canu.b_del AND NOT uu.b_del AND uu.b_act;";
+        
+        ArrayList<Integer> lUsers = new ArrayList<>();
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            while (res.next()) {
+                lUsers.add(res.getInt("id_authorn_user"));
+            }
+            
+            return lUsers;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Obtiene un nuevo agrupador para los pasos que pertenezcan a un mismo nodo de autorización
+     * 
+     * @param connection
+     * @return 
+     */
+    public static int getNewAuthorizationGrouper(Connection connection) {
+        String sql = "SELECT "
+                + "    COALESCE(MAX(authorn_grouper_n), 0) + 1 AS authorn_grouper "
+                + "FROM "
+                + " " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + ";";
+        
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            if (res.next()) {
+                return res.getInt("authorn_grouper");
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return 0;
+    }
+    
+    /**
+     * Obtiene los id de los steps correspondientes al grouper recibido
+     * 
+     * @param connection
+     * @param grouper
+     * @return 
+     */
+    private static ArrayList<Integer> getStepsOfAuthorizationGrouper(Connection connection, final int grouper) {
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                + "WHERE authorn_grouper_n = " + grouper + " AND NOT b_del;";
+        
+        ArrayList<Integer> lStepIds = new ArrayList<>();
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            while (res.next()) {
+                lStepIds.add(res.getInt("id_authorn_step"));
+            }
+            
+            return lStepIds;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Obtiene los id de los steps AUTORIZADOS correspondientes al grouper recibido
+     * 
+     * @param connection
+     * @param grouper
+     * @return 
+     */
+    private static ArrayList<Integer> getStepsAuthorizedOfAuthorizationGrouper(Connection connection, final int grouper) {
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                + "WHERE authorn_grouper_n = " + grouper + " AND NOT b_del AND b_authorn;";
+        
+        ArrayList<Integer> lStepIds = new ArrayList<>();
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            while (res.next()) {
+                lStepIds.add(res.getInt("id_authorn_step"));
+            }
+            
+            return lStepIds;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Obtiene los id de los steps PENDIENTES correspondientes al grouper recibido
+     * 
+     * @param connection
+     * @param grouper
+     * @return 
+     */
+    private static ArrayList<Integer> getStepsPendingOfAuthorizationGrouper(Connection connection, final int grouper) {
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                + "WHERE authorn_grouper_n = " + grouper + " AND NOT b_del AND NOT b_authorn AND NOT b_reject;";
+        
+        ArrayList<Integer> lStepIds = new ArrayList<>();
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            while (res.next()) {
+                lStepIds.add(res.getInt("id_authorn_step"));
+            }
+            
+            return lStepIds;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Determina si los steps del grouper están rechazados.
+     * Con un solo paso rechazado esta función devuelve true
+     * 
+     * @param connection
+     * @param grouper
+     * @return 
+     */
+    private static boolean isRejectOfAuthorizationGrouper(Connection connection, final int grouper) {
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                + "WHERE authorn_grouper_n = " + grouper + " AND NOT b_del AND b_reject;";
+        
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            return res.next();
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Proceso después de la autorización de un paso
+     * 
+     * @param session
+     * @param oStep
+     * @throws Exception 
+     */
+    private static void doAfterAuthorization(SGuiSession session, SDbAuthorizationStep oStep) throws Exception {
+        /**
+         * Si todos los usuarios deben autorizar, no hace nada
+         */
+        if (oStep.isAllUsers()) {
+            return;
+        }
+        /**
+         * Si el step no pertenece a un grupo, no hace nada
+         */
+        if (oStep.getAuthorizationGrouper_n() == 0) {
+            return;
+        }
+        /**
+         * Si un step del grupo está rechazado, no hace nada
+         */
+        if (SAuthorizationUtils.isRejectOfAuthorizationGrouper(session.getDatabase().getConnection(), oStep.getAuthorizationGrouper_n())) {
+            return;
+        }
+        ArrayList<Integer> lStepIds = SAuthorizationUtils.getStepsOfAuthorizationGrouper(session.getDatabase().getConnection(), oStep.getAuthorizationGrouper_n());
+        int nStepsInGrouper = lStepIds.size();
+        /**
+         * Si solo hay un step en el grupo, no hace nada
+         */
+        if (nStepsInGrouper == 1) {
+            return;
+        }
+        /**
+         * Si ya no hay ningún step pendiente de autorizar, no hace nada
+         */
+        ArrayList<Integer> lPendingStepIds = SAuthorizationUtils.getStepsPendingOfAuthorizationGrouper(session.getDatabase().getConnection(), oStep.getAuthorizationGrouper_n());
+        if (lPendingStepIds.isEmpty()) {
+            return;
+        }
+        /**
+         * Autorizar por default los steps pendientes si la configuración no los requiere todos
+         */
+        if (oStep.getUserAuthorizationsNode_n() == 1 || ((nStepsInGrouper - lPendingStepIds.size()) == oStep.getUserAuthorizationsNode_n())) {
+            SDbAuthorizationStep oStepAux;
+            for (Integer nAuthStepId : lPendingStepIds) {
+                oStepAux = new SDbAuthorizationStep();
+                oStepAux.read(session, new int[] { nAuthStepId });
+                oStepAux.setDateTimeAuthorized_n(null);
+                oStepAux.setFkUserAuthorizationId_n(oStep.getFkUserAuthorizationId_n());
+                oStepAux.setAuthorized(true);
+                oStepAux.setDateTimeRejected_n(null);
+                oStepAux.setFkUserRejectId_n(0);
+                oStepAux.setRejected(false);
+                oStepAux.setComments("Autorizado por default");
+                
+                oStepAux.save(session);
+            }
+        }
     }
     
     /**

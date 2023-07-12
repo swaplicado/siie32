@@ -317,7 +317,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Ítem"));
@@ -343,7 +343,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Ítem"));
@@ -388,7 +388,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         Vector<SGridRow> rows = new Vector<>();
 
         try {
-            moGridMatReqEty.clearGrid();
+            moGridMatReqEty.clearGridRows();
             
             mlMaterialRequestEntries = moMaterialRequest.getChildEntries();
             for (SDbMaterialRequestEntry oMaterialRequestEntry : mlMaterialRequestEntries) {
@@ -408,12 +408,16 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());
                 oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
                 
-                params.setPkCompanyBranchId(0);
-                params.setPkWarehouseId(0);
-                params.setSegregationId(mnSegregationId);
-                STrnStock oReqSeg = STrnStockSegregationUtils.getStockSegregated((SClientInterface) miClient, params);
+                double dSegregated = 0d;
+                if (mnSegregationId > 0) {
+                    params.setPkCompanyBranchId(0);
+                    params.setPkWarehouseId(0);
+                    params.setSegregationId(mnSegregationId);
+                    STrnStock oReqSeg = STrnStockSegregationUtils.getStockSegregated((SClientInterface) miClient, params);
                 
-                oRow.setAuxSegregated(oReqSeg.getSegregatedStock());
+                    dSegregated = oReqSeg.getSegregatedStock();
+                }
+                oRow.setAuxSegregated(dSegregated);
                 
                 rows.add(oRow);
             }
@@ -421,6 +425,10 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             moGridMatReqEty.populateGrid(rows, this);
             moGridMatReqEty.clearSortKeys();
             moGridMatReqEty.setSelectedGridRow(0);
+            
+            if (rows.isEmpty()) {
+                moGridSegregationRows.clearGridRows();
+            }
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);

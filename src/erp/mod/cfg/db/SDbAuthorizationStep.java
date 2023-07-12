@@ -37,6 +37,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     protected Date mtDateTimeAuthorized_n;
     protected Date mtDateTimeRejected_n;
     protected String msComments;
+    protected int mnAuthorizationGrouper_n;
+    protected int mnUserAuthorizationsNode_n;
+    protected boolean mbAllUsers;
     protected boolean mbAuthorized;
     protected boolean mbRejected;
     protected boolean mbRequired;
@@ -45,6 +48,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     protected int mnFkAuthorizationTypeId;
     protected int mnFkAuthorizationPathId_n;
     protected int mnFkUserStepId;
+    protected int mnFkNodeStepId_n;
     protected int mnFkUserAuthorizationId_n;
     protected int mnFkUserRejectId_n;
     //protected int mnFkUserInsertId;
@@ -53,6 +57,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     //protected Date mtTsUserUpdate;
 
     protected String msAuxStepUsername;
+    protected String msAuxAuthUsername;
 
     public SDbAuthorizationStep() {
         super(SModConsts.CFGU_AUTHORN_STEP);
@@ -70,6 +75,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     public void setDateTimeAuthorized_n(Date t) { mtDateTimeAuthorized_n = t; }
     public void setDateTimeRejected_n(Date t) { mtDateTimeRejected_n = t; }
     public void setComments(String s) { msComments = s; }
+    public void setAuthorizationGrouper_n(int n) { mnAuthorizationGrouper_n = n; }
+    public void setUserAuthorizationsNode_n(int n) { mnUserAuthorizationsNode_n = n; }
+    public void setAllUsers(boolean b) { mbAllUsers = b; }
     public void setAuthorized(boolean b) { mbAuthorized = b; }
     public void setRejected(boolean b) { mbRejected = b; }
     public void setRequired(boolean b) { mbRequired = b; }
@@ -78,6 +86,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     public void setFkAuthorizationTypeId(int n) { mnFkAuthorizationTypeId = n; }
     public void setFkAuthorizationPathId_n(int n) { mnFkAuthorizationPathId_n = n; }
     public void setFkUserStepId(int n) { mnFkUserStepId = n; }
+    public void setFkNodeStepId_n(int n) { mnFkNodeStepId_n = n; }
     public void setFkUserAuthorizationId_n(int n) { mnFkUserAuthorizationId_n = n; }
     public void setFkUserRejectId_n(int n) { mnFkUserRejectId_n = n; }
 //    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -97,6 +106,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     public Date getDateTimeAuthorized_n() { return mtDateTimeAuthorized_n; }
     public Date getDateTimeRejected_n() { return mtDateTimeRejected_n; }
     public String getComments() { return msComments; }
+    public int getAuthorizationGrouper_n() { return mnAuthorizationGrouper_n; }
+    public int getUserAuthorizationsNode_n() { return mnUserAuthorizationsNode_n; }
+    public boolean isAllUsers() { return mbAllUsers; }
     public boolean isAuthorized() { return mbAuthorized; }
     public boolean isRejected() { return mbRejected; }
     public boolean isRequired() { return mbRequired; }
@@ -105,6 +117,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     public int getFkAuthorizationTypeId() { return mnFkAuthorizationTypeId; }
     public int getFkAuthorizationPathId_n() { return mnFkAuthorizationPathId_n; }
     public int getFkUserStepId() { return mnFkUserStepId; }
+    public int getFkNodeStepId_n() { return mnFkNodeStepId_n; }
     public int getFkUserAuthorizationId_n() { return mnFkUserAuthorizationId_n; }
     public int getFkUserRejectId_n() { return mnFkUserRejectId_n; }
 //    public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -114,6 +127,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
 
     
     public String getAuxStepUsername() { return msAuxStepUsername; }
+    public String getAuxAuthUsername() { return msAuxAuthUsername; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -141,6 +155,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         mtDateTimeAuthorized_n = null;
         mtDateTimeRejected_n = null;
         msComments = "";
+        mnAuthorizationGrouper_n = 0;
+        mnUserAuthorizationsNode_n = 0;
+        mbAllUsers = false;
         mbAuthorized = false;
         mbRejected = false;
         mbRequired = false;
@@ -149,6 +166,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         mnFkAuthorizationTypeId = 0;
         mnFkAuthorizationPathId_n = 0;
         mnFkUserStepId = 0;
+        mnFkNodeStepId_n = 0;
         mnFkUserAuthorizationId_n = 0;
         mnFkUserRejectId_n = 0;
         mnFkUserInsertId = 0;
@@ -157,6 +175,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         mtTsUserUpdate = null;
         
         msAuxStepUsername = "";
+        msAuxAuthUsername = "";
     }
 
     @Override
@@ -213,6 +232,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
             mtDateTimeAuthorized_n = resultSet.getTimestamp("dt_time_authorn_n");
             mtDateTimeRejected_n = resultSet.getTimestamp("dt_time_reject_n");
             msComments = resultSet.getString("comments");
+            mnAuthorizationGrouper_n = resultSet.getInt("authorn_grouper_n");
+            mnUserAuthorizationsNode_n = resultSet.getInt("usrs_authorn_node_n");
+            mbAllUsers = resultSet.getBoolean("b_all");
             mbAuthorized = resultSet.getBoolean("b_authorn");
             mbRejected = resultSet.getBoolean("b_reject");
             mbRequired = resultSet.getBoolean("b_req");
@@ -221,6 +243,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
             mnFkAuthorizationTypeId = resultSet.getInt("fk_tp_authorn");
             mnFkAuthorizationPathId_n = resultSet.getInt("fk_authorn_path_n");
             mnFkUserStepId = resultSet.getInt("fk_usr_step");
+            mnFkNodeStepId_n = resultSet.getInt("fk_node_step_n");
             mnFkUserAuthorizationId_n = resultSet.getInt("fk_usr_authorn_n");
             mnFkUserRejectId_n = resultSet.getInt("fk_usr_reject_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -241,6 +264,18 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         }
         else {
             msAuxStepUsername = "";
+        }
+        
+        String userAuth = "SELECT usr "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.USRU_USR) 
+                    + " WHERE id_usr = " + mnFkUserAuthorizationId_n;
+        
+        ResultSet resultSetAuth = session.getStatement().getConnection().createStatement().executeQuery(userAuth);
+        if (resultSetAuth.next()) {
+            msAuxAuthUsername = resultSetAuth.getString("usr");
+        }
+        else {
+            msAuxAuthUsername = "";
         }
 
         mnQueryResultId = SDbConsts.READ_OK;
@@ -271,6 +306,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                     (mtDateTimeAuthorized_n == null ? "null" : ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeAuthorized_n) + "'")) + ", " + 
                     (mtDateTimeRejected_n == null ? "null" : ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeRejected_n) + "'")) + ", " + 
                     "'" + msComments + "', " + 
+                    (mnAuthorizationGrouper_n == 0 ? "null" : ("'" + mnAuthorizationGrouper_n + "'")) + ", " + 
+                    (mnUserAuthorizationsNode_n == 0 ? "null" : mnUserAuthorizationsNode_n) + ", " + 
+                    (mbAllUsers ? 1 : 0) + ", " + 
                     (mbAuthorized ? 1 : 0) + ", " + 
                     (mbRejected ? 1 : 0) + ", " + 
                     (mbRequired ? 1 : 0) + ", " + 
@@ -279,6 +317,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                     mnFkAuthorizationTypeId + ", " + 
                     (mnFkAuthorizationPathId_n == 0 ? "null" : mnFkAuthorizationPathId_n) + ", " +
                     mnFkUserStepId + ", " + 
+                    (mnFkNodeStepId_n == 0 ? "null" : mnFkNodeStepId_n) + ", " +
                     (mnFkUserAuthorizationId_n == 0 ? "null" : mnFkUserAuthorizationId_n) + ", " +
                     (mnFkUserRejectId_n == 0 ? "null" : mnFkUserRejectId_n) + ", " +
                     mnFkUserInsertId + ", " + 
@@ -303,6 +342,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                         "dt_time_authorn_n = " + (mtDateTimeAuthorized_n != null ? ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeAuthorized_n) + "'") : "NULL") + ", " +
                         "dt_time_reject_n = " + (mtDateTimeRejected_n != null ? ("'" + SLibUtils.DbmsDateFormatDatetime.format(mtDateTimeRejected_n) + "'") : "NULL") + ", " +
                         "comments = '" + msComments + "', " +
+                        "authorn_grouper_n = " + (mnAuthorizationGrouper_n > 0 ? mnAuthorizationGrouper_n : "NULL") + ", " +
+                        "usrs_authorn_node_n = " + (mnUserAuthorizationsNode_n > 0 ? mnUserAuthorizationsNode_n : "NULL") + ", " +
+                        "b_all = " + (mbAllUsers ? 1 : 0) + ", " +
                         "b_authorn = " + (mbAuthorized ? 1 : 0) + ", " +
                         "b_reject = " + (mbRejected ? 1 : 0) + ", " +
                         "b_req = " + (mbRequired ? 1 : 0) + ", " +
@@ -311,6 +353,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                         "fk_tp_authorn = " + mnFkAuthorizationTypeId + ", " +
                         "fk_authorn_path_n = " + (mnFkAuthorizationPathId_n == 0 ? "null" : mnFkAuthorizationPathId_n) + ", " +
                         "fk_usr_step = " + mnFkUserStepId + ", " +
+                        "fk_node_step_n = " + (mnFkNodeStepId_n == 0 ? "null" : mnFkNodeStepId_n) + ", " +
                         "fk_usr_authorn_n = " + (mnFkUserAuthorizationId_n == 0 ? "null" : mnFkUserAuthorizationId_n) + ", " +
                         "fk_usr_reject_n = " + (mnFkUserRejectId_n == 0 ? "null" : mnFkUserRejectId_n) + ", " +
 //                        "fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -341,6 +384,9 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         registry.setDateTimeAuthorized_n(this.getDateTimeAuthorized_n());
         registry.setDateTimeRejected_n(this.getDateTimeRejected_n());
         registry.setComments(this.getComments());
+        registry.setAllUsers(this.isAllUsers());
+        registry.setAuthorizationGrouper_n(this.getAuthorizationGrouper_n());
+        registry.setUserAuthorizationsNode_n(this.getUserAuthorizationsNode_n());
         registry.setAuthorized(this.isAuthorized());
         registry.setRejected(this.isRejected());
         registry.setRequired(this.isRequired());
@@ -349,6 +395,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         registry.setFkAuthorizationTypeId(this.getFkAuthorizationTypeId());
         registry.setFkAuthorizationPathId_n(this.getFkAuthorizationPathId_n());
         registry.setFkUserStepId(this.getFkUserStepId());
+        registry.setFkNodeStepId_n(this.getFkNodeStepId_n());
         registry.setFkUserAuthorizationId_n(this.getFkUserAuthorizationId_n());
         registry.setFkUserRejectId_n(this.getFkUserRejectId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
@@ -448,21 +495,24 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                 value = mbRequired;
                 break;
             case 2:
-                value = mbAuthorized;
-                break;
-            case 3:
-                value = mtDateTimeAuthorized_n;
-                break;
-            case 4:
-                value = mbRejected;
-                break;
-            case 5:
-                value = mtDateTimeRejected_n;
-                break;
-            case 6:
                 value = msAuxStepUsername;
                 break;
+            case 3:
+                value = mbAuthorized;
+                break;
+            case 4:
+                value = mtDateTimeAuthorized_n;
+                break;
+            case 5:
+                value = msAuxAuthUsername;
+                break;
+            case 6:
+                value = mbRejected;
+                break;
             case 7:
+                value = mtDateTimeRejected_n;
+                break;
+            case 8:
                 value = msComments;
                 break;
             default:

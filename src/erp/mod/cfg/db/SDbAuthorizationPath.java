@@ -32,11 +32,13 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
     protected int mnUserLevel;
     protected Date mtDateStart;
     protected Date mtDateEnd;
+    protected int mnNodeAuthorizationUsers;
+    protected boolean mbNodeAll;
     protected boolean mbRequired;
 //    protected boolean mbDeleted;
 //    protected boolean mbSystem;
     protected int mnFkAuthorizationTypeId;
-    protected int mnFkUserAuthorizationId;
+    protected int mnFkNodeAuthorizationId;
 //    protected int mnFkUserInsertId;
 //    protected int mnFkUserUpdateId;
 //    protected Date mtTsUserInsert;
@@ -54,11 +56,13 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
     public void setUserLevel(int n) { mnUserLevel = n; }
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
+    public void setNodeAuthorizationUsers(int n) { mnNodeAuthorizationUsers = n; }
+    public void setNodeAll(boolean b) { mbNodeAll = b; }
     public void setRequired(boolean b) { mbRequired = b; }
 //    public void setDeleted(boolean b) { mbDeleted = b; }
 //    public void setSystem(boolean b) { mbSystem = b; }
     public void setFkAuthorizationTypeId(int n) { mnFkAuthorizationTypeId = n; }
-    public void setFkUserAuthorizationId(int n) { mnFkUserAuthorizationId = n; }
+    public void setFkNodeAuthorizationId(int n) { mnFkNodeAuthorizationId = n; }
 //    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
 //    public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
 //    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -72,11 +76,13 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
     public int getUserLevel() { return mnUserLevel; }
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
+    public int getNodeAuthorizationUsers() { return mnNodeAuthorizationUsers; }
+    public boolean isNodeAll() { return mbNodeAll; }
     public boolean isRequired() { return mbRequired; }
 //    public boolean isDeleted() { return mbDeleted; }
 //    public boolean isSystem() { return mbSystem; }
     public int getFkAuthorizationTypeId() { return mnFkAuthorizationTypeId; }
-    public int getFkUserAuthorizationId() { return mnFkUserAuthorizationId; }
+    public int getFkNodeAuthorizationId() { return mnFkNodeAuthorizationId; }
 //    public int getFkUserInsertId() { return mnFkUserInsertId; }
 //    public int getFkUserUpdateId() { return mnFkUserUpdateId; }
 //    public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -108,7 +114,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         mbDeleted = false;
         mbSystem = false;
         mnFkAuthorizationTypeId = 0;
-        mnFkUserAuthorizationId = 0;
+        mnFkNodeAuthorizationId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -165,11 +171,13 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
             mnUserLevel = resultSet.getInt("lev");
             mtDateStart = resultSet.getDate("dt_sta");
             mtDateEnd = resultSet.getDate("dt_end_n");
+            mnNodeAuthorizationUsers = resultSet.getInt("usrs_authorn_node");
+            mbNodeAll = resultSet.getBoolean("b_node_all");
             mbRequired = resultSet.getBoolean("b_req");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkAuthorizationTypeId = resultSet.getInt("fk_tp_authorn");
-            mnFkUserAuthorizationId = resultSet.getInt("fk_usr_authorn");
+            mnFkNodeAuthorizationId = resultSet.getInt("fk_authorn_node");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -202,11 +210,13 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
                     mnUserLevel + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " + 
+                    mnNodeAuthorizationUsers + ", " + 
+                    (mbNodeAll ? 1 : 0) + ", " + 
                     (mbRequired ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkAuthorizationTypeId + ", " + 
-                    mnFkUserAuthorizationId + ", " + 
+                    mnFkNodeAuthorizationId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -225,11 +235,13 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
                     "lev = " + mnUserLevel + ", " +
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "dt_end_n = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
+                    "usrs_authorn_node = " + mnNodeAuthorizationUsers + ", " +
+                    "b_node_all = " + (mbNodeAll ? 1 : 0) + ", " +
                     "b_req = " + (mbRequired ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_authorn = " + mnFkAuthorizationTypeId + ", " +
-                    "fk_usr_authorn = " + mnFkUserAuthorizationId + ", " +
+                    "fk_authorn_node = " + mnFkNodeAuthorizationId + ", " +
 //                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
 //                    "ts_usr_ins = " + "NOW()" + ", " +
@@ -254,11 +266,13 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         registry.setUserLevel(this.getUserLevel());
         registry.setDateStart(this.getDateStart());
         registry.setDateEnd(this.getDateEnd());
+        registry.setNodeAuthorizationUsers(this.getNodeAuthorizationUsers());
+        registry.setNodeAll(this.isNodeAll());
         registry.setRequired(this.isRequired());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkAuthorizationTypeId(this.getFkAuthorizationTypeId());
-        registry.setFkUserAuthorizationId(this.getFkUserAuthorizationId());
+        registry.setFkNodeAuthorizationId(this.getFkNodeAuthorizationId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

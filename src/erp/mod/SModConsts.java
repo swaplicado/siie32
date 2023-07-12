@@ -91,6 +91,8 @@ public abstract class SModConsts {
     public static final int CFGU_CERT = 1013001;
     public static final int CFGU_FUNC = 1013011;
     public static final int CFGU_SHIFT = 1013021;
+    public static final int CFGU_AUTHORN_NODE = 1013033;
+    public static final int CFGU_AUTHORN_NODE_USR = 1013034;
     public static final int CFGU_AUTHORN_PATH = 1013031;
     public static final int CFGU_AUTHORN_STEP = 1013032;
 
@@ -839,6 +841,8 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_CERT, "cfgu_cert");
         TablesMap.put(CFGU_FUNC, "cfgu_func");
         TablesMap.put(CFGU_SHIFT, "cfgu_shift");
+        TablesMap.put(CFGU_AUTHORN_NODE, "cfgu_authorn_node");
+        TablesMap.put(CFGU_AUTHORN_NODE_USR, "cfgu_authorn_node_usr");
         TablesMap.put(CFGU_AUTHORN_PATH, "cfgu_authorn_path");
         TablesMap.put(CFGU_AUTHORN_STEP, "cfgu_authorn_step");
 
