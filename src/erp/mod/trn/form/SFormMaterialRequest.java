@@ -1081,21 +1081,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     
     private void actionAuthorizeOrRejectResource(final int iAction) {
         try {
-            String reason = "";
-            if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
-                reason = JOptionPane.showInputDialog("Ingrese motivo de rechazo:");
-                if (reason == null) {
-                    return;
-                }
-            }
-            String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
-                                                                        iAction,
-                                                                        SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
-                                                                        moRegistry.getPrimaryKey(),
-                                                                        miClient.getSession().getUser().getPkUserId(),
-                                                                        reason);
+            String response = SAuthorizationUtils.authorizeOrReject(miClient.getSession(), 
+                                                                    moRegistry.getPrimaryKey(), 
+                                                                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, 
+                                                                    iAction);
+            
             if (response.length() > 0) {
-                    miClient.showMsgBoxError(response);
+                miClient.showMsgBoxError(response);
             }
             else {
                 miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 

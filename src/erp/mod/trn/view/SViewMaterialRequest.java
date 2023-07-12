@@ -151,21 +151,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else {
                 try {
-                    String reason = "";
-                    if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
-                        reason = JOptionPane.showInputDialog("Ingrese motivo de rechazo:");
-                        if (reason == null) {
-                            return;
-                        }
-                    }
                     SDbMaterialRequest req = new SDbMaterialRequest();
                     req.read(miClient.getSession(), gridRow.getRowPrimaryKey());
-                    String response = SAuthorizationUtils.authOrRejResource(miClient.getSession(),
-                                                                                iAction,
-                                                                                SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
-                                                                                req.getPrimaryKey(),
-                                                                                miClient.getSession().getUser().getPkUserId(),
-                                                                                reason);
+                    String response = SAuthorizationUtils.authorizeOrReject(miClient.getSession(), 
+                                                                    req.getPrimaryKey(), 
+                                                                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, 
+                                                                    iAction);
                     if (response.length() > 0) {
                             miClient.showMsgBoxError(response);
                     }

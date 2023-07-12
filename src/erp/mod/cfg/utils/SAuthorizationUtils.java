@@ -16,6 +16,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -281,6 +284,42 @@ public class SAuthorizationUtils {
     }
     
     /**
+     * Autorizar o rechazar recurso
+     * 
+     * @param session
+     * @param pk
+     * @param resourceType
+     * @param iAction
+     * @return 
+     */
+    public static String authorizeOrReject(SGuiSession session, final int[] pk, final int resourceType, final int iAction) {
+        String reason = "";
+        if (iAction == SAuthorizationUtils.AUTH_ACTION_REJECT) {
+            JTextArea textArea = new JTextArea(5, 40); // Set the number of rows and columns
+            JScrollPane scrollPane = new JScrollPane(textArea);
+
+            int option = JOptionPane.showOptionDialog(null, scrollPane, "Ingrese motivo de rechazo", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+
+            if (option == JOptionPane.OK_OPTION) {
+                String input = textArea.getText();
+                System.out.println("Input: " + input);
+            }
+            else {
+                return "Acción cancelada";
+            }
+        }
+        
+        String response = SAuthorizationUtils.authOrRejResource(session,
+                                                                        iAction,
+                                                                        resourceType,
+                                                                        pk,
+                                                                        session.getUser().getPkUserId(),
+                                                                        reason);
+        
+        return response;
+    }
+    
+    /**
      * Petición de autorización o rechazo de recurso.
      * Si el proceso ha sido exitoso devuelve un Strin vacío, si ha ocurrido un error el 
      * String explicará lo que ha sucedido
@@ -426,6 +465,7 @@ public class SAuthorizationUtils {
      * 
      * @param session
      * @param idAuthStep
+     * @param reasonRej
      * 
      * @return 
      */
