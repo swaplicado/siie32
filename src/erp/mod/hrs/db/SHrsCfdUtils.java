@@ -123,7 +123,7 @@ public abstract class SHrsCfdUtils {
                 + "bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name, pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
                 + "pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp "
                 + "AND pri.id_iss = COALESCE((SELECT MAX(prix.id_iss) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS prix "
                 + " WHERE prix.id_pay = pr.id_pay AND prix.id_emp = pr.id_emp AND NOT prix.b_del), 0) "

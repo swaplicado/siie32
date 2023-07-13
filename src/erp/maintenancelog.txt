@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 214.2/ 2023-07-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a consulta de recibos de nómina pendientes de timbrar.
+2) Corrección a validación de pertenencia de cierto aniversario a un período de fechas, excluyendo aniversarios que inician precisamente dentro del período en cuestión.
+
+================================================================================
 SIIE 3.2 214.1/ 2023-07-10
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

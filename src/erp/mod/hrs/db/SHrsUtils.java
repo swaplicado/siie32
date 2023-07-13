@@ -2504,23 +2504,26 @@ public abstract class SHrsUtils {
      * @throws java.lang.Exception 
      */
     public static boolean isAnniversaryBelongingToPeriod(final Date dateBenefits, final Date periodStart, final Date periodEnd) throws Exception {
+        boolean belongsToPeriod = false;
+        
         SLibTimeUtils.validatePeriod(periodStart, periodEnd);
         
-        boolean belongsToPeriod = false;
         int[] digestedBenefitsDate = SLibTimeUtils.digestDate(dateBenefits);
         int[] digestedPeriodStart = SLibTimeUtils.digestDate(periodStart);
         int[] digestedPeriodEnd = SLibTimeUtils.digestDate(periodEnd);
         
-        if (digestedPeriodStart[0] == digestedPeriodEnd[0]) {
-            // start and end dates are of the same year:
-            Date anniversary = SLibTimeUtils.createDate(digestedPeriodEnd[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
-            belongsToPeriod = SLibTimeUtils.isBelongingToPeriod(anniversary, periodStart, periodEnd);
-        }
-        else if ((digestedPeriodStart[0] + 1) == digestedPeriodEnd[0]) {
-            // start date is of the previous year of end date:
-            Date anniversaryAtStart = SLibTimeUtils.createDate(digestedPeriodStart[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
-            Date anniversaryAtEnd = SLibTimeUtils.createDate(digestedPeriodEnd[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
-            belongsToPeriod = SLibTimeUtils.isBelongingToPeriod(anniversaryAtStart, periodStart, periodEnd) || SLibTimeUtils.isBelongingToPeriod(anniversaryAtEnd, periodStart, periodEnd);
+        if (digestedBenefitsDate[0] < digestedPeriodStart[0]) {
+            if (digestedPeriodStart[0] == digestedPeriodEnd[0]) {
+                // start and end dates are of the same year:
+                Date anniversaryAtPeriod = SLibTimeUtils.createDate(digestedPeriodStart[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
+                belongsToPeriod = SLibTimeUtils.isBelongingToPeriod(anniversaryAtPeriod, periodStart, periodEnd);
+            }
+            else if ((digestedPeriodStart[0] + 1) == digestedPeriodEnd[0]) {
+                // start date is of the previous year of end date:
+                Date anniversaryAtStart = SLibTimeUtils.createDate(digestedPeriodStart[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
+                Date anniversaryAtEnd = SLibTimeUtils.createDate(digestedPeriodEnd[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
+                belongsToPeriod = SLibTimeUtils.isBelongingToPeriod(anniversaryAtStart, periodStart, periodEnd) || SLibTimeUtils.isBelongingToPeriod(anniversaryAtEnd, periodStart, periodEnd);
+            }
         }
         
         return belongsToPeriod;
