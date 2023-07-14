@@ -17,6 +17,7 @@ import erp.lib.SLibConstants;
 import erp.lib.table.STableCellEditorOptions;
 import erp.lib.table.STableConstants;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
+import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SFinUtilities;
@@ -54,6 +55,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -83,7 +86,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  */
 public class SFormBankLayout extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 
@@ -1712,6 +1715,19 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
     }
 
+    private void validateXmlDocNum(boolean isXml,String numInvoice) throws Exception {
+        if (!isXml) {
+            throw new Exception("La factura " + numInvoice + " no contiene XML");
+        }
+    }
+
+    public void validateXmlDoc(boolean isXml) {
+        if (!isXml) {
+            miClient.getSession().getClient().showMsgBoxWarning("La factura seleccionada no contiene XML");
+        }
+    }
+    
+        
     private ArrayList<SLayoutBankXmlRow> createLayoutBankXmlRows() {
         ArrayList<SLayoutBankXmlRow> layoutBankXmlRows = new ArrayList<>();
         
@@ -1857,7 +1873,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 
             default:
         }
-        
+
         jtfRows.setText(SLibUtils.DecimalFormatInteger.format(mnSelectedRows) + "/" + SLibUtils.DecimalFormatInteger.format(moGridPayments.getModel().getRowCount()));
     }
     
@@ -2369,10 +2385,21 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
     }
 
-    private void editingStoppedPaymentChecked() {
+    private void editingStoppedPaymentChecked() throws Exception {
         if (isModeForTransfersOfPayments()) {
             int index = moGridPayments.getTable().getSelectedRow();
             
+           
+            if (SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_FIN_AP_PAY_CFD_REQ)) == 1 ) {
+                SGridRow gridRow =  moGridPayments.getModel().getGridRows().get(index);
+                SLayoutBankRow layoutBankRow = (SLayoutBankRow) gridRow;
+                boolean existingXml = layoutBankRow.isXml();
+
+                if(layoutBankRow.isForPayment()){
+                    validateXmlDoc(existingXml);
+                }
+            }
+           
             computeBalance();
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(index);
@@ -2832,6 +2859,28 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     validation.setMessage(e.getMessage());
                 }
                 
+                try {
+                    if (SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_FIN_AP_PAY_CFD_REQ)) == 1 ) {
+                        if (validation.isValid()) {
+                            for (int i = 0; i < moGridPayments.getModel().getRowCount() ; i++) {
+                                SGridRow gridRow =  moGridPayments.getModel().getGridRows().get(i);
+                                SLayoutBankRow layoutBankRow = (SLayoutBankRow) gridRow;
+                                boolean existingXml = layoutBankRow.isXml();
+                                if (layoutBankRow.isForPayment()) {
+                                    try {
+                                        validateXmlDocNum(existingXml, layoutBankRow.getDpsNumber());
+                                    }
+                                    catch (Exception e) {
+                                        validation.setMessage(e.getMessage());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(SFormBankLayout.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
                 if (validation.isValid()) {
                     if (jtfLayoutPath.getText().isEmpty()) {
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlLayoutPath) + "'.");
@@ -3013,7 +3062,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     switch (moGridPayments.getTable().getSelectedColumn()) {
                         case COL_TRN_TP_PAY_CHECK:
-                            editingStoppedPaymentChecked();
+                        {
+                            try {
+                                editingStoppedPaymentChecked();
+                            } catch (Exception ex) {
+                                Logger.getLogger(SFormBankLayout.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                             break;
                         case COL_TRN_TP_PAY_PAY:
                         case COL_TRN_TP_PAY_EXR:
