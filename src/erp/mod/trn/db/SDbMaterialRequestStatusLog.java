@@ -30,7 +30,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser {
     protected Date mtTsUser;
 
     public SDbMaterialRequestStatusLog() {
-        super(SModConsts.TRN_MAT_REQ_STA_LOG);
+        super(SModConsts.TRN_MAT_REQ_ST_LOG);
     }
 
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
