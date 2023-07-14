@@ -47,6 +47,9 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected int mnAuxRowId;
     
     protected SDataItem moDataItem;
+    protected SDbMaterialConsumptionEntity moDbmsMatConsEntity;
+    protected SDbMaterialConsumptionSubentity moDbmsMatConsSubentity;
+    protected SDbMaterialRequestPriority moDbmsMatReqPty;
 
     public SDbMaterialRequestEntry() {
         super(SModConsts.TRN_MAT_REQ_ETY);
@@ -92,7 +95,35 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     
     public int getAuxRowId() { return mnAuxRowId; }
     public SDataItem getDataItem() { return moDataItem; }
+    
+    private String getDescription() {
+        for (SDbMaterialRequestEntryNote note : maChildNotes) {
+            if (note.getIsDescription()) {
+                return note.getNotes();
+            }
+        }
+        return "";
+    }
 
+    public void readOptionalInfo(SGuiSession session) throws Exception {
+        moDbmsMatConsEntity = null;
+        moDbmsMatConsSubentity = null;
+        moDbmsMatReqPty = null;
+        
+        if (mnFkEntMatConsumptionEntityId_n != 0) {
+            moDbmsMatConsEntity = new SDbMaterialConsumptionEntity();
+            moDbmsMatConsEntity.read(session, new int[] { mnFkEntMatConsumptionEntityId_n });
+        }
+        if (mnFkSubentMatConsumptionEntityId_n != 0) {
+            moDbmsMatConsSubentity = new SDbMaterialConsumptionSubentity();
+            moDbmsMatConsSubentity.read(session, new int[] { mnFkSubentMatConsumptionEntityId_n, mnFkSubentMatConsumptionSubentityId_n });
+        }
+        if (mnFkMatRequestPriorityId_n != 0) {
+            moDbmsMatReqPty = new SDbMaterialRequestPriority();
+            moDbmsMatReqPty.read(session, new int[] { mnFkMatRequestPriorityId_n });
+        }
+    }
+            
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkMatRequestId = pk[0];
@@ -128,6 +159,9 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         
         mnAuxRowId = 0;
         moDataItem = null;
+        moDbmsMatConsEntity = null;
+        moDbmsMatConsSubentity = null;
+        moDbmsMatReqPty = null;
     }
 
     @Override
@@ -212,6 +246,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                 moDataItem = new SDataItem();
                 moDataItem.read(new int[] { mnFkItemId }, statement);
             }
+            
+            readOptionalInfo(session);
 
             mbRegistryNew = false;
         }
@@ -360,10 +396,15 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         Object value = null;
         
         switch (row) {
-            case 0: value = moDataItem.getCode(); break;
-            case 1: value = moDataItem.getName(); break;
+            case 0: value = mbNewItem ? "" : moDataItem.getCode(); break;
+            case 1: value = mbNewItem ? getDescription() : moDataItem.getName(); break;
             case 2: value = mdQuantity; break;
-            case 3: value = mbNewItem; break;
+            case 3: value = mbNewItem ? "" : moDataItem.getDbmsDataUnit().getSymbol(); break;
+            case 4: value = mbNewItem; break;
+            case 5: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
+            case 6: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
+            case 7: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
+            case 8: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
         }
         
         return value;

@@ -242,7 +242,8 @@ public class SModuleTrn extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Presentación", 1);
                 sql = "SELECT id_mat_pres AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE NOT b_del "
+                        + "WHERE NOT b_del AND id_mat_pres <> " + SModSysConsts.TRNU_MAT_PRES_NA + " "
+                        + (params != null ? "AND fk_unit = " + params.getType() + " " : "")
                         + "ORDER BY name";
                 break;
             case SModConsts.TRN_MAINT_AREA:
@@ -284,21 +285,44 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_PROV_ENT:
                 settings = new SGuiCatalogueSettings("Entidad de suministro", 1);
-                sql = "SELECT id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE NOT b_del "
-                        + "ORDER BY name";
+                switch (subtype) {
+                    case SModConsts.USRU_USR:
+                        sql = "SELECT p.id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(p.code, ' - ', p.name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS p "
+                                + "INNER JOIN trn_mat_prov_ent_usr AS pu ON p.id_mat_prov_ent = pu.id_mat_prov_ent "
+                                + "WHERE NOT b_del AND pu.id_usr = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY pu.b_default DESC, p.name";
+                        break;
+                    default:
+                        sql = "SELECT id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY name";
+                        break;
+                }
                 break;
             case SModConsts.TRN_MAT_CONS_ENT:
                 settings = new SGuiCatalogueSettings("Entidad de consumo", 1);
-                sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE NOT b_del "
-                        + "ORDER BY name";
+                switch (subtype) {
+                    case SModConsts.USRU_USR:
+                        sql = "SELECT c.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(c.code, ' - ', c.name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS c "
+                                + "INNER JOIN trn_mat_cons_ent_usr AS cu ON c.id_mat_cons_ent = cu.id_mat_cons_ent "
+                                + "WHERE NOT b_del AND cu.id_usr = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY cu.b_default DESC, c.name";
+                        break;
+                    default:
+                        sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY name";
+                        break;
+                }
                 break;
             case SModConsts.TRN_MAT_CONS_SUBENT:
-                settings = new SGuiCatalogueSettings("Subentidad de consumo", 2);
-                sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , name AS " + SDbConsts.FIELD_ITEM + " "
+                settings = new SGuiCatalogueSettings("Subentidad de consumo", 2, 1);
+                sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + ", "
+                        + "id_mat_cons_ent AS " + SDbConsts.FIELD_FK + "1 "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
                         + "ORDER BY name";
@@ -401,19 +425,22 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_REQ:
                 switch(subtype) {
-                    case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
-                        view = new SViewMaterialRequest(miClient, subtype, "Mis req. nuevas");
+                    case SModSysConsts.TRNX_MAT_REQ_PET:
+                        switch (params.getType()) {
+                            case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis req. nuevas"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis req. x autorizar"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_PROV: title = "Mis req. en proceso"; break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis requicisiones"; break;
+                        }
                         break;
-                    case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
-                        view = new SViewMaterialRequest(miClient, subtype, "Mis req. x autorizar");
-                        break;
-                    case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
-                        view = new SViewMaterialRequest(miClient, subtype, "Mis req. en proceso");
-                        break;
-                    default:
-                        view = new SViewMaterialRequest(miClient, subtype, "Mis requicisiones");
+                    case SModSysConsts.TRNX_MAT_REQ_REV:
+                        switch (params.getType()) {
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Requisiciones x autorizar"; break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis requicisiones"; break;
+                        }
                         break;
                 }
+                view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
             case SModConsts.TRN_ITEM_COST:
                 view = new SViewItemCost(miClient, "Costos de ítems");

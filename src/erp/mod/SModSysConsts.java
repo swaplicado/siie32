@@ -688,6 +688,8 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT = 252;    // out status of tools maintenance
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
     
+    public static final int TRNU_MAT_PRES_NA = 1; // not applicable
+    
     public static final int TRNS_ST_MAT_REQ_NEW = 1; // new
     public static final int TRNS_ST_MAT_REQ_AUTH = 2; // in authorization
     public static final int TRNS_ST_MAT_REQ_PROV = 3; // in provision
@@ -735,6 +737,10 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAINT_TOOL_LENT = 22;
     public static final int TRNX_MAINT_TOOL_MAINT = 23;
     public static final int TRNX_MAINT_TOOL_LOST = 24;
+    
+    public static final int TRNX_MAT_REQ_PET = 1; // Solicitante
+    public static final int TRNX_MAT_REQ_REV = 2; // Revisor
+    public static final int TRNX_MAT_REQ_PROV = 3; // Suministrador
     
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
     public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";

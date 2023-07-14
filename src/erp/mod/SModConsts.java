@@ -456,11 +456,12 @@ public abstract class SModConsts {
     public static final int TRN_MAT_CONS_ENT_USR = 2023334;
     public static final int TRN_MAT_PROV_ENT = 2023335;
     public static final int TRN_MAT_PROV_ENT_WAH = 2023336;
-    public static final int TRN_MAT_REQ = 2023337;
-    public static final int TRN_MAT_REQ_NTS = 2023338;
-    public static final int TRN_MAT_REQ_ETY = 2023339;
-    public static final int TRN_MAT_REQ_ETY_NTS = 2023340;
-    public static final int TRN_MAT_REQ_STA_LOG = 2023341;
+    public static final int TRN_MAT_PROV_ENT_USR = 2023337;
+    public static final int TRN_MAT_REQ = 2023338;
+    public static final int TRN_MAT_REQ_NTS = 2023339;
+    public static final int TRN_MAT_REQ_ETY = 2023340;
+    public static final int TRN_MAT_REQ_ETY_NTS = 2023341;
+    public static final int TRN_MAT_REQ_STA_LOG = 2023342;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -1168,6 +1169,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAT_CONS_ENT_USR, "trn_mat_cons_ent_usr");
         TablesMap.put(TRN_MAT_PROV_ENT, "trn_mat_prov_ent");
         TablesMap.put(TRN_MAT_PROV_ENT_WAH, "trn_mat_prov_ent_wah");
+        TablesMap.put(TRN_MAT_PROV_ENT_USR, "trn_mat_prov_ent_usr");
         TablesMap.put(TRN_MAT_REQ, "trn_mat_req");
         TablesMap.put(TRN_MAT_REQ_NTS, "trn_mat_req_nts");
         TablesMap.put(TRN_MAT_REQ_ETY, "trn_mat_req_ety");
