@@ -59,6 +59,8 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMfgYearId_n;
     protected int mnFkMfgOrderId_n;
     protected int mnFkMfgChargeId_n;
+    protected int mnFkMatRequestId_n;
+    protected int mnFkMatRequestEtyId_n;
     protected int mnFkBookkeepingYearId_n;
     protected int mnFkBookkeepingNumberId_n;
     protected int mnFkMaintMovementTypeId;
@@ -104,6 +106,8 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
     public void setFkMfgOrderId_n(int n) { mnFkMfgOrderId_n = n; }
     public void setFkMfgChargeId_n(int n) { mnFkMfgChargeId_n = n; }
+    public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
+    public void setFkMatRequestEtyId_n(int n) { mnFkMatRequestEtyId_n = n; }
     public void setFkBookkeepingYearId_n(int n) { mnFkBookkeepingYearId_n = n; }
     public void setFkBookkeepingNumberId_n(int n) { mnFkBookkeepingNumberId_n = n; }
     public void setFkMaintMovementTypeId(int n) { mnFkMaintMovementTypeId = n; }
@@ -142,6 +146,8 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
     public int getFkMfgOrderId_n() { return mnFkMfgOrderId_n; }
     public int getFkMfgChargeId_n() { return mnFkMfgChargeId_n; }
+    public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
+    public int getFkMatRequestEtyId_n() { return mnFkMatRequestEtyId_n; }
     public int getFkBookkeepingYearId_n() { return mnFkBookkeepingYearId_n; }
     public int getFkBookkeepingNumberId_n() { return mnFkBookkeepingNumberId_n; }
     public int getFkMaintMovementTypeId() { return mnFkMaintMovementTypeId; }
@@ -208,6 +214,8 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
         mnFkMfgYearId_n = 0;
         mnFkMfgOrderId_n = 0;
         mnFkMfgChargeId_n = 0;
+        mnFkMatRequestId_n = 0;
+        mnFkMatRequestEtyId_n = 0;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
         mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA ; // default value set only for preventing bugs
@@ -267,6 +275,8 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgYearId_n = resultSet.getInt("fid_mfg_year_n");
                 mnFkMfgOrderId_n = resultSet.getInt("fid_mfg_ord_n");
                 mnFkMfgChargeId_n = resultSet.getInt("fid_mfg_chg_n");
+                mnFkMatRequestId_n = resultSet.getInt("fid_mat_req_n");
+                mnFkMatRequestEtyId_n = resultSet.getInt("fid_mat_req_ety_n");
                 mnFkBookkeepingYearId_n = resultSet.getInt("fid_bkk_year_n");
                 mnFkBookkeepingNumberId_n = resultSet.getInt("fid_bkk_num_n");
                 mnFkMaintMovementTypeId = resultSet.getInt("fid_maint_mov_tp");
@@ -309,7 +319,8 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?) }");
 
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkItemId);
@@ -363,6 +374,14 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 callableStatement.setNull(nParam++, Types.SMALLINT);
                 callableStatement.setNull(nParam++, Types.INTEGER);
                 callableStatement.setNull(nParam++, Types.INTEGER);
+            }
+            if (mnFkMatRequestId_n != 0) {
+                callableStatement.setInt(nParam++, mnFkMatRequestId_n);
+                callableStatement.setInt(nParam++, mnFkMatRequestEtyId_n);
+            }
+            else {
+                callableStatement.setNull(nParam++, Types.INTEGER);
+                callableStatement.setNull(nParam++, Types.SMALLINT);
             }
             if (mnFkBookkeepingYearId_n != 0) {
                 callableStatement.setInt(nParam++, mnFkBookkeepingYearId_n);

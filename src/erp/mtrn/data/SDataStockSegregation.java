@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 
 /**
@@ -20,10 +21,11 @@ import sa.lib.db.SDbConsts;
 public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     protected int mnPkStockSegregationId;
+    protected Date mtExpirationDate_n;
     protected boolean mbDeleted;
     protected int mnFkStockSegregationTypeId;
     protected int mnFkReference1Id;
-    protected int mnFkReference2Id;
+    protected int mnFkReference2Id_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -40,10 +42,11 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
     }
 
     public void setPkStockSegregationId(int n) { mnPkStockSegregationId = n; }
+    public void setExpirationDate_n(Date t) { mtExpirationDate_n = t; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkStockSegregationTypeId(int n) { mnFkStockSegregationTypeId = n; }
     public void setFkReference1Id(int n) { mnFkReference1Id = n; }
-    public void setFkReference2Id(int n) { mnFkReference2Id = n; }
+    public void setFkReference2Id_n(int n) { mnFkReference2Id_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -52,10 +55,11 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
 
     public int getPkStockSegregationId() { return mnPkStockSegregationId; }
+    public Date getExpirationDate_n() { return mtExpirationDate_n; }
     public boolean getDeleted() { return mbDeleted; }
     public int getFkStockSegregationTypeId() { return mnFkStockSegregationTypeId; }
     public int getFkReference1Id() { return mnFkReference1Id; }
-    public int getFkReference2Id() { return mnFkReference2Id; }
+    public int getFkReference2Id_n() { return mnFkReference2Id_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -70,14 +74,14 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
         ResultSet resultSet = null;
         ArrayList<SDataStockSegregationWarehouse> entries = new ArrayList<>();
 
-        sql = "SELECT id_whs "
-                + "FROM trn_stk_seg_whs " 
+        sql = "SELECT id_cob, id_whs "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " " 
                 + getSqlWhere()
-                + "ORDER BY id_whs;";
+                + "ORDER BY id_cob, id_whs;";
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
             SDataStockSegregationWarehouse segregationWarehouse = new SDataStockSegregationWarehouse();
-            segregationWarehouse.read(new int[] { mnPkStockSegregationId, resultSet.getInt(1) }, statement.getConnection().createStatement());
+            segregationWarehouse.read(new int[] { mnPkStockSegregationId, resultSet.getInt("id_cob"), resultSet.getInt("id_whs") }, statement.getConnection().createStatement());
             entries.add(segregationWarehouse);
         }
         
@@ -129,10 +133,11 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
         super.resetRegistry();
         
         mnPkStockSegregationId = 0;
+        mtExpirationDate_n = null;
         mbDeleted = false;
         mnFkStockSegregationTypeId = 0;
         mnFkReference1Id = 0;
-        mnFkReference2Id = 0;
+        mnFkReference2Id_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -153,17 +158,18 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
         reset();
 
         try {
-            sql = "SELECT * FROM trn_stk_seg " + getSqlWhere(key);
+            sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG) + " " + getSqlWhere(key);
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
             else {
                 mnPkStockSegregationId = resultSet.getInt("id_stk_seg");
+                mtExpirationDate_n = resultSet.getDate("dt_exp_n");
                 mbDeleted = resultSet.getBoolean("b_del");
                 mnFkStockSegregationTypeId = resultSet.getInt("fid_tp_stk_seg");
                 mnFkReference1Id = resultSet.getInt("fid_ref_1");
-                mnFkReference2Id = resultSet.getInt("fid_ref_2");
+                mnFkReference2Id_n = resultSet.getInt("fid_ref_2_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -205,12 +211,13 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
                 mbDeleted = false;
                 mnFkUserEditId = SUtilConsts.USR_NA_ID;
 
-                sql = "INSERT INTO trn_stk_seg VALUES (" +
+                sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG) + " VALUES (" +
                         mnPkStockSegregationId + ", " + 
+                        (mtExpirationDate_n != null ? ("'" + SLibUtils.DbmsDateFormatDate.format(mtExpirationDate_n) + "'") : ("null")) + ", " + 
                         (mbDeleted ? 1 : 0) + ", " + 
                         mnFkStockSegregationTypeId + ", " + 
                         mnFkReference1Id + ", " + 
-                        mnFkReference2Id + ", " + 
+                        (mnFkReference2Id_n == 0 ? "null" : mnFkReference2Id_n) + ", " + 
                         (mnFkUserNewId == 0 ? 1 : mnFkUserNewId) + ", " + 
                         (mnFkUserEditId == 0 ? 1 : mnFkUserEditId) + ", " + 
                         (mnFkUserDeleteId == 0 ? 1 : mnFkUserDeleteId) + ", " + 
@@ -221,12 +228,13 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
                 
             }
             else {
-                sql = "UPDATE trn_stk_seg SET " +
+                sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG) + " SET " +
                         "id_stk_seg = " + mnPkStockSegregationId + ", " +
+                        "dt_exp_n = " + (mtExpirationDate_n != null ? ("'" + SLibUtils.DbmsDateFormatDate.format(mtExpirationDate_n) + "'") : ("null")) + ", " + 
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                         "fid_tp_stk_seg = " + mnFkStockSegregationTypeId + ", " +
                         "fid_ref_1 = " + mnFkReference1Id + ", " +
-                        "fid_ref_2 = " + mnFkReference2Id + ", " +
+                        "fid_ref_2_n = " + (mnFkReference2Id_n == 0 ? "null" : mnFkReference2Id_n) + ", " +
                         "fid_usr_edit = " + (mnFkUserEditId == 0 ? 1 : mnFkUserEditId) + ", " +
                         "ts_edit = " + "NOW()";
                 

@@ -690,7 +690,7 @@ public class SViewProductionOrder extends erp.lib.table.STableTab implements jav
                 "COALESCE((SELECT COALESCE(SUM(qty_inc) * 100.0, 0) " +
                 "FROM trn_stk_seg AS seg " +
                 "INNER JOIN trn_stk_seg_whs_ety AS sety ON seg.id_stk_seg = sety.id_stk_seg " +
-                "WHERE seg.fid_ref_1 = o.id_year AND seg.fid_ref_2 = o.id_ord AND NOT seg.b_del) / " +
+                "WHERE seg.fid_ref_1 = o.id_year AND seg.fid_ref_2_n = o.id_ord AND NOT seg.b_del) / " +
                 "(SELECT COALESCE(SUM(eti.gross_req), 0) " +
                 "FROM  mfg_exp_ord AS meo " +
                 "INNER JOIN mfg_exp AS exp ON meo.id_exp = exp.id_exp AND meo.id_exp_year = exp.id_year " +

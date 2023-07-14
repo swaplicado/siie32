@@ -54,6 +54,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
@@ -11416,6 +11417,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             catch (NoSuchMethodException | SecurityException e) {
                 SLibUtilities.printOutException(this, e);
             }
+        }
+        
+        try {
+            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, registry.getPrimaryKey());
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return method;
