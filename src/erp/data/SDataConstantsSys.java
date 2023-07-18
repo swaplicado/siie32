@@ -914,8 +914,6 @@ public abstract class SDataConstantsSys {
 
     public static final int FINU_TAX_BAS_VAT = 1;
     
-    public static final int[] FINU_TAX_IVA_EX = { 1, 1 };
-
     public static final java.lang.String FINU_TP_REC_FY_OPEN = "EA";
     public static final java.lang.String FINU_TP_REC_FY_END = "EC";
     public static final java.lang.String FINU_TP_REC_PUR = "C";
