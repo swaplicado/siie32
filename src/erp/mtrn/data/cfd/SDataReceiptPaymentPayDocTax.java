@@ -6,6 +6,7 @@
 package erp.mtrn.data.cfd;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataTax;
@@ -44,11 +45,11 @@ public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegist
             mdRate = moDbmsTax.getPercentage();
             mnFkCfdTaxId = moDbmsTax.getDbmsCfdTaxId();
             mnFkTaxTypeId = moDbmsTax.getFkTaxTypeId();
-            if (moDbmsTax.getVatType().toLowerCase().equals("exent")) {
-                msFactorCode = "E";
+            if (SLibUtils.compareKeys(moDbmsTax.getPrimaryKey(), SDataConstantsSys.FINU_TAX_IVA_EX)) {
+                msFactorCode = SDataConstantsSys.FINX_TAX_FACT_EX;
             }
             else {
-                msFactorCode = "T";
+                msFactorCode = SDataConstantsSys.FINX_TAX_FACT_TA;
             }
         }
     }
