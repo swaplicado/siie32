@@ -454,6 +454,7 @@ public abstract class SModConsts {
     public static final int TRN_MAT_CONS_ENT = 2023332;
     public static final int TRN_MAT_CONS_SUBENT = 2023333;
     public static final int TRN_MAT_CONS_ENT_USR = 2023334;
+    public static final int TRN_MAT_CONS_ENT_EMP = 2023343;
     public static final int TRN_MAT_PROV_ENT = 2023335;
     public static final int TRN_MAT_PROV_ENT_WAH = 2023336;
     public static final int TRN_MAT_PROV_ENT_USR = 2023337;
@@ -1168,6 +1169,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAT_CONS_ENT, "trn_mat_cons_ent");
         TablesMap.put(TRN_MAT_CONS_SUBENT, "trn_mat_cons_subent");
         TablesMap.put(TRN_MAT_CONS_ENT_USR, "trn_mat_cons_ent_usr");
+        TablesMap.put(TRN_MAT_CONS_ENT_EMP, "trn_mat_cons_ent_emp");
         TablesMap.put(TRN_MAT_PROV_ENT, "trn_mat_prov_ent");
         TablesMap.put(TRN_MAT_PROV_ENT_WAH, "trn_mat_prov_ent_wah");
         TablesMap.put(TRN_MAT_PROV_ENT_USR, "trn_mat_prov_ent_usr");

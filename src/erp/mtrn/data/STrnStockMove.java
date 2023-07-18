@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class STrnStockMove implements java.io.Serializable {
 
@@ -26,6 +26,9 @@ public class STrnStockMove implements java.io.Serializable {
     protected String msSerialNumber;
     protected int mnMaintUserId_n;
     protected int mnMaintUserSupervisorId;
+    protected int mnFkConsumeEntityId_n;
+    protected int mnFkSubConsumeEntityId_n;
+    protected int mnFkSubConsumeSubEntityId_n;
 
     protected int mnAuxRowNumber;
     protected String msAuxLot;
@@ -66,24 +69,49 @@ public class STrnStockMove implements java.io.Serializable {
      * Creates stock move.
      * @param moveKey Stock move primary key (year, item, unit, lot, company branch, warehouse).
      * @param quantity Stock move quantity.
-     * @param value Stock move total value in local currency.
+     * @param totalValue Stock move total value in local currency.
      */
-    public STrnStockMove(int[] moveKey, double quantity, double value) {
-        this(moveKey, quantity, value, "", 0, 0);
+    public STrnStockMove(int[] moveKey, double quantity, double totalValue) {
+        this(moveKey, quantity, totalValue, "", 0, 0);
     }
     
-    public STrnStockMove(int[] moveKey, double quantity, double value, int maintUserId_n, int maintUserSupervisorId) {
-        this(moveKey, quantity, value, "", maintUserId_n, maintUserSupervisorId);
+    /**
+     * 
+     * @param moveKey
+     * @param quantity
+     * @param totalValue
+     * @param maintUserId_n
+     * @param maintUserSupervisorId 
+     */
+    public STrnStockMove(int[] moveKey, double quantity, double totalValue, int maintUserId_n, int maintUserSupervisorId) {
+        this(moveKey, quantity, totalValue, "", maintUserId_n, maintUserSupervisorId);
+    }
+    
+    /**
+     * 
+     * @param moveKey
+     * @param quantity
+     * @param consumeEntKey
+     * @param consumeSubEntKey 
+     */
+    public STrnStockMove(int[] moveKey, double quantity, int[] consumeEntKey, int[] consumeSubEntKey) {
+        this(moveKey, quantity, 0, "", 0, 0 );
+        
+        mnFkConsumeEntityId_n = consumeEntKey == null ? 0 : consumeEntKey[0];
+        mnFkSubConsumeEntityId_n = consumeSubEntKey == null ? 0 : consumeSubEntKey[0];
+        mnFkSubConsumeSubEntityId_n =  consumeSubEntKey == null ? 0 : consumeSubEntKey[1];
     }
 
     /**
      * Creates stock move.
      * @param moveKey Stock move primary key (year, item, unit, lot, company branch, warehouse).
      * @param quantity Stock move quantity.
-     * @param value Stock move total value in local currency.
+     * @param totalValue Stock move total value in local currency.
      * @param serialNumber Stock move serial number.
+     * @param maintUserId_n
+     * @param maintUserSupervisorId
      */
-    public STrnStockMove(int[] moveKey, double quantity, double value, String serialNumber, int maintUserId_n, int maintUserSupervisorId) {
+    public STrnStockMove(int[] moveKey, double quantity, double totalValue, String serialNumber, int maintUserId_n, int maintUserSupervisorId) {
         mnPkYearId = moveKey[0];
         mnPkItemId = moveKey[1];
         mnPkUnitId = moveKey[2];
@@ -91,7 +119,7 @@ public class STrnStockMove implements java.io.Serializable {
         mnPkCompanyBranchId = moveKey[4];
         mnPkWarehouseId = moveKey[5];
         mdQuantity = quantity;
-        mdValue = value;
+        mdValue = totalValue;
         msSerialNumber = serialNumber;
         mnMaintUserId_n = maintUserId_n;
         mnMaintUserSupervisorId = maintUserSupervisorId;
@@ -120,6 +148,9 @@ public class STrnStockMove implements java.io.Serializable {
     public void setSerialNumber(String s) { msSerialNumber = s; }
     public void setFkMaintUserId_n(int n) { mnMaintUserId_n = n; }
     public void setFkMaintUserSupervisorId(int n) { mnMaintUserSupervisorId = n; }
+    public void setFkConsumeEntityId_n(int n) { mnFkConsumeEntityId_n = n; }
+    public void setFkSubConsumeEntityId_n(int n) { mnFkSubConsumeEntityId_n = n; }
+    public void setFkSubConsumeSubEntityId_n(int n) { mnFkSubConsumeSubEntityId_n = n; }
 
     public void setAuxRowNumber(int n) { mnAuxRowNumber = n; }
     public void setAuxLot(String s) { msAuxLot = s; }
@@ -144,6 +175,9 @@ public class STrnStockMove implements java.io.Serializable {
     public String getSerialNumber() { return msSerialNumber; }
     public int getMaintUserId_n() { return mnMaintUserId_n; }
     public int getMaintUserSupervisorId(){ return mnMaintUserSupervisorId; }
+    public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
+    public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
+    public int getFkSubConsumeSubEntityId_n() { return mnFkSubConsumeSubEntityId_n; }
 
     public int getAuxRowNumber() { return mnAuxRowNumber; }
     public String getAuxLot() { return msAuxLot; }

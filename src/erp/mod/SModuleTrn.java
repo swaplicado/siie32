@@ -325,6 +325,7 @@ public class SModuleTrn extends SGuiModule {
                         + "id_mat_cons_ent AS " + SDbConsts.FIELD_FK + "1 "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
+                        + (params != null && params.getKey() != null ? "AND id_mat_cons_ent = " + params.getKey()[0] : "") + " " 
                         + "ORDER BY name";
                 break;
             default:

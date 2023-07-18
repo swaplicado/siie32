@@ -27,7 +27,7 @@ import sa.lib.gui.SGuiSession;
  * 
  * @author Edwin Carmona
  */
-public class SAuthorizationUtils {
+public abstract class SAuthorizationUtils {
     
     /**
      * Query base para la obtención de la ruta de autorización

@@ -19,7 +19,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -46,6 +46,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMfgYearId_n;
     protected int mnFkMfgOrderId_n;
     protected int mnFkMfgChargeId_n;
+    protected int mnFkMatRequestId_n;
+    protected int mnFkMatRequestEtyId_n;
+    protected int mnFkConsumeEntityId_n;
+    protected int mnFkSubConsumeEntityId_n;
+    protected int mnFkSubConsumeSubEntityId_n;
     protected int mnFkMaintAreaId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -62,6 +67,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msDbmsUnitSymbol;
     protected java.lang.String msDbmsOriginalUnit;
     protected java.lang.String msDbmsOriginalUnitSymbol;
+    protected java.lang.String msDbmsConsumeEntity;
+    protected java.lang.String msDbmsSubConsumeEntity;
     protected java.lang.String msDbmsMaintArea;
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
@@ -104,6 +111,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
     public void setFkMfgOrderId_n(int n) { mnFkMfgOrderId_n = n; }
     public void setFkMfgChargeId_n(int n) { mnFkMfgChargeId_n = n; }
+    public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
+    public void setFkMatRequestEtyId_n(int n) { mnFkMatRequestEtyId_n = n; }
+    public void setFkConsumeEntityId_n(int n) { mnFkConsumeEntityId_n = n; }
+    public void setFkSubConsumeEntityId_n(int n) { mnFkSubConsumeEntityId_n = n; }
+    public void setFkSubConsumeSubEntityId_n(int n) { mnFkSubConsumeSubEntityId_n = n; }
     public void setFkMaintAreaId(int n) { mnFkMaintAreaId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -135,6 +147,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
     public int getFkMfgOrderId_n() { return mnFkMfgOrderId_n; }
     public int getFkMfgChargeId_n() { return mnFkMfgChargeId_n; }
+    public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
+    public int getFkMatRequestEtyId_n() { return mnFkMatRequestEtyId_n; }
+    public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
+    public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
+    public int getFkSubConsumeSubEntityId_n() { return mnFkSubConsumeSubEntityId_n; }
     public int getFkMaintAreaId() { return mnFkMaintAreaId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -151,6 +168,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setDbmsUnitSymbol(java.lang.String s) { msDbmsUnitSymbol = s; }
     public void setDbmsOriginalUnit(java.lang.String s) { msDbmsOriginalUnit = s; }
     public void setDbmsOriginalUnitSymbol(java.lang.String s) { msDbmsOriginalUnitSymbol = s; }
+    public void setDbmsConsumeEntity(java.lang.String s) { msDbmsConsumeEntity = s; }
+    public void setDbmsSubConsumeEntity(java.lang.String s) { msDbmsSubConsumeEntity = s; }
     public void setDbmsMaintArea(java.lang.String s) { msDbmsMaintArea = s; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
@@ -164,6 +183,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getDbmsUnitSymbol() { return msDbmsUnitSymbol; }
     public java.lang.String getDbmsOriginalUnit() { return msDbmsOriginalUnit; }
     public java.lang.String getDbmsOriginalUnitSymbol() { return msDbmsOriginalUnitSymbol; }
+    public java.lang.String getDbmsConsumeEntity() { return msDbmsConsumeEntity; }
+    public java.lang.String getDbmsSubConsumeEntity() { return msDbmsSubConsumeEntity; }
     public java.lang.String getDbmsMaintArea() { return msDbmsMaintArea; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
@@ -236,6 +257,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         mnFkMfgYearId_n = 0;
         mnFkMfgOrderId_n = 0;
         mnFkMfgChargeId_n = 0;
+        mnFkMatRequestId_n = 0;
+        mnFkMatRequestEtyId_n = 0;
+        mnFkConsumeEntityId_n = 0;
+        mnFkSubConsumeEntityId_n = 0;
+        mnFkSubConsumeSubEntityId_n = 0;
         mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;              // default value set only for preventing bugs
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -252,6 +278,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         msDbmsUnitSymbol = "";
         msDbmsOriginalUnit = "";
         msDbmsOriginalUnitSymbol = "";
+        msDbmsConsumeEntity = "";
+        msDbmsSubConsumeEntity = "";
         msDbmsMaintArea = "";
         msDbmsUserNew = "";
         msDbmsUserEdit = "";
@@ -287,6 +315,9 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "INNER JOIN erp.usru_usr AS un ON de.fid_usr_new = un.id_usr " +
                     "INNER JOIN erp.usru_usr AS ue ON de.fid_usr_edit = ue.id_usr " +
                     "INNER JOIN erp.usru_usr AS ud ON de.fid_usr_del = ud.id_usr " +
+                    "LEFT JOIN trn_mat_cons_ent AS tmce ON de.fk_mat_cons_ent_n = tmce.id_mat_cons_ent " +
+                    "LEFT JOIN trn_mat_cons_subent AS tmcs ON de.fk_mat_sub_cons_ent_n = tmcs.id_mat_cons_ent " +
+                                                        "AND de.fk_mat_sub_cons_sub_ent_n = tmcs.id_mat_cons_subent " +
                     "WHERE de.id_year = " + key[0] + " AND de.id_doc = " + key[1] + " AND de.id_ety = " + key[2] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -316,7 +347,12 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgYearId_n = resultSet.getInt("de.fid_mfg_year_n");
                 mnFkMfgOrderId_n = resultSet.getInt("de.fid_mfg_ord_n");
                 mnFkMfgChargeId_n = resultSet.getInt("de.fid_mfg_chg_n");
-                mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");              
+                mnFkMatRequestId_n = resultSet.getInt("fid_mat_req_n");
+                mnFkMatRequestEtyId_n = resultSet.getInt("fid_mat_req_ety_n");
+                mnFkConsumeEntityId_n = resultSet.getInt("fk_mat_cons_ent_n");
+                mnFkSubConsumeEntityId_n = resultSet.getInt("fk_mat_sub_cons_ent_n");
+                mnFkSubConsumeSubEntityId_n = resultSet.getInt("fk_mat_sub_cons_sub_ent_n");
+                mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");
                 mnFkUserNewId = resultSet.getInt("de.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("de.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("de.fid_usr_del");
@@ -333,6 +369,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 msDbmsUnitSymbol = resultSet.getString("u.symbol");
                 msDbmsOriginalUnit = resultSet.getString("uo.unit");
                 msDbmsOriginalUnitSymbol = resultSet.getString("uo.symbol");
+                msDbmsConsumeEntity = resultSet.getString("tmce.name") == null ? "" : resultSet.getString("tmce.name");
+                msDbmsSubConsumeEntity = resultSet.getString("tmcs.name") == null ? "" : resultSet.getString("tmcs.name");
                 msDbmsMaintArea = resultSet.getString("ma.name");
                 msDbmsUserNew = resultSet.getString("un.usr");
                 msDbmsUserEdit = resultSet.getString("ue.usr");
@@ -397,7 +435,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "{ CALL trn_diog_ety_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ? ) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -421,6 +460,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             if (mnFkMfgYearId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgYearId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkMfgOrderId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgOrderId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             if (mnFkMfgChargeId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgChargeId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            if (mnFkMatRequestId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
+            if (mnFkMatRequestEtyId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestEtyId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
+            if (mnFkConsumeEntityId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkConsumeEntityId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            if (mnFkSubConsumeEntityId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkSubConsumeEntityId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            if (mnFkSubConsumeSubEntityId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkSubConsumeSubEntityId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkMaintAreaId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);
@@ -585,6 +629,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setFkMfgYearId_n(this.getClonedFkMfgYearId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgYearId_n() : this.getFkMfgYearId_n());
         registry.setFkMfgOrderId_n(this.getClonedFkMfgOrderId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgOrderId_n() : this.getFkMfgOrderId_n());
         registry.setFkMfgChargeId_n(this.getClonedFkMfgChargeId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgChargeId_n() : this.getFkMfgChargeId_n());
+        registry.setFkMatRequestId_n(this.getFkMatRequestId_n());
+        registry.setFkMatRequestEtyId_n(this.getFkMatRequestEtyId_n());
+        registry.setFkConsumeEntityId_n(this.getFkConsumeEntityId_n());
+        registry.setFkSubConsumeEntityId_n(this.getFkSubConsumeEntityId_n());
+        registry.setFkSubConsumeSubEntityId_n(this.getFkSubConsumeSubEntityId_n());
         registry.setFkMaintAreaId(this.getFkMaintAreaId());
         registry.setFkUserNewId(this.getFkUserNewId());
         registry.setFkUserEditId(this.getFkUserEditId());
@@ -599,6 +648,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setDbmsItemKey(this.getDbmsItemKey());
         registry.setDbmsUnit(this.getDbmsUnit());
         registry.setDbmsUnitSymbol(this.getDbmsUnitSymbol());
+        registry.setDbmsConsumeEntity(this.getDbmsConsumeEntity());
+        registry.setDbmsSubConsumeEntity(this.getDbmsSubConsumeEntity());
         registry.setDbmsMaintArea(this.getDbmsMaintArea());
         registry.setDbmsUserNew(this.getDbmsUserNew());
         registry.setDbmsUserEdit(this.getDbmsUserEdit());

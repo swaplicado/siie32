@@ -23,7 +23,7 @@ import java.sql.Types;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -61,6 +61,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMfgChargeId_n;
     protected int mnFkMatRequestId_n;
     protected int mnFkMatRequestEtyId_n;
+    protected int mnFkConsumeEntityId_n;
+    protected int mnFkSubConsumeEntityId_n;
+    protected int mnFkSubConsumeSubEntityId_n;
     protected int mnFkBookkeepingYearId_n;
     protected int mnFkBookkeepingNumberId_n;
     protected int mnFkMaintMovementTypeId;
@@ -108,6 +111,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMfgChargeId_n(int n) { mnFkMfgChargeId_n = n; }
     public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
     public void setFkMatRequestEtyId_n(int n) { mnFkMatRequestEtyId_n = n; }
+    public void setFkConsumeEntityId_n(int n) { mnFkConsumeEntityId_n = n; }
+    public void setFkSubConsumeEntityId_n(int n) { mnFkSubConsumeEntityId_n = n; }
+    public void setFkSubConsumeSubEntityId_n(int n) { mnFkSubConsumeSubEntityId_n = n; }
     public void setFkBookkeepingYearId_n(int n) { mnFkBookkeepingYearId_n = n; }
     public void setFkBookkeepingNumberId_n(int n) { mnFkBookkeepingNumberId_n = n; }
     public void setFkMaintMovementTypeId(int n) { mnFkMaintMovementTypeId = n; }
@@ -148,6 +154,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMfgChargeId_n() { return mnFkMfgChargeId_n; }
     public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
     public int getFkMatRequestEtyId_n() { return mnFkMatRequestEtyId_n; }
+    public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
+    public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
+    public int getFkSubConsumeSubEntityId_n() { return mnFkSubConsumeSubEntityId_n; }
     public int getFkBookkeepingYearId_n() { return mnFkBookkeepingYearId_n; }
     public int getFkBookkeepingNumberId_n() { return mnFkBookkeepingNumberId_n; }
     public int getFkMaintMovementTypeId() { return mnFkMaintMovementTypeId; }
@@ -216,6 +225,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
         mnFkMfgChargeId_n = 0;
         mnFkMatRequestId_n = 0;
         mnFkMatRequestEtyId_n = 0;
+        mnFkConsumeEntityId_n = 0;
+        mnFkSubConsumeEntityId_n = 0;
+        mnFkSubConsumeSubEntityId_n = 0;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
         mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA ; // default value set only for preventing bugs
@@ -277,6 +289,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgChargeId_n = resultSet.getInt("fid_mfg_chg_n");
                 mnFkMatRequestId_n = resultSet.getInt("fid_mat_req_n");
                 mnFkMatRequestEtyId_n = resultSet.getInt("fid_mat_req_ety_n");
+                mnFkConsumeEntityId_n = resultSet.getInt("fid_mat_cons_ent_n");
+                mnFkSubConsumeEntityId_n = resultSet.getInt("fid_mat_sub_cons_ent_n");
+                mnFkSubConsumeSubEntityId_n = resultSet.getInt("fid_mat_sub_cons_sub_ent_n");
                 mnFkBookkeepingYearId_n = resultSet.getInt("fid_bkk_year_n");
                 mnFkBookkeepingNumberId_n = resultSet.getInt("fid_bkk_num_n");
                 mnFkMaintMovementTypeId = resultSet.getInt("fid_maint_mov_tp");
@@ -320,7 +335,7 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?, ?, ?) }");
 
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkItemId);
@@ -381,6 +396,20 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
             }
             else {
                 callableStatement.setNull(nParam++, Types.INTEGER);
+                callableStatement.setNull(nParam++, Types.SMALLINT);
+            }
+            if (mnFkConsumeEntityId_n != 0) {
+                callableStatement.setInt(nParam++, mnFkConsumeEntityId_n);
+            }
+            else {
+                callableStatement.setNull(nParam++, Types.SMALLINT);
+            }
+            if (mnFkSubConsumeEntityId_n != 0) {
+                callableStatement.setInt(nParam++, mnFkSubConsumeEntityId_n);
+                callableStatement.setInt(nParam++, mnFkSubConsumeSubEntityId_n);
+            }
+            else {
+                callableStatement.setNull(nParam++, Types.SMALLINT);
                 callableStatement.setNull(nParam++, Types.SMALLINT);
             }
             if (mnFkBookkeepingYearId_n != 0) {
