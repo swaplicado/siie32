@@ -305,7 +305,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
         try {
             sql = "SELECT de.*, d.fid_bkk_year_n, d.fid_bkk_num_n, " +
-                    "i.item, i.item_key, i.part_num, u.unit, u.symbol, uo.unit, uo.symbol, ma.name, un.usr, ue.usr, ud.usr " +
+                    "i.item, i.item_key, i.part_num, u.unit, u.symbol, uo.unit, " +
+                        "uo.symbol, ma.name, tmce.name, tmcs.name, un.usr, ue.usr, ud.usr " +
                     "FROM trn_diog_ety AS de " +
                     "INNER JOIN trn_diog AS d ON de.id_year = d.id_year AND de.id_doc = d.id_doc " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
@@ -315,9 +316,9 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "INNER JOIN erp.usru_usr AS un ON de.fid_usr_new = un.id_usr " +
                     "INNER JOIN erp.usru_usr AS ue ON de.fid_usr_edit = ue.id_usr " +
                     "INNER JOIN erp.usru_usr AS ud ON de.fid_usr_del = ud.id_usr " +
-                    "LEFT JOIN trn_mat_cons_ent AS tmce ON de.fk_mat_cons_ent_n = tmce.id_mat_cons_ent " +
-                    "LEFT JOIN trn_mat_cons_subent AS tmcs ON de.fk_mat_sub_cons_ent_n = tmcs.id_mat_cons_ent " +
-                                                        "AND de.fk_mat_sub_cons_sub_ent_n = tmcs.id_mat_cons_subent " +
+                    "LEFT OUTER JOIN trn_mat_cons_ent AS tmce ON de.fid_mat_cons_ent_n = tmce.id_mat_cons_ent " +
+                    "LEFT OUTER JOIN trn_mat_cons_subent AS tmcs ON de.fid_mat_sub_cons_ent_n = tmcs.id_mat_cons_ent " +
+                                                        "AND de.fid_mat_sub_cons_sub_ent_n = tmcs.id_mat_cons_subent " +
                     "WHERE de.id_year = " + key[0] + " AND de.id_doc = " + key[1] + " AND de.id_ety = " + key[2] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -347,11 +348,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgYearId_n = resultSet.getInt("de.fid_mfg_year_n");
                 mnFkMfgOrderId_n = resultSet.getInt("de.fid_mfg_ord_n");
                 mnFkMfgChargeId_n = resultSet.getInt("de.fid_mfg_chg_n");
-                mnFkMatRequestId_n = resultSet.getInt("fid_mat_req_n");
-                mnFkMatRequestEtyId_n = resultSet.getInt("fid_mat_req_ety_n");
-                mnFkConsumeEntityId_n = resultSet.getInt("fk_mat_cons_ent_n");
-                mnFkSubConsumeEntityId_n = resultSet.getInt("fk_mat_sub_cons_ent_n");
-                mnFkSubConsumeSubEntityId_n = resultSet.getInt("fk_mat_sub_cons_sub_ent_n");
+                mnFkMatRequestId_n = resultSet.getInt("de.fid_mat_req_n");
+                mnFkMatRequestEtyId_n = resultSet.getInt("de.fid_mat_req_ety_n");
+                mnFkConsumeEntityId_n = resultSet.getInt("de.fid_mat_cons_ent_n");
+                mnFkSubConsumeEntityId_n = resultSet.getInt("de.fid_mat_sub_cons_ent_n");
+                mnFkSubConsumeSubEntityId_n = resultSet.getInt("de.fid_mat_sub_cons_sub_ent_n");
                 mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");
                 mnFkUserNewId = resultSet.getInt("de.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("de.fid_usr_edit");
