@@ -90,10 +90,10 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
         }
         
-        where += (where.isEmpty() ? "" : "AND ") + "(f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
+        where += (where.isEmpty() ? "" : "AND ") + "(cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
                 ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = " +
                 SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " " +
-                "OR f_get_st_auth(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
+                "OR cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
                 ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = " +
                 SAuthorizationUtils.AUTH_STATUS_NA + ") ";
         where += "AND fk_st_mat_req >= " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " ";

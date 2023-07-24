@@ -913,7 +913,7 @@ public abstract class SDataConstantsSys {
     public static final int FINS_ST_FIN_MOV_TRANSIT = 2;
 
     public static final int FINU_TAX_BAS_VAT = 1;
-
+    
     public static final java.lang.String FINU_TP_REC_FY_OPEN = "EA";
     public static final java.lang.String FINU_TP_REC_FY_END = "EC";
     public static final java.lang.String FINU_TP_REC_PUR = "C";
@@ -999,6 +999,9 @@ public abstract class SDataConstantsSys {
     
     public static final int FINX_ACC = 1;
     public static final int FINX_ACC_DEEP = 2;
+    
+    public static final String FINX_TAX_FACT_EX = "E";
+    public static final String FINX_TAX_FACT_TA = "T";
     
     public static final int TRNS_CT_DPS_PUR = 1;
     public static final int TRNS_CT_DPS_SAL = 2;
