@@ -23,6 +23,7 @@ import erp.mod.trn.db.SDbMaintConfig;
 import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
+import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormFunctionalAreaBudgets;
@@ -33,6 +34,7 @@ import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
 import erp.mod.trn.form.SFormMaintUser;
 import erp.mod.trn.form.SFormMaintUserSupervisor;
+import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewCurrencyBalance;
@@ -51,6 +53,8 @@ import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMaintUser;
 import erp.mod.trn.view.SViewMaintUserSupervisor;
+import erp.mod.trn.view.SViewMaterialRequest;
+import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewValCost;
@@ -84,6 +88,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
     private SFormItemCost moFormItemCost;
+    private SFormMaterialRequest moFormMaterialReq;
     private SFormMaintUser moFormMaintUserEmployee;
     private SFormMaintUser moFormMaintUserContractor;
     private SFormMaintUser moFormMaintUserToolMaintProv;
@@ -185,6 +190,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_COST_IDENT_LOT:
                 registry = new SDbIdentifiedCostLot();
                 break;
+            case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRNX_MAT_REQ_PEND:
+                registry = new SDbMaterialRequest();
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -200,6 +209,13 @@ public class SModuleTrn extends SGuiModule {
         SGuiCatalogueSettings settings = null;
 
         switch (type) {
+            case SModConsts.TRNS_ST_MAT_REQ:
+                settings = new SGuiCatalogueSettings("Estatus de requisición", 1);
+                sql = "SELECT id_st_mat_req AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_st_mat_req ";
+                break;
             case SModConsts.TRNU_TP_DPS:
                 settings = new SGuiCatalogueSettings("Tipo de documento", 3);
                 sql = "SELECT id_ct_dps AS " + SDbConsts.FIELD_ID + "1, id_cl_dps AS " + SDbConsts.FIELD_ID + "2, id_tp_dps AS " + SDbConsts.FIELD_ID + "3, "
@@ -214,6 +230,21 @@ public class SModuleTrn extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
                         + "ORDER BY id_tp_dps_ann ";
+                break;
+            case SModConsts.TRNU_MAT_REQ_PTY:
+                settings = new SGuiCatalogueSettings("Prioridad", 1);
+                sql = "SELECT id_mat_req_pty AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_mat_req_pty";
+                break;
+            case SModConsts.TRNU_MAT_PRES:
+                settings = new SGuiCatalogueSettings("Presentación", 1);
+                sql = "SELECT id_mat_pres AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del AND id_mat_pres <> " + SModSysConsts.TRNU_MAT_PRES_NA + " "
+                        + (params != null ? "AND fk_unit = " + params.getType() + " " : "")
+                        + "ORDER BY name";
                 break;
             case SModConsts.TRN_MAINT_AREA:
                 settings = new SGuiCatalogueSettings("Área de mantenimiento", 1);
@@ -251,6 +282,50 @@ public class SModuleTrn extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del AND fk_maint_user_n = " + params.getKey()[0] + " "
                         + "ORDER BY name, id_maint_user_supv ";
+                break;
+            case SModConsts.TRN_MAT_PROV_ENT:
+                settings = new SGuiCatalogueSettings("Entidad de suministro", 1);
+                switch (subtype) {
+                    case SModConsts.USRU_USR:
+                        sql = "SELECT p.id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(p.code, ' - ', p.name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS p "
+                                + "INNER JOIN trn_mat_prov_ent_usr AS pu ON p.id_mat_prov_ent = pu.id_mat_prov_ent "
+                                + "WHERE NOT b_del AND pu.id_usr = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY pu.b_default DESC, p.name";
+                        break;
+                    default:
+                        sql = "SELECT id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY name";
+                        break;
+                }
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT:
+                settings = new SGuiCatalogueSettings("Entidad de consumo", 1);
+                switch (subtype) {
+                    case SModConsts.USRU_USR:
+                        sql = "SELECT c.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(c.code, ' - ', c.name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS c "
+                                + "INNER JOIN trn_mat_cons_ent_usr AS cu ON c.id_mat_cons_ent = cu.id_mat_cons_ent "
+                                + "WHERE NOT b_del AND cu.id_usr = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY cu.b_default DESC, c.name";
+                        break;
+                    default:
+                        sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY name";
+                        break;
+                }
+                break;
+            case SModConsts.TRN_MAT_CONS_SUBENT:
+                settings = new SGuiCatalogueSettings("Subentidad de consumo", 2, 1);
+                sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + ", "
+                        + "id_mat_cons_ent AS " + SDbConsts.FIELD_FK + "1 "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -348,6 +423,25 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAINT_USER_SUPV:
                 view = new SViewMaintUserSupervisor(miClient, "Mantto. - Residentes contratistas");
                 break;
+            case SModConsts.TRN_MAT_REQ:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PET:
+                        switch (params.getType()) {
+                            case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis req. nuevas"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis req. x autorizar"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_PROV: title = "Mis req. en proceso"; break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis requicisiones"; break;
+                        }
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_REV:
+                        switch (params.getType()) {
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Requisiciones x autorizar"; break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis requicisiones"; break;
+                        }
+                        break;
+                }
+                view = new SViewMaterialRequest(miClient, subtype, title, params);
+                break;
             case SModConsts.TRN_ITEM_COST:
                 view = new SViewItemCost(miClient, "Costos de ítems");
                 break;
@@ -363,6 +457,9 @@ public class SModuleTrn extends SGuiModule {
                 break;             
             case SModConsts.TRNX_ACC_PEND:
                 view = new SViewAccountsPending(miClient, subtype, (subtype == SModSysConsts.BPSS_CT_BP_CUS ? "CXC" : "CXP"));
+                break;
+            case SModConsts.TRNX_MAT_REQ_PEND:
+                view = new SViewMaterialRequestPending(miClient, "Requisiciones pendientes");
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 view = new SViewFunctionalAreaBudgets(miClient, "Presupuestos mensuales gastos");
@@ -442,6 +539,11 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_ITEM_COST:
                 if (moFormItemCost == null) moFormItemCost = new SFormItemCost(miClient, "Costos de ítems");
                 form = moFormItemCost;
+                break;
+            case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRNX_MAT_REQ_PEND:
+                if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                form = moFormMaterialReq;
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");

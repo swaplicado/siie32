@@ -6,6 +6,7 @@
 package erp.mtrn.data.cfd;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataTax;
@@ -39,16 +40,23 @@ public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegist
         reset();
     }
     
-    private void assignTaxInfo() {
+    private void assignTaxInfo() throws Exception {
         if (moDbmsTax != null) {
             mdRate = moDbmsTax.getPercentage();
             mnFkCfdTaxId = moDbmsTax.getDbmsCfdTaxId();
             mnFkTaxTypeId = moDbmsTax.getFkTaxTypeId();
-            if (moDbmsTax.getVatType().toLowerCase().equals("exent")) {
-                msFactorCode = "E";
-            }
-            else {
-                msFactorCode = "T";
+            switch (moDbmsTax.getVatType().toLowerCase()) {
+                case "exent" : 
+                    msFactorCode = SDataConstantsSys.FINX_TAX_FACT_EX; 
+                    break;
+                case "tcero":
+                case "tgral":
+                case "tfron":
+                case "efron":
+                    msFactorCode = SDataConstantsSys.FINX_TAX_FACT_TA;
+                    break;
+                default:
+                    throw new Exception("El impuesto no tiene configurado un tipo de impuesto.");
             }
         }
     }
@@ -75,7 +83,7 @@ public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegist
     public int getFkCfdTaxId() { return mnFkCfdTaxId; }
     public int getFkTaxTypeId() { return mnFkTaxTypeId; }
     
-    public void setDbmsTax(SDataTax o) { 
+    public void setDbmsTax(SDataTax o) throws Exception { 
         moDbmsTax = o; 
         assignTaxInfo();
     }
@@ -243,7 +251,9 @@ public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegist
         clone.setFkCfdTaxId(mnFkCfdTaxId);
         clone.setFkTaxTypeId(mnFkTaxTypeId);
         
-        clone.setDbmsTax(moDbmsTax); // el clon comparte esta instancia que es de sólo lectura
+        try {
+            clone.setDbmsTax(moDbmsTax); // el clon comparte esta instancia que es de sólo lectura
+        } catch(Exception e) { }
         
         return clone;
     }

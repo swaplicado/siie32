@@ -95,6 +95,9 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_CFD_ORG_NAMES = "CFD_ORG_NAMES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
+    public static final String CFG_PARAM_TRN_MAT_PTY = "TRN_MAT_PTY";
+    public static final String CFG_PARAM_TRN_MAT_ITM_DMY = "TRN_MAT_ITM_DMY";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
@@ -306,6 +309,11 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_MFG_FG_DEV = 105056;
     public static final int PRV_INV_MFG_CON = 105057;
     public static final int PRV_INV_MAINT = 105058;
+    public static final int PRV_INV_REQ_MAT_PET = 105059;
+    public static final int PRV_INV_REQ_MAT_REV = 105060;
+    public static final int PRV_INV_REQ_MAT_PROV = 105061;
+    public static final int PRV_INV_REQ_MAT_PUR = 105062;
+    public static final int PRV_INV_REQ_MAT_ADM = 105063;
     public static final int PRV_INV_REP = 105901;
 
     public static final int PRV_MKT_CUS_CFG = 106001;
@@ -905,7 +913,7 @@ public abstract class SDataConstantsSys {
     public static final int FINS_ST_FIN_MOV_TRANSIT = 2;
 
     public static final int FINU_TAX_BAS_VAT = 1;
-
+    
     public static final java.lang.String FINU_TP_REC_FY_OPEN = "EA";
     public static final java.lang.String FINU_TP_REC_FY_END = "EC";
     public static final java.lang.String FINU_TP_REC_PUR = "C";
@@ -991,6 +999,9 @@ public abstract class SDataConstantsSys {
     
     public static final int FINX_ACC = 1;
     public static final int FINX_ACC_DEEP = 2;
+    
+    public static final String FINX_TAX_FACT_EX = "E";
+    public static final String FINX_TAX_FACT_TA = "T";
     
     public static final int TRNS_CT_DPS_PUR = 1;
     public static final int TRNS_CT_DPS_SAL = 2;
@@ -1159,6 +1170,7 @@ public abstract class SDataConstantsSys {
 
     public static final int TRNS_TP_STK_SEG_SHIP = 1;       // shipment
     public static final int TRNS_TP_STK_SEG_MFG_ORD = 2;    // manufacturing order
+    public static final int TRNS_TP_STK_SEG_REQ_MAT = 3;    // Material request
 
     public static final int TRNS_TP_STK_SEG_INC = 1;    // increment
     public static final int TRNS_TP_STK_SEG_DEC = 2;    // decrement

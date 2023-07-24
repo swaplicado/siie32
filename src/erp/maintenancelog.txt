@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 216.1/ 2023-07-18
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en el cálculo y asignación de factor de los impuestos en el complemento de recepción de pagos.
+
+================================================================================
+SIIE 3.2 216.0/ 2023-07-14
+Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación de las requisiciones de materiales en em módulo de inventarios.
 SIIE 3.2 214.3/ 2023-07-21
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -79,6 +79,8 @@ public abstract class SModConsts {
     public static final int CFGS_TP_DBMS = 1011009;
     public static final int CFGS_TP_MMS = 1011010;
     public static final int CFGS_TP_MOD = 1011011;
+    public static final int CFGS_TP_AUTHORN = 1011020;
+    public static final int CFGS_ST_AUTHORN = 1011021;
 
     public static final int CFGU_CUR = 1012001;
     public static final int CFGU_CO = 1012002;
@@ -89,6 +91,10 @@ public abstract class SModConsts {
     public static final int CFGU_CERT = 1013001;
     public static final int CFGU_FUNC = 1013011;
     public static final int CFGU_SHIFT = 1013021;
+    public static final int CFGU_AUTHORN_NODE = 1013033;
+    public static final int CFGU_AUTHORN_NODE_USR = 1013034;
+    public static final int CFGU_AUTHORN_PATH = 1013031;
+    public static final int CFGU_AUTHORN_STEP = 1013032;
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
@@ -346,6 +352,9 @@ public abstract class SModConsts {
     public static final int TRNS_TP_STK_SEG_MOV = 2021032;
     public static final int TRNS_CFD_CAT = 2021201;
     public static final int TRNS_TP_MAINT_MOV = 2021301;
+    public static final int TRNS_ST_MAT_REQ = 2021302;
+    public static final int TRNS_ST_MAT_PROV = 2021303;
+    public static final int TRNS_ST_MAT_PUR = 2021304;
 
     public static final int TRNU_DPS_NAT = 2022001;
     public static final int TRNU_TP_DPS = 2022002;
@@ -353,6 +362,8 @@ public abstract class SModConsts {
     public static final int TRNU_TP_PAY_SYS = 2022003;
     public static final int TRNU_TP_IOG_ADJ = 2022004;
     public static final int TRNU_TP_DPS_ANN = 2022005;
+    public static final int TRNU_MAT_REQ_PTY = 2022007;
+    public static final int TRNU_MAT_PRES = 2022008;
 
     public static final int TRN_DNS_DPS = 2023001;
     public static final int TRN_DNS_DIOG = 2023002;
@@ -410,6 +421,7 @@ public abstract class SModConsts {
     public static final int TRN_STK_SEG = 2023061;
     public static final int TRN_STK_SEG_WHS = 2023062;
     public static final int TRN_STK_SEG_WHS_ETY = 2023063;
+    public static final int TRN_STK_SEG_X = 2023065;
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;
@@ -439,6 +451,17 @@ public abstract class SModConsts {
     public static final int TRN_MAINT_USER_SUPV = 2023316;
     public static final int TRN_MAINT_DIOG_SIG = 2023321;
     public static final int TRN_FUNC_BUDGET = 2023331;
+    public static final int TRN_MAT_CONS_ENT = 2023332;
+    public static final int TRN_MAT_CONS_SUBENT = 2023333;
+    public static final int TRN_MAT_CONS_ENT_USR = 2023334;
+    public static final int TRN_MAT_PROV_ENT = 2023335;
+    public static final int TRN_MAT_PROV_ENT_WAH = 2023336;
+    public static final int TRN_MAT_PROV_ENT_USR = 2023337;
+    public static final int TRN_MAT_REQ = 2023338;
+    public static final int TRN_MAT_REQ_NTS = 2023339;
+    public static final int TRN_MAT_REQ_ETY = 2023340;
+    public static final int TRN_MAT_REQ_ETY_NTS = 2023341;
+    public static final int TRN_MAT_REQ_ST_LOG = 2023342;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -456,6 +479,8 @@ public abstract class SModConsts {
     public static final int TRNX_INT_CUS_QRY = 2024053;     // integral query customers
     public static final int TRNX_INT_SUP_QRY = 2024054;     // integral query provider
     public static final int TRNX_ACC_PEND = 2024071;        // accounts pending: receivable accounts & payable accounts
+    public static final int TRNX_MAT_REQ_PEND = 2024072;        // material requisitions pending supply
+    public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;   // renglones de requisiciones en diálogo de segregaciones
     public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_FUNC_EXPENSES = 2024336;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
@@ -806,6 +831,8 @@ public abstract class SModConsts {
         TablesMap.put(CFGS_TP_DBMS, "erp.cfgs_tp_dbms");
         TablesMap.put(CFGS_TP_MMS, "erp.cfgs_tp_mms");
         TablesMap.put(CFGS_TP_MOD, "erp.cfgs_tp_mod");
+        TablesMap.put(CFGS_TP_AUTHORN, "erp.cfgs_tp_authorn");
+        TablesMap.put(CFGS_ST_AUTHORN, "erp.cfgs_st_authorn");
 
         TablesMap.put(CFGU_CUR, "erp.cfgu_cur");
         TablesMap.put(CFGU_CO, "erp.cfgu_co");
@@ -816,6 +843,10 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_CERT, "cfgu_cert");
         TablesMap.put(CFGU_FUNC, "cfgu_func");
         TablesMap.put(CFGU_SHIFT, "cfgu_shift");
+        TablesMap.put(CFGU_AUTHORN_NODE, "cfgu_authorn_node");
+        TablesMap.put(CFGU_AUTHORN_NODE_USR, "cfgu_authorn_node_usr");
+        TablesMap.put(CFGU_AUTHORN_PATH, "cfgu_authorn_path");
+        TablesMap.put(CFGU_AUTHORN_STEP, "cfgu_authorn_step");
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");
@@ -1037,6 +1068,9 @@ public abstract class SModConsts {
         TablesMap.put(TRNS_TP_STK_SEG_MOV, "erp.trns_tp_stk_seg_mov");
         TablesMap.put(TRNS_CFD_CAT, "erp.trns_cfd_cat");
         TablesMap.put(TRNS_TP_MAINT_MOV, "erp.trns_tp_maint_mov");
+        TablesMap.put(TRNS_ST_MAT_REQ, "erp.trns_st_mat_req");
+        TablesMap.put(TRNS_ST_MAT_PROV, "erp.trns_st_mat_prov");
+        TablesMap.put(TRNS_ST_MAT_PUR, "erp.trns_st_mat_pur");
 
         TablesMap.put(TRNU_DPS_NAT, "erp.trnu_dps_nat");
         TablesMap.put(TRNU_TP_DPS, "erp.trnu_tp_dps");
@@ -1044,6 +1078,8 @@ public abstract class SModConsts {
         TablesMap.put(TRNU_TP_PAY_SYS, "erp.trnu_tp_pay_sys");
         TablesMap.put(TRNU_TP_IOG_ADJ, "erp.trnu_tp_iog_adj");
         TablesMap.put(TRNU_TP_DPS_ANN, "erp.trnu_tp_dps_ann");
+        TablesMap.put(TRNU_MAT_REQ_PTY, "erp.trnu_mat_req_pty");
+        TablesMap.put(TRNU_MAT_PRES, "erp.trnu_mat_pres");
 
         TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");
         TablesMap.put(TRN_DNS_DIOG, "trn_dns_diog");
@@ -1129,6 +1165,17 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAINT_USER_SUPV, "trn_maint_user_supv");
         TablesMap.put(TRN_MAINT_DIOG_SIG, "trn_maint_diog_sig");
         TablesMap.put(TRN_FUNC_BUDGET, "trn_func_budget");
+        TablesMap.put(TRN_MAT_CONS_ENT, "trn_mat_cons_ent");
+        TablesMap.put(TRN_MAT_CONS_SUBENT, "trn_mat_cons_subent");
+        TablesMap.put(TRN_MAT_CONS_ENT_USR, "trn_mat_cons_ent_usr");
+        TablesMap.put(TRN_MAT_PROV_ENT, "trn_mat_prov_ent");
+        TablesMap.put(TRN_MAT_PROV_ENT_WAH, "trn_mat_prov_ent_wah");
+        TablesMap.put(TRN_MAT_PROV_ENT_USR, "trn_mat_prov_ent_usr");
+        TablesMap.put(TRN_MAT_REQ, "trn_mat_req");
+        TablesMap.put(TRN_MAT_REQ_NTS, "trn_mat_req_nts");
+        TablesMap.put(TRN_MAT_REQ_ETY, "trn_mat_req_ety");
+        TablesMap.put(TRN_MAT_REQ_ETY_NTS, "trn_mat_req_ety_nts");
+        TablesMap.put(TRN_MAT_REQ_ST_LOG, "trn_mat_req_st_log");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");
