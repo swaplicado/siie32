@@ -204,7 +204,7 @@ public class SViewEmployeeBenefitTables extends SGridPaneView implements ActionL
         String vacationBonus = ((String) miClient.getSession().readField(SModConsts.HRSS_TP_BEN, new int[] { SModSysConsts.HRSS_TP_BEN_VAC_BON }, SDbRegistry.FIELD_NAME)).toLowerCase();
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Nombre empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Clave empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_uni", "Sindicalizado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tpay.name", "Período pago", 75));

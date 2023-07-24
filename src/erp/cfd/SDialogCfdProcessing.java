@@ -440,6 +440,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                                 
                                 File pdfFile = new File(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
                                 File xmlFile = new File(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
+                                
                                 if (pdfFile.exists()) {
                                     pdfFile.delete();
                                 }

@@ -911,11 +911,14 @@ public abstract class SCfdUtils implements Serializable {
                                         packet.setAuxDataPayrollReceiptIssue(dataPayrollReceiptIssue);
                                     }
                                     break;
+                                    
                                 case SDataConstantsSys.TRNS_TP_CFD_BOL:
                                     bol = new SDbBillOfLading();
                                     bol.read(client.getSession(), registryKey);
                                     
                                     packet.setAuxDataBillOfLading(bol);
+                                    break;
+                                    
                                 default:
                             }
                         }
@@ -954,7 +957,10 @@ public abstract class SCfdUtils implements Serializable {
                         // XXX NOTE: 2018-02-24, Sergio Flores: Check why is read again the CFD registry:
                         
                         SDataCfd cfdForPrinting = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, dataCfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                        printCfd(client, cfdForPrinting, payrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, true);
+                        
+                        if (dataCfd.getFkCfdTypeId() != SDataConstantsSys.TRNS_TP_CFD_PAYROLL) { // CFD of payroll must not be saved to file system
+                            printCfd(client, cfdForPrinting, payrollCfdVersion, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, true);
+                        }
 
                         // set flag PDF as correct:
 

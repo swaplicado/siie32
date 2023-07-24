@@ -1993,6 +1993,7 @@ public abstract class STrnUtilities {
                         }
                         pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
                     }
+                    
                     if (!pdfFile.exists()) {
                         throw new SMailException("El archivo PDF no existe.");
                     }
@@ -2012,6 +2013,7 @@ public abstract class STrnUtilities {
                                 fw.write(cfd.getDocXml());
                             }
                         }
+                        
                         if (!xmlFile.exists()) {
                             throw new SMailException("El archivo XML no existe.");
                         }

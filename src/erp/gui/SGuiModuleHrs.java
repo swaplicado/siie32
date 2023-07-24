@@ -632,7 +632,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBenBenefitVacStat.setEnabled(hasRightPay);
         jmiBenBenefitVac.setEnabled(/*hasRightPay*/false);
         jmiBenBenefitBonVac.setEnabled(/*hasRightPay*/false);
-        jmiBenBenefitBonAnn.setEnabled(/*hasRightPay*/false);
+        jmiBenBenefitBonAnn.setEnabled(hasRightPay);
         jmiBenBenefitAdjustmentEar.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight);
         jmiBenLoan.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);
         jmiBenLoanAdjustmentEar.setEnabled(hasRightPay || hasRightPayWeek || hasRightPayFortnight || hasRightAuxHrs);

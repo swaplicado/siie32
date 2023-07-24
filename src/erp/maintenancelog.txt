@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 214.3/ 2023-07-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejora para selección de recibos a timbrar con CFDI existente.
+2) Estandarización de etiquetas de vistas para nombres y números de empleados y centros de costo.
+
+================================================================================
 SIIE 3.2 214.2/ 2023-07-13
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

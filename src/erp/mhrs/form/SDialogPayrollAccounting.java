@@ -437,7 +437,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         i = 0;
         aoTableColumns = new STableColumnForm[8];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 150);
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Clave empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código departamento", 50);
@@ -456,7 +456,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         i = 0;
         aoTableColumns = new STableColumnForm[13];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 150);
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Clave empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código departamento", 50);
