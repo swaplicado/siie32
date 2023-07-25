@@ -6,6 +6,7 @@ package erp.mod.hrs.db;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.utils.SAnniversary;
 import java.util.Date;
+import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
 
@@ -21,8 +22,8 @@ public class SRowBenefitTablesMassiveAssignation implements SGridRow {
     protected int mnBenefitType;
     protected int mnUpdateMode;
     protected SDbEmployee moEmployee;
-    protected SDbEmployeeBenefitTables moCurrentBenefitTables;
     protected SAnniversary moAnniversary;
+    protected SDbEmployeeBenefitTables moCurrentBenefitTables;
     
     /**
      * Creates new row for massive update of benefit tables.
@@ -37,20 +38,26 @@ public class SRowBenefitTablesMassiveAssignation implements SGridRow {
         mnBenefitType = benefitType;
         mnUpdateMode = updateMode;
         moEmployee = employee;
-        moCurrentBenefitTables = SHrsBenefitUtils.getCurrentBenefitTables(session, employee.getPkEmployeeId());
         moAnniversary = moEmployee.createAnniversary(today);
+        
+        try {
+            moCurrentBenefitTables = SHrsBenefitUtils.getCurrentBenefitTables(session, employee.getPkEmployeeId());
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
     }
     
     public SDbEmployee getEmployee() {
         return moEmployee;
     }
     
-    public SDbEmployeeBenefitTables getCurrentBenefitTables() {
-        return moCurrentBenefitTables;
-    }
-    
     public SAnniversary getAnniversary() {
         return moAnniversary;
+    }
+    
+    public SDbEmployeeBenefitTables getCurrentBenefitTables() {
+        return moCurrentBenefitTables;
     }
     
     public int getAssignationAnniversary() {

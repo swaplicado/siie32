@@ -107,9 +107,15 @@ public abstract class SHrsCfdUtils {
 
     /**
      * Obtener la lista de recibos de nómina activos pendientes de timbrar, de la siguiente forma:<br>
+     * 1) Recibos de nómina cuya emisión más reciente tenga estatus 'emitido', pero que no tenga CFD o que su CFD no esté emitido o esté cancelado.<br>
+     * 1) Recibos de nómina cuya emisión más reciente tenga estatus 'cancelado', pero que no tenga CFD o que su CFD no esté emitido o esté cancelado.<br>
+     * 
+     * 2) Por otro lado, recibos de nómina cuyas emisiones estén 'canceladas', pero con CFD 'nuevo' o 'cancelado' o sin UUID (i.e., sin timbrar, o sea, redundantemente, 'nuevo').<br>
+     * <b>NOTA:</b> Al cerrarse la nómina, se crean los registros de emisión de cada recibo de nómina con estatus 'emitido (2)'.
+     * 
      * 1) Por un lado, recibos de nómina cuyas emisiones estén 'emitidas' o 'canceladas', pero sin CFD.<br>
      * 2) Por otro lado, recibos de nómina cuyas emisiones estén 'canceladas', pero con CFD 'nuevo' o 'cancelado' o sin UUID (i.e., sin timbrar, o sea, redundantemente, 'nuevo').<br>
-     * <b>NOTA:</b> Al cerrarse la nómina, se crean la emisión de cada recibo de nómina como 'emitida'.
+     * <b>NOTA:</b> Al cerrarse la nómina, se crean los registros de emisión de cada recibo de nómina con estatus 'emitido (2)'.
      * @param session
      * @param payrollId
      * @return
@@ -118,14 +124,17 @@ public abstract class SHrsCfdUtils {
     public static ArrayList<SHrsPayrollEmployeeReceipt> getReceiptsPendig(final SGuiSession session, final int payrollId) throws Exception {
         ArrayList<SHrsPayrollEmployeeReceipt> receipts = new ArrayList<>();
         
-        String sql = "SELECT pri.id_pay, pri.id_emp, pri.id_iss, "
+        String sql = "SELECT "
+                + "pri.id_pay, pri.id_emp, pri.id_iss, "
+                + "pri.num_ser, pri.num, pri.dt_iss, pri.dt_pay, pri.uuid_rel, pri.fk_tp_pay_sys, pri.fk_st_rcp, "
                 + "p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, "
-                + "bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name, pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
-                + "pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
+                + "pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
+                + "bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp "
-                + "AND pri.id_iss = COALESCE((SELECT MAX(prix.id_iss) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS prix "
+                + "AND pri.id_iss = COALESCE("
+                + "(SELECT MAX(prix.id_iss) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS prix "
                 + " WHERE prix.id_pay = pr.id_pay AND prix.id_emp = pr.id_emp AND NOT prix.b_del), 0) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " bp ON bp.id_bp = pr.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
@@ -133,14 +142,11 @@ public abstract class SHrsCfdUtils {
                 + "WHERE p.id_pay = " + payrollId + " "
                 + "AND NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND pr.b_cfd_req "
                 + "AND ("
-                + "(pri.fk_st_rcp IN (" + SModSysConsts.TRNS_ST_DPS_EMITED + ", " + SModSysConsts.TRNS_ST_DPS_ANNULED + ") "
-                + "AND NOT EXISTS (SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c "
-                + " WHERE c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss)) "
+                + "pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_ANNULED + " "
                 + "OR "
-                + "(pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_ANNULED + " "
-                + "AND EXISTS (SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c "
-                + " WHERE c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss "
-                + " AND (c.fid_st_xml IN (" + SModSysConsts.TRNS_ST_DPS_NEW + " , " + SModSysConsts.TRNS_ST_DPS_ANNULED + ") OR c.uuid = '')))) "
+                + "NOT (pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND EXISTS "
+                + "(SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c "
+                + " WHERE c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ")))"
                 + "ORDER BY _emp_name, id_emp, id_iss;";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
@@ -169,6 +175,7 @@ public abstract class SHrsCfdUtils {
                 receipt.setDateOfPayment(resultSet.getDate("dt_pay"));
                 receipt.setPaymentTypeSysId(resultSet.getInt("fk_tp_pay_sys"));
                 receipt.setPaymentTypeSys("");
+                receipt.setReceiptStatusId(resultSet.getInt("fk_st_rcp"));
                 receipt.setUuidToSubstitute(resultSet.getString("uuid_rel"));
                 
                 receipts.add(receipt);

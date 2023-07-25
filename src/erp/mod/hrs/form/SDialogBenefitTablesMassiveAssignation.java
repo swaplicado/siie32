@@ -13,6 +13,7 @@ import erp.mod.hrs.db.SDbEmployeeBenefitTables;
 import erp.mod.hrs.db.SHrsBenefitUtils;
 import erp.mod.hrs.db.SRowBenefitTablesMassiveAssignation;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -830,16 +831,15 @@ public class SDialogBenefitTablesMassiveAssignation extends SBeanFormDialog impl
                 moUpdateFields.setFieldsEnabled(true);
 
                 try {
-                    SGuiUtils.setCursorWait(miClient);
+                    getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                     
                     populateEmployees();
-                    
-                    SGuiUtils.setCursorDefault(miClient);
                 }
                 catch (Exception e) {
-                    SGuiUtils.setCursorDefault(miClient);
-                    
                     SLibUtils.showException(this, e);
+                }
+                finally {
+                    getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
             };
         }
@@ -993,10 +993,10 @@ public class SDialogBenefitTablesMassiveAssignation extends SBeanFormDialog impl
             // compute massive assignation of benefits:
             
             try {
-                SGuiUtils.setCursorWait(miClient);
+                getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 
                 if (SHrsBenefitUtils.computeMassiveAssignation(miClient.getSession(), benefitType, moKeyBenefitTable.getValue()[0], rows)) {
-                    SGuiUtils.setCursorDefault(miClient);
+                    getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                     
                     miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);
                     miClient.getSession().notifySuscriptors(SModConsts.HRS_EMP_BEN);
@@ -1006,9 +1006,10 @@ public class SDialogBenefitTablesMassiveAssignation extends SBeanFormDialog impl
                 }
             }
             catch (Exception e) {
-                SGuiUtils.setCursorDefault(miClient);
-                
                 SLibUtils.showException(this, e);
+            }
+            finally {
+                getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
     }

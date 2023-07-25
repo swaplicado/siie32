@@ -2999,7 +2999,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     int yearBenefits = SLibTimeUtils.digestYear(moFieldDateBenefits.getDate())[0];
                     HashMap<Integer, String> benefitNames = new HashMap<>();
                     HashMap<Integer, String> userNames = new HashMap<>();
-                    ArrayList<SDbEmployeeBenefitTablesAnnum> annums = moEmployeeBenefitTables.getBenefitAnnums(null, benefitType);
+                    ArrayList<SDbEmployeeBenefitTablesAnnum> annums = moEmployeeBenefitTables.getBenefitAnnums(miClient.getSession(), benefitType);
                     
                     for (SDbEmployeeBenefitTablesAnnum annum : annums) {
                         String benefitName = benefitNames.get(annum.getFkBenefitId());
@@ -3162,7 +3162,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 break;
                 
             case SModSysConsts.HRSS_TP_BEN_VAC_BON:
-                if (moEmployeeBenefitTables == null || moEmployeeBenefitTables.getFkBenefitVacationBonusId()== 0) {
+                if (moEmployeeBenefitTables == null || moEmployeeBenefitTables.getFkBenefitVacationBonusId() == 0) {
                     moFieldBenVacBonTable.resetField(); // triggers item-state-change event if needed
                     jspVacBonSeniorityStart.setValue(1);
                     jtfVacBonLastUpdate.setText("");
@@ -3180,7 +3180,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 break;
                 
             case SModSysConsts.HRSS_TP_BEN_ANN_BON:
-                if (moEmployeeBenefitTables == null || moEmployeeBenefitTables.getFkBenefitAnnualBonusId()== 0) {
+                if (moEmployeeBenefitTables == null || moEmployeeBenefitTables.getFkBenefitAnnualBonusId() == 0) {
                     moFieldBenAnnBonTable.resetField(); // triggers item-state-change event if needed
                     jspAnnBonSeniorityStart.setValue(1);
                     jtfAnnBonLastUpdate.setText("");
@@ -4180,7 +4180,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moBenefitsAnnBonPane.createTable(null);
         moWageFactorsPane.createTable(null);
         
-        moEmployeeBenefitTables = null;
         renderBenefitsAndWageFactors();
     }
 
@@ -4682,11 +4681,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         
         try {
             moEmployeeBenefitTables = SHrsBenefitUtils.getCurrentBenefitTables(((SGuiClient) miClient).getSession(), moEmployee.getPkEmployeeId());
-            renderBenefitsAndWageFactors();
         }
         catch (Exception e) {
-            SLibUtilities.renderException(this, e);
+            SLibUtilities.printOutException(this, e);
         }
+        
+        if (moEmployeeBenefitTables == null) {
+            miClient.showMsgBoxWarning("El empleado no cuenta aún con su registro de prestaciones.");
+        }
+        renderBenefitsAndWageFactors();
     }
 
     @Override

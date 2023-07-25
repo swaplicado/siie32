@@ -345,6 +345,7 @@ public class SDialogUpdateAllDpsItem extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
@@ -359,6 +360,7 @@ public class SDialogUpdateAllDpsItem extends javax.swing.JDialog implements erp.
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
           SFormUtilities.populateComboBox(miClient, jcbFkItemId, SDataConstants.ITMU_ITEM);
 

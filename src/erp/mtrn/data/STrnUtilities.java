@@ -1865,6 +1865,7 @@ public abstract class STrnUtilities {
      * @throws javax.mail.MessagingException
      * @throws java.sql.SQLException
      */
+    @SuppressWarnings("deprecation")
     public static boolean sendMailCfd(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int contactType, final int bizPartnerId, final int bizPartnerBranchId, boolean catchExceptions) throws MessagingException, SQLException, SMailException, Exception {
         boolean send = false;
         
@@ -1993,6 +1994,7 @@ public abstract class STrnUtilities {
                         }
                         pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
                     }
+                    
                     if (!pdfFile.exists()) {
                         throw new SMailException("El archivo PDF no existe.");
                     }
@@ -2012,6 +2014,7 @@ public abstract class STrnUtilities {
                                 fw.write(cfd.getDocXml());
                             }
                         }
+                        
                         if (!xmlFile.exists()) {
                             throw new SMailException("El archivo XML no existe.");
                         }
