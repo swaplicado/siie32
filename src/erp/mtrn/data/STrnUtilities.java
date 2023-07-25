@@ -1865,6 +1865,7 @@ public abstract class STrnUtilities {
      * @throws javax.mail.MessagingException
      * @throws java.sql.SQLException
      */
+    @SuppressWarnings("deprecation")
     public static boolean sendMailCfd(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int contactType, final int bizPartnerId, final int bizPartnerBranchId, boolean catchExceptions) throws MessagingException, SQLException, SMailException, Exception {
         boolean send = false;
         
