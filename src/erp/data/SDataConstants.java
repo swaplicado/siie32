@@ -294,9 +294,11 @@ public abstract class SDataConstants {
     public static final int FINS_CL_ACC = 206009;
     public static final int FINS_CLS_ACC = 206010;
     public static final int FINS_TP_ACC_SPE = 206011;
+    public static final int FINS_CL_SYS_MOV_32 = 206091; // fins_cl_sys_mov (esta tabla reemplazaría a la eventualmente obsoleta fins_ct_sys_mov_xxx)
+    public static final int FINS_TP_SYS_MOV_32 = 206092; // fins_tp_sys_mov (esta tabla reemplazaría a la eventualmente obsoleta fins_tp_sys_mov_xxx)
     public static final int FINS_TP_ACC_SYS = 206012;
-    public static final int FINS_CT_SYS_MOV = 206013;   // fins_ct_sys_mov_xxx
-    public static final int FINS_TP_SYS_MOV = 206014;   // fins_tp_sys_mov_xxx
+    public static final int FINS_CT_SYS_MOV = 206013; // fins_ct_sys_mov_xxx
+    public static final int FINS_TP_SYS_MOV = 206014; // fins_tp_sys_mov_xxx
     public static final int FINS_CT_ACC_CASH = 206015;
     public static final int FINS_TP_ACC_CASH = 206016;
     public static final int FINS_TP_ACC_BP = 206017;

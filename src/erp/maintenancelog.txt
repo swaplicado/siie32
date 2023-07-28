@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 216.3/ 2023-07-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de funcionalidad de preservación y recuperación de información temporal de capturas de registros. Y su puesta en marcha para pólizas contables.
+
+================================================================================
 SIIE 3.2 216.2/ 2023-07-25
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -26,6 +26,7 @@ public abstract class SLibConstants {
     public static final int DATA_TYPE_TIME = 9;
     public static final int DATA_TYPE_KEY = 10;
 
+    public static final int FIELD_TYPE = 0;
     public static final int FIELD_TYPE_TEXT = 1;
     public static final int FIELD_TYPE_TEXT_AREA = 2;
     public static final int FIELD_TYPE_NUM_INTEGER = 3;
@@ -37,6 +38,7 @@ public abstract class SLibConstants {
     public static final int FIELD_TYPE_COMBO_BOX = 9;
     public static final int FIELD_TYPE_CHECK_BOX = 10;
     public static final int FIELD_TYPE_FORMATTED_TEXT = 11;
+    public static final int FIELD_DELETED = 21;
 
     public static final int CASE_UPPER = 1;
     public static final int CASE_LOWER = 2;
@@ -53,8 +55,6 @@ public abstract class SLibConstants {
     public static final int DESCRIPTION_NAME_ABBR = 3;
     public static final int DESCRIPTION_NAME_LAN = 4;
 
-    public static final int FIELD_DEL = 1;
-    
     public static final int LAN_SPANISH = 1;
     public static final int LAN_ENGLISH = 2;
 
