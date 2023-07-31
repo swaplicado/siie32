@@ -23,7 +23,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser {
     protected int mnPkMatRequestId;
     protected int mnPkLogId;
     protected int mnFkMatRequestStatusId;
-    protected int mnFkMatRequestStatusAuthId;
+    protected int mnFkMatRequestAuthotizationStatusId;
     protected int mnFkMatProvisionStatusId;
     protected int mnFkMatPurchaseStatusId;
     protected int mnFkUserId;
@@ -36,7 +36,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser {
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
     public void setPkLogId(int n) { mnPkLogId = n; }
     public void setFkMatRequestStatusId(int n) { mnFkMatRequestStatusId = n; }
-    public void setFkMatRequestStatusAuthId(int n) { mnFkMatRequestStatusAuthId = n; }
+    public void setFkMatRequestAuthotizationStatusId(int n) { mnFkMatRequestAuthotizationStatusId = n; }
     public void setFkMatProvisionStatusId(int n) { mnFkMatProvisionStatusId = n; }
     public void setFkMatPurchaseStatusId(int n) { mnFkMatPurchaseStatusId = n; }
     public void setFkUserId(int n) { mnFkUserId = n; }
@@ -45,7 +45,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser {
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkLogId() { return mnPkLogId; }
     public int getFkMatRequestStatusId() { return mnFkMatRequestStatusId; }
-    public int getFkMatRequestStatusAuthId() { return mnFkMatRequestStatusAuthId; }
+    public int getFkMatRequestAuthorizationStatusId() { return mnFkMatRequestAuthotizationStatusId; }
     public int getFkMatProvisionStatusId() { return mnFkMatProvisionStatusId; }
     public int getFkMatPurchaseStatusId() { return mnFkMatPurchaseStatusId; }
     public int getFkUserId() { return mnFkUserId; }
@@ -67,7 +67,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser {
         mnPkMatRequestId = 0;
         mnPkLogId = 0;
         mnFkMatRequestStatusId = 0;
-        mnFkMatRequestStatusAuthId = 0;
+        mnFkMatRequestAuthotizationStatusId = 0;
         mnFkMatProvisionStatusId = 0;
         mnFkMatPurchaseStatusId = 0;
         mnFkUserId = 0;
@@ -121,7 +121,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser {
                     mnPkMatRequestId + ", " + 
                     mnPkLogId + ", " + 
                     mnFkMatRequestStatusId + ", " + 
-                    mnFkMatRequestStatusAuthId + ", " + 
+                    mnFkMatRequestAuthotizationStatusId + ", " + 
                     mnFkMatProvisionStatusId + ", " + 
                     mnFkMatPurchaseStatusId + ", " + 
                     mnFkUserId + ", " + 

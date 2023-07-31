@@ -102,7 +102,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "v.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt AS " + SDbConsts.FIELD_DATE + ", "
-                + "LPAD(v.num, 6, '0') AS folio, "
+                + "v.num folio, "
                 + "v.dt_req_n, "
                 + "v.ref, "
                 + "v.b_ext_sys, "
