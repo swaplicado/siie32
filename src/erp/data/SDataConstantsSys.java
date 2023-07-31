@@ -96,8 +96,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_CFD_ORG_NAMES = "CFD_ORG_NAMES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
     public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
-    public static final String CFG_PARAM_TRN_MAT_PTY = "TRN_MAT_PTY";
-    public static final String CFG_PARAM_TRN_MAT_ITM_DMY = "TRN_MAT_ITM_DMY";
+    public static final String CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT = "TRN_MAT_REQ_PTY_DEFAULT";
+    public static final String CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW = "TRN_MAT_REQ_ETY_ITEM_NEW";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
@@ -309,11 +309,11 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_MFG_FG_DEV = 105056;
     public static final int PRV_INV_MFG_CON = 105057;
     public static final int PRV_INV_MAINT = 105058;
-    public static final int PRV_INV_REQ_MAT_PET = 105059;
-    public static final int PRV_INV_REQ_MAT_REV = 105060;
-    public static final int PRV_INV_REQ_MAT_PROV = 105061;
-    public static final int PRV_INV_REQ_MAT_PUR = 105062;
-    public static final int PRV_INV_REQ_MAT_ADM = 105063;
+    public static final int PRV_INV_REQ_MAT_REQ = 105061;
+    public static final int PRV_INV_REQ_MAT_REV = 105062;
+    public static final int PRV_INV_REQ_MAT_PROV = 105063;
+    public static final int PRV_INV_REQ_MAT_PUR = 105064;
+    public static final int PRV_INV_REQ_MAT_ADMOR = 105065;
     public static final int PRV_INV_REP = 105901;
 
     public static final int PRV_MKT_CUS_CFG = 106001;

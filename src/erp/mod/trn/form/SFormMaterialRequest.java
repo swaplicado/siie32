@@ -27,6 +27,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -903,7 +904,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moTextItemName.setValue("");
         moTextItemDescription.setValue("");
         moBoolNewItem.setValue(false);
-        moKeyPresentation.setSelectedIndex(0);
         moDecFactConv.setValue(0.0);
         moDecQty.setValue(0.0);
         moKeyUnit.setSelectedIndex(0);
@@ -912,6 +912,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moDateReqEty.setValue(null);
         moKeyPriEty.setSelectedIndex(0);
         moTextEtyNotes.setValue("");
+        if (moKeyPresentation.getItemCount() > 0) {
+            moKeyPresentation.setSelectedIndex(0);
+        }
     }
     
     private void enableEntryControls(boolean enable) {
@@ -926,6 +929,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyPriEty.setEnabled(enable);
         moTextEtyNotes.setEnabled(enable);
         moKeyPresentation.setEnabled(isCapturingData && moKeyPresentation.getItemCount() > 1);
+        moDecFactConv.setEnabled(isCapturingData && moDecFactConv.getValue() == 0);
+        moKeyConsSubentEty.setEnabled(isCapturingData && moKeyConsEntEty.isEnabled() && moKeyConsEntEty.getSelectedIndex() > 0);
         
         jbRegisterEty.setEnabled(enable);
     }
@@ -959,10 +964,26 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                     moTextEtyNotes.setValue(note.getNotes());
                 }
             }
-            isCapturingData = false;
-            enableEntryControls(false);
-            stateChangeConsEntEty();
         }
+        else {
+            moItemEty = null;
+            moKeyPresentation.removeAllItems();
+            moTextItemCode.setValue("");
+            moTextItemName.setValue("");
+            moBoolNewItem.setValue(false);
+            moDecFactConv.setValue(0.0);
+            moDecQty.setValue(0.0);
+            moKeyUnit.setSelectedIndex(0);
+            moIntConsDays.setValue(0);
+            moKeyConsEntEty.setSelectedIndex(0);
+            moDateReqEty.setValue(null);
+            moKeyPriEty.setSelectedIndex(0);
+            moTextItemDescription.setValue("");
+            moTextEtyNotes.setValue("");
+        }
+        isCapturingData = false;
+        enableEntryControls(false);
+        stateChangeConsEntEty();
     }
     
     private SDbMaterialRequestEntry setEtyValues(SDbMaterialRequestEntry ety) throws Exception {
@@ -981,6 +1002,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         ety.setDataItem(moItemEty);
         ety.readOptionalInfo(miClient.getSession());
         
+        ety.getChildNotes().clear();
         if (moBoolNewItem.getValue()) {
             SDbMaterialRequestEntryNote note = new SDbMaterialRequestEntryNote();
             note.setNotes(moTextItemDescription.getValue());
@@ -1014,7 +1036,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     
     private int[] getDefaultPriority() {
         try {
-            String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_PTY + "';";
+            String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW + "';";
             ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
                 return new int[] { resultSet.getInt(1) };
@@ -1044,7 +1066,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moTextItemDescription.setEnabled(moBoolNewItem.getValue());
             moTextItemCode.setEnabled(!moBoolNewItem.getValue());
             if (moBoolNewItem.getValue()) {
-                String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_ITM_DMY + "';";
+                String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT + "';";
                 ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
                 if (resultSet.next()) {
                     moItemEty = new SDataItem();
@@ -1085,7 +1107,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moKeyConsSubent.setEnabled(false);            
         }
         if (moKeyConsEnt.getSelectedIndex() <= 0) {
-            moKeyConsSubent.setSelectedIndex(0);
+            if (moKeyConsSubent.getItemCount() > 0) moKeyConsSubent.setSelectedIndex(0);
             moKeyConsSubent.setEnabled(false);
         }
         else if (isRegistryEditable && moKeyConsEnt.getSelectedIndex() > 0) {
@@ -1097,11 +1119,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         if (!isRegistryEditable){
             moKeyConsSubentEty.setEnabled(false);
         }
-        else if (moKeyConsEntEty.getSelectedIndex() <= 0) {
-            moKeyConsSubentEty.setSelectedIndex(0);
+        else if (moKeyConsEntEty.getSelectedIndex() <= 0 ) {
+            if (moKeyConsSubentEty.getItemCount() > 0) moKeyConsSubentEty.setSelectedIndex(0);
             moKeyConsSubentEty.setEnabled(false);
         }
-        else if (isRegistryEditable && moKeyConsEntEty.getSelectedIndex() > 0) {
+        else if (isRegistryEditable && moKeyConsEntEty.getSelectedIndex() > 0 && isCapturingData) {
             moKeyConsSubentEty.setEnabled(true);
         }
     }
@@ -1341,7 +1363,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moBoolProvClosed.setValue(moRegistry.isCloseProvision());
         moBoolPurClosed.setValue(moRegistry.isClosePurchase());
         
+        maMatReqNotes = new ArrayList<>();
         maMatReqNotes = moRegistry.getChildNotes();
+        maMatReqEntries = new ArrayList<>();
         maMatReqEntries = moRegistry.getChildEntries();
         
         if (maMatReqNotes.size() > 0) {
@@ -1466,7 +1490,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 actionSave(SModSysConsts.TRNS_ST_MAT_REQ_NEW);
             }
             else if (button == jbSaveAndSend) {
-                actionSave(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
+                if (miClient.showMsgBoxConfirm("¿Esta seguro de enviar la requisición?") == JOptionPane.OK_OPTION) {
+                    actionSave(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
+                }
             }
             else if (button == jbAuthorize) {
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_AUTHORIZE);

@@ -181,7 +181,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         SDbMaterialRequestStatusLog log = new SDbMaterialRequestStatusLog();
         log.setPkMatRequestId(mnPkMatRequestId);
         log.setFkMatRequestStatusId(mnFkMatRequestStatusId);
-        log.setFkMatRequestStatusAuthId(mnAuxReqAuthStatusId);
+        log.setFkMatRequestAuthotizationStatusId(mnAuxReqAuthStatusId);
         log.setFkMatProvisionStatusId(mnFkMatProvisionStatusId);
         log.setFkMatPurchaseStatusId(mnFkMatPurchaseStatusId);
         log.setRegistryNew(true);
