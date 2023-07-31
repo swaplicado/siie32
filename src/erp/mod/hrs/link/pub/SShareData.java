@@ -219,6 +219,11 @@ public class SShareData {
         return SUtilsJSON.insertData(sJsonInc);
     }
     
+    public String cancelIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        return SUtilsJSON.cancelData(sJsonInc);
+    }
+    
     /**
      * 
      * @param employees

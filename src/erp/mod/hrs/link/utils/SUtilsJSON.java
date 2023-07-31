@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.mod.hrs.link.db.SShareDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.hrs.link.db.SCancelResponse;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SIncidentResponse;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
@@ -238,6 +239,36 @@ public class SUtilsJSON {
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
             return jsonInString2;
         }       
+    }
+    
+    public static String cancelData(String sJsonInc) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+        
+        SCancelJSON objResponse = new SCancelJSON();
+        SCancelResponse CancelResponse = new SCancelResponse();
+        SShareDB sDb = new SShareDB();
+        
+        // objeto para leer el JSON
+        JSONParser parser = new JSONParser();
+        JSONObject root;
+        
+        try {
+            root = (JSONObject) parser.parse(sJsonInc);
+             // revisar si hay incidencias para esas fechas
+            CancelResponse = sDb.checkCancel(sJsonInc);
+           
+            
+            objResponse.response = CancelResponse;
+            
+            // Java objects to JSON string - pretty-print
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+        } catch (ParseException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+        }   
     }
     
     /**

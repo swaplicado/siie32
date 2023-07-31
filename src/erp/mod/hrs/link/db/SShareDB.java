@@ -29,6 +29,8 @@ import erp.mod.SModSysConsts;
 import erp.mod.SModUtils;
 import erp.mod.SModuleHrs;
 import erp.mod.hrs.db.SDbAbsence;
+import static erp.mod.hrs.link.db.SCancelResponse.RESPONSE_CONSUME;
+import static erp.mod.hrs.link.db.SCancelResponse.RESPONSE_OK_CAN;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_INS;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
@@ -1234,6 +1236,85 @@ public class SShareDB {
         }
     }
     
+    public SCancelResponse checkCancel (String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
+        ResultSet resultSet;
+        int company = 0;
+        //conexión a bd
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+        
+        //Creación del objeto respuesta.
+        SCancelResponse objResponse = new SCancelResponse();
+        
+        if (conn == null) {
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+            return objResponse;
+        }
+        
+        JSONParser parser = new JSONParser();
+        JSONObject root;
+        
+        try {
+            String consumos = "";
+            root = (JSONObject) parser.parse(sJsonInc);
+            company = Integer.parseInt(root.get("company_id").toString());
+            String companies = "SELECT * "
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
+                                    + "WHERE id_co = " + company ;
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(companies);
+            if(!resultSet.next()){
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("El id de la empresa no corresponde con nuestros registros");
+                return objResponse;
+            } 
+            
+            conn = mdb.connect("", "", resultSet.getString("bd"), "", "");
+
+            if (conn == null) {
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+                return objResponse;
+            }
+            
+            consumos = "SELECT * "
+                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " AS abs "
+                                    + "INNER JOIN hrs_abs_cns AS cns ON abs.id_emp = cns.id_emp AND abs.id_abs = cns.id_abs "
+                                    + "WHERE hrs_abs.id_emp = " + root.get("employee_id").toString() + " AND "
+                                    + " ext_req_id IN " + root.get("appBreakDowns").toString() + " AND "
+                                    + "NOT hrs_abs.b_del AND NOT abs.b_clo AND NOT cns.b_del;";
+            stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(consumos);
+            if (resultSet.next()) {
+                objResponse.setCode(RESPONSE_CONSUME);
+                objResponse.setMessage("La incidencia ya tiene al menos un consumo no se puede cancelar");
+                resultSet.previous();
+            }else{
+                
+                consumos = "UPDATE hrs_abs "
+                        + "SET b_clo = 1 WHERE ext_req_id IN " + root.get("appBreakDowns").toString();
+                stCon = conn.createStatement();
+
+                resultSet = stCon.executeQuery(consumos);
+                
+                objResponse.setCode(RESPONSE_OK_CAN);
+                objResponse.setMessage("La incidencia se cancelo");
+                
+                
+            }
+            
+            return objResponse;
+        } catch (ParseException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage(SShareDB.class.getName());
+            return objResponse;
+        }
+    }
+    
     public SIncidentResponse setinIncidents(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException{
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         ResultSet resultSet;
@@ -1281,7 +1362,7 @@ public class SShareDB {
         }
            
         database.connect(
-                "127.0.0.1", // agregar esta constante a la configuración de CAP Link
+                "192.168.1.233", // agregar esta constante a la configuración de CAP Link
                 "3306", // agregar esta constante a la configuración de CAP Link
                 resultSet.getString("bd"), // agregar esta constante a la configuración de CAP Link
                 "root", // agregar esta constante a la configuración de CAP Link
