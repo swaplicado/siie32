@@ -37,6 +37,7 @@ import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
 import erp.mod.hrs.link.utils.SIncidentsJSON;
 import erp.musr.data.SDataUser;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -1278,13 +1279,17 @@ public class SShareDB {
                 objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
                 return objResponse;
             }
+            String arregloAuxiliar = "";
+            arregloAuxiliar = arregloAuxiliar + root.get("appBreakDowns").toString();
+            arregloAuxiliar = arregloAuxiliar.replace("[", "(");
+            arregloAuxiliar = arregloAuxiliar.replace("]", ")");
             
             consumos = "SELECT * "
                                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " AS abs "
                                     + "INNER JOIN hrs_abs_cns AS cns ON abs.id_emp = cns.id_emp AND abs.id_abs = cns.id_abs "
-                                    + "WHERE hrs_abs.id_emp = " + root.get("employee_id").toString() + " AND "
-                                    + " ext_req_id IN " + root.get("appBreakDowns").toString() + " AND "
-                                    + "NOT hrs_abs.b_del AND NOT abs.b_clo AND NOT cns.b_del;";
+                                    + "WHERE abs.id_emp = " + root.get("employee_id").toString() + " AND "
+                                    + " ext_req_id IN " + arregloAuxiliar + " AND "
+                                    + "NOT abs.b_del AND NOT abs.b_clo AND NOT cns.b_del;";
             stCon = conn.createStatement();
 
             resultSet = stCon.executeQuery(consumos);
@@ -1295,10 +1300,10 @@ public class SShareDB {
             }else{
                 
                 consumos = "UPDATE hrs_abs "
-                        + "SET b_clo = 1 WHERE ext_req_id IN " + root.get("appBreakDowns").toString();
-                stCon = conn.createStatement();
-
-                resultSet = stCon.executeQuery(consumos);
+                        + "SET b_clo = 1 WHERE ext_req_id IN " + arregloAuxiliar + ";";
+                
+                PreparedStatement preparedStmt = conn.prepareStatement(consumos);
+                preparedStmt.executeUpdate();
                 
                 objResponse.setCode(RESPONSE_OK_CAN);
                 objResponse.setMessage("La incidencia se cancelo");
