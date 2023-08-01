@@ -95,6 +95,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_CFD_ORG_NAMES = "CFD_ORG_NAMES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    public static final String CFG_PARAM_FIN_BANK_LAYOUT_CFD_REQ = "FIN_BANK_LAYOUT_CFD_REQ";
     public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
     public static final String CFG_PARAM_TRN_MAT_PTY = "TRN_MAT_PTY";
     public static final String CFG_PARAM_TRN_MAT_ITM_DMY = "TRN_MAT_ITM_DMY";

@@ -12,6 +12,7 @@ import sa.lib.SLibUtils;
  * SCfgParamValues permite obtener valores individuales desde un valor de parámetro de la configuración de SIIE (cfg_params).
  * Los valores individuales están definidos en el valor del parámetro como duplas de valores separados entre sí mediante punto y coma en el formato key=value.
  * P. ej,. key1=val1;key2=val2;...keyn=valn
+ * Las claves de los parámetros están definidos en SDataConstantsSys.CFG_PARAM_...
  * @author Sergio Flores
  */
 public class SCfgParamValues {
