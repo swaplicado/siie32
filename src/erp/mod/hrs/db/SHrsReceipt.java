@@ -838,7 +838,7 @@ public class SHrsReceipt {
         SHrsReceiptDeduction hrsReceiptDeductionSscNew = null;
         SDbPayroll payroll = moHrsPayroll.getPayroll(); // convenience variable
         
-        if (payroll.isSsContribution() && !moPayrollReceipt.isAssimilated()) {  // assimilables are not elegible for SS contribution
+        if (payroll.isSsContribution() && !moPayrollReceipt.isAssimilated() && moPayrollReceipt.getEffectiveSalary(payroll.isFortnightStandard()) > payroll.getMwzWage()) {  // assimilables and minimum wage employees are not elegible for SS contribution
             // Validate configuration of SS contribution:
 
             if (moHrsPayroll.getModuleConfig().getFkDeductionSsContributionId_n() == 0) {
@@ -875,8 +875,8 @@ public class SHrsReceipt {
             
             for (int row = 0; row < ssContributionTable.getChildRows().size(); row++) {
                 double sscRow = 0;
-                
                 SDbSsContributionTableRow dbSscTableRow = ssContributionTable.getChildRows().get(row);
+                
                 switch(dbSscTableRow.getPkRowId()) {
                     case SHrsConsts.SS_INC_MON: // money
                     case SHrsConsts.SS_INC_PEN: // pensioner
