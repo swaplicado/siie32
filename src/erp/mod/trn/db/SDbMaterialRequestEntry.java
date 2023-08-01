@@ -383,7 +383,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
 
     @Override
     public boolean isRowEdited() {
-        return isRowEdited();
+        return isRegistryEdited();
     }
 
     @Override

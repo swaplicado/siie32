@@ -5,6 +5,9 @@
 package erp.mod;
 
 import erp.data.SDataConstantsSys;
+import erp.mod.trn.db.SDbConfEmployeeVsEntity;
+import erp.mod.trn.db.SDbConfUserVsEntity;
+import erp.mod.trn.db.SDbConfWarehouseVsEntity;
 import erp.mod.trn.db.SDbDelivery;
 import erp.mod.trn.db.SDbDeliveryEntry;
 import erp.mod.trn.db.SDbDps;
@@ -23,8 +26,12 @@ import erp.mod.trn.db.SDbMaintConfig;
 import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
+import erp.mod.trn.db.SDbMaterialPresentation;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.form.SFormConfEmployeeVsEntity;
+import erp.mod.trn.form.SFormConfUserVsEntity;
+import erp.mod.trn.form.SFormConfWarehouseVsEntity;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormFunctionalAreaBudgets;
 import erp.mod.trn.form.SFormIdentifiedCostCalculation;
@@ -34,9 +41,13 @@ import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
 import erp.mod.trn.form.SFormMaintUser;
 import erp.mod.trn.form.SFormMaintUserSupervisor;
+import erp.mod.trn.form.SFormMaterialPresentation;
 import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.view.SViewAccountsPending;
+import erp.mod.trn.view.SViewConfEmployeeVsEntity;
+import erp.mod.trn.view.SViewConfUserVsEntity;
+import erp.mod.trn.view.SViewConfWarehouseVsEntity;
 import erp.mod.trn.view.SViewCurrencyBalance;
 import erp.mod.trn.view.SViewDelivery;
 import erp.mod.trn.view.SViewDeliveryQuery;
@@ -53,6 +64,7 @@ import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMaintUser;
 import erp.mod.trn.view.SViewMaintUserSupervisor;
+import erp.mod.trn.view.SViewMaterialPresentation;
 import erp.mod.trn.view.SViewMaterialRequest;
 import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMmsConfig;
@@ -81,6 +93,10 @@ import sa.lib.gui.SGuiReport;
 public class SModuleTrn extends SGuiModule {
 
     private SFormItemRequiredDpsConfig moFormItemRequiredDpsConfig;
+    private SFormMaterialPresentation moFormMaterialPresentation;
+    private SFormConfUserVsEntity moFormUserVsEntity;
+    private SFormConfEmployeeVsEntity moFormEmployeeVsEntity;
+    private SFormConfWarehouseVsEntity moFormWarehouseVsEntity;
     private SFormInventoryValuation moFormInventoryValuationPrcCalc;
     private SFormInventoryValuation moFormInventoryValuationUpdCost;
     private SFormIdentifiedCostCalculation moFormIdentifiedCostCalculation;
@@ -120,6 +136,9 @@ public class SModuleTrn extends SGuiModule {
                     public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
                     public String getSqlWhere(int[] pk) { return "WHERE id_ct_dps = " + pk[0] + " AND id_cl_dps = " + pk[1] + " AND id_tp_dps = " + pk[2] + " "; }
                 };
+                break;
+            case SModConsts.TRNU_MAT_PRES:
+                registry = new SDbMaterialPresentation();
                 break;
             case SModConsts.TRNS_TP_MAINT_MOV:
                 registry = new SDbRegistrySysFly(type) {
@@ -181,18 +200,27 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_FUNC_BUDGET:
                 registry = new SDbFunctionalAreaBudget();
                 break;
-            case SModConsts.TRNX_FUNC_BUDGETS:
-                registry = new SDbFunctionalAreaBudgets();
-                break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 registry = new SDbIdentifiedCostCalculation();
                 break;
             case SModConsts.TRN_COST_IDENT_LOT:
                 registry = new SDbIdentifiedCostLot();
                 break;
+            case SModConsts.TRNX_FUNC_BUDGETS:
+                registry = new SDbFunctionalAreaBudgets();
+                break;
             case SModConsts.TRN_MAT_REQ:
             case SModConsts.TRNX_MAT_REQ_PEND:
                 registry = new SDbMaterialRequest();
+                break;
+            case SModConsts.TRNX_CONF_USR_VS_ENT:
+                registry = new SDbConfUserVsEntity();
+                break;
+            case SModConsts.TRNX_CONF_EMP_VS_ENT:
+                registry = new SDbConfEmployeeVsEntity();
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_ENT:
+                registry = new SDbConfWarehouseVsEntity();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -347,6 +375,9 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
                 view = new SViewItemRequiredDpsConfig(miClient, "Configuración ítems obligatorios documentos origen");
                 break;
+            case SModConsts.TRNU_MAT_PRES:
+                view = new SViewMaterialPresentation(miClient, "Presentación de materiales");
+                break;
             case SModConsts.TRN_DPS_ETY_PRC:
                 switch (subtype) {
                     case SModConsts.MOD_TRN_SAL_N:
@@ -467,6 +498,15 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_FUNC_EXPENSES:
                 view = new SViewFunctionalAreaExpenses(miClient, subtype, "Control presupuestos mensuales gastos");
                 break;
+            case SModConsts.TRNX_CONF_USR_VS_ENT:
+                view = new SViewConfUserVsEntity(miClient, "Conf. usuarios vs. entidades");
+                break;
+            case SModConsts.TRNX_CONF_EMP_VS_ENT:
+                view = new SViewConfEmployeeVsEntity(miClient, "Conf. empleados vs. entidades");
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_ENT:
+                view = new SViewConfWarehouseVsEntity(miClient, "Conf. almacenes vs. entidades");
+                break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");
                 break;
@@ -490,6 +530,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
                 if(moFormItemRequiredDpsConfig == null) moFormItemRequiredDpsConfig = new SFormItemRequiredDpsConfig(miClient, "Configuración de ítems obligatorios con documentos origen");
                 form = moFormItemRequiredDpsConfig;
+                break;
+            case SModConsts.TRNU_MAT_PRES:
+                if (moFormMaterialPresentation == null) moFormMaterialPresentation = new SFormMaterialPresentation(miClient, "Presentación de materiales");
+                form = moFormMaterialPresentation;
                 break;
             case SModConsts.TRN_INV_VAL:
                 if (moFormInventoryValuationPrcCalc == null) moFormInventoryValuationPrcCalc = new SFormInventoryValuation(miClient, SModConsts.TRNX_INV_VAL_PRC_CALC, "Valuación de inventarios");
@@ -548,6 +592,18 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");
                 form = moFormFunctionalAreaBudgets;
+                break;
+            case SModConsts.TRNX_CONF_USR_VS_ENT:
+                if (moFormUserVsEntity == null) moFormUserVsEntity = new SFormConfUserVsEntity(miClient, "Configuración de usuario vs. entidades");
+                form = moFormUserVsEntity;
+                break;
+            case SModConsts.TRNX_CONF_EMP_VS_ENT:
+                if (moFormEmployeeVsEntity == null) moFormEmployeeVsEntity = new SFormConfEmployeeVsEntity(miClient, "Configuración de empleado vs. entidades");
+                form = moFormEmployeeVsEntity;
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_ENT:
+                if (moFormWarehouseVsEntity == null) moFormWarehouseVsEntity = new SFormConfWarehouseVsEntity(miClient, "Configuración de almacén vs. entidades");
+                form = moFormWarehouseVsEntity;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
