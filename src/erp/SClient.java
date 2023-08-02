@@ -37,8 +37,10 @@ import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.lib.gui.SGuiDatePicker;
 import erp.lib.gui.SGuiDateRangePicker;
+import erp.lib.gui.SGuiModule;
 import erp.mcfg.data.SDataCertificate;
 import erp.mfin.data.SDataExchangeRate;
+import erp.mfin.data.SDataRecord;
 import erp.mod.SModConsts;
 import erp.mod.SModUtils;
 import erp.mod.SModuleBps;
@@ -71,6 +73,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -80,6 +83,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
+import org.joda.time.LocalDate;
 import redis.clients.jedis.Jedis;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -110,7 +114,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 216.1"; // fecha release: 2023-07-18
+    public static final String APP_RELEASE = "3.2 217.2"; // fecha release: 2023-08-01
     public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -1175,17 +1179,82 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
         catch (Exception e) {
             showMsgBoxWarning("No se encontró el servidor de acceso exclusivo a registros."
-                    + "\nFavor de comunicarlo al administrador del sistema."
+                    + "\nSin embargo puede continuar usando " + APP_NAME + ", pero proceda con precaución al capturar información."
+                    + "\nDe cualquier forma, favor de comunicar esta situación al administrador del sistema."
                     + "\n(" + e.getMessage() + ")");
             moJedis = null;
         }
     }
+    
+    private void recoverTempData() throws Exception {
+        
+        // try to recover last unsaved journal voucher:
+        
+        boolean recover = false;
+        SDataRecord recordTemp = new SDataRecord();
+        
+        if (recordTemp.existsTempFile(this)) {
+            recordTemp.readTempFileData(this);
+            
+            Date datetimeTemp = recordTemp.getTempFileTimestamp();
+            
+            if (datetimeTemp != null) {
+                Date datetimeDbms = null;
+                
+                if (recordTemp.getIsRegistryNew()) {
+                    recover = true; // temp data is new
+                }
+                else {
+                    SDataRecord recordDbms = new SDataRecord();
+                    recordDbms.setAuxReadHeaderOnly(true);
+                    recordDbms.read(recordTemp.getPrimaryKey(), moSession.getStatement());
+
+                    datetimeDbms = recordDbms.getLastDbUpdate();
+                    
+                    LocalDate dateTemp = new LocalDate(datetimeTemp);
+                    LocalDate dateDbms = new LocalDate(datetimeDbms);
+                    
+                    if (dateDbms.compareTo(dateTemp) <= 0) {
+                        recover = true; // last storage was at least the same day of last temporal preservation
+                    }
+                }
+                
+                if (recover) {
+                    String message = "¡SE RECUPERÓ INFORMACIÓN QUE NO FUE GUARDADA!"
+                            + "\nHay información sin guardar de la póliza contable '" + recordTemp.getRecordPrimaryKey() + "'."
+                            + "\nFecha y hora de la información recuperada: " + SLibUtils.DateFormatDatetimeTimeZone.format(datetimeTemp) + ".";
+                    
+                    if (!recordTemp.getIsRegistryNew()) {
+                        message += "\nÚltima actualización de esta póliza contable: " + SLibUtils.DateFormatDatetimeTimeZone.format(datetimeDbms) + ".";
+                    }
+                    
+                    message += "\n\nIMPORTANTE: Si decide NO revisar la información recuperada, será eliminada."
+                            + "\n¿Desea revisar y, en su caso, guardar la información recuperada?";
+                    
+                    boolean review = showMsgBoxConfirm(message) == JOptionPane.YES_OPTION;
+                    
+                    if (!review) {
+                        review = showMsgBoxConfirm("Confirmar si desea eliminar la información recuperada de la póliza contable '" + recordTemp.getRecordPrimaryKey() + "'.") != JOptionPane.YES_OPTION;
+                    }
+                    
+                    if (review) {
+                        SGuiModule module = getGuiModule(SDataConstants.MOD_FIN);
+                        module.setAuxRegistry(recordTemp);
+                        if (module.showForm(SDataConstants.FIN_REC, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                            module.refreshCatalogues(SDataConstants.FIN_REC);
+                            showMsgBoxInformation("La póliza contable '" + recordTemp.getRecordPrimaryKey() + "' ha sido guardada.");
+                        }
+                    }
+                }
+            }
+            
+            recordTemp.deleteTempFile(this);
+        }
+    }
 
     private void logout() {
-        Cursor cursor = getCursor();
-
         try {
-            setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
             actionFileCloseViews();
 
             if (mbLoggedIn) {
@@ -1244,19 +1313,18 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             SLibUtils.showException(this, e);
         }
         finally {
-            setCursor(cursor);
+            getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
     private void login() {
         boolean lookup = false;
-        Cursor cursor = getCursor();
         SLoginResponse response = null;
 
         mbLoggedIn = false;
 
         try {
-            setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
             moServer = (SServerRemote) Naming.lookup("rmi://" + moParamsApp.getErpHost() + ":" + moParamsApp.getErpRmiRegistryPort() + "/" + moParamsApp.getErpInstance());
             lookup = true;
@@ -1291,6 +1359,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                             showMsgBoxWarning(SLibConstants.MSG_ERR_LOGIN_USR_CO);
                             break;
                         case SLibConstants.LOGIN_OK:
+                            // login concedido
+                            // IMPORTANTE: ¡Favor de no cambiar el orden de las instrucciones de esta sección!
+                            
                             mbLoggedIn = true;
                             moSessionXXX = response.getSession();
                             moSessionXXX.getFormatters().redefineTableCellRenderers();
@@ -1301,10 +1372,14 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
                             boolean actionOk = actionFileSession(true);
                             
-                            if (!moParamsApp.getWithServer() && actionOk) {
-                                createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
-                                        response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
+                            if (actionOk) {
+                                // check if a Redis session is needed:
+                                if (!moParamsApp.getWithServer()) {
+                                    createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
+                                            response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
+                                }
                             }
+                            
                             break;
                         default:
                             showMsgBoxWarning(SLibConstants.MSG_ERR_LOGIN_UNKNOWN);
@@ -1326,7 +1401,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             SLibUtils.showException(this, e);
         }
         finally {
-            setCursor(cursor);
+            getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
             if (!lookup) {
                 showMsgBoxWarning("No se pudo establecer conexión con el ERP Server: '" + moParamsApp.getErpInstance() + "',\nen el host: '" + moParamsApp.getErpHost() + "'.");
@@ -1349,9 +1424,17 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 moModuleInv = new SGuiModuleTrnInv(this);
                 moModuleMkt = new SGuiModuleMkt(this);
                 moModuleLog = new SGuiModuleLog(this);
-                moModuleMfg = new SGuiModuleMfg(this);            
+                moModuleMfg = new SGuiModuleMfg(this);
                 moModuleHrs = new SGuiModuleHrs(this);
-                moModuleQlt = new SGuiModuleQlt(this);  
+                moModuleQlt = new SGuiModuleQlt(this);
+                
+                try {
+                    // check if there are temporal data to recover:
+                    recoverTempData();
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
             }
         }
     }
@@ -1498,7 +1581,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         else if (onLogin) {
             actionFileCloseSession();
         }
-            return response;
+        
+        return response;
     }
 
     private void actionFilePassword() {

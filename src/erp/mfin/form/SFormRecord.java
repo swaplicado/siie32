@@ -38,11 +38,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
@@ -95,8 +97,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private erp.mfin.form.SFormExchangeRateDiff moFormExchangeRateDiff;
     private erp.lib.table.STablePaneGrid moPaneGridEntries;
 
-    private boolean mbParamIsReadOnly;
-    private boolean mbOriginalIsDeleted;
+    private boolean mbParamReadOnly;
+    private boolean mbNonEditable;
+    private boolean mbOldIsDeleted;
     private java.lang.String msAuxLastEntryConcept;
     
     private ArrayList<SDataCfdRecordRow> maCfdRecordRows = null;
@@ -247,6 +250,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbCdtCreditDbr = new javax.swing.JButton();
         jbCdtExchangeRateDiff = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
+        jpControls1 = new javax.swing.JPanel();
+        jckEnableTempFileData = new javax.swing.JCheckBox();
+        jpControls2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -907,16 +913,24 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
 
-        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpControls.setLayout(new java.awt.BorderLayout());
+
+        jckEnableTempFileData.setText("Habilitar recuperación de datos");
+        jckEnableTempFileData.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpControls1.add(jckEnableTempFileData);
+
+        jpControls.add(jpControls1, java.awt.BorderLayout.WEST);
 
         jbOk.setText("Aceptar"); // NOI18N
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpControls.add(jbOk);
+        jpControls2.add(jbOk);
 
         jbCancel.setText("Cancelar"); // NOI18N
         jbCancel.setToolTipText("[Escape]");
-        jpControls.add(jbCancel);
+        jpControls2.add(jbCancel);
+
+        jpControls.add(jpControls2, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
@@ -964,6 +978,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moPaneGridEntries = new STablePaneGrid(miClient);
         moPaneGridEntries.setDoubleClickAction(this, "publicActionEntryEdit");
         jpEntries.add(moPaneGridEntries, BorderLayout.CENTER);
+        jckEnableTempFileData.setSelected(true);
 
         int i = 0;
         STableColumnForm[] aoTableColumns = new STableColumnForm[35];
@@ -990,7 +1005,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Entidad", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem auxiliar", STableConstants.WIDTH_ITEM);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Docto. (factura)", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Docto. (factura)", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "CFDI directos", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "CFDI indirectos", STableConstants.WIDTH_NUM_INTEGER);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Ejercicio contable", STableConstants.WIDTH_YEAR_PERIOD);
@@ -1078,6 +1093,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbCdtExchangeRateDiff.addActionListener(this);
         
         jcbFkAccountCashId_n.addItemListener(this);
+        jckEnableTempFileData.addItemListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "publicActionEntryNew", "entryNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionEntryNewInsert", "entryNewInsert", KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK);
@@ -1116,6 +1132,14 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
+    private void updateRecordEntries() {
+        moRecord.getDbmsRecordEntries().clear();
+
+        for (STableRow row : moPaneGridEntries.getGridRows()) {
+            moRecord.getDbmsRecordEntries().add((SDataRecordEntry) row.getData());
+        }
+    }
+
     private void updateRecord() throws Exception {
         if (moRecordType.getIsAccountCashRequired() && jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
             jcbFkAccountCashId_n.requestFocusInWindow();
@@ -1124,20 +1148,84 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         
         moRecord.setDate(moFieldDate.getDate());
         moRecord.setConcept(moFieldConcept.getString());
-        if (moFieldFkAccountCashId_n.getComponent().isEnabled()) {
+        moRecord.setIsAdjustmentsYearEnd(moFieldIsAdjustmentYearEnd.getBoolean());
+        moRecord.setIsAdjustmentsAudit(moFieldIsAdjustmentAudit.getBoolean());
+        moRecord.setIsDeleted(moFieldIsDeleted.getBoolean());
+        
+        if (moRecordType.getIsAccountCashRequired()) {
             moRecord.setFkCompanyBranchId_n(moFieldFkAccountCashId_n.getKeyAsIntArray()[0]);
             moRecord.setFkAccountCashId_n(moFieldFkAccountCashId_n.getKeyAsIntArray()[1]);
         }
+        else {
+            moRecord.setFkCompanyBranchId_n(0);
+            moRecord.setFkAccountCashId_n(0);
+        }
+        
+        moRecord.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+
         moRecord.setDbmsDataAccountCash(moAccountCash);
 
-        moRecord.getDbmsRecordEntries().clear();
+        updateRecordEntries();
+    }
+    
+    private void deleteTempFile() {
+        if (moRecord != null) { // delete temporal data if record was instantiated
+            try {
+                moRecord.deleteTempFile(miClient);
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+        }
+    }
+    
+    private void saveTempFileData() throws IOException, Exception {
+        if (moRecord != null) {
+            if (!moRecord.getTempDataJustRecovered() && !mbNonEditable && jckEnableTempFileData.isSelected()) { // save temporal file only if record is not of system
+                updateRecord();
 
-        for (STableRow row : moPaneGridEntries.getGridRows()) {
-            moRecord.getDbmsRecordEntries().add((SDataRecordEntry) row.getData());
+                moRecord.saveTempFileData(miClient);
+            }
+            
+            moRecord.setTempDataJustRecovered(false); // allow to preserve subsequent changes to record
+        }
+    }
+    
+    private void renderAccountCash() {
+        if (jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
+            moAccountCash = null;
+            jtfAccountCashCurrencyKey.setText("");
+        }
+        else {
+            moAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, moFieldFkAccountCashId_n.getKey(), SLibConstants.EXEC_MODE_SILENT);
+            jtfAccountCashCurrencyKey.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moAccountCash.getFkCurrencyId() }));
         }
     }
 
-    private void renderEntries(boolean renumber) {
+    private void renderHeader() {
+        // render period:
+        
+        java.util.Date date = moFieldDate.getDate();
+
+        if (date == null) {
+            jtfPeriod.setText("");
+        }
+        else {
+            jtfPeriod.setText(miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(date));
+        }
+        
+        // render company branch:
+        
+        jtfCompanyBranch.setText(moRecord == null ? miClient.getSessionXXX().getCurrentCompanyBranchName() : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BPB, new int[] { moRecord.getFkCompanyBranchId() }));
+        jtfCompanyBranch.setToolTipText(jtfCompanyBranch.getText());
+        jtfCompanyBranch.setCaretPosition(0);
+        
+        // render account cash settings:
+        
+        renderAccountCash();
+    }
+
+    private void renderRecordEntries(boolean renumber) {
         moPaneGridEntries.renderTableRows();
         
         if (renumber) {
@@ -1162,48 +1250,24 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void calculateBalance() {
+    private void calculateBalance() throws Exception {
         double debit = 0;
         double credit = 0;
 
         for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-            debit = SLibUtils.roundAmount(debit + ((SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData()).getDebit());
-            credit = SLibUtils.roundAmount(credit + ((SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData()).getCredit());
+            SDataRecordEntry entry = (SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData();
+            
+            debit = SLibUtils.roundAmount(debit + entry.getDebit());
+            credit = SLibUtils.roundAmount(credit + entry.getCredit());
         }
 
         jtfDebit.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(debit));
         jtfCredit.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(credit));
         jtfBalance.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(debit - credit));
+        
+        saveTempFileData();
     }
-
-    private void renderPeriod() {
-        java.util.Date date = moFieldDate.getDate();
-
-        if (date == null) {
-            jtfPeriod.setText("");
-        }
-        else {
-            jtfPeriod.setText(miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(date));
-        }
-    }
-
-    private void renderCompanyBranch() {
-        jtfCompanyBranch.setText(moRecord == null ? miClient.getSessionXXX().getCurrentCompanyBranchName() : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BPB, new int[] { moRecord.getFkCompanyBranchId() }));
-        jtfCompanyBranch.setToolTipText(jtfCompanyBranch.getText());
-        jtfCompanyBranch.setCaretPosition(0);
-    }
-
-    private void renderAccountCashSettings() {
-        if (jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
-            moAccountCash = null;
-            jtfAccountCashCurrencyKey.setText("");
-        }
-        else {
-            moAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, moFieldFkAccountCashId_n.getKey(), SLibConstants.EXEC_MODE_SILENT);
-            jtfAccountCashCurrencyKey.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moAccountCash.getFkCurrencyId() }));
-        }
-    }
-
+    
     private int obtainNextUserId() {
         int userId = 0;
 
@@ -1229,7 +1293,21 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     }
 
     private void itemStateChangedAccountCashId_n() {
-        renderAccountCashSettings();
+        renderAccountCash();
+    }
+    
+    private void itemStateChangedEnableTempFileData() {
+        if (jckEnableTempFileData.isSelected()) {
+            try {
+                saveTempFileData();
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+        }
+        else {
+            deleteTempFile();
+        }
     }
 
     private void actionPerformedDate() {
@@ -1294,7 +1372,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 mbIsXmlTranfer = true;
             }
             updateFilesXmlInfo();
-            renderEntries(true);
+            renderRecordEntries(true);
         }
         else {
             miClient.showMsgBoxWarning("La póliza contable no tiene partidas activas.");
@@ -1360,7 +1438,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 entry = (SDataRecordEntry) moFormEntry.getRegistry();
 
                 moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
-                renderEntries(true);
+                renderRecordEntries(true);
                 calculateBalance();
                 moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
 
@@ -1401,7 +1479,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                         moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
                     }
 
-                    renderEntries(true);
+                    renderRecordEntries(true);
                     calculateBalance();
                     moPaneGridEntries.setTableRowSelection(index + 1);
 
@@ -1447,7 +1525,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                     entry = (SDataRecordEntry) moFormEntry.getRegistry();
 
                     moPaneGridEntries.insertTableRow(new SDataRecordEntryRow(entry), index);
-                    renderEntries(true);
+                    renderRecordEntries(true);
                     calculateBalance();
                     moPaneGridEntries.setTableRowSelection(index + 1);
 
@@ -1487,7 +1565,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
                 if (form.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     moPaneGridEntries.setTableRow(new SDataRecordEntryRow((SDataRecordEntry) form.getRegistry()), index);
-                    renderEntries(true);
+                    renderRecordEntries(true);
                     calculateBalance();
                     moPaneGridEntries.setTableRowSelection(index);
                 }
@@ -1495,7 +1573,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedEntryDelete() {
+    private void actionPerformedEntryDelete() throws Exception {
         if (jbEntryDelete.isEnabled()) {
             int index = moPaneGridEntries.getTable().getSelectedRow();
             int userId = 0;
@@ -1551,7 +1629,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                     }
                 }
 
-                renderEntries(true);
+                renderRecordEntries(true);
                 calculateBalance();
                 moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
             }
@@ -1568,7 +1646,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
                 moPaneGridEntries.setTableRow(new SDataRecordEntryRow(entryB), index);
                 moPaneGridEntries.setTableRow(new SDataRecordEntryRow(entryA), index + 1);
-                renderEntries(true);
+                renderRecordEntries(true);
                 moPaneGridEntries.setTableRowSelection(index + 1);
             }
         }
@@ -1584,7 +1662,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
                 moPaneGridEntries.setTableRow(new SDataRecordEntryRow(entryB), index - 1);
                 moPaneGridEntries.setTableRow(new SDataRecordEntryRow(entryA), index);
-                renderEntries(true);
+                renderRecordEntries(true);
                 moPaneGridEntries.setTableRowSelection(index - 1);
             }
         }
@@ -1662,7 +1740,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             SDataRecordEntry entry = (SDataRecordEntry) moFormMoneyInOut.getRegistry();
 
             moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
-            renderEntries(true);
+            renderRecordEntries(true);
             calculateBalance();
             moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
         }
@@ -1683,7 +1761,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             SDataRecordEntry entry = (SDataRecordEntry) moFormMoneyInOutBizPartner.getRegistry();
 
             moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
-            renderEntries(true);
+            renderRecordEntries(true);
             calculateBalance();
             moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
         }
@@ -1717,6 +1795,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                     cashBalance = SDataUtilities.obtainAccountCashBalanceUpdated(miClient, moAccountCash.getFkCurrencyId(), moRecord.getDate(), moAccountCash.getPrimaryKey(), 
                             moAccountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH ? SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH : SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, moRecord, null);
                 }
+                
+                updateRecord();
 
                 dialog.formRefreshCatalogues();
                 dialog.formReset();
@@ -1735,7 +1815,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                             moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
                         }
 
-                        renderEntries(true);
+                        renderRecordEntries(true);
                         calculateBalance();
                         moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
                     }
@@ -1775,6 +1855,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                     cashBalance = SDataUtilities.obtainAccountCashBalanceUpdated(miClient, moAccountCash.getFkCurrencyId(), moRecord.getDate(), moAccountCash.getPrimaryKey(), 
                             moAccountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH ? SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH : SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, moRecord, null);
                 }
+                
+                updateRecord();
 
                 dialog.formRefreshCatalogues();
                 dialog.formReset();
@@ -1792,7 +1874,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                             moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
                         }
 
-                        renderEntries(true);
+                        renderRecordEntries(true);
                         calculateBalance();
                         moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
                     }
@@ -1804,7 +1886,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
     }
 
-    private void actionPerformedExchangeRateDiff(final boolean profit) {
+    private void actionPerformedExchangeRateDiff(final boolean profit) throws Exception {
         int userId = 0;
         String msg = "";
         SDataRecord record = null;
@@ -1835,7 +1917,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         if (!msg.isEmpty()) {
             miClient.showMsgBoxWarning(msg);
         }
-        else {                
+        else {
+            updateRecord();
+            
             moFormExchangeRateDiff.setValue(SDataConstants.FIN_REC, moRecord);
             moFormExchangeRateDiff.setValue(SDataConstantsSys.FINS_CT_SYS_MOV_CASH, profit);
             moFormExchangeRateDiff.formReset();
@@ -1851,7 +1935,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                         moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
                     }
 
-                    renderEntries(true);
+                    renderRecordEntries(true);
                     calculateBalance();
                     moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
                 }
@@ -1872,7 +1956,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             SDataRecordEntry entry = (SDataRecordEntry) moFormMoneyOutCheck.getRegistry();
 
             moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
-            renderEntries(true);
+            renderRecordEntries(true);
             calculateBalance();
             moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
         }
@@ -1896,7 +1980,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                     moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
                 }
 
-                renderEntries(true);
+                renderRecordEntries(true);
                 calculateBalance();
                 moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
             }
@@ -1908,7 +1992,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             int index = moPaneGridEntries.getTable().getSelectedRow();
 
             moPaneGridEntries.setGridViewStatus(!jtbEntryDeletedFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
-            renderEntries(false);
+            renderRecordEntries(false);
             moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
 
             jbEntryMoveUp.setEnabled(jtbEntryDeletedFilter.isSelected() && jbEntryNew.isEnabled());
@@ -1934,7 +2018,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 }
             }
             else {
-                if (!mbOriginalIsDeleted && jckIsDeleted.isSelected() && miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) != JOptionPane.YES_OPTION) {
+                if (!mbOldIsDeleted && jckIsDeleted.isSelected() && miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) != JOptionPane.YES_OPTION) {
                     ok = false;
                 }
 
@@ -1948,7 +2032,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
     private void actionPerformedCancel() {
         if (jbCancel.isEnabled()) {
-            if (jckIsSystem.isSelected() || mbParamIsReadOnly || miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_FORM_CLOSE) == JOptionPane.YES_OPTION) {
+            if (mbNonEditable || miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_FORM_CLOSE) == JOptionPane.YES_OPTION) {
+                deleteTempFile();
+                
                 mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
                 setVisible(false);
             }
@@ -1999,7 +2085,12 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     }
 
     public void publicActionEntryDelete() {
-        actionPerformedEntryDelete();
+        try {
+            actionPerformedEntryDelete();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     public void publicActionEntryMoveDown() {
@@ -2090,6 +2181,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbRecordToRecordEntryXml;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkAccountCashId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbGuiModeConcept;
+    private javax.swing.JCheckBox jckEnableTempFileData;
     private javax.swing.JCheckBox jckIsAdjustmentAudit;
     private javax.swing.JCheckBox jckIsAdjustmentYearEnd;
     private javax.swing.JCheckBox jckIsAudited;
@@ -2124,6 +2216,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JPanel jpControlCashAccount2;
     private javax.swing.JPanel jpControlCashAccount3;
     private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpControls1;
+    private javax.swing.JPanel jpControls2;
     private javax.swing.JPanel jpEntries;
     private javax.swing.JPanel jpRecord;
     private javax.swing.JPanel jpRecord1;
@@ -2164,7 +2258,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moRecord = null;
         moRecordType = null;
         moAccountCash = null;
-        mbOriginalIsDeleted = false;
+        mbNonEditable = false;
+        mbOldIsDeleted = false;
         msAuxLastEntryConcept = "";
 
         moPaneGridEntries.createTable(this);
@@ -2239,6 +2334,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbCdtCreditDbr.setEnabled(true);
         jbCdtExchangeRateDiff.setEnabled(true);
         
+        jckEnableTempFileData.setEnabled(true);
         jbOk.setEnabled(true);
 
         jlGuiModeInput.setEnabled(true);
@@ -2255,10 +2351,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         maCfdRecordRows = new ArrayList<>();
         jtfXmlFilesNumber.setText("0");
 
-        calculateBalance();
-        renderPeriod();
-        renderCompanyBranch();
-        renderAccountCashSettings();
+        try {
+            renderHeader();
+            calculateBalance();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     @Override
@@ -2362,8 +2461,6 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
-        boolean isReadOnly = false;
-
         moRecord = (SDataRecord) registry;
         moRecordType = (SDataRecordType) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TP_REC, new Object[] { moRecord.getPkRecordTypeId() }, SLibConstants.EXEC_MODE_VERBOSE);
         moAccountCash = moRecord.getDbmsDataAccountCash();
@@ -2382,21 +2479,19 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jckIsSystem.setSelected(moRecord.getIsSystem());
         moFieldIsDeleted.setFieldValue(moRecord.getIsDeleted());
 
-        mbOriginalIsDeleted = moRecord.getIsDeleted();
+        mbOldIsDeleted = moRecord.getIsDeleted();
 
         for (SDataRecordEntry entry : moRecord.getDbmsRecordEntries()) {
             moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
         }
-        renderEntries(false);
+        renderRecordEntries(false);
         moPaneGridEntries.setTableRowSelection(0);
 
-        if (!SDataUtilities.isPeriodOpen(miClient, moRecord.getDate())) {
-            mbParamIsReadOnly = true;
+        if (mbParamReadOnly || moRecord.getIsSystem() || moRecord.getIsAudited() || moRecord.getIsAuthorized() || !SDataUtilities.isPeriodOpen(miClient, moRecord.getDate())) {
+            mbNonEditable = true;
         }
 
-        if (mbParamIsReadOnly || moRecord.getIsSystem() || moRecord.getIsAudited() || moRecord.getIsAuthorized()) {
-            isReadOnly = true;
-
+        if (mbNonEditable) {
             jftDate.setEditable(false);
             jftDate.setFocusable(false);
             jtfConcept.setEditable(false);
@@ -2456,6 +2551,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             jbCdtCreditDbr.setEnabled(false);
             jbCdtExchangeRateDiff.setEnabled(false);
 
+            jckEnableTempFileData.setEnabled(false);
             jbOk.setEnabled(false);
 
             jcbGuiModeConcept.setEnabled(false);
@@ -2475,24 +2571,24 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         }
         else {
             jpCommands.add(jpCommandsCashAccount, BorderLayout.CENTER);
-            jlGuiModeInput.setEnabled(!isReadOnly);
-            jrbModeInputSimple.setEnabled(!isReadOnly);
-            jrbModeInputMultiple.setEnabled(!isReadOnly);
-            bgModeInput.setSelected(jrbModeInputSimple.getModel(), !isReadOnly);
+            jlGuiModeInput.setEnabled(!mbNonEditable);
+            jrbModeInputSimple.setEnabled(!mbNonEditable);
+            jrbModeInputMultiple.setEnabled(!mbNonEditable);
+            bgModeInput.setSelected(jrbModeInputSimple.getModel(), !mbNonEditable);
             
-            boolean enableXrtDiff = !isReadOnly && !miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moAccountCash.getFkCurrencyId() });
+            boolean enableXrtDiff = !mbNonEditable && !miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moAccountCash.getFkCurrencyId() });
             jbMiExchangeRateDiff.setEnabled(enableXrtDiff);
             jbMoExchangeRateDiff.setEnabled(enableXrtDiff);
             
-            boolean enableCheck = !isReadOnly && moAccountCash.getIsCheckWalletApplying();
+            boolean enableCheck = !mbNonEditable && moAccountCash.getIsCheckWalletApplying();
             jbMoneyOutCheck.setEnabled(enableCheck);
             
-            jbAccountCashEdit.setEnabled(!isReadOnly);
+            jbAccountCashEdit.setEnabled(!mbNonEditable);
         }
 
         if (moRecord.getPkRecordTypeId().equals(SDataConstantsSys.FINU_TP_REC_JOURNAL)) {
-            jckIsAdjustmentYearEnd.setEnabled(!isReadOnly);
-            jckIsAdjustmentAudit.setEnabled(!isReadOnly);
+            jckIsAdjustmentYearEnd.setEnabled(!mbNonEditable);
+            jckIsAdjustmentAudit.setEnabled(!mbNonEditable);
         }
         else {
             jckIsAdjustmentYearEnd.setEnabled(false);
@@ -2506,10 +2602,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             updateFilesXmlInfo();
         }
 
-        calculateBalance();
-        renderPeriod();
-        renderCompanyBranch();
-        renderAccountCashSettings();
+        try {
+            renderHeader();
+            calculateBalance();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     @Override
@@ -2518,27 +2617,11 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FORM_EDIT_ONLY);
         }
         else {
-            moRecord.setDate(moFieldDate.getDate());
-            moRecord.setConcept(moFieldConcept.getString());
-            moRecord.setIsAdjustmentsYearEnd(moFieldIsAdjustmentYearEnd.getBoolean());
-            moRecord.setIsAdjustmentsAudit(moFieldIsAdjustmentAudit.getBoolean());
-            moRecord.setIsDeleted(moFieldIsDeleted.getBoolean());
-            
-            if (jcbFkAccountCashId_n.getSelectedIndex() <= 0) {
-                moRecord.setFkCompanyBranchId_n(0);
-                moRecord.setFkAccountCashId_n(0);
+            try {
+                updateRecord();
             }
-            else {
-                moRecord.setFkCompanyBranchId_n(moFieldFkAccountCashId_n.getKeyAsIntArray()[0]);
-                moRecord.setFkAccountCashId_n(moFieldFkAccountCashId_n.getKeyAsIntArray()[1]);
-            }
-            
-            moRecord.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-
-            moRecord.getDbmsRecordEntries().clear();
-
-            for (STableRow row : moPaneGridEntries.getGridRows()) {
-                moRecord.getDbmsRecordEntries().add((SDataRecordEntry) row.getData());
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
             }
         }
         
@@ -2647,7 +2730,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
             case SLibConstants.VALUE_STATUS:
-                mbParamIsReadOnly = (Boolean) value;
+                mbParamReadOnly = (Boolean) value;
                 break;
             default:
         }
@@ -2810,6 +2893,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 }
             }
         }
+        else if (e.getSource() instanceof JCheckBox) {
+            JCheckBox checkBox = (JCheckBox) e.getSource();
+            
+            if (checkBox == jckEnableTempFileData) {
+                itemStateChangedEnableTempFileData();
+            }
+        }
     }
 
     @Override
@@ -2820,9 +2910,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             if (row != null) {
                 SDataRecordEntry entry = (SDataRecordEntry) row.getData();
 
-                jbEntryNewCopy.setEnabled(!jckIsSystem.isSelected() && !entry.getIsSystem() && !mbParamIsReadOnly);
-                jbEntryEdit.setEnabled(!jckIsSystem.isSelected() && !entry.getIsSystem() && !mbParamIsReadOnly);
-                jbEntryDelete.setEnabled(!jckIsSystem.isSelected() && (!entry.getIsSystem() || entry.getUserId() != 0) && !mbParamIsReadOnly);
+                jbEntryNewCopy.setEnabled(!jckIsSystem.isSelected() && !entry.getIsSystem() && !mbNonEditable);
+                jbEntryEdit.setEnabled(!jckIsSystem.isSelected() && !entry.getIsSystem() && !mbNonEditable);
+                jbEntryDelete.setEnabled(!jckIsSystem.isSelected() && (!entry.getIsSystem() || entry.getUserId() != 0) && !mbNonEditable);
             }
         }
     }

@@ -454,15 +454,16 @@ public abstract class SModConsts {
     public static final int TRN_MAT_CONS_ENT = 2023332;
     public static final int TRN_MAT_CONS_SUBENT = 2023333;
     public static final int TRN_MAT_CONS_ENT_USR = 2023334;
-    public static final int TRN_MAT_CONS_ENT_EMP = 2023343;
-    public static final int TRN_MAT_PROV_ENT = 2023335;
-    public static final int TRN_MAT_PROV_ENT_WAH = 2023336;
+    public static final int TRN_MAT_CONS_ENT_EMP = 2023335;
+    public static final int TRN_MAT_PROV_ENT = 2023336;
     public static final int TRN_MAT_PROV_ENT_USR = 2023337;
-    public static final int TRN_MAT_REQ = 2023338;
-    public static final int TRN_MAT_REQ_NTS = 2023339;
-    public static final int TRN_MAT_REQ_ETY = 2023340;
-    public static final int TRN_MAT_REQ_ETY_NTS = 2023341;
-    public static final int TRN_MAT_REQ_ST_LOG = 2023342;
+    public static final int TRN_MAT_PROV_ENT_WHS = 2023338;
+    public static final int TRN_MAT_REQ = 2023339;
+    public static final int TRN_MAT_REQ_NTS = 2023340;
+    public static final int TRN_MAT_REQ_ETY = 2023341;
+    public static final int TRN_MAT_REQ_ETY_NTS = 2023342;
+    public static final int TRN_MAT_REQ_ETY_ITEM_CHG = 2023343;
+    public static final int TRN_MAT_REQ_ST_LOG = 2023344;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -484,6 +485,9 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;   // renglones de requisiciones en diálogo de segregaciones
     public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_FUNC_EXPENSES = 2024336;    // massive CRUD of functional area monthly-budgets
+    public static final int TRNX_CONF_USR_VS_ENT = 2024337;
+    public static final int TRNX_CONF_EMP_VS_ENT = 2024338;
+    public static final int TRNX_CONF_WHS_VS_ENT = 2024339;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     
@@ -1171,7 +1175,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAT_CONS_ENT_USR, "trn_mat_cons_ent_usr");
         TablesMap.put(TRN_MAT_CONS_ENT_EMP, "trn_mat_cons_ent_emp");
         TablesMap.put(TRN_MAT_PROV_ENT, "trn_mat_prov_ent");
-        TablesMap.put(TRN_MAT_PROV_ENT_WAH, "trn_mat_prov_ent_wah");
+        TablesMap.put(TRN_MAT_PROV_ENT_WHS, "trn_mat_prov_ent_whs");
         TablesMap.put(TRN_MAT_PROV_ENT_USR, "trn_mat_prov_ent_usr");
         TablesMap.put(TRN_MAT_REQ, "trn_mat_req");
         TablesMap.put(TRN_MAT_REQ_NTS, "trn_mat_req_nts");

@@ -15,12 +15,35 @@ import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
-import erp.mmfg.data.*;
-import erp.mmfg.form.*;
+import erp.mmfg.data.SDataBom;
+import erp.mmfg.data.SDataCost;
+import erp.mmfg.data.SDataCostClosePeriod;
+import erp.mmfg.data.SDataExplotionMaterials;
+import erp.mmfg.data.SDataGang;
+import erp.mmfg.data.SDataLeadtimeCo;
+import erp.mmfg.data.SDataLeadtimeCob;
+import erp.mmfg.data.SDataManufacturingLine;
+import erp.mmfg.data.SDataManufacturingLineConfigItem;
+import erp.mmfg.data.SDataProductionOrder;
+import erp.mmfg.data.SDataProductionOrderCharge;
+import erp.mmfg.data.SDataRequisition;
+import erp.mmfg.form.SDialogExplotionMaterials;
+import erp.mmfg.form.SDialogMfgClosePeriod;
+import erp.mmfg.form.SDialogProductionOrderSaved;
+import erp.mmfg.form.SDialogRepProductionOrder;
+import erp.mmfg.form.SFormBom;
+import erp.mmfg.form.SFormCost;
+import erp.mmfg.form.SFormExplotionMaterials;
+import erp.mmfg.form.SFormGang;
+import erp.mmfg.form.SFormLeadtime;
+import erp.mmfg.form.SFormManufacturingLine;
+import erp.mmfg.form.SFormManufacturingLineConfigItem;
+import erp.mmfg.form.SFormProductionOrder;
+import erp.mmfg.form.SFormProductionOrderCharge;
+import erp.mmfg.form.SFormRequisition;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
-import redis.clients.jedis.Jedis;
 
 /**
  *
@@ -309,12 +332,12 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAssingLotsFinishedGood.setEnabled(hasRightAssignLot);
         jmReports.setEnabled(hasRightReports);
 
-        jmiProductionOrderNew.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_NEW }, SLibConstants.FIELD_DEL));
-        jmiProductionOrderLot.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_LOT }, SLibConstants.FIELD_DEL));
-        jmiProductionOrderLotAssigned.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG }, SLibConstants.FIELD_DEL));
-        jmiProductionOrderProcess.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_PROC }, SLibConstants.FIELD_DEL));
-        jmiProductionOrderEnd.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_END }, SLibConstants.FIELD_DEL));
-        jmiProductionOrderClose.setVisible(!(Boolean)SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_CLS }, SLibConstants.FIELD_DEL));
+        jmiProductionOrderNew.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_NEW }, SLibConstants.FIELD_DELETED));
+        jmiProductionOrderLot.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_LOT }, SLibConstants.FIELD_DELETED));
+        jmiProductionOrderLotAssigned.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG }, SLibConstants.FIELD_DELETED));
+        jmiProductionOrderProcess.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_PROC }, SLibConstants.FIELD_DELETED));
+        jmiProductionOrderEnd.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_END }, SLibConstants.FIELD_DELETED));
+        jmiProductionOrderClose.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_CLS }, SLibConstants.FIELD_DELETED));
         
         // GUI configuration:
         

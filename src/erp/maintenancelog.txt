@@ -1,4 +1,34 @@
 ================================================================================
+SIIE 3.2 217.2/ 2023-08-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de restricción de deducción de seguro social en recibos de nóminas si el empleado gana el salario mínimo.
+
+================================================================================
+SIIE 3.2 217.1/ 2023-08-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión a validación de existencia de XML del CFD en layouts bancarios de pagos a documentos.
+
+================================================================================
+SIIE 3.2 217.0/ 2023-07-31
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de las configuraciones complementarias para la requisición de materiales.
+
+================================================================================
+SIIE 3.2 216.3/ 2023-07-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de funcionalidad de preservación y recuperación de información temporal de capturas de registros. Y su puesta en marcha para pólizas contables.
+
+================================================================================
+SIIE 3.2 216.2/ 2023-07-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección consulta de vista de beneficios para agregar el centro de costo asociado al departamento del empleado.
+
+================================================================================
 SIIE 3.2 216.1/ 2023-07-18
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

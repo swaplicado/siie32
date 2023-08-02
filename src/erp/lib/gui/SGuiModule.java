@@ -402,12 +402,12 @@ public abstract class SGuiModule {
                     moRegistry = (SDataRegistry) response.getPacket();
                     moLastSavedPrimaryKey = moRegistry.getPrimaryKey();
                     registry.setPrimaryKey(moRegistry.getPrimaryKey());
+                    registry.deleteTempFile(miClient);
                 }
                 /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-
                 
                 for (SSrvLock il : mvIndependentLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), il);
