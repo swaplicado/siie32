@@ -623,6 +623,9 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_ITEM_COST:
                 guiReport = new SGuiReport("reps/trn_cont_marg.jasper", "Reporte margen de contribución");
                 break;
+            case SModConsts.TRN_MAT_REQ:
+                guiReport = new SGuiReport("reps/trn_mat_req.jasper", "Requisición de materiales");
+                break;
             case SModConsts.TRNR_CON_STA:
                 guiReport = new SGuiReport("reps/trn_con_sta.jasper", "Reporte de estatus de contratos");
                 break;

@@ -51,7 +51,8 @@ public class SViewConfUserVsEntity extends SGridPaneView {
             where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
         
-        where += (where.isEmpty() ? "" : "AND ") + "pu.id_prv = " + SDataConstantsSys.PRV_INV_REQ_MAT_REQ + " ";
+        where += (where.isEmpty() ? "" : "AND ") + "(pu.id_prv = " + SDataConstantsSys.PRV_INV_REQ_MAT_REQ + " "
+                + "OR pu.id_prv = " + SDataConstantsSys.PRV_INV_REQ_MAT_REV + ") ";
 
         msSql = "SELECT DISTINCT v.id_usr AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.usr AS " + SDbConsts.FIELD_CODE + ", "

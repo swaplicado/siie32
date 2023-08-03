@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 217.3/ 2023-08-03
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del formato de impresión de las requisiciones de materiales.
+2) Corrección en la generación de CFDI de recepción de pagos al tener impuesto IVA Exento.
+
+================================================================================
 SIIE 3.2 217.2/ 2023-08-01
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
