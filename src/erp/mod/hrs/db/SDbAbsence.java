@@ -36,7 +36,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     protected int mnBenefitsYear;
     protected int mnBenefitsAnniversary;
     protected String msNotes;
-    protected int mnExternarRequestId;
+    protected int mnExternalRequestId;
     protected boolean mbTimeClockSourced;
     protected boolean mbClosed;
     //protected boolean mbDeleted;
@@ -92,7 +92,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public void setBenefitsYear(int n) { mnBenefitsYear = n; }
     public void setBenefitsAnniversary(int n) { mnBenefitsAnniversary = n; }
     public void setNotes(String s) { msNotes = s; }
-    public void setExternarRequestId(int n) { mnExternarRequestId = n; }
+    public void setExternalRequestId(int n) { mnExternalRequestId = n; }
     public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setClosed(boolean b) { mbClosed = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -119,7 +119,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public int getBenefitsYear() { return mnBenefitsYear; }
     public int getBenefitsAnniversary() { return mnBenefitsAnniversary; }
     public String getNotes() { return msNotes; }
-    public int getExternarRequestId() { return mnExternarRequestId; }
+    public int getExternalRequestId() { return mnExternalRequestId; }
     public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isClosed() { return mbClosed; }
     public boolean isDeleted() { return mbDeleted; }
@@ -268,7 +268,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         mnBenefitsYear = 0;
         mnBenefitsAnniversary = 0;
         msNotes = "";
-        mnExternarRequestId = 0;
+        mnExternalRequestId = 0;
         mbTimeClockSourced = false;
         mbClosed = false;
         mbDeleted = false;
@@ -347,7 +347,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             mnBenefitsYear = resultSet.getInt("ben_year");
             mnBenefitsAnniversary = resultSet.getInt("ben_ann");
             msNotes = resultSet.getString("nts");
-            mnExternarRequestId = resultSet.getInt("ext_req_id");
+            mnExternalRequestId = resultSet.getInt("ext_req_id");
             mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbClosed = resultSet.getBoolean("b_clo");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -403,7 +403,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     mnBenefitsYear + ", " + 
                     mnBenefitsAnniversary + ", " + 
                     "'" + msNotes + "', " +
-                    mnExternarRequestId + ", " + 
+                    mnExternalRequestId + ", " + 
                     (mbTimeClockSourced ? 1 : 0) + ", " +
                     (mbClosed ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
@@ -437,7 +437,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     "ben_year = " + mnBenefitsYear + ", " +
                     "ben_ann = " + mnBenefitsAnniversary + ", " +
                     "nts = '" + msNotes + "', " +
-                    "ext_req_id = " + mnExternarRequestId + ", " +
+                    "ext_req_id = " + mnExternalRequestId + ", " +
                     "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_clo = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -486,7 +486,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         registry.setBenefitsYear(this.getBenefitsYear());
         registry.setBenefitsAnniversary(this.getBenefitsAnniversary());
         registry.setNotes(this.getNotes());
-        registry.setExternarRequestId(this.getExternarRequestId());
+        registry.setExternalRequestId(this.getExternalRequestId());
         registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());
