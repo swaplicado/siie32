@@ -1,8 +1,8 @@
 ================================================================================
-SIIE 3.2 217.5/ 2023-08-07
+SIIE 3.2 217.5/ 2023-08-08
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Revisión de validación de cambio de mes al cambiar la fecha de documentos, para restringirlo si el documento ya tiene pagos.
+1) Revisión y corrección de restricción de cambio de período original de documentos por cambio en sus fechas, si ya tienen pagos.
 
 ================================================================================
 SIIE 3.2 217.4/ 2023-08-04

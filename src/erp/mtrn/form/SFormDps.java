@@ -9785,11 +9785,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     validation.setComponent(jcbNumberSeries);
                 }
                 else if (isCfdEmissionRequired && jcbCfdiPaymentWay.getSelectedIndex() <= 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlCfdiPaymentWay.getText() + "'.");
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiPaymentWay.getText() + "'.");
                     validation.setComponent(jcbCfdiPaymentWay);
                 }
                 else if (isCfdEmissionRequired && jcbCfdiPaymentMethod.getSelectedIndex() <= 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlCfdiPaymentMethod.getText() + "'.");
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiPaymentMethod.getText() + "'.");
                     validation.setComponent(jcbCfdiPaymentMethod);
                 }
                 else if (moDps.getTotal_r() < 0) {
@@ -9854,18 +9854,26 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
                 
-                // validate that date can be changed, if neccesary:
+                // check if month can be changed, when neccesary:
                 
                 if (!validation.getIsError() && !moDps.getIsRegistryNew() && mbIsDpsInvoice) {
-                    int[] dateOld = SLibTimeUtils.digestMonth(moDps.getDate());
+                    int[] dateOld = SLibTimeUtils.digestMonth(moDps.getOldDate());
                     int[] dateNew = SLibTimeUtils.digestMonth(moFieldDate.getDate());
 
-                    if (dateOld[0] != dateNew[0] || dateOld[1] != dateNew[1]) { // does year or month change?
+                    if (dateOld[0] != dateNew[0] || dateOld[1] != dateNew[1]) { // does month or year change?
                         String[] months = SLibTimeUtils.createMonthsOfYearStd(Calendar.LONG);
+                        String change = "de " + months[dateOld[1] - 1] + " " + dateOld[0] + " a " + months[dateNew[1] - 1] + " " + dateNew[0];
                         
                         try {
-                            moDps.validateDocBalance(miClient.getSession().getDatabase().getConnection(), "No se puede cambiar el período del documento ("
-                                    + "de " + months[dateOld[1] - 1] + " " + dateOld[0] + " a " + months[dateNew[1] - 1] + " " + dateNew[0] + "):\n");
+                            // exception will be thrown if documet has payments:
+                            moDps.validateDocBalance(miClient.getSession().getDatabase().getConnection(), "No se puede cambiar el período del documento " + change + ":\n");
+                            
+                            // no exception thrown, so confirm change of month or year:
+                            if (miClient.showMsgBoxConfirm("La fecha original del documento '" + SLibUtils.DateFormatDate.format(moDps.getOldDate()) + "' ha sido cambiada a '" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "'.\n"
+                                    + "¿Está seguro que desea cambiar el período del documento " + change + "?") != JOptionPane.YES_OPTION) {
+                                throw new Exception(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDate.getText() + "':\n"
+                                        + "puede ser '" + SLibUtils.DateFormatDate.format(moDps.getOldDate()) + "' o al menos una fecha de " + months[dateOld[1] - 1] + " " + dateOld[0] + ".");
+                            }
                         }
                         catch (Exception e) {
                             validation.setMessage(e.getMessage());

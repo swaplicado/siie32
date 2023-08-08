@@ -303,9 +303,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected erp.mtrn.data.SDataPdf moDbmsDataPdf;	
     protected erp.mtrn.data.SDataCfd moDbmsDataCfdBol;
     
+    protected java.util.Date mtOldDate; // read-only member
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
-
+    
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
         mlRegistryTimeout = 1000 * 60 * 60 * 2; // 2 hr
@@ -2100,9 +2101,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }																		
     public erp.mtrn.data.SDataCfd getDbmsDataCfdBol() { return moDbmsDataCfdBol; }																		
     
+    public java.util.Date getOldDate() { return mtOldDate; }
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
-    
+
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
 
@@ -2368,6 +2370,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moDbmsDataPdf = null;					 
         moDbmsDataCfdBol = null;					 
         
+        mtOldDate = null;
         msXtaTotalCyAsText = "";
         createXtaDpsType();
     }
@@ -2525,6 +2528,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msDbmsIncotermCode = oResultSet.getString("i.code");
                 msDbmsAuthorizationStatusName = oResultSet.getString("st.st_dps_authorn");
                 
+                mtOldDate = mtDate;
                 computeXtaTotalCyAsText(statement);
                 createXtaDpsType();
 
