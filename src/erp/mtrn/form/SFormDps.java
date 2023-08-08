@@ -104,6 +104,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -9771,7 +9772,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     validation.setMessage("¡No se han especificado la clave de esta empresa como proveedor del cliente " + moBizPartner.getBizPartner() + ".\n" +
                             "Actualizar este dato en el Módulo Configuración, vista 'Clientes', forma de captura 'Cliente', pestaña 'Información adicional', campo 'Clave de la empresa'.");
                 }
-                else if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate()) && (moDps.getIsRegistryNew() || mbIsDpsInvoice || mbIsDpsAdjustment)) {
+                else if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
                     validation.setComponent(jftDate);
                 }
@@ -9853,18 +9854,27 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
                 
-                // validate global data:
+                // validate that date can be changed, if neccesary:
                 
-                if (!validation.getIsError()) {
-                    if ((jcbGblPeriodicity.getSelectedIndex() > 0 && (jcbGblMonth.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
-                            (jcbGblMonth.getSelectedIndex() > 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
-                            (moFieldCfdiGblYear.getInteger() != 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || jcbGblMonth.getSelectedIndex() <= 0))) {
-                        validation.setMessage("Todos los campos con la información de la factura global deben contener un valor.");
-                        validation.setComponent(jcbGblPeriodicity);
+                if (!validation.getIsError() && !moDps.getIsRegistryNew() && mbIsDpsInvoice) {
+                    int[] dateOld = SLibTimeUtils.digestMonth(moDps.getDate());
+                    int[] dateNew = SLibTimeUtils.digestMonth(moFieldDate.getDate());
+
+                    if (dateOld[0] != dateNew[0] || dateOld[1] != dateNew[1]) { // does year or month change?
+                        String[] months = SLibTimeUtils.createMonthsOfYearStd(Calendar.LONG);
+                        
+                        try {
+                            moDps.validateDocBalance(miClient.getSession().getDatabase().getConnection(), "No se puede cambiar el período del documento ("
+                                    + "de " + months[dateOld[1] - 1] + " " + dateOld[0] + " a " + months[dateNew[1] - 1] + " " + dateNew[0] + "):\n");
+                        }
+                        catch (Exception e) {
+                            validation.setMessage(e.getMessage());
+                            validation.setComponent(jftDate);
+                        }
                     }
                 }
 
-                // validate exchange rate:
+                // validate exchange rate, if neccesary:
 
                 if (!validation.getIsError() && !miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray())) {
                     if (SLibUtils.roundAmount(moFieldExchangeRate.getDouble()) == 1d && 
@@ -10055,6 +10065,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     validation.setMessage(e.getMessage());
                                     validation.setComponent(moPaneGridEntries);
                                     jTabbedPane.setSelectedIndex(TAB_ETY);
+                                    break;
                                 }
                             }
                         }
@@ -10062,18 +10073,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         double prepaymentsCy = mdPrepaymentsCy;
                         double applicationsCy = 0;
                         
-                        // check document's balance
-                        
-                        try {
-                            if (mbIsDpsInvoice && SLibTimeUtils.digestMonth(moDps.getDate())[1] != SLibTimeUtils.digestMonth(moFieldDate.getDate())[1]) {
-                                moDps.validateDocBalance(miClient.getSession().getDatabase().getConnection(), "No se puede cambiar el periodo del documento: ");
-                            }
-                        }
-                        catch (Exception e) {
-                            validation.setMessage(e.getMessage());
-                            validation.setComponent(jftDate);
-                        }
-
                         // check prepayments:
 
                         if (!validation.getIsError() && mdPrepaymentsCy != 0) {
@@ -10250,6 +10249,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
                                             "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
                                             "El certificado expiró el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate()) + ".");
+                                }
+                                else if ((jcbGblPeriodicity.getSelectedIndex() > 0 && (jcbGblMonth.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
+                                        (jcbGblMonth.getSelectedIndex() > 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
+                                        (moFieldCfdiGblYear.getInteger() != 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || jcbGblMonth.getSelectedIndex() <= 0))) {
+                                    validation.setMessage("Todos los campos con la información de la factura global deben contener un valor.");
+                                    validation.setComponent(jcbGblPeriodicity);
                                 }
                                 else if (isCfdAddendaRequired()) {
                                     switch (moBizPartnerCategory.getFkCfdAddendaTypeId()) {

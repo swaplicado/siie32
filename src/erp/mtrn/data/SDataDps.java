@@ -1015,45 +1015,45 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             for (i = 201; i <= 224; i++) {
                 switch (i) {
                     case 201:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_dps_supply WHERE id_src_year = " + mnPkYearId + " AND id_src_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_dps_supply WHERE id_src_year = " + mnPkYearId + " AND id_src_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento tiene vínculo(s) con otro(s) documento(s) como origen!";
                         break;
                     /*
                     case 202:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_dps_supply WHERE id_des_year = " + mnPkYearId + " AND id_des_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_dps_supply WHERE id_des_year = " + mnPkYearId + " AND id_des_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento tiene vínculo(s) con otro(s) documento(s) como destino!";
                         break;
                     */
                     case 203:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_dps_adj WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_dps_adj WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento está asociado con otro documento de ajuste!";
                         break;
                     /*
                     case 204:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_dps_adj WHERE id_adj_year = " + mnPkYearId + " AND id_adj_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_dps_adj WHERE id_adj_year = " + mnPkYearId + " AND id_adj_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento de ajuste está asociado con otro documento!";
                         break;
                     */
                     case 205:
-                        sSql = "SELECT count(*) AS f_count FROM trn_diog WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_diog WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
                         sMsgAux = "¡El documento está asociado con un documento de entradas y salidas de mercancías!";
                         break;
                     case 206:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM trn_diog AS d " +
                                 "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                                 "WHERE de.fid_dps_year_n = " + mnPkYearId + " AND de.fid_dps_doc_n = " + mnPkDocId + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL AND de.b_del = 0 AND d.b_del = 0 ";
                         sMsgAux = "¡El documento está asociado con un surtido de almacén!";
                         break;
                     case 207:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM trn_diog AS d " +
                                 "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                                 "WHERE de.fid_dps_year_n = " + mnPkYearId + " AND de.fid_dps_doc_n = " + mnPkDocId + " AND de.fid_dps_adj_year_n IS NOT NULL AND de.fid_dps_adj_doc_n IS NOT NULL AND de.b_del = 0 AND d.b_del = 0 ";
                         sMsgAux = "¡El documento está asociado con una devolución de almacén como documento!";
                         break;
                     case 208:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM trn_diog AS d " +
                                 "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                                 "WHERE de.fid_dps_adj_year_n = " + mnPkYearId + " AND de.fid_dps_adj_doc_n = " + mnPkDocId + " AND de.b_del = 0 AND d.b_del = 0 ";
@@ -1061,7 +1061,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         break;
 
                     case 209:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM mkt_comms " +
                                 "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND b_del = 0 ";
                         sMsgAux = "¡El documento está asociado con un documento de comisiones!";
@@ -1070,39 +1070,39 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         // Not longer needed since September 2014, due to new commissions tables.
                         break;
                     case 211:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_riss WHERE id_old_year = " + mnPkYearId + " AND id_old_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_riss WHERE id_old_year = " + mnPkYearId + " AND id_old_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento ha sido reimpreso!";
                         break;
                     case 212:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_riss WHERE id_new_year = " + mnPkYearId + " AND id_new_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_riss WHERE id_new_year = " + mnPkYearId + " AND id_new_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento es el reemplazo de otro documento!";
                         break;
                     case 213:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_repl WHERE id_old_year = " + mnPkYearId + " AND id_old_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_repl WHERE id_old_year = " + mnPkYearId + " AND id_old_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento ha sido sustituído!";
                         break;
                     case 214:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_repl WHERE id_new_year = " + mnPkYearId + " AND id_new_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_repl WHERE id_new_year = " + mnPkYearId + " AND id_new_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento es la sustitución de otro documento!";
                         break;
                     case 215:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_iog_chg WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_iog_chg WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento está asociado con un cambio de compras-ventas!";
                         break;
                     case 216:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dps_iog_war WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_iog_war WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento está asociado con una garantía de compras-ventas!";
                         break;
                     case 217:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dsm_ety WHERE fid_src_dps_year_n = " + mnPkYearId + " AND fid_src_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dsm_ety WHERE fid_src_dps_year_n = " + mnPkYearId + " AND fid_src_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
                         sMsgAux = "¡El documento está asociado con un movimiento de asociado de negocios como origen!";
                         break;
                     case 218:
-                        sSql = "SELECT count(*) AS f_count FROM trn_dsm_ety WHERE fid_des_dps_year_n = " + mnPkYearId + " AND fid_des_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
+                        sSql = "SELECT COUNT(*) AS f_count FROM trn_dsm_ety WHERE fid_des_dps_year_n = " + mnPkYearId + " AND fid_des_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
                         sMsgAux = "¡El documento está asociado con un movimiento de asociado de negocios como destino!";
                         break;
                     case 219:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                 "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " AND " +
@@ -1110,7 +1110,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento!\nSe debe eliminar las pólizas contables de cierre o apertura de ejercicio, antes de eliminar el documento.";
                         break;
                     case 220:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                 "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " AND " +
@@ -1119,7 +1119,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         break;
                     case 221:
                         if ((isDocument() || isAdjustment()) && !isPrepaymentOnly()) {
-                            sSql = "SELECT count(*) AS f_count " +
+                            sSql = "SELECT COUNT(*) AS f_count " +
                                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                     "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " AND " +
@@ -1133,7 +1133,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         break;
                     case 222:
                         if ((isDocument() || isAdjustment()) && !isPrepaymentOnly()) {
-                            sSql = "SELECT count(*) AS f_count " +
+                            sSql = "SELECT COUNT(*) AS f_count " +
                                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                     "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " AND " +
@@ -1145,13 +1145,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                         break;
                     case 223:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM log_ship " +
                                 "WHERE b_del = 0 AND fk_ord_year_n = " + mnPkYearId + " AND fk_ord_doc_n = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento está asociado a un documento de embarques!";
                         break;
                     case 224:
-                        sSql = "SELECT count(*) AS f_count " +
+                        sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM log_ship AS d " +
                                 "INNER JOIN log_ship_dest_ety AS de ON d.id_ship = de.id_ship " +
                                 "WHERE d.b_del = 0 AND de.fk_dps_year_n = " + mnPkYearId + " AND de.fk_dps_doc_n = " + mnPkDocId + " ";
