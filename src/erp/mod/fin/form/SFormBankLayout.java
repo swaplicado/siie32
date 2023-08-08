@@ -101,6 +101,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private static final int COL_TRN_TP_PREPAY_AGREE = 4;
     private static final int COL_TRN_TP_PREPAY_AGREE_REF = 5;
     
+    private static final int MAX_MISSING_CFD = 8;
+    
     private JCheckBox jckShowOnlyDocsDateDue;
     private JCheckBox jckShowOnlyBenefsWithAccounts;
     private JButton jbExchangeRateReset;
@@ -1716,7 +1718,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         if (mnLayoutBank == SFinConsts.LAY_BANK_BBAJ) {
             for (SLayoutBankRow row : layoutBankRows) {
                 if (row.getBajioBankAlias().isEmpty()) {
-                    throw new Exception("No se ha especificado el 'alias ' de la cuenta de abono '" + row.getBeneficiaryAccountNumber() + "' del proveedor '" + row.getBizPartner() + "'.");
+                    throw new Exception("No se ha especificado el 'alias' de la cuenta de abono '" + row.getBeneficiaryAccountNumber() + "' del proveedor '" + row.getBizPartner() + "'.");
                 }
             }
         }
@@ -2852,7 +2854,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            if (isModeForTransfers()) {
+            if (isModeForTransfers()) { // both invoice payments and prepayments
                 try {
                     validateTransfers();
                 }
@@ -2865,33 +2867,33 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlLayoutPath) + "'.");
                         validation.setComponent(jbPickLayoutPath);
                     }
-                    else {
+                    else if (isModeForTransfersOfPayments()) { // only invoice payments
                         int missingCfdCount = 0;
-                        String missingCfdDpsNumbers = "";
+                        String missingCfdInvoices = "";
                         boolean validateSatStatus = false;
                         
                         for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
                             SLayoutBankRow layoutBankRow = (SLayoutBankRow) moGridPayments.getGridRow(i);
                             
                             if (layoutBankRow.isForPayment()) {
-                                
                                 if (layoutBankRow.isXml()) {
                                     validateSatStatus = true;
                                 }
                                 else if (mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_YES || mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_OPC) {
-                                    missingCfdCount++;
-                                    
-                                    if (missingCfdCount > 0 && missingCfdCount % 5 == 0) {
-                                        missingCfdDpsNumbers += "\n";
+                                    if (++missingCfdCount <= MAX_MISSING_CFD) {
+                                        missingCfdInvoices += (missingCfdInvoices.isEmpty() ? "" : "\n") + layoutBankRow.getBizPartner() + ": " + layoutBankRow.getDpsNumber();
                                     }
-                                    
-                                    missingCfdDpsNumbers += (missingCfdDpsNumbers.isEmpty() ? "" : ", ") + layoutBankRow.getDpsNumber();
                                 }
                             }
                         }
                         
                         if (missingCfdCount > 0) {
-                            String message = "¡Las siguientes facturas no tienen XML del CFD!:\n" + missingCfdDpsNumbers;
+                            if (missingCfdCount > MAX_MISSING_CFD) {
+                                int surplus = missingCfdCount - MAX_MISSING_CFD;
+                                missingCfdInvoices += "\n(Además de " + (surplus == 1 ? "otra factura" : "otras " + surplus + "facturas") + " más.)";
+                            }
+                            
+                            String message = "¡Hay " + (missingCfdCount == 1 ? "una factura que no tiene" : missingCfdCount + " facturas que no tienen") + " XML del CFD!:\n" + missingCfdInvoices;
                             
                             switch (mnCfgParamCfdRequired) {
                                 case SBankLayoutConsts.CFD_REQ_YES:
@@ -2899,7 +2901,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                     break;
                                 case SBankLayoutConsts.CFD_REQ_OPC:
                                     if (miClient.showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                        validation.setMessage("Es necesario agregar el XML del CFD a las facturas:\n" + missingCfdDpsNumbers);
+                                        validation.setMessage("Es necesario agregar el XML del CFD a " + (missingCfdCount == 1 ? "la factura" : "las facturas") + ":\n" + missingCfdInvoices);
                                     }
                                     break;
                                 default:

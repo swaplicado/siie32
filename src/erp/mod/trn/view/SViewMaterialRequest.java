@@ -7,6 +7,7 @@ package erp.mod.trn.view;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.gui.grid.SGridFilterPanelMatReqStatus;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -16,11 +17,11 @@ import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -43,6 +44,7 @@ import sa.lib.gui.SGuiParams;
  */
 public class SViewMaterialRequest extends SGridPaneView implements ActionListener {
 
+    private JButton jbPrint;
     private JButton jbAuthCardex;
     private JButton jbAuthorize;
     private JButton jbReject;
@@ -70,16 +72,19 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         hasAuthRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
         
+        jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Kardex de autorizaciones", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
         
+        getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
         
+        jbPrint.setEnabled(true);
         jbAuthCardex.setEnabled(true);
         jbAuthorize.setEnabled(hasAuthRight);
         jbReject.setEnabled(hasAuthRight);
@@ -106,8 +111,31 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
+    private void actionPrint() {
+        if (jbPrint.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        print(gridRow.getRowPrimaryKey()[0]);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
+    }
+    
     private void actionCardex() {
-        int[] key = null;
+        int[] key;
         
         if (jbAuthCardex.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -205,6 +233,15 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
+    private void print(int idMatReq) throws Exception {
+        HashMap<String, Object> params;
+        
+        params = miClient.createReportParams();
+        params.put("nMatReqId", idMatReq);
+        
+        miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
+    }
+    
     @Override
     public void prepareSqlQuery() {
         String where = "";
@@ -251,10 +288,11 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
                 + "v.fk_ent_mat_cons_ent = ceu.id_mat_cons_ent AND ceu.id_usr = " + usrId + " ";
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PET) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PET || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
             if (usrId != 2 ) { // SUPER
                 needJoin = true;
-                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + ") " ;
+                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
+                        + "OR peu.id_usr = " + usrId + " OR ceu.id_usr = " + usrId + ") ";
             }
         }
         
@@ -391,7 +429,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbAuthCardex) {
+            if (button == jbPrint) {
+                actionPrint();
+            }
+            else if (button == jbAuthCardex) {
                 actionCardex();
             }
             else if (button == jbAuthorize) {

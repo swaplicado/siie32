@@ -1253,6 +1253,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                             trasDR.getAttTipoFactorDR().setString(docTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
                             trasDR.getAttTasaOCuotaDR().setDouble(docTax.getRate());
                             trasDR.getAttImporteDR().setDouble(docTax.getTax());
+                            if (docTax.getFactorCode().equals("E")) {
+                                trasDR.getAttTasaOCuotaDR().setCanBeZero(false);
+                                trasDR.getAttImporteDR().setCanBeZero(false);
+                            }
                             arrTrasladoDR.add(trasDR);
                         }
                     }
@@ -1294,6 +1298,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         trasP.getAttTipoFactorP().setString(payTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
                         trasP.getAttTasaOCuotaP().setDouble(payTax.getRate());
                         trasP.getAttImporteP().setDouble(payTax.getTax());
+                        if (payTax.getFactorCode().equals("E")) {
+                            trasP.getAttTasaOCuotaP().setCanBeZero(false);
+                            trasP.getAttImporteP().setCanBeZero(false);
+                        }
                         arrTrasladoP.add(trasP);
                     }
                 }
