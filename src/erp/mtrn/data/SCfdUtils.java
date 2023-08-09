@@ -4844,11 +4844,11 @@ public abstract class SCfdUtils implements Serializable {
                     comprobante.setEltOpcImpuestos(new cfd.ver40.DElementImpuestos(comprobante));
                 }
                 
-                comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
                 if (exemptTaxesAvailable) {
-                    comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setCanBeZero(true);
+                    comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setCanBeZero(false);
                 }
                 if (!impuestosTrasladados.getEltImpuestoTrasladados().isEmpty()) {
+                    comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().setDouble(dTotalImptoTrasladado);
                     comprobante.getEltOpcImpuestos().setEltOpcImpuestosTrasladados(impuestosTrasladados);
                 }
             }
