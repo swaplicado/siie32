@@ -11,6 +11,11 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
+import erp.mod.SModConsts;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import sa.lib.grid.SGridRow;
 
@@ -26,26 +31,44 @@ public class SMaterialRequestEntryRow implements SGridRow {
     //protected boolean mbDeleted;
     protected int mnFkItemId;
     protected int mnFkUnitId;
+    protected int mnFkConsumeEntityId_n;
+    protected int mnFkSubConsumeEntityId_n;
     
     protected String msAuxItemCode;
     protected String msAuxItemName;
     protected String msAuxUnitCode;
+    protected String msAuxConsumeEntity;
     protected double mdAuxSegregated;
+    protected double mdAuxSupplied;
     protected double mdAuxStock;
     protected double mdAuxToSegregate;
+    protected double mdAuxToSupply;
     protected boolean mbAuxBulk;
     
     SClientInterface miClient;
     
-    public SMaterialRequestEntryRow(SClientInterface client, final int fkItem, final int fkUnit) {
+    protected int mnFormType;
+    
+    public static int FORM_SEGREGATION = 1;
+    public static int FORM_SUPPLY = 2;
+    
+    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit, final int fkConsEntity, final int fkSubConsEntity) {
         miClient = client;
+        mnFormType = formType;
         mnFkItemId = fkItem;
         mnFkUnitId = fkUnit;
+        mnFkConsumeEntityId_n = fkConsEntity;
+        mnFkSubConsumeEntityId_n = fkSubConsEntity;
         
-        this.readAuxs();
+        try {
+            this.readAuxs();
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestEntryRow.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
-    private void readAuxs() {
+    private void readAuxs() throws SQLException {
         SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { mnFkItemId }, SLibConstants.EXEC_MODE_VERBOSE);
         SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { mnFkUnitId }, SLibConstants.EXEC_MODE_VERBOSE);
         
@@ -53,6 +76,27 @@ public class SMaterialRequestEntryRow implements SGridRow {
         msAuxItemName = item.getName();
         msAuxUnitCode = unit.getSymbol();
         mbAuxBulk = item.getIsBulk();
+        
+        msAuxConsumeEntity = "";
+        if (mnFkConsumeEntityId_n > 0) {
+            String sqlEntity = "SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " "
+                + "WHERE id_mat_cons_ent = " + mnFkConsumeEntityId_n + ";";
+
+            ResultSet resultSetEntity = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sqlEntity);
+            if (resultSetEntity.next()) {
+                msAuxConsumeEntity = resultSetEntity.getString("name");
+            }
+        }
+
+        if (mnFkSubConsumeEntityId_n > 0) {
+            String sqlSubEntity = "SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " "
+                + "WHERE id_mat_cons_ent = " + mnFkSubConsumeEntityId_n + " AND id_mat_cons_subent = " + mnFkSubConsumeEntityId_n + ";";
+
+            ResultSet resultSetSubEntity = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sqlSubEntity);
+            if (resultSetSubEntity.next()) {
+                msAuxConsumeEntity += "-" + resultSetSubEntity.getString("name");
+            }
+        }
     }
     
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
@@ -60,21 +104,27 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public void setQuantity(double d) { mdQuantity = d; }
 
     public void setAuxSegregated(double mdAuxSegregated) { this.mdAuxSegregated = mdAuxSegregated; }
+    public void setAuxSupplied(double mdAuxSupplied) { this.mdAuxSupplied = mdAuxSupplied; }
     public void setAuxStock(double mdAuxStock) { this.mdAuxStock = mdAuxStock; }
     public void setAuxToSegregate(double mdAuxToSegregate) { this.mdAuxToSegregate = mdAuxToSegregate; }
+    public void setAuxToSupply(double mdAuxToSupply) { this.mdAuxToSupply = mdAuxToSupply; }
 
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
     public double getQuantity() { return mdQuantity; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
+    public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
+    public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
     
     public String getAuxItemCode() { return msAuxItemCode; }
     public String getAuxItemName() { return msAuxItemName; }
     public String getAuxUnitCode() { return msAuxUnitCode; }
     public double getAuxSegregated() { return mdAuxSegregated; }
+    public double getAuxSupplied() { return mdAuxSupplied; }
     public double getAuxStock() { return mdAuxStock; }
     public double getAuxToSegregate() { return mdAuxToSegregate; }
+    public double getAuxToSupply() { return mdAuxToSupply; }
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -115,32 +165,69 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public Object getRowValueAt(int col) {
         Object value = null;
         
-        switch(col) {
-            case 0:
-                value = msAuxItemCode;
-                break;
-            case 1:
-                value = msAuxItemName;
-                break;
-            case 2:
-                value = msAuxUnitCode;
-                break;
-            case 3:
-                value = mdQuantity;
-                break;
-            case 4:
-                value = mdAuxSegregated;
-                break;
-            case 5:
-                value = mdAuxStock;
-                break;
-            case 6:
-                value = mdQuantity - mdAuxSegregated;
-                break;
-            case 7:
-                value = mdAuxToSegregate;
-                break;
-            default:
+        if (mnFormType == FORM_SEGREGATION) {
+            switch(col) {
+                case 0:
+                    value = msAuxItemCode;
+                    break;
+                case 1:
+                    value = msAuxItemName;
+                    break;
+                case 2:
+                    value = msAuxUnitCode;
+                    break;
+                case 3:
+                    value = mdQuantity;
+                    break;
+                case 4:
+                    value = mdAuxSegregated;
+                    break;
+                case 5:
+                    value = mdAuxStock;
+                    break;
+                case 6:
+                    value = mdQuantity - mdAuxSegregated;
+                    break;
+                case 7:
+                    value = mdAuxToSegregate;
+                    break;
+                default:
+            }
+        }
+        else {
+            switch(col) {
+                case 0:
+                    value = msAuxItemCode;
+                    break;
+                case 1:
+                    value = msAuxItemName;
+                    break;
+                case 2:
+                    value = msAuxUnitCode;
+                    break;
+                case 3:
+                    value = mdQuantity;
+                    break;
+                case 4:
+                    value = mdAuxSupplied;
+                    break;
+                case 5:
+                    value = mdAuxSegregated;
+                    break;
+                case 6:
+                    value = mdAuxStock;
+                    break;
+                case 7:
+                    value = mdQuantity - mdAuxSupplied;
+                    break;
+                case 8:
+                    value = mdAuxToSupply;
+                    break;
+                case 9:
+                    value = msAuxConsumeEntity;
+                    break;
+                default:
+            }
         }
 
         return value;
@@ -148,24 +235,50 @@ public class SMaterialRequestEntryRow implements SGridRow {
 
     @Override
     public void setRowValueAt(Object value, int col) {
-        switch(col) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-                break;
-            case 7:
-                if (SMaterialRequestEntryRow.hasDecimals((double) value) && !mbAuxBulk) {
-                    JOptionPane.showMessageDialog(null, "El ítem no es a granel.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                else {
-                    mdAuxToSegregate = (double) value;
-                }
-                break;
-            default:
+        if (mnFormType == FORM_SEGREGATION) {
+            switch(col) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    break;
+                case 7:
+                    if (SMaterialRequestEntryRow.hasDecimals((double) value) && !mbAuxBulk) {
+                        JOptionPane.showMessageDialog(null, "El ítem no es a granel.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        mdAuxToSegregate = (double) value;
+                    }
+                    break;
+                default:
+            }
+        }
+        else {
+            switch(col) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    break;
+                case 8:
+                    if (SMaterialRequestEntryRow.hasDecimals((double) value) && !mbAuxBulk) {
+                        JOptionPane.showMessageDialog(null, "El ítem no es a granel.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        mdAuxToSupply = (double) value;
+                    }
+                    break;
+                case 9:
+                    break;
+                default:
+            }
         }
     }
     

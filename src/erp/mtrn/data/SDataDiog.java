@@ -62,6 +62,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected int mnFkDiogDocId_n;
     protected int mnFkMfgYearId_n;
     protected int mnFkMfgOrderId_n;
+    protected int mnFkMatRequestId_n;
     protected int mnFkBookkeepingYearId_n;
     protected int mnFkBookkeepingNumberId_n;
     protected int mnFkMaintMovementTypeId;
@@ -300,7 +301,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
      * @param warehouseId id of warehouse origin of movement.
      * @throws Exception 
      */
-    private void releaseSegregations(final java.sql.Connection connection, final int segregationStkId, final Vector<SDataDiogEntry> entries, final int companyBranchId, final int warehouseId) throws Exception {
+    private void releaseSegregations(final java.sql.Connection connection, final int segregationStkId, final Vector<SDataDiogEntry> entries, final int companyBranchId, final int warehouseId,
+                                        final int segType, final int[] refPk) throws Exception {
         SDataStockSegregationWarehouseEntry ety = null;
         double quantityToRelease = 0;
         double quantitySegregated = 0;
@@ -344,12 +346,17 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
                     ety = new SDataStockSegregationWarehouseEntry();
                     ety.setPkStockSegregationId(segregationStkId);
+                    ety.setPkCompanyBranchId(companyBranchId);
                     ety.setPkWarehouseId(warehouseId);
                     ety.setQuantityDecrement(quantityToRelease);
                     ety.setFkStockSegregationMovementTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_DEC);
                     ety.setFkYearId(mnPkYearId);
                     ety.setFkItemId(diogEty.getFkItemId());
                     ety.setFkUnitId(diogEty.getFkOriginalUnitId());
+                    if (segType == SDataConstantsSys.TRNS_TP_STK_SEG_REQ_MAT) {
+                        ety.setFkMatRequestId_n(refPk[0]);
+                        ety.setFkMatRequestEtyId_n(refPk[1]);
+                    }
 
                     ety.save(connection);
                 }
@@ -419,6 +426,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setFkDiogDocId_n(int n) { mnFkDiogDocId_n = n; }
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
     public void setFkMfgOrderId_n(int n) { mnFkMfgOrderId_n = n; }
+    public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
     public void setFkBookkeepingYearId_n(int n) { mnFkBookkeepingYearId_n = n; }
     public void setFkBookkeepingNumberId_n(int n) { mnFkBookkeepingNumberId_n = n; }
     public void setFkMaintMovementTypeId(int n) { mnFkMaintMovementTypeId = n; }
@@ -467,6 +475,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int getFkDiogDocId_n() { return mnFkDiogDocId_n; }
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
     public int getFkMfgOrderId_n() { return mnFkMfgOrderId_n; }
+    public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
     public int getFkBookkeepingYearId_n() { return mnFkBookkeepingYearId_n; }
     public int getFkBookkeepingNumberId_n() { return mnFkBookkeepingNumberId_n; }
     public int getFkMaintMovementTypeId() { return mnFkMaintMovementTypeId; }
@@ -632,6 +641,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnFkDiogDocId_n = 0;
         mnFkMfgYearId_n = 0;
         mnFkMfgOrderId_n = 0;
+        mnFkMatRequestId_n = 0;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
         mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA; // default value set only for preventing bugs
@@ -726,6 +736,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mnFkDiogDocId_n = resultSet.getInt("iog.fid_diog_doc_n");
                 mnFkMfgYearId_n = resultSet.getInt("iog.fid_mfg_year_n");
                 mnFkMfgOrderId_n = resultSet.getInt("iog.fid_mfg_ord_n");
+                mnFkMatRequestId_n = resultSet.getInt("fid_mat_req_n");
                 mnFkBookkeepingYearId_n = resultSet.getInt("iog.fid_bkk_year_n");
                 mnFkBookkeepingNumberId_n = resultSet.getInt("iog.fid_bkk_num_n");
                 mnFkMaintMovementTypeId = resultSet.getInt("iog.fid_maint_mov_tp");
@@ -895,7 +906,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -924,6 +935,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             if (mnFkDiogDocId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkDiogDocId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             if (mnFkMfgYearId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgYearId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkMfgOrderId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgOrderId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            if (mnFkMatRequestId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             if (mnFkBookkeepingYearId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkBookkeepingYearId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkBookkeepingNumberId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkBookkeepingNumberId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkMaintMovementTypeId);
@@ -971,6 +983,15 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                         //System.out.println("SDataDiog: 3.1.1");
                         if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                        
+                        // Release segregations
+                        if (! entry.getIsDeleted() && entry.getFkMatRequestEtyId_n() != SLibConstants.UNDEFINED && mnFkDiogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) {
+                            Vector<SDataDiogEntry> vAux = new Vector<>();
+                            vAux.add(entry);
+                            releaseSegregations(connection, moAuxSegregationStockId, vAux, 
+                                                mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_STK_SEG_REQ_MAT, 
+                                                new int[] { entry.getFkMatRequestId_n(), entry.getFkMatRequestEtyId_n() });
                         }
                     }
                 }
@@ -1035,7 +1056,9 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 
                 // release the stock in segregations:
                 if (moAuxSegregationStockId != SLibConstants.UNDEFINED && mnFkDiogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) {
-                    releaseSegregations(connection, moAuxSegregationStockId, mvDbmsDiogEntries, mnFkCompanyBranchId, mnFkWarehouseId);
+                    if (mnFkMfgOrderId_n > 0) {
+                        releaseSegregations(connection, moAuxSegregationStockId, mvDbmsDiogEntries, mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD, new int[] { mnFkMfgYearId_n, mnFkMfgOrderId_n });
+                    }
                 }
                 
                 mbIsRegistryNew = false;
@@ -1227,6 +1250,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         registry.setFkDiogDocId_n(this.getFkDiogDocId_n());
         registry.setFkMfgYearId_n(this.getFkMfgYearId_n());
         registry.setFkMfgOrderId_n(this.getFkMfgOrderId_n());
+        registry.setFkMatRequestId_n(this.getFkMatRequestId_n());
         registry.setFkBookkeepingYearId_n(this.getFkBookkeepingYearId_n());
         registry.setFkBookkeepingNumberId_n(this.getFkBookkeepingNumberId_n());
         registry.setFkMaintMovementTypeId(this.getFkMaintMovementTypeId());

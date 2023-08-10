@@ -1391,8 +1391,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             }            
             else if (fingerPassword != 0) {
                 if (STrnMaintUtilities.verifyFingerPassword(miClient, fingerPassword)) {
-                        moMaintDiogSignature = new SDbMaintDiogSignature();
-                        showSignatureStatus();                
+                    moMaintDiogSignature = new SDbMaintDiogSignature();
+                    showSignatureStatus();                
                 }
             } 
             else {
