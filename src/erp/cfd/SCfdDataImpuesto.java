@@ -180,6 +180,10 @@ public class SCfdDataImpuesto implements DCfdTax {
                     conceptoImpuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
                     conceptoImpuestoTraslado.getAttImporte().setDouble(mdImporte);
                 }
+                else {
+                    conceptoImpuestoTraslado.getAttTasaOCuota().setCanBeZero(false);
+                    conceptoImpuestoTraslado.getAttImporte().setCanBeZero(false);
+                }
                 
                 impuesto = conceptoImpuestoTraslado;
                 break;
@@ -253,7 +257,10 @@ public class SCfdDataImpuesto implements DCfdTax {
                     impuestoTraslado.getAttTasaOCuota().setDouble(mdTasa);
                     impuestoTraslado.getAttImporte().setDouble(mdImporte);
                 }
-                
+                else {
+                    impuestoTraslado.getAttTasaOCuota().setCanBeZero(false);
+                    impuestoTraslado.getAttImporte().setCanBeZero(false);
+                }
                 impuesto = impuestoTraslado;
                 break;
             default:
