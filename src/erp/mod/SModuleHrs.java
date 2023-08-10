@@ -26,6 +26,10 @@ import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbDepartment;
 import erp.mod.hrs.db.SDbDepartmentCostCenter;
+import erp.mod.hrs.db.SDbDocAdminRecord;
+import erp.mod.hrs.db.SDbDocAdminRecordPreceptSubsection;
+import erp.mod.hrs.db.SDbDocBreach;
+import erp.mod.hrs.db.SDbDocBreachPreceptSubsection;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeBenefitTables;
@@ -50,6 +54,9 @@ import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SDbPaysheetCustomType;
 import erp.mod.hrs.db.SDbPosition;
 import erp.mod.hrs.db.SDbPrePayrollCutoffCalendar;
+import erp.mod.hrs.db.SDbPrecept;
+import erp.mod.hrs.db.SDbPreceptSection;
+import erp.mod.hrs.db.SDbPreceptSubsection;
 import erp.mod.hrs.db.SDbShift;
 import erp.mod.hrs.db.SDbSsContributionTable;
 import erp.mod.hrs.db.SDbSsContributionTableRow;
@@ -573,6 +580,27 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_ADV_SET:
                 registry = new SDbAdvanceSettlement();
+                break;
+            case SModConsts.HRS_PREC:
+                registry = new SDbPrecept();
+                break;
+            case SModConsts.HRS_PREC_SEC:
+                registry = new SDbPreceptSection();
+                break;
+            case SModConsts.HRS_PREC_SUBSEC:
+                registry = new SDbPreceptSubsection();
+                break;
+            case SModConsts.HRS_DOC_BREACH:
+                registry = new SDbDocBreach();
+                break;
+            case SModConsts.HRS_DOC_BREACH_PREC_SUBSEC:
+                registry = new SDbDocBreachPreceptSubsection();
+                break;
+            case SModConsts.HRS_DOC_ADM_REC:
+                registry = new SDbDocAdminRecord();
+                break;
+            case SModConsts.HRS_DOC_ADM_REC_PREC_SUBSEC:
+                registry = new SDbDocAdminRecordPreceptSubsection();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

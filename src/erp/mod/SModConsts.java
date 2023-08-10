@@ -79,8 +79,9 @@ public abstract class SModConsts {
     public static final int CFGS_TP_DBMS = 1011009;
     public static final int CFGS_TP_MMS = 1011010;
     public static final int CFGS_TP_MOD = 1011011;
-    public static final int CFGS_TP_AUTHORN = 1011020;
-    public static final int CFGS_ST_AUTHORN = 1011021;
+    public static final int CFGS_TP_AUTHORN = 1011021;
+    public static final int CFGS_ST_AUTHORN = 1011022;
+    public static final int CFGS_TP_DOC = 1011501;
 
     public static final int CFGU_CUR = 1012001;
     public static final int CFGU_CO = 1012002;
@@ -95,6 +96,7 @@ public abstract class SModConsts {
     public static final int CFGU_AUTHORN_NODE_USR = 1013034;
     public static final int CFGU_AUTHORN_PATH = 1013031;
     public static final int CFGU_AUTHORN_STEP = 1013032;
+    public static final int CFGU_DOC = 1013501;
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
@@ -678,8 +680,9 @@ public abstract class SModConsts {
     public static final int HRSS_TP_DIS = 2061075;
     public static final int HRSS_TP_DAY = 2061081;
     public static final int HRSS_BANK = 2061091;
-    public static final int HRSS_BONUS = 2061093;
     public static final int HRSS_GROCERY_SRV = 2061096;
+    public static final int HRSS_BONUS = 2061101;
+    public static final int HRSS_TP_PREC = 2061501;
 
     public static final int HRSU_CL_ABS = 2062001;
     public static final int HRSU_TP_ABS = 2062002;
@@ -749,6 +752,13 @@ public abstract class SModConsts {
     public static final int HRS_ACC_PAY = 2063251;
     public static final int HRS_ACC_PAY_RCP = 2063252;
     public static final int HRS_ADV_SET = 2063261;
+    public static final int HRS_PREC = 2063501;
+    public static final int HRS_PREC_SEC = 2063502;
+    public static final int HRS_PREC_SUBSEC = 2063503;
+    public static final int HRS_DOC_BREACH = 2063511;
+    public static final int HRS_DOC_BREACH_PREC_SUBSEC = 2063512;
+    public static final int HRS_DOC_ADM_REC = 2063521;
+    public static final int HRS_DOC_ADM_REC_PREC_SUBSEC = 2063522;
 
     public static final int HRSX_DATE = 2064001;
     public static final int HRSX_AUT_EAR = 2064021;
@@ -838,6 +848,7 @@ public abstract class SModConsts {
         TablesMap.put(CFGS_TP_MOD, "erp.cfgs_tp_mod");
         TablesMap.put(CFGS_TP_AUTHORN, "erp.cfgs_tp_authorn");
         TablesMap.put(CFGS_ST_AUTHORN, "erp.cfgs_st_authorn");
+        TablesMap.put(CFGS_TP_DOC, "erp.cfgs_tp_doc");
 
         TablesMap.put(CFGU_CUR, "erp.cfgu_cur");
         TablesMap.put(CFGU_CO, "erp.cfgu_co");
@@ -852,6 +863,7 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_AUTHORN_NODE_USR, "cfgu_authorn_node_usr");
         TablesMap.put(CFGU_AUTHORN_PATH, "cfgu_authorn_path");
         TablesMap.put(CFGU_AUTHORN_STEP, "cfgu_authorn_step");
+        TablesMap.put(CFGU_DOC, "cfgu_doc");
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");
@@ -1329,8 +1341,9 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
         TablesMap.put(HRSS_BANK, "erp.hrss_bank");
-	TablesMap.put(HRSS_BONUS, "erp.hrss_bonus");
         TablesMap.put(HRSS_GROCERY_SRV, "erp.hrss_grocery_srv");
+        TablesMap.put(HRSS_BONUS, "erp.hrss_bonus");
+        TablesMap.put(HRSS_TP_PREC, "erp.hrss_tp_prec");
 
         TablesMap.put(HRSU_CL_ABS, "erp.hrsu_cl_abs");
         TablesMap.put(HRSU_TP_ABS, "erp.hrsu_tp_abs");
@@ -1396,6 +1409,13 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ACC_PAY, "hrs_acc_pay");
         TablesMap.put(HRS_ACC_PAY_RCP, "hrs_acc_pay_rcp");
         TablesMap.put(HRS_ADV_SET, "hrs_adv_set");
+        TablesMap.put(HRS_PREC, "hrs_prec");
+        TablesMap.put(HRS_PREC_SEC, "hrs_prec_sec");
+        TablesMap.put(HRS_PREC_SUBSEC, "hrs_prec_subsec");
+        TablesMap.put(HRS_DOC_BREACH, "hrs_doc_breach");
+        TablesMap.put(HRS_DOC_BREACH_PREC_SUBSEC, "hrs_doc_breach_prec_subsec");
+        TablesMap.put(HRS_DOC_ADM_REC, "hrs_doc_adm_rec");
+        TablesMap.put(HRS_DOC_ADM_REC_PREC_SUBSEC, "hrs_doc_adm_rec_prec_subsec");
         
         TablesMap.put(QLT_LOT_APR, "qlt_lot_apr");
         TablesMap.put(QLT_TP_ANALYSIS, "qlt_tp_analysis");
