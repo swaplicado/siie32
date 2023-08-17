@@ -44,6 +44,9 @@ public abstract class SModSysConsts {
     public static final int CFGS_TP_MMS_ORD_PUR = 4;
     public static final int CFGS_TP_MMS_PAYROLL = 6;
     public static final int CFGS_TP_MMS_FIN_PAY_AUTH_REQ = 11;
+    
+    public static final int CFGS_TP_DOC_BREACH = 9001; // breach
+    public static final int CFGS_TP_DOC_ADM_REC = 9002; // administrative record
 
     public static final int CFGU_CUR_MXN = 1;
     public static final int CFGU_CUR_USD = 2;

@@ -21,6 +21,7 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
     protected int mnPkPreceptId;
     protected int mnPkSectionId;
     protected int mnPkSubsectionId;
+    protected int mnSortingPos;
     
     public SDbDocAdminRecordPreceptSubsection() {
         super(SModConsts.HRS_DOC_ADM_REC_PREC_SUBSEC);
@@ -30,11 +31,17 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
     public void setPkPreceptId(int n) { mnPkPreceptId = n; }
     public void setPkSectionId(int n) { mnPkSectionId = n; }
     public void setPkSubsectionId(int n) { mnPkSubsectionId = n; }
+    public void setSortingPos(int n) { mnSortingPos = n; }
 
     public int getPkDocAdminRecordId() { return mnPkDocAdminRecordId; }
     public int getPkPreceptId() { return mnPkPreceptId; }
     public int getPkSectionId() { return mnPkSectionId; }
     public int getPkSubsectionId() { return mnPkSubsectionId; }
+    public int getSortingPos() { return mnSortingPos; }
+    
+    public int[] getPreceptSubsectionKey() {
+        return new int[] { mnPkPreceptId, mnPkSectionId, mnPkSubsectionId };
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -57,6 +64,7 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
         mnPkPreceptId = 0;
         mnPkSectionId = 0;
         mnPkSubsectionId = 0;
+        mnSortingPos = 0;
     }
 
     @Override
@@ -103,6 +111,7 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
             mnPkPreceptId = resultSet.getInt("id_prec");
             mnPkSectionId = resultSet.getInt("id_sec");
             mnPkSubsectionId = resultSet.getInt("id_subsec");
+            mnSortingPos = resultSet.getInt("sort");
 
             mbRegistryNew = false;
         }
@@ -124,7 +133,8 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
                     mnPkDocAdminRecordId + ", " + 
                     mnPkPreceptId + ", " + 
                     mnPkSectionId + ", " + 
-                    mnPkSubsectionId + " " + 
+                    mnPkSubsectionId + ", " + 
+                    mnSortingPos + " " + 
                     ")";
         }
         else {
@@ -144,6 +154,7 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
         registry.setPkPreceptId(this.getPkPreceptId());
         registry.setPkSectionId(this.getPkSectionId());
         registry.setPkSubsectionId(this.getPkSubsectionId());
+        registry.setSortingPos(this.getSortingPos());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

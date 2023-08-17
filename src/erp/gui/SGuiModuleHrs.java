@@ -146,6 +146,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayReissueCfdis;
     private javax.swing.JMenuItem jmiPayVerifyCfdis;
     
+    private javax.swing.JMenu jmSan;
+    private javax.swing.JMenuItem jmiSanDocBreach;
+    private javax.swing.JMenuItem jmiSanDocBreachEmp;
+    private javax.swing.JMenuItem jmiSanDocAdminRecord;
+    private javax.swing.JMenuItem jmiSanDocAdminRecordEmp;
+    
     private javax.swing.JMenu jmImp;
     private javax.swing.JMenuItem jmiImpFormerPayroll;
     private javax.swing.JMenuItem jmiImpFormerPayrollEmp;
@@ -392,6 +398,18 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.add(jmiPayVerifyCfdis);
         */
         
+        jmSan = new JMenu("Sanciones");
+        jmiSanDocBreach = new JMenuItem("Infracciones");
+        jmiSanDocBreachEmp = new JMenuItem("Infracciones por empleado");
+        jmiSanDocAdminRecord = new JMenuItem("Actas administrativas");
+        jmiSanDocAdminRecordEmp = new JMenuItem("Actas administrativas por empleado");
+        
+        jmSan.add(jmiSanDocBreach);
+        jmSan.add(jmiSanDocBreachEmp);
+        jmSan.addSeparator();
+        jmSan.add(jmiSanDocAdminRecord);
+        jmSan.add(jmiSanDocAdminRecordEmp);
+        
         jmImp = new JMenu("Importación");
         jmiImpFormerPayroll = new JMenuItem("Nóminas importadas");
         jmiImpFormerPayrollEmp = new JMenuItem("Nóminas importadas vs. pólizas contables");
@@ -535,6 +553,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayReissueCfdis.addActionListener(this);
         jmiPayVerifyCfdis.addActionListener(this);
         
+        jmiSanDocBreach.addActionListener(this);
+        jmiSanDocBreachEmp.addActionListener(this);
+        jmiSanDocAdminRecord.addActionListener(this);
+        jmiSanDocAdminRecordEmp.addActionListener(this);
+        
         jmiImpFormerPayroll.addActionListener(this);
         jmiImpFormerPayrollEmp.addActionListener(this);
         jmiImpImport.addActionListener(this);
@@ -667,6 +690,17 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCalculatedEstimateIncomeTax.setEnabled(hasRightPay);
         jmiPayReissueCfdis.setEnabled(hasRightPay);
         jmiPayVerifyCfdis.setEnabled(hasRightPay);
+        
+        boolean hasRightDocBreach = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_DOC_BREACH).HasRight;
+        boolean hasRightDocAdminRecord = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_DOC_ADM_REC).HasRight;
+        int levelRightDocBreach = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_DOC_BREACH).Level;
+        int levelRightDocAdminRecord = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_DOC_ADM_REC).Level;
+
+        jmSan.setEnabled(hasRightDocBreach || hasRightDocAdminRecord);
+        jmiSanDocBreach.setEnabled(hasRightDocBreach);
+        jmiSanDocBreachEmp.setEnabled(hasRightDocBreach && SLibUtilities.belongsTo(levelRightDocBreach, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
+        jmiSanDocAdminRecord.setEnabled(hasRightDocAdminRecord);
+        jmiSanDocAdminRecordEmp.setEnabled(hasRightDocAdminRecord && SLibUtilities.belongsTo(levelRightDocAdminRecord, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
 
         boolean hasRightImport = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_IMP).HasRight;
         
@@ -892,7 +926,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCfg, jmCat, jmBen, jmPay, jmImp, jmRep };
+        return new JMenu[] { jmCfg, jmCat, jmBen, jmPay, jmSan, jmImp, jmRep };
     }
 
     @Override
@@ -1150,6 +1184,18 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiPayVerifyCfdis) {
                 new SDialogVerifyCfdis((SGuiClient) miClient, "Verificación de CFDIs").setFormVisible(true);
+            }
+            else if (item == jmiSanDocBreach) {
+                miClient.getSession().showView(SModConsts.HRS_DOC_BREACH, 0, null);
+            }
+            else if (item == jmiSanDocBreachEmp) {
+
+            }
+            else if (item == jmiSanDocAdminRecord) {
+                
+            }
+            else if (item == jmiSanDocAdminRecordEmp) {
+                
             }
             else if (item == jmiImpFormerPayroll) {
                 showView(SDataConstants.HRS_SIE_PAY);

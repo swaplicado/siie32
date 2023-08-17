@@ -96,7 +96,7 @@ public abstract class SModConsts {
     public static final int CFGU_AUTHORN_NODE_USR = 1013034;
     public static final int CFGU_AUTHORN_PATH = 1013031;
     public static final int CFGU_AUTHORN_STEP = 1013032;
-    public static final int CFGU_DOC = 1013501;
+    public static final int CFGU_DOC = 1013500;
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
@@ -822,6 +822,8 @@ public abstract class SModConsts {
     public static final int HRSR_WAGE_SAL_CSV = 2065051;
     public static final int HRSR_EAR_DED_CSV = 2065052;
     public static final int HRSR_VAC_CSV = 2065053;
+    public static final int HRSR_DOC_BREACH = 2065511;
+    public static final int HRSR_DOC_ADM_REC = 2065521;
 
     /*
      * Quality

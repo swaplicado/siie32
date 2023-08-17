@@ -24,6 +24,7 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
     protected int mnPkSubsectionId;
     protected String msCode;
     protected String msName;
+    protected int mnSortingPos;
     /*
     protected boolean mbDeleted;
     protected int mnFkUserInsertId;
@@ -41,6 +42,7 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
     public void setPkSubsectionId(int n) { mnPkSubsectionId = n; }
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
+    public void setSortingPos(int n) { mnSortingPos = n; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -52,6 +54,7 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
     public int getPkSubsectionId() { return mnPkSubsectionId; }
     public String getCode() { return msCode; }
     public String getName() { return msName; }
+    public int getSortingPos() { return mnSortingPos; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -78,7 +81,8 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
         mnPkSectionId = 0;
         mnPkSubsectionId = 0;
         msCode = "";
-        msName = null;
+        msName = "";
+        mnSortingPos = 0;
         mbDeleted = false;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
@@ -140,6 +144,7 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
             mnPkSubsectionId = resultSet.getInt("id_subsec");
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
+            mnSortingPos = resultSet.getInt("sort");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -170,6 +175,7 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
                     mnPkSubsectionId + ", " + 
                     "'" + msCode + "', " + 
                     "'" + msName + "', " + 
+                    mnSortingPos + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
@@ -186,6 +192,7 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
                     //"id_subsec = " + mnPkSubsectionId + ", " +
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
+                    "sort = " + mnSortingPos + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -208,6 +215,7 @@ public class SDbPreceptSubsection extends SDbRegistryUser {
         registry.setPkSubsectionId(this.getPkSubsectionId());
         registry.setCode(this.getCode());
         registry.setName(this.getName());
+        registry.setSortingPos(this.getSortingPos());
         registry.setDeleted(this.isDeleted());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());

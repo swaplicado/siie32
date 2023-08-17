@@ -85,6 +85,7 @@ import erp.mod.hrs.form.SFormCutoffCalendar;
 import erp.mod.hrs.form.SFormDeduction;
 import erp.mod.hrs.form.SFormDepartment;
 import erp.mod.hrs.form.SFormDepartmentCostCenter;
+import erp.mod.hrs.form.SFormDocBreach;
 import erp.mod.hrs.form.SFormEarning;
 import erp.mod.hrs.form.SFormEmployeeDismissalType;
 import erp.mod.hrs.form.SFormEmployeeType;
@@ -125,6 +126,7 @@ import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
 import erp.mod.hrs.view.SViewDepartmentCostCenter;
+import erp.mod.hrs.view.SViewDocBreach;
 import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeBenefitTables;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
@@ -237,6 +239,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormBenefitAdjustmentEarning moFormBenefitAdjustmentEarning;
     private SFormLoanAdjustmentDeduction moFormLoanAdjustmentDeduction;
     private SFormLoanAdjustmentEarning moFormLoanAdjustmentEarning;
+    private SFormDocBreach moFormDocBreach;
 
     private SBeanOptionPicker moPickerEarnings;
     private SBeanOptionPicker moPickerDeductions;
@@ -1160,6 +1163,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_ADV_SET:
                 view = new SViewAdvanceSettlement(miClient, "Control adelantos liquidación");
                 break;
+            case SModConsts.HRS_DOC_BREACH:
+                view = new SViewDocBreach(miClient, "Infracciones");
+                break;
             case SModConsts.HRSX_PAY_REC:
                 view = new SViewPayrollReceiptRecord(miClient, "Recibos nóminas vs. pólizas contables");
                 break;
@@ -1464,6 +1470,10 @@ public class SModuleHrs extends SGuiModule {
                 if (moAdvanceSettlement == null) moAdvanceSettlement = new SFormAdvanceSettlement(miClient, "Control de adelanto de liquidación");
                 form = moAdvanceSettlement;
                 break;
+            case SModConsts.HRS_DOC_BREACH:
+                if (moFormDocBreach == null) moFormDocBreach = new SFormDocBreach(miClient, "Infracción");
+                form = moFormDocBreach;
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -1514,6 +1524,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSR_POS:
                 guiReport = new SGuiReport("reps/hrsr_pos.jasper", "Reporte de posiciones");
+                break;
+            case SModConsts.HRSR_DOC_BREACH:
+                guiReport = new SGuiReport("reps/hrs_doc_breach.jasper", "Infracción");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

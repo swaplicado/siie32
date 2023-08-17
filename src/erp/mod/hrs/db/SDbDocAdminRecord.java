@@ -127,19 +127,29 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
 
     public ArrayList<SDbDocAdminRecordPreceptSubsection> getChildPreceptSubsections() { return maChildPreceptSubsections; }
     
-    public int getNextNumber(SGuiSession session) throws SQLException, Exception {
-        int nextNumber = 0;
+    public void setPreceptSubsectionKeys(final ArrayList<int[]> keys) {
+        maChildPreceptSubsections.clear();
+        
+        for (int[] key : keys) {
+            SDbDocAdminRecordPreceptSubsection child = new SDbDocAdminRecordPreceptSubsection();
+            
+            child.setPkDocAdminRecordId(mnPkDocAdminRecordId);
+            child.setPkPreceptId(key[0]);
+            child.setPkSectionId(key[1]);
+            child.setPkSubsectionId(key[2]);
+            
+            maChildPreceptSubsections.add(child);
+        }
+    }
 
-        String sql = "SELECT COALESCE(MAX(num), 0) + 1 "
-                + "FROM " + getSqlTable() + " "
-                + "WHERE NOT b_del;";
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                nextNumber = resultSet.getInt(1);
-            }
+    public ArrayList<int[]> getPreceptSubsectionKeys() {
+        ArrayList<int[]> keys = new ArrayList<>();
+        
+        for (SDbDocAdminRecordPreceptSubsection child : maChildPreceptSubsections) {
+            keys.add(child.getPreceptSubsectionKey());
         }
         
-        return nextNumber;
+        return keys;
     }
 
     @Override
@@ -271,7 +281,7 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
             msSql = "SELECT id_prec, id_sec, id_subsec "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DOC_ADM_REC_PREC_SUBSEC) + " "
                     + "WHERE id_doc_adm_rec = " + mnPkDocAdminRecordId + " "
-                    + "ORDER BY id_prec, id_sec, id_subsec;";
+                    + "ORDER BY sort, id_prec, id_sec, id_subsec;";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
                 SDbDocAdminRecordPreceptSubsection child = new SDbDocAdminRecordPreceptSubsection();
@@ -384,9 +394,11 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         
         // save children:
         
+        int sortingPos = 0;
         for (SDbDocAdminRecordPreceptSubsection child : maChildPreceptSubsections) {
             child.setRegistryNew(true);
             child.setPkDocAdminRecordId(mnPkDocAdminRecordId);
+            child.setSortingPos(++sortingPos);
             child.save(session);
         }
         
@@ -437,5 +449,20 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    public static int getNextNumber(SGuiSession session) throws SQLException, Exception {
+        int nextNumber = 0;
+
+        String sql = "SELECT COALESCE(MAX(num), 0) + 1 "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DOC_ADM_REC) + " "
+                + "WHERE NOT b_del;";
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                nextNumber = resultSet.getInt(1);
+            }
+        }
+        
+        return nextNumber;
     }
 }

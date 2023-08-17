@@ -99,7 +99,13 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
     public static final String CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT = "TRN_MAT_REQ_PTY_DEFAULT";
     public static final String CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW = "TRN_MAT_REQ_ETY_ITEM_NEW";
+    public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
+    public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
+    public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
+    public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
+    public static final String CFG_PARAM_DOC_HRS_REP_COM = "DOC_HRS_REP_COM";
+    public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
@@ -365,6 +371,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_PAY_FOR = 109012;
     public static final int PRV_HRS_ABS = 109016;
     public static final int PRV_HRS_AUX_HRS = 109021;
+    public static final int PRV_HRS_DOC_BREACH = 109051;
+    public static final int PRV_HRS_DOC_ADM_REC = 109052;
     public static final int PRV_HRS_EMP_PERS_DATA = 109091;
     public static final int PRV_HRS_EMP_VARIABLE_EARNINGS = 109092;
     public static final int PRV_HRS_REP = 109901;
