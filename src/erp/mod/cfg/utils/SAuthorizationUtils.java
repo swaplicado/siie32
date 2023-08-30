@@ -542,6 +542,12 @@ public abstract class SAuthorizationUtils {
      * @throws Exception 
      */
     public static void processAuthorizations(SGuiSession session, final int authorizationType, final Object pk) throws Exception {
+        // Si el recurso ya tiene pasos de autorización no se determinan nuevamente
+        if (SAuthorizationUtils.hasStepsOfAuthorization(session, authorizationType, pk)) {
+            return;
+        }
+        
+        // Lectura de path de configuración
         ArrayList<SDbAuthorizationPath> lCfgs = SAuthorizationUtils.getConfigurationsOfType(session, authorizationType);
         String condPk = "";
         ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
@@ -549,7 +555,36 @@ public abstract class SAuthorizationUtils {
             case AUTH_TYPE_MAT_REQUEST:
                 condPk = "id_mat_req = " + ((int[]) pk)[0];
                 for (SDbAuthorizationPath oCfg : lCfgs) {
-                    if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
+                    // Si la configuración es basada en el JSON del registro
+                    if (oCfg.getConfigurationJson() != null && oCfg.getConfigurationJson().length() > 0) {
+                        // Determinar si la configuración aplica para el registro actual
+                        /**
+                         * {
+                         *       "conditions" : [
+                         *               {
+                         *                       "keyName" : "ConsumeEntity",
+                         *                       "operator" : "=",
+                         *                       "strValue" : "2"
+                         *               },
+                         *               {
+                         *                       "keyName" : "MatReqUser",
+                         *                       "operator" : "=",
+                         *                       "strValue" : "6"
+                         *               }
+                         *       ]
+                         *  }
+                         * 
+                         * Este es un JSON de ejemplo, se pueden agregar n condiciones y cada una deberá cumplirse para que la configuración se considere
+                         * como que aplica
+                         */
+                        String res = SMatRequestAuthorizationUtils.applyCfg(session, ((int[]) pk)[0], oCfg);
+                        if (res.isEmpty()) {
+                            // Agregar los pasos de autorización generados por la ruta
+                            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+                        }
+                    }
+                    // Si está basada en la condición de la tabla
+                    else if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglón de autorización
                         lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
                     }
@@ -662,7 +697,7 @@ public abstract class SAuthorizationUtils {
                 return false;
         }
         
-        query += oCfg.getConditionValue();
+        query += "'" + oCfg.getConditionValue() + "'";
         
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(query);
@@ -1072,6 +1107,37 @@ public abstract class SAuthorizationUtils {
                 oStepAux.save(session);
             }
         }
+    }
+    
+    private static boolean hasStepsOfAuthorization(SGuiSession session, final int authorizationType, final Object pk) {
+         String condPk = "";
+        switch(authorizationType) {
+            case AUTH_TYPE_MAT_REQUEST:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " ";
+                break;
+                
+            case AUTH_TYPE_DPS:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " AND res_pk_n2_n = " + ((int[]) pk)[1] + " ";
+                break;
+        }
+        
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                + "WHERE NOT b_del AND "
+                    + "fk_tp_authorn = " + authorizationType + " AND "
+                    + condPk + ";";
+        
+        ResultSet res;
+        try {
+            res = session.getStatement().getConnection().createStatement().executeQuery(sql);
+            
+            return res.next();
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
     }
     
     /**
