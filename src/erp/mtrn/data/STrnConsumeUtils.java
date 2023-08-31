@@ -61,7 +61,7 @@ public abstract class STrnConsumeUtils {
         String sql = "SELECT " +
                 "cee.* " +
                 "FROM " +
-                SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_EMP) + " AS cee " +
+                SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS cee " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " ce ON cee.id_mat_cons_ent = ce.id_mat_cons_ent " +
                 "WHERE NOT ce.b_del " +
                 "AND cee.id_bp = " + idBp + " " +

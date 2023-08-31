@@ -609,7 +609,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 
                 int subConsEntity = oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() > 0 ? 
                                         oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() : 
-                                        moMaterialRequest.getFkSubentMatConsumptionSubentityId_n();
+                                        moMaterialRequest.getFkSubentMatConsumptionSubentityId();
                 
                 SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
                                                                             SMaterialRequestEntryRow.FORM_SUPPLY,

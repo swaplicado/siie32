@@ -110,6 +110,7 @@ public abstract class SModConsts {
     public static final int USRS_PRV = 1021005;
     public static final int USRS_ROL = 1021006;
     public static final int USRS_ROL_PRV = 1021007;
+    public static final int USRS_LINK = 1021008;
 
     public static final int USRU_ACCESS_CO = 1022001;
     public static final int USRU_ACCESS_COB = 1022002;
@@ -451,19 +452,24 @@ public abstract class SModConsts {
     public static final int TRN_MAINT_USER_SUPV = 2023316;
     public static final int TRN_MAINT_DIOG_SIG = 2023321;
     public static final int TRN_FUNC_BUDGET = 2023331;
-    public static final int TRN_MAT_CONS_ENT = 2023332;
-    public static final int TRN_MAT_CONS_SUBENT = 2023333;
-    public static final int TRN_MAT_CONS_ENT_USR = 2023334;
-    public static final int TRN_MAT_CONS_ENT_EMP = 2023335;
-    public static final int TRN_MAT_PROV_ENT = 2023336;
-    public static final int TRN_MAT_PROV_ENT_USR = 2023337;
-    public static final int TRN_MAT_PROV_ENT_WHS = 2023338;
-    public static final int TRN_MAT_REQ = 2023339;
-    public static final int TRN_MAT_REQ_NTS = 2023340;
-    public static final int TRN_MAT_REQ_ETY = 2023341;
-    public static final int TRN_MAT_REQ_ETY_NTS = 2023342;
-    public static final int TRN_MAT_REQ_ETY_ITEM_CHG = 2023343;
-    public static final int TRN_MAT_REQ_ST_LOG = 2023344;
+    public static final int TRN_MAT_CC_GRP = 2023332;
+    public static final int TRN_MAT_CC_GRP_ITEM = 2023333;
+    public static final int TRN_MAT_CC_GRP_USR = 2023334;
+    public static final int TRN_MAT_CONS_ENT = 2023335;
+    public static final int TRN_MAT_CONS_ENT_USR = 2023336;
+    public static final int TRN_MAT_CONS_SUBENT = 2023337;
+    public static final int TRN_MAT_CONS_SUBENT_USR = 2023338;
+    public static final int TRN_MAT_CONS_SUBENT_CC = 2023339;
+    public static final int TRN_MAT_CONS_SUBENT_CC_CC_GRP = 2023340;
+    public static final int TRN_MAT_PROV_ENT = 2023341;
+    public static final int TRN_MAT_PROV_ENT_USR = 2023342;
+    public static final int TRN_MAT_PROV_ENT_WHS = 2023343;
+    public static final int TRN_MAT_REQ = 2023344;
+    public static final int TRN_MAT_REQ_NTS = 2023345;
+    public static final int TRN_MAT_REQ_ETY = 2023346;
+    public static final int TRN_MAT_REQ_ETY_NTS = 2023347;
+    public static final int TRN_MAT_REQ_ETY_ITEM_CHG = 2023348;
+    public static final int TRN_MAT_REQ_ST_LOG = 2023349;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -486,8 +492,19 @@ public abstract class SModConsts {
     public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_FUNC_EXPENSES = 2024336;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_CONF_USR_VS_ENT = 2024337;
-    public static final int TRNX_CONF_EMP_VS_ENT = 2024338;
-    public static final int TRNX_CONF_WHS_VS_ENT = 2024339;
+    public static final int TRNX_DET_USR_VS_ENT = 2024338;
+    public static final int TRNX_CONF_EMP_VS_ENT = 2024339;
+    public static final int TRNX_DET_EMP_VS_ENT = 2024340;
+    public static final int TRNX_CONF_WHS_VS_ENT = 2024341;
+    public static final int TRNX_DET_WHS_VS_ENT = 2024342;
+    public static final int TRNX_CONF_SUBENT_VS_CC = 2024343;
+    public static final int TRNX_DET_SUBENT_VS_CC = 2024344;
+    public static final int TRNX_CONF_SUBENT_VS_CC_GRP = 2024345;
+    public static final int TRNX_DET_SUBENT_VS_CC_GRP = 2024346;
+    public static final int TRNX_CONF_CC_GRP_VS_ITM = 2024347;
+    public static final int TRNX_DET_CC_GRP_VS_ITM = 2024348;
+    public static final int TRNX_CONF_CC_GRP_VS_USR = 2024349;
+    public static final int TRNX_DET_CC_GRP_VS_USR = 2024350;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     
@@ -863,6 +880,7 @@ public abstract class SModConsts {
         TablesMap.put(USRS_PRV, "erp.usrs_prv");
         TablesMap.put(USRS_ROL, "erp.usrs_rol");
         TablesMap.put(USRS_ROL_PRV, "erp.usrs_rol_prv");
+        TablesMap.put(USRS_LINK, "erp.usrs_link");
 
         TablesMap.put(USRU_ACCESS_CO, "erp.usru_access_co");
         TablesMap.put(USRU_ACCESS_COB, "erp.usru_access_cob");
@@ -1170,17 +1188,23 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAINT_USER_SUPV, "trn_maint_user_supv");
         TablesMap.put(TRN_MAINT_DIOG_SIG, "trn_maint_diog_sig");
         TablesMap.put(TRN_FUNC_BUDGET, "trn_func_budget");
+        TablesMap.put(TRN_MAT_CC_GRP, "trn_mat_cc_grp");
+        TablesMap.put(TRN_MAT_CC_GRP_ITEM, "trn_mat_cc_grp_item");
+        TablesMap.put(TRN_MAT_CC_GRP_USR, "trn_mat_cc_grp_usr");
         TablesMap.put(TRN_MAT_CONS_ENT, "trn_mat_cons_ent");
-        TablesMap.put(TRN_MAT_CONS_SUBENT, "trn_mat_cons_subent");
         TablesMap.put(TRN_MAT_CONS_ENT_USR, "trn_mat_cons_ent_usr");
-        TablesMap.put(TRN_MAT_CONS_ENT_EMP, "trn_mat_cons_ent_emp");
+        TablesMap.put(TRN_MAT_CONS_SUBENT, "trn_mat_cons_subent");
+        TablesMap.put(TRN_MAT_CONS_SUBENT_USR, "trn_mat_cons_subent_usr");
+        TablesMap.put(TRN_MAT_CONS_SUBENT_CC, "trn_mat_cons_subent_cc");
+        TablesMap.put(TRN_MAT_CONS_SUBENT_CC_CC_GRP, "trn_mat_cons_subent_cc_cc_grp");
         TablesMap.put(TRN_MAT_PROV_ENT, "trn_mat_prov_ent");
-        TablesMap.put(TRN_MAT_PROV_ENT_WHS, "trn_mat_prov_ent_whs");
         TablesMap.put(TRN_MAT_PROV_ENT_USR, "trn_mat_prov_ent_usr");
+        TablesMap.put(TRN_MAT_PROV_ENT_WHS, "trn_mat_prov_ent_whs");
         TablesMap.put(TRN_MAT_REQ, "trn_mat_req");
         TablesMap.put(TRN_MAT_REQ_NTS, "trn_mat_req_nts");
         TablesMap.put(TRN_MAT_REQ_ETY, "trn_mat_req_ety");
         TablesMap.put(TRN_MAT_REQ_ETY_NTS, "trn_mat_req_ety_nts");
+        TablesMap.put(TRN_MAT_REQ_ETY_ITEM_CHG, "trn_mat_req_ety_item_chg");
         TablesMap.put(TRN_MAT_REQ_ST_LOG, "trn_mat_req_st_log");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");

@@ -56,6 +56,11 @@
                 <Property name="alignment" type="int" value="0"/>
               </Layout>
               <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlWarehouse">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Almac&#xe9;n:"/>
+                  </Properties>
+                </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextWarehouse">
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>

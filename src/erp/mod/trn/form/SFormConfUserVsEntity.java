@@ -9,6 +9,8 @@ import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbConfUserVsEntity;
 import erp.mod.trn.db.SDbMaterialConsumptionEntity;
 import erp.mod.trn.db.SDbMaterialConsumptionEntityUser;
+import erp.mod.trn.db.SDbMaterialConsumptionSubentity;
+import erp.mod.trn.db.SDbMaterialConsumptionSubentityUser;
 import erp.mod.trn.db.SDbMaterialProvisionEntity;
 import erp.mod.trn.db.SDbMaterialProvisionEntityUser;
 import java.awt.event.ActionEvent;
@@ -38,15 +40,19 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     
     private SDbConfUserVsEntity moRegistry;
     
-    private SGridPaneForm moGridMatProvEnt;
-    private SGridPaneForm moGridMatProvEntSelected;
     private SGridPaneForm moGridMatConsEnt;
     private SGridPaneForm moGridMatConsEntSelected;
+    private SGridPaneForm moGridMatConsSubent;
+    private SGridPaneForm moGridMatConsSubentSelected;
+    private SGridPaneForm moGridMatProvEnt;
+    private SGridPaneForm moGridMatProvEntSelected;
     
-    private ArrayList<SDbMaterialProvisionEntity> maMatProvEnt;
-    private ArrayList<SDbMaterialProvisionEntityUser> maMatProvEntSelected;
     private ArrayList<SDbMaterialConsumptionEntity> maMatConsEnt;
     private ArrayList<SDbMaterialConsumptionEntityUser> maMatConsEntSelected;
+    private ArrayList<SDbMaterialConsumptionSubentity> maMatConsSubent;
+    private ArrayList<SDbMaterialConsumptionSubentityUser> maMatConsSubentSelected;
+    private ArrayList<SDbMaterialProvisionEntity> maMatProvEnt;
+    private ArrayList<SDbMaterialProvisionEntityUser> maMatProvEntSelected;
 
     /**
      * Creates new form SFormConfUserVsEntity.
@@ -69,34 +75,17 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     private void initComponents() {
 
         jpRegistry = new javax.swing.JPanel();
-        jpProvision = new javax.swing.JPanel();
-        jpUser = new javax.swing.JPanel();
-        moTextUser = new sa.lib.gui.bean.SBeanFieldText();
-        jpProvAvailable = new javax.swing.JPanel();
-        jpProvAvialableLabel = new javax.swing.JPanel();
-        jlProvAva = new javax.swing.JLabel();
-        jpGridProvAva = new javax.swing.JPanel();
-        jpProvButtons = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jbProvAdd = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jbProvAddAll = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jbProvRemove = new javax.swing.JButton();
-        jPanel4 = new javax.swing.JPanel();
-        jbProvRemoveAll = new javax.swing.JButton();
-        jpProvSelected = new javax.swing.JPanel();
-        jpProvSelectedLabel = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jpGridProvSel = new javax.swing.JPanel();
         jpConsumption = new javax.swing.JPanel();
+        jpUser = new javax.swing.JPanel();
+        jlUser = new javax.swing.JLabel();
+        moTextUser = new sa.lib.gui.bean.SBeanFieldText();
+        jlNote = new javax.swing.JLabel();
         jpConsAvailable = new javax.swing.JPanel();
         jpConsAvailableLabel = new javax.swing.JPanel();
         jlConsAvailableLabel = new javax.swing.JLabel();
         jpGridConsAva = new javax.swing.JPanel();
         jpConsButtons = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jbConsAdd = new javax.swing.JButton();
         jPanel8 = new javax.swing.JPanel();
@@ -109,86 +98,66 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         jpConsSelectedLabel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jpGridConsSel = new javax.swing.JPanel();
+        jpConsumptionS = new javax.swing.JPanel();
+        jpConsAvailable1 = new javax.swing.JPanel();
+        jpConsAvailableLabel1 = new javax.swing.JPanel();
+        jlConsAvailableLabel1 = new javax.swing.JLabel();
+        jpGridConsAva1 = new javax.swing.JPanel();
+        jpConsButtons1 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jbConsSAdd = new javax.swing.JButton();
+        jPanel14 = new javax.swing.JPanel();
+        jbConsSAddAll = new javax.swing.JButton();
+        jPanel15 = new javax.swing.JPanel();
+        jbConsSRemove = new javax.swing.JButton();
+        jPanel16 = new javax.swing.JPanel();
+        jbConsSRemoveAll = new javax.swing.JButton();
+        jpConsSelected1 = new javax.swing.JPanel();
+        jpConsSelectedLabel1 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jpGridConsSel1 = new javax.swing.JPanel();
+        jpProvision = new javax.swing.JPanel();
+        jpProvAvailable = new javax.swing.JPanel();
+        jpProvAvialableLabel = new javax.swing.JPanel();
+        jlProvAva = new javax.swing.JLabel();
+        jpGridProvAva = new javax.swing.JPanel();
+        jpProvButtons = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jbProvAdd = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jbProvAddAll = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jbProvRemove = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jbProvRemoveAll = new javax.swing.JButton();
+        jpProvSelected = new javax.swing.JPanel();
+        jpProvSelectedLabel = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jpGridProvSel = new javax.swing.JPanel();
 
         setResizable(false);
 
         jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jpProvision.setLayout(new java.awt.BorderLayout());
+        jpConsumption.setLayout(new java.awt.BorderLayout());
 
         jpUser.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlUser.setText("Usuario:");
+        jpUser.add(jlUser);
 
         moTextUser.setEditable(false);
         moTextUser.setEnabled(false);
         moTextUser.setPreferredSize(new java.awt.Dimension(400, 23));
         jpUser.add(moTextUser);
 
-        jpProvision.add(jpUser, java.awt.BorderLayout.NORTH);
+        jlNote.setText("Con permisos de requisiciones");
+        jpUser.add(jlNote);
 
-        jpProvAvailable.setLayout(new java.awt.BorderLayout());
-
-        jpProvAvialableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jlProvAva.setText("Entidades de suministro disponibles:");
-        jpProvAvialableLabel.add(jlProvAva);
-
-        jpProvAvailable.add(jpProvAvialableLabel, java.awt.BorderLayout.NORTH);
-
-        jpGridProvAva.setPreferredSize(new java.awt.Dimension(400, 198));
-        jpGridProvAva.setLayout(new java.awt.BorderLayout());
-        jpProvAvailable.add(jpGridProvAva, java.awt.BorderLayout.CENTER);
-
-        jpProvButtons.setLayout(new java.awt.GridLayout(6, 0));
-        jpProvButtons.add(jPanel5);
-
-        jbProvAdd.setText(">");
-        jbProvAdd.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel1.add(jbProvAdd);
-
-        jpProvButtons.add(jPanel1);
-
-        jbProvAddAll.setText(">>");
-        jbProvAddAll.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel2.add(jbProvAddAll);
-
-        jpProvButtons.add(jPanel2);
-
-        jbProvRemove.setText("<");
-        jbProvRemove.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel3.add(jbProvRemove);
-
-        jpProvButtons.add(jPanel3);
-
-        jbProvRemoveAll.setText("<<");
-        jbProvRemoveAll.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel4.add(jbProvRemoveAll);
-
-        jpProvButtons.add(jPanel4);
-
-        jpProvAvailable.add(jpProvButtons, java.awt.BorderLayout.EAST);
-
-        jpProvision.add(jpProvAvailable, java.awt.BorderLayout.CENTER);
-
-        jpProvSelected.setLayout(new java.awt.BorderLayout());
-
-        jpProvSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jLabel2.setText("Entidades de suministro seleccionadas:");
-        jLabel2.setPreferredSize(new java.awt.Dimension(400, 16));
-        jpProvSelectedLabel.add(jLabel2);
-
-        jpProvSelected.add(jpProvSelectedLabel, java.awt.BorderLayout.NORTH);
-
-        jpGridProvSel.setPreferredSize(new java.awt.Dimension(410, 198));
-        jpGridProvSel.setLayout(new java.awt.BorderLayout());
-        jpProvSelected.add(jpGridProvSel, java.awt.BorderLayout.CENTER);
-
-        jpProvision.add(jpProvSelected, java.awt.BorderLayout.EAST);
-
-        jpRegistry.add(jpProvision, java.awt.BorderLayout.NORTH);
-
-        jpConsumption.setLayout(new java.awt.BorderLayout());
+        jpConsumption.add(jpUser, java.awt.BorderLayout.PAGE_START);
 
         jpConsAvailable.setLayout(new java.awt.BorderLayout());
 
@@ -199,12 +168,12 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpConsAvailable.add(jpConsAvailableLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridConsAva.setPreferredSize(new java.awt.Dimension(400, 198));
+        jpGridConsAva.setPreferredSize(new java.awt.Dimension(400, 150));
         jpGridConsAva.setLayout(new java.awt.BorderLayout());
         jpConsAvailable.add(jpGridConsAva, java.awt.BorderLayout.CENTER);
 
-        jpConsButtons.setLayout(new java.awt.GridLayout(6, 0));
-        jpConsButtons.add(jPanel6);
+        jpConsButtons.setLayout(new java.awt.GridLayout(5, 0));
+        jpConsButtons.add(jPanel5);
 
         jbConsAdd.setText(">");
         jbConsAdd.setPreferredSize(new java.awt.Dimension(50, 23));
@@ -244,13 +213,141 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpConsSelected.add(jpConsSelectedLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridConsSel.setPreferredSize(new java.awt.Dimension(410, 198));
+        jpGridConsSel.setPreferredSize(new java.awt.Dimension(500, 150));
         jpGridConsSel.setLayout(new java.awt.BorderLayout());
         jpConsSelected.add(jpGridConsSel, java.awt.BorderLayout.CENTER);
 
         jpConsumption.add(jpConsSelected, java.awt.BorderLayout.EAST);
 
-        jpRegistry.add(jpConsumption, java.awt.BorderLayout.SOUTH);
+        jpRegistry.add(jpConsumption, java.awt.BorderLayout.NORTH);
+
+        jpConsumptionS.setLayout(new java.awt.BorderLayout());
+
+        jpConsAvailable1.setLayout(new java.awt.BorderLayout());
+
+        jpConsAvailableLabel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlConsAvailableLabel1.setText("Subentidades de consumo disponibles:");
+        jpConsAvailableLabel1.add(jlConsAvailableLabel1);
+
+        jpConsAvailable1.add(jpConsAvailableLabel1, java.awt.BorderLayout.NORTH);
+
+        jpGridConsAva1.setPreferredSize(new java.awt.Dimension(400, 150));
+        jpGridConsAva1.setLayout(new java.awt.BorderLayout());
+        jpConsAvailable1.add(jpGridConsAva1, java.awt.BorderLayout.CENTER);
+
+        jpConsButtons1.setLayout(new java.awt.GridLayout(5, 0));
+        jpConsButtons1.add(jPanel6);
+
+        jbConsSAdd.setText(">");
+        jbConsSAdd.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel13.add(jbConsSAdd);
+
+        jpConsButtons1.add(jPanel13);
+
+        jbConsSAddAll.setText(">>");
+        jbConsSAddAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel14.add(jbConsSAddAll);
+
+        jpConsButtons1.add(jPanel14);
+
+        jbConsSRemove.setText("<");
+        jbConsSRemove.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel15.add(jbConsSRemove);
+
+        jpConsButtons1.add(jPanel15);
+
+        jbConsSRemoveAll.setText("<<");
+        jbConsSRemoveAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel16.add(jbConsSRemoveAll);
+
+        jpConsButtons1.add(jPanel16);
+
+        jpConsAvailable1.add(jpConsButtons1, java.awt.BorderLayout.EAST);
+
+        jpConsumptionS.add(jpConsAvailable1, java.awt.BorderLayout.CENTER);
+
+        jpConsSelected1.setLayout(new java.awt.BorderLayout());
+
+        jpConsSelectedLabel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel5.setText("Subentidades de consumo seleccionadas:");
+        jLabel5.setPreferredSize(new java.awt.Dimension(400, 16));
+        jpConsSelectedLabel1.add(jLabel5);
+
+        jpConsSelected1.add(jpConsSelectedLabel1, java.awt.BorderLayout.NORTH);
+
+        jpGridConsSel1.setPreferredSize(new java.awt.Dimension(500, 150));
+        jpGridConsSel1.setLayout(new java.awt.BorderLayout());
+        jpConsSelected1.add(jpGridConsSel1, java.awt.BorderLayout.CENTER);
+
+        jpConsumptionS.add(jpConsSelected1, java.awt.BorderLayout.EAST);
+
+        jpRegistry.add(jpConsumptionS, java.awt.BorderLayout.CENTER);
+
+        jpProvision.setLayout(new java.awt.BorderLayout());
+
+        jpProvAvailable.setLayout(new java.awt.BorderLayout());
+
+        jpProvAvialableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlProvAva.setText("Entidades de suministro disponibles:");
+        jpProvAvialableLabel.add(jlProvAva);
+
+        jpProvAvailable.add(jpProvAvialableLabel, java.awt.BorderLayout.NORTH);
+
+        jpGridProvAva.setPreferredSize(new java.awt.Dimension(400, 150));
+        jpGridProvAva.setLayout(new java.awt.BorderLayout());
+        jpProvAvailable.add(jpGridProvAva, java.awt.BorderLayout.CENTER);
+
+        jpProvButtons.setLayout(new java.awt.GridLayout(5, 0));
+        jpProvButtons.add(jPanel12);
+
+        jbProvAdd.setText(">");
+        jbProvAdd.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel1.add(jbProvAdd);
+
+        jpProvButtons.add(jPanel1);
+
+        jbProvAddAll.setText(">>");
+        jbProvAddAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel2.add(jbProvAddAll);
+
+        jpProvButtons.add(jPanel2);
+
+        jbProvRemove.setText("<");
+        jbProvRemove.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel3.add(jbProvRemove);
+
+        jpProvButtons.add(jPanel3);
+
+        jbProvRemoveAll.setText("<<");
+        jbProvRemoveAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel4.add(jbProvRemoveAll);
+
+        jpProvButtons.add(jPanel4);
+
+        jpProvAvailable.add(jpProvButtons, java.awt.BorderLayout.EAST);
+
+        jpProvision.add(jpProvAvailable, java.awt.BorderLayout.CENTER);
+
+        jpProvSelected.setLayout(new java.awt.BorderLayout());
+
+        jpProvSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel2.setText("Entidades de suministro seleccionadas:");
+        jLabel2.setPreferredSize(new java.awt.Dimension(400, 16));
+        jpProvSelectedLabel.add(jLabel2);
+
+        jpProvSelected.add(jpProvSelectedLabel, java.awt.BorderLayout.NORTH);
+
+        jpGridProvSel.setPreferredSize(new java.awt.Dimension(500, 150));
+        jpGridProvSel.setLayout(new java.awt.BorderLayout());
+        jpProvSelected.add(jpGridProvSel, java.awt.BorderLayout.CENTER);
+
+        jpProvision.add(jpProvSelected, java.awt.BorderLayout.EAST);
+
+        jpRegistry.add(jpProvision, java.awt.BorderLayout.SOUTH);
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.NORTH);
 
@@ -260,8 +357,14 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -274,20 +377,35 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     private javax.swing.JButton jbConsAddAll;
     private javax.swing.JButton jbConsRemove;
     private javax.swing.JButton jbConsRemoveAll;
+    private javax.swing.JButton jbConsSAdd;
+    private javax.swing.JButton jbConsSAddAll;
+    private javax.swing.JButton jbConsSRemove;
+    private javax.swing.JButton jbConsSRemoveAll;
     private javax.swing.JButton jbProvAdd;
     private javax.swing.JButton jbProvAddAll;
     private javax.swing.JButton jbProvRemove;
     private javax.swing.JButton jbProvRemoveAll;
     private javax.swing.JLabel jlConsAvailableLabel;
+    private javax.swing.JLabel jlConsAvailableLabel1;
+    private javax.swing.JLabel jlNote;
     private javax.swing.JLabel jlProvAva;
+    private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpConsAvailable;
+    private javax.swing.JPanel jpConsAvailable1;
     private javax.swing.JPanel jpConsAvailableLabel;
+    private javax.swing.JPanel jpConsAvailableLabel1;
     private javax.swing.JPanel jpConsButtons;
+    private javax.swing.JPanel jpConsButtons1;
     private javax.swing.JPanel jpConsSelected;
+    private javax.swing.JPanel jpConsSelected1;
     private javax.swing.JPanel jpConsSelectedLabel;
+    private javax.swing.JPanel jpConsSelectedLabel1;
     private javax.swing.JPanel jpConsumption;
+    private javax.swing.JPanel jpConsumptionS;
     private javax.swing.JPanel jpGridConsAva;
+    private javax.swing.JPanel jpGridConsAva1;
     private javax.swing.JPanel jpGridConsSel;
+    private javax.swing.JPanel jpGridConsSel1;
     private javax.swing.JPanel jpGridProvAva;
     private javax.swing.JPanel jpGridProvSel;
     private javax.swing.JPanel jpProvAvailable;
@@ -302,58 +420,11 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 880, 570);
+        SGuiUtils.setWindowBounds(this, 1040, 700);
         
         moTextUser.setTextSettings("Usuario", 255);
         
         moFields.setFormButton(jbSave);
-        
-        // Entidades de suministro disponibles
-        
-        moGridMatProvEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT, 0, "Entidades de suministro") {
-            
-            @Override
-            public void initGrid() {
-                setRowButtonsEnabled(false);
-            }
-            
-            @Override
-            public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> columns = new ArrayList<>();
-
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
-
-                return columns;
-            }
-        };
-
-        jpGridProvAva.add(moGridMatProvEnt);
-        mvFormGrids.add(moGridMatProvEnt);
-        
-        // Entidades de suministro seleccionadas
-        
-        moGridMatProvEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT_USR, 0, "Entidades de suministro seleccionadas") {
-            
-            @Override
-            public void initGrid() {
-                setRowButtonsEnabled(false);
-            }
-            
-            @Override
-            public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> columns = new ArrayList<>();
-
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
-                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
-                col.setEditable(true);
-                columns.add(col);
-                
-                return columns;
-            }
-        };
-
-        jpGridProvSel.add(moGridMatProvEntSelected);
-        mvFormGrids.add(moGridMatProvEntSelected);
         
         // Entidades de consumo disponibles
         
@@ -401,6 +472,102 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpGridConsSel.add(moGridMatConsEntSelected);
         mvFormGrids.add(moGridMatConsEntSelected);
+        
+        // Subentidades de consumo disponibles
+        
+        moGridMatConsSubent = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT, 0, "Subentidades de consumo") {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subentidad de consumo"));
+
+                return columns;
+            }
+        };
+
+        jpGridConsAva1.add(moGridMatConsSubent);
+        mvFormGrids.add(moGridMatConsSubent);
+        
+        // Subentidades de consumo seleccionadas
+        
+        moGridMatConsSubentSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_USR, 0, "Subentidades de consumo seleccionadas") {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subentidad de consumo"));
+                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
+                col.setEditable(true);
+                columns.add(col);
+
+                return columns;
+            }
+        };
+
+        jpGridConsSel1.add(moGridMatConsSubentSelected);
+        mvFormGrids.add(moGridMatConsSubentSelected);
+        
+        // Entidades de suministro disponibles
+        
+        moGridMatProvEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT, 0, "Entidades de suministro") {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
+
+                return columns;
+            }
+        };
+
+        jpGridProvAva.add(moGridMatProvEnt);
+        mvFormGrids.add(moGridMatProvEnt);
+        
+        // Entidades de suministro seleccionadas
+        
+        moGridMatProvEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT_USR, 0, "Entidades de suministro seleccionadas") {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
+                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
+                col.setEditable(true);
+                columns.add(col);
+                
+                return columns;
+            }
+        };
+
+        jpGridProvSel.add(moGridMatProvEntSelected);
+        mvFormGrids.add(moGridMatProvEntSelected);
         
         jpCommandRight.remove(jbEdit);
         jpCommandRight.remove(jbReadInfo);
@@ -456,6 +623,31 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         }
     }
     
+    private void readMaterialConsumptionSubentities() {
+        try {
+            Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+            String sql = "SELECT id_mat_cons_ent, id_mat_cons_subent FROM trn_mat_cons_subent ORDER BY id_mat_cons_ent, id_mat_cons_subent";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                boolean found = false;
+                for (SDbMaterialConsumptionSubentityUser eu : maMatConsSubentSelected) {
+                    if (resultSet.getInt(1) == eu.getPkMatConsumptionEntityId() && resultSet.getInt(2) == eu.getPkMatConsumptionSubentityId()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    SDbMaterialConsumptionSubentity ce = new SDbMaterialConsumptionSubentity();
+                    ce.read(miClient.getSession(), new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                    maMatConsSubent.add(ce);
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
     private void populateGridMatProvEnt()  {
         Vector<SGridRow> vRows = new Vector<>();
         if (maMatProvEnt.size() > 0) {
@@ -488,56 +680,20 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         moGridMatConsEntSelected.populateGrid(vRows);
     }
     
-    private void actionProvAdd() {
-        try {
-            int provId = ((SDbMaterialProvisionEntity) moGridMatProvEnt.getSelectedGridRow()).getPkMatProvisionEntityId();
-            if (maMatProvEnt.remove((SDbMaterialProvisionEntity) moGridMatProvEnt.getSelectedGridRow()) ) {
-                SDbMaterialProvisionEntityUser eu = new SDbMaterialProvisionEntityUser();
-                eu.setPkMatProvisionEntityId(provId);
-                eu.readAuxMatProvEnt(miClient.getSession());
-                maMatProvEntSelected.add(eu);
-
-                populateGridMatProvEnt();
-                populateGridMatProvEntSelected();
-            }
+    private void populateGridMatConsSubent() {
+        Vector<SGridRow> vRows = new Vector<>();
+        if (maMatConsSubent.size() > 0) {
+            vRows.addAll(maMatConsSubent);
         }
-        catch (Exception e) {
-            miClient.showMsgBoxError(e.getMessage());
-        }
-    }
-
-    private void actionProvAddAll() {
-        try {
-            for (SDbMaterialProvisionEntity pe : maMatProvEnt) {
-                SDbMaterialProvisionEntityUser eu = new SDbMaterialProvisionEntityUser();
-                eu.setPkMatProvisionEntityId(pe.getPkMatProvisionEntityId());
-                eu.readAuxMatProvEnt(miClient.getSession());
-                maMatProvEntSelected.add(eu);
-            }
-            maMatProvEnt.clear();
-            populateGridMatProvEnt();
-            populateGridMatProvEntSelected();
-        }
-        catch (Exception e) {
-            miClient.showMsgBoxError(e.getMessage());
-        }
+        moGridMatConsSubent.populateGrid(vRows);
     }
     
-    private void actionProvRemove() {
-        maMatProvEnt.add(((SDbMaterialProvisionEntityUser) moGridMatProvEntSelected.getSelectedGridRow()).getAuxMatProvEnt());
-        if (maMatProvEntSelected.remove(((SDbMaterialProvisionEntityUser) moGridMatProvEntSelected.getSelectedGridRow()))) {
-            populateGridMatProvEnt();
-            populateGridMatProvEntSelected();
+    private void populateGridMatConsSubentSelected() {
+        Vector<SGridRow> vRows = new Vector<>();
+        if (maMatConsSubentSelected.size() > 0) {
+            vRows.addAll(maMatConsSubentSelected);
         }
-    }
-
-    private void actionProvRemoveAll() {
-        for (SDbMaterialProvisionEntityUser eu : maMatProvEntSelected) {
-            maMatProvEnt.add(eu.getAuxMatProvEnt());
-        }
-        maMatProvEntSelected.clear();
-        populateGridMatProvEnt();
-        populateGridMatProvEntSelected();
+        moGridMatConsSubentSelected.populateGrid(vRows);
     }
     
     private void actionConsAdd() {
@@ -591,39 +747,156 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         populateGridMatConsEnt();
         populateGridMatConsEntSelected();
     }
+    
+     private void actionConsSAdd() {
+        try {
+            int consId = ((SDbMaterialConsumptionSubentity) moGridMatConsSubent.getSelectedGridRow()).getPkMatConsumptionEntityId();
+            int consSId = ((SDbMaterialConsumptionSubentity) moGridMatConsSubent.getSelectedGridRow()).getPkMatConsumptionSubentityId();
+            if (maMatConsSubent.remove((SDbMaterialConsumptionSubentity) moGridMatConsSubent.getSelectedGridRow()) ) {
+                SDbMaterialConsumptionSubentityUser eu = new SDbMaterialConsumptionSubentityUser();
+                eu.setPkMatConsumptionEntityId(consId);
+                eu.setPkMatConsumptionSubentityId(consSId);
+                eu.readAuxMatConsSubent(miClient.getSession());
+                maMatConsSubentSelected.add(eu);
+
+                populateGridMatConsSubent();
+                populateGridMatConsSubentSelected();
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+
+    private void actionConsSAddAll() {
+        try {
+            for (SDbMaterialConsumptionSubentity ce : maMatConsSubent) {
+                SDbMaterialConsumptionSubentityUser eu = new SDbMaterialConsumptionSubentityUser();
+                eu.setPkMatConsumptionEntityId(ce.getPkMatConsumptionEntityId());
+                eu.setPkMatConsumptionSubentityId(ce.getPkMatConsumptionSubentityId());
+                eu.readAuxMatConsSubent(miClient.getSession());
+                maMatConsSubentSelected.add(eu);
+            }
+            maMatConsSubent.clear();
+            populateGridMatConsSubent();
+            populateGridMatConsSubentSelected();
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+
+    private void actionConsSRemove() {
+        maMatConsSubent.add(((SDbMaterialConsumptionSubentityUser) moGridMatConsSubentSelected.getSelectedGridRow()).getAuxMatConsSubent());
+        if (maMatConsSubentSelected.remove(((SDbMaterialConsumptionSubentityUser) moGridMatConsSubentSelected.getSelectedGridRow()))) {
+            populateGridMatConsSubent();
+            populateGridMatConsSubentSelected();
+        }
+    }
+
+    private void actionConsSRemoveAll() {
+        for (SDbMaterialConsumptionSubentityUser eu : maMatConsSubentSelected) {
+            maMatConsSubent.add(eu.getAuxMatConsSubent());
+        }
+        maMatConsSubentSelected.clear();
+        populateGridMatConsSubent();
+        populateGridMatConsSubentSelected();
+    }
+    
+    private void actionProvAdd() {
+        try {
+            int provId = ((SDbMaterialProvisionEntity) moGridMatProvEnt.getSelectedGridRow()).getPkMatProvisionEntityId();
+            if (maMatProvEnt.remove((SDbMaterialProvisionEntity) moGridMatProvEnt.getSelectedGridRow()) ) {
+                SDbMaterialProvisionEntityUser eu = new SDbMaterialProvisionEntityUser();
+                eu.setPkMatProvisionEntityId(provId);
+                eu.readAuxMatProvEnt(miClient.getSession());
+                maMatProvEntSelected.add(eu);
+
+                populateGridMatProvEnt();
+                populateGridMatProvEntSelected();
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+
+    private void actionProvAddAll() {
+        try {
+            for (SDbMaterialProvisionEntity pe : maMatProvEnt) {
+                SDbMaterialProvisionEntityUser eu = new SDbMaterialProvisionEntityUser();
+                eu.setPkMatProvisionEntityId(pe.getPkMatProvisionEntityId());
+                eu.readAuxMatProvEnt(miClient.getSession());
+                maMatProvEntSelected.add(eu);
+            }
+            maMatProvEnt.clear();
+            populateGridMatProvEnt();
+            populateGridMatProvEntSelected();
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void actionProvRemove() {
+        maMatProvEnt.add(((SDbMaterialProvisionEntityUser) moGridMatProvEntSelected.getSelectedGridRow()).getAuxMatProvEnt());
+        if (maMatProvEntSelected.remove(((SDbMaterialProvisionEntityUser) moGridMatProvEntSelected.getSelectedGridRow()))) {
+            populateGridMatProvEnt();
+            populateGridMatProvEntSelected();
+        }
+    }
+
+    private void actionProvRemoveAll() {
+        for (SDbMaterialProvisionEntityUser eu : maMatProvEntSelected) {
+            maMatProvEnt.add(eu.getAuxMatProvEnt());
+        }
+        maMatProvEntSelected.clear();
+        populateGridMatProvEnt();
+        populateGridMatProvEntSelected();
+    }
 
     @Override
     public void addAllListeners() {
-        jbProvAdd.addActionListener(this);
-        jbProvAddAll.addActionListener(this);
-        jbProvRemove.addActionListener(this);
-        jbProvRemoveAll.addActionListener(this);
         jbConsAdd.addActionListener(this);
         jbConsAddAll.addActionListener(this);
         jbConsRemove.addActionListener(this);
         jbConsRemoveAll.addActionListener(this);
+        jbConsSAdd.addActionListener(this);
+        jbConsSAddAll.addActionListener(this);
+        jbConsSRemove.addActionListener(this);
+        jbConsSRemoveAll.addActionListener(this);
+        jbProvAdd.addActionListener(this);
+        jbProvAddAll.addActionListener(this);
+        jbProvRemove.addActionListener(this);
+        jbProvRemoveAll.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        jbProvAdd.removeActionListener(this);
-        jbProvAddAll.removeActionListener(this);
-        jbProvRemove.removeActionListener(this);
-        jbProvRemoveAll.removeActionListener(this);
         jbConsAdd.removeActionListener(this);
         jbConsAddAll.removeActionListener(this);
         jbConsRemove.removeActionListener(this);
         jbConsRemoveAll.removeActionListener(this);
+        jbConsSAdd.removeActionListener(this);
+        jbConsSAddAll.removeActionListener(this);
+        jbConsSRemove.removeActionListener(this);
+        jbConsSRemoveAll.removeActionListener(this);
+        jbProvAdd.removeActionListener(this);
+        jbProvAddAll.removeActionListener(this);
+        jbProvRemove.removeActionListener(this);
+        jbProvRemoveAll.removeActionListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
         moTextUser.setValue("");
         
-        maMatProvEnt = new ArrayList<>();
-        maMatProvEntSelected = new ArrayList<>();
         maMatConsEnt = new ArrayList<>();
         maMatConsEntSelected = new ArrayList<>();
+        maMatConsSubent = new ArrayList<>();
+        maMatConsSubentSelected = new ArrayList<>();
+        maMatProvEnt = new ArrayList<>();
+        maMatProvEntSelected = new ArrayList<>();
     }
 
     @Override
@@ -638,20 +911,26 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         
         moTextUser.setValue(moRegistry.getUserName());
         
-        for (SDbMaterialProvisionEntityUser eu : moRegistry.getProvEntUser()) {
-            maMatProvEntSelected.add(eu);
-        }
         for (SDbMaterialConsumptionEntityUser eu : moRegistry.getConsEntUser()) {
             maMatConsEntSelected.add(eu);
         }
+        for (SDbMaterialConsumptionSubentityUser eu : moRegistry.getConsSubentUser()) {
+            maMatConsSubentSelected.add(eu);
+        }
+        for (SDbMaterialProvisionEntityUser eu : moRegistry.getProvEntUser()) {
+            maMatProvEntSelected.add(eu);
+        }
         
-        readMaterialProvisionEntities();
         readMaterialConsumptionEntities();
+        readMaterialConsumptionSubentities();
+        readMaterialProvisionEntities();
         
-        populateGridMatProvEnt();
-        populateGridMatProvEntSelected();
         populateGridMatConsEnt();
         populateGridMatConsEntSelected();
+        populateGridMatConsSubent();
+        populateGridMatConsSubentSelected();
+        populateGridMatProvEnt();
+        populateGridMatProvEntSelected();
         
         addAllListeners();
     }
@@ -662,14 +941,19 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         if (registry.isRegistryNew()) { }
         
-        registry.getProvEntUser().clear();
-        for (SDbMaterialProvisionEntityUser eu : maMatProvEntSelected) {
-            registry.getProvEntUser().add(eu);
-        }
-        
         registry.getConsEntUser().clear();
         for (SDbMaterialConsumptionEntityUser eu : maMatConsEntSelected) {
             registry.getConsEntUser().add(eu);
+        }
+        
+        registry.getConsSubentUser().clear();
+        for (SDbMaterialConsumptionSubentityUser eu : maMatConsSubentSelected) {
+            registry.getConsSubentUser().add(eu);
+        }
+        
+        registry.getProvEntUser().clear();
+        for (SDbMaterialProvisionEntityUser eu : maMatProvEntSelected) {
+            registry.getProvEntUser().add(eu);
         }
 
         return registry;
@@ -678,21 +962,6 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
-        
-        if (validation.isValid() && !maMatProvEntSelected.isEmpty()) {
-            int defaults = 0;
-            for (SDbMaterialProvisionEntityUser eu : maMatProvEntSelected) {
-                if (eu.isDefault()) {
-                    defaults++;
-                }
-            }
-            if (defaults == 0) {
-                validation.setMessage("No ha seleccionado ninguna entidad de suministro como predeterminada.");
-            }
-            else if (defaults > 1) {
-                validation.setMessage("Hay mas de una entidad de suministro seleccionada como predeterminada.");
-            }
-        }
         
         if (validation.isValid() && !maMatConsEntSelected.isEmpty()) {
             int defaults = 0;
@@ -709,6 +978,47 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             }
         }
         
+        if (validation.isValid() && !maMatConsSubentSelected.isEmpty()) {
+            int defaults = 0;
+            for (SDbMaterialConsumptionSubentityUser eu : maMatConsSubentSelected) {
+                if (eu.isDefault()) {
+                    defaults++;
+                }
+            }
+            if (defaults == 0) {
+                validation.setMessage("No ha seleccionado ninguna subentidad de consumo como predeterminada.");
+            }
+            else if (defaults > 1) {
+                validation.setMessage("Hay mas de una entidad de subconsumo seleccionada como predeterminada.");
+            }
+        }
+        
+        if (validation.isValid() && !maMatProvEntSelected.isEmpty()) {
+            int defaults = 0;
+            for (SDbMaterialProvisionEntityUser eu : maMatProvEntSelected) {
+                if (eu.isDefault()) {
+                    defaults++;
+                }
+            }
+            if (defaults == 0) {
+                validation.setMessage("No ha seleccionado ninguna entidad de suministro como predeterminada.");
+            }
+            else if (defaults > 1) {
+                validation.setMessage("Hay mas de una entidad de suministro seleccionada como predeterminada.");
+            }
+        }
+        
+        if (validation.isValid()) {
+            for (SDbMaterialConsumptionEntityUser eu : maMatConsEntSelected) {
+                for (SDbMaterialConsumptionSubentityUser seu : maMatConsSubentSelected) {
+                    if (seu.getPkMatConsumptionEntityId() == eu.getPkMatConsumptionEntityId()) {
+                        validation.setMessage("No es necesario configurar subentidades de consumo que dependan de una entidad de consumo que ya esté configurada.");
+                        break;
+                    }
+                }
+            }
+        }
+        
         return validation;
     }
 
@@ -717,19 +1027,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbProvAdd) {
-                actionProvAdd();
-            }
-            else if (button == jbProvAddAll) {
-                actionProvAddAll();
-            }
-            else if (button == jbProvRemove) {
-                actionProvRemove();
-            }
-            else if (button == jbProvRemoveAll) {
-                actionProvRemoveAll();
-            }
-            else if (button == jbConsAdd) {
+            if (button == jbConsAdd) {
                 actionConsAdd();
             }
             else if (button == jbConsAddAll) {
@@ -740,6 +1038,30 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             }
             else if (button == jbConsRemoveAll) {
                 actionConsRemoveAll();
+            }
+            else if (button == jbConsSAdd) {
+                actionConsSAdd();
+            }
+            else if (button == jbConsSAddAll) {
+                actionConsSAddAll();
+            }
+            else if (button == jbConsSRemove) {
+                actionConsSRemove();
+            }
+            else if (button == jbConsSRemoveAll) {
+                actionConsSRemoveAll();
+            }
+            else if (button == jbProvAdd) {
+                actionProvAdd();
+            }
+            else if (button == jbProvAddAll) {
+                actionProvAddAll();
+            }
+            else if (button == jbProvRemove) {
+                actionProvRemove();
+            }
+            else if (button == jbProvRemoveAll) {
+                actionProvRemoveAll();
             }
         }
     }

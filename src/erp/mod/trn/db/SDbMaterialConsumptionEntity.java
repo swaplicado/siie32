@@ -30,9 +30,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
-    */
-    protected String msFkCostCenterId;
-    /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
@@ -50,7 +47,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
     public void setName(String s) { msName = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
-    public void setFkCostCenterId(String s) { msFkCostCenterId = s; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -61,7 +57,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
     public String getName() { return msName; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
-    public String getFkCostCenterId() { return msFkCostCenterId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -88,7 +83,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
         msName = "";
         mbDeleted = false;
         mbSystem = false;
-        msFkCostCenterId = "";
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -146,7 +140,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
             msName = resultSet.getString("name");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
-            msFkCostCenterId = resultSet.getString("fid_cc");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -191,7 +184,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
                     "'" + msName + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
-                    "'" + msFkCostCenterId + "', " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -207,7 +199,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
                     "name = '" + msName + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                    "fid_cc = '" + msFkCostCenterId + "', " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -229,7 +220,6 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
         registry.setName(this.getName());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
-        registry.setFkCostCenterId(this.getFkCostCenterId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
@@ -280,10 +270,10 @@ public class SDbMaterialConsumptionEntity extends SDbRegistryUser implements SGr
     }
 
     @Override
-    public Object getRowValueAt(int row) {
+    public Object getRowValueAt(int col) {
         Object value = null;
         
-        switch (row) {
+        switch (col) {
             case 0: value = msName; break; 
         }
         

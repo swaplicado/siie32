@@ -62,6 +62,9 @@ public abstract class SModSysConsts {
     public static final int USRS_TP_USR_USR = 1;
     public static final int USRS_TP_USR_ADM = 2;
     public static final int USRS_TP_USR_SUP = 3;
+    
+    public static final int USRS_LINK_USR = 1;
+    public static final int USRS_LINK_EMP = 2;
 
     /*
      * Business partners

@@ -323,13 +323,13 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
                 + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " " 
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
-                + "v.fk_ent_mat_cons_ent = ceu.id_mat_cons_ent AND ceu.id_usr = " + usrId + " ";
+                + "v.fk_ent_mat_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
         
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PET || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
             if (usrId != 2 ) { // SUPER
                 needJoin = true;
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
-                        + "OR peu.id_usr = " + usrId + " OR ceu.id_usr = " + usrId + ") ";
+                        + "OR peu.id_usr = " + usrId + " OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
             }
         }
         

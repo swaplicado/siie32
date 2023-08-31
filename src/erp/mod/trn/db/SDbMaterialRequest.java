@@ -43,8 +43,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkUserRequesterId;
     protected int mnFkContractorId_n;
     protected int mnFkEntMatConsumptionEntityId;
-    protected int mnFkSubentMatConsumptionEntityId_n;
-    protected int mnFkSubentMatConsumptionSubentityId_n;
+    protected int mnFkSubentMatConsumptionEntityId;
+    protected int mnFkSubentMatConsumptionSubentityId;
+    protected int mnFkCostCenterId;
     protected int mnFkUserCloseProvisionId;
     protected int mnFkUserClosePurchaseId;
     /*
@@ -101,8 +102,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setFkUserRequesterId(int n) { mnFkUserRequesterId = n; }
     public void setFkContractorId_n(int n) { mnFkContractorId_n = n; }
     public void setFkEntMatConsumptionEntityId(int n) { mnFkEntMatConsumptionEntityId = n; }
-    public void setFkSubentMatConsumptionEntityId_n(int n) { mnFkSubentMatConsumptionEntityId_n = n; }
-    public void setFkSubentMatConsumptionSubentityId_n(int n) { mnFkSubentMatConsumptionSubentityId_n = n; }
+    public void setFkSubentMatConsumptionEntityId(int n) { mnFkSubentMatConsumptionEntityId = n; }
+    public void setFkSubentMatConsumptionSubentityId(int n) { mnFkSubentMatConsumptionSubentityId = n; }
+    public void setFkCostCenterId(int n) { mnFkCostCenterId = n; }
     public void setFkUserCloseProvisionId(int n) { mnFkUserCloseProvisionId = n; }
     public void setFkUserClosePurchaseId(int n) { mnFkUserClosePurchaseId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -146,8 +148,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getFkUserRequesterId() { return mnFkUserRequesterId; }
     public int getFkContractorId_n() { return mnFkContractorId_n; }
     public int getFkEntMatConsumptionEntityId() { return mnFkEntMatConsumptionEntityId; }
-    public int getFkSubentMatConsumptionEntityId_n() { return mnFkSubentMatConsumptionEntityId_n; }
-    public int getFkSubentMatConsumptionSubentityId_n() { return mnFkSubentMatConsumptionSubentityId_n; }
+    public int getFkSubentMatConsumptionEntityId() { return mnFkSubentMatConsumptionEntityId; }
+    public int getFkSubentMatConsumptionSubentityId() { return mnFkSubentMatConsumptionSubentityId; }
+    public int getFkCostCenterId() { return mnFkCostCenterId; }
     public int getFkUserCloseProvisionId() { return mnFkUserCloseProvisionId; }
     public int getFkUserClosePurchaseId() { return mnFkUserClosePurchaseId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -220,8 +223,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnFkUserRequesterId = 0;
         mnFkContractorId_n = 0;
         mnFkEntMatConsumptionEntityId = 0;
-        mnFkSubentMatConsumptionEntityId_n = 0;
-        mnFkSubentMatConsumptionSubentityId_n = 0;
+        mnFkSubentMatConsumptionEntityId = 0;
+        mnFkSubentMatConsumptionSubentityId = 0;
+        mnFkCostCenterId = 0;
         mnFkUserCloseProvisionId = 0;
         mnFkUserClosePurchaseId = 0;
         mnFkUserInsertId = 0;
@@ -314,8 +318,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkUserRequesterId = resultSet.getInt("fk_usr_req");
             mnFkContractorId_n = resultSet.getInt("fk_contractor_n");
             mnFkEntMatConsumptionEntityId = resultSet.getInt("fk_ent_mat_cons_ent");
-            mnFkSubentMatConsumptionEntityId_n = resultSet.getInt("fk_subent_mat_cons_ent_n");
-            mnFkSubentMatConsumptionSubentityId_n = resultSet.getInt("fk_subent_mat_cons_subent_n");
+            mnFkSubentMatConsumptionEntityId = resultSet.getInt("fk_subent_mat_cons_ent_n");
+            mnFkSubentMatConsumptionSubentityId = resultSet.getInt("fk_subent_mat_cons_subent_n");
+            mnFkCostCenterId = resultSet.getInt("fk_cc_n");
             mnFkUserCloseProvisionId = resultSet.getInt("fk_usr_clo_prov");
             mnFkUserClosePurchaseId = resultSet.getInt("fk_usr_clo_pur");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -460,8 +465,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     mnFkUserRequesterId + ", " + 
                     (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") + 
                     mnFkEntMatConsumptionEntityId + ", " + 
-                    (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") + 
-                    (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId_n + ", ") + 
+                    (mnFkSubentMatConsumptionEntityId == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId + ", ") + 
+                    (mnFkSubentMatConsumptionSubentityId == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId + ", ") + 
+                    (mnFkCostCenterId == 0 ? "NULL, " : mnFkCostCenterId + ", ") + 
                     mnFkUserCloseProvisionId + ", " + 
                     mnFkUserClosePurchaseId + ", " + 
                     mnFkUserInsertId + ", " + 
@@ -513,8 +519,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_usr_req = " + mnFkUserRequesterId + ", " +
                     "fk_contractor_n = " + (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") +
                     "fk_ent_mat_cons_ent = " + mnFkEntMatConsumptionEntityId + ", " +
-                    "fk_subent_mat_cons_ent_n = " + (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") +
-                    "fk_subent_mat_cons_subent_n = " + (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId_n + ", ") +
+                    "fk_subent_mat_cons_ent_n = " + (mnFkSubentMatConsumptionEntityId == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId + ", ") +
+                    "fk_subent_mat_cons_subent_n = " + (mnFkSubentMatConsumptionSubentityId == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId + ", ") +
+                    "fk_cc_n = " + (mnFkCostCenterId == 0 ? "NULL, " : mnFkCostCenterId + ", ") +
                     "fk_usr_clo_prov = " + mnFkUserCloseProvisionId + ", " +
                     "fk_usr_clo_pur = " + mnFkUserClosePurchaseId + ", " +
                     "fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -606,8 +613,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setFkUserRequesterId(this.getFkUserRequesterId());
         registry.setFkContractorId_n(this.getFkContractorId_n());
         registry.setFkEntMatConsumptionEntityId(this.getFkEntMatConsumptionEntityId());
-        registry.setFkSubentMatConsumptionEntityId_n(this.getFkSubentMatConsumptionEntityId_n());
-        registry.setFkSubentMatConsumptionSubentityId_n(this.getFkSubentMatConsumptionSubentityId_n());
+        registry.setFkSubentMatConsumptionEntityId(this.getFkSubentMatConsumptionEntityId());
+        registry.setFkSubentMatConsumptionSubentityId(this.getFkSubentMatConsumptionSubentityId());
+        registry.setFkCostCenterId(this.getFkCostCenterId());
         registry.setFkUserCloseProvisionId(this.getFkUserCloseProvisionId());
         registry.setFkUserClosePurchaseId(this.getFkUserClosePurchaseId());
         registry.setFkUserInsertId(this.getFkUserInsertId());

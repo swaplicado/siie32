@@ -41,6 +41,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected int mnFkEntMatConsumptionEntityId_n;
     protected int mnFkSubentMatConsumptionEntityId_n;
     protected int mnFkSubentMatConsumptionSubentityId_n;
+    protected int mnFkCostCenterId_n;
     
     protected ArrayList<SDbMaterialRequestEntryNote> maChildNotes;
     
@@ -70,6 +71,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setFkEntMatConsumptionEntityId_n(int n) { mnFkEntMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionEntityId_n(int n) { mnFkSubentMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionSubentityId_n(int n) { mnFkSubentMatConsumptionSubentityId_n = n; }
+    public void setFkCostCenterId_n(int n) { mnFkCostCenterId_n = n; }
     
     public void setDataItem(SDataItem o) { moDataItem = o; }
     
@@ -90,6 +92,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public int getFkEntMatConsumptionEntityId_n() { return mnFkEntMatConsumptionEntityId_n; }
     public int getFkSubentMatConsumptionEntityId_n() { return mnFkSubentMatConsumptionEntityId_n; }
     public int getFkSubentMatConsumptionSubentityId_n() { return mnFkSubentMatConsumptionSubentityId_n; }
+    public int getFkCostCenterId_n() { return mnFkCostCenterId_n; }
     
     public ArrayList<SDbMaterialRequestEntryNote> getChildNotes() { return maChildNotes; }
     
@@ -154,6 +157,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mnFkEntMatConsumptionEntityId_n = 0;
         mnFkSubentMatConsumptionEntityId_n = 0;
         mnFkSubentMatConsumptionSubentityId_n = 0;
+        mnFkCostCenterId_n = 0;
         
         maChildNotes = new ArrayList<>();
         
@@ -223,6 +227,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mnFkEntMatConsumptionEntityId_n = resultSet.getInt("fk_ent_mat_cons_ent_n");
             mnFkSubentMatConsumptionEntityId_n = resultSet.getInt("fk_subent_mat_cons_ent_n");
             mnFkSubentMatConsumptionSubentityId_n = resultSet.getInt("fk_subent_mat_cons_subent_n");
+            mnFkCostCenterId_n = resultSet.getInt("fk_cc_n");
             
             // Read aswell document notes:
             
@@ -281,7 +286,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") + 
                     (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") + 
                     (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") + 
-                    (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL " : mnFkSubentMatConsumptionSubentityId_n + " ") + 
+                    (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId_n + ", ") + 
+                    (mnFkCostCenterId_n == 0 ? "NULL " : mnFkCostCenterId_n + " ") + 
                     ")";
         }
         else {
@@ -302,7 +308,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     "fk_mat_req_pty_n = " + (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") +
                     "fk_ent_mat_cons_ent_n = " + (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") +
                     "fk_subent_mat_cons_ent_n = " + (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") +
-                    "fk_subent_mat_cons_subent_n = " + (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL " : mnFkSubentMatConsumptionSubentityId_n + " ") +
+                    "fk_subent_mat_cons_subent_n = " + (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId_n + ", ") +
+                    "fk_cc_n = " + (mnFkCostCenterId_n == 0 ? "NULL " : mnFkCostCenterId_n + " ") +
                     getSqlWhere();
         }
         
@@ -343,6 +350,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         registry.setFkEntMatConsumptionEntityId_n(this.getFkEntMatConsumptionEntityId_n());
         registry.setFkSubentMatConsumptionEntityId_n(this.getFkSubentMatConsumptionEntityId_n());
         registry.setFkSubentMatConsumptionSubentityId_n(this.getFkSubentMatConsumptionSubentityId_n());
+        registry.setFkCostCenterId_n(this.getFkCostCenterId_n());
         
         for (SDbMaterialRequestEntryNote note : this.getChildNotes()) {
             registry.getChildNotes().add(note);

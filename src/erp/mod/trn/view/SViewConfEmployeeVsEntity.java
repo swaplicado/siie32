@@ -5,6 +5,7 @@
 package erp.mod.trn.view;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -55,11 +56,11 @@ public class SViewConfEmployeeVsEntity extends SGridPaneView {
         msSql = "SELECT DISTINCT v.id_maint_user AS " + SDbConsts.FIELD_ID + "1, "
                 + "bp.bp AS " + SDbConsts.FIELD_CODE + ", "
                 + "bp.bp AS " + SDbConsts.FIELD_NAME + ", "
-                + "IF(ee.id_emp IS NULL, 0, 1) AS conf, "
+                + "IF(ee.id_ref IS NULL, 0, 1) AS conf, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "ee.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                + "ee.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
-                + "ee.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                + "ee.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAINT_USER) + " AS v "
@@ -67,10 +68,10 @@ public class SViewConfEmployeeVsEntity extends SGridPaneView {
                 + "v.id_maint_user = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS em ON "
                 + "v.id_maint_user = em.id_emp "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_EMP) + " AS ee ON "
-                + "v.id_maint_user = ee.id_emp "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ee ON "
+                + "ee.id_link = " + SModSysConsts.USRS_LINK_EMP + " AND v.id_maint_user = ee.id_ref "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                + "ee.fk_usr_ins = ui.id_usr "
+                + "ee.fk_usr = ui.id_usr "
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY bp.bp, v.id_maint_user "; 
     }
@@ -93,7 +94,7 @@ public class SViewConfEmployeeVsEntity extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.TRN_MAINT_USER);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.HRSU_EMP);
-        moSuscriptionsSet.add(SModConsts.TRN_MAT_CONS_ENT_EMP);
+        moSuscriptionsSet.add(SModConsts.TRN_MAT_CONS_ENT_USR);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 }

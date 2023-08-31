@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.form.SDialogItemPicker;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataStockSegregation;
@@ -17,18 +18,24 @@ import erp.mtrn.data.SDataStockSegregationWarehouseEntry;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.db.SDbConsts;
+import sa.lib.grid.SGridColumnForm;
+import sa.lib.grid.SGridConsts;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiOptionPickerSettings;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Isabel Servín
  */
 public class SMaterialRequestUtils {
     
@@ -311,5 +318,103 @@ public class SMaterialRequestUtils {
         catch (SQLException ex) {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Devuelve el objeto del grupo del centro de costo a traves del ítem
+     * @param session
+     * @param link 
+     * @param id 
+     * @return Grupo cc
+     * @throws java.lang.Exception
+     */
+    public SDbMaterialCostCenterGroup getCostCenterGroupByItem(SGuiSession session, int link, int id) throws Exception {
+        SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        String sql = "SELECT id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " " +
+                "WHERE id_link = " + link + " AND id_ref = " + id + " ";
+        ResultSet resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            ccg.read(session, new int[] { resultSet.getInt(1)} );
+        }
+        return ccg;
+    }
+    
+    /**
+     * Devuelve el objeto del grupo del centro de costo a traves de un id de usuario o empleado
+     * @param session
+     * @param link 1 Usuario, 2 Empleado
+     * @param id 
+     * @return Grupo cc
+     * @throws java.lang.Exception
+     */
+    public SDbMaterialCostCenterGroup getCostCenterGroupByUser(SGuiSession session, int link, int id) throws Exception {
+        SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        String sql = "SELECT id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " " +
+                "WHERE id_link = " + link + " AND id_ref = " + id + " ";
+        ResultSet resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            ccg.read(session, new int[] { resultSet.getInt(1)} );
+        }
+        return ccg;
+    }
+    
+    /**
+     * Devuelve el objeto del grupo del centro de costo a traves del pk de la subentidad de consumo y el pk del centro de costo
+     * @param session 
+     * @param pkConsSubent 
+     * @param pkCc 
+     * @return Grupo cc
+     * @throws java.lang.Exception
+     */
+    public SDbMaterialCostCenterGroup getCostCenterGroupByUser(SGuiSession session, int[] pkConsSubent, int pkCc) throws Exception {
+        SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        String sql = "SELECT id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC_CC_GRP) + " " +
+                "WHERE id_mat_cons_ent = " + pkConsSubent[0] + " AND id_mat_cons_subent = " + pkConsSubent[1] + " AND id_cc = " + pkCc;
+        ResultSet resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            ccg.read(session, new int[] { resultSet.getInt(1)} );
+        }
+        return ccg;
+    }
+    
+    public SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
+        String sql = "";
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        SGuiOptionPickerSettings settings = null;
+        SDialogItemPicker picker = new SDialogItemPicker();
+        switch (type) {
+            case SModConsts.ITMU_ITEM:
+                switch (subtype) {
+                    case SModConsts.TRN_MAT_REQ:
+                        sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "FROM ("
+                                + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
+                                + "igen.id_link = " + SModSysConsts.ITMS_LINK_IGEN + " AND igen.id_ref = i.fid_igen " 
+                                + "UNION "
+                                + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS ii ON "
+                                + "ii.id_link = " + SModSysConsts.ITMS_LINK_ITEM + " AND ii.id_ref = i.id_item "
+                                + ") AS a "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " AS ccgu ON "
+                                + "a.id_mat_cc_grp = ccgu.id_mat_cc_grp "
+                                + "WHERE NOT a.b_del AND a.id_mat_cc_grp = " + params.getParamsMap().get(SModConsts.TRN_MAT_CC_GRP) + " "
+                                + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
+                                + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY a.item_key, a.item, a.id_item ";
+                        break;
+                }
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
+                settings = new SGuiOptionPickerSettings("Ítem", sql, gridColumns, 1);
+                
+                picker.setPickerSettings(client, type, subtype, settings);
+                break;
+        }
+        return picker;
     }
 }
