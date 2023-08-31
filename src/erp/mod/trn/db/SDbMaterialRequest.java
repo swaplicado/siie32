@@ -318,9 +318,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkUserRequesterId = resultSet.getInt("fk_usr_req");
             mnFkContractorId_n = resultSet.getInt("fk_contractor_n");
             mnFkEntMatConsumptionEntityId = resultSet.getInt("fk_ent_mat_cons_ent");
-            mnFkSubentMatConsumptionEntityId = resultSet.getInt("fk_subent_mat_cons_ent_n");
-            mnFkSubentMatConsumptionSubentityId = resultSet.getInt("fk_subent_mat_cons_subent_n");
-            mnFkCostCenterId = resultSet.getInt("fk_cc_n");
+            mnFkSubentMatConsumptionEntityId = resultSet.getInt("fk_subent_mat_cons_ent");
+            mnFkSubentMatConsumptionSubentityId = resultSet.getInt("fk_subent_mat_cons_subent");
+            mnFkCostCenterId = resultSet.getInt("fk_cc");
             mnFkUserCloseProvisionId = resultSet.getInt("fk_usr_clo_prov");
             mnFkUserClosePurchaseId = resultSet.getInt("fk_usr_clo_pur");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -519,9 +519,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_usr_req = " + mnFkUserRequesterId + ", " +
                     "fk_contractor_n = " + (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") +
                     "fk_ent_mat_cons_ent = " + mnFkEntMatConsumptionEntityId + ", " +
-                    "fk_subent_mat_cons_ent_n = " + (mnFkSubentMatConsumptionEntityId == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId + ", ") +
-                    "fk_subent_mat_cons_subent_n = " + (mnFkSubentMatConsumptionSubentityId == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId + ", ") +
-                    "fk_cc_n = " + (mnFkCostCenterId == 0 ? "NULL, " : mnFkCostCenterId + ", ") +
+                    "fk_subent_mat_cons_ent = " + (mnFkSubentMatConsumptionEntityId == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId + ", ") +
+                    "fk_subent_mat_cons_subent = " + (mnFkSubentMatConsumptionSubentityId == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId + ", ") +
+                    "fk_cc = " + (mnFkCostCenterId == 0 ? "NULL, " : mnFkCostCenterId + ", ") +
                     "fk_usr_clo_prov = " + mnFkUserCloseProvisionId + ", " +
                     "fk_usr_clo_pur = " + mnFkUserClosePurchaseId + ", " +
                     "fk_usr_ins = " + mnFkUserInsertId + ", " +

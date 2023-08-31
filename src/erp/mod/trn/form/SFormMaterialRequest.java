@@ -287,7 +287,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlConsSubent.setText("Subent. cons.:");
+        jlConsSubent.setText("Subent. cons.:*");
         jlConsSubent.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlConsSubent);
 
@@ -299,7 +299,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCostCenter.setText("Centro costo:");
+        jlCostCenter.setText("Centro costo:*");
         jlCostCenter.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlCostCenter);
 
