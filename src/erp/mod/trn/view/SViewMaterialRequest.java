@@ -321,15 +321,15 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
         
         join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
-                + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " " 
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
-                + "v.fk_ent_mat_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
+                + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " " ;
+                //+ "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
+                //+ "v.fk_ent_mat_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
         
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PET || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
             if (usrId != 2 ) { // SUPER
                 needJoin = true;
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
-                        + "OR peu.id_usr = " + usrId + " OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
+                        + "OR peu.id_usr = " + usrId + " ";//+ " OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
             }
         }
         
@@ -350,8 +350,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "smpu.name AS comp_status, "
                 + "ur.usr AS usr_req, "
                 + "bmu.bp AS contractor, "
-                + "ce.code AS cons_ent, "
-                + "cse.code AS cons_subent, "
                 + "CASE "
                     + "WHEN cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
@@ -397,10 +395,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_contractor_n = mu.id_maint_user "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bmu ON "
                 + "mu.id_maint_user = bmu.id_bp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS ce ON "
-                + "v.fk_ent_mat_cons_ent = ce.id_mat_cons_ent "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " AS cse ON "
-                + "v.fk_subent_mat_cons_ent = cse.id_mat_cons_ent AND v.fk_subent_mat_cons_subent = cse.id_mat_cons_subent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
                 + "v.fk_usr_clo_prov = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ucp ON "
@@ -422,8 +416,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cons_ent", "Ent. consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cons_subent", "Subent. consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "contractor", "Contratista"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ref", "Referencia"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));

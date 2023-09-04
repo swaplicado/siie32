@@ -479,7 +479,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
             moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDocLapsing_n()));
             */
-            moTextRequest.setValue(moMaterialRequest.getAuxConsEntName());
+//            moTextRequest.setValue(moMaterialRequest.getAuxConsEntName());
             moTextEntity.setValue(moMaterialRequest.getAuxProvEntName());
 
             showMaterialRequestEntries();

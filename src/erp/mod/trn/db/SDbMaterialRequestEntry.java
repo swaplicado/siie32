@@ -31,6 +31,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected Date mtDateRequest_n;
     protected double mdQuantity;
     protected double mdFactorConvertion;
+    protected double mdPriceUnitarySystem;
+    protected double mdPriceUnitary;
+    protected String msPriceUnitaryReference;
+    protected double mdTotal_r;
     protected int mnCosnsumptionEstimated;
     protected boolean mbNewItem;
     //protected boolean mbDeleted;
@@ -61,6 +65,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setDateRequest_n(Date t) { mtDateRequest_n = t; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setFactorConvertion(double d) { mdFactorConvertion = d; }
+    public void setPriceUnitarySystem(double d) { mdPriceUnitarySystem = d; }
+    public void setPriceUnitary(double d) { mdPriceUnitary = d; }
+    public void setPriceUnitaryReference(String s) { msPriceUnitaryReference = s; }
+    public void setTotal_r(double d) { mdTotal_r = d; }
     public void setCosnsumptionEstimated(int n) { mnCosnsumptionEstimated = n; }
     public void setNewItem(boolean b) { mbNewItem = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -82,6 +90,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public Date getDateRequest_n() { return mtDateRequest_n; }
     public double getQuantity() { return mdQuantity; }
     public double getFactorConvertion() { return mdFactorConvertion; }
+    public double getPriceUnitarySystem() { return mdPriceUnitarySystem; }
+    public double getPriceUnitary() { return mdPriceUnitary; }
+    public String getPriceUnitaryReference() { return msPriceUnitaryReference; }
+    public double getTotal_r() { return mdTotal_r; }
     public int getCosnsumptionEstimated() { return mnCosnsumptionEstimated; }
     public boolean isNewItem() { return mbNewItem; }
     public boolean isDeleted() { return mbDeleted; }
@@ -147,6 +159,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mtDateRequest_n = null;
         mdQuantity = 0;
         mdFactorConvertion = 0;
+        mdPriceUnitarySystem = 0;
+        mdPriceUnitary = 0;
+        msPriceUnitaryReference = "";
+        mdTotal_r = 0;
         mnCosnsumptionEstimated = 0;
         mbNewItem = false;
         mbDeleted = false;
@@ -217,6 +233,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mtDateRequest_n = resultSet.getDate("dt_req_n");
             mdQuantity = resultSet.getDouble("qty");
             mdFactorConvertion = resultSet.getDouble("fact_conv");
+            mdPriceUnitarySystem = resultSet.getDouble("price_u_sys");
+            mdPriceUnitary = resultSet.getDouble("price_u");
+            msPriceUnitaryReference = resultSet.getString("price_u_ref");
+            mdTotal_r = resultSet.getDouble("tot_r");
             mnCosnsumptionEstimated = resultSet.getInt("cons_est");
             mbNewItem = resultSet.getBoolean("b_new_item");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -277,6 +297,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") + 
                     mdQuantity + ", " + 
                     mdFactorConvertion + ", " + 
+                    mdPriceUnitarySystem + ", " + 
+                    mdPriceUnitary + ", " + 
+                    "'" + msPriceUnitaryReference + "', " + 
+                    mdTotal_r + ", " + 
                     mnCosnsumptionEstimated + ", " + 
                     (mbNewItem ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -299,6 +323,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     "dt_req_n = " + (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") +
                     "qty = " + mdQuantity + ", " +
                     "fact_conv = " + mdFactorConvertion + ", " +
+                    "price_u_sys = " + mdPriceUnitarySystem + ", " +
+                    "price_u = " + mdPriceUnitary + ", " +
+                    "price_u_ref = '" + msPriceUnitaryReference + "', " +
+                    "tot_r = " + mdTotal_r + ", " +
                     "cons_est = " + mnCosnsumptionEstimated + ", " +
                     "b_new_item = " + (mbNewItem ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -340,6 +368,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         registry.setDateRequest_n(this.getDateRequest_n());
         registry.setQuantity(this.getQuantity());
         registry.setFactorConvertion(this.getFactorConvertion());
+        registry.setPriceUnitarySystem(this.getPriceUnitarySystem());
+        registry.setPriceUnitary(this.getPriceUnitary());
+        registry.setPriceUnitaryReference(this.getPriceUnitaryReference());
+        registry.setTotal_r(this.getTotal_r());
         registry.setCosnsumptionEstimated(this.getCosnsumptionEstimated());
         registry.setNewItem(this.isNewItem());
         registry.setDeleted(this.isDeleted());

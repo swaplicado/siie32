@@ -6,7 +6,6 @@ package erp.mod.trn.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
-import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
@@ -603,37 +602,37 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 params.setPkWarehouseId(moKeyWarehouseEntity.getSelectedIndex() > 0 ? moKeyWarehouseEntity.getValue()[1] : 0);
                 STrnStock oStock = STrnStockSegregationUtils.getAllStock((SClientInterface) miClient, params);
                 
-                int consEntity = oMaterialRequestEntry.getFkEntMatConsumptionEntityId_n() > 0 ? 
-                                        oMaterialRequestEntry.getFkEntMatConsumptionEntityId_n() : 
-                                        moMaterialRequest.getFkEntMatConsumptionEntityId();
+//                int consEntity = oMaterialRequestEntry.getFkEntMatConsumptionEntityId_n() > 0 ? 
+//                                        oMaterialRequestEntry.getFkEntMatConsumptionEntityId_n() : 
+//                                        moMaterialRequest.getFkEntMatConsumptionEntityId();
                 
-                int subConsEntity = oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() > 0 ? 
-                                        oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() : 
-                                        moMaterialRequest.getFkSubentMatConsumptionSubentityId();
+//                int subConsEntity = oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() > 0 ? 
+//                                        oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() : 
+//                                        moMaterialRequest.getFkSubentMatConsumptionSubentityId();
+//                
+//                SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
+//                                                                            SMaterialRequestEntryRow.FORM_SUPPLY,
+//                                                                            oMaterialRequestEntry.getFkItemId(), 
+//                                                                            oMaterialRequestEntry.getFkUnitId(),
+//                                                                            consEntity,
+//                                                                            subConsEntity
+//                                                                            );
                 
-                SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
-                                                                            SMaterialRequestEntryRow.FORM_SUPPLY,
-                                                                            oMaterialRequestEntry.getFkItemId(), 
-                                                                            oMaterialRequestEntry.getFkUnitId(),
-                                                                            consEntity,
-                                                                            subConsEntity
-                                                                            );
-                
-                oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
-                oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
-                oRow.setQuantity(oMaterialRequestEntry.getQuantity());
-                oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
-                
-                double dSegregated = 0d;
-                if (mnSegregationId > 0) {
-                    params.setPkCompanyBranchId(0);
-                    params.setPkWarehouseId(0);
-                    params.setSegregationId(mnSegregationId);
-                    STrnStock oReqSeg = STrnStockSegregationUtils.getStockSegregated((SClientInterface) miClient, params);
-                
-                    dSegregated = oReqSeg.getSegregatedStock();
-                }
-                oRow.setAuxSegregated(dSegregated);
+//                oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
+//                oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
+//                oRow.setQuantity(oMaterialRequestEntry.getQuantity());
+//                oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
+//                
+//                double dSegregated = 0d;
+//                if (mnSegregationId > 0) {
+//                    params.setPkCompanyBranchId(0);
+//                    params.setPkWarehouseId(0);
+//                    params.setSegregationId(mnSegregationId);
+//                    STrnStock oReqSeg = STrnStockSegregationUtils.getStockSegregated((SClientInterface) miClient, params);
+//                
+//                    dSegregated = oReqSeg.getSegregatedStock();
+//                }
+//                oRow.setAuxSegregated(dSegregated);
                 
                 if (bReset) {
                     ArrayList<SMaterialRequestSupplyRow> lEntrySuppliesRows = SMaterialRequestUtils.getMaterialRequestSupplies(miClient, oMaterialRequestEntry.getPkMatRequestId(), oMaterialRequestEntry.getPkEntryId());
@@ -664,9 +663,9 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                                 .mapToDouble(o -> o.getQuantity())
                                 .sum();
                 }
-                oRow.setAuxSupplied(qtySupplied + qtyMemorySupplied);
-                
-                rows.add(oRow);
+//                oRow.setAuxSupplied(qtySupplied + qtyMemorySupplied);
+//                
+//                rows.add(oRow);
             }
 
             moGridMatReqEty.populateGrid(rows, this);
@@ -720,7 +719,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
             moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDocLapsing_n()));
             */
-            moTextRequest.setValue(moMaterialRequest.getAuxConsEntName());
+//            moTextRequest.setValue(moMaterialRequest.getAuxConsEntName());
             moTextEntity.setValue(moMaterialRequest.getAuxProvEntName());
 
             mlMemoryMaterialRequestSupplies = new ArrayList<>();

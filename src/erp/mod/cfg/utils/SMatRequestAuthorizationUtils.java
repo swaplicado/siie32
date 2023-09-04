@@ -46,7 +46,7 @@ public class SMatRequestAuthorizationUtils {
      */
     public static ArrayList<Integer> getConsumeEntitys(SDbMaterialRequest oMatReq) {
         ArrayList<Integer> consumeEntitys = new ArrayList<>();
-        consumeEntitys.add(oMatReq.getFkEntMatConsumptionEntityId());
+        //consumeEntitys.add(oMatReq.getFkEntMatConsumptionEntityId());
         for (SDbMaterialRequestEntry oEty : oMatReq.getChildEntries()) {
             consumeEntitys.add(oEty.getFkEntMatConsumptionEntityId_n());
         }
