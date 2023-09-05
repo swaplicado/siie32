@@ -39,3 +39,4 @@ sa*.xml
 config*.xml
 *.jrxml
 src/.tmp.driveupload/
+.tmp.driveupload/
