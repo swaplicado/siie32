@@ -105,8 +105,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private ArrayList<SDataCfdRecordRow> maCfdRecordRows = null;
     private boolean mbIsXmlTranfer = false;
 
-    /** Creates new form SFormRecord
-     * @param client */
+    /**
+     * Creates new form SFormRecord
+     * @param client GUI client.
+     */
     public SFormRecord(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -2806,7 +2808,6 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 else if (button == jbEntryShowIndirectCfd) {
                     actionPerformedEntryShowIndirectCfd();
                 }
-
                 else if (button == jbMoneyIn) {
                     actionPerformedMoneyInOut(moRecord.getDbmsDataAccountCash(), true);
                 }
@@ -2834,7 +2835,6 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 else if (button == jbMiExchangeRateDiff || button == jbCdtExchangeRateDiff) {
                     actionPerformedExchangeRateDiff(true);
                 }
-
                 else if (button == jbMoneyOut) {
                     actionPerformedMoneyInOut(moRecord.getDbmsDataAccountCash(), false);
                 }

@@ -29,6 +29,7 @@ public class SDbDocBreach extends SDbRegistryUser {
     protected String msBreachDescrip;
     protected String msFilevaultId;
     protected Date mtFilevaultTs_n;
+    protected String msFileType;
     protected boolean mbOffenderUnionized;
     /*
     protected boolean mbDeleted;
@@ -50,6 +51,8 @@ public class SDbDocBreach extends SDbRegistryUser {
     
     protected ArrayList<SDbDocBreachPreceptSubsection> maChildPreceptSubsections;
     
+    protected String msOldFilevaultId;
+    
     public SDbDocBreach() {
         super(SModConsts.HRS_DOC_BREACH);
     }
@@ -61,6 +64,7 @@ public class SDbDocBreach extends SDbRegistryUser {
     public void setBreachDescrip(String s) { msBreachDescrip = s; }
     public void setFilevaultId(String s) { msFilevaultId = s; }
     public void setFilevaultTs_n(Date t) { mtFilevaultTs_n = t; }
+    public void setFileType(String s) { msFileType = s; }
     public void setOffenderUnionized(boolean b) { mbOffenderUnionized = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkDocumentId(int n) { mnFkDocumentId = n; }
@@ -83,6 +87,7 @@ public class SDbDocBreach extends SDbRegistryUser {
     public String getBreachDescrip() { return msBreachDescrip; }
     public String getFilevaultId() { return msFilevaultId; }
     public Date getFilevaultTs_n() { return mtFilevaultTs_n; }
+    public String getFileType() { return msFileType; }
     public boolean isOffenderUnionized() { return mbOffenderUnionized; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkDocumentId() { return mnFkDocumentId; }
@@ -100,6 +105,10 @@ public class SDbDocBreach extends SDbRegistryUser {
 
     public ArrayList<SDbDocBreachPreceptSubsection> getChildPreceptSubsections() { return maChildPreceptSubsections; }
 
+    public void setOldFilevaultId(String s) { msOldFilevaultId = s; }
+    
+    public String getOldFilevaultId() { return msOldFilevaultId; }
+    
     public void setPreceptSubsectionKeys(final ArrayList<int[]> keys) {
         maChildPreceptSubsections.clear();
         
@@ -146,6 +155,7 @@ public class SDbDocBreach extends SDbRegistryUser {
         msBreachDescrip = "";
         msFilevaultId = "";
         mtFilevaultTs_n = null;
+        msFileType = "";
         mbOffenderUnionized = false;
         mbDeleted = false;
         mnFkDocumentId = 0;
@@ -162,6 +172,8 @@ public class SDbDocBreach extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         maChildPreceptSubsections = new ArrayList<>();
+        
+        msOldFilevaultId = "";
     }
 
     @Override
@@ -214,6 +226,7 @@ public class SDbDocBreach extends SDbRegistryUser {
             msBreachDescrip = resultSet.getString("breach_descrip");
             msFilevaultId = resultSet.getString("filevault_id");
             mtFilevaultTs_n = resultSet.getTimestamp("filevault_ts_n");
+            msFileType = resultSet.getString("file_type");
             mbOffenderUnionized = resultSet.getBoolean("b_offender_uni");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkDocumentId = resultSet.getInt("fk_doc");
@@ -244,6 +257,10 @@ public class SDbDocBreach extends SDbRegistryUser {
                 maChildPreceptSubsections.add(child);
             }
             
+            // preserve old values:
+            
+            msOldFilevaultId = msFilevaultId;
+            
             // finish reading:
 
             mbRegistryNew = false;
@@ -257,9 +274,25 @@ public class SDbDocBreach extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
+        // get next number:
+        
         if (mnNumber == 0) {
             mnNumber = getNextNumber(session);
         }
+        
+        // normalize timestamp of filevalut:
+        
+        String filevaultTs_n = "";
+        
+        if (msFilevaultId.isEmpty()) {
+            filevaultTs_n = "NULL";
+            msFileType = "";
+        }
+        else if (!msFilevaultId.equals(msOldFilevaultId)) {
+            filevaultTs_n = "NOW()";
+        }
+        
+        // save registry:
 
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -275,7 +308,8 @@ public class SDbDocBreach extends SDbRegistryUser {
                     "'" + msBreachAbstract + "', " + 
                     "'" + msBreachDescrip + "', " + 
                     "'" + msFilevaultId + "', " + 
-                    (mtFilevaultTs_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtFilevaultTs_n) + "'") + ", " + 
+                    filevaultTs_n + ", " + 
+                    "'" + msFileType + "', " + 
                     (mbOffenderUnionized ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkDocumentId + ", " + 
@@ -302,7 +336,8 @@ public class SDbDocBreach extends SDbRegistryUser {
                     "breach_abstract = '" + msBreachAbstract + "', " +
                     "breach_descrip = '" + msBreachDescrip + "', " +
                     "filevault_id = '" + msFilevaultId + "', " +
-                    "filevault_ts_n = " + (mtFilevaultTs_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtFilevaultTs_n) + "'") + ", " +
+                    "filevault_ts_n = " + filevaultTs_n + ", " +
+                    "file_type = '" + msFileType + "', " +
                     "b_offender_uni = " + (mbOffenderUnionized ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_doc = " + mnFkDocumentId + ", " +
@@ -356,6 +391,7 @@ public class SDbDocBreach extends SDbRegistryUser {
         registry.setBreachDescrip(this.getBreachDescrip());
         registry.setFilevaultId(this.getFilevaultId());
         registry.setFilevaultTs_n(this.getFilevaultTs_n());
+        registry.setFileType(this.getFileType());
         registry.setOffenderUnionized(this.isOffenderUnionized());
         registry.setDeleted(this.isDeleted());
         registry.setFkDocumentId(this.getFkDocumentId());
@@ -374,6 +410,8 @@ public class SDbDocBreach extends SDbRegistryUser {
         for (SDbDocBreachPreceptSubsection child : maChildPreceptSubsections) {
             registry.getChildPreceptSubsections().add(child.clone());
         }
+        
+        registry.setOldFilevaultId(this.getOldFilevaultId());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

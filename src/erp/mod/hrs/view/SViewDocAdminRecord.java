@@ -9,8 +9,9 @@ import erp.data.SDataConstantsSys;
 import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbDocument;
-import erp.mod.hrs.db.SDbDocBreach;
+import erp.mod.hrs.db.SDbDocAdminRecord;
 import erp.mod.hrs.utils.SDocUtils;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -43,7 +44,7 @@ import sa.lib.gui.SGuiConsts;
  *
  * @author Sergio Flores
  */
-public class SViewDocBreach extends SGridPaneView implements ActionListener {
+public class SViewDocAdminRecord extends SGridPaneView implements ActionListener {
     
     private int mnFilterAuthorId;
     private JFileChooser moFileChooserUpload;
@@ -56,21 +57,21 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
     private JButton jbFileView;
     private JButton jbFileDelete;
 
-    public SViewDocBreach(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_DOC_BREACH, 0, title);
+    public SViewDocAdminRecord(SGuiClient client, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_DOC_ADM_REC, 0, title);
         initComponents();
     }
     
     private void initComponents() {
-        int levelRightDocBreach = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_HRS_DOC_BREACH).Level;
-        boolean enableNew = levelRightDocBreach >= SUtilConsts.LEV_CAPTURE;
-        boolean enableCopy = levelRightDocBreach >= SUtilConsts.LEV_CAPTURE;
-        boolean enableEdit = levelRightDocBreach >= SUtilConsts.LEV_CAPTURE;
-        boolean enableDelete = levelRightDocBreach >= SUtilConsts.LEV_MANAGER;
+        int levelRightDocAdminRecord = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_HRS_DOC_ADM_REC).Level;
+        boolean enableNew = levelRightDocAdminRecord >= SUtilConsts.LEV_CAPTURE;
+        boolean enableCopy = levelRightDocAdminRecord >= SUtilConsts.LEV_CAPTURE;
+        boolean enableEdit = levelRightDocAdminRecord >= SUtilConsts.LEV_CAPTURE;
+        boolean enableDelete = levelRightDocAdminRecord >= SUtilConsts.LEV_MANAGER;
         
         setRowButtonsEnabled(enableNew, enableCopy, enableEdit, false, enableDelete);
         
-        if (levelRightDocBreach == SUtilConsts.LEV_CAPTURE || levelRightDocBreach == SUtilConsts.LEV_AUTHOR) {
+        if (levelRightDocAdminRecord == SUtilConsts.LEV_CAPTURE || levelRightDocAdminRecord == SUtilConsts.LEV_AUTHOR) {
             mnFilterAuthorId = miClient.getSession().getUser().getPkUserId();
             
             JTextField author = new JTextField(miClient.getSession().getUser().getName());
@@ -130,12 +131,12 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "db.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "dar.b_del = 0 ";
         }
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_YEAR).getValue();
         if (filter != null && filter instanceof int[]) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "YEAR(db.breach_ts) = " + ((int[]) filter)[0] + " ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "YEAR(dar.rec_dt_sta) = " + ((int[]) filter)[0] + " ";
         }
 
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
@@ -145,7 +146,7 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSU_DEP)).getValue();
         if (filter != null && ((int[]) filter).length == 1) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "db.fk_offender_dep = " + ((int[]) filter)[0] + " ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "dar.fk_offender_dep = " + ((int[]) filter)[0] + " ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
@@ -162,71 +163,82 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
         }
         
         if (mnFilterAuthorId != 0) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "db.fk_usr_ins = " + mnFilterAuthorId + " ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "dar.fk_usr_ins = " + mnFilterAuthorId + " ";
         }
         
         msSql = "SELECT "
-                + "db.id_doc_breach AS " + SDbConsts.FIELD_ID + "1, "
-                + "db.num, "
-                + "db.num AS " + SDbConsts.FIELD_CODE + ", "
-                + "db.num AS " + SDbConsts.FIELD_NAME + ", "
-                + "db.breach_ts, "
-                + "db.breach_abstract, "
-                + "db.filevault_id, "
-                + "db.filevault_ts_n, "
-                + "db.file_type, "
-                + "db.b_offender_uni, "
+                + "dar.id_doc_adm_rec AS " + SDbConsts.FIELD_ID + "1, "
+                + "dar.num, "
+                + "dar.num AS " + SDbConsts.FIELD_CODE + ", "
+                + "dar.num AS " + SDbConsts.FIELD_NAME + ", "
+                + "dar.rec_dt_sta, "
+                + "dar.rec_dt_end, "
+                + "dar.breach_abstract, "
+                + "dar.filevault_id, "
+                + "dar.filevault_ts_n, "
+                + "dar.file_type, "
+                + "dar.b_offender_uni, "
+                + "dar.b_hrs_witness_1, "
+                + "dar.b_hrs_witness_2, "
                 + "cob.code AS _cob_code, "
-                + "ba.bp AS _emp_author, "
                 + "bo.bp AS _emp_offender, "
                 + "bb.bp AS _emp_boss, "
+                + "bh.bp AS _emp_hrs, "
                 + "bu.bp AS _emp_union_n, "
+                + "bw1.bp AS _emp_witness_1, "
+                + "bw2.bp AS _emp_witness_2, "
                 + "emp.num, "
                 + "emp.b_act, "
                 + "dep.name AS _dep_name, "
                 + "pos.name AS _pos_name, "
-                + "db.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "db.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                + "db.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
-                + "db.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
-                + "db.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
+                + "dar.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "dar.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                + "dar.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
+                + "dar.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                + "dar.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DOC_BREACH) + " AS db "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON cob.id_bpb = db.fk_cob "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba ON ba.id_bp = db.fk_emp_author "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bo ON bo.id_bp = db.fk_emp_offender "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bb ON bb.id_bp = db.fk_emp_boss "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = db.fk_emp_offender "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = db.fk_offender_dep "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " AS pos ON pos.id_pos = db.fk_offender_pos "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON db.fk_usr_ins = ui.id_usr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON db.fk_usr_upd = uu.id_usr "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bu ON bu.id_bp = db.fk_emp_union_n "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DOC_ADM_REC) + " AS dar "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON cob.id_bpb = dar.fk_cob "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bo ON bo.id_bp = dar.fk_emp_offender "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bb ON bb.id_bp = dar.fk_emp_boss "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bh ON bh.id_bp = dar.fk_emp_hrs "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bw1 ON bw1.id_bp = dar.fk_emp_witness_1 "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bw2 ON bw2.id_bp = dar.fk_emp_witness_2 "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = dar.fk_emp_offender "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = dar.fk_offender_dep "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " AS pos ON pos.id_pos = dar.fk_offender_pos "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON dar.fk_usr_ins = ui.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON dar.fk_usr_upd = uu.id_usr "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bu ON bu.id_bp = dar.fk_emp_union_n "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY db.num, db.id_doc_breach ";
+                + "ORDER BY dar.num, dar.id_doc_adm_rec ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "db.num", "Folio"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "dar.num", "Folio"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "_cob_code", "Sucursal"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "db.breach_ts", "Fecha-hr"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "dar.rec_dt_sta", "Fecha-hr inicial"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_offender", "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "emp.num", "Clave"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "emp.b_act", "Activo empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_dep_name", "Depto. empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pos_name", "Puesto empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "db.b_offender_uni", "Sindicalizado empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "db.breach_abstract", "Falta cometida"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_author", "Reporta"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "dar.b_offender_uni", "Sindicalizado empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "dar.breach_abstract", "Falta cometida"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_boss", "Jefe inmediato"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_hrs", "Rep. patronal"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_union_n", "Rep. sindical"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "db.filevault_id", "ID documento"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "db.filevault_ts_n", "TS documento"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "db.file_type", "Tipo archivo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_witness_1", "Testigo #1"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "dar.b_hrs_witness_1", "Testigo #1 es RRHH"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_witness_2", "Testigo #2"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "dar.b_hrs_witness_2", "Testigo #2 es RRHH"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "dar.filevault_id", "ID documento"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "dar.filevault_ts_n", "TS documento"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "dar.file_type", "Tipo archivo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
@@ -253,17 +265,67 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SDbDocBreach docBreach = (SDbDocBreach) miClient.getSession().readRegistry(SModConsts.HRS_DOC_BREACH, gridRow.getRowPrimaryKey());
-                SDbDocument document = (SDbDocument) miClient.getSession().readRegistry(SModConsts.CFGU_DOC, new int[] { docBreach.getFkDocumentId() });
-                
-                HashMap<String, Object> paramsMap = miClient.createReportParams();
-                paramsMap.put("docId", (long) docBreach.getPkDocBreachId());
-                paramsMap.put("docCode", document.getCode());
-                paramsMap.put("docName", document.getName());
-                paramsMap.put("docNotes", document.getNotes());
-                paramsMap.put("docPreceptSubsections", SDocUtils.composePreceptSubsections(miClient.getSession(), docBreach.getPreceptSubsectionKeys(), " "));
-                
-                miClient.getSession().printReport(SModConsts.HRSR_DOC_BREACH, 0, null, paramsMap);
+                try {
+                    SDbDocAdminRecord docAdminRecord = (SDbDocAdminRecord) miClient.getSession().readRegistry(SModConsts.HRS_DOC_ADM_REC, gridRow.getRowPrimaryKey());
+                    SDbDocument document = (SDbDocument) miClient.getSession().readRegistry(SModConsts.CFGU_DOC, new int[] { docAdminRecord.getFkDocumentId() });
+
+                    HashMap<String, Object> paramsMap = miClient.createReportParams();
+                    paramsMap.put("docId", (long) docAdminRecord.getPkDocAdminRecordId());
+                    paramsMap.put("docCode", document.getCode());
+                    paramsMap.put("docName", document.getName());
+                    paramsMap.put("docNotes", document.getNotes());
+                    paramsMap.put("docPreceptSubsections", SDocUtils.composePreceptSubsections(miClient.getSession(), docAdminRecord.getPreceptSubsectionKeys(), " "));
+
+                    String value;
+                    HashMap<String, String> docDataValuesMap = SDocUtils.getDocDataValuesMap(miClient.getSession(), SModSysConsts.CFGS_TP_DOC_ADM_REC);
+                    
+                    value = docDataValuesMap.get(SDocUtils.VAL_DOC_ADM_REC_ORG);
+                    if (value != null) {
+                        paramsMap.put("termOrg", value);
+                        paramsMap.put("termOrgU", SLibUtils.textFirstUpperCase(value));
+                    }
+                    
+                    value = docDataValuesMap.get(SDocUtils.VAL_DOC_ADM_REC_PRON);
+                    if (value != null) {
+                        paramsMap.put("termPronoun", value);
+                        paramsMap.put("termPronounU", SLibUtils.textFirstUpperCase(value));
+                    }
+                    
+                    value = docDataValuesMap.get(SDocUtils.VAL_DOC_ADM_REC_EMP);
+                    if (value != null) {
+                        paramsMap.put("termEmployee", value);
+                        paramsMap.put("termEmployeeU", SLibUtils.textFirstUpperCase(value));
+                    }
+                    
+                    value = docDataValuesMap.get(SDocUtils.VAL_DOC_ADM_REC_BOSS);
+                    if (value != null) {
+                        paramsMap.put("termBoss", value);
+                        paramsMap.put("termBossU", SLibUtils.textFirstUpperCase(value));
+                    }
+                    
+                    value = docDataValuesMap.get(SDocUtils.VAL_DOC_ADM_REC_LIAB);
+                    if (value != null) {
+                        paramsMap.put("termLiable", value);
+                        paramsMap.put("termLiableU", SLibUtils.textFirstUpperCase(value));
+                    }
+                    
+                    value = docDataValuesMap.get(SDocUtils.VAL_DOC_ADM_REC_REP);
+                    if (value != null) {
+                        paramsMap.put("termRepresent", value);
+                        paramsMap.put("termRepresentU", SLibUtils.textFirstUpperCase(value));
+                    }
+                    
+                    value = docDataValuesMap.get(SDocUtils.VAL_DOC_ADM_REC_WIT);
+                    if (value != null) {
+                        paramsMap.put("termWitness", value);
+                        paramsMap.put("termWitnessU", SLibUtils.textFirstUpperCase(value));
+                    }
+                    
+                    miClient.getSession().printReport(SModConsts.HRSR_DOC_ADM_REC, 0, null, paramsMap);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
             }
         }
     }
@@ -276,10 +338,10 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SDbDocBreach docBreach = (SDbDocBreach) miClient.getSession().readRegistry(SModConsts.HRS_DOC_BREACH, gridRow.getRowPrimaryKey());
+                SDbDocAdminRecord docAdminRecord = (SDbDocAdminRecord) miClient.getSession().readRegistry(SModConsts.HRS_DOC_ADM_REC, gridRow.getRowPrimaryKey());
                 
-                if (!docBreach.getFilevaultId().isEmpty()) {
-                    miClient.showMsgBoxWarning("Este documento ya tiene un archivo (ID: '" + docBreach.getFilevaultId() + "', TS: '" + SLibUtils.DateFormatDatetime.format(docBreach.getFilevaultTs_n()) + "').");
+                if (!docAdminRecord.getFilevaultId().isEmpty()) {
+                    miClient.showMsgBoxWarning("Este documento ya tiene un archivo (ID: '" + docAdminRecord.getFilevaultId() + "', TS: '" + SLibUtils.DateFormatDatetime.format(docAdminRecord.getFilevaultTs_n()) + "').");
                 }
                 else {
                     moFileChooserUpload.setSelectedFile(new File("")); // clear previous selected file
@@ -288,10 +350,10 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                         try {
                             File file = moFileChooserUpload.getSelectedFile();
                             String fileType = SDocUtils.isPdf(file) ? SDocUtils.FILE_TYPE_PDF : SDocUtils.FILE_TYPE_IMG;
-                            String filevaultId = SDocUtils.uploadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_BREACH, fileType, file);
-                            docBreach.setFilevaultId(filevaultId);
-                            docBreach.setFileType(fileType);
-                            docBreach.save(miClient.getSession());
+                            String filevaultId = SDocUtils.uploadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_ADM_REC, fileType, file);
+                            docAdminRecord.setFilevaultId(filevaultId);
+                            docAdminRecord.setFileType(fileType);
+                            docAdminRecord.save(miClient.getSession());
                             miClient.getSession().notifySuscriptors(mnGridType);
                             
                             miClient.showMsgBoxInformation("El archivo del documento '" + file.getName() + "' (ID: '" + filevaultId + "') ha sido cargado.");
@@ -313,8 +375,8 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SDbDocBreach docBreach = (SDbDocBreach) miClient.getSession().readRegistry(SModConsts.HRS_DOC_BREACH, gridRow.getRowPrimaryKey());
-                String filevaultId = docBreach.getFilevaultId();
+                SDbDocAdminRecord docAdminRecord = (SDbDocAdminRecord) miClient.getSession().readRegistry(SModConsts.HRS_DOC_ADM_REC, gridRow.getRowPrimaryKey());
+                String filevaultId = docAdminRecord.getFilevaultId();
                 
                 if (filevaultId.isEmpty()) {
                     miClient.showMsgBoxWarning("Este documento no tiene archivo.");
@@ -322,7 +384,7 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 else {
                     if (moFileChooserDownload.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                         try {
-                            String filename = SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_BREACH, filevaultId, moFileChooserDownload.getSelectedFile());
+                            String filename = SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_ADM_REC, filevaultId, moFileChooserDownload.getSelectedFile());
                             
                             miClient.showMsgBoxInformation("El archivo del documento '" + filename + "' (ID: '" + filevaultId + "') ha sido descargado.");
                         }
@@ -344,8 +406,8 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
             }
             else {
                 try {
-                    SDbDocBreach docBreach = (SDbDocBreach) miClient.getSession().readRegistry(SModConsts.HRS_DOC_BREACH, gridRow.getRowPrimaryKey());
-                    SDocUtils.viewFile(miClient, SDocUtils.BUCKET_DOC_BREACH, docBreach.getFilevaultId());
+                    SDbDocAdminRecord docAdminRecord = (SDbDocAdminRecord) miClient.getSession().readRegistry(SModConsts.HRS_DOC_ADM_REC, gridRow.getRowPrimaryKey());
+                    SDocUtils.viewFile(miClient, SDocUtils.BUCKET_DOC_ADM_REC, docAdminRecord.getFilevaultId());
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -362,8 +424,8 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SDbDocBreach docBreach = (SDbDocBreach) miClient.getSession().readRegistry(SModConsts.HRS_DOC_BREACH, gridRow.getRowPrimaryKey());
-                String filevaultId = docBreach.getFilevaultId();
+                SDbDocAdminRecord docAdminRecord = (SDbDocAdminRecord) miClient.getSession().readRegistry(SModConsts.HRS_DOC_ADM_REC, gridRow.getRowPrimaryKey());
+                String filevaultId = docAdminRecord.getFilevaultId();
                 
                 if (filevaultId.isEmpty()) {
                     miClient.showMsgBoxWarning("Este documento no tiene archivo.");
@@ -371,10 +433,10 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 else {
                     if (miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar el archivo del documento (ID: '" + filevaultId + "')?") == JOptionPane.YES_OPTION) {
                         try {
-                            String filename = SDocUtils.deleteFile(miClient.getSession(), SDocUtils.BUCKET_DOC_BREACH, filevaultId);
-                            docBreach.setFilevaultId("");
-                            docBreach.setFileType("");
-                            docBreach.save(miClient.getSession());
+                            String filename = SDocUtils.deleteFile(miClient.getSession(), SDocUtils.BUCKET_DOC_ADM_REC, filevaultId);
+                            docAdminRecord.setFilevaultId("");
+                            docAdminRecord.setFileType("");
+                            docAdminRecord.save(miClient.getSession());
                             miClient.getSession().notifySuscriptors(mnGridType);
                             
                             miClient.showMsgBoxInformation("El archivo del documento '" + filename + "' (ID: '" + filevaultId + "') ha sido eliminado.");

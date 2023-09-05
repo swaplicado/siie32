@@ -74,7 +74,7 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_doc_admin_rec = " + mnPkDocAdminRecordId + " "
+        return "WHERE id_doc_adm_rec = " + mnPkDocAdminRecordId + " "
                 + "AND id_prec = " + mnPkPreceptId + " "
                 + "AND id_sec = " + mnPkSectionId + " "
                 + "AND id_subsec = " + mnPkSubsectionId + " ";
@@ -82,7 +82,7 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_doc_admin_rec = " + pk[0] + " "
+        return "WHERE id_doc_adm_rec = " + pk[0] + " "
                 + "AND id_prec = " + pk[1] + " "
                 + "AND id_sec = " + pk[2] + " "
                 + "AND id_subsec = " + pk[3]+ " ";
@@ -107,7 +107,7 @@ public class SDbDocAdminRecordPreceptSubsection extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkDocAdminRecordId = resultSet.getInt("id_doc_admin_rec");
+            mnPkDocAdminRecordId = resultSet.getInt("id_doc_adm_rec");
             mnPkPreceptId = resultSet.getInt("id_prec");
             mnPkSectionId = resultSet.getInt("id_sec");
             mnPkSubsectionId = resultSet.getInt("id_subsec");

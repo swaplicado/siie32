@@ -33,7 +33,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     protected String msOffenderComments2;
     protected String msFilevaultId;
     protected Date mtFilevaultTs_n;
+    protected String msFileType;
     protected boolean mbOffenderUnionized;
+    protected boolean mbHumanResourcesWitness1;
+    protected boolean mbHumanResourcesWitness2;
     /*
     protected boolean mbDeleted;
     */
@@ -59,6 +62,8 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     
     protected ArrayList<SDbDocAdminRecordPreceptSubsection> maChildPreceptSubsections;
     
+    protected String msOldFilevaultId;
+    
     public SDbDocAdminRecord() {
         super(SModConsts.HRS_DOC_ADM_REC);
     }
@@ -74,7 +79,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     public void setOffenderComments2(String s) { msOffenderComments2 = s; }
     public void setFilevaultId(String s) { msFilevaultId = s; }
     public void setFilevaultTs_n(Date t) { mtFilevaultTs_n = t; }
+    public void setFileType(String s) { msFileType = s; }
     public void setOffenderUnionized(boolean b) { mbOffenderUnionized = b; }
+    public void setHumanResourcesWitness1(boolean b) { mbHumanResourcesWitness1 = b; }
+    public void setHumanResourcesWitness2(boolean b) { mbHumanResourcesWitness2 = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkDocumentId(int n) { mnFkDocumentId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
@@ -105,7 +113,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     public String getOffenderComments2() { return msOffenderComments2; }
     public String getFilevaultId() { return msFilevaultId; }
     public Date getFilevaultTs_n() { return mtFilevaultTs_n; }
+    public String getFileType() { return msFileType; }
     public boolean isOffenderUnionized() { return mbOffenderUnionized; }
+    public boolean isHumanResourcesWitness1() { return mbHumanResourcesWitness1; }
+    public boolean isHumanResourcesWitness2() { return mbHumanResourcesWitness2; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkDocumentId() { return mnFkDocumentId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
@@ -126,6 +137,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
     public ArrayList<SDbDocAdminRecordPreceptSubsection> getChildPreceptSubsections() { return maChildPreceptSubsections; }
+    
+    public void setOldFilevaultId(String s) { msOldFilevaultId = s; }
+    
+    public String getOldFilevaultId() { return msOldFilevaultId; }
     
     public void setPreceptSubsectionKeys(final ArrayList<int[]> keys) {
         maChildPreceptSubsections.clear();
@@ -177,7 +192,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         msOffenderComments2 = null;
         msFilevaultId = "";
         mtFilevaultTs_n = null;
+        msFileType = "";
         mbOffenderUnionized = false;
+        mbHumanResourcesWitness1 = false;
+        mbHumanResourcesWitness2 = false;
         mbDeleted = false;
         mnFkDocumentId = 0;
         mnFkCompanyBranchId = 0;
@@ -198,6 +216,8 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         maChildPreceptSubsections = new ArrayList<>();
+        
+        msOldFilevaultId = "";
     }
 
     @Override
@@ -254,7 +274,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
             msOffenderComments2 = resultSet.getString("offender_cmts_2");
             msFilevaultId = resultSet.getString("filevault_id");
             mtFilevaultTs_n = resultSet.getTimestamp("filevault_ts_n");
+            msFileType = resultSet.getString("file_type");
             mbOffenderUnionized = resultSet.getBoolean("b_offender_uni");
+            mbHumanResourcesWitness1 = resultSet.getBoolean("b_hrs_witness_1");
+            mbHumanResourcesWitness2 = resultSet.getBoolean("b_hrs_witness_2");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkDocumentId = resultSet.getInt("fk_doc");
             mnFkCompanyBranchId = resultSet.getInt("fk_cob");
@@ -289,6 +312,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
                 maChildPreceptSubsections.add(child);
             }
             
+            // preserve old values:
+            
+            msOldFilevaultId = msFilevaultId;
+            
             // finish reading:
 
             mbRegistryNew = false;
@@ -302,9 +329,25 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
+        // get next number:
+        
         if (mnNumber == 0) {
             mnNumber = getNextNumber(session);
         }
+        
+        // normalize timestamp of filevalut:
+        
+        String filevaultTs_n = "";
+        
+        if (msFilevaultId.isEmpty()) {
+            filevaultTs_n = "NULL";
+            msFileType = "";
+        }
+        else if (!msFilevaultId.equals(msOldFilevaultId)) {
+            filevaultTs_n = "NOW()";
+        }
+        
+        // save registry:
 
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -324,8 +367,11 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
                     "'" + msOffenderComments1 + "', " + 
                     "'" + msOffenderComments2 + "', " + 
                     "'" + msFilevaultId + "', " + 
-                    (mtFilevaultTs_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtFilevaultTs_n) + "'") + ", " + 
+                    filevaultTs_n + ", " + 
+                    "'" + msFileType + "', " + 
                     (mbOffenderUnionized ? 1 : 0) + ", " + 
+                    (mbHumanResourcesWitness1 ? 1 : 0) + ", " + 
+                    (mbHumanResourcesWitness2 ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkDocumentId + ", " + 
                     mnFkCompanyBranchId + ", " + 
@@ -343,7 +389,7 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
-                    "NOW()" + ", " + 
+                    "NOW()" + " " + 
                     ")";
         }
         else {
@@ -360,8 +406,11 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
                     "offender_cmts_1 = '" + msOffenderComments1 + "', " +
                     "offender_cmts_2 = '" + msOffenderComments2 + "', " +
                     "filevault_id = '" + msFilevaultId + "', " +
-                    "filevault_ts_n = " + (mtFilevaultTs_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtFilevaultTs_n) + "'") + ", " +
+                    "filevault_ts_n = " + filevaultTs_n + ", " +
+                    "file_type = '" + msFileType + "', " +
                     "b_offender_uni = " + (mbOffenderUnionized ? 1 : 0) + ", " +
+                    "b_hrs_witness_1 = " + (mbHumanResourcesWitness1 ? 1 : 0) + ", " +
+                    "b_hrs_witness_2 = " + (mbHumanResourcesWitness2 ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_doc = " + mnFkDocumentId + ", " +
                     "fk_cob = " + mnFkCompanyBranchId + ", " +
@@ -423,7 +472,10 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         registry.setOffenderComments2(this.getOffenderComments2());
         registry.setFilevaultId(this.getFilevaultId());
         registry.setFilevaultTs_n(this.getFilevaultTs_n());
+        registry.setFileType(this.getFileType());
         registry.setOffenderUnionized(this.isOffenderUnionized());
+        registry.setHumanResourcesWitness1(this.isHumanResourcesWitness1());
+        registry.setHumanResourcesWitness2(this.isHumanResourcesWitness2());
         registry.setDeleted(this.isDeleted());
         registry.setFkDocumentId(this.getFkDocumentId());
         registry.setFkCompanyBranchId(this.getFkCompanyBranchId());
@@ -446,6 +498,8 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         for (SDbDocAdminRecordPreceptSubsection child : maChildPreceptSubsections) {
             registry.getChildPreceptSubsections().add(child.clone());
         }
+
+        registry.setOldFilevaultId(this.getOldFilevaultId());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

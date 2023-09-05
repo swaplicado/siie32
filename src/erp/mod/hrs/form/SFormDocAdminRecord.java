@@ -5,13 +5,17 @@
 package erp.mod.hrs.form;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.gui.session.SSessionCustom;
+import erp.lib.SLibConstants;
+import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbDocument;
-import erp.mod.hrs.db.SDbDocBreach;
+import erp.mod.hrs.db.SDbDocAdminRecord;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.musr.data.SDataUser;
@@ -38,9 +42,9 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Sergio Flores
  */
-public class SFormDocBreach extends SBeanForm implements ActionListener {
+public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
     
-    private SDbDocBreach moRegistry;
+    private SDbDocAdminRecord moRegistry;
     private SDbEmployee moOffender;
     private SPickerEmployee moPickerEmployee;
     private SPickerPreceptSubsections moPickerPreceptSubsections;
@@ -51,19 +55,22 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
     private int mnPrivilegeLevel;
     private int mnEmployeeOffenderId;
     private int mnEmployeeBossId;
-    private int mnEmployeeAuthorId;
+    private int mnEmployeeHumanResourcesId;
     private int mnEmployeeUnionId_n;
+    private int mnEmployeeWitness1;
+    private int mnEmployeeWitness2;
+    private int mnHumanResoursesDepartmentId;
     private int mnOffenderDepartmentId;
     private int mnOffenderPositionId;
     private ArrayList<int[]> maPreceptSubsectionKeys;
 
     /**
-     * Creates new form SFormDocBreach
+     * Creates new form SFormDocAdminRecord
      * @param client GUI client.
      * @param title Title.
      */
-    public SFormDocBreach(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_DOC_BREACH, 0, title);
+    public SFormDocAdminRecord(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_DOC_ADM_REC, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -88,21 +95,26 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         jlNumber = new javax.swing.JLabel();
         jtfNumber = new javax.swing.JTextField();
         jtfCompanyBranchCode = new javax.swing.JTextField();
+        jtfLocality = new javax.swing.JTextField();
+        jtfState = new javax.swing.JTextField();
         jPanelDocN3 = new javax.swing.JPanel();
-        jlDatetime = new javax.swing.JLabel();
-        moDatetime = new sa.lib.gui.bean.SBeanFieldDatetime();
-        jlDatetimeHelp = new javax.swing.JLabel();
+        jlDatetimeStart = new javax.swing.JLabel();
+        moDatetimeStart = new sa.lib.gui.bean.SBeanFieldDatetime();
+        jlDatetimeStartHelp = new javax.swing.JLabel();
+        jPanelDocN7 = new javax.swing.JPanel();
+        jlDatetimeEnd = new javax.swing.JLabel();
+        moDatetimeEnd = new sa.lib.gui.bean.SBeanFieldDatetime();
+        jlDatetimeEndHelp = new javax.swing.JLabel();
         jPanelDocN4 = new javax.swing.JPanel();
-        jPanelDocN5 = new javax.swing.JPanel();
         jlEmployeeOffender = new javax.swing.JLabel();
         jtfEmployeeOffender = new javax.swing.JTextField();
         jbPickEmployeeOffender = new javax.swing.JButton();
-        jPanelDocN6 = new javax.swing.JPanel();
+        jPanelDocN5 = new javax.swing.JPanel();
         jlOffenderDepartment = new javax.swing.JLabel();
         jtfOffenderDepartmentName = new javax.swing.JTextField();
         jtfOffenderDepartmentCode = new javax.swing.JTextField();
         jckOffenderActive = new javax.swing.JCheckBox();
-        jPanelDocN7 = new javax.swing.JPanel();
+        jPanelDocN6 = new javax.swing.JPanel();
         jlOffenderPosition = new javax.swing.JLabel();
         jtfOffenderPositionName = new javax.swing.JTextField();
         jtfOffenderPositionCode = new javax.swing.JTextField();
@@ -112,15 +124,24 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         jtfEmployeeBoss = new javax.swing.JTextField();
         jbPickEmployeeBoss = new javax.swing.JButton();
         jPanelDocN9 = new javax.swing.JPanel();
-        jlEmployeeAuthor = new javax.swing.JLabel();
-        jtfEmployeeAuthor = new javax.swing.JTextField();
-        jbPickEmployeeAuthor = new javax.swing.JButton();
+        jlEmployeeHumanResources = new javax.swing.JLabel();
+        jtfEmployeeHumanResources = new javax.swing.JTextField();
+        jbPickEmployeeHumanResources = new javax.swing.JButton();
+        jlEmployeeHumanResourcesHelp = new javax.swing.JLabel();
         jPanelDocN10 = new javax.swing.JPanel();
         jlEmployeeUnion_n = new javax.swing.JLabel();
         jtfEmployeeUnion_n = new javax.swing.JTextField();
         jbPickEmployeeUnion_n = new javax.swing.JButton();
         jPanelDocN11 = new javax.swing.JPanel();
+        jlEmployeeWitness1 = new javax.swing.JLabel();
+        jtfEmployeeWitness1 = new javax.swing.JTextField();
+        jbPickEmployeeWitness1 = new javax.swing.JButton();
+        moBoolHumanResourcesWitness1 = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanelDocN12 = new javax.swing.JPanel();
+        jlEmployeeWitness2 = new javax.swing.JLabel();
+        jtfEmployeeWitness2 = new javax.swing.JTextField();
+        jbPickEmployeeWitness2 = new javax.swing.JButton();
+        moBoolHumanResourcesWitness2 = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanelDocC = new javax.swing.JPanel();
         jPanelDocC1 = new javax.swing.JPanel();
         jPanelDocC11 = new javax.swing.JPanel();
@@ -145,6 +166,14 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         jlBreachDescrip = new javax.swing.JLabel();
         jspBreachDescrip = new javax.swing.JScrollPane();
         jtaBreachDescrip = new javax.swing.JTextArea();
+        jPanelSanC12 = new javax.swing.JPanel();
+        jlOffenderComments1 = new javax.swing.JLabel();
+        jspOffenderComments1 = new javax.swing.JScrollPane();
+        jtaOffenderComments1 = new javax.swing.JTextArea();
+        jPanelSanC13 = new javax.swing.JPanel();
+        jlOffenderComments2 = new javax.swing.JLabel();
+        jspOffenderComments2 = new javax.swing.JScrollPane();
+        jtaOffenderComments2 = new javax.swing.JTextArea();
 
         jPanel.setLayout(new java.awt.BorderLayout());
 
@@ -192,95 +221,120 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         jtfCompanyBranchCode.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanelDocN2.add(jtfCompanyBranchCode);
 
+        jtfLocality.setEditable(false);
+        jtfLocality.setText("TEXT");
+        jtfLocality.setToolTipText("Localidad");
+        jtfLocality.setFocusable(false);
+        jtfLocality.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanelDocN2.add(jtfLocality);
+
+        jtfState.setEditable(false);
+        jtfState.setText("TEXT");
+        jtfState.setToolTipText("Estado");
+        jtfState.setFocusable(false);
+        jtfState.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanelDocN2.add(jtfState);
+
         jPanelDocN.add(jPanelDocN2);
 
         jPanelDocN3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDatetime.setText("Fecha-hr:*");
-        jlDatetime.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanelDocN3.add(jlDatetime);
-        jPanelDocN3.add(moDatetime);
+        jlDatetimeStart.setText("Fecha-hr inicial:*");
+        jlDatetimeStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanelDocN3.add(jlDatetimeStart);
+        jPanelDocN3.add(moDatetimeStart);
 
-        jlDatetimeHelp.setForeground(java.awt.Color.gray);
-        jlDatetimeHelp.setText("formato: dd/mm/aaaa hh:mm:ss (24 hr)");
-        jlDatetimeHelp.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanelDocN3.add(jlDatetimeHelp);
+        jlDatetimeStartHelp.setForeground(java.awt.Color.gray);
+        jlDatetimeStartHelp.setText("formato: dd/mm/aaaa hh:mm:ss (24 hr)");
+        jlDatetimeStartHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanelDocN3.add(jlDatetimeStartHelp);
 
         jPanelDocN.add(jPanelDocN3);
 
-        jPanelDocN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanelDocN.add(jPanelDocN4);
+        jPanelDocN7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanelDocN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jlDatetimeEnd.setText("Fecha-hr final:*");
+        jlDatetimeEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanelDocN7.add(jlDatetimeEnd);
+        jPanelDocN7.add(moDatetimeEnd);
+
+        jlDatetimeEndHelp.setForeground(java.awt.Color.gray);
+        jlDatetimeEndHelp.setText("formato: dd/mm/aaaa hh:mm:ss (24 hr)");
+        jlDatetimeEndHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanelDocN7.add(jlDatetimeEndHelp);
+
+        jPanelDocN.add(jPanelDocN7);
+
+        jPanelDocN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployeeOffender.setText("Empleado:*");
         jlEmployeeOffender.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanelDocN5.add(jlEmployeeOffender);
+        jPanelDocN4.add(jlEmployeeOffender);
 
         jtfEmployeeOffender.setEditable(false);
         jtfEmployeeOffender.setText("TEXT");
         jtfEmployeeOffender.setFocusable(false);
         jtfEmployeeOffender.setPreferredSize(new java.awt.Dimension(305, 23));
-        jPanelDocN5.add(jtfEmployeeOffender);
+        jPanelDocN4.add(jtfEmployeeOffender);
 
         jbPickEmployeeOffender.setText("...");
         jbPickEmployeeOffender.setToolTipText("Seleccionar...");
         jbPickEmployeeOffender.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanelDocN5.add(jbPickEmployeeOffender);
+        jPanelDocN4.add(jbPickEmployeeOffender);
 
-        jPanelDocN.add(jPanelDocN5);
+        jPanelDocN.add(jPanelDocN4);
 
-        jPanelDocN6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanelDocN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlOffenderDepartment.setText("Depto. empleado:");
         jlOffenderDepartment.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanelDocN6.add(jlOffenderDepartment);
+        jPanelDocN5.add(jlOffenderDepartment);
 
         jtfOffenderDepartmentName.setEditable(false);
         jtfOffenderDepartmentName.setText("TEXT");
         jtfOffenderDepartmentName.setFocusable(false);
         jtfOffenderDepartmentName.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanelDocN6.add(jtfOffenderDepartmentName);
+        jPanelDocN5.add(jtfOffenderDepartmentName);
 
         jtfOffenderDepartmentCode.setEditable(false);
         jtfOffenderDepartmentCode.setText("TEXT");
         jtfOffenderDepartmentCode.setFocusable(false);
         jtfOffenderDepartmentCode.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanelDocN6.add(jtfOffenderDepartmentCode);
+        jPanelDocN5.add(jtfOffenderDepartmentCode);
 
         jckOffenderActive.setText("Está activo");
         jckOffenderActive.setEnabled(false);
         jckOffenderActive.setFocusable(false);
         jckOffenderActive.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanelDocN6.add(jckOffenderActive);
+        jPanelDocN5.add(jckOffenderActive);
 
-        jPanelDocN.add(jPanelDocN6);
+        jPanelDocN.add(jPanelDocN5);
 
-        jPanelDocN7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanelDocN6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlOffenderPosition.setText("Puesto empleado:");
         jlOffenderPosition.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanelDocN7.add(jlOffenderPosition);
+        jPanelDocN6.add(jlOffenderPosition);
 
         jtfOffenderPositionName.setEditable(false);
         jtfOffenderPositionName.setText("TEXT");
         jtfOffenderPositionName.setFocusable(false);
         jtfOffenderPositionName.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanelDocN7.add(jtfOffenderPositionName);
+        jPanelDocN6.add(jtfOffenderPositionName);
 
         jtfOffenderPositionCode.setEditable(false);
         jtfOffenderPositionCode.setText("TEXT");
         jtfOffenderPositionCode.setFocusable(false);
         jtfOffenderPositionCode.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanelDocN7.add(jtfOffenderPositionCode);
+        jPanelDocN6.add(jtfOffenderPositionCode);
 
         jckOffenderUnionized.setText("Es sindicalizado");
         jckOffenderUnionized.setEnabled(false);
         jckOffenderUnionized.setFocusable(false);
         jckOffenderUnionized.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanelDocN7.add(jckOffenderUnionized);
+        jPanelDocN6.add(jckOffenderUnionized);
 
-        jPanelDocN.add(jPanelDocN7);
+        jPanelDocN.add(jPanelDocN6);
 
         jPanelDocN8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -303,20 +357,27 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
 
         jPanelDocN9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmployeeAuthor.setText("Reporta:*");
-        jlEmployeeAuthor.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanelDocN9.add(jlEmployeeAuthor);
+        jlEmployeeHumanResources.setText("Rep. patronal:");
+        jlEmployeeHumanResources.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanelDocN9.add(jlEmployeeHumanResources);
 
-        jtfEmployeeAuthor.setEditable(false);
-        jtfEmployeeAuthor.setText("TEXT");
-        jtfEmployeeAuthor.setFocusable(false);
-        jtfEmployeeAuthor.setPreferredSize(new java.awt.Dimension(305, 23));
-        jPanelDocN9.add(jtfEmployeeAuthor);
+        jtfEmployeeHumanResources.setEditable(false);
+        jtfEmployeeHumanResources.setText("TEXT");
+        jtfEmployeeHumanResources.setFocusable(false);
+        jtfEmployeeHumanResources.setPreferredSize(new java.awt.Dimension(305, 23));
+        jPanelDocN9.add(jtfEmployeeHumanResources);
 
-        jbPickEmployeeAuthor.setText("...");
-        jbPickEmployeeAuthor.setToolTipText("Seleccionar...");
-        jbPickEmployeeAuthor.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanelDocN9.add(jbPickEmployeeAuthor);
+        jbPickEmployeeHumanResources.setText("...");
+        jbPickEmployeeHumanResources.setToolTipText("Seleccionar...");
+        jbPickEmployeeHumanResources.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanelDocN9.add(jbPickEmployeeHumanResources);
+
+        jlEmployeeHumanResourcesHelp.setForeground(java.awt.Color.gray);
+        jlEmployeeHumanResourcesHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_view_info.png"))); // NOI18N
+        jlEmployeeHumanResourcesHelp.setText("RRHH");
+        jlEmployeeHumanResourcesHelp.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jlEmployeeHumanResourcesHelp.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanelDocN9.add(jlEmployeeHumanResourcesHelp);
 
         jPanelDocN.add(jPanelDocN9);
 
@@ -340,9 +401,49 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         jPanelDocN.add(jPanelDocN10);
 
         jPanelDocN11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmployeeWitness1.setText("Testigo #1:");
+        jlEmployeeWitness1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanelDocN11.add(jlEmployeeWitness1);
+
+        jtfEmployeeWitness1.setEditable(false);
+        jtfEmployeeWitness1.setText("TEXT");
+        jtfEmployeeWitness1.setFocusable(false);
+        jtfEmployeeWitness1.setPreferredSize(new java.awt.Dimension(305, 23));
+        jPanelDocN11.add(jtfEmployeeWitness1);
+
+        jbPickEmployeeWitness1.setText("...");
+        jbPickEmployeeWitness1.setToolTipText("Seleccionar...");
+        jbPickEmployeeWitness1.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanelDocN11.add(jbPickEmployeeWitness1);
+
+        moBoolHumanResourcesWitness1.setText("Es RRHH");
+        moBoolHumanResourcesWitness1.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanelDocN11.add(moBoolHumanResourcesWitness1);
+
         jPanelDocN.add(jPanelDocN11);
 
         jPanelDocN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmployeeWitness2.setText("Testigo #2:");
+        jlEmployeeWitness2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanelDocN12.add(jlEmployeeWitness2);
+
+        jtfEmployeeWitness2.setEditable(false);
+        jtfEmployeeWitness2.setText("TEXT");
+        jtfEmployeeWitness2.setFocusable(false);
+        jtfEmployeeWitness2.setPreferredSize(new java.awt.Dimension(305, 23));
+        jPanelDocN12.add(jtfEmployeeWitness2);
+
+        jbPickEmployeeWitness2.setText("...");
+        jbPickEmployeeWitness2.setToolTipText("Seleccionar...");
+        jbPickEmployeeWitness2.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanelDocN12.add(jbPickEmployeeWitness2);
+
+        moBoolHumanResourcesWitness2.setText("Es RRHH");
+        moBoolHumanResourcesWitness2.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanelDocN12.add(moBoolHumanResourcesWitness2);
+
         jPanelDocN.add(jPanelDocN12);
 
         jPanelDoc.add(jPanelDocN, java.awt.BorderLayout.NORTH);
@@ -467,6 +568,52 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
 
         jPanelSanC1.add(jPanelSanC11);
 
+        jPanelSanC12.setLayout(new java.awt.BorderLayout());
+
+        jlOffenderComments1.setForeground(new java.awt.Color(0, 102, 102));
+        jlOffenderComments1.setText("Comentarios iniciales del empleado:");
+        jlOffenderComments1.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanelSanC12.add(jlOffenderComments1, java.awt.BorderLayout.PAGE_START);
+
+        jspOffenderComments1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jspOffenderComments1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jspOffenderComments1.setPreferredSize(new java.awt.Dimension(100, 125));
+
+        jtaOffenderComments1.setColumns(20);
+        jtaOffenderComments1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jtaOffenderComments1.setLineWrap(true);
+        jtaOffenderComments1.setRows(5);
+        jtaOffenderComments1.setText("The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.");
+        jtaOffenderComments1.setWrapStyleWord(true);
+        jspOffenderComments1.setViewportView(jtaOffenderComments1);
+
+        jPanelSanC12.add(jspOffenderComments1, java.awt.BorderLayout.CENTER);
+
+        jPanelSanC1.add(jPanelSanC12);
+
+        jPanelSanC13.setLayout(new java.awt.BorderLayout());
+
+        jlOffenderComments2.setForeground(new java.awt.Color(0, 102, 102));
+        jlOffenderComments2.setText("Comentarios finales del empleado:");
+        jlOffenderComments2.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanelSanC13.add(jlOffenderComments2, java.awt.BorderLayout.PAGE_START);
+
+        jspOffenderComments2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jspOffenderComments2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jspOffenderComments2.setPreferredSize(new java.awt.Dimension(100, 125));
+
+        jtaOffenderComments2.setColumns(20);
+        jtaOffenderComments2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jtaOffenderComments2.setLineWrap(true);
+        jtaOffenderComments2.setRows(5);
+        jtaOffenderComments2.setText("The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.");
+        jtaOffenderComments2.setWrapStyleWord(true);
+        jspOffenderComments2.setViewportView(jtaOffenderComments2);
+
+        jPanelSanC13.add(jspOffenderComments2, java.awt.BorderLayout.CENTER);
+
+        jPanelSanC1.add(jPanelSanC13);
+
         jPanelSanC.add(jPanelSanC1, java.awt.BorderLayout.PAGE_START);
 
         jPanelSan.add(jPanelSanC, java.awt.BorderLayout.CENTER);
@@ -501,60 +648,88 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
     private javax.swing.JPanel jPanelSanC;
     private javax.swing.JPanel jPanelSanC1;
     private javax.swing.JPanel jPanelSanC11;
+    private javax.swing.JPanel jPanelSanC12;
+    private javax.swing.JPanel jPanelSanC13;
     private javax.swing.JPanel jPanelSanN;
-    private javax.swing.JButton jbPickEmployeeAuthor;
     private javax.swing.JButton jbPickEmployeeBoss;
+    private javax.swing.JButton jbPickEmployeeHumanResources;
     private javax.swing.JButton jbPickEmployeeOffender;
     private javax.swing.JButton jbPickEmployeeUnion_n;
+    private javax.swing.JButton jbPickEmployeeWitness1;
+    private javax.swing.JButton jbPickEmployeeWitness2;
     private javax.swing.JButton jbPickPreceptSubsections;
     private javax.swing.JButton jbViewFile;
     private javax.swing.JCheckBox jckOffenderActive;
     private javax.swing.JCheckBox jckOffenderUnionized;
     private javax.swing.JLabel jlBreachAbstract;
     private javax.swing.JLabel jlBreachDescrip;
-    private javax.swing.JLabel jlDatetime;
-    private javax.swing.JLabel jlDatetimeHelp;
+    private javax.swing.JLabel jlDatetimeEnd;
+    private javax.swing.JLabel jlDatetimeEndHelp;
+    private javax.swing.JLabel jlDatetimeStart;
+    private javax.swing.JLabel jlDatetimeStartHelp;
     private javax.swing.JLabel jlDoc;
-    private javax.swing.JLabel jlEmployeeAuthor;
     private javax.swing.JLabel jlEmployeeBoss;
+    private javax.swing.JLabel jlEmployeeHumanResources;
+    private javax.swing.JLabel jlEmployeeHumanResourcesHelp;
     private javax.swing.JLabel jlEmployeeOffender;
     private javax.swing.JLabel jlEmployeeUnion_n;
+    private javax.swing.JLabel jlEmployeeWitness1;
+    private javax.swing.JLabel jlEmployeeWitness2;
     private javax.swing.JLabel jlFilevault;
     private javax.swing.JLabel jlNumber;
+    private javax.swing.JLabel jlOffenderComments1;
+    private javax.swing.JLabel jlOffenderComments2;
     private javax.swing.JLabel jlOffenderDepartment;
     private javax.swing.JLabel jlOffenderPosition;
     private javax.swing.JLabel jlPreceptSubsections;
     private javax.swing.JScrollPane jspBreachDescrip;
+    private javax.swing.JScrollPane jspOffenderComments1;
+    private javax.swing.JScrollPane jspOffenderComments2;
     private javax.swing.JScrollPane jspPreceptSubsections;
     private javax.swing.JTextArea jtaBreachDescrip;
+    private javax.swing.JTextArea jtaOffenderComments1;
+    private javax.swing.JTextArea jtaOffenderComments2;
     private javax.swing.JTextArea jtaPreceptSubsections;
     private javax.swing.JTextField jtfCompanyBranchCode;
     private javax.swing.JTextField jtfDocCode;
     private javax.swing.JTextField jtfDocName;
-    private javax.swing.JTextField jtfEmployeeAuthor;
     private javax.swing.JTextField jtfEmployeeBoss;
+    private javax.swing.JTextField jtfEmployeeHumanResources;
     private javax.swing.JTextField jtfEmployeeOffender;
     private javax.swing.JTextField jtfEmployeeUnion_n;
+    private javax.swing.JTextField jtfEmployeeWitness1;
+    private javax.swing.JTextField jtfEmployeeWitness2;
     private javax.swing.JTextField jtfFileType;
     private javax.swing.JTextField jtfFilevaultId;
     private javax.swing.JTextField jtfFilevaultTs;
+    private javax.swing.JTextField jtfLocality;
     private javax.swing.JTextField jtfNumber;
     private javax.swing.JTextField jtfOffenderDepartmentCode;
     private javax.swing.JTextField jtfOffenderDepartmentName;
     private javax.swing.JTextField jtfOffenderPositionCode;
     private javax.swing.JTextField jtfOffenderPositionName;
-    private sa.lib.gui.bean.SBeanFieldDatetime moDatetime;
+    private javax.swing.JTextField jtfState;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolHumanResourcesWitness1;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolHumanResourcesWitness2;
+    private sa.lib.gui.bean.SBeanFieldDatetime moDatetimeEnd;
+    private sa.lib.gui.bean.SBeanFieldDatetime moDatetimeStart;
     private sa.lib.gui.bean.SBeanFieldText moTextBreachAbstract;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
 
-        moDatetime.setDateSettings(miClient, SGuiUtils.getLabelName(jlDatetime), true);
+        moDatetimeStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDatetimeStart), true);
+        moDatetimeEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDatetimeEnd), true);
+        moBoolHumanResourcesWitness1.setBooleanSettings(moBoolHumanResourcesWitness1.getText(), false);
+        moBoolHumanResourcesWitness2.setBooleanSettings(moBoolHumanResourcesWitness2.getText(), false);
         moTextBreachAbstract.setTextSettings(SGuiUtils.getLabelName(jlBreachAbstract), 100);
         moTextBreachAbstract.setTextCaseType(0);
 
-        moFields.addField(moDatetime);
+        moFields.addField(moDatetimeStart);
+        moFields.addField(moDatetimeEnd);
+        moFields.addField(moBoolHumanResourcesWitness1);
+        moFields.addField(moBoolHumanResourcesWitness2);
         moFields.addField(moTextBreachAbstract);
 
         moFields.setFormButton(jbSave);
@@ -572,7 +747,7 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
             SLibUtils.showException(this, e);
         }
         
-        mnPrivilegeLevel = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_HRS_DOC_BREACH).Level;
+        mnPrivilegeLevel = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_HRS_DOC_ADM_REC).Level;
     }
     
     private void validateShowForm() throws Exception {
@@ -633,14 +808,24 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
                 employee = jtfEmployeeBoss;
                 break;
                 
-            case SPickerEmployee.MODE_AUTHOR:
-                mnEmployeeAuthorId = effectiveId = employeeId;
-                employee = jtfEmployeeAuthor;
+            case SPickerEmployee.MODE_REP_COM:
+                mnEmployeeHumanResourcesId = effectiveId = employeeId;
+                employee = jtfEmployeeHumanResources;
                 break;
                 
             case SPickerEmployee.MODE_REP_UNI:
                 mnEmployeeUnionId_n = effectiveId = employeeId;
                 employee = jtfEmployeeUnion_n;
+                break;
+                
+            case SPickerEmployee.MODE_WITNESS_1:
+                mnEmployeeWitness1 = effectiveId = employeeId;
+                employee = jtfEmployeeWitness1;
+                break;
+                
+            case SPickerEmployee.MODE_WITNESS_2:
+                mnEmployeeWitness2 = effectiveId = employeeId;
+                employee = jtfEmployeeWitness2;
                 break;
                 
             default:
@@ -674,14 +859,6 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
                             moOffender.getFkPositionId(), 
                             moOffender.isUnionized(), 
                             moOffender.isActive());
-                }
-            }
-        }
-        else if (employeeMode == SPickerEmployee.MODE_AUTHOR) {
-            if (mnEmployeeAuthorId != 0 && moRegistry.isRegistryNew()) {
-                SDbEmployee author = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId }, SDbConsts.MODE_VERBOSE);
-                if (!author.isActive()) {
-                    mnEmployeeAuthorId = effectiveId = 0; // no inactive employees allowed!
                 }
             }
         }
@@ -763,7 +940,7 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
     private void actionPerformedViewFile() {
         if (jbViewFile.isEnabled()) {
             try {
-                SDocUtils.viewFile(miClient, SDocUtils.BUCKET_DOC_BREACH, moRegistry.getFilevaultId());
+                SDocUtils.viewFile(miClient, SDocUtils.BUCKET_DOC_ADM_REC, moRegistry.getFilevaultId());
             }
             catch (Exception e) {
                 SLibUtils.showException(this, e);
@@ -775,8 +952,10 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
     public void addAllListeners() {
         jbPickEmployeeOffender.addActionListener(this);
         jbPickEmployeeBoss.addActionListener(this);
-        jbPickEmployeeAuthor.addActionListener(this);
+        jbPickEmployeeHumanResources.addActionListener(this);
         jbPickEmployeeUnion_n.addActionListener(this);
+        jbPickEmployeeWitness1.addActionListener(this);
+        jbPickEmployeeWitness2.addActionListener(this);
         jbPickPreceptSubsections.addActionListener(this);
         jbViewFile.addActionListener(this);
     }
@@ -785,8 +964,10 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
     public void removeAllListeners() {
         jbPickEmployeeOffender.removeActionListener(this);
         jbPickEmployeeBoss.removeActionListener(this);
-        jbPickEmployeeAuthor.removeActionListener(this);
+        jbPickEmployeeHumanResources.removeActionListener(this);
         jbPickEmployeeUnion_n.removeActionListener(this);
+        jbPickEmployeeWitness1.removeActionListener(this);
+        jbPickEmployeeWitness2.removeActionListener(this);
         jbPickPreceptSubsections.removeActionListener(this);
         jbViewFile.removeActionListener(this);
     }
@@ -800,7 +981,7 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
     public void setRegistry(SDbRegistry registry) throws Exception {
         validateShowForm();
         
-        moRegistry = (SDbDocBreach) registry;
+        moRegistry = (SDbDocAdminRecord) registry;
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -809,17 +990,32 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         reloadCatalogues();
         
         if (moRegistry.isRegistryNew()) {
-            boolean isBeingCopied = moRegistry.getPkDocBreachId() != 0;
+            boolean isBeingCopied = moRegistry.getPkDocAdminRecordId() != 0;
             
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
             
-            moRegistry.setNumber(SDbDocBreach.getNextNumber(miClient.getSession()));
-            moRegistry.setBreachTs(miClient.getSession().getCurrentDate());
-            moRegistry.setFkDocumentId(SDocUtils.getDocCurrentVersionId(miClient.getSession(), SModSysConsts.CFGS_TP_DOC_BREACH));
+            moRegistry.setNumber(SDbDocAdminRecord.getNextNumber(miClient.getSession()));
+            moRegistry.setRecordTsStart(miClient.getSession().getCurrentDate());
+            moRegistry.setRecordTsEnd(miClient.getSession().getCurrentDate());
+            moRegistry.setFkDocumentId(SDocUtils.getDocCurrentVersionId(miClient.getSession(), SModSysConsts.CFGS_TP_DOC_ADM_REC));
             moRegistry.setFkCompanyBranchId(((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey()[0]);
             
-            mnEmployeeAuthorId = ((SDataUser) miClient.getSession().getUser()).getFkBizPartnerId_n();
+            SDataBizPartnerBranch companyBranch = new SDataBizPartnerBranch();
+            companyBranch.read(((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey(), miClient.getSession().getStatement());
+            
+            moRegistry.setFkCompanyBranchAddressId(companyBranch.getDbmsBizPartnerBranchAddressOfficial().getPkAddressId());
+            moRegistry.setLocality(companyBranch.getDbmsBizPartnerBranchAddressOfficial().getLocality());
+            moRegistry.setFkStateId(companyBranch.getDbmsBizPartnerBranchAddressOfficial().getFkStateId_n());
+            
+            mnEmployeeHumanResourcesId = mnCfgParamHrsRepCompanyId;
+            mnHumanResoursesDepartmentId = mnCfgParamHrsDepartmentId;
+            
+            mnEmployeeWitness1 = 0;
+            mnEmployeeWitness2 = ((SDataUser) miClient.getSession().getUser()).getFkBizPartnerId_n();
+            
+            moRegistry.setHumanResourcesWitness1(false);
+            moRegistry.setHumanResourcesWitness2(true);
             
             if (isBeingCopied && !moRegistry.getFilevaultId().isEmpty()) {
                 miClient.showMsgBoxInformation("Se eliminará la información de control del resguardo del archivo del documento (ID: " + moRegistry.getFilevaultId() + ").\n"
@@ -831,7 +1027,11 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
             
-            mnEmployeeAuthorId = moRegistry.getFkEmployeeAuthorId();
+            mnEmployeeHumanResourcesId = moRegistry.getFkEmployeeHumanResourcesId();
+            mnHumanResoursesDepartmentId = moRegistry.getFkHumanResourcesDepartmentId();
+            
+            mnEmployeeWitness1 = moRegistry.getFkEmployeeWitness1Id();
+            mnEmployeeWitness2 = moRegistry.getFkEmployeeWitness2Id();
         }
         
         mnEmployeeOffenderId = moRegistry.getFkEmployeeOffenderId();
@@ -852,7 +1052,14 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         jtfCompanyBranchCode.setText((String) miClient.getSession().readField(SModConsts.BPSU_BPB, new int[] { moRegistry.getFkCompanyBranchId() }, SDbRegistry.FIELD_CODE));
         jtfCompanyBranchCode.setCaretPosition(0);
         
-        moDatetime.setValue(moRegistry.getBreachTs());
+        jtfLocality.setText(moRegistry.getLocality());
+        jtfLocality.setCaretPosition(0);
+        
+        jtfState.setText(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.LOCU_STA, new int[] { moRegistry.getFkStateId() }, SLibConstants.DESCRIPTION_NAME));
+        jtfState.setCaretPosition(0);
+        
+        moDatetimeStart.setValue(moRegistry.getRecordTsStart());
+        moDatetimeEnd.setValue(moRegistry.getRecordTsEnd());
         
         showEmployee(SPickerEmployee.MODE_OFFENDER, mnEmployeeOffenderId, false);
         showOffenderData(
@@ -862,8 +1069,14 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
                 moOffender == null ? false : moOffender.isActive()); // offender just read in method showEmployee()
         
         showEmployee(SPickerEmployee.MODE_BOSS, mnEmployeeBossId, false);
-        showEmployee(SPickerEmployee.MODE_AUTHOR, mnEmployeeAuthorId, false);
+        showEmployee(SPickerEmployee.MODE_REP_COM, mnEmployeeHumanResourcesId, false);
         showEmployee(SPickerEmployee.MODE_REP_UNI, mnEmployeeUnionId_n, false);
+        showEmployee(SPickerEmployee.MODE_WITNESS_1, mnEmployeeWitness1, false);
+        showEmployee(SPickerEmployee.MODE_WITNESS_2, mnEmployeeWitness2, false);
+        
+        jlEmployeeHumanResourcesHelp.setToolTipText("Nombre departamento: " + miClient.getSession().readField(SModConsts.HRSU_DEP, new int[] { mnHumanResoursesDepartmentId }, SDbRegistry.FIELD_NAME));
+        moBoolHumanResourcesWitness1.setValue(moRegistry.isHumanResourcesWitness1());
+        moBoolHumanResourcesWitness2.setValue(moRegistry.isHumanResourcesWitness2());
         
         updatePreceptSubsections(moRegistry.getPreceptSubsectionKeys());
         
@@ -881,9 +1094,14 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         jtaBreachDescrip.setText(moRegistry.getBreachDescrip());
         jtaBreachDescrip.setCaretPosition(0);
 
+        jtaOffenderComments1.setText(moRegistry.getOffenderComments1());
+        jtaOffenderComments1.setCaretPosition(0);
+
+        jtaOffenderComments2.setText(moRegistry.getOffenderComments2());
+        jtaOffenderComments2.setCaretPosition(0);
+
         setFormEditable(true);
         
-        jbPickEmployeeAuthor.setEnabled(mnPrivilegeLevel > SUtilConsts.LEV_CAPTURE);
         jbViewFile.setEnabled(!moRegistry.getFilevaultId().isEmpty());
         jbSave.setEnabled(moRegistry.getFilevaultId().isEmpty());
         
@@ -899,7 +1117,7 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbDocBreach registry = moRegistry.clone();
+        SDbDocAdminRecord registry = moRegistry.clone();
 
         if (registry.isRegistryNew()) {
             registry.setNumber(0); // reset number so it can be regenerated
@@ -907,19 +1125,30 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
 
         //registry.setPkDocBreachId(...);
         //registry.setNumber(...);
-        registry.setBreachTs(moDatetime.getValue());
+        //registry.setLocality(...); // immutable member
+        registry.setRecordTsStart(moDatetimeStart.getValue());
+        registry.setRecordTsEnd(moDatetimeEnd.getValue());
         registry.setBreachAbstract(moTextBreachAbstract.getValue());
         registry.setBreachDescrip(jtaBreachDescrip.getText());
+        registry.setOffenderComments1(jtaOffenderComments1.getText());
+        registry.setOffenderComments2(jtaOffenderComments2.getText());
         //registry.setFilevaultId(...);
         //registry.setFilevaultTs_n(...);
         registry.setOffenderUnionized(jckOffenderUnionized.isSelected());
+        registry.setHumanResourcesWitness1(moBoolHumanResourcesWitness1.getValue());
+        registry.setHumanResourcesWitness2(moBoolHumanResourcesWitness2.getValue());
         //registry.setDeleted(...);
         //registry.setFkDocumentId(...); // immutable member
         //registry.setFkCompanyBranchId(...); // immutable member
-        registry.setFkEmployeeAuthorId(mnEmployeeAuthorId);
+        //registry.setFkCompanyBranchAddressId(...); // immutable member
+        //registry.setFkStateId(...); // immutable member
         registry.setFkEmployeeOffenderId(mnEmployeeOffenderId);
         registry.setFkEmployeeBossId(mnEmployeeBossId);
         registry.setFkEmployeeUnionId_n(mnEmployeeUnionId_n);
+        registry.setFkEmployeeHumanResourcesId(mnEmployeeHumanResourcesId);
+        registry.setFkEmployeeWitness1Id(mnEmployeeWitness1);
+        registry.setFkEmployeeWitness2Id(mnEmployeeWitness2);
+        registry.setFkHumanResourcesDepartmentId(mnHumanResoursesDepartmentId);
         registry.setFkOffenderDepartmentId(mnOffenderDepartmentId);
         registry.setFkOffenderPositionId(mnOffenderPositionId);
         //registry.setFkUserInsertId(...);
@@ -937,12 +1166,12 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            LocalTime localTime = new LocalTime(moDatetime.getValue());
+            LocalTime localTime = new LocalTime(moDatetimeStart.getValue());
             if (localTime.getMillisOfDay() == 0) {
-                if (miClient.showMsgBoxConfirm("¿Estás seguro/a que no deseas espeficar la hora para el campo '" + moDatetime.getFieldName() + "'?") != JOptionPane.YES_OPTION) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDatetime.getFieldName() + "':\n"
+                if (miClient.showMsgBoxConfirm("¿Estás seguro/a que no deseas espeficar la hora para el campo '" + moDatetimeStart.getFieldName() + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDatetimeStart.getFieldName() + "':\n"
                             + "horas, minutos y segundos en formato: hh:mm:ss (24 hr)");
-                    validation.setComponent(moDatetime.getComponent().getEditor());
+                    validation.setComponent(moDatetimeStart.getComponent().getEditor());
                 }
             }
         }
@@ -956,17 +1185,27 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployeeBoss) + "'.");
                 validation.setComponent(jbPickEmployeeBoss);
             }
-            else if (mnEmployeeAuthorId == 0) {
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployeeAuthor) + "'.");
-                validation.setComponent(jbPickEmployeeAuthor);
+            else if (mnEmployeeHumanResourcesId == 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployeeHumanResources) + "'.");
+                validation.setComponent(jbPickEmployeeHumanResources);
             }
             else if (jckOffenderUnionized.isSelected() && mnEmployeeUnionId_n == 0) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployeeUnion_n) + "'.");
                 validation.setComponent(jbPickEmployeeUnion_n);
             }
+            else if (mnEmployeeWitness1 == 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployeeWitness1) + "'.");
+                validation.setComponent(jbPickEmployeeWitness1);
+            }
+            else if (mnEmployeeWitness2 == 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployeeWitness2) + "'.");
+                validation.setComponent(jbPickEmployeeWitness2);
+            }
             else {
                 jtaPreceptSubsections.setText(SLibUtils.textTrim(jtaPreceptSubsections.getText()));
                 jtaBreachDescrip.setText(SLibUtils.textTrim(jtaBreachDescrip.getText()));
+                jtaOffenderComments1.setText(SLibUtils.textTrim(jtaOffenderComments1.getText()));
+                jtaOffenderComments2.setText(SLibUtils.textTrim(jtaOffenderComments2.getText()));
                 
                 if (jtaPreceptSubsections.getText().isEmpty()) {
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlPreceptSubsections) + "'.");
@@ -975,6 +1214,14 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
                 else if (jtaBreachDescrip.getText().isEmpty()) {
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlBreachDescrip) + "'.");
                     validation.setComponent(jtaBreachDescrip);
+                }
+                else if (jtaOffenderComments1.getText().isEmpty() && miClient.showMsgBoxConfirm("¿Estás seguro/a que deseas dejar sin valor al campo '" + SGuiUtils.getLabelName(jlOffenderComments1) + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlOffenderComments1) + "'.");
+                    validation.setComponent(jtaOffenderComments1);
+                }
+                else if (jtaOffenderComments2.getText().isEmpty() && miClient.showMsgBoxConfirm("¿Estás seguro/a que deseas dejar sin valor al campo '" + SGuiUtils.getLabelName(jlOffenderComments2) + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlOffenderComments2) + "'.");
+                    validation.setComponent(jtaOffenderComments2);
                 }
             }
         }
@@ -993,11 +1240,17 @@ public class SFormDocBreach extends SBeanForm implements ActionListener {
             else if (button == jbPickEmployeeBoss) {
                 actionPerformedPickEmployee(SPickerEmployee.MODE_BOSS, jtfEmployeeBoss, false);
             }
-            else if (button == jbPickEmployeeAuthor) {
-                actionPerformedPickEmployee(SPickerEmployee.MODE_AUTHOR, jtfEmployeeAuthor, false);
+            else if (button == jbPickEmployeeHumanResources) {
+                actionPerformedPickEmployee(SPickerEmployee.MODE_REP_COM, jtfEmployeeHumanResources, false);
             }
             else if (button == jbPickEmployeeUnion_n) {
                 actionPerformedPickEmployee(SPickerEmployee.MODE_REP_UNI, jtfEmployeeUnion_n, false);
+            }
+            else if (button == jbPickEmployeeWitness1) {
+                actionPerformedPickEmployee(SPickerEmployee.MODE_WITNESS_1, jtfEmployeeWitness1, false);
+            }
+            else if (button == jbPickEmployeeWitness2) {
+                actionPerformedPickEmployee(SPickerEmployee.MODE_WITNESS_2, jtfEmployeeWitness2, false);
             }
             else if (button == jbPickPreceptSubsections) {
                 actionPerformedPickPreceptSubsections();

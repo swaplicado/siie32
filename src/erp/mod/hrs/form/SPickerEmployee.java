@@ -168,9 +168,7 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
         String name = moTextEmployeeName.getValue();
         
         if (name.isEmpty()) {
-            for (Employee employee : maEmployees) {
-                employees.add(employee);
-            }
+            employees.addAll(maEmployees);
         }
         else {
             for (Employee employee : maEmployees) {

@@ -148,9 +148,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     
     private javax.swing.JMenu jmSan;
     private javax.swing.JMenuItem jmiSanDocBreach;
-    private javax.swing.JMenuItem jmiSanDocBreachEmp;
+    private javax.swing.JMenuItem jmiSanDocBreachSum;
     private javax.swing.JMenuItem jmiSanDocAdminRecord;
-    private javax.swing.JMenuItem jmiSanDocAdminRecordEmp;
+    private javax.swing.JMenuItem jmiSanDocAdminRecordSum;
     
     private javax.swing.JMenu jmImp;
     private javax.swing.JMenuItem jmiImpFormerPayroll;
@@ -400,15 +400,15 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmSan = new JMenu("Sanciones");
         jmiSanDocBreach = new JMenuItem("Infracciones");
-        jmiSanDocBreachEmp = new JMenuItem("Infracciones por empleado");
+        jmiSanDocBreachSum = new JMenuItem("Infracciones por empleado (resumen)");
         jmiSanDocAdminRecord = new JMenuItem("Actas administrativas");
-        jmiSanDocAdminRecordEmp = new JMenuItem("Actas administrativas por empleado");
+        jmiSanDocAdminRecordSum = new JMenuItem("Actas administrativas por empleado (resumen)");
         
         jmSan.add(jmiSanDocBreach);
-        jmSan.add(jmiSanDocBreachEmp);
+        jmSan.add(jmiSanDocBreachSum);
         jmSan.addSeparator();
         jmSan.add(jmiSanDocAdminRecord);
-        jmSan.add(jmiSanDocAdminRecordEmp);
+        jmSan.add(jmiSanDocAdminRecordSum);
         
         jmImp = new JMenu("Importación");
         jmiImpFormerPayroll = new JMenuItem("Nóminas importadas");
@@ -554,9 +554,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayVerifyCfdis.addActionListener(this);
         
         jmiSanDocBreach.addActionListener(this);
-        jmiSanDocBreachEmp.addActionListener(this);
+        jmiSanDocBreachSum.addActionListener(this);
         jmiSanDocAdminRecord.addActionListener(this);
-        jmiSanDocAdminRecordEmp.addActionListener(this);
+        jmiSanDocAdminRecordSum.addActionListener(this);
         
         jmiImpFormerPayroll.addActionListener(this);
         jmiImpFormerPayrollEmp.addActionListener(this);
@@ -698,9 +698,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmSan.setEnabled(hasRightDocBreach || hasRightDocAdminRecord);
         jmiSanDocBreach.setEnabled(hasRightDocBreach);
-        jmiSanDocBreachEmp.setEnabled(hasRightDocBreach && SLibUtilities.belongsTo(levelRightDocBreach, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
+        jmiSanDocBreachSum.setEnabled(hasRightDocBreach && SLibUtilities.belongsTo(levelRightDocBreach, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
         jmiSanDocAdminRecord.setEnabled(hasRightDocAdminRecord);
-        jmiSanDocAdminRecordEmp.setEnabled(hasRightDocAdminRecord && SLibUtilities.belongsTo(levelRightDocAdminRecord, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
+        jmiSanDocAdminRecordSum.setEnabled(hasRightDocAdminRecord && SLibUtilities.belongsTo(levelRightDocAdminRecord, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
 
         boolean hasRightImport = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_IMP).HasRight;
         
@@ -1188,14 +1188,14 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiSanDocBreach) {
                 miClient.getSession().showView(SModConsts.HRS_DOC_BREACH, 0, null);
             }
-            else if (item == jmiSanDocBreachEmp) {
-
+            else if (item == jmiSanDocBreachSum) {
+                miClient.getSession().showView(SModConsts.HRSX_DOC_BREACH_SUM, 0, null);
             }
             else if (item == jmiSanDocAdminRecord) {
-                
+                miClient.getSession().showView(SModConsts.HRS_DOC_ADM_REC, 0, null);
             }
-            else if (item == jmiSanDocAdminRecordEmp) {
-                
+            else if (item == jmiSanDocAdminRecordSum) {
+                miClient.getSession().showView(SModConsts.HRSX_DOC_ADM_REC_SUM, 0, null);
             }
             else if (item == jmiImpFormerPayroll) {
                 showView(SDataConstants.HRS_SIE_PAY);

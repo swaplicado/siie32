@@ -507,6 +507,7 @@ public class SFormDeduction extends SBeanForm implements ItemListener {
 
         if (moRegistry.isRegistryNew()) {
             boolean isBeingCopied = moRegistry.getPkDeductionId() != 0;
+            
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
 

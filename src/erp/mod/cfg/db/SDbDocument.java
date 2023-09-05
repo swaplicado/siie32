@@ -24,11 +24,13 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbDocument extends SDbRegistryUser {
     
-    public static final int FIELD_NOTES = SDbRegistry.FIELD_BASE + 1;
+    public static final int FIELD_DATA = SDbRegistry.FIELD_BASE + 1;
+    public static final int FIELD_NOTES = SDbRegistry.FIELD_BASE + 2;
 
     protected int mnPkDocumentId;
     protected String msCode;
     protected String msName;
+    protected String msData;
     protected String msNotes;
     protected Date mtDate;
     protected boolean mbObsolet;
@@ -51,6 +53,7 @@ public class SDbDocument extends SDbRegistryUser {
     public void setPkDocumentId(int n) { mnPkDocumentId = n; }
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
+    public void setData(String s) { msData = s; }
     public void setNotes(String s) { msNotes = s; }
     public void setDate(Date t) { mtDate = t; }
     public void setObsolet(boolean b) { mbObsolet = b; }
@@ -65,6 +68,7 @@ public class SDbDocument extends SDbRegistryUser {
     public int getPkDocumentId() { return mnPkDocumentId; }
     public String getCode() { return msCode; }
     public String getName() { return msName; }
+    public String getData() { return msData; }
     public String getNotes() { return msNotes; }
     public Date getDate() { return mtDate; }
     public boolean isObsolet() { return mbObsolet; }
@@ -93,6 +97,7 @@ public class SDbDocument extends SDbRegistryUser {
         mnPkDocumentId = 0;
         msCode = "";
         msName = "";
+        msData = "";
         msNotes = "";
         mtDate = null;
         mbObsolet = false;
@@ -151,6 +156,7 @@ public class SDbDocument extends SDbRegistryUser {
             mnPkDocumentId = resultSet.getInt("id_doc");
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
+            msData = resultSet.getString("data");
             msNotes = resultSet.getString("notes");
             mtDate = resultSet.getDate("dt_doc");
             mbObsolet = resultSet.getBoolean("b_obs");
@@ -184,6 +190,7 @@ public class SDbDocument extends SDbRegistryUser {
                     mnPkDocumentId + ", " + 
                     "'" + msCode + "', " + 
                     "'" + msName + "', " + 
+                    "'" + msData + "', " + 
                     "'" + msNotes + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " + 
                     (mbObsolet ? 1 : 0) + ", " + 
@@ -203,6 +210,7 @@ public class SDbDocument extends SDbRegistryUser {
                     //"id_doc = " + mnPkDocumentId + ", " +
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
+                    "data = '" + msData + "', " +
                     "notes = '" + msNotes + "', " +
                     "dt_doc = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
                     "b_obs = " + (mbObsolet ? 1 : 0) + ", " +
@@ -229,6 +237,7 @@ public class SDbDocument extends SDbRegistryUser {
         registry.setPkDocumentId(this.getPkDocumentId());
         registry.setCode(this.getCode());
         registry.setName(this.getName());
+        registry.setData(this.getData());
         registry.setNotes(this.getNotes());
         registry.setDate(this.getDate());
         registry.setObsolet(this.isObsolet());
@@ -261,8 +270,11 @@ public class SDbDocument extends SDbRegistryUser {
             case SDbRegistry.FIELD_NAME:
                 msSql += "name ";
                 break;
+            case FIELD_DATA:
+                msSql += "data ";
+                break;
             case FIELD_NOTES:
-                msSql += "name ";
+                msSql += "notes ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -278,6 +290,7 @@ public class SDbDocument extends SDbRegistryUser {
             switch (field) {
                 case SDbRegistry.FIELD_CODE:
                 case SDbRegistry.FIELD_NAME:
+                case FIELD_DATA:
                 case FIELD_NOTES:
                     value = resultSet.getString(1);
                     break;

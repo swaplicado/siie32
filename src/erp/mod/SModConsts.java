@@ -760,6 +760,8 @@ public abstract class SModConsts {
     public static final int HRS_DOC_ADM_REC = 2063521;
     public static final int HRS_DOC_ADM_REC_PREC_SUBSEC = 2063522;
 
+    public static final int HRSU_TP_PAY_SYS = 2064050;
+
     public static final int HRSX_DATE = 2064001;
     public static final int HRSX_AUT_EAR = 2064021;
     public static final int HRSX_AUT_DED = 2064022;
@@ -786,6 +788,8 @@ public abstract class SModConsts {
     public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_EMP_LOG_SUA = 2064161;
     public static final int HRSX_EMP_LOG_IDSE = 2064162;
+    public static final int HRSX_DOC_BREACH_SUM = 2064511;
+    public static final int HRSX_DOC_ADM_REC_SUM = 2064521;
     
     public static final int HRSX_LAYOUT_SUA_HIRE = 1; // High worker
     public static final int HRSX_LAYOUT_SUA_DISMISS = 2; // Low worker
@@ -803,8 +807,6 @@ public abstract class SModConsts {
     public static final int HRSX_LAYOUT_SUA_AFI = 14; // Affiliate data
     public static final int HRSX_HIRE_DISMISSED = 0; // Employee hire log dismissed
     public static final int HRSX_HIRE_ACTIVE = 1;    // Employee hire log active
-
-    public static final int HRSU_TP_PAY_SYS = 2064050;
 
     public static final int HRSR_PAY = 2065001;
     public static final int HRSR_PRE_PAY = 2065002;
