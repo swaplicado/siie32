@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -52,6 +51,7 @@ public class SMaterialRequestSupplyRow implements SGridRow {
     protected double mdAuxToSegregate;
     protected double mdAuxToSupply;
     protected boolean mbAuxBulk;
+    protected boolean mbAuxIsInv; 
     
     SClientInterface miClient;
     
@@ -122,6 +122,7 @@ public class SMaterialRequestSupplyRow implements SGridRow {
             msAuxItemName = item.getName();
             msAuxUnitCode = unit.getSymbol();
             mbAuxBulk = item.getIsBulk();
+            mbAuxIsInv = item.getIsInventoriable();
         }
         catch (SQLException ex) {
             Logger.getLogger(SMaterialRequestSupplyRow.class.getName()).log(Level.SEVERE, null, ex);
@@ -168,6 +169,7 @@ public class SMaterialRequestSupplyRow implements SGridRow {
     public double getAuxStock() { return mdAuxStock; }
     public double getAuxToSegregate() { return mdAuxToSegregate; }
     public double getAuxToSupply() { return mdAuxToSupply; }
+    public boolean getIsInventorable() { return mbAuxIsInv; }
     
     public boolean isTheSameRow(SMaterialRequestSupplyRow oRow) {
         return oRow.getFkCompanyBranchId() == this.getFkCompanyBranchId()

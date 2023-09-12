@@ -13,8 +13,10 @@ import erp.mod.SModSysConsts;
 import erp.mod.trn.form.SDialogItemPicker;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
+import erp.mtrn.data.SDataMaterialRequestRow;
 import erp.mtrn.data.SDataStockSegregation;
 import erp.mtrn.data.SDataStockSegregationWarehouseEntry;
+import erp.mtrn.data.STrnStockMove;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -251,7 +253,7 @@ public class SMaterialRequestUtils {
             oDiogEty.setOriginalQuantity(oSupply.getQuantity());
             oDiogEty.setOriginalValueUnitary(0d);
             oDiogEty.setSortingPosition(0);
-            oDiogEty.setIsInventoriable(false);
+            oDiogEty.setIsInventoriable(oSupply.getIsInventorable());
             oDiogEty.setIsDeleted(false);
             oDiogEty.setFkItemId(oSupply.getFkItemId());
             oDiogEty.setFkUnitId(oSupply.getFkUnitId());
@@ -271,6 +273,18 @@ public class SMaterialRequestUtils {
             oDiogEty.setFkSubConsumeEntityId_n(oSupply.getFkSubConsumeEntityId_n());
             oDiogEty.setFkSubConsumeSubEntityId_n(oSupply.getFkSubConsumeSubEntityId_n());
             oDiogEty.setFkUserNewId(fkUser);
+            
+            // year, item, unit, lot, company branch, warehouse
+            oDiogEty.getAuxStockMoves().add(new STrnStockMove(new int[] { pkYear, 
+                                                                            oSupply.getFkItemId(), 
+                                                                            oSupply.getFkUnitId(), 
+                                                                            0, 
+                                                                            oSupply.getFkCompanyBranchId(), 
+                                                                            oSupply.getFkWarehouseId()
+                                                                        }, 
+                                                                        oSupply.getQuantity(),
+                                                                        new int[] { oSupply.getFkConsumeEntityId_n() },
+                                                                        new int[] { oSupply.getFkSubConsumeEntityId_n(), oSupply.getFkSubConsumeSubEntityId_n() }));
                     
             oDiog.getDbmsEntries().add(oDiogEty);
         }
@@ -289,6 +303,18 @@ public class SMaterialRequestUtils {
             for (SDataDiog oDiog : lDiogs) {
                 if (! oDiog.getIsRegistryNew()) {
                     SMaterialRequestUtils.deleteMaintDiogSign(connection, oDiog.getPkYearId(), oDiog.getPkDocId());
+                }
+                
+                boolean areAllDeleted = true;
+                for (SDataDiogEntry oEntry : oDiog.getDbmsEntries()) {
+                    if (! oEntry.getIsDeleted()) {
+                        areAllDeleted = false;
+                        break;
+                    }
+                }
+                
+                if (areAllDeleted) {
+                    oDiog.setIsDeleted(true);
                 }
                 
                 oDiog.save(connection.createStatement().getConnection());
@@ -415,6 +441,116 @@ public class SMaterialRequestUtils {
                 picker.setPickerSettings(client, type, subtype, settings);
                 break;
         }
+        
         return picker;
+    }
+    
+    /**
+     * Obtiene las requisiciones de materiales para ser mostradas en el picker de selección en la importación
+     * 
+     * @param client
+     * @param idUser
+     * @param idConsumeEntity
+     * @param idConsumeSubentity
+     * @param folio
+     * @return 
+     */
+    public static ArrayList<SDataMaterialRequestRow> getMaterialRequest(SGuiClient client, final int idUser, final int idConsumeEntity, final int idConsumeSubentity, final String folio) {
+        ArrayList<SDataMaterialRequestRow> rows = new ArrayList<>();
+        try {
+            String sql = "SELECT id_mat_req FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " WHERE NOT b_del ";
+            if (idUser > 0) {
+                sql += "AND fk_usr_req = " + idUser + " ";
+            }
+            if (folio != null && !folio.isEmpty()) {
+                sql += "AND num LIKE '%" + folio + "%' ";
+            }
+            
+            ResultSet resultSet = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
+            
+            SDataMaterialRequestRow row;
+            SDbMaterialRequest matReq;
+            while(resultSet.next()) {
+                matReq = new SDbMaterialRequest();
+                matReq.read(client.getSession(), new int[] { resultSet.getInt("id_mat_req") });
+                row = new SDataMaterialRequestRow((SClientInterface) client, matReq);
+                rows.add(row);
+            }
+            
+            return rows;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Obtiene la cantidad importada de la partida de la requisición, puede filtrarse por tipo de documento.
+     * 
+     * @param session
+     * @param pkMatReqEty llave primaria de la partida de la requisición
+     * @param dpsType tipo de documento, si este es nulo, no filtra y muestra la suma de todas las referencias de todos los tipos de documento
+     * @return 
+     */
+    public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType) {
+        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr ";
+        
+        if (dpsType != null) {
+            query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON drm.id_year = dety.id_year "
+                                                                                            + "AND drm.id_doc = dety.id_doc "
+                                                                                            + "AND drm.id_ety = dety.id_ety ";
+            query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON dety.id_year = d.id_year "
+                                                                                            + "AND dety.id_doc = d.id_doc ";
+            query += "AND d.fid_ct_dps = " + dpsType[0]  + " " +
+                   "AND d.fid_cl_dps = " + dpsType[1]  + " " +
+                   "AND d.fid_tp_dps = " + dpsType[2]  + " ";
+        }
+        
+        query += "WHERE dmr.id_mat_req = " + pkMatReqEty[0] + " AND dmr.id_mat_req_ety = " + pkMatReqEty[1] + " ";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
+            
+            if (resultSet.next()) {
+                return resultSet.getDouble("qty_linked");
+            }
+            
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return 0d;
+    }
+    
+    public static double getQuantitySupplied(SGuiSession session, final int[] pkMatRequestEty) {
+        String query = "SELECT " +
+                        "SUM(mov_out) AS qty_supplied " +
+                        "FROM " +
+                        SModConsts.TablesMap.get(SModConsts.TRN_STK) + " " +
+                        "WHERE " +
+                        "    NOT b_del AND id_year = " + session.getCurrentYear() + " " +
+                        "        AND dt <= '" + session.getCurrentDate() + "' " +
+                        "        AND fid_mat_req_n = " + pkMatRequestEty[0] + " " +
+                        "        AND fid_mat_req_ety_n = " + pkMatRequestEty[1] + " " +
+                        "        AND fid_ct_iog = " + SDataConstantsSys.TRNS_CT_IOG_OUT +";";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
+            
+            if (resultSet.next()) {
+                return resultSet.getDouble("qty_supplied");
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return 0d;
     }
 }
