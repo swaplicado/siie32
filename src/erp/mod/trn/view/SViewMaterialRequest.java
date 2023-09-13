@@ -14,7 +14,6 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
-import erp.mod.trn.form.SDialogMaterialRequestSupply;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -50,12 +49,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbAuthorize;
     private JButton jbReject;
     private JButton jbSegregate;
-    private JButton jbSupply;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
     private SDialogMaterialRequestSegregation moDialogSegregations;
-    private SDialogMaterialRequestSupply moDialogSupply;
     
     private boolean hasAuthRight;
     
@@ -80,21 +77,18 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
-        jbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_stk_out.gif")), "Surtir", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSupply);
         
         jbPrint.setEnabled(true);
         jbAuthCardex.setEnabled(true);
         jbAuthorize.setEnabled(hasAuthRight);
         jbReject.setEnabled(hasAuthRight);
         jbSegregate.setEnabled(hasAuthRight);
-        jbSupply.setEnabled(hasAuthRight);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -108,7 +102,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
-        moDialogSupply = new SDialogMaterialRequestSupply(miClient, "Surtidos de la requisición");
         
         if (mnGridMode != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
             jbRowNew.setEnabled(false);
@@ -247,36 +240,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         params.put("nMatReqId", idMatReq);
         
         miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
-    }
-    
-    private void actionSupply() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-            }
-            else {
-                try {
-                    int[] key = (int[]) gridRow.getRowPrimaryKey();
-                    
-                    moDialogSupply.setFormParams(key, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE);
-                    moDialogSupply.setVisible(true);
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
-            }
-        }
     }
     
     @Override
@@ -497,9 +460,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbSegregate) {
                 actionSegregateOrRelease();
-            }
-            else if (button == jbSupply) {
-                actionSupply();
             }
         }
     }

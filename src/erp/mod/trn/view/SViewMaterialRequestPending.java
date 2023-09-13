@@ -10,11 +10,13 @@ import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.trn.form.SDialogMaterialRequestSupply;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -22,6 +24,7 @@ import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -37,6 +40,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private JButton mjbClose;
     private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private SDialogMaterialRequestSupply moDialogSupply;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     
     /**
@@ -71,6 +75,38 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        
+        moDialogSupply = new SDialogMaterialRequestSupply(miClient, "Surtidos de la requisición");
+    }
+    
+    private void actionSupply() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                    moDialogSupply.setFormParams(key, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE);
+                    moDialogSupply.setVisible(true);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
     }
     
     @Override
@@ -202,7 +238,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            
+            if (button == mjbSupply) {
+                actionSupply();
+            }
         }
     }
 }
