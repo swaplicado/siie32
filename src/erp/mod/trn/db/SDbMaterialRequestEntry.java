@@ -55,6 +55,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected SDbMaterialConsumptionEntity moDbmsMatConsEntity;
     protected SDbMaterialConsumptionSubentity moDbmsMatConsSubentity;
     protected SDbMaterialRequestPriority moDbmsMatReqPty;
+    protected SDbMaterialPresentation moDbmsPresentation;
 
     public SDbMaterialRequestEntry() {
         super(SModConsts.TRN_MAT_REQ_ETY);
@@ -124,6 +125,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         moDbmsMatConsEntity = null;
         moDbmsMatConsSubentity = null;
         moDbmsMatReqPty = null;
+        moDbmsPresentation = null;
         
         if (mnFkEntMatConsumptionEntityId_n != 0) {
             moDbmsMatConsEntity = new SDbMaterialConsumptionEntity();
@@ -136,6 +138,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         if (mnFkMatRequestPriorityId_n != 0) {
             moDbmsMatReqPty = new SDbMaterialRequestPriority();
             moDbmsMatReqPty.read(session, new int[] { mnFkMatRequestPriorityId_n });
+        }
+        if (mnFkMatPresentationId != 0) {
+            moDbmsPresentation = new SDbMaterialPresentation();
+            moDbmsPresentation.read(session, new int[] { mnFkMatPresentationId });
         }
     }
             
@@ -182,6 +188,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         moDbmsMatConsEntity = null;
         moDbmsMatConsSubentity = null;
         moDbmsMatReqPty = null;
+        moDbmsPresentation = null;
     }
 
     @Override
@@ -440,11 +447,15 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             case 1: value = mbNewItem ? getDescription() : moDataItem.getName(); break;
             case 2: value = mdQuantity; break;
             case 3: value = mbNewItem ? "" : moDataItem.getDbmsDataUnit().getSymbol(); break;
-            case 4: value = mbNewItem; break;
-            case 5: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
-            case 6: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
-            case 7: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
-            case 8: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
+            case 4: value = mdTotal_r; break;
+            case 5: value = mbNewItem; break;
+            case 6: value = moDbmsPresentation != null ? moDbmsPresentation.getName(): ""; break;
+            case 7: value = mdFactorConvertion; break;
+            case 8: value = mnCosnsumptionEstimated; break;
+            case 9: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
+            case 10: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
+            case 11: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
+            case 12: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
         }
         
         return value;

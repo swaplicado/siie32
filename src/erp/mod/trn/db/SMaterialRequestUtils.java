@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.form.SDialogItemPicker;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
@@ -354,7 +355,7 @@ public class SMaterialRequestUtils {
      * @return Grupo cc
      * @throws java.lang.Exception
      */
-    public SDbMaterialCostCenterGroup getCostCenterGroupByItem(SGuiSession session, int link, int id) throws Exception {
+    public static SDbMaterialCostCenterGroup getCostCenterGroupByItem(SGuiSession session, int link, int id) throws Exception {
         SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
         Statement statement = session.getDatabase().getConnection().createStatement();
         String sql = "SELECT id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " " +
@@ -374,7 +375,7 @@ public class SMaterialRequestUtils {
      * @return Grupo cc
      * @throws java.lang.Exception
      */
-    public SDbMaterialCostCenterGroup getCostCenterGroupByUser(SGuiSession session, int link, int id) throws Exception {
+    public static SDbMaterialCostCenterGroup getCostCenterGroupByUser(SGuiSession session, int link, int id) throws Exception {
         SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
         Statement statement = session.getDatabase().getConnection().createStatement();
         String sql = "SELECT id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " " +
@@ -394,7 +395,7 @@ public class SMaterialRequestUtils {
      * @return Grupo cc
      * @throws java.lang.Exception
      */
-    public SDbMaterialCostCenterGroup getCostCenterGroupByUser(SGuiSession session, int[] pkConsSubent, int pkCc) throws Exception {
+    public static SDbMaterialCostCenterGroup getCostCenterGroupByUser(SGuiSession session, int[] pkConsSubent, int pkCc) throws Exception {
         SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
         Statement statement = session.getDatabase().getConnection().createStatement();
         String sql = "SELECT id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC_CC_GRP) + " " +
@@ -406,7 +407,7 @@ public class SMaterialRequestUtils {
         return ccg;
     }
     
-    public SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
+    public static SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
         String sql = "";
         ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
         SGuiOptionPickerSettings settings = null;
@@ -415,6 +416,12 @@ public class SMaterialRequestUtils {
             case SModConsts.ITMU_ITEM:
                 switch (subtype) {
                     case SModConsts.TRN_MAT_REQ:
+                        String in = "";
+                        ArrayList<SDbMaterialCostCenterGroup> arr = (ArrayList<SDbMaterialCostCenterGroup>) params.getParamsMap().get(SModConsts.TRN_MAT_CC_GRP);
+                        for (SDbMaterialCostCenterGroup ccg : arr) {
+                            in += (in.isEmpty() ? "(" : ", ") + ccg.getPkMaterialCostCenterGroupId();
+                        }
+                        in += (in.isEmpty() ? "" : ")");
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2 "
                                 + "FROM ("
@@ -428,7 +435,7 @@ public class SMaterialRequestUtils {
                                 + ") AS a "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " AS ccgu ON "
                                 + "a.id_mat_cc_grp = ccgu.id_mat_cc_grp "
-                                + "WHERE NOT a.b_del AND a.id_mat_cc_grp = " + params.getParamsMap().get(SModConsts.TRN_MAT_CC_GRP) + " "
+                                + "WHERE NOT a.b_del AND a.id_mat_cc_grp IN " + in + " "
                                 + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
                                 + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
                                 + "ORDER BY a.item_key, a.item, a.id_item ";
@@ -446,6 +453,7 @@ public class SMaterialRequestUtils {
     }
     
     /**
+<<<<<<< Updated upstream
      * Obtiene las requisiciones de materiales para ser mostradas en el picker de selección en la importación
      * 
      * @param client
@@ -498,7 +506,8 @@ public class SMaterialRequestUtils {
      * @return 
      */
     public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType) {
-        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr ";
+        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM " ;
+                //+ SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr ";
         
         if (dpsType != null) {
             query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON drm.id_year = dety.id_year "
@@ -552,5 +561,37 @@ public class SMaterialRequestUtils {
         }
         
         return 0d;
+    }
+    /*
+     * Devuelve la cantidad de presupuesto que ha sido pedido a un centro de consumo, se excluyen los documentos eliminados y rechazados
+     * @param session 
+     * @param pkBudget 
+     * @param reqId 
+     * @return presupuesto solicitado
+     * @throws java.lang.Exception
+     */
+    public static double getConsumedBudget(SGuiSession session, int[] pkBudget, int reqId) throws Exception {
+        double consBud = 0;
+        ResultSet resultSet;
+        
+        String sql = "SELECT cc.per, r.tot_r, " +
+                "cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", '" + 
+                SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', r.id_mat_req, NULL, NULL, NULL, NULL) AS auth " +
+                "FROM trn_mat_req_cc AS cc " +
+                "INNER JOIN trn_mat_req AS r ON " +
+                "cc.id_mat_req = r.id_mat_req " +
+                "WHERE cc.fk_budget_mat_cons_ent = " + pkBudget[0] + " " +
+                "AND cc.fk_budget_year = " + pkBudget[1] + " " +
+                "AND cc.fk_budget_period = " + pkBudget[2] + " " +
+                "AND r.id_mat_req <> " + reqId + " " + 
+                "AND NOT r.b_del;";
+        resultSet = session.getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            if (resultSet.getInt(3) != SAuthorizationUtils.AUTH_STATUS_REJECTED) {
+                consBud += resultSet.getDouble(1) * resultSet.getDouble(2);
+            }
+        }
+        
+        return consBud;
     }
 }

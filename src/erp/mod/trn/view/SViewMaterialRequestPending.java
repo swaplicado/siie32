@@ -4,6 +4,8 @@
  */
 package erp.mod.trn.view;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -13,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -36,13 +37,15 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private JButton mjbClose;
     private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     
     /**
      * @param client GUI client.
+     * @param subtype
      * @param title View's GUI tab title.
      */
-    public SViewMaterialRequestPending(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_MAT_REQ_PEND, SLibConsts.UNDEFINED, title, null);
+    public SViewMaterialRequestPending(SGuiClient client, int subtype, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_MAT_REQ_PEND, subtype, title, null);
         initComponents();
     }
     
@@ -54,6 +57,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbOpen.setToolTipText("Abrir para suministro");
         mjbClose.setSize(23, 23);
         mjbOpen.setSize(23, 23);
+        mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         
         jbRowNew.setEnabled(false);
         jbRowDelete.setEnabled(false);
@@ -73,6 +77,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     public void prepareSqlQuery() {
         String where = "";
         Object filter;
+        int usrId = miClient.getSession().getUser().getPkUserId();
         
         moPaneSettings = new SGridPaneSettings(1);
 
@@ -97,7 +102,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = " +
                 SAuthorizationUtils.AUTH_STATUS_NA + ") ";
         where += "AND fk_st_mat_req >= " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " ";
-        
+        where += mbHasAdmRight ? "" : (where.isEmpty() ? "" : "AND ") + "peu.id_usr = " + usrId + " ";
         msSql = "SELECT v.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
@@ -112,8 +117,6 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "smr.name AS status, "
                 + "ur.usr AS usr_req, "
                 + "bmu.bp AS contractor, "
-                + "ce.name AS cons_ent, "
-                + "cse.name AS cons_subent, "
                 + "SUM(ve.qty) AS org_qty, "
                 + "0 AS adj_qty, "
                 + "0 AS net_qty, "
@@ -132,6 +135,8 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "v.id_mat_req = ve.id_mat_req "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON "
                 + "v.fk_mat_prov_ent = pe.id_mat_prov_ent "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
+                + "pe.id_mat_prov_ent = peu.id_mat_prov_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rp ON "
                 + "v.fk_mat_req_pty = rp.id_mat_req_pty "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_MAT_REQ) + " AS smr ON "
@@ -142,10 +147,6 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "v.fk_contractor_n = mu.id_maint_user "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bmu ON "
                 + "mu.id_maint_user = bmu.id_bp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS ce ON "
-                + "v.fk_ent_mat_cons_ent = ce.id_mat_cons_ent "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " AS cse ON "
-                + "v.fk_subent_mat_cons_ent_n = cse.id_mat_cons_ent AND v.fk_subent_mat_cons_subent_n = cse.id_mat_cons_subent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
                 + "v.fk_usr_clo_prov = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
@@ -161,13 +162,11 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "prov_ent", "Ent. Suministro"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "prov_ent", "Ctro. Suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "contractor", "Contratista"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cons_ent", "Ent. consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cons_subent", "Subent. consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "org_qty", "Cant. original")); 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "adj_qty", "Cant. ajustada")); 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "net_qty", "Cant. neta")); 

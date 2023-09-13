@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.grid.SGridRow;
@@ -33,9 +32,12 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
     protected int mnFkBudgetYearId;
     protected int mnFkBudgetPeriodId;
     
-    protected SDbMaterialConsumptionSubentity moSDbConsSubent;
+    protected SDbMaterialConsumptionSubentity moDbmsConsSubent;
     protected SDataCostCenter moDataCostCenter;
-    protected SDbMaterialConsumptionEntityBudget moSDbEntBudget;
+    protected SDbMaterialConsumptionEntityBudget moDbmsEntBudget;
+    
+    protected double mdRowConsBudWOReq;
+    protected double mdRowConsBudWReq;
     
     public SDbMaterialRequestCostCenter() {
         super(SModConsts.TRN_MAT_REQ_CC);
@@ -50,7 +52,14 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
     public void setFkBudgetMatConsumptionEntityId(int n) { mnFkBudgetMatConsumptionEntityId = n; }
     public void setFkBudgetYearId(int n) { mnFkBudgetYearId = n; }
     public void setFkBudgetPeriodId(int n) { mnFkBudgetPeriodId = n; }
-
+    
+    public void setDbmsConsSubent(SDbMaterialConsumptionSubentity o) { moDbmsConsSubent = o; }
+    public void setDataCostCenter(SDataCostCenter o) { moDataCostCenter = o; }
+    public void setDbmsEntBudget(SDbMaterialConsumptionEntityBudget o) { moDbmsEntBudget = o; }
+    
+    public void setRowConsBudWOReq(double d){ mdRowConsBudWOReq = d; }
+    public void setRowConsBudWReq(double d){ mdRowConsBudWReq = d; }
+    
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntMatConsumptionEntityId() { return mnPkEntMatConsumptionEntityId; }
     public int getPkSubentMatConsumptionEntityId() { return mnPkSubentMatConsumptionEntityId; }
@@ -61,9 +70,16 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
     public int getFkBudgetYearId() { return mnFkBudgetYearId; }
     public int getFkBudgetPeriodId() { return mnFkBudgetPeriodId; }
     
+    public SDbMaterialConsumptionSubentity getDbmsConsSubent() { return moDbmsConsSubent; }
+    public SDataCostCenter getDataCostCenter() { return moDataCostCenter; }
+    public SDbMaterialConsumptionEntityBudget getDbmsEntBudget() { return moDbmsEntBudget; }
+    
+    public double getRowConsBudWOReq() { return mdRowConsBudWOReq; }
+    public double getRowConsBudWReq() { return mdRowConsBudWReq; }
+    
     public void readSubentity(SGuiSession session) throws Exception {
-        moSDbConsSubent = new SDbMaterialConsumptionSubentity();
-        moSDbConsSubent.read(session, new int[] { mnPkSubentMatConsumptionEntityId, mnPkSubentMatConsumptionSubentityId });
+        moDbmsConsSubent = new SDbMaterialConsumptionSubentity();
+        moDbmsConsSubent.read(session, new int[] { mnPkSubentMatConsumptionEntityId, mnPkSubentMatConsumptionSubentityId });
     }
 
     public void readCostCenter(SGuiSession session) throws Exception {
@@ -79,8 +95,8 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
     }
     
     public void readEntBudget(SGuiSession session) throws Exception {
-        moSDbEntBudget = new SDbMaterialConsumptionEntityBudget();
-        moSDbEntBudget.read(session, new int[] { mnFkBudgetMatConsumptionEntityId, mnFkBudgetYearId, mnFkBudgetPeriodId });
+        moDbmsEntBudget = new SDbMaterialConsumptionEntityBudget();
+        moDbmsEntBudget.read(session, new int[] { mnFkBudgetMatConsumptionEntityId, mnFkBudgetYearId, mnFkBudgetPeriodId });
     }
 
     @Override
@@ -111,9 +127,12 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
         mnFkBudgetYearId = 0;
         mnFkBudgetPeriodId = 0;
         
-        moSDbConsSubent = null;
+        moDbmsConsSubent = null;
         moDataCostCenter = null;
-        moSDbEntBudget = null;
+        moDbmsEntBudget = null;
+        
+        mdRowConsBudWOReq = 0;
+        mdRowConsBudWReq = 0;
     }
 
     @Override
@@ -215,6 +234,11 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
                     "fk_budget_period = " + mnFkBudgetPeriodId + " " +
                     getSqlWhere();
         }
+        
+        session.getStatement().execute(msSql);
+        
+        mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
     @Override
@@ -230,6 +254,13 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
         registry.setFkBudgetMatConsumptionEntityId(this.getFkBudgetMatConsumptionEntityId());
         registry.setFkBudgetYearId(this.getFkBudgetYearId());
         registry.setFkBudgetPeriodId(this.getFkBudgetPeriodId());
+        
+        registry.setDbmsConsSubent(this.getDbmsConsSubent());
+        registry.setDataCostCenter(this.getDataCostCenter());
+        registry.setDbmsEntBudget(this.getDbmsEntBudget());
+        
+        registry.setRowConsBudWOReq(this.getRowConsBudWOReq());
+        registry.setRowConsBudWReq(this.getRowConsBudWReq());
         
         registry.setRegistryNew(this.isRegistryNew());
         
@@ -276,20 +307,24 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
         Object value = null;
         
         switch (col) {
-            case 0: value = moSDbConsSubent.getXtaConsumptionEntityName(); break;
-            case 1: value = moSDbConsSubent.getName(); break;
+            case 0: value = moDbmsConsSubent.getXtaConsumptionEntityName(); break;
+            case 1: value = moDbmsConsSubent.getName(); break;
             case 2: value = moDataCostCenter.getPkCostCenterIdXXX(); break;
             case 3: value = mdPercentage; break;
             case 4: value = mnFkBudgetYearId; break;
-            case 5: value = SLibUtils.DateFormatDateShort.format(moSDbEntBudget.getDateStart()); break;
-            case 6: value = SLibUtils.DateFormatDateShort.format(moSDbEntBudget.getDateEnd()); break;
-            case 7: value = moSDbEntBudget.getBudget(); break;
+            case 5: value = moDbmsEntBudget.getDateStart(); break;
+            case 6: value = moDbmsEntBudget.getDateEnd(); break;
+            case 7: value = moDbmsEntBudget.getBudget(); break;
+            case 8: value = mdRowConsBudWOReq; break;
+            case 9: value = mdRowConsBudWReq; break;
         }
         return value;
     }
 
     @Override
     public void setRowValueAt(Object value, int col) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch (col) {
+            case 3: mdPercentage = (double) value; break;
+        }
     }
 }

@@ -55,7 +55,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
             <Property name="columns" type="int" value="1"/>
-            <Property name="rows" type="int" value="4"/>
+            <Property name="rows" type="int" value="5"/>
             <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
@@ -138,15 +138,39 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDate">
+                <Component class="javax.swing.JLabel" name="jlBudget">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Fecha presupuesto:*"/>
+                    <Property name="text" type="java.lang.String" value="Presupuesto:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[140, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDate">
+                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyBudget">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[300, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel26">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlAsign">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Asignaci&#xf3;n:*"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[140, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecPer">
                 </Component>
               </SubComponents>
             </Container>
