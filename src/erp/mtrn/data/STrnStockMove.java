@@ -26,9 +26,6 @@ public class STrnStockMove implements java.io.Serializable {
     protected String msSerialNumber;
     protected int mnMaintUserId_n;
     protected int mnMaintUserSupervisorId;
-    protected int mnFkConsumeEntityId_n;
-    protected int mnFkSubConsumeEntityId_n;
-    protected int mnFkSubConsumeSubEntityId_n;
 
     protected int mnAuxRowNumber;
     protected String msAuxLot;
@@ -86,21 +83,6 @@ public class STrnStockMove implements java.io.Serializable {
     public STrnStockMove(int[] moveKey, double quantity, double totalValue, int maintUserId_n, int maintUserSupervisorId) {
         this(moveKey, quantity, totalValue, "", maintUserId_n, maintUserSupervisorId);
     }
-    
-    /**
-     * 
-     * @param moveKey
-     * @param quantity
-     * @param consumeEntKey
-     * @param consumeSubEntKey 
-     */
-    public STrnStockMove(int[] moveKey, double quantity, int[] consumeEntKey, int[] consumeSubEntKey) {
-        this(moveKey, quantity, 0, "", 0, 0 );
-        
-        mnFkConsumeEntityId_n = consumeEntKey == null ? 0 : consumeEntKey[0];
-        mnFkSubConsumeEntityId_n = consumeSubEntKey == null ? 0 : consumeSubEntKey[0];
-        mnFkSubConsumeSubEntityId_n =  consumeSubEntKey == null ? 0 : consumeSubEntKey[1];
-    }
 
     /**
      * Creates stock move.
@@ -148,9 +130,6 @@ public class STrnStockMove implements java.io.Serializable {
     public void setSerialNumber(String s) { msSerialNumber = s; }
     public void setFkMaintUserId_n(int n) { mnMaintUserId_n = n; }
     public void setFkMaintUserSupervisorId(int n) { mnMaintUserSupervisorId = n; }
-    public void setFkConsumeEntityId_n(int n) { mnFkConsumeEntityId_n = n; }
-    public void setFkSubConsumeEntityId_n(int n) { mnFkSubConsumeEntityId_n = n; }
-    public void setFkSubConsumeSubEntityId_n(int n) { mnFkSubConsumeSubEntityId_n = n; }
 
     public void setAuxRowNumber(int n) { mnAuxRowNumber = n; }
     public void setAuxLot(String s) { msAuxLot = s; }
@@ -175,9 +154,6 @@ public class STrnStockMove implements java.io.Serializable {
     public String getSerialNumber() { return msSerialNumber; }
     public int getMaintUserId_n() { return mnMaintUserId_n; }
     public int getMaintUserSupervisorId(){ return mnMaintUserSupervisorId; }
-    public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
-    public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
-    public int getFkSubConsumeSubEntityId_n() { return mnFkSubConsumeSubEntityId_n; }
 
     public int getAuxRowNumber() { return mnAuxRowNumber; }
     public String getAuxLot() { return msAuxLot; }

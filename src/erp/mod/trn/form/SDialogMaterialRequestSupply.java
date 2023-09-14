@@ -602,20 +602,10 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 params.setPkWarehouseId(moKeyWarehouseEntity.getSelectedIndex() > 0 ? moKeyWarehouseEntity.getValue()[1] : 0);
                 STrnStock oStock = STrnStockSegregationUtils.getAllStock((SClientInterface) miClient, params);
                 
-                int consEntity = oMaterialRequestEntry.getFkEntMatConsumptionEntityId_n() > 0 ? 
-                                        oMaterialRequestEntry.getFkEntMatConsumptionEntityId_n() : 
-                                        SLibConsts.UNDEFINED;
-                
-                int subConsEntity = oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() > 0 ? 
-                                        oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n() : 
-                                        SLibConsts.UNDEFINED;
-                
                 SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
                                                                             SMaterialRequestEntryRow.FORM_SUPPLY,
                                                                             oMaterialRequestEntry.getFkItemId(), 
-                                                                            oMaterialRequestEntry.getFkUnitId(),
-                                                                            consEntity,
-                                                                            subConsEntity
+                                                                            oMaterialRequestEntry.getFkUnitId()
                                                                             );
                 
                 oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
@@ -694,7 +684,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             etys.addAll(mlMemoryMaterialRequestSupplies);
             
             for (SMaterialRequestSupplyRow ety : etys) {
-                if (ety.getFkMatRequestId() == oMaterialRequestEntry.getPkMatRequestId() && ety.getFkMatRequestEntryId() == oMaterialRequestEntry.getPkEntryId()
+                if (ety.getFkMatRequestId() == oMaterialRequestEntry.getPkMatRequestId() 
+                        && ety.getFkMatRequestEntryId() == oMaterialRequestEntry.getPkEntryId()
                         && ! ety.isDeleted()) {
                     rows.add(ety);
                 }
@@ -792,20 +783,11 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
             if (oMatReqRow.getAuxToSupply() > 0) {
-                int consumeEntity = moCheckModifyConsEntity.isSelected() ? 
-                                        (moKeyConsumeEntity.getValue().length > 0 ? moKeyConsumeEntity.getValue()[0] : 0) : 
-                                        oMatReqRow.getFkConsumeEntityId_n();
-                int subConsumeEntity = moCheckModifyConsEntity.isSelected() ? 
-                                        (moKeySubConsumeEntity.getValue().length > 1 ? moKeySubConsumeEntity.getValue()[1] : 0) : 
-                                        oMatReqRow.getFkSubConsumeEntityId_n();
-                
                 oSupplyEty = new SMaterialRequestSupplyRow((SClientInterface) miClient, 
                                                             oMatReqRow.getFkItemId(), 
                                                             oMatReqRow.getFkUnitId(),
                                                             moKeyWarehouseEntity.getValue()[0],
-                                                            moKeyWarehouseEntity.getValue()[1],
-                                                            consumeEntity,
-                                                            subConsumeEntity
+                                                            moKeyWarehouseEntity.getValue()[1]
                                                             );
                 
                 oSupplyEty.setPkDiogYearId(miClient.getSession().getCurrentYear());
@@ -892,12 +874,12 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             int user = moKeyMaintUser.getSelectedIndex() <= 0 ? 0 : moKeyMaintUser.getValue()[0];
             int userSup = moKeyMaintUserSupervisor.getSelectedIndex() <= 0 ? 1 : moKeyMaintUserSupervisor.getValue()[0];
             ArrayList<SDataDiog> lDiogs = SMaterialRequestUtils.makeDiogs(miClient.getSession().getCurrentYear(), 
-                                                                 miClient.getSession().getCurrentDate(), 
-                                                                 miClient.getSession().getUser().getPkUserId(),
-                                                                 mlMemoryMaterialRequestSupplies,
-                                                                 mnSegregationId,
-                                                                 user,
-                                                                 userSup
+                                                                miClient.getSession().getCurrentDate(), 
+                                                                miClient.getSession().getUser().getPkUserId(),
+                                                                mlMemoryMaterialRequestSupplies,
+                                                                mnSegregationId,
+                                                                user,
+                                                                userSup
                                                             );
 
            HashMap<String, SDataDiog> mDbDiogs = new HashMap<>();

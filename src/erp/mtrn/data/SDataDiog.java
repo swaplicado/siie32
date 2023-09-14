@@ -177,9 +177,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         stockMove.setFkMfgChargeId_n(iogEntry.getFkMfgChargeId_n());
         stockMove.setFkMatRequestId_n(iogEntry.getFkMatRequestId_n());
         stockMove.setFkMatRequestEtyId_n(iogEntry.getFkMatRequestEtyId_n());
-        stockMove.setFkConsumeEntityId_n(iogEntry.getFkConsumeEntityId_n());
-        stockMove.setFkSubConsumeEntityId_n(iogEntry.getFkSubConsumeEntityId_n());
-        stockMove.setFkSubConsumeSubEntityId_n(iogEntry.getFkSubConsumeSubEntityId_n());
         stockMove.setFkBookkeepingYearId_n(mnFkBookkeepingYearId_n);
         stockMove.setFkBookkeepingNumberId_n(mnFkBookkeepingNumberId_n);
         stockMove.setFkMaintMovementTypeId(mnFkMaintMovementTypeId);

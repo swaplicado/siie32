@@ -403,9 +403,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
                                                                             SMaterialRequestEntryRow.FORM_SEGREGATION,
                                                                             oMaterialRequestEntry.getFkItemId(), 
-                                                                            oMaterialRequestEntry.getFkUnitId(),
-                                                                            oMaterialRequestEntry.getFkEntMatConsumptionEntityId_n(),
-                                                                            oMaterialRequestEntry.getFkSubentMatConsumptionSubentityId_n());
+                                                                            oMaterialRequestEntry.getFkUnitId());
                 oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
                 oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());

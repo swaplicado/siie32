@@ -52,13 +52,13 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public static int FORM_SEGREGATION = 1;
     public static int FORM_SUPPLY = 2;
     
-    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit, final int fkConsEntity, final int fkSubConsEntity) {
+    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit) {
         miClient = client;
         mnFormType = formType;
         mnFkItemId = fkItem;
         mnFkUnitId = fkUnit;
-        mnFkConsumeEntityId_n = fkConsEntity;
-        mnFkSubConsumeEntityId_n = fkSubConsEntity;
+        mnFkConsumeEntityId_n = 0;
+        mnFkSubConsumeEntityId_n = 0;
         
         try {
             this.readAuxs();

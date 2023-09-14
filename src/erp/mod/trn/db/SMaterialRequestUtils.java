@@ -133,11 +133,12 @@ public class SMaterialRequestUtils {
                     SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS dety ON diog.id_year = dety.id_year " +
                     "        AND diog.id_doc = dety.id_doc " +
                     "WHERE " +
-                    "    NOT dety.b_del AND dety.fid_mat_req_n = " + idMaterialRequest + " " +
+                    "NOT diog.b_del " +
+                    "  AND NOT dety.b_del AND dety.fid_mat_req_n = " + idMaterialRequest + " " +
                     "        AND dety.fid_mat_req_ety_n = " + idMatEty + " " +
-                    "        AND diog.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0] + " " +
-                    "        AND diog.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1] + " " +
-                    "        AND diog.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2] + " " +
+                    "        AND diog.fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[0] + " " +
+                    "        AND diog.fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[1] + " " +
+                    "        AND diog.fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[2] + " " +
                     "ORDER BY dety.sort_pos ASC;";
         
         try {
@@ -149,9 +150,7 @@ public class SMaterialRequestUtils {
                                                         res.getInt("dety.fid_item"), 
                                                         res.getInt("dety.fid_unit"), 
                                                         res.getInt("fid_cob"), 
-                                                        res.getInt("fid_wh"),
-                                                        res.getInt("fid_mat_cons_ent_n"),
-                                                        res.getInt("fid_mat_sub_cons_sub_ent_n"));
+                                                        res.getInt("fid_wh"));
                 
                 oSuppRow.setQuantity(res.getDouble("qty"));
                 oSuppRow.setPkDiogYearId(res.getInt("id_year"));
@@ -159,9 +158,6 @@ public class SMaterialRequestUtils {
                 oSuppRow.setPkDiogEtyId(res.getInt("id_ety"));
                 oSuppRow.setFkMatRequestId(idMaterialRequest);
                 oSuppRow.setFkMatRequestEntryId(idMatEty);
-                oSuppRow.setFkConsumeEntityId_n(res.getInt("fid_mat_cons_ent_n"));
-                oSuppRow.setFkSubConsumeEntityId_n(res.getInt("fid_mat_sub_cons_ent_n"));
-                oSuppRow.setFkSubConsumeSubEntityId_n(res.getInt("fid_mat_sub_cons_sub_ent_n"));
                 
                 lRows.add(oSuppRow);
             }
@@ -212,9 +208,9 @@ public class SMaterialRequestUtils {
                 oDiog.setIsRecordAutomatic(false);
                 oDiog.setIsSystem(true);
                 oDiog.setIsDeleted(false);
-                oDiog.setFkDiogCategoryId(SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[0]);
-                oDiog.setFkDiogClassId(SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[1]);
-                oDiog.setFkDiogTypeId(SModSysConsts.TRNS_TP_IOG_OUT_MFG_CON[2]);
+                oDiog.setFkDiogCategoryId(SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[0]);
+                oDiog.setFkDiogClassId(SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[1]);
+                oDiog.setFkDiogTypeId(SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[2]);
                 oDiog.setFkDiogAdjustmentTypeId(1);
                 oDiog.setFkCompanyBranchId(oSupply.getFkCompanyBranchId());
                 oDiog.setFkWarehouseId(oSupply.getFkWarehouseId());
@@ -270,9 +266,6 @@ public class SMaterialRequestUtils {
             oDiogEty.setFkMfgChargeId_n(0);
             oDiogEty.setFkMatRequestId_n(oSupply.getFkMatRequestId());
             oDiogEty.setFkMatRequestEtyId_n(oSupply.getFkMatRequestEntryId());
-            oDiogEty.setFkConsumeEntityId_n(oSupply.getFkConsumeEntityId_n());
-            oDiogEty.setFkSubConsumeEntityId_n(oSupply.getFkSubConsumeEntityId_n());
-            oDiogEty.setFkSubConsumeSubEntityId_n(oSupply.getFkSubConsumeSubEntityId_n());
             oDiogEty.setFkUserNewId(fkUser);
             
             // year, item, unit, lot, company branch, warehouse
@@ -283,10 +276,7 @@ public class SMaterialRequestUtils {
                                                                             oSupply.getFkCompanyBranchId(), 
                                                                             oSupply.getFkWarehouseId()
                                                                         }, 
-                                                                        oSupply.getQuantity(),
-                                                                        new int[] { oSupply.getFkConsumeEntityId_n() },
-                                                                        new int[] { oSupply.getFkSubConsumeEntityId_n(), oSupply.getFkSubConsumeSubEntityId_n() }));
-                    
+                                                                        oSupply.getQuantity()));
             oDiog.getDbmsEntries().add(oDiogEty);
         }
         
@@ -453,7 +443,6 @@ public class SMaterialRequestUtils {
     }
     
     /**
-<<<<<<< Updated upstream
      * Obtiene las requisiciones de materiales para ser mostradas en el picker de selección en la importación
      * 
      * @param client
@@ -593,5 +582,69 @@ public class SMaterialRequestUtils {
         }
         
         return consBud;
+    }
+    
+    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfisFromMatReq(Connection conn, final int idMatRequest) {
+        ResultSet resultSet;
+        
+        String query = "SELECT * "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " "
+                + "WHERE id_mat_req = " + idMatRequest;
+        
+        ArrayList<SMatConsumeSubEntCcConfig> lConfigs = new ArrayList<>();
+        try {
+            resultSet = conn.createStatement().executeQuery(query);
+            SMatConsumeSubEntCcConfig oConfig;
+            while (resultSet.next()) {
+                oConfig = new SMatConsumeSubEntCcConfig();
+                oConfig.setFkMaterialRequestId(idMatRequest);
+                oConfig.setFkSubentMatConsumptionEntityId(resultSet.getInt("fk_subent_mat_cons_ent"));
+                oConfig.setFkSubentMatConsumptionSubentityId(resultSet.getInt("fk_subent_mat_cons_subent"));
+                oConfig.setFkCostCenterId(resultSet.getInt("id_cc"));
+
+                lConfigs.add(oConfig);
+            }
+            
+            return lConfigs;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return new ArrayList<>();
+        }
+    }
+    
+    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfisFromMatReqEty(Connection conn, final int[] pkMatRequestEntry) {
+        ResultSet resultSet;
+        
+        String query = "SELECT * "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " "
+                + "WHERE NOT b_del AND id_mat_req = " + pkMatRequestEntry[0] + " AND id_ety = " + pkMatRequestEntry[1];
+        
+        ArrayList<SMatConsumeSubEntCcConfig> lConfigs = new ArrayList<>();
+        try {
+            resultSet = conn.createStatement().executeQuery(query);
+            SMatConsumeSubEntCcConfig oConfig;
+            if (resultSet.next()) {
+                if (resultSet.getInt("fk_subent_mat_cons_ent_n") == 0) {
+                    return new ArrayList<>();
+                }
+                
+                oConfig = new SMatConsumeSubEntCcConfig();
+                oConfig.setPercentage(100d);
+                oConfig.setFkMaterialRequestId(pkMatRequestEntry[0]);
+                oConfig.setFkMaterialRequestEntryId(pkMatRequestEntry[1]);
+                oConfig.setFkSubentMatConsumptionEntityId(resultSet.getInt("fk_subent_mat_cons_ent_n"));
+                oConfig.setFkSubentMatConsumptionSubentityId(resultSet.getInt("fk_subent_mat_cons_subent_n"));
+                oConfig.setFkCostCenterId(resultSet.getInt("fk_cc_n"));
+
+                lConfigs.add(oConfig);
+            }
+            
+            return lConfigs;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return new ArrayList<>();
+        }
     }
 }

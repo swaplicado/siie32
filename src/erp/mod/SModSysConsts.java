@@ -641,6 +641,7 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_TP_IOG_IN_MFG_FG_ASD = { 1, 6, 5 };
     public static final int[] TRNS_TP_IOG_IN_MFG_FG_RET = { 1, 6, 6 };
     public static final int[] TRNS_TP_IOG_IN_MFG_CON = { 1, 6, 7 };
+    public static final int[] TRNS_TP_IOG_IN_DEV_CONS = { 1, 7, 1 };
     public static final int[] TRNS_TP_IOG_IN_EXP_PUR = {1, 9, 1 };
     public static final int[] TRNS_TP_IOG_IN_EXP_MFG = {1, 9, 2 };
     public static final int[] TRNS_TP_IOG_IN_CST_RM = {1, 9, 3 };
@@ -663,6 +664,7 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_TP_IOG_OUT_MFG_FG_ASD = { 2, 6, 5 };
     public static final int[] TRNS_TP_IOG_OUT_MFG_FG_RET = { 2, 6, 6 };
     public static final int[] TRNS_TP_IOG_OUT_MFG_CON = { 2, 6, 7 };
+    public static final int[] TRNS_TP_IOG_OUT_SUPP_CONS = { 2, 7, 1 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_PUR = {2, 9, 1 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_MFG = {2, 9, 2 };
     public static final int[] TRNS_TP_IOG_OUT_CST_RM = {2, 9, 3 };

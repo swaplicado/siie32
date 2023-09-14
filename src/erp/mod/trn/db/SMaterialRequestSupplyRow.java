@@ -55,15 +55,15 @@ public class SMaterialRequestSupplyRow implements SGridRow {
     
     SClientInterface miClient;
     
-    public SMaterialRequestSupplyRow(SClientInterface client, final int fkItem, final int fkUnit, final int fkCoB, final int fkWhs, final int fkConsEnt, final int fkSubConsEnt) {
+    public SMaterialRequestSupplyRow(SClientInterface client, final int fkItem, final int fkUnit, final int fkCoB, final int fkWhs) {
         miClient = client;
         mnFkItemId = fkItem;
         mnFkUnitId = fkUnit;
         mnFkCompanyBranchId = fkCoB;
         mnFkWarehouseId = fkWhs;
-        mnFkConsumeEntityId_n = fkConsEnt;
-        mnFkSubConsumeEntityId_n = fkConsEnt;
-        mnFkSubConsumeSubEntityId_n = fkSubConsEnt;
+        mnFkConsumeEntityId_n = 0;
+        mnFkSubConsumeEntityId_n = 0;
+        mnFkSubConsumeSubEntityId_n = 0;
         
         mbDeleted = false;
         

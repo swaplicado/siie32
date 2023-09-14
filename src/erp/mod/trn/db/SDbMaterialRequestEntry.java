@@ -120,6 +120,29 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         }
         return "";
     }
+    
+    /**
+     * Obtiene las configuraciones de sub entidad de consumo vs centros de costo
+     * 
+     * @return lista de configuraciones
+     */
+    public ArrayList<SMatConsumeSubEntCcConfig> getCcConfis() {
+        ArrayList<SMatConsumeSubEntCcConfig> lConfigs = new ArrayList<>();
+        
+        if (mnFkSubentMatConsumptionEntityId_n > 0 && mnFkSubentMatConsumptionSubentityId_n > 0) {
+            SMatConsumeSubEntCcConfig oConfig = new SMatConsumeSubEntCcConfig();
+            
+            oConfig.setFkMaterialRequestId(mnPkMatRequestId);
+            oConfig.setFkMaterialRequestEntryId(mnPkEntryId);
+            oConfig.setFkSubentMatConsumptionEntityId(mnFkSubentMatConsumptionEntityId_n);
+            oConfig.setFkSubentMatConsumptionSubentityId(mnFkSubentMatConsumptionSubentityId_n);
+            oConfig.setFkCostCenterId(mnFkCostCenterId_n);
+
+            lConfigs.add(oConfig);
+        }
+        
+        return lConfigs;
+    }
 
     public void readOptionalInfo(SGuiSession session) throws Exception {
         moDbmsMatConsEntity = null;

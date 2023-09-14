@@ -11,9 +11,12 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SMatConsumeSubEntCcConfig;
+import erp.mod.trn.db.SMaterialRequestUtils;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Vector;
 import sa.lib.SLibUtils;
 
@@ -48,9 +51,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMfgChargeId_n;
     protected int mnFkMatRequestId_n;
     protected int mnFkMatRequestEtyId_n;
-    protected int mnFkConsumeEntityId_n;
-    protected int mnFkSubConsumeEntityId_n;
-    protected int mnFkSubConsumeSubEntityId_n;
     protected int mnFkMaintAreaId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -75,6 +75,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msDbmsUserDelete;
 
     protected java.util.Vector<erp.mtrn.data.STrnStockMove> mvAuxStockMoves;
+    protected ArrayList<SDataDiogEtyMatConsEntCostCenter> mlAuxDiogEtyMatEntCcsConfigs;
 
     protected int mnClonedFkMfgYearId_n;
     protected int mnClonedFkMfgOrderId_n;
@@ -113,9 +114,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMfgChargeId_n(int n) { mnFkMfgChargeId_n = n; }
     public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
     public void setFkMatRequestEtyId_n(int n) { mnFkMatRequestEtyId_n = n; }
-    public void setFkConsumeEntityId_n(int n) { mnFkConsumeEntityId_n = n; }
-    public void setFkSubConsumeEntityId_n(int n) { mnFkSubConsumeEntityId_n = n; }
-    public void setFkSubConsumeSubEntityId_n(int n) { mnFkSubConsumeSubEntityId_n = n; }
     public void setFkMaintAreaId(int n) { mnFkMaintAreaId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -149,9 +147,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMfgChargeId_n() { return mnFkMfgChargeId_n; }
     public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
     public int getFkMatRequestEtyId_n() { return mnFkMatRequestEtyId_n; }
-    public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
-    public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
-    public int getFkSubConsumeSubEntityId_n() { return mnFkSubConsumeSubEntityId_n; }
     public int getFkMaintAreaId() { return mnFkMaintAreaId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -191,6 +186,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
 
     public java.util.Vector<erp.mtrn.data.STrnStockMove> getAuxStockMoves() { return mvAuxStockMoves; }
+    public ArrayList<SDataDiogEtyMatConsEntCostCenter> getAuxDiogEtyMatEntCcsConfigs() { return mlAuxDiogEtyMatEntCcsConfigs; }
 
     public void setClonedFkMfgYearId_n(int n) { mnClonedFkMfgYearId_n = n; }
     public void setClonedFkMfgOrderId_n(int n) { mnClonedFkMfgOrderId_n = n; }
@@ -259,9 +255,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         mnFkMfgChargeId_n = 0;
         mnFkMatRequestId_n = 0;
         mnFkMatRequestEtyId_n = 0;
-        mnFkConsumeEntityId_n = 0;
-        mnFkSubConsumeEntityId_n = 0;
-        mnFkSubConsumeSubEntityId_n = 0;
         mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;              // default value set only for preventing bugs
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -286,6 +279,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         msDbmsUserDelete = "";
 
         mvAuxStockMoves.clear();
+        mlAuxDiogEtyMatEntCcsConfigs = new ArrayList<>();
 
         mnClonedFkMfgYearId_n = 0;
         mnClonedFkMfgOrderId_n = 0;
@@ -306,7 +300,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         try {
             sql = "SELECT de.*, d.fid_bkk_year_n, d.fid_bkk_num_n, " +
                     "i.item, i.item_key, i.part_num, u.unit, u.symbol, uo.unit, " +
-                        "uo.symbol, ma.name, tmce.name, tmcs.name, un.usr, ue.usr, ud.usr " +
+                        "uo.symbol, ma.name, un.usr, ue.usr, ud.usr " +
                     "FROM trn_diog_ety AS de " +
                     "INNER JOIN trn_diog AS d ON de.id_year = d.id_year AND de.id_doc = d.id_doc " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
@@ -316,9 +310,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "INNER JOIN erp.usru_usr AS un ON de.fid_usr_new = un.id_usr " +
                     "INNER JOIN erp.usru_usr AS ue ON de.fid_usr_edit = ue.id_usr " +
                     "INNER JOIN erp.usru_usr AS ud ON de.fid_usr_del = ud.id_usr " +
-                    "LEFT OUTER JOIN trn_mat_cons_ent AS tmce ON de.fid_mat_cons_ent_n = tmce.id_mat_cons_ent " +
-                    "LEFT OUTER JOIN trn_mat_cons_subent AS tmcs ON de.fid_mat_sub_cons_ent_n = tmcs.id_mat_cons_ent " +
-                                                        "AND de.fid_mat_sub_cons_sub_ent_n = tmcs.id_mat_cons_subent " +
                     "WHERE de.id_year = " + key[0] + " AND de.id_doc = " + key[1] + " AND de.id_ety = " + key[2] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -350,9 +341,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgChargeId_n = resultSet.getInt("de.fid_mfg_chg_n");
                 mnFkMatRequestId_n = resultSet.getInt("de.fid_mat_req_n");
                 mnFkMatRequestEtyId_n = resultSet.getInt("de.fid_mat_req_ety_n");
-                mnFkConsumeEntityId_n = resultSet.getInt("de.fid_mat_cons_ent_n");
-                mnFkSubConsumeEntityId_n = resultSet.getInt("de.fid_mat_sub_cons_ent_n");
-                mnFkSubConsumeSubEntityId_n = resultSet.getInt("de.fid_mat_sub_cons_sub_ent_n");
                 mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");
                 mnFkUserNewId = resultSet.getInt("de.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("de.fid_usr_edit");
@@ -408,6 +396,18 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     mbHasLinksShipment = resultSet.getInt("f_count") > 0;
                 }
                 
+                String ccsQuery = "SELECT id_diog_ety_ce_cc FROM trn_diog_ety_cons_ent_cc "
+                + "WHERE fid_diog_doc = " + mnFkDpsYearId_n + " "
+                + "AND fid_diog_year = " + mnFkDpsDocId_n + " "
+                + "AND fid_diog_ety = " + mnFkDpsEntryId_n + " ";
+                ResultSet res = statement.getConnection().createStatement().executeQuery(ccsQuery);
+                while (res.next()) {
+                    SDataDiogEtyMatConsEntCostCenter oConfig = new SDataDiogEtyMatConsEntCostCenter();
+                    oConfig.read(new int[] { res.getInt("id_diog_ety_ce_cc") }, statement);
+                    
+                    mlAuxDiogEtyMatEntCcsConfigs.add(oConfig);
+                }
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -436,8 +436,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "{ CALL trn_diog_ety_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ? ) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -463,9 +462,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             if (mnFkMfgChargeId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgChargeId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             if (mnFkMatRequestId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkMatRequestEtyId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestEtyId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
-            if (mnFkConsumeEntityId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkConsumeEntityId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
-            if (mnFkSubConsumeEntityId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkSubConsumeEntityId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
-            if (mnFkSubConsumeSubEntityId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkSubConsumeSubEntityId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkMaintAreaId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);
@@ -476,6 +472,34 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             mnPkEntryId = callableStatement.getInt(nParam - 3);
             mnDbmsErrorId = callableStatement.getInt(nParam - 2);
             msDbmsError = callableStatement.getString(nParam - 1);
+            
+            String deleteQuery = "DELETE FROM trn_diog_ety_cons_ent_cc "
+                    + "WHERE fid_diog_doc = " + mnFkDpsYearId_n + " "
+                    + "AND fid_diog_year = " + mnFkDpsDocId_n + " "
+                    + "AND fid_diog_ety = " + mnFkDpsEntryId_n + " ";
+            connection.createStatement().executeUpdate(deleteQuery);
+            if (mnFkMatRequestEtyId_n > 0) {
+                ArrayList<SMatConsumeSubEntCcConfig> lConfigs = SMaterialRequestUtils.getCcConfisFromMatReqEty(connection, 
+                                                                                new int[] { mnFkMatRequestId_n, mnFkMatRequestEtyId_n });
+                
+                if (lConfigs.isEmpty()) {
+                    lConfigs = SMaterialRequestUtils.getCcConfisFromMatReq(connection, mnFkMatRequestId_n);
+                }
+                
+                SDataDiogEtyMatConsEntCostCenter oDataConfig;
+                for (SMatConsumeSubEntCcConfig oConfig : lConfigs) {
+                    oDataConfig = new SDataDiogEtyMatConsEntCostCenter();
+                    oDataConfig.setPercentage(oConfig.getPercentage());
+                    oDataConfig.setFkDiogYearId(mnPkYearId);
+                    oDataConfig.setFkDiogDocId(mnPkDocId);
+                    oDataConfig.setFkDiogEntryId(mnPkEntryId);
+                    oDataConfig.setFkSubentMatConsumptionEntityId(oConfig.getFkSubentMatConsumptionEntityId());
+                    oDataConfig.setFkSubentMatConsumptionSubentityId(oConfig.getFkSubentMatConsumptionSubentityId());
+                    oDataConfig.setFkCostCenterId(oConfig.getFkCostCenterId());
+                    
+                    oDataConfig.save(connection);
+                }
+            }
 
             if (mnDbmsErrorId != 0) {
                 throw new Exception(msDbmsError);
@@ -632,9 +656,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setFkMfgChargeId_n(this.getClonedFkMfgChargeId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgChargeId_n() : this.getFkMfgChargeId_n());
         registry.setFkMatRequestId_n(this.getFkMatRequestId_n());
         registry.setFkMatRequestEtyId_n(this.getFkMatRequestEtyId_n());
-        registry.setFkConsumeEntityId_n(this.getFkConsumeEntityId_n());
-        registry.setFkSubConsumeEntityId_n(this.getFkSubConsumeEntityId_n());
-        registry.setFkSubConsumeSubEntityId_n(this.getFkSubConsumeSubEntityId_n());
         registry.setFkMaintAreaId(this.getFkMaintAreaId());
         registry.setFkUserNewId(this.getFkUserNewId());
         registry.setFkUserEditId(this.getFkUserEditId());
@@ -658,6 +679,10 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
         for (STrnStockMove move : mvAuxStockMoves) {
             registry.getAuxStockMoves().add(move.clone());
+        }
+        
+        for (SDataDiogEtyMatConsEntCostCenter oConfig : mlAuxDiogEtyMatEntCcsConfigs) {
+            registry.getAuxDiogEtyMatEntCcsConfigs().add(oConfig.clone());
         }
 
         return registry;

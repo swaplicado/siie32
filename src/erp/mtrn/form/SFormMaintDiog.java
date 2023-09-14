@@ -1292,9 +1292,6 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                     iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                     iogEntry.setFkMaintAreaId(jcbEntryMaintArea.getSelectedIndex() <= 0 ? SModSysConsts.TRN_MAINT_AREA_NA : ((SGuiItem) jcbEntryMaintArea.getSelectedItem()).getPrimaryKey()[0]);
-                    iogEntry.setFkConsumeEntityId_n(jcbEntryConsEntity.getSelectedIndex() <= 0 ? 0 : ((SGuiItem) jcbEntryConsEntity.getSelectedItem()).getPrimaryKey()[0]);
-                    iogEntry.setFkSubConsumeEntityId_n(jcbEntrySubConsEntity.getSelectedIndex() <= 0 ? 0 : ((SGuiItem) jcbEntrySubConsEntity.getSelectedItem()).getPrimaryKey()[0]);
-                    iogEntry.setFkSubConsumeSubEntityId_n(jcbEntrySubConsEntity.getSelectedIndex() <= 0 ? 0 : ((SGuiItem) jcbEntrySubConsEntity.getSelectedItem()).getPrimaryKey()[1]);
 
                     iogEntry.setFkUserNewId(SUtilConsts.USR_NA_ID);
                     iogEntry.setFkUserEditId(SUtilConsts.USR_NA_ID);
@@ -1310,10 +1307,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     iogEntry.setDbmsMaintArea(jcbEntryMaintArea.getSelectedIndex() <= 0 ? "" : ((SGuiItem) jcbEntryMaintArea.getSelectedItem()).getItem());
 
                     int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
-                    iogEntry.getAuxStockMoves().add(new STrnStockMove(new int[] { year, iogEntry.getFkItemId(), iogEntry.getFkUnitId(), SDataConstantsSys.TRNX_STK_LOT_DEF_ID, moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() }, 
-                                                                    iogEntry.getQuantity(),
-                                                                    new int[] { iogEntry.getFkConsumeEntityId_n() },
-                                                                    new int[] { iogEntry.getFkSubConsumeEntityId_n(), iogEntry.getFkSubConsumeSubEntityId_n() }));
+                    iogEntry.getAuxStockMoves().add(new STrnStockMove(new int[] { year, iogEntry.getFkItemId(), iogEntry.getFkUnitId(), SDataConstantsSys.TRNX_STK_LOT_DEF_ID, moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() }, iogEntry.getQuantity()));
 
                     moPaneDiogEntries.addTableRow(new SDataDiogMaintMovementEntryRow(iogEntry));
                     moPaneDiogEntries.renderTableRows();
