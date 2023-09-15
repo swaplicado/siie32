@@ -25,8 +25,8 @@ public class SDataDiogMaintMovementEntryRow extends erp.lib.table.STableRow {
         mvValues.add(diogEntry.getDbmsItem());
 //        mvValues.add(diogEntry.getDbmsPartNum());
         mvValues.add(diogEntry.getDbmsMaintArea());
-        mvValues.add(diogEntry.getDbmsConsumeEntity());
-        mvValues.add(diogEntry.getDbmsSubConsumeEntity());
+//        mvValues.add(diogEntry.getDbmsConsumeEntity());
+//        mvValues.add(diogEntry.getDbmsSubConsumeEntity());
         mvValues.add(diogEntry.getOriginalQuantity());
         mvValues.add(diogEntry.getDbmsOriginalUnitSymbol());
         mvValues.add(diogEntry.getOriginalValueUnitary());

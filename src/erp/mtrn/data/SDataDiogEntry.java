@@ -67,8 +67,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msDbmsUnitSymbol;
     protected java.lang.String msDbmsOriginalUnit;
     protected java.lang.String msDbmsOriginalUnitSymbol;
-    protected java.lang.String msDbmsConsumeEntity;
-    protected java.lang.String msDbmsSubConsumeEntity;
     protected java.lang.String msDbmsMaintArea;
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
@@ -163,8 +161,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setDbmsUnitSymbol(java.lang.String s) { msDbmsUnitSymbol = s; }
     public void setDbmsOriginalUnit(java.lang.String s) { msDbmsOriginalUnit = s; }
     public void setDbmsOriginalUnitSymbol(java.lang.String s) { msDbmsOriginalUnitSymbol = s; }
-    public void setDbmsConsumeEntity(java.lang.String s) { msDbmsConsumeEntity = s; }
-    public void setDbmsSubConsumeEntity(java.lang.String s) { msDbmsSubConsumeEntity = s; }
     public void setDbmsMaintArea(java.lang.String s) { msDbmsMaintArea = s; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
@@ -178,8 +174,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getDbmsUnitSymbol() { return msDbmsUnitSymbol; }
     public java.lang.String getDbmsOriginalUnit() { return msDbmsOriginalUnit; }
     public java.lang.String getDbmsOriginalUnitSymbol() { return msDbmsOriginalUnitSymbol; }
-    public java.lang.String getDbmsConsumeEntity() { return msDbmsConsumeEntity; }
-    public java.lang.String getDbmsSubConsumeEntity() { return msDbmsSubConsumeEntity; }
     public java.lang.String getDbmsMaintArea() { return msDbmsMaintArea; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
@@ -271,8 +265,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         msDbmsUnitSymbol = "";
         msDbmsOriginalUnit = "";
         msDbmsOriginalUnitSymbol = "";
-        msDbmsConsumeEntity = "";
-        msDbmsSubConsumeEntity = "";
         msDbmsMaintArea = "";
         msDbmsUserNew = "";
         msDbmsUserEdit = "";
@@ -358,8 +350,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 msDbmsUnitSymbol = resultSet.getString("u.symbol");
                 msDbmsOriginalUnit = resultSet.getString("uo.unit");
                 msDbmsOriginalUnitSymbol = resultSet.getString("uo.symbol");
-                msDbmsConsumeEntity = resultSet.getString("tmce.name") == null ? "" : resultSet.getString("tmce.name");
-                msDbmsSubConsumeEntity = resultSet.getString("tmcs.name") == null ? "" : resultSet.getString("tmcs.name");
                 msDbmsMaintArea = resultSet.getString("ma.name");
                 msDbmsUserNew = resultSet.getString("un.usr");
                 msDbmsUserEdit = resultSet.getString("ue.usr");
@@ -670,8 +660,6 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setDbmsItemKey(this.getDbmsItemKey());
         registry.setDbmsUnit(this.getDbmsUnit());
         registry.setDbmsUnitSymbol(this.getDbmsUnitSymbol());
-        registry.setDbmsConsumeEntity(this.getDbmsConsumeEntity());
-        registry.setDbmsSubConsumeEntity(this.getDbmsSubConsumeEntity());
         registry.setDbmsMaintArea(this.getDbmsMaintArea());
         registry.setDbmsUserNew(this.getDbmsUserNew());
         registry.setDbmsUserEdit(this.getDbmsUserEdit());

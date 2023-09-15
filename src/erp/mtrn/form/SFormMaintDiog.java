@@ -675,19 +675,19 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jtfEntryTextToFind.addActionListener(this);
         jcbMaintUser.addItemListener(this);
         jcbMaintReturnUser.addItemListener(this);
-        jcbEntryConsEntity.addItemListener(this);
-        jcbEntrySubConsEntity.addItemListener(this);
+//        jcbEntryConsEntity.addItemListener(this);
+//        jcbEntrySubConsEntity.addItemListener(this);
         jtfEntryQuantity.addFocusListener(this);
         jtfEntryValueUnit.addFocusListener(this);
         jtfEntryValue.addFocusListener(this);
 
         int i = 0;
-        STableColumnForm tableColumnsEntry[] = new STableColumnForm[16];
+        STableColumnForm tableColumnsEntry[] = new STableColumnForm[14];
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Área mantenimiento", 150);
-        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Entidad de consumo", 150);
-        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sub entidad de consumo", 150);
+//        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Entidad de consumo", 150);
+//        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sub entidad de consumo", 150);
         tableColumnsEntry[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY);
         tableColumnsEntry[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -762,9 +762,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jcbMaintUserSupervisor.setEnabled(true);
         }
         
-        int idBp = ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()[0];
-        int idConsumeEntity = STrnConsumeUtils.getDefaultEntityOfBp(miClient.getSession(), idBp);
-        SGuiUtils.locateItem(jcbEntryConsEntity, new int[] { idConsumeEntity });
+//        int idBp = ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()[0];
+//        int idConsumeEntity = STrnConsumeUtils.getDefaultEntityOfBp(miClient.getSession(), idBp);
+//        SGuiUtils.locateItem(jcbEntryConsEntity, new int[] { idConsumeEntity });
     }
     
     private void populateMaintReturnUserSupervisor() {
@@ -858,7 +858,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jtfEntryTextToFind.setEditable(true);
             jtfEntryTextToFind.setFocusable(true);
             jcbEntryMaintArea.setEnabled(mbMaintAreaNeeded);
-            jcbEntryConsEntity.setEnabled(true);
+            jcbEntryConsEntity.setEnabled(false);
             jcbEntrySubConsEntity.setEnabled(false);
             jtfEntryQuantity.setEditable(true);
             jtfEntryQuantity.setFocusable(true);
@@ -2138,7 +2138,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                         stateChangedReturnMaintUser();
                     }
                     else if (comboBox == jcbEntryConsEntity) {
-                        stateChangedCosumeEntity();
+//                        stateChangedCosumeEntity();
                     }
                 }
             }
