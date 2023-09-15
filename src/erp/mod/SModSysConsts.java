@@ -748,6 +748,8 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_PROV = 3; // Suministrador
     public static final int TRNX_MAT_REQ_PUR = 4; // Comprador
     public static final int TRNX_MAT_REQ_AUTHO_RECH = 100; // autorizado/rechazado
+    public static final int TRNX_MAT_REQ_PEND_DETAIL = 101; // pendiente a detalle
+    public static final int TRNX_MAT_REQ_PROVIDED = 102; // suministrado
     
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
     public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";

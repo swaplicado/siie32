@@ -1655,7 +1655,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moTextAuthStatus.setValue(moRegistry.getAuxAuthStatus());
         
-        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND) {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
             jbSave.setEnabled(false);
             jbSaveAndSend.setEnabled(false);
         }
@@ -1832,7 +1832,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
     @Override
     public void focusGained(FocusEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

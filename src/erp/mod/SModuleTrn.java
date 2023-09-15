@@ -31,6 +31,7 @@ import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
 import erp.mod.trn.db.SDbMaterialConsumptionEntity;
+import erp.mod.trn.db.SDbMaterialConsumptionEntityBudget;
 import erp.mod.trn.db.SDbMaterialConsumptionSubentity;
 import erp.mod.trn.db.SDbMaterialCostCenterGroup;
 import erp.mod.trn.db.SDbMaterialPresentation;
@@ -54,6 +55,7 @@ import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
 import erp.mod.trn.form.SFormMaintUser;
 import erp.mod.trn.form.SFormMaintUserSupervisor;
+import erp.mod.trn.form.SFormMaterialConsumptionEntityBudget;
 import erp.mod.trn.form.SFormMaterialCostCenterGroup;
 import erp.mod.trn.form.SFormMaterialPresentation;
 import erp.mod.trn.form.SFormMaterialRequest;
@@ -91,6 +93,7 @@ import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMaintUser;
 import erp.mod.trn.view.SViewMaintUserSupervisor;
 import erp.mod.trn.view.SViewMaterialConsumptionEntity;
+import erp.mod.trn.view.SViewMaterialConsumptionEntityBudget;
 import erp.mod.trn.view.SViewMaterialConsumptionSubentity;
 import erp.mod.trn.view.SViewMaterialCostCenterGroup;
 import erp.mod.trn.view.SViewMaterialPresentation;
@@ -146,6 +149,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaintUser moFormMaintUserToolMaintProv;
     private SFormMaintUserSupervisor moFormMaintUserSupv;
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
+    private SFormMaterialConsumptionEntityBudget moFormMaterialConsumptionEntityBudget;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -246,7 +250,7 @@ public class SModuleTrn extends SGuiModule {
                 registry = new SDbMaterialCostCenterGroup();
                 break;
             case SModConsts.TRN_MAT_REQ:
-            case SModConsts.TRNX_MAT_REQ_PEND:
+            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 registry = new SDbMaterialRequest();
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
@@ -257,6 +261,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_CONS_SUBENT:
                 registry = new SDbMaterialConsumptionSubentity();
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
+                registry = new SDbMaterialConsumptionEntityBudget();
                 break;
             case SModConsts.TRN_MAT_PROV_ENT:
                 registry = new SDbMaterialProvisionEntity();
@@ -578,18 +585,26 @@ public class SModuleTrn extends SGuiModule {
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
-            case SModConsts.TRNX_MAT_REQ_PEND:
+            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PROV: title = "Requisiciones x surtir"; break;
-                    case SModSysConsts.TRNX_MAT_REQ_PUR: title = "Requisiciones x comprar"; break;
+                    case SModSysConsts.TRNX_MAT_REQ_PROV: 
+                        switch (params.getType()) {
+                            case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "Req x suministrar a detalle"; break;
+                            case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "Requisiciones suministrar"; break;
+                            case SLibConsts.UNDEFINED: title = "Requisiciones x suministrar"; break;
+                        }
+                    break;
                 }
-                view = new SViewMaterialRequestPending(miClient, subtype, title);
+                view = new SViewMaterialRequestPending(miClient, subtype, title, params);
                 break;
             case SModConsts.TRN_MAT_CONS_ENT:
                 view = new SViewMaterialConsumptionEntity(miClient, "Centros de consumo");
                 break;
             case SModConsts.TRN_MAT_CONS_SUBENT:
-                view = new SViewMaterialConsumptionSubentity(miClient, "Centros de consumo");
+                view = new SViewMaterialConsumptionSubentity(miClient, "Subcentros de consumo");
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
+                view = new SViewMaterialConsumptionEntityBudget(miClient, "Centros de consumo presupuesto");
                 break;
             case SModConsts.TRN_MAT_PROV_ENT:
                 view = new SViewMaterialProvisionEntity(miClient, "Centros de suministro");
@@ -718,6 +733,10 @@ public class SModuleTrn extends SGuiModule {
                 if (moFormMaintArea == null) moFormMaintArea = new SFormMaintArea(miClient, "Área de mantenimiento");
                 form = moFormMaintArea;
                 break;
+            case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
+                if (moFormMaterialConsumptionEntityBudget == null) moFormMaterialConsumptionEntityBudget = new SFormMaterialConsumptionEntityBudget(miClient, "Presupuesto centros de consumo");
+                form = moFormMaterialConsumptionEntityBudget;
+                break;
             case SModConsts.TRN_MAINT_USER:
                 switch (subtype){
                     case SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE:
@@ -748,7 +767,7 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormMaterialCostCenterGroup;
                 break;
             case SModConsts.TRN_MAT_REQ:
-            case SModConsts.TRNX_MAT_REQ_PEND:
+            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
                 form = moFormMaterialReq;
                 break;
