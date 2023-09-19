@@ -31,6 +31,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected Date mtDateRequest_n;
     protected double mdQuantity;
     protected double mdFactorConvertion;
+    protected double mdPriceUnitarySystem;
+    protected double mdPriceUnitary;
+    protected String msPriceUnitaryReference;
+    protected double mdTotal_r;
     protected int mnCosnsumptionEstimated;
     protected boolean mbNewItem;
     //protected boolean mbDeleted;
@@ -41,6 +45,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected int mnFkEntMatConsumptionEntityId_n;
     protected int mnFkSubentMatConsumptionEntityId_n;
     protected int mnFkSubentMatConsumptionSubentityId_n;
+    protected int mnFkCostCenterId_n;
     
     protected ArrayList<SDbMaterialRequestEntryNote> maChildNotes;
     
@@ -50,6 +55,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected SDbMaterialConsumptionEntity moDbmsMatConsEntity;
     protected SDbMaterialConsumptionSubentity moDbmsMatConsSubentity;
     protected SDbMaterialRequestPriority moDbmsMatReqPty;
+    protected SDbMaterialPresentation moDbmsPresentation;
 
     public SDbMaterialRequestEntry() {
         super(SModConsts.TRN_MAT_REQ_ETY);
@@ -60,6 +66,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setDateRequest_n(Date t) { mtDateRequest_n = t; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setFactorConvertion(double d) { mdFactorConvertion = d; }
+    public void setPriceUnitarySystem(double d) { mdPriceUnitarySystem = d; }
+    public void setPriceUnitary(double d) { mdPriceUnitary = d; }
+    public void setPriceUnitaryReference(String s) { msPriceUnitaryReference = s; }
+    public void setTotal_r(double d) { mdTotal_r = d; }
     public void setCosnsumptionEstimated(int n) { mnCosnsumptionEstimated = n; }
     public void setNewItem(boolean b) { mbNewItem = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -70,6 +80,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setFkEntMatConsumptionEntityId_n(int n) { mnFkEntMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionEntityId_n(int n) { mnFkSubentMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionSubentityId_n(int n) { mnFkSubentMatConsumptionSubentityId_n = n; }
+    public void setFkCostCenterId_n(int n) { mnFkCostCenterId_n = n; }
     
     public void setDataItem(SDataItem o) { moDataItem = o; }
     
@@ -80,6 +91,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public Date getDateRequest_n() { return mtDateRequest_n; }
     public double getQuantity() { return mdQuantity; }
     public double getFactorConvertion() { return mdFactorConvertion; }
+    public double getPriceUnitarySystem() { return mdPriceUnitarySystem; }
+    public double getPriceUnitary() { return mdPriceUnitary; }
+    public String getPriceUnitaryReference() { return msPriceUnitaryReference; }
+    public double getTotal_r() { return mdTotal_r; }
     public int getCosnsumptionEstimated() { return mnCosnsumptionEstimated; }
     public boolean isNewItem() { return mbNewItem; }
     public boolean isDeleted() { return mbDeleted; }
@@ -90,6 +105,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public int getFkEntMatConsumptionEntityId_n() { return mnFkEntMatConsumptionEntityId_n; }
     public int getFkSubentMatConsumptionEntityId_n() { return mnFkSubentMatConsumptionEntityId_n; }
     public int getFkSubentMatConsumptionSubentityId_n() { return mnFkSubentMatConsumptionSubentityId_n; }
+    public int getFkCostCenterId_n() { return mnFkCostCenterId_n; }
     
     public ArrayList<SDbMaterialRequestEntryNote> getChildNotes() { return maChildNotes; }
     
@@ -104,11 +120,35 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         }
         return "";
     }
+    
+    /**
+     * Obtiene las configuraciones de sub entidad de consumo vs centros de costo
+     * 
+     * @return lista de configuraciones
+     */
+    public ArrayList<SMatConsumeSubEntCcConfig> getCcConfis() {
+        ArrayList<SMatConsumeSubEntCcConfig> lConfigs = new ArrayList<>();
+        
+        if (mnFkSubentMatConsumptionEntityId_n > 0 && mnFkSubentMatConsumptionSubentityId_n > 0) {
+            SMatConsumeSubEntCcConfig oConfig = new SMatConsumeSubEntCcConfig();
+            
+            oConfig.setFkMaterialRequestId(mnPkMatRequestId);
+            oConfig.setFkMaterialRequestEntryId(mnPkEntryId);
+            oConfig.setFkSubentMatConsumptionEntityId(mnFkSubentMatConsumptionEntityId_n);
+            oConfig.setFkSubentMatConsumptionSubentityId(mnFkSubentMatConsumptionSubentityId_n);
+            oConfig.setFkCostCenterId(mnFkCostCenterId_n);
+
+            lConfigs.add(oConfig);
+        }
+        
+        return lConfigs;
+    }
 
     public void readOptionalInfo(SGuiSession session) throws Exception {
         moDbmsMatConsEntity = null;
         moDbmsMatConsSubentity = null;
         moDbmsMatReqPty = null;
+        moDbmsPresentation = null;
         
         if (mnFkEntMatConsumptionEntityId_n != 0) {
             moDbmsMatConsEntity = new SDbMaterialConsumptionEntity();
@@ -121,6 +161,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         if (mnFkMatRequestPriorityId_n != 0) {
             moDbmsMatReqPty = new SDbMaterialRequestPriority();
             moDbmsMatReqPty.read(session, new int[] { mnFkMatRequestPriorityId_n });
+        }
+        if (mnFkMatPresentationId != 0) {
+            moDbmsPresentation = new SDbMaterialPresentation();
+            moDbmsPresentation.read(session, new int[] { mnFkMatPresentationId });
         }
     }
             
@@ -144,6 +188,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mtDateRequest_n = null;
         mdQuantity = 0;
         mdFactorConvertion = 0;
+        mdPriceUnitarySystem = 0;
+        mdPriceUnitary = 0;
+        msPriceUnitaryReference = "";
+        mdTotal_r = 0;
         mnCosnsumptionEstimated = 0;
         mbNewItem = false;
         mbDeleted = false;
@@ -154,6 +202,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mnFkEntMatConsumptionEntityId_n = 0;
         mnFkSubentMatConsumptionEntityId_n = 0;
         mnFkSubentMatConsumptionSubentityId_n = 0;
+        mnFkCostCenterId_n = 0;
         
         maChildNotes = new ArrayList<>();
         
@@ -162,6 +211,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         moDbmsMatConsEntity = null;
         moDbmsMatConsSubentity = null;
         moDbmsMatReqPty = null;
+        moDbmsPresentation = null;
     }
 
     @Override
@@ -213,6 +263,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mtDateRequest_n = resultSet.getDate("dt_req_n");
             mdQuantity = resultSet.getDouble("qty");
             mdFactorConvertion = resultSet.getDouble("fact_conv");
+            mdPriceUnitarySystem = resultSet.getDouble("price_u_sys");
+            mdPriceUnitary = resultSet.getDouble("price_u");
+            msPriceUnitaryReference = resultSet.getString("price_u_ref");
+            mdTotal_r = resultSet.getDouble("tot_r");
             mnCosnsumptionEstimated = resultSet.getInt("cons_est");
             mbNewItem = resultSet.getBoolean("b_new_item");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -223,6 +277,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mnFkEntMatConsumptionEntityId_n = resultSet.getInt("fk_ent_mat_cons_ent_n");
             mnFkSubentMatConsumptionEntityId_n = resultSet.getInt("fk_subent_mat_cons_ent_n");
             mnFkSubentMatConsumptionSubentityId_n = resultSet.getInt("fk_subent_mat_cons_subent_n");
+            mnFkCostCenterId_n = resultSet.getInt("fk_cc_n");
             
             // Read aswell document notes:
             
@@ -272,6 +327,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") + 
                     mdQuantity + ", " + 
                     mdFactorConvertion + ", " + 
+                    mdPriceUnitarySystem + ", " + 
+                    mdPriceUnitary + ", " + 
+                    "'" + msPriceUnitaryReference + "', " + 
+                    mdTotal_r + ", " + 
                     mnCosnsumptionEstimated + ", " + 
                     (mbNewItem ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -281,7 +340,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") + 
                     (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") + 
                     (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") + 
-                    (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL " : mnFkSubentMatConsumptionSubentityId_n + " ") + 
+                    (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId_n + ", ") + 
+                    (mnFkCostCenterId_n == 0 ? "NULL " : mnFkCostCenterId_n + " ") + 
                     ")";
         }
         else {
@@ -293,6 +353,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     "dt_req_n = " + (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") +
                     "qty = " + mdQuantity + ", " +
                     "fact_conv = " + mdFactorConvertion + ", " +
+                    "price_u_sys = " + mdPriceUnitarySystem + ", " +
+                    "price_u = " + mdPriceUnitary + ", " +
+                    "price_u_ref = '" + msPriceUnitaryReference + "', " +
+                    "tot_r = " + mdTotal_r + ", " +
                     "cons_est = " + mnCosnsumptionEstimated + ", " +
                     "b_new_item = " + (mbNewItem ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -302,7 +366,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     "fk_mat_req_pty_n = " + (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") +
                     "fk_ent_mat_cons_ent_n = " + (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") +
                     "fk_subent_mat_cons_ent_n = " + (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") +
-                    "fk_subent_mat_cons_subent_n = " + (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL " : mnFkSubentMatConsumptionSubentityId_n + " ") +
+                    "fk_subent_mat_cons_subent_n = " + (mnFkSubentMatConsumptionSubentityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionSubentityId_n + ", ") +
+                    "fk_cc_n = " + (mnFkCostCenterId_n == 0 ? "NULL " : mnFkCostCenterId_n + " ") +
                     getSqlWhere();
         }
         
@@ -333,6 +398,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         registry.setDateRequest_n(this.getDateRequest_n());
         registry.setQuantity(this.getQuantity());
         registry.setFactorConvertion(this.getFactorConvertion());
+        registry.setPriceUnitarySystem(this.getPriceUnitarySystem());
+        registry.setPriceUnitary(this.getPriceUnitary());
+        registry.setPriceUnitaryReference(this.getPriceUnitaryReference());
+        registry.setTotal_r(this.getTotal_r());
         registry.setCosnsumptionEstimated(this.getCosnsumptionEstimated());
         registry.setNewItem(this.isNewItem());
         registry.setDeleted(this.isDeleted());
@@ -343,6 +412,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         registry.setFkEntMatConsumptionEntityId_n(this.getFkEntMatConsumptionEntityId_n());
         registry.setFkSubentMatConsumptionEntityId_n(this.getFkSubentMatConsumptionEntityId_n());
         registry.setFkSubentMatConsumptionSubentityId_n(this.getFkSubentMatConsumptionSubentityId_n());
+        registry.setFkCostCenterId_n(this.getFkCostCenterId_n());
         
         for (SDbMaterialRequestEntryNote note : this.getChildNotes()) {
             registry.getChildNotes().add(note);
@@ -400,11 +470,15 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             case 1: value = mbNewItem ? getDescription() : moDataItem.getName(); break;
             case 2: value = mdQuantity; break;
             case 3: value = mbNewItem ? "" : moDataItem.getDbmsDataUnit().getSymbol(); break;
-            case 4: value = mbNewItem; break;
-            case 5: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
-            case 6: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
-            case 7: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
-            case 8: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
+            case 4: value = mdTotal_r; break;
+            case 5: value = mbNewItem; break;
+            case 6: value = moDbmsPresentation != null ? moDbmsPresentation.getName(): ""; break;
+            case 7: value = mdFactorConvertion; break;
+            case 8: value = mnCosnsumptionEstimated; break;
+            case 9: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
+            case 10: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
+            case 11: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
+            case 12: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
         }
         
         return value;

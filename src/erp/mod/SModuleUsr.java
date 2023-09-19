@@ -66,7 +66,15 @@ public class SModuleUsr extends SGuiModule {
                         + "WHERE NOT b_del "
                         + "ORDER BY usr ";
                 break;
-                default:
+            case SModConsts.USRS_LINK:
+                settings = new SGuiCatalogueSettings("Tipo de referencia", 1);
+                sql = "SELECT id_link AS " + SDbConsts.FIELD_ID + "1, "
+                        + "name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name ";
+                break;
+            default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 

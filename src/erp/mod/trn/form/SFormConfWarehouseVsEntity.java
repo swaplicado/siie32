@@ -66,6 +66,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         jpRegistry = new javax.swing.JPanel();
         jpProvision = new javax.swing.JPanel();
         jpWarehouse = new javax.swing.JPanel();
+        jlWarehouse = new javax.swing.JLabel();
         moTextWarehouse = new sa.lib.gui.bean.SBeanFieldText();
         jpProvAvailable = new javax.swing.JPanel();
         jpProvAvailableLabel = new javax.swing.JPanel();
@@ -92,6 +93,9 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         jpProvision.setLayout(new java.awt.BorderLayout());
 
         jpWarehouse.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlWarehouse.setText("Almacén:");
+        jpWarehouse.add(jlWarehouse);
 
         moTextWarehouse.setEditable(false);
         moTextWarehouse.setEnabled(false);
@@ -179,6 +183,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
     private javax.swing.JButton jbProvRemoveAll;
     private javax.swing.JLabel jlProvAvailable;
     private javax.swing.JLabel jlProvSelected;
+    private javax.swing.JLabel jlWarehouse;
     private javax.swing.JPanel jpGridProvAva;
     private javax.swing.JPanel jpGridProvSel;
     private javax.swing.JPanel jpProvAvailable;

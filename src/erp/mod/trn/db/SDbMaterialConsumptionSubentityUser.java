@@ -19,52 +19,58 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implements SGridRow, Serializable {
-    
-    protected int mnPkMatConsumptionEntityId;
-    protected int mnPkEmployeeId;
-    protected boolean mbDefault;
-    /*
-    protected int mnFkUserInsertId;
-    protected Date mtTsUserInsert;
-    */
-    
-    protected SDbMaterialConsumptionEntity moAuxMatConsEnt;
+public class SDbMaterialConsumptionSubentityUser extends SDbRegistryUser implements SGridRow, Serializable {
 
-    public SDbMaterialConsumptionEntityEmployee() {
-        super(SModConsts.TRN_MAT_CONS_ENT_EMP);
+    protected int mnPkMatConsumptionEntityId;
+    protected int mnPkMatConsumptionSubentityId;
+    protected int mnPkLinkId;
+    protected int mnPkReferenceId;
+    protected boolean mbDefault;
+    protected int mnFkUserId;
+    protected Date mtTsUser;
+    
+    protected SDbMaterialConsumptionSubentity moAuxMatConsSubent;
+
+    public SDbMaterialConsumptionSubentityUser() {
+        super(SModConsts.TRN_MAT_CONS_SUBENT_USR);
     }
-    
+
     public void setPkMatConsumptionEntityId(int n) { mnPkMatConsumptionEntityId = n; }
-    public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
+    public void setPkMatConsumptionSubentityId(int n) { mnPkMatConsumptionSubentityId = n; }
+    public void setPkLinkId(int n) { mnPkLinkId = n; }
+    public void setPkReferenceId(int n) { mnPkReferenceId = n; }
     public void setDefault(boolean b) { mbDefault = b; }
-    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
-    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
+    public void setFkUserId(int n) { mnFkUserId = n; }
+    public void setTsUser(Date t) { mtTsUser = t; }
     
-    public void setAuxMatConsEnt(SDbMaterialConsumptionEntity o) { moAuxMatConsEnt = o; }
+    public void setAuxMatConsSubent (SDbMaterialConsumptionSubentity o) { moAuxMatConsSubent = o; }
     
     public int getPkMatConsumptionEntityId() { return mnPkMatConsumptionEntityId; }
-    public int getPkEmployeeId() { return mnPkEmployeeId; }
+    public int getPkMatConsumptionSubentityId() { return mnPkMatConsumptionSubentityId; }
+    public int getPkLinkId() { return mnPkLinkId; }
+    public int getPkReferenceId() { return mnPkReferenceId; }
     public boolean isDefault() { return mbDefault; }
-    public int getFkUserInsertId() { return mnFkUserInsertId; }
-    public Date getTsUserInsert() { return mtTsUserInsert; }
+    public int getFkUserId() { return mnFkUserId; }
+    public Date getTsUser() { return mtTsUser; }
     
-    public SDbMaterialConsumptionEntity getAuxMatConsEnt() { return moAuxMatConsEnt; }
-
-    public void readAuxMatConsEnt(SGuiSession session) throws Exception {
-        moAuxMatConsEnt = new SDbMaterialConsumptionEntity();
-        moAuxMatConsEnt.read(session, new int[] { mnPkMatConsumptionEntityId });
+    public SDbMaterialConsumptionSubentity getAuxMatConsSubent() { return moAuxMatConsSubent; }
+    
+    public void readAuxMatConsSubent(SGuiSession session) throws Exception {
+        moAuxMatConsSubent = new SDbMaterialConsumptionSubentity();
+        moAuxMatConsSubent.read(session, new int[] { mnPkMatConsumptionEntityId, mnPkMatConsumptionSubentityId });
     }
     
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkMatConsumptionEntityId = pk[0];
-        mnPkEmployeeId = pk[1];
+        mnPkMatConsumptionSubentityId = pk[1];
+        mnPkLinkId = pk[2];
+        mnPkReferenceId = pk[3];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkMatConsumptionEntityId, mnPkEmployeeId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkMatConsumptionSubentityId, mnPkLinkId, mnPkReferenceId };
     }
 
     @Override
@@ -72,12 +78,14 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
         initBaseRegistry();
         
         mnPkMatConsumptionEntityId = 0;
-        mnPkEmployeeId = 0;
+        mnPkMatConsumptionSubentityId = 0;
+        mnPkLinkId = 0;
+        mnPkReferenceId = 0;
         mbDefault = false;
-        mnFkUserInsertId = 0;
-        mtTsUserInsert = null;
+        mnFkUserId = 0;
+        mtTsUser = null;
         
-        moAuxMatConsEnt = null;
+        moAuxMatConsSubent = null;
     }
 
     @Override
@@ -88,13 +96,17 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
     @Override
     public String getSqlWhere() {
         return "WHERE id_mat_cons_ent = " + mnPkMatConsumptionEntityId + " " +
-                "AND id_emp = " + mnPkEmployeeId + " ";
+                "AND id_mat_cons_subent = " + mnPkMatConsumptionSubentityId + " " +
+                "AND id_link = " + mnPkLinkId + " " +
+                "AND id_ref = " + mnPkReferenceId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_mat_cons_ent = " + pk[0] + " " +
-                "AND id_emp = " + pk[1] + " ";
+    return "WHERE id_mat_cons_ent = " + pk[0] + " " +
+                "AND id_mat_cons_subent = " + pk[1] + " " +
+                "AND id_link = " + pk[2] + " " +
+                "AND id_ref = " + pk[3] + " ";
     }
 
     @Override
@@ -117,12 +129,14 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
         }
         else {
             mnPkMatConsumptionEntityId = resultSet.getInt("id_mat_cons_ent");
-            mnPkEmployeeId = resultSet.getInt("id_emp");
+            mnPkMatConsumptionSubentityId = resultSet.getInt("id_mat_cons_subent");
+            mnPkLinkId = resultSet.getInt("id_link");
+            mnPkReferenceId = resultSet.getInt("id_ref");
             mbDefault = resultSet.getBoolean("b_default");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mnFkUserId = resultSet.getInt("fk_usr");
+            mtTsUser = resultSet.getTimestamp("ts_usr");
             
-            readAuxMatConsEnt(session);
+            readAuxMatConsSubent(session);
 
             mbRegistryNew = false;
         }
@@ -135,24 +149,28 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        mnFkUserInsertId = session.getUser().getPkUserId();
+        mnFkUserId = session.getUser().getPkUserId();
         
         if (mbRegistryNew) {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkMatConsumptionEntityId + ", " + 
-                    mnPkEmployeeId + ", " + 
-                    (mbDefault ? 1 : 0) + ", " +
-                    mnFkUserInsertId + ", " + 
+                    mnPkMatConsumptionSubentityId + ", " + 
+                    mnPkLinkId + ", " + 
+                    mnPkReferenceId + ", " + 
+                    (mbDefault ? 1 : 0) + ", " + 
+                    mnFkUserId + ", " + 
                     "NOW()" + " " + 
                     ")";
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
                     //"id_mat_cons_ent = " + mnPkMatConsumptionEntityId + ", " +
-                    //"id_bp = " + mnPkEmployeeId + ", " +
-                    "b_default = " + (mbDefault ? 1 : 0) + ", " +
-                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                    //"ts_usr_ins = " + "NOW()" + " " +
+                    //"id_mat_cons_subent = " + mnPkMatConsumptionSubentityId + ", " +
+                    //"id_link = " + mnPkLinkId + ", " +
+                    //"id_ref = " + mnPkReferenceId + ", " +
+                    "b_default = " + (mbDefault ? 1 : 0) + " " +
+                    //"fk_usr = " + mnFkUserId + ", " +
+                    //"ts_usr = " + "NOW()" + ", " +
                     getSqlWhere();
         }
         
@@ -163,14 +181,16 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
     }
 
     @Override
-    public SDbMaterialConsumptionEntityEmployee clone() throws CloneNotSupportedException {
-        SDbMaterialConsumptionEntityEmployee registry = new SDbMaterialConsumptionEntityEmployee();
+    public SDbMaterialConsumptionSubentityUser clone() throws CloneNotSupportedException {
+        SDbMaterialConsumptionSubentityUser registry = new SDbMaterialConsumptionSubentityUser();
         
         registry.setPkMatConsumptionEntityId(this.getPkMatConsumptionEntityId());
-        registry.setPkEmployeeId(this.getPkEmployeeId());
+        registry.setPkMatConsumptionSubentityId(this.getPkMatConsumptionSubentityId());
+        registry.setPkLinkId(this.getPkLinkId());
+        registry.setPkReferenceId(this.getPkReferenceId());
         registry.setDefault(this.isDefault());
-        registry.setFkUserInsertId(this.getFkUserInsertId());
-        registry.setTsUserInsert(this.getTsUserInsert());
+        registry.setFkUserId(this.getFkUserId());
+        registry.setTsUser(this.getTsUser());
 
         registry.setRegistryNew(this.isRegistryNew());
         
@@ -179,7 +199,7 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
 
     @Override
     public int[] getRowPrimaryKey() {
-        return new int [] { mnPkMatConsumptionEntityId, mnPkEmployeeId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkMatConsumptionSubentityId, mnPkLinkId, mnPkReferenceId };
     }
 
     @Override
@@ -217,8 +237,9 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
         Object value = null;
         
         switch (col) {
-            case 0: value = moAuxMatConsEnt.getName(); break;
-            case 1: value = mbDefault; break;
+            case 0: value = moAuxMatConsSubent.getXtaConsumptionEntityName(); break;
+            case 1: value = moAuxMatConsSubent.getName(); break;
+            case 2: value = mbDefault; break;
         }
         
         return value;
@@ -227,7 +248,7 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
     @Override
     public void setRowValueAt(Object value, int col) {
         switch (col) {
-            case 1: mbDefault = (boolean) value; break;
+            case 2: mbDefault = (boolean) value; break;
         }
     }
 }
