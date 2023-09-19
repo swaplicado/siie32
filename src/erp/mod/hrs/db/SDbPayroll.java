@@ -531,15 +531,14 @@ public class SDbPayroll extends SDbRegistryUser {
 
             statement = session.getStatement().getConnection().createStatement();
 
-            msSql = "SELECT pr.id_pay, pr.id_emp " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-                    "p.id_pay = pr.id_pay " +
-                    "WHERE pr.id_pay = " + mnPkPayrollId + "; ";
+            msSql = "SELECT id_emp " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " " +
+                    "WHERE id_pay = " + mnPkPayrollId + " " +
+                    "ORDER BY id_emp;";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
                 SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
-                payrollReceipt.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                payrollReceipt.read(session, new int[] { mnPkPayrollId, resultSet.getInt(1) });
                 maChildPayrollReceipts.add(payrollReceipt);
             }
 
