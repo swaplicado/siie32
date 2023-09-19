@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import sa.lib.gui.SGuiClient;
 
 /**
@@ -19,16 +17,16 @@ import sa.lib.gui.SGuiClient;
  * @author AdrianAviles
  */
 public class SConectionUtils {
-    
+
     private SGuiClient miClient;
     public int responseCode;
     public StringBuffer response;
-    
+
     public SConectionUtils(SGuiClient client) {
         miClient = client;
     }
-        
-    public void conectWithSiieApp(String url, String method, String data, String authorization){
+
+    public void conectWithSiieApp(String url, String method, String data, String authorization) {
         try {
             // URL del servidor web
             URL oUrl = new URL(url);
@@ -38,8 +36,8 @@ public class SConectionUtils {
 
             // Establecer método de solicitud
             connection.setRequestMethod(method);
-            
-            if(authorization != null){
+
+            if (authorization != null) {
                 connection.setRequestProperty("Authorization", authorization);
             }
 
@@ -48,8 +46,9 @@ public class SConectionUtils {
 
             // Establecer el tipo de contenido
             connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
 
-            if(method == "POST"){
+            if (method == "POST") {
                 // Escribir los datos en el cuerpo de la solicitud
                 OutputStream outputStream = connection.getOutputStream();
                 outputStream.write(data.getBytes());
@@ -69,7 +68,7 @@ public class SConectionUtils {
             }
             reader.close();
         } catch (Exception e) {
-            
+
         }
     }
 }

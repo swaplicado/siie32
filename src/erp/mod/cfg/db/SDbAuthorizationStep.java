@@ -58,6 +58,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
 
     protected String msAuxStepUsername;
     protected String msAuxAuthUsername;
+    protected String msAuxRejectUsername;
 
     public SDbAuthorizationStep() {
         super(SModConsts.CFGU_AUTHORN_STEP);
@@ -128,6 +129,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     
     public String getAuxStepUsername() { return msAuxStepUsername; }
     public String getAuxAuthUsername() { return msAuxAuthUsername; }
+    public String getAuxRejectUsername() { return msAuxRejectUsername; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -176,6 +178,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         
         msAuxStepUsername = "";
         msAuxAuthUsername = "";
+        msAuxRejectUsername = "";
     }
 
     @Override
@@ -276,6 +279,18 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         }
         else {
             msAuxAuthUsername = "";
+        }
+        
+        String userReject = "SELECT usr "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.USRU_USR) 
+                    + " WHERE id_usr = " + mnFkUserRejectId_n;
+        
+        ResultSet resultSetReject = session.getStatement().getConnection().createStatement().executeQuery(userReject);
+        if (resultSetReject.next()) {
+            msAuxRejectUsername = resultSetReject.getString("usr");
+        }
+        else {
+            msAuxRejectUsername = "";
         }
 
         mnQueryResultId = SDbConsts.READ_OK;

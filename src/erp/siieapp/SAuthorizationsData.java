@@ -5,28 +5,34 @@
  */
 package erp.siieapp;
 
-import java.util.Date;
-
 /**
  *
  * @author AdrianAviles
  */
 public class SAuthorizationsData {
     int[] idData;
-    Date date;
     String folio;
-    int dataType;
+    String authorizationStatusName;
+    String authorizationTypeName;
+    String dataTypeName;
+    String userCreator;
+    String userUpdator;
+    String consumeEntity;
+    String supplierEntity;
+    String requisitionStatus;
+    String date;
+    int fkDataType;
     int fkUserCreator;
     int fkUserUpdator;
-    Date dateInsert;
-    Date dateUpdate;
     int authorizationStatus;
+    String dateInsert;
+    String dateUpdate;
 
     public void setIdData(int[] idData) {
         this.idData = idData;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -35,7 +41,7 @@ public class SAuthorizationsData {
     }
 
     public void setDataType(int dataType) {
-        this.dataType = dataType;
+        this.fkDataType = dataType;
     }
 
     public void setFkUserCreator(int fkUserCreator) {
@@ -46,11 +52,11 @@ public class SAuthorizationsData {
         this.fkUserUpdator = fkUserUpdator;
     }
 
-    public void setDateInsert(Date dateInsert) {
+    public void setDateInsert(String dateInsert) {
         this.dateInsert = dateInsert;
     }
 
-    public void setDateUpdate(Date dateUpdate) {
+    public void setDateUpdate(String dateUpdate) {
         this.dateUpdate = dateUpdate;
     }
 
@@ -62,7 +68,7 @@ public class SAuthorizationsData {
         return idData;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -71,7 +77,7 @@ public class SAuthorizationsData {
     }
 
     public int getDataType() {
-        return dataType;
+        return fkDataType;
     }
 
     public int getFkUserCreator() {
@@ -82,15 +88,89 @@ public class SAuthorizationsData {
         return fkUserUpdator;
     }
 
-    public Date getDateInsert() {
+    public String getDateInsert() {
         return dateInsert;
     }
 
-    public Date getDateUpdate() {
+    public String getDateUpdate() {
         return dateUpdate;
     }
 
     public int getAuthorizationStatus() {
         return authorizationStatus;
     }
+
+    public String getAuthorizationStatusName() {
+        return authorizationStatusName;
+    }
+
+    public void setAuthorizationStatusName(String authorizationStatusName) {
+        this.authorizationStatusName = authorizationStatusName;
+    }
+
+    public String getAuthorizationTypeName() {
+        return authorizationTypeName;
+    }
+
+    public void setAuthorizationTypeName(String authorizationTypeName) {
+        this.authorizationTypeName = authorizationTypeName;
+    }
+
+    public String getDataTypeName() {
+        return dataTypeName;
+    }
+
+    public void setDataTypeName(String dataTypeName) {
+        this.dataTypeName = dataTypeName;
+    }
+
+    public String getUserCreator() {
+        return userCreator;
+    }
+
+    public void setUserCreator(String userCreator) {
+        this.userCreator = userCreator;
+    }
+
+    public String getUserUpdator() {
+        return userUpdator;
+    }
+
+    public void setUserUpdator(String userUpdator) {
+        this.userUpdator = userUpdator;
+    }
+
+    public String getConsumeEntity() {
+        return consumeEntity;
+    }
+
+    public void setConsumeEntity(String consumeEntity) {
+        this.consumeEntity = consumeEntity;
+    }
+
+    public String getSupplierEntity() {
+        return supplierEntity;
+    }
+
+    public void setSupplierEntity(String supplierEntity) {
+        this.supplierEntity = supplierEntity;
+    }
+
+    public String getRequisitionStatus() {
+        return requisitionStatus;
+    }
+
+    public void setRequisitionStatus(String requisitionStatus) {
+        this.requisitionStatus = requisitionStatus;
+    }
+
+    public int getFkDataType() {
+        return fkDataType;
+    }
+
+    public void setFkDataType(int fkDataType) {
+        this.fkDataType = fkDataType;
+    }
+    
+    
 }
