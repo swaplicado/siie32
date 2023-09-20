@@ -10,10 +10,13 @@ import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.trn.db.SDbMaterialCostCenterGroup;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mod.trn.db.SDbMaterialRequestEntryNote;
 import erp.mod.trn.db.SDbMaterialRequestNote;
+import erp.mod.trn.db.SMaterialRequestUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +25,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -29,6 +33,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibConsts;
@@ -43,7 +49,6 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiFieldKeyGroup;
 import sa.lib.gui.SGuiFields;
-import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
@@ -53,12 +58,18 @@ import sa.lib.gui.SGuiValidation;
  * @author Isabel Servín
  * 
  */
-public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements SGridPaneFormOwner, ActionListener, ListSelectionListener, ItemListener, FocusListener {
+public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  SGridPaneFormOwner, ActionListener, ListSelectionListener, ItemListener, FocusListener, CellEditorListener {
 
     private SDbMaterialRequest moRegistry;
+    
+    private ArrayList<SDbMaterialRequestCostCenter> maMatReqCC;
     private ArrayList<SDbMaterialRequestEntry> maMatReqEntries;
     private ArrayList<SDbMaterialRequestNote> maMatReqNotes;
+    
+    private SGridPaneForm moGridMatReqCC;
     private SGridPaneForm moGridMatReqList;
+    
+    private SFormMaterialRequestCostCenter moFormMatReqCC;
     
     private boolean isEtyNew;
     private boolean isCapturingData;
@@ -68,13 +79,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     
     private int mnStatusReqId;
     
-    private SGuiFieldKeyGroup moFieldKeyConsEntity;
     private SGuiFieldKeyGroup moFieldKeyConsEntityEty;
     private SGuiFields moFieldsEty;
     private SDataItem moItemEty;
     
     private JButton jbSaveAndSend;
-
+    
     /**
      * Creates new form SFormItemCost
      * @param client
@@ -100,6 +110,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpRegistry = new javax.swing.JPanel();
         jpCaptureArea = new javax.swing.JPanel();
         jpRequest = new javax.swing.JPanel();
+        jPanel20 = new javax.swing.JPanel();
         jpReq1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlProvEnt = new javax.swing.JLabel();
@@ -107,27 +118,21 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jPanel5 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         moIntNumber = new sa.lib.gui.bean.SBeanFieldInteger();
-        jPanel7 = new javax.swing.JPanel();
-        jlDate = new javax.swing.JLabel();
         moDate = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel8 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
         jlUsrReq = new javax.swing.JLabel();
         moKeyUsrReq = new sa.lib.gui.bean.SBeanFieldKey();
         jpReq2 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
-        jlConsEnt = new javax.swing.JLabel();
-        moKeyConsEnt = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel15 = new javax.swing.JPanel();
-        jlConsSubent = new javax.swing.JLabel();
-        moKeyConsSubent = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel16 = new javax.swing.JPanel();
         jlContractor = new javax.swing.JLabel();
         moKeyContractor = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel17 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
         moTextReferecnce = new sa.lib.gui.bean.SBeanFieldText();
         jbImport = new javax.swing.JButton();
-        moBoolImport = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel16 = new javax.swing.JPanel();
+        jlAsign = new javax.swing.JLabel();
+        moDecAsign = new sa.lib.gui.bean.SBeanFieldDecimal();
         jpReq3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jlDateReq = new javax.swing.JLabel();
@@ -136,19 +141,19 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jlPriReq = new javax.swing.JLabel();
         moKeyPriReq = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel26 = new javax.swing.JPanel();
-        jlReqStatus = new javax.swing.JLabel();
-        moTextReqStatus = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel27 = new javax.swing.JPanel();
+        jlTotal = new javax.swing.JLabel();
+        moDecTotal = new sa.lib.gui.bean.SBeanFieldDecimal();
         jpReqNotes = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jlReqNotes = new javax.swing.JLabel();
         moTextReqNotes = new sa.lib.gui.bean.SBeanFieldText();
+        jpTableCC = new javax.swing.JPanel();
         jpEty = new javax.swing.JPanel();
         jpEtyCapture = new javax.swing.JPanel();
         jpItem = new javax.swing.JPanel();
         jPanel29 = new javax.swing.JPanel();
         jlItem = new javax.swing.JLabel();
-        moTextItemCode = new sa.lib.gui.bean.SBeanFieldText();
+        moTextItemKey = new sa.lib.gui.bean.SBeanFieldText();
         moTextItemName = new sa.lib.gui.bean.SBeanFieldText();
         jbPickItem = new javax.swing.JButton();
         jPanel30 = new javax.swing.JPanel();
@@ -158,8 +163,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jlQty = new javax.swing.JLabel();
         moDecQty = new sa.lib.gui.bean.SBeanFieldDecimal();
         moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
-        jlConsEntEty = new javax.swing.JLabel();
-        moKeyConsEntEty = new sa.lib.gui.bean.SBeanFieldKey();
+        jLabel6 = new javax.swing.JLabel();
+        jlUnitPriceSist = new javax.swing.JLabel();
+        moDecUnitPriceSis = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlDateReqEty = new javax.swing.JLabel();
         moDateReqEty = new sa.lib.gui.bean.SBeanFieldDate();
         jlSpace = new javax.swing.JLabel();
@@ -167,16 +173,32 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jlConsDays = new javax.swing.JLabel();
         moIntConsDays = new sa.lib.gui.bean.SBeanFieldInteger();
         jLabel5 = new javax.swing.JLabel();
-        jlConsSubentEty = new javax.swing.JLabel();
-        moKeyConsSubentEty = new sa.lib.gui.bean.SBeanFieldKey();
+        jLabel7 = new javax.swing.JLabel();
+        jlUnitPrice = new javax.swing.JLabel();
+        moDecUnitPrice = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlPriEty = new javax.swing.JLabel();
         moKeyPriEty = new sa.lib.gui.bean.SBeanFieldKey();
         jlSpace3 = new javax.swing.JLabel();
         jPanel46 = new javax.swing.JPanel();
         jlPresentation = new javax.swing.JLabel();
         moKeyPresentation = new sa.lib.gui.bean.SBeanFieldKey();
+        jlTotalEty = new javax.swing.JLabel();
+        moDecTotalEty = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlConsEntEty = new javax.swing.JLabel();
+        moKeyConsEntEty = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel47 = new javax.swing.JPanel();
         jlFactConv = new javax.swing.JLabel();
         moDecFactConv = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jLabel1 = new javax.swing.JLabel();
+        jlUnitPriceRef = new javax.swing.JLabel();
+        moTextUnitPriceRef = new sa.lib.gui.bean.SBeanFieldText();
+        jlConsSubentEty = new javax.swing.JLabel();
+        moKeyConsSubentEty = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel48 = new javax.swing.JPanel();
+        jlEtyNotes = new javax.swing.JLabel();
+        moTextEtyNotes = new sa.lib.gui.bean.SBeanFieldText();
+        jlCostCenterEty = new javax.swing.JLabel();
+        moKeyCostCenterEty = new sa.lib.gui.bean.SBeanFieldKey();
         jpButtons = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
@@ -189,12 +211,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbDeleteEty = new javax.swing.JButton();
         jPanel18 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
-        jlEtyNotes = new javax.swing.JLabel();
-        moTextEtyNotes = new sa.lib.gui.bean.SBeanFieldText();
         jpTable = new javax.swing.JPanel();
         jpEntries = new javax.swing.JPanel();
         jpValidate = new javax.swing.JPanel();
         jpEstados = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        moTextReqStatus = new sa.lib.gui.bean.SBeanFieldText();
         jlAuthStatus = new javax.swing.JLabel();
         moTextAuthStatus = new sa.lib.gui.bean.SBeanFieldText();
         jbAuthorize = new javax.swing.JButton();
@@ -214,11 +236,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpRequest.setBorder(javax.swing.BorderFactory.createTitledBorder("Requisición:"));
         jpRequest.setLayout(new java.awt.BorderLayout());
 
-        jpReq1.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
+        jPanel20.setLayout(new java.awt.BorderLayout());
+
+        jpReq1.setLayout(new java.awt.GridLayout(3, 0, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlProvEnt.setText("Ent. suministro:*");
+        jlProvEnt.setText("Ctro. suministro:*");
         jlProvEnt.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlProvEnt);
 
@@ -229,7 +253,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNumber.setText("Folio:*");
+        jlNumber.setText("Folio y fecha:");
         jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlNumber);
 
@@ -237,94 +261,72 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moIntNumber.setPreferredSize(new java.awt.Dimension(73, 23));
         jPanel5.add(moIntNumber);
 
+        moDate.setEditable(false);
+        moDate.setEnabled(false);
+        jPanel5.add(moDate);
+
         jpReq1.add(jPanel5);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Fecha:*");
-        jlDate.setToolTipText("");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlDate);
+        jlUsrReq.setText("Solicitante:*");
+        jlUsrReq.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlUsrReq);
 
-        moDate.setEditable(false);
-        moDate.setEnabled(false);
-        jPanel7.add(moDate);
+        moKeyUsrReq.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel7.add(moKeyUsrReq);
 
         jpReq1.add(jPanel7);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel20.add(jpReq1, java.awt.BorderLayout.WEST);
 
-        jlUsrReq.setText("Solicitante:*");
-        jlUsrReq.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel8.add(jlUsrReq);
-
-        moKeyUsrReq.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel8.add(moKeyUsrReq);
-
-        jpReq1.add(jPanel8);
-
-        jpRequest.add(jpReq1, java.awt.BorderLayout.WEST);
-
-        jpReq2.setLayout(new java.awt.GridLayout(4, 0));
+        jpReq2.setLayout(new java.awt.GridLayout(3, 0));
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlConsEnt.setText("Ent. consumo:*");
-        jlConsEnt.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel14.add(jlConsEnt);
+        jlContractor.setText("Contratista:");
+        jlContractor.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel14.add(jlContractor);
 
-        moKeyConsEnt.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel14.add(moKeyConsEnt);
+        moKeyContractor.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel14.add(moKeyContractor);
 
         jpReq2.add(jPanel14);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlConsSubent.setText("Subent. cons.:");
-        jlConsSubent.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel15.add(jlConsSubent);
+        jlReference.setText("Referencia:");
+        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlReference);
 
-        moKeyConsSubent.setEnabled(false);
-        moKeyConsSubent.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel15.add(moKeyConsSubent);
+        moTextReferecnce.setEnabled(false);
+        moTextReferecnce.setPreferredSize(new java.awt.Dimension(73, 23));
+        jPanel15.add(moTextReferecnce);
+
+        jbImport.setText("Importar");
+        jbImport.setEnabled(false);
+        jbImport.setPreferredSize(new java.awt.Dimension(79, 23));
+        jPanel15.add(jbImport);
 
         jpReq2.add(jPanel15);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlContractor.setText("Contratista:");
-        jlContractor.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel16.add(jlContractor);
+        jlAsign.setText("Sum. asignación:");
+        jlAsign.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jlAsign);
+        jlAsign.getAccessibleContext().setAccessibleName("Suma asignación:");
 
-        moKeyContractor.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel16.add(moKeyContractor);
+        moDecAsign.setEditable(false);
+        moDecAsign.setText("0.00");
+        moDecAsign.setEnabled(false);
+        jPanel16.add(moDecAsign);
 
         jpReq2.add(jPanel16);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel20.add(jpReq2, java.awt.BorderLayout.CENTER);
 
-        jlReference.setText("Referencia:");
-        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel17.add(jlReference);
-
-        moTextReferecnce.setEnabled(false);
-        moTextReferecnce.setPreferredSize(new java.awt.Dimension(73, 23));
-        jPanel17.add(moTextReferecnce);
-
-        jbImport.setText("Importar");
-        jbImport.setEnabled(false);
-        jbImport.setPreferredSize(new java.awt.Dimension(79, 23));
-        jPanel17.add(jbImport);
-
-        moBoolImport.setText("Importado");
-        moBoolImport.setEnabled(false);
-        jPanel17.add(moBoolImport);
-
-        jpReq2.add(jPanel17);
-
-        jpRequest.add(jpReq2, java.awt.BorderLayout.CENTER);
-
-        jpReq3.setLayout(new java.awt.GridLayout(4, 0));
+        jpReq3.setLayout(new java.awt.GridLayout(3, 0));
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -349,21 +351,18 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlReqStatus.setText("Estatus:");
-        jlReqStatus.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel26.add(jlReqStatus);
+        jlTotal.setText("Total requisición:");
+        jlTotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel26.add(jlTotal);
 
-        moTextReqStatus.setEditable(false);
-        moTextReqStatus.setEnabled(false);
-        moTextReqStatus.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel26.add(moTextReqStatus);
+        moDecTotal.setEditable(false);
+        moDecTotal.setText("0.00");
+        moDecTotal.setEnabled(false);
+        jPanel26.add(moDecTotal);
 
         jpReq3.add(jPanel26);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        jpReq3.add(jPanel27);
-
-        jpRequest.add(jpReq3, java.awt.BorderLayout.EAST);
+        jPanel20.add(jpReq3, java.awt.BorderLayout.EAST);
 
         jpReqNotes.setLayout(new java.awt.GridLayout(1, 0));
 
@@ -378,7 +377,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpReqNotes.add(jPanel2);
 
-        jpRequest.add(jpReqNotes, java.awt.BorderLayout.SOUTH);
+        jPanel20.add(jpReqNotes, java.awt.BorderLayout.SOUTH);
+
+        jpRequest.add(jPanel20, java.awt.BorderLayout.NORTH);
+
+        jpTableCC.setPreferredSize(new java.awt.Dimension(77, 100));
+        jpTableCC.setLayout(new java.awt.BorderLayout());
+        jpRequest.add(jpTableCC, java.awt.BorderLayout.CENTER);
 
         jpCaptureArea.add(jpRequest, java.awt.BorderLayout.NORTH);
 
@@ -387,24 +392,22 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jpEtyCapture.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jpItem.setLayout(new java.awt.GridLayout(5, 0, 0, 5));
+        jpItem.setLayout(new java.awt.GridLayout(7, 0, 0, 5));
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItem.setText("Ítem:*");
         jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jlItem);
-
-        moTextItemCode.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel29.add(moTextItemCode);
+        jPanel29.add(moTextItemKey);
 
         moTextItemName.setEditable(false);
         moTextItemName.setEnabled(false);
-        moTextItemName.setPreferredSize(new java.awt.Dimension(690, 23));
+        moTextItemName.setPreferredSize(new java.awt.Dimension(665, 23));
         jPanel29.add(moTextItemName);
 
         jbPickItem.setText("...");
-        jbPickItem.setToolTipText("Seleccionar unidad");
+        jbPickItem.setToolTipText("Seleccionar ítem");
         jbPickItem.setFocusable(false);
         jbPickItem.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel29.add(jbPickItem);
@@ -424,23 +427,24 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlQty.setText("Cant. requerida:*");
+        jlQty.setText("Cantidad:*");
         jlQty.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel44.add(jlQty);
-
-        moDecQty.setPreferredSize(new java.awt.Dimension(130, 23));
         jPanel44.add(moDecQty);
 
         moKeyUnit.setEditable(true);
         moKeyUnit.setEnabled(false);
         jPanel44.add(moKeyUnit);
 
-        jlConsEntEty.setText("Ent. consumo:");
-        jlConsEntEty.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel44.add(jlConsEntEty);
+        jLabel6.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel44.add(jLabel6);
 
-        moKeyConsEntEty.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel44.add(moKeyConsEntEty);
+        jlUnitPriceSist.setText("Precio u. sist.:");
+        jlUnitPriceSist.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel44.add(jlUnitPriceSist);
+
+        moDecUnitPriceSis.setEditable(false);
+        jPanel44.add(moDecUnitPriceSis);
 
         jlDateReqEty.setText("Fecha requerida:");
         jlDateReqEty.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -455,31 +459,29 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlConsDays.setText("Días consumo:");
+        jlConsDays.setText("T. consumo:");
         jlConsDays.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel45.add(jlConsDays);
-
-        moIntConsDays.setPreferredSize(new java.awt.Dimension(130, 23));
         jPanel45.add(moIntConsDays);
 
-        jLabel5.setText("(estimación)");
+        jLabel5.setText("(días estimados)");
         jLabel5.setPreferredSize(new java.awt.Dimension(100, 23));
         jLabel5.setVerifyInputWhenFocusTarget(false);
         jPanel45.add(jLabel5);
 
-        jlConsSubentEty.setText("Subent. cons.:");
-        jlConsSubentEty.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel45.add(jlConsSubentEty);
+        jLabel7.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel45.add(jLabel7);
 
-        moKeyConsSubentEty.setEnabled(false);
-        moKeyConsSubentEty.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel45.add(moKeyConsSubentEty);
+        jlUnitPrice.setText("Precio u.:*");
+        jlUnitPrice.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel45.add(jlUnitPrice);
+        jPanel45.add(moDecUnitPrice);
 
         jlPriEty.setText("Prioridad:");
         jlPriEty.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel45.add(jlPriEty);
 
-        moKeyPriEty.setPreferredSize(new java.awt.Dimension(140, 23));
+        moKeyPriEty.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel45.add(moKeyPriEty);
 
         jlSpace3.setPreferredSize(new java.awt.Dimension(4, 23));
@@ -498,15 +500,68 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyPresentation.setPreferredSize(new java.awt.Dimension(236, 23));
         jPanel46.add(moKeyPresentation);
 
-        jlFactConv.setText("Fact. conversión:");
+        jlTotalEty.setText("Importe:");
+        jlTotalEty.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel46.add(jlTotalEty);
+
+        moDecTotalEty.setEditable(false);
+        jPanel46.add(moDecTotalEty);
+
+        jlConsEntEty.setText("Ctro. consumo:");
+        jlConsEntEty.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel46.add(jlConsEntEty);
+
+        moKeyConsEntEty.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel46.add(moKeyConsEntEty);
+
+        jpItem.add(jPanel46);
+
+        jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFactConv.setText("Factor conv.:");
         jlFactConv.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel46.add(jlFactConv);
+        jPanel47.add(jlFactConv);
 
         moDecFactConv.setToolTipText("Factor de conversión");
         moDecFactConv.setEnabled(false);
-        jPanel46.add(moDecFactConv);
+        jPanel47.add(moDecFactConv);
 
-        jpItem.add(jPanel46);
+        jLabel1.setPreferredSize(new java.awt.Dimension(131, 23));
+        jPanel47.add(jLabel1);
+
+        jlUnitPriceRef.setText("Ref. precio u.:*");
+        jlUnitPriceRef.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel47.add(jlUnitPriceRef);
+        jPanel47.add(moTextUnitPriceRef);
+
+        jlConsSubentEty.setText("Subctro. cons.:");
+        jlConsSubentEty.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel47.add(jlConsSubentEty);
+
+        moKeyConsSubentEty.setEnabled(false);
+        moKeyConsSubentEty.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel47.add(moKeyConsSubentEty);
+
+        jpItem.add(jPanel47);
+
+        jPanel48.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEtyNotes.setText("Notas:");
+        jlEtyNotes.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.add(jlEtyNotes);
+
+        moTextEtyNotes.setPreferredSize(new java.awt.Dimension(448, 23));
+        jPanel48.add(moTextEtyNotes);
+
+        jlCostCenterEty.setText("Centro costo:");
+        jlCostCenterEty.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel48.add(jlCostCenterEty);
+
+        moKeyCostCenterEty.setEnabled(false);
+        moKeyCostCenterEty.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel48.add(moKeyCostCenterEty);
+
+        jpItem.add(jPanel48);
 
         jpEtyCapture.add(jpItem, java.awt.BorderLayout.CENTER);
 
@@ -524,7 +579,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbRegisterEty.setText("Agregar");
+        jbRegisterEty.setText("Registrar");
         jbRegisterEty.setEnabled(false);
         jbRegisterEty.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel10.add(jbRegisterEty);
@@ -556,14 +611,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jPanel18.setLayout(new java.awt.BorderLayout());
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlEtyNotes.setText("Notas:");
-        jlEtyNotes.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel19.add(jlEtyNotes);
-
-        moTextEtyNotes.setPreferredSize(new java.awt.Dimension(890, 23));
-        jPanel19.add(moTextEtyNotes);
-
         jPanel18.add(jPanel19, java.awt.BorderLayout.CENTER);
 
         jpEtyCapture.add(jPanel18, java.awt.BorderLayout.SOUTH);
@@ -585,6 +632,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpValidate.setLayout(new java.awt.BorderLayout());
 
         jpEstados.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel3.setText("Estat.:");
+        jpEstados.add(jLabel3);
+
+        moTextReqStatus.setEditable(false);
+        moTextReqStatus.setEnabled(false);
+        moTextReqStatus.setPreferredSize(new java.awt.Dimension(110, 23));
+        jpEstados.add(moTextReqStatus);
 
         jlAuthStatus.setText("Autorización:");
         jpEstados.add(jlAuthStatus);
@@ -618,7 +673,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moBoolProvClosed.setText("Terminado");
         moBoolProvClosed.setToolTipText("Cerrado para suministro");
         moBoolProvClosed.setEnabled(false);
-        moBoolProvClosed.setPreferredSize(new java.awt.Dimension(125, 23));
         jpEstados.add(moBoolProvClosed);
 
         jlPurStatus.setText("Compras:");
@@ -642,7 +696,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -651,12 +709,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
@@ -664,10 +721,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
+    private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAuthorize;
     private javax.swing.JButton jbDeleteEty;
@@ -677,14 +735,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JButton jbPickItem;
     private javax.swing.JButton jbRegisterEty;
     private javax.swing.JButton jbReject;
+    private javax.swing.JLabel jlAsign;
     private javax.swing.JLabel jlAuthStatus;
     private javax.swing.JLabel jlConsDays;
-    private javax.swing.JLabel jlConsEnt;
     private javax.swing.JLabel jlConsEntEty;
-    private javax.swing.JLabel jlConsSubent;
     private javax.swing.JLabel jlConsSubentEty;
     private javax.swing.JLabel jlContractor;
-    private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlCostCenterEty;
     private javax.swing.JLabel jlDateReq;
     private javax.swing.JLabel jlDateReqEty;
     private javax.swing.JLabel jlEtyNotes;
@@ -700,9 +757,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JLabel jlQty;
     private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlReqNotes;
-    private javax.swing.JLabel jlReqStatus;
     private javax.swing.JLabel jlSpace;
     private javax.swing.JLabel jlSpace3;
+    private javax.swing.JLabel jlTotal;
+    private javax.swing.JLabel jlTotalEty;
+    private javax.swing.JLabel jlUnitPrice;
+    private javax.swing.JLabel jlUnitPriceRef;
+    private javax.swing.JLabel jlUnitPriceSist;
     private javax.swing.JLabel jlUsrReq;
     private javax.swing.JLabel jlspace;
     private javax.swing.JPanel jpButtons;
@@ -719,23 +780,27 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JPanel jpReqNotes;
     private javax.swing.JPanel jpRequest;
     private javax.swing.JPanel jpTable;
+    private javax.swing.JPanel jpTableCC;
     private javax.swing.JPanel jpValidate;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolImport;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolNewItem;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolProvClosed;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolPurClosed;
     private sa.lib.gui.bean.SBeanFieldDate moDate;
     private sa.lib.gui.bean.SBeanFieldDate moDateReq;
     private sa.lib.gui.bean.SBeanFieldDate moDateReqEty;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecAsign;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecFactConv;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecQty;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecTotal;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecTotalEty;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecUnitPrice;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecUnitPriceSis;
     private sa.lib.gui.bean.SBeanFieldInteger moIntConsDays;
     private sa.lib.gui.bean.SBeanFieldInteger moIntNumber;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyConsEnt;
     private sa.lib.gui.bean.SBeanFieldKey moKeyConsEntEty;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyConsSubent;
     private sa.lib.gui.bean.SBeanFieldKey moKeyConsSubentEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyContractor;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCostCenterEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPresentation;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPriEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPriReq;
@@ -744,45 +809,51 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private sa.lib.gui.bean.SBeanFieldKey moKeyUsrReq;
     private sa.lib.gui.bean.SBeanFieldText moTextAuthStatus;
     private sa.lib.gui.bean.SBeanFieldText moTextEtyNotes;
-    private sa.lib.gui.bean.SBeanFieldText moTextItemCode;
     private sa.lib.gui.bean.SBeanFieldText moTextItemDescription;
+    private sa.lib.gui.bean.SBeanFieldText moTextItemKey;
     private sa.lib.gui.bean.SBeanFieldText moTextItemName;
     private sa.lib.gui.bean.SBeanFieldText moTextProvStatus;
     private sa.lib.gui.bean.SBeanFieldText moTextPurStatus;
     private sa.lib.gui.bean.SBeanFieldText moTextReferecnce;
     private sa.lib.gui.bean.SBeanFieldText moTextReqNotes;
     private sa.lib.gui.bean.SBeanFieldText moTextReqStatus;
+    private sa.lib.gui.bean.SBeanFieldText moTextUnitPriceRef;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 1024, 671);
+        SGuiUtils.setWindowBounds(this, 1024, 700);
         
         moFieldsEty = new SGuiFields();
         
         moKeyProvEnt.setKeySettings(miClient, SGuiUtils.getLabelName(jlProvEnt), true);
         moIntNumber.setIntegerSettings(SGuiUtils.getLabelName(jlNumber), SGuiConsts.GUI_TYPE_INT, true);
-        moDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate), true);
+        moDate.setDateSettings(miClient, SGuiUtils.getLabelName("Fecha"), true);
         moKeyUsrReq.setKeySettings(miClient, SGuiUtils.getLabelName(jlUsrReq), true);
         moKeyContractor.setKeySettings(miClient, SGuiUtils.getLabelName(jlContractor), false);
         moTextReferecnce.setTextSettings(SGuiUtils.getLabelName(jlReference), 25, 0);
-        moKeyConsEnt.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsEnt), true);
-        moKeyConsSubent.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsSubent), false);
         moDateReq.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateReq), false);
         moKeyPriReq.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriReq), true);
-        moTextReqStatus.setTextSettings(SGuiUtils.getLabelName(jlReqStatus), 100, 0);
+        moTextReqStatus.setTextSettings(SGuiUtils.getLabelName("Estatus"), 100, 0);
+        moDecTotal.setDecimalSettings(SGuiUtils.getLabelName(jlTotal), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecAsign.setDecimalSettings(SGuiUtils.getLabelName(jlAsign), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
         moTextReqNotes.setTextSettings(SGuiUtils.getLabelName(jlReqNotes), 500, 0);
         
-        moTextItemCode.setTextSettings(SGuiUtils.getLabelName(jlItem), 500, 1);
+        moTextItemKey.setTextSettings(SGuiUtils.getLabelName(jlItem), 500, 1);
         moTextItemName.setTextSettings(SGuiUtils.getLabelName(jlItem), 500, 1);
         moBoolNewItem.setBooleanSettings(SGuiUtils.getLabelName(moBoolNewItem.getText()), false);
         moTextItemDescription.setTextSettings(SGuiUtils.getLabelName("Descripción"), 500, 1);
         moKeyPresentation.setKeySettings(miClient, SGuiUtils.getLabelName(jlPresentation), false);
         moDecFactConv.setDecimalSettings(SGuiUtils.getLabelName(jlFactConv), SGuiConsts.GUI_TYPE_DEC, false);
-        moDecQty.setDecimalSettings(SGuiUtils.getLabelName(jlQty), SGuiConsts.GUI_TYPE_DEC, true);
+        moDecQty.setDecimalSettings(SGuiUtils.getLabelName(jlQty), SGuiConsts.GUI_TYPE_DEC_QTY, true);
         moKeyUnit.setKeySettings(miClient, SGuiUtils.getLabelName("Unidad"), true);
         moIntConsDays.setIntegerSettings(SGuiUtils.getLabelName(jlConsDays), SGuiConsts.GUI_TYPE_INT, false);
+        moDecUnitPriceSis.setDecimalSettings(SGuiUtils.getLabelName(jlUnitPriceSist), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moDecUnitPrice.setDecimalSettings(SGuiUtils.getLabelName(jlUnitPrice), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecTotalEty.setDecimalSettings(SGuiUtils.getLabelName(jlUnitPrice), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moTextUnitPriceRef.setTextSettings(SGuiUtils.getLabelName(jlUnitPriceRef), 15);
         moKeyConsEntEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsEntEty), false);
         moKeyConsSubentEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsSubentEty), false);
+        moKeyCostCenterEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlCostCenterEty), false);
         moDateReqEty.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateReqEty), false);
         moKeyPriEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriEty), false);
         
@@ -798,15 +869,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moFields.addField(moKeyUsrReq);
         moFields.addField(moKeyContractor);
         moFields.addField(moTextReferecnce);
-        moFields.addField(moKeyConsEnt);
-        moFields.addField(moKeyConsSubent);
         moFields.addField(moDateReq);
         moFields.addField(moKeyPriReq);
         moFields.addField(moBoolProvClosed);
         moFields.addField(moTextReqStatus);
+        moFields.addField(moDecTotal);
         moFields.addField(moTextReqNotes);
         
-        moFieldsEty.addField(moTextItemCode);
+        moFieldsEty.addField(moTextItemKey);
         moFieldsEty.addField(moTextItemName);
         moFieldsEty.addField(moBoolNewItem);
         moFieldsEty.addField(moTextItemDescription);
@@ -815,15 +885,54 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moFieldsEty.addField(moDecQty);
         moFieldsEty.addField(moKeyUnit);
         moFieldsEty.addField(moIntConsDays);
+        moFieldsEty.addField(moDecUnitPriceSis);
+        moFieldsEty.addField(moDecUnitPrice);
+        moFieldsEty.addField(moDecTotalEty);
+        moFieldsEty.addField(moTextUnitPriceRef);
         moFieldsEty.addField(moKeyConsEntEty);
         moFieldsEty.addField(moKeyConsSubentEty);
+        moFieldsEty.addField(moKeyCostCenterEty);
         moFieldsEty.addField(moDateReqEty);
         moFieldsEty.addField(moKeyPriEty);
         
-        moFieldKeyConsEntity = new SGuiFieldKeyGroup(miClient);
         moFieldKeyConsEntityEty = new SGuiFieldKeyGroup(miClient);
 
         moFields.setFormButton(jbSave);
+        
+        moFormMatReqCC = new SFormMaterialRequestCostCenter(miClient, "Requisición de materiales y centros de costo");
+        
+        moGridMatReqCC = new SGridPaneForm(miClient, SModConsts.TRN_MAT_REQ_CC, SLibConsts.UNDEFINED, "Requisición de materiales y centros de costo")  {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(true);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+                
+                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_DISC, "Asignación");
+                col.setEditable(true);
+                
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Centro consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subcentro consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "Centro costo"));
+                columns.add(col);
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_CAL_YEAR, "Año presupuesto"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha ini. presupuesto"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha fin presupuesto"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Presupuesto"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Pres. solic. ant."));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Pres. solic. tot."));
+                
+                return columns;
+            }
+        };
+        moGridMatReqCC.setForm(moFormMatReqCC);
+        moGridMatReqCC.setPaneFormOwner(this);
+        mvFormGrids.add(moGridMatReqCC);
+        jpTableCC.add(moGridMatReqCC, BorderLayout.CENTER);
         
         moGridMatReqList = new SGridPaneForm(miClient, SModConsts.TRN_MAT_REQ_ETY, SLibConsts.UNDEFINED, "Ítems") {
             
@@ -838,11 +947,15 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código ítem"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem", 350));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Cantidad"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Cantidad"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Importe"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Nuevo ítem"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Ent. cosumo"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subent. consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Presentación"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_8D, "Factor conv."));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "T. consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Ctro. consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subctro. consumo"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Prioridad"));
                 
@@ -861,11 +974,73 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jpCommandRight.add(jbSaveAndSend);
         jpCommandRight.add(jbCancel);
         
-        moKeyConsSubent.setEnabled(false);
+        moKeyCostCenterEty.setEnabled(false);
         moBoolProvClosed.setEnabled(false);
         
         hasUserRevRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
         hasUserProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
+    }
+    
+    private void populateMatReqCC() {
+        try {
+            Vector vRows = new Vector<>();
+            if (maMatReqCC.size() > 0) {
+                for(SDbMaterialRequestCostCenter cc : maMatReqCC) {
+                    cc.setRowConsBudWOReq(SMaterialRequestUtils.getConsumedBudget(miClient.getSession(), 
+                                new int[] { cc.getFkBudgetMatConsumptionEntityId(), cc.getFkBudgetYearId(), cc.getFkBudgetPeriodId() }, cc.getPkMatRequestId()));       
+                }
+                vRows.addAll(maMatReqCC);
+            }
+            moGridMatReqCC.populateGrid(vRows);
+            moGridMatReqCC.getTable().getDefaultEditor(Double.class).addCellEditorListener(this); 
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void nonRepeatRows() {
+        ArrayList<SPkMatCC> arrpk = new ArrayList<>();
+        for (int i = 0; i < moGridMatReqCC.getTable().getRowCount(); i++) {
+            boolean found = false;
+            for (SPkMatCC pk : arrpk) {
+                if (SLibUtils.compareKeys(moGridMatReqCC.getGridRow(i).getRowPrimaryKey(), pk.getPrimaryKey())){
+                    miClient.showMsgBoxInformation("Ya existe el centro de costo seleccionado.");
+                    moGridMatReqCC.removeGridRow(i);
+                    moGridMatReqCC.renderGridRows();
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                SPkMatCC pk = new SPkMatCC();
+                pk.setPrimaryKey(moGridMatReqCC.getGridRow(i).getRowPrimaryKey());
+                arrpk.add(pk);
+            }
+        }
+    }
+    
+    private void updateReqAsignBudgetRows(){
+        double reqBudget = 0;
+        double reqAsign = 0;
+        if (maMatReqEntries.size() > 0) {
+            for (SDbMaterialRequestEntry ety : maMatReqEntries) {
+                if (!ety.isDeleted()) {
+                    reqBudget += ety.getTotal_r();
+                }
+            }
+            for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
+                SDbMaterialRequestCostCenter cc = (SDbMaterialRequestCostCenter) row;
+                double rowBudget = cc.getRowConsBudWOReq();
+                rowBudget += (cc.getPercentage() * reqBudget);
+                cc.setRowConsBudWReq(rowBudget);
+                reqAsign += cc.getPercentage();
+            }
+            moGridMatReqCC.renderGridRows();
+        }
+        
+        moDecTotal.setValue(reqBudget);
+        moDecAsign.setValue(reqAsign);
     }
     
     private void populateMatReqEntries() throws Exception {
@@ -885,10 +1060,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }
     
     private void enableReqControls(boolean enable) {
+        moDecTotal.setEnabled(false);
         moKeyProvEnt.setEnabled(enable);
         moKeyUsrReq.setEnabled(enable);
         moKeyContractor.setEnabled(enable);
-        moKeyConsEnt.setEnabled(enable);
         moDateReq.setEnabled(enable);
         moKeyPriReq.setEnabled(enable);
         moTextReqNotes.setEnabled(enable);
@@ -900,7 +1075,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }
     
     private void clearEntryControls() {
-        moTextItemCode.setValue("");
+        moDecUnitPriceSis.setValue(0.0);
+        moDecTotalEty.setValue(0.0);
+        moDecUnitPrice.setValue(0.0);
+        moTextUnitPriceRef.setValue("");
+        moTextItemKey.setValue("");
         moTextItemName.setValue("");
         moTextItemDescription.setValue("");
         moBoolNewItem.setValue(false);
@@ -918,7 +1097,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }
     
     private void enableEntryControls(boolean enable) {
-        moTextItemCode.setEnabled(enable);
+        moDecUnitPriceSis.setEnabled(false);
+        moDecTotalEty.setEnabled(false);
+        moDecUnitPrice.setEnabled(enable);
+        moTextUnitPriceRef.setEnabled(enable);
+        moTextItemKey.setEnabled(enable);
         jbPickItem.setEnabled(enable);
         moBoolNewItem.setEnabled(enable);
         moTextItemDescription.setEnabled(!enable ? enable : moBoolNewItem.getValue());
@@ -931,6 +1114,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyPresentation.setEnabled(isCapturingData && moKeyPresentation.getItemCount() > 1);
         moDecFactConv.setEnabled(isCapturingData && moDecFactConv.getValue() == 0);
         moKeyConsSubentEty.setEnabled(isCapturingData && moKeyConsEntEty.isEnabled() && moKeyConsEntEty.getSelectedIndex() > 0);
+        moKeyCostCenterEty.setEnabled(isCapturingData && moKeyConsSubentEty.isEnabled() && moKeyConsSubentEty.getSelectedIndex() > 0);
         
         jbRegisterEty.setEnabled(enable);
     }
@@ -941,16 +1125,21 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             
             populatePresentation(moItemEty.getFkUnitId());
 
-            moTextItemCode.setValue(moItemEty.getCode());
+            moTextItemKey.setValue(moItemEty.getCode());
             moTextItemName.setValue(moItemEty.getName());
             moBoolNewItem.setValue(ety.isNewItem());
             moKeyPresentation.setValue(new int[] { ety.getFkMatPresentationId() });
             moDecFactConv.setValue(ety.getFactorConvertion());
             moDecQty.setValue(ety.getQuantity());
             moKeyUnit.setValue(new int[] { ety.getFkUnitId() });
+            moDecUnitPriceSis.setValue(ety.getPriceUnitarySystem());
+            moDecUnitPrice.setValue(ety.getPriceUnitary());
+            moTextUnitPriceRef.setValue(ety.getPriceUnitaryReference());
+            moDecTotalEty.setValue(ety.getTotal_r());
             moIntConsDays.setValue(ety.getCosnsumptionEstimated());
             moKeyConsEntEty.setValue(new int[] { ety.getFkEntMatConsumptionEntityId_n() });
             moKeyConsSubentEty.setValue(new int[] { ety.getFkSubentMatConsumptionEntityId_n(), ety.getFkSubentMatConsumptionSubentityId_n() });
+            moKeyCostCenterEty.setValue(new int[] { ety.getFkCostCenterId_n() });
             moDateReqEty.setValue(ety.getDateRequest_n());
             moKeyPriEty.setValue(new int[] { ety.getFkMatRequestPriorityId_n()});
             moTextItemDescription.setValue("");
@@ -968,12 +1157,16 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         else {
             moItemEty = null;
             moKeyPresentation.removeAllItems();
-            moTextItemCode.setValue("");
+            moTextItemKey.setValue("");
             moTextItemName.setValue("");
             moBoolNewItem.setValue(false);
             moDecFactConv.setValue(0.0);
             moDecQty.setValue(0.0);
             moKeyUnit.setSelectedIndex(0);
+            moDecUnitPriceSis.setValue(0.0);
+            moDecUnitPrice.setValue(0.0);
+            moTextUnitPriceRef.setValue("");
+            moDecTotalEty.setValue(0.0);
             moIntConsDays.setValue(0);
             moKeyConsEntEty.setSelectedIndex(0);
             moDateReqEty.setValue(null);
@@ -992,6 +1185,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         ety.setFactorConvertion(moDecFactConv.getValue());
         ety.setCosnsumptionEstimated(moIntConsDays.getValue());
         ety.setNewItem(moBoolNewItem.getValue());
+        ety.setPriceUnitarySystem(moDecUnitPriceSis.getValue());
+        ety.setPriceUnitary(moDecUnitPrice.getValue());
+        ety.setTotal_r(moDecTotalEty.getValue());
+        ety.setPriceUnitaryReference(moTextUnitPriceRef.getValue());
         ety.setFkItemId(moItemEty.getPkItemId());
         ety.setFkUnitId(moKeyUnit.getValue()[0]);
         ety.setFkMatPresentationId(moKeyPresentation.getSelectedIndex() == 0 ? SModSysConsts.TRNU_MAT_PRES_NA : moKeyPresentation.getValue()[0]);
@@ -999,6 +1196,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         ety.setFkEntMatConsumptionEntityId_n(moKeyConsEntEty.getSelectedIndex() == 0 ? 0 : moKeyConsEntEty.getValue()[0]);
         ety.setFkSubentMatConsumptionEntityId_n(moKeyConsSubentEty.getSelectedIndex() <= 0 ? 0 : moKeyConsSubentEty.getValue()[0]);
         ety.setFkSubentMatConsumptionSubentityId_n(moKeyConsSubentEty.getSelectedIndex() <= 0 ? 0 : moKeyConsSubentEty.getValue()[1]);
+        ety.setFkCostCenterId_n(moKeyCostCenterEty.getSelectedIndex() <= 0 ? 0 : moKeyCostCenterEty.getValue()[0] );
         ety.setDataItem(moItemEty);
         ety.readOptionalInfo(miClient.getSession());
         
@@ -1036,7 +1234,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     
     private int[] getDefaultPriority() {
         try {
-            String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW + "';";
+            String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT + "';";
             ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
                 return new int[] { resultSet.getInt(1) };
@@ -1064,14 +1262,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private void stateChangeNewItem() {
         try {
             moTextItemDescription.setEnabled(moBoolNewItem.getValue());
-            moTextItemCode.setEnabled(!moBoolNewItem.getValue());
+            moTextItemKey.setEnabled(!moBoolNewItem.getValue());
             if (moBoolNewItem.getValue()) {
-                String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT + "';";
+                String sql = "SELECT param_value FROM cfg_param WHERE param_key = '" + SDataConstantsSys.CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW + "';";
                 ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
                 if (resultSet.next()) {
                     moItemEty = new SDataItem();
                     moItemEty.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
-                    moTextItemCode.setValue(moItemEty.getCode());
+                    moTextItemKey.setValue(moItemEty.getCode());
                     moTextItemName.setValue(moItemEty.getName());
                     moKeyUnit.setValue(new int[] { moItemEty.getFkUnitId() } );
                     populatePresentation(moItemEty.getFkUnitId());
@@ -1102,19 +1300,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         }
     }
     
-    private void stateChangeConsEnt() {
-        if (!isRegistryEditable){
-            moKeyConsSubent.setEnabled(false);            
-        }
-        if (moKeyConsEnt.getSelectedIndex() <= 0) {
-            if (moKeyConsSubent.getItemCount() > 0) moKeyConsSubent.setSelectedIndex(0);
-            moKeyConsSubent.setEnabled(false);
-        }
-        else if (isRegistryEditable && moKeyConsEnt.getSelectedIndex() > 0) {
-            moKeyConsSubent.setEnabled(true);
-        }
-    }
-    
     private void stateChangeConsEntEty() {
         if (!isRegistryEditable){
             moKeyConsSubentEty.setEnabled(false);
@@ -1128,32 +1313,101 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         }
     }
     
-    private void actionPickItem() {
-        int[] key;
-        SGuiOptionPicker picker;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_ITM_N).getOptionPicker(SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
-        picker.resetPicker();
-        picker.setPickerVisible(true);
-
-        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
-
-            if (key != null) {
-                assignItem(key);
-            }
+    private void stateChangeConsSubentEty() {
+        if (moKeyConsSubentEty.getSelectedIndex() <= 0) {
+            moKeyCostCenterEty.removeAllItems();
+            moKeyCostCenterEty.setEnabled(false);
+        }
+        else {
+            SGuiParams params = new SGuiParams();
+            params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
+            params.getParamsMap().put(SModConsts.TRN_MAT_CONS_SUBENT, moKeyConsSubentEty.getValue());
+            miClient.getSession().populateCatalogue(moKeyCostCenterEty, SModConsts.FIN_CC, SModConsts.TRN_MAT_REQ, params);
+            moKeyCostCenterEty.setEnabled(isCapturingData);
         }
     }
     
-    private void actionItemCode() {
+    private void actionPickItem() {
         try {
-            String sql = "SELECT id_item FROM erp.itmu_item WHERE code = '" + moTextItemCode.getValue() + "' ";
-            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                assignItem(new int[] { resultSet.getInt(1) });
+            int[] key;
+            SDialogItemPicker picker;
+
+            if (moGridMatReqCC.getTable().getRowCount() >= 1 || moKeyCostCenterEty.getSelectedIndex() >= 1) {
+                ArrayList<SDbMaterialCostCenterGroup> ccg = new ArrayList<>();
+                for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
+                    SDbMaterialRequestCostCenter cc = (SDbMaterialRequestCostCenter) row;
+                    SDbMaterialCostCenterGroup aux = SMaterialRequestUtils.getCostCenterGroupByUser(miClient.getSession(), 
+                            new int[] { cc.getPkSubentMatConsumptionEntityId(), cc.getPkSubentMatConsumptionSubentityId() }, cc.getPkCostCenterId());
+                    ccg.add(aux);
+                }
+                if (ccg.isEmpty()) {
+                    int[] pkConsSubent = moKeyConsSubentEty.getValue();
+                    int pkCc = moKeyCostCenterEty.getValue()[0];
+                    SDbMaterialCostCenterGroup aux = SMaterialRequestUtils.getCostCenterGroupByUser(miClient.getSession(), 
+                            pkConsSubent, pkCc);
+                    ccg.add(aux);
+                }
+                
+                SGuiParams params = new SGuiParams();
+                params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
+                params.getParamsMap().put(SModConsts.TRN_MAT_CC_GRP, ccg);
+
+                picker = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
+                picker.resetPicker();
+                picker.setPickerVisible(true);
+
+                if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+                    key = (int[]) picker.getOption();
+
+                    if (key != null) {
+                        assignItem(key);
+                    }
+                }
             }
             else {
-                miClient.showMsgBoxInformation("No hay ningún ítem con el código ingresado.");
+                miClient.showMsgBoxInformation("Debe seleccionar un centro de costo ya sea a nivel de partida o a nivel de requisición.");
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void actionItemKey() {
+        try {
+            String sql2 = "SELECT * FROM trn_mat_cc_grp_item AS cgi " +
+                    "INNER JOIN trn_mat_cc_grp_usr AS cgu ON " +
+                    "cgi.id_mat_cc_grp = cgu.id_mat_cc_grp " +
+                    "WHERE cgu.id_link = " + SModSysConsts.USRS_LINK_USR + " " +
+                    "AND cgu.id_ref = " + miClient.getSession().getUser().getPkUserId() + " ";
+            
+            String sql = "SELECT id_item, fid_igen, item FROM erp.itmu_item WHERE item_key = '" + moTextItemKey.getValue() + "' ";
+            Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+            
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                int idItem = resultSet.getInt(1);
+                int idIgen = resultSet.getInt(2);
+                String item = resultSet.getString(3);
+                
+                sql = sql2 + "AND cgi.id_link = " + SModSysConsts.ITMS_LINK_ITEM + " and cgi.id_ref = " + idItem;
+                ResultSet resultSet2 = statement.executeQuery(sql);
+                if (resultSet2.next()) {
+                    assignItem(new int[] { idItem });
+                }
+                else {
+                    sql = sql2 + "AND cgi.id_link = " + SModSysConsts.ITMS_LINK_IGEN + " and cgi.id_ref = " + idIgen;
+                    resultSet2 = statement.executeQuery(sql);
+                    if (resultSet2.next()) {
+                        assignItem(new int[] { idItem });
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("No tiene acceso al ítem " + item + ".");
+                    }
+                }
+            }
+            else {
+                miClient.showMsgBoxInformation("No hay ningún ítem con el código " + moTextItemKey.getValue() + ".");
             }
         }
         catch(Exception e) {
@@ -1161,10 +1415,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         }
     }
     
+    private void actionUnitPrice() {
+        moDecTotalEty.setValue(SLibUtils.roundAmount(moDecQty.getValue() * moDecUnitPrice.getValue()));
+    }
+    
     private void assignItem(int[] key) {
         moItemEty = new SDataItem();
         moItemEty.read(key, miClient.getSession().getStatement());
-        moTextItemCode.setValue(moItemEty.getCode());
+        moTextItemKey.setValue(moItemEty.getKey());
         moTextItemName.setValue(moItemEty.getName());
         moKeyUnit.setValue(new int[] { moItemEty.getFkUnitId() } );
         populatePresentation(moItemEty.getFkUnitId());
@@ -1203,6 +1461,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 populateMatReqEntries();
                 isCapturingData = false;
                 enableEntryControls(false);
+                updateReqAsignBudgetRows();
             }
             else {
                 miClient.showMsgBoxInformation(validation.getMessage());
@@ -1279,8 +1538,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbSaveAndSend.addActionListener(this);
         moBoolNewItem.addItemListener(this);
         moKeyPresentation.addItemListener(this);
-        moTextItemCode.addFocusListener(this);
-        moKeyConsEnt.addItemListener(this);
+        moTextItemKey.addFocusListener(this);
+        moDecQty.addFocusListener(this);
+        moDecUnitPrice.addFocusListener(this);
+        moKeyConsSubentEty.addItemListener(this);
     }
 
     @Override
@@ -1297,8 +1558,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbSaveAndSend.removeActionListener(this);
         moBoolNewItem.removeItemListener(this);
         moKeyPresentation.removeItemListener(this);
-        moTextItemCode.removeFocusListener(this);
-        moKeyConsEnt.removeItemListener(this);
+        moTextItemKey.removeFocusListener(this);
+        moDecQty.removeFocusListener(this);
+        moDecUnitPrice.removeFocusListener(this);
+        moKeyConsSubentEty.removeItemListener(this);
     }
 
     @Override
@@ -1306,14 +1569,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         SGuiParams params = new SGuiParams();
         params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
 
-        moFieldKeyConsEntity.initGroup();
-        moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
-        moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, SLibConsts.UNDEFINED, null);
-        moFieldKeyConsEntity.populateCatalogues();
-        
         moFieldKeyConsEntityEty.initGroup();
         moFieldKeyConsEntityEty.addFieldKey(moKeyConsEntEty, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
-        moFieldKeyConsEntityEty.addFieldKey(moKeyConsSubentEty, SModConsts.TRN_MAT_CONS_SUBENT, SLibConsts.UNDEFINED, null);
+        moFieldKeyConsEntityEty.addFieldKey(moKeyConsSubentEty, SModConsts.TRN_MAT_CONS_SUBENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
         moFieldKeyConsEntityEty.populateCatalogues();
         
         miClient.getSession().populateCatalogue(moKeyProvEnt, SModConsts.TRN_MAT_PROV_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
@@ -1341,32 +1599,37 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             jtfRegistryKey.setText("");
             moKeyUsrReq.setValue(new int[] { miClient.getSession().getUser().getPkUserId() });
             moKeyPriReq.setValue(getDefaultPriority());
+            if (moKeyProvEnt.getItemCount() == 2) {
+                moKeyProvEnt.setSelectedIndex(1);
+            } 
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
             moKeyUsrReq.setValue(new int[] { moRegistry.getFkUserRequesterId() });
             moKeyPriReq.setValue(new int[] { moRegistry.getFkMatRequestPriorityId() });
+            moKeyProvEnt.setValue(new int[] { moRegistry.getFkMatProvisionEntityId() });
         }
 
-        moKeyProvEnt.setValue(new int[] { moRegistry.getFkMatProvisionEntityId() });
+        moDecQty.setValue(moRegistry.getTotal_r());
         moIntNumber.setValue(moRegistry.getNumber());
         moDate.setValue(moRegistry.getDate());
         moKeyContractor.setValue(new int[] { moRegistry.getFkContractorId_n() });
         moTextReferecnce.setValue(moRegistry.getReference());
         moTextReferecnce.setValue(moRegistry.getReference());
-        moBoolImport.setValue(moRegistry.isExternalSystem());
-        moKeyConsEnt.setValue(new int[] { moRegistry.getFkEntMatConsumptionEntityId() });
-        moKeyConsSubent.setValue(new int[] { moRegistry.getFkSubentMatConsumptionEntityId_n(), moRegistry.getFkSubentMatConsumptionSubentityId_n() });
         moDateReq.setValue(moRegistry.getDateRequest_n());
         moTextReqStatus.setValue(moRegistry.getAuxReqStatus());
         
         moBoolProvClosed.setValue(moRegistry.isCloseProvision());
         moBoolPurClosed.setValue(moRegistry.isClosePurchase());
         
+        maMatReqCC = new ArrayList<>();
+        maMatReqCC = moRegistry.getChildCostCenters();
         maMatReqNotes = new ArrayList<>();
         maMatReqNotes = moRegistry.getChildNotes();
         maMatReqEntries = new ArrayList<>();
         maMatReqEntries = moRegistry.getChildEntries();
+        
+        populateMatReqCC();
         
         if (maMatReqNotes.size() > 0) {
             moTextReqNotes.setValue(maMatReqNotes.get(0).getNotes());
@@ -1392,7 +1655,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         
         moTextAuthStatus.setValue(moRegistry.getAuxAuthStatus());
         
-        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND) {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
             jbSave.setEnabled(false);
             jbSaveAndSend.setEnabled(false);
         }
@@ -1408,8 +1671,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moBoolProvClosed.setEnabled(false);
         moKeyUsrReq.setEnabled(false);
         moDate.setEnabled(false);
-        stateChangeConsEnt();
         enableGridButtons();
+        updateReqAsignBudgetRows();
         
         isEtyNew = false;
     }
@@ -1429,17 +1692,20 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         registry.setDate(moDate.getValue());
         registry.setDateRequest_n(moDateReq.getValue());
         registry.setReference(moTextReferecnce.getValue());
-        registry.setExternalSystem(moBoolImport.getValue());
         registry.setExternalSystemId("");
+        registry.setTotal_r(moDecTotal.getValue());
         registry.setCloseProvision(moBoolProvClosed.getValue());
         registry.setFkMatProvisionEntityId(moKeyProvEnt.getValue()[0]);
         registry.setFkMatRequestPriorityId(moKeyPriReq.getValue()[0]);
         registry.setFkMatRequestStatusId(mnStatusReqId);
         registry.setFkUserRequesterId(moKeyUsrReq.getValue()[0]);
         registry.setFkContractorId_n(moKeyContractor.getSelectedIndex() == 0 ? 0 : moKeyContractor.getValue()[0]);
-        registry.setFkEntMatConsumptionEntityId(moKeyConsEnt.getValue()[0]);
-        registry.setFkSubentMatConsumptionEntityId_n(moKeyConsSubent.getSelectedIndex() == 0 ? 0 : moKeyConsSubent.getValue()[0]);
-        registry.setFkSubentMatConsumptionSubentityId_n(moKeyConsSubent.getSelectedIndex() == 0 ? 0 : moKeyConsSubent.getValue()[1]);
+        
+        registry.getChildCostCenters().clear();
+        for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
+            SDbMaterialRequestCostCenter cc = (SDbMaterialRequestCostCenter) row;
+            registry.getChildCostCenters().add(cc);
+        }
         
         registry.getChildNotes().clear();
         if (!moTextReqNotes.getValue().isEmpty()) {
@@ -1460,7 +1726,18 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
-        if (validation.isValid() && maMatReqEntries.size() <= 0) {
+        if (validation.isValid()) {
+            double per = 0;
+            for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
+                SDbMaterialRequestCostCenter cc = (SDbMaterialRequestCostCenter) row;
+                per += cc.getPercentage();
+            }
+            if (per != 1) {
+                validation.setMessage("La suma de los porcentajes de los centros de costo no es igual al 100%");
+            }
+        }
+        
+        if (validation.isValid() && maMatReqEntries.size() <= 0) { 
             validation.setMessage("Debe agregar al menos un ítem para solicitar.");
         }
         
@@ -1516,29 +1793,33 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             if (comboBox == moKeyPresentation) {
                 stateChangePresentation();
             }
-            else if (comboBox == moKeyConsEnt) {
-                stateChangeConsEnt();
-            }
             else if (comboBox == moKeyConsEntEty) {
                 stateChangeConsEntEty();
             }
+            else if (comboBox == moKeyConsSubentEty) {
+                stateChangeConsSubentEty();
+            }
         }
-        
     }
 
     @Override
     public void notifyRowNew(int gridType, int gridSubtype, int row, SGridRow gridRow) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch (gridType) {
+            case SModConsts.TRN_MAT_REQ_CC:
+                nonRepeatRows();
+                updateReqAsignBudgetRows();
+                break;
+        }
     }
 
     @Override
     public void notifyRowEdit(int gridType, int gridSubtype, int row, SGridRow gridRow) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
     }
 
     @Override
     public void notifyRowDelete(int gridType, int gridSubtype, int row, SGridRow gridRow) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
     }
 
     @Override
@@ -1551,7 +1832,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
     @Override
     public void focusGained(FocusEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -1559,9 +1839,44 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         if (e.getSource() instanceof JTextField) {
             JTextField textField = (JTextField) e.getSource();
             
-            if (textField == moTextItemCode) {
-                actionItemCode();
+            if (textField == moTextItemKey) {
+                actionItemKey();
+            }
+            else if (textField == moDecQty) {
+                actionUnitPrice();
+            }
+            else if (textField == moDecUnitPrice) {
+                actionUnitPrice();
             }
         }
+    }
+
+    @Override
+    public void editingStopped(ChangeEvent e) {
+        updateReqAsignBudgetRows();
+    }
+
+    @Override
+    public void editingCanceled(ChangeEvent e) {
+    }
+}
+
+class SPkMatCC {
+    protected int mnPkMatRequestId;
+    protected int mnPkEntMatConsumptionEntityId;
+    protected int mnPkSubentMatConsumptionEntityId;
+    protected int mnPkSubentMatConsumptionSubentityId;
+    protected int mnPkCostCenterId;
+    
+    public void setPrimaryKey(int[] pk) {
+        mnPkMatRequestId = pk[0];
+        mnPkEntMatConsumptionEntityId = pk[1];
+        mnPkSubentMatConsumptionEntityId = pk[2];
+        mnPkSubentMatConsumptionSubentityId = pk[3];
+        mnPkCostCenterId = pk[4];
+    }
+
+    public int[] getPrimaryKey() {
+        return new int[] { mnPkMatRequestId, mnPkEntMatConsumptionEntityId, mnPkSubentMatConsumptionEntityId, mnPkSubentMatConsumptionSubentityId, mnPkCostCenterId };
     }
 }

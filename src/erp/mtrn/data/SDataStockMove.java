@@ -23,7 +23,7 @@ import java.sql.Types;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 

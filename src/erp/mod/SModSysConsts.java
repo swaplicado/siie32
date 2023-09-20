@@ -62,6 +62,9 @@ public abstract class SModSysConsts {
     public static final int USRS_TP_USR_USR = 1;
     public static final int USRS_TP_USR_ADM = 2;
     public static final int USRS_TP_USR_SUP = 3;
+    
+    public static final int USRS_LINK_USR = 1;
+    public static final int USRS_LINK_EMP = 2;
 
     /*
      * Business partners
@@ -638,6 +641,7 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_TP_IOG_IN_MFG_FG_ASD = { 1, 6, 5 };
     public static final int[] TRNS_TP_IOG_IN_MFG_FG_RET = { 1, 6, 6 };
     public static final int[] TRNS_TP_IOG_IN_MFG_CON = { 1, 6, 7 };
+    public static final int[] TRNS_TP_IOG_IN_DEV_CONS = { 1, 7, 1 };
     public static final int[] TRNS_TP_IOG_IN_EXP_PUR = {1, 9, 1 };
     public static final int[] TRNS_TP_IOG_IN_EXP_MFG = {1, 9, 2 };
     public static final int[] TRNS_TP_IOG_IN_CST_RM = {1, 9, 3 };
@@ -660,6 +664,7 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_TP_IOG_OUT_MFG_FG_ASD = { 2, 6, 5 };
     public static final int[] TRNS_TP_IOG_OUT_MFG_FG_RET = { 2, 6, 6 };
     public static final int[] TRNS_TP_IOG_OUT_MFG_CON = { 2, 6, 7 };
+    public static final int[] TRNS_TP_IOG_OUT_SUPP_CONS = { 2, 7, 1 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_PUR = {2, 9, 1 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_MFG = {2, 9, 2 };
     public static final int[] TRNS_TP_IOG_OUT_CST_RM = {2, 9, 3 };
@@ -741,6 +746,10 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_PET = 1; // Solicitante
     public static final int TRNX_MAT_REQ_REV = 2; // Revisor
     public static final int TRNX_MAT_REQ_PROV = 3; // Suministrador
+    public static final int TRNX_MAT_REQ_PUR = 4; // Comprador
+    public static final int TRNX_MAT_REQ_AUTHO_RECH = 100; // autorizado/rechazado
+    public static final int TRNX_MAT_REQ_PEND_DETAIL = 101; // pendiente a detalle
+    public static final int TRNX_MAT_REQ_PROVIDED = 102; // suministrado
     
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
     public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";

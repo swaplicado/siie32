@@ -320,7 +320,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Ítem"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Concepto"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Requeridas"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Apartadas"));
@@ -401,6 +401,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 STrnStock oStock = STrnStockSegregationUtils.getAllStock((SClientInterface) miClient, params);
                 
                 SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
+                                                                            SMaterialRequestEntryRow.FORM_SEGREGATION,
                                                                             oMaterialRequestEntry.getFkItemId(), 
                                                                             oMaterialRequestEntry.getFkUnitId());
                 oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
@@ -476,7 +477,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
             moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDocLapsing_n()));
             */
-            moTextRequest.setValue(moMaterialRequest.getAuxConsEntName());
+//            moTextRequest.setValue(moMaterialRequest.getAuxConsEntName());
             moTextEntity.setValue(moMaterialRequest.getAuxProvEntName());
 
             showMaterialRequestEntries();

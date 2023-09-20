@@ -365,8 +365,27 @@ public class SModuleFin extends SGuiModule {
                 break;
             case SModConsts.FIN_CC:
                 settings = new SGuiCatalogueSettings("Centro de costo", 1);
-                sql = "SELECT pk_cc AS " + SDbConsts.FIELD_ID + "1, CONCAT(id_cc, ' - ', cc) AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM fin_cc WHERE NOT b_del ORDER BY id_cc, cc ";
+                switch (subtype) {
+                    case SModConsts.TRN_MAT_REQ:
+                        int idUsr = (int) params.getParamsMap().get(SModConsts.USRU_USR);
+                        int[] pkConsSub = (int[]) params.getParamsMap().get(SModConsts.TRN_MAT_CONS_SUBENT);
+                        sql = "SELECT cc.pk_cc AS " + SDbConsts.FIELD_ID + "1, CONCAT(cc.id_cc, ' - ', cc.cc) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM fin_cc AS cc "
+                                + "INNER JOIN trn_mat_cons_subent_cc AS cscc ON " 
+                                + "cc.pk_cc = cscc.id_cc "
+                                + "INNER JOIN trn_mat_cons_subent_cc_cc_grp AS csccg ON "
+                                + "cscc.id_cc = csccg.id_cc " 
+                                + "INNER JOIN trn_mat_cc_grp_usr AS ccgu ON " 
+                                + "csccg.id_mat_cc_grp = ccgu.id_mat_cc_grp " 
+                                + "WHERE cscc.id_mat_cons_ent = " + pkConsSub[0] + " AND cscc.id_mat_cons_subent = " + pkConsSub[1] + " "
+                                + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ccgu.id_ref = " + idUsr + " "
+                                + "AND NOT cc.b_del ORDER BY cc.id_cc, cc.cc ";
+                        break;
+                    default:
+                        sql = "SELECT pk_cc AS " + SDbConsts.FIELD_ID + "1, CONCAT(id_cc, ' - ', cc) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM fin_cc WHERE NOT b_del ORDER BY id_cc, cc ";
+                        break;
+                }
                 break;
             case SModConsts.FIN_ACC_CASH:
                 settings = new SGuiCatalogueSettings("Cuenta de dinero", 2);
