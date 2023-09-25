@@ -100,6 +100,26 @@ public abstract class SDataReadDescriptions {
                     
                 sql = "SELECT " + sql + " AS descrip FROM erp.locu_cty WHERE " + (pk instanceof int[] ? "id_cty = " + ((int[]) pk)[0] : "cty_code = '" + ((String) pk) + "'") + " ";
                 break;
+            case SDataConstants.LOCU_STA:
+                switch (descriptionType) {
+                    case SLibConstants.DESCRIPTION_CODE:
+                        sql = "sta_code";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME:
+                        sql = "sta";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME_ABBR:
+                        sql = "sta_abbr";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME_LAN:
+                        sql = "sta_lan";
+                        break;
+                    default:
+                        sql = "sta";
+                }
+                    
+                sql = "SELECT " + sql + " AS descrip FROM erp.locu_sta WHERE " + (pk instanceof int[] ? "id_sta = " + ((int[]) pk)[0] : "sta_code = '" + ((String) pk) + "'") + " ";
+                break;
             case SDataConstants.BPSS_CT_BP:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "ct_bp") + " AS descrip FROM erp.bpss_ct_bp WHERE id_ct_bp = " + ((int[]) pk)[0] + " ";
                 break;

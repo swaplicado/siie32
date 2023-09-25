@@ -8,11 +8,13 @@ package erp.mod;
 import erp.mod.cfg.db.SDbCompanyBranchEntity;
 import erp.mod.cfg.db.SDbCountry;
 import erp.mod.cfg.db.SDbCurrency;
+import erp.mod.cfg.db.SDbDocument;
 import erp.mod.cfg.db.SDbFunctionalArea;
 import erp.mod.cfg.db.SDbLanguage;
 import erp.mod.cfg.db.SDbShift;
-import erp.mod.cfg.form.*;
-import erp.mod.cfg.view.*;
+import erp.mod.cfg.form.SFormFunctionalArea;
+import erp.mod.cfg.view.SViewAuthorizations;
+import erp.mod.cfg.view.SViewFunctionalArea;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -63,6 +65,9 @@ public class SModuleCfg extends SGuiModule {
                 break;
             case SModConsts.CFGU_SHIFT:
                 registry = new SDbShift();
+                break;
+            case SModConsts.CFGU_DOC:
+                registry = new SDbDocument();
                 break;
             case SModConsts.LOCU_CTY:
                 registry = new SDbCountry();
