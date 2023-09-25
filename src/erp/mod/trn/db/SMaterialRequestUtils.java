@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona, Isabel Servín
  */
-public class SMaterialRequestUtils {
+public abstract class SMaterialRequestUtils {
     
     public static SDataStockSegregation getSegregationOfMaterialRequest(SGuiSession session, final int idMaterialRequest) {
         String query = "SELECT id_stk_seg "
@@ -492,24 +492,33 @@ public class SMaterialRequestUtils {
      * @param session
      * @param pkMatReqEty llave primaria de la partida de la requisición
      * @param dpsType tipo de documento, si este es nulo, no filtra y muestra la suma de todas las referencias de todos los tipos de documento
+     * @param pkDpsEtyExcluded
      * @return 
      */
-    public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType) {
-        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM " ;
-                + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr ";
-        
-        if (dpsType != null) {
-            query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON drm.id_year = dety.id_year "
-                                                                                            + "AND drm.id_doc = dety.id_doc "
-                                                                                            + "AND drm.id_ety = dety.id_ety ";
-            query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON dety.id_year = d.id_year "
+    public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType, final int[] pkDpsEtyExcluded) {
+        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM "
+                + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON dmr.fid_dps_year = dety.id_year "
+                                                                                        + "AND dmr.fid_dps_doc = dety.id_doc "
+                                                                                        + "AND dmr.fid_dps_ety = dety.id_ety "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON dety.id_year = d.id_year "
                                                                                             + "AND dety.id_doc = d.id_doc ";
+        if (dpsType != null) {
             query += "AND d.fid_ct_dps = " + dpsType[0]  + " " +
                    "AND d.fid_cl_dps = " + dpsType[1]  + " " +
                    "AND d.fid_tp_dps = " + dpsType[2]  + " ";
         }
         
-        query += "WHERE dmr.id_mat_req = " + pkMatReqEty[0] + " AND dmr.id_mat_req_ety = " + pkMatReqEty[1] + " ";
+        query += "WHERE NOT dety.b_del AND NOT d.b_del AND dmr.fid_mat_req = " + pkMatReqEty[0] + " AND dmr.fid_mat_req_ety = " + pkMatReqEty[1] + " ";
+        
+        if (pkDpsEtyExcluded != null) {
+            if (pkDpsEtyExcluded.length == 2) {
+                query += "AND dmr.fid_dps_year <> " + pkDpsEtyExcluded[0] + " AND dmr.fid_dps_doc <> " + pkDpsEtyExcluded[1] + " ";
+            }
+            if (pkDpsEtyExcluded.length == 3) {
+                query += "AND dmr.fid_dps_year <> " + pkDpsEtyExcluded[0] + " AND dmr.fid_dps_doc <> " + pkDpsEtyExcluded[1] + " AND dmr.fid_dps_ety <> " + pkDpsEtyExcluded[2];
+            }
+        }
         
         try {
             ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
@@ -584,7 +593,7 @@ public class SMaterialRequestUtils {
         return consBud;
     }
     
-    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfisFromMatReq(Connection conn, final int idMatRequest) {
+    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfigsFromMatReq(Connection conn, final int idMatRequest) {
         ResultSet resultSet;
         
         String query = "SELECT * "
@@ -613,7 +622,7 @@ public class SMaterialRequestUtils {
         }
     }
     
-    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfisFromMatReqEty(Connection conn, final int[] pkMatRequestEntry) {
+    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfigsFromMatReqEty(Connection conn, final int[] pkMatRequestEntry) {
         ResultSet resultSet;
         
         String query = "SELECT * "
