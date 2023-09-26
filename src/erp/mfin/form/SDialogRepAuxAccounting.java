@@ -46,7 +46,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas, Isabel Servín
+ * @author Juan Barajas, Isabel Servín, Claudio Peña
  */
 public class SDialogRepAuxAccounting extends JDialog implements ActionListener, ItemListener, ChangeListener {
 
@@ -145,6 +145,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jPanel8 = new javax.swing.JPanel();
         jckShowRecordAdjAudit = new javax.swing.JCheckBox();
         jckShowRecordAdjYearEnd = new javax.swing.JCheckBox();
+        jckDontShowIncludeCounts = new javax.swing.JCheckBox();
         jPanel19 = new javax.swing.JPanel();
         jckStrechWithOverflow = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
@@ -401,6 +402,10 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         jckShowRecordAdjYearEnd.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel8.add(jckShowRecordAdjYearEnd);
 
+        jckDontShowIncludeCounts.setText("No mostrar cuentas en 0");
+        jckDontShowIncludeCounts.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel8.add(jckDontShowIncludeCounts);
+
         jPanel9.add(jPanel8);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -556,6 +561,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             jftDateStart.requestFocus();
             jckShowCostCenter.setSelected(true);
             jckShowRecordAdjYearEnd.setSelected(true);
+            jckDontShowIncludeCounts.setSelected(false);
             jckShowRecordAdjAudit.setSelected(true);
 
             actionEntityCheck();
@@ -586,8 +592,14 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-            report = SDataConstantsSys.REP_FIN_AUX_ACC;
+            
+            if (jckDontShowIncludeCounts.isSelected()) {
+               report = SDataConstantsSys.REP_FIN_AUX_ACC_DON;
+            }
+            else {
+               report = SDataConstantsSys.REP_FIN_AUX_ACC;
+            }
+            
             aMask = composeMaskAccount();
 
             map = miClient.createReportParams();
@@ -879,6 +891,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
     private javax.swing.JComboBox jcbEntity;
     private javax.swing.JComboBox jcbItem;
     private javax.swing.JComboBox jcbTax;
+    private javax.swing.JCheckBox jckDontShowIncludeCounts;
     private javax.swing.JCheckBox jckShowBizPartner;
     private javax.swing.JCheckBox jckShowCostCenter;
     private javax.swing.JCheckBox jckShowEntity;

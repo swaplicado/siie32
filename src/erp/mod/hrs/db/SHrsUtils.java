@@ -924,7 +924,6 @@ public abstract class SHrsUtils {
                 + "WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
                 + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
                 + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del AND id_log > 1 GROUP BY id_emp;";
-
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
                 employeeIds.add(resultSet.getInt("id_emp"));                  
@@ -2044,8 +2043,10 @@ public abstract class SHrsUtils {
                             + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
                             + "INNER JOIN cfg_param_co AS par "
                             + "INNER JOIN hrs_cfg AS cfg "
-                            + "WHERE ssc.dt >= '" + dateSta + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
-                            + "AND emp.id_emp = " + pkUser ; 
+                            + "WHERE "
+                            /*+ "ssc.dt >= '" + dateSta + "' AND ssc.dt <= '" + dateEnd + "' AND "*/
+                            + "NOT ssc.b_del "
+                            + "AND emp.id_emp = " + pkUser + " ORDER BY ssc.dt DESC LIMIT 1" ; 
 
                     resultSetHeader = client.getSession().getStatement().executeQuery(sql);
 
@@ -4112,7 +4113,7 @@ public abstract class SHrsUtils {
 
         return days;
     }
-    
+    // xxx123 refactorizar
     public static double getSbcIntegrationFactor(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {
         int seniority = 0;
         int daysTableAnnualBonus = 0;

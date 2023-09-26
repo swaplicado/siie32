@@ -609,7 +609,7 @@ public abstract class STrnUtilities {
         return SLibUtilities.belongsTo(iogTypeKey, new int[][] {
             SDataConstantsSys.TRNS_TP_IOG_OUT_PUR_PUR, SDataConstantsSys.TRNS_TP_IOG_IN_SAL_SAL });
     }
-
+    
     /**
      * @param iogTypeKey IOG type key. Constants defined in SDataConstantsSys.
      */
@@ -1629,7 +1629,16 @@ public abstract class STrnUtilities {
             else {
                 if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                     bizPartnerUserSend = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
-                    userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                    //Si es un pedido mandar el correo del institucional
+                    if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
+                        userMail = ((SDataUser) client.getSession().getUser()).getEmail();
+                        if (userMail.isEmpty()) {
+                            userMail = mms.getUser();
+                        }
+                    }
+                    else {
+                        userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                    }
                 }
                 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
