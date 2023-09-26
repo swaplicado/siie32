@@ -519,7 +519,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPetTbAuth = new JMenuItem("Mis requisiciones por autorizar");
         jmiReqPetTbProcc = new JMenuItem("Mis requisiciones en proceso (suministro o compras)");
         jmiReqPetAll = new JMenuItem("Todas mis requisiciones");
-        jmiReqRevTbAuth = new JMenuItem("Requicisiones por autorizar (revisor)");
+        jmiReqRevTbAuth = new JMenuItem("Requisiciones por autorizar (revisor)");
         jmiReqRevAll = new JMenuItem("Requisiciones aprobadas/rechazadas");
         jmiReqSupPend = new JMenuItem("Requisiciones por suministrar");
         jmiReqSupPendDet = new JMenuItem("Requisiciones por suministrar a detalle");
@@ -1695,22 +1695,24 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_REV, params);
             }
             else if (item == jmiReqSupPend) {
-                SGuiParams params = new SGuiParams(SLibConstants.UNDEFINED);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PROV, params);
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SLibConstants.UNDEFINED, params);
             }
             else if (item == jmiReqSupPendDet) {
-                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PROV, params);
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
             }
             else if (item == jmiReqSup) {
-                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROVIDED);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PROV, params);
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PROVIDED, params);
             }
             else if (item == jmiReqPurPend) {
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR,  SLibConstants.UNDEFINED, null);
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR, SLibConstants.UNDEFINED, params);
             }
             else if (item == jmiReqPurPendDet) {
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR,  SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, null);
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
             }
             else if (item == jmiReqMatPresentation) {
                 miClient.getSession().showView(SModConsts.TRNU_MAT_PRES, SLibConstants.UNDEFINED, null);

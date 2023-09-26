@@ -170,6 +170,15 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public boolean getAuxLastProvClosedSta() { return mbAuxLastProvClosedSta; }
     public boolean getAuxLastPurClosedSta() { return mbAuxLastPurClosedSta; }
     
+    public String getConsumptionInfo() {
+        String description = "";
+        for (SDbMaterialRequestCostCenter oCc : maChildCostCenters) {
+            description += oCc.getConsumptionInfo() + " ";
+        }
+        
+        return description;
+    }
+    
     private void saveLog(SGuiSession session) throws Exception {
         SDbMaterialRequestStatusLog log = new SDbMaterialRequestStatusLog();
         log.setPkMatRequestId(mnPkMatRequestId);

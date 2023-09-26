@@ -7,7 +7,6 @@ package erp.mtrn.data;
 
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.data.SDataRegistry;
 import erp.data.SDataConstants;
 import java.sql.ResultSet;
 import java.util.Date;

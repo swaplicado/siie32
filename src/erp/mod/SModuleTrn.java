@@ -251,6 +251,7 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_REQ:
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
+            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 registry = new SDbMaterialRequest();
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
@@ -573,7 +574,7 @@ public class SModuleTrn extends SGuiModule {
                             case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis req. nuevas"; break;
                             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis req. x autorizar"; break;
                             case SModSysConsts.TRNS_ST_MAT_REQ_PROV: title = "Mis req. en proceso"; break;
-                            case SLibConsts.UNDEFINED: title = "Todas mis requicisiones"; break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis requisiciones"; break;
                         }
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_REV:
@@ -587,15 +588,25 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PROV: 
-                        switch (params.getType()) {
-                            case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "Req x suministrar a detalle"; break;
-                            case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "Requisiciones suministrar"; break;
-                            case SLibConsts.UNDEFINED: title = "Requisiciones x suministrar"; break;
-                        }
-                    break;
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "Req x suministrar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "Requisiciones suministradas";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "Requisiciones x suministrar";
+                        break;
                 }
-                view = new SViewMaterialRequestPending(miClient, subtype, title, params);
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_SUP, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "Req x comprar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_PURCHASED: title = "Requisiciones compradas";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "Requisiciones x comprar";
+                        break;
+                }
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
                 break;
             case SModConsts.TRN_MAT_CONS_ENT:
                 view = new SViewMaterialConsumptionEntity(miClient, "Centros de consumo");
@@ -768,6 +779,7 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_REQ:
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
+            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
                 form = moFormMaterialReq;
                 break;

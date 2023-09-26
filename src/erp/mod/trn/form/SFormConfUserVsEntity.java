@@ -163,7 +163,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpConsAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlConsAvailableLabel.setText("Entidades de consumo disponibles:");
+        jlConsAvailableLabel.setText("Centros de consumo disponibles:");
         jpConsAvailableLabel.add(jlConsAvailableLabel);
 
         jpConsAvailable.add(jpConsAvailableLabel, java.awt.BorderLayout.NORTH);
@@ -207,7 +207,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpConsSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel4.setText("Entidades de consumo seleccionadas:");
+        jLabel4.setText("Centros de consumo seleccionadas:");
         jLabel4.setPreferredSize(new java.awt.Dimension(400, 16));
         jpConsSelectedLabel.add(jLabel4);
 
@@ -227,7 +227,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpConsAvailableLabel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlConsAvailableLabel1.setText("Subentidades de consumo disponibles:");
+        jlConsAvailableLabel1.setText("Sucentros de consumo disponibles:");
         jpConsAvailableLabel1.add(jlConsAvailableLabel1);
 
         jpConsAvailable1.add(jpConsAvailableLabel1, java.awt.BorderLayout.NORTH);
@@ -271,7 +271,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpConsSelectedLabel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel5.setText("Subentidades de consumo seleccionadas:");
+        jLabel5.setText("Subcentro de consumo seleccionadas:");
         jLabel5.setPreferredSize(new java.awt.Dimension(400, 16));
         jpConsSelectedLabel1.add(jLabel5);
 
@@ -291,7 +291,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpProvAvialableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlProvAva.setText("Entidades de suministro disponibles:");
+        jlProvAva.setText("Centros de suministro disponibles:");
         jpProvAvialableLabel.add(jlProvAva);
 
         jpProvAvailable.add(jpProvAvialableLabel, java.awt.BorderLayout.NORTH);
@@ -335,7 +335,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
 
         jpProvSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel2.setText("Entidades de suministro seleccionadas:");
+        jLabel2.setText("Centros de suministro seleccionadas:");
         jLabel2.setPreferredSize(new java.awt.Dimension(400, 16));
         jpProvSelectedLabel.add(jLabel2);
 
@@ -426,9 +426,9 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         
         moFields.setFormButton(jbSave);
         
-        // Entidades de consumo disponibles
+        // Centros de consumo disponibles
         
-        moGridMatConsEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT, 0, "Entidades de consumo") {
+        moGridMatConsEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT, 0, "Centros de consumo") {
             
             @Override
             public void initGrid() {
@@ -439,7 +439,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
 
                 return columns;
             }
@@ -448,9 +448,9 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         jpGridConsAva.add(moGridMatConsEnt);
         mvFormGrids.add(moGridMatConsEnt);
         
-        // Entidades de consumo seleccionadas
+        // Centroes de consumo seleccionadas
         
-        moGridMatConsEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT_USR, 0, "Entidades de consumo seleccionadas") {
+        moGridMatConsEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT_USR, 0, "Centros de consumo seleccionadas") {
             
             @Override
             public void initGrid() {
@@ -461,7 +461,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 col.setEditable(true);
                 columns.add(col);
@@ -473,9 +473,9 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         jpGridConsSel.add(moGridMatConsEntSelected);
         mvFormGrids.add(moGridMatConsEntSelected);
         
-        // Subentidades de consumo disponibles
+        // Subcentros de consumo disponibles
         
-        moGridMatConsSubent = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT, 0, "Subentidades de consumo") {
+        moGridMatConsSubent = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT, 0, "Subcentros de consumo") {
             
             @Override
             public void initGrid() {
@@ -486,8 +486,8 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Entidad de consumo"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subentidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Centro de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subcentro de consumo"));
 
                 return columns;
             }
@@ -496,9 +496,9 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         jpGridConsAva1.add(moGridMatConsSubent);
         mvFormGrids.add(moGridMatConsSubent);
         
-        // Subentidades de consumo seleccionadas
+        // Subcentroes de consumo seleccionadas
         
-        moGridMatConsSubentSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_USR, 0, "Subentidades de consumo seleccionadas") {
+        moGridMatConsSubentSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_USR, 0, "Subcentros de consumo seleccionadas") {
             
             @Override
             public void initGrid() {
@@ -509,8 +509,8 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Entidad de consumo"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subentidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Centro de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subcentro de consumo"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 col.setEditable(true);
                 columns.add(col);
@@ -522,9 +522,9 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         jpGridConsSel1.add(moGridMatConsSubentSelected);
         mvFormGrids.add(moGridMatConsSubentSelected);
         
-        // Entidades de suministro disponibles
+        // Centroes de suministro disponibles
         
-        moGridMatProvEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT, 0, "Entidades de suministro") {
+        moGridMatProvEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT, 0, "Centros de suministro") {
             
             @Override
             public void initGrid() {
@@ -535,7 +535,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de suministro"));
 
                 return columns;
             }
@@ -544,9 +544,9 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
         jpGridProvAva.add(moGridMatProvEnt);
         mvFormGrids.add(moGridMatProvEnt);
         
-        // Entidades de suministro seleccionadas
+        // Centros de suministro seleccionadas
         
-        moGridMatProvEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT_USR, 0, "Entidades de suministro seleccionadas") {
+        moGridMatProvEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT_USR, 0, "Centros de suministro seleccionadas") {
             
             @Override
             public void initGrid() {
@@ -557,7 +557,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de suministro"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 col.setEditable(true);
                 columns.add(col);

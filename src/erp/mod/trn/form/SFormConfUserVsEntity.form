@@ -102,7 +102,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlConsAvailableLabel">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Entidades de consumo disponibles:"/>
+                        <Property name="text" type="java.lang.String" value="Centros de consumo disponibles:"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -219,7 +219,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jLabel4">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Entidades de consumo seleccionadas:"/>
+                        <Property name="text" type="java.lang.String" value="Centros de consumo seleccionadas:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[400, 16]"/>
                         </Property>
@@ -276,7 +276,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlConsAvailableLabel1">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Subentidades de consumo disponibles:"/>
+                        <Property name="text" type="java.lang.String" value="Sucentros de consumo disponibles:"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -393,7 +393,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jLabel5">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Subentidades de consumo seleccionadas:"/>
+                        <Property name="text" type="java.lang.String" value="Subcentro de consumo seleccionadas:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[400, 16]"/>
                         </Property>
@@ -450,7 +450,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlProvAva">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Entidades de suministro disponibles:"/>
+                        <Property name="text" type="java.lang.String" value="Centros de suministro disponibles:"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -567,7 +567,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jLabel2">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Entidades de suministro seleccionadas:"/>
+                        <Property name="text" type="java.lang.String" value="Centros de suministro seleccionadas:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[400, 16]"/>
                         </Property>

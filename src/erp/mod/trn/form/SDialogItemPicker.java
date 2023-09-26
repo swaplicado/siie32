@@ -439,16 +439,16 @@ public class SDialogItemPicker extends JDialog implements SGuiOptionPicker, KeyL
     @Override
     public void keyReleased(KeyEvent e) {
         Vector items = new Vector();
-        String name = moTextItem.getValue();
-        if (name.isEmpty()) {
+        String textToSearch = moTextItem.getValue();
+        if (textToSearch.isEmpty()) {
             items.addAll(allRows);
         }
         else {
             for (SGridRow item : allRows) {
-                if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(0).toString()).contains(SLibUtils.textToAscii(name).toUpperCase())) {
+                if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(0).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
                     items.add(item);
                 }
-                else if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(1).toString()).contains(SLibUtils.textToAscii(name).toUpperCase())) {
+                else if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(1).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
                     items.add(item);
                 }
             }

@@ -1069,6 +1069,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moTextReqNotes.setEnabled(enable);
         
         jbNewEty.setEnabled(enable);
+        moGridMatReqCC.setRowButtonsEnabled(enable);
+        moGridMatReqCC.setEnabled(enable);
         
         jbSave.setEnabled(enable);
         jbSaveAndSend.setEnabled(enable);
@@ -1375,6 +1377,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     
     private void actionItemKey() {
         try {
+            if (moTextItemKey.getValue() == null || moTextItemKey.getValue().isEmpty()) {
+                return;
+            }
+            
             String sql2 = "SELECT * FROM trn_mat_cc_grp_item AS cgi " +
                     "INNER JOIN trn_mat_cc_grp_usr AS cgu ON " +
                     "cgi.id_mat_cc_grp = cgu.id_mat_cc_grp " +
@@ -1655,7 +1661,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moTextAuthStatus.setValue(moRegistry.getAuxAuthStatus());
         
-        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_SUP || getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
             jbSave.setEnabled(false);
             jbSaveAndSend.setEnabled(false);
         }

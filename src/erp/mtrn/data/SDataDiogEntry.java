@@ -469,11 +469,11 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     + "AND fid_diog_ety = " + mnFkDpsEntryId_n + " ";
             connection.createStatement().executeUpdate(deleteQuery);
             if (mnFkMatRequestEtyId_n > 0) {
-                ArrayList<SMatConsumeSubEntCcConfig> lConfigs = SMaterialRequestUtils.getCcConfisFromMatReqEty(connection, 
+                ArrayList<SMatConsumeSubEntCcConfig> lConfigs = SMaterialRequestUtils.getCcConfigsFromMatReqEty(connection, 
                                                                                 new int[] { mnFkMatRequestId_n, mnFkMatRequestEtyId_n });
                 
                 if (lConfigs.isEmpty()) {
-                    lConfigs = SMaterialRequestUtils.getCcConfisFromMatReq(connection, mnFkMatRequestId_n);
+                    lConfigs = SMaterialRequestUtils.getCcConfigsFromMatReq(connection, mnFkMatRequestId_n);
                 }
                 
                 SDataDiogEtyMatConsEntCostCenter oDataConfig;

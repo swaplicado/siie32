@@ -150,7 +150,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEntity.setText("Entidad:");
+        jlEntity.setText("Centro:");
         jlEntity.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel15.add(jlEntity);
 
@@ -403,7 +403,10 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
                                                                             SMaterialRequestEntryRow.FORM_SEGREGATION,
                                                                             oMaterialRequestEntry.getFkItemId(), 
-                                                                            oMaterialRequestEntry.getFkUnitId());
+                                                                            oMaterialRequestEntry.getFkUnitId(),
+                                                                            oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
+                                                                                    moMaterialRequest.getConsumptionInfo() : 
+                                                                                    oMaterialRequestEntry.getConsumptionInfo());
                 oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
                 oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());

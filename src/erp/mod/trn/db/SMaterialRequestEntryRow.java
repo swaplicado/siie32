@@ -11,8 +11,6 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
-import erp.mod.SModConsts;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,13 +50,14 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public static int FORM_SEGREGATION = 1;
     public static int FORM_SUPPLY = 2;
     
-    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit) {
+    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit, String consumeEntity) {
         miClient = client;
         mnFormType = formType;
         mnFkItemId = fkItem;
         mnFkUnitId = fkUnit;
         mnFkConsumeEntityId_n = 0;
         mnFkSubConsumeEntityId_n = 0;
+        msAuxConsumeEntity = consumeEntity;
         
         try {
             this.readAuxs();
@@ -70,33 +69,12 @@ public class SMaterialRequestEntryRow implements SGridRow {
     
     private void readAuxs() throws SQLException {
         SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { mnFkItemId }, SLibConstants.EXEC_MODE_VERBOSE);
-        SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { mnFkUnitId }, SLibConstants.EXEC_MODE_VERBOSE);
+        SDataUnit unit = item.getDbmsDataUnit();
         
         msAuxItemCode = item.getKey();
         msAuxItemName = item.getName();
         msAuxUnitCode = unit.getSymbol();
         mbAuxBulk = item.getIsBulk();
-        
-        msAuxConsumeEntity = "";
-        if (mnFkConsumeEntityId_n > 0) {
-            String sqlEntity = "SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " "
-                + "WHERE id_mat_cons_ent = " + mnFkConsumeEntityId_n + ";";
-
-            ResultSet resultSetEntity = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sqlEntity);
-            if (resultSetEntity.next()) {
-                msAuxConsumeEntity = resultSetEntity.getString("name");
-            }
-        }
-
-        if (mnFkSubConsumeEntityId_n > 0) {
-            String sqlSubEntity = "SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " "
-                + "WHERE id_mat_cons_ent = " + mnFkSubConsumeEntityId_n + " AND id_mat_cons_subent = " + mnFkSubConsumeEntityId_n + ";";
-
-            ResultSet resultSetSubEntity = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sqlSubEntity);
-            if (resultSetSubEntity.next()) {
-                msAuxConsumeEntity += "-" + resultSetSubEntity.getString("name");
-            }
-        }
     }
     
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }

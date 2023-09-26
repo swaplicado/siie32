@@ -301,8 +301,7 @@ public abstract class SAuthorizationUtils {
             int option = JOptionPane.showOptionDialog(null, scrollPane, "Ingrese motivo de rechazo", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
 
             if (option == JOptionPane.OK_OPTION) {
-                String input = textArea.getText();
-                System.out.println("Input: " + input);
+                reason = textArea.getText();
             }
             else {
                 return "Acción cancelada";

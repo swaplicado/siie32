@@ -126,7 +126,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
      * 
      * @return lista de configuraciones
      */
-    public ArrayList<SMatConsumeSubEntCcConfig> getCcConfis() {
+    public ArrayList<SMatConsumeSubEntCcConfig> getCcConfigs() {
         ArrayList<SMatConsumeSubEntCcConfig> lConfigs = new ArrayList<>();
         
         if (mnFkSubentMatConsumptionEntityId_n > 0 && mnFkSubentMatConsumptionSubentityId_n > 0) {
@@ -142,6 +142,33 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         }
         
         return lConfigs;
+    }
+    
+    public String getConsumptionInfo() {
+        String description = "";
+        if (moDbmsMatConsEntity != null && moDbmsMatConsSubentity != null) {
+            description = moDbmsMatConsEntity.getName() + " - " + moDbmsMatConsSubentity.getName();
+        }
+        
+        return description;
+    }
+    
+    public String getConsumptionEntityInfo() {
+        String description = "";
+        if (moDbmsMatConsEntity != null) {
+            description = moDbmsMatConsEntity.getName();
+        }
+        
+        return description;
+    }
+    
+    public String getConsumptionSubentityInfo() {
+        String description = "";
+        if (moDbmsMatConsSubentity != null) {
+            description = moDbmsMatConsSubentity.getName();
+        }
+        
+        return description;
     }
 
     public void readOptionalInfo(SGuiSession session) throws Exception {

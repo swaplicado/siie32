@@ -111,6 +111,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private boolean mbUpdatingForm;
+    private boolean mbMatRequestImport;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
     
@@ -5777,6 +5778,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setMessage("El valor para el campo '" + jlOriginalQuantity.getText() + "' debe ser entero.");
                     validation.setComponent(jtfOriginalQuantity);
                 }
+                else if (moDpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                    if (moFieldOriginalQuantity.getDouble() < moDpsEntry.getDbmsDpsEntryMatRequestLink().getQuantity()) {
+                        validation.setMessage("El valor para el campo '" + jlOriginalQuantity.getText() + "' no puede ser menor de lo que se vinculó con la requisición, "
+                                + "debe eliminar el renglón y agregarlo de nuevo.");
+                        validation.setComponent(jtfOriginalQuantity);
+                    }
+                }
                 else if (SLibUtils.parseDouble(jtfQuantityRo.getText()) == 0d) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlQuantity.getText() + "'.");
                     // remember that field jtfQuantityRo is read only!, it cannot gain focus
@@ -6181,7 +6189,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moPaneGridNotes.setTableRowSelection(0);
 
         for (SDataDpsEntryPrice price : moDpsEntry.getDbmsEntryPrices()) {
-                moPaneGridPrices.addTableRow(new SDataDpsEntryPriceRow(price.clone()));
+            moPaneGridPrices.addTableRow(new SDataDpsEntryPriceRow(price.clone()));
         }
         moPaneGridPrices.renderTableRows();
         moPaneGridPrices.setTableRowSelection(0);
@@ -6201,7 +6209,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldComplCfdUnit.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getCfdUnit());
             moFieldComplPredial.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getPredial());
         }
-
+        
+        if (mbMatRequestImport) {
+            calculateTotal();
+            moDpsEntry.setFlagOpenedByMatRequestImport(true);
+        }
+        
         renderDpsEntryValue();
         renderFieldsStatus();
         jckIsDeleted.setEnabled(true);
@@ -6472,6 +6485,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 mbPostEmissionEdition = (Boolean) value;
                 jbEditLogistics.setEnabled(mbPostEmissionEdition);
                 jbEditNotes.setEnabled(mbPostEmissionEdition);
+                break;
+            
+            case SLibConstants.VALUE_IS_MAT_REQ:
+                mbMatRequestImport = (Boolean) value;
                 break;
                 
             default:

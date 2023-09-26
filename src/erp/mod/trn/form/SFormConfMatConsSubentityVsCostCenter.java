@@ -74,7 +74,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
 
         jpEntity.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlEntity.setText("Entidad:");
+        jlEntity.setText("Centro:");
         jlEntity.setPreferredSize(new java.awt.Dimension(70, 16));
         jpEntity.add(jlEntity);
 
@@ -83,7 +83,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
         moTextEntity.setPreferredSize(new java.awt.Dimension(250, 23));
         jpEntity.add(moTextEntity);
 
-        jlSubentity.setText("Subentidad:");
+        jlSubentity.setText("Subcentro:");
         jlSubentity.setPreferredSize(new java.awt.Dimension(70, 16));
         jpEntity.add(jlSubentity);
 
@@ -119,8 +119,8 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 880, 550);
         
-        moTextEntity.setTextSettings("Entidad", 250);
-        moTextSubentity.setTextSettings("Subentidad", 250);
+        moTextEntity.setTextSettings("Centro", 250);
+        moTextSubentity.setTextSettings("Subcentro", 250);
         
         moGridCostCenter = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_CC, 0, "Centros de costo") {
             

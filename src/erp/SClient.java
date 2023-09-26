@@ -114,7 +114,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 219.0"; // fecha release: 2023-09-05
+    public static final String APP_RELEASE = "3.2 220.0"; // fecha release: 2023-09-26
     public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -197,6 +197,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconDocImport;
     private ImageIcon moIconDocImportCfd;
     private ImageIcon moIconDocImportCfdOrd;
+    private ImageIcon moIconDocImportMatReq;
     private ImageIcon moIconDocOpen;
     private ImageIcon moIconDocClose;
     private ImageIcon moIconDocXml;
@@ -733,6 +734,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconDocImport = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import.gif"));
         moIconDocImportCfd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd.gif"));
         moIconDocImportCfdOrd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_ord.gif"));
+        moIconDocImportMatReq = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_mat_req.gif"));
         moIconDocOpen = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif"));
         moIconDocClose = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_close.gif"));
         moIconDocXml = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"));
@@ -2199,6 +2201,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_DOC_IMPORT_CFD_ORD:
                 imageIcon = moIconDocImportCfdOrd;
+                break;
+            case SLibConstants.ICON_DOC_IMPORT_MAT_REQ:
+                imageIcon = moIconDocImportMatReq;
                 break;
             case SLibConstants.ICON_DOC_OPEN:
                 imageIcon = moIconDocOpen;
