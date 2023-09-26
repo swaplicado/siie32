@@ -58,7 +58,7 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
         jlBimester = new javax.swing.JLabel();
         moIntBimester = new sa.lib.gui.bean.SBeanFieldInteger();
 
-        setTitle("Actualización de SBC de empleados:");
+        setTitle("Actualización SBC de empleados:");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);

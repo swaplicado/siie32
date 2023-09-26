@@ -7,7 +7,7 @@ package erp.mod;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Sergio Flores, Claudio Peña
  */
 public abstract class SModSysConsts {
 
@@ -917,6 +917,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_REWARD_PUNCT = 10;  // Reward for punctuality
     public static final int HRSS_TP_EAR_DISAB = 14;         // Disability
     /** No longer belongs to oficial catalog, but preserved active for convenience because it is used internally by system. */    
+    public static final int HRSS_TP_EAR_SCHO = 15;          // Literacy scholarship and promotion of culture    
     public static final int HRSS_TP_EAR_TAX_SUB = 17;       // Tax Subsidy
     public static final int HRSS_TP_EAR_OVER_TIME = 19;     // Overtime
     public static final int HRSS_TP_EAR_SUN_BONUS = 20;     // Sunday Bonus
