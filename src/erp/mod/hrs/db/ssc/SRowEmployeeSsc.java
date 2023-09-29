@@ -206,9 +206,8 @@ public class SRowEmployeeSsc implements SGridRow {
                 case 2:
                     value = moEmployee.getDateBenefits();
                     break;
-                case 3:
-                    value = moAnniversary.getCurrentAnniversaryPropPartForBenefits();
-//                    value = SSscUtils.getEmployeeAntiquity(moEmployee.getDateBenefits(), mtPeriodEnd);
+                case 3: 
+                    value = SSscUtils.getEmployeeAntiquity(moEmployee.getDateBenefits(), mtPeriodEnd);
                     break;
                 case 4:
                     value = moSession.readField(SModConsts.HRSS_TP_PAY, new int[] { moEmployee.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME);
