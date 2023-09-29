@@ -567,7 +567,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         // Si el estatus de requisición esta "En autorización"
         if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_AUTH) {
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
-            SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
+            boolean reset = false;
+            SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId }, reset);
             mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
             
             mnAuxReqStatusIdOld = mnFkMatRequestStatusId;

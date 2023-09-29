@@ -419,7 +419,7 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
         }
         else {
             jtfProviderEntity.setText(moMaterialRequest.getAuxProvEntName());
-            jtfConsumeEntity.setText("REFINERÍA (FIX)");
+            jtfConsumeEntity.setText(moMaterialRequest.getConsumptionInfo());
             
             jtfProviderEntity.setToolTipText(jtfProviderEntity.getText());
             jtfConsumeEntity.setToolTipText(jtfConsumeEntity.getText());

@@ -295,9 +295,9 @@ public class SPanelMaterialRequestEntry extends javax.swing.JPanel {
             jtfUnit.setText(moMaterialRequestEty.getDataItem().getDbmsDataUnit().getUnit());
             
             if (moMaterialRequestEty.getFkSubentMatConsumptionSubentityId_n() > 0) {
-                jtfConsumeEntity.setText(moMaterialRequestEty.getConsumptionEntityInfo());
-                jtfConsumeEntity1.setText(moMaterialRequestEty.getConsumptionSubentityInfo());
-                jtfConsumeEntity2.setText(moMaterialRequestEty.getConsumptionSubentityInfo());
+                jtfConsumeEntity.setText(moMaterialRequestEty.getConsumptionEntityInfo().isEmpty() ? "NA" : moMaterialRequestEty.getConsumptionEntityInfo());
+                jtfConsumeEntity1.setText(moMaterialRequestEty.getConsumptionSubentityInfo().isEmpty() ? "NA" : moMaterialRequestEty.getConsumptionEntityInfo());
+                jtfConsumeEntity2.setText(moMaterialRequestEty.getConsumptionSubentityInfo().isEmpty() ? "NA" : moMaterialRequestEty.getConsumptionSubentityInfo());
             }
             else {
                 jtfConsumeEntity.setText("");

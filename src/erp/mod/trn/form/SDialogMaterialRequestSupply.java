@@ -653,7 +653,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
      */
     private void initMaterialRequestData() {
         try {
-            moTextNumber.setValue(moMaterialRequest.getNumber() + "");
+            moTextNumber.setValue(String.format("%05d", moMaterialRequest.getNumber()));
             /*
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
             moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDocLapsing_n()));

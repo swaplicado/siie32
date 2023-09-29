@@ -225,6 +225,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     
                     moDialogSegregations.setFormParams(key);
                     moDialogSegregations.setVisible(true);
+                    
+                    miClient.getSession().notifySuscriptors(mnGridType);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -320,7 +322,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt AS " + SDbConsts.FIELD_DATE + ", "
-                + "v.num AS folio, "
+                + "LPAD(v.num, 6, 0) AS folio, "
                 + "v.dt_req_n, "
                 + "v.ref, "
                 + "v.b_ext_sys, "
@@ -439,6 +441,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
         moSuscriptionsSet.add(SModConsts.CFGU_AUTHORN_STEP);
+        moSuscriptionsSet.add(SModConsts.TRN_MAT_REQ);
+        moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_PEND_SUP);
+        moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_PEND_PUR);
     }
 
     @Override

@@ -560,6 +560,7 @@ public abstract class SMaterialRequestUtils {
         
         return 0d;
     }
+    
     /*
      * Devuelve la cantidad de presupuesto que ha sido pedido a un centro de consumo, se excluyen los documentos eliminados y rechazados
      * @param session 
@@ -607,8 +608,8 @@ public abstract class SMaterialRequestUtils {
             while (resultSet.next()) {
                 oConfig = new SMatConsumeSubEntCcConfig();
                 oConfig.setFkMaterialRequestId(idMatRequest);
-                oConfig.setFkSubentMatConsumptionEntityId(resultSet.getInt("fk_subent_mat_cons_ent"));
-                oConfig.setFkSubentMatConsumptionSubentityId(resultSet.getInt("fk_subent_mat_cons_subent"));
+                oConfig.setFkSubentMatConsumptionEntityId(resultSet.getInt("id_mat_subent_cons_ent"));
+                oConfig.setFkSubentMatConsumptionSubentityId(resultSet.getInt("id_mat_subent_cons_subent"));
                 oConfig.setFkCostCenterId(resultSet.getInt("id_cc"));
 
                 lConfigs.add(oConfig);
@@ -654,6 +655,65 @@ public abstract class SMaterialRequestUtils {
         catch (SQLException ex) {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<>();
+        }
+    }
+    
+    public static String hasLinksMaterialRequest(SGuiSession session, int[] pkMatReq) throws SQLException {
+        String sql = "SELECT ety.* FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS ety "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS di ON ety.id_year = di.id_year "
+                    + "AND ety.id_doc = di.id_doc "
+                    + "WHERE ety.fid_mat_req_n = " + pkMatReq[0] + " "
+                    + "AND NOT ety.b_del "
+                    + "AND NOT di.b_del;";
+        
+        String message = "";
+        ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        
+        if (resultSet.next()) {
+            message = "La requisición tiene suministros de almacén.";
+        }
+        
+        sql = "SELECT " +
+            "dpsmr.* " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS ety " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON ety.id_year = d.id_year AND ety.id_doc = d.id_doc " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dpsmr ON ety.id_year = dpsmr.fid_dps_year AND ety.id_doc = dpsmr.fid_dps_doc AND ety.id_ety = dpsmr.fid_dps_ety " +
+            "WHERE NOT d.b_del AND NOT ety.b_del AND dpsmr.fid_mat_req = " + pkMatReq[0] + ";";
+        
+        ResultSet resultSetDps = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        
+        if (resultSetDps.next()) {
+            message = "La requisición tiene vínculos con documentos de compra.";
+        }
+
+        return message;
+    }
+    
+    public static String updateStatusOfMaterialRequest(SGuiSession session, int[] pkMatReq, int statusId) {
+        try {
+            SDbMaterialRequest req = new SDbMaterialRequest();
+            req.read(session, pkMatReq);
+            req.setFkMatRequestStatusId(statusId);
+            
+            if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
+                SAuthorizationUtils.deleteStepsOfAuthorization(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, pkMatReq);
+            }
+            else if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
+                req.setCloseProvision(true);
+                req.setClosePurchase(false);
+            }
+            else if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
+                req.setCloseProvision(false);
+                req.setClosePurchase(true);
+            }
+            
+            req.save(session);
+            
+            return "";
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
         }
     }
 }

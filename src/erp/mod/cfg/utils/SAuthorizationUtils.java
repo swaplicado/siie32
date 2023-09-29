@@ -537,12 +537,17 @@ public abstract class SAuthorizationUtils {
      * @param session
      * @param authorizationType
      * @param pk
+     * @param reset determina si los pasos previos de autorización tienen que borrarse
      * 
      * @throws Exception 
      */
-    public static void processAuthorizations(SGuiSession session, final int authorizationType, final Object pk) throws Exception {
+    public static void processAuthorizations(SGuiSession session, final int authorizationType, final Object pk, final boolean reset) throws Exception {
+        if (reset) {
+            SAuthorizationUtils.deleteStepsOfAuthorization(session, authorizationType, pk);
+        }
+        
         // Si el recurso ya tiene pasos de autorización no se determinan nuevamente
-        if (SAuthorizationUtils.hasStepsOfAuthorization(session, authorizationType, pk)) {
+        if (!reset && SAuthorizationUtils.hasStepsOfAuthorization(session, authorizationType, pk)) {
             return;
         }
         
@@ -1137,6 +1142,46 @@ public abstract class SAuthorizationUtils {
         }
         
         return false;
+    }
+    
+    public static void deleteStepsOfAuthorization(SGuiSession session, final int authorizationType, final Object pk) {
+         String condPk = "";
+        switch(authorizationType) {
+            case AUTH_TYPE_MAT_REQUEST:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " ";
+                break;
+                
+            case AUTH_TYPE_DPS:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " AND res_pk_n2_n = " + ((int[]) pk)[1] + " ";
+                break;
+        }
+        
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                + "WHERE NOT b_del AND "
+                    + "fk_tp_authorn = " + authorizationType + " AND "
+                    + condPk + ";";
+        
+        ResultSet res;
+        try {
+            res = session.getStatement().getConnection().createStatement().executeQuery(sql);
+            String ids = "";
+            while (res.next()) {
+                ids += res.getInt("id_authorn_step") + ",";
+            }
+            
+            if (! ids.isEmpty()) {
+                ids = ids.substring(0, ids.length() - 1);
+            }
+            
+            sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " SET b_del = true "
+                    + "WHERE id_authorn_step IN (" + ids + ");";
+            
+            session.getStatement().getConnection().createStatement().executeUpdate(sql);
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**

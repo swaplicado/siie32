@@ -11574,7 +11574,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         try {
-            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, registry.getPrimaryKey());
+            boolean reset = false;
+            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, registry.getPrimaryKey(), reset);
         }
         catch (Exception ex) {
             Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);

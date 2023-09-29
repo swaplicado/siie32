@@ -7,6 +7,7 @@ package erp.mod.cfg.utils;
 
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -46,9 +47,13 @@ public class SMatRequestAuthorizationUtils {
      */
     public static ArrayList<Integer> getConsumeEntitys(SDbMaterialRequest oMatReq) {
         ArrayList<Integer> consumeEntitys = new ArrayList<>();
-        //consumeEntitys.add(oMatReq.getFkEntMatConsumptionEntityId());
+        for (SDbMaterialRequestCostCenter element : oMatReq.getChildCostCenters()) {
+            consumeEntitys.add(element.getPkEntMatConsumptionEntityId());
+        }
         for (SDbMaterialRequestEntry oEty : oMatReq.getChildEntries()) {
-            consumeEntitys.add(oEty.getFkEntMatConsumptionEntityId_n());
+            if (oEty.getFkEntMatConsumptionEntityId_n() > 0) {
+                consumeEntitys.add(oEty.getFkEntMatConsumptionEntityId_n());
+            }
         }
         
         return consumeEntitys;

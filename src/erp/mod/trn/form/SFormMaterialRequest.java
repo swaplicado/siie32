@@ -529,7 +529,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jLabel1.setPreferredSize(new java.awt.Dimension(131, 23));
         jPanel47.add(jLabel1);
 
-        jlUnitPriceRef.setText("Ref. precio u.:*");
+        jlUnitPriceRef.setText("Ref. precio u.:");
         jlUnitPriceRef.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel47.add(jlUnitPriceRef);
         jPanel47.add(moTextUnitPriceRef);

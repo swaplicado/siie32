@@ -11,6 +11,7 @@ import erp.lib.form.SFormValidation;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
+import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
@@ -19,6 +20,7 @@ import erp.mtrn.data.SDataDpsDpsMaterialRequestLink;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryNotes;
 import erp.mtrn.data.SDataMaterialRequestEntryLinkRow;
+import erp.mtrn.data.STrnFunctionalAreaUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -443,6 +445,18 @@ public class SDialogMatReqDpsLink extends javax.swing.JDialog implements erp.lib
             moDps = new SDataDps();
             moDps.setIsRecordAutomatic(true);
             moDps.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);
+            moDps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
+            moDps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
+            moDps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
+            ArrayList<String> areas = STrnFunctionalAreaUtils.getFunctionalAreasOfUser(miClient, 
+                                                                                miClient.getSession().getUser().getPkUserId(), 
+                                                                                STrnFunctionalAreaUtils.FUNC_AREA_ID);
+            if (areas.size() > 0) {
+                moDps.setFkFunctionalAreaId(Integer.parseInt(areas.get(0)));
+            }
+            else {
+                moDps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+            }
             
             mlEtys = null;
         }
