@@ -56,6 +56,11 @@
                 <Property name="alignment" type="int" value="0"/>
               </Layout>
               <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlWarehouse">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Almac&#xe9;n:"/>
+                  </Properties>
+                </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextWarehouse">
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>
@@ -89,7 +94,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlProvAvailable">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Entidades de suministro disponibles:"/>
+                        <Property name="text" type="java.lang.String" value="Centros de suministro disponibles:"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -206,7 +211,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlProvSelected">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Entidades de suministro seleccionadas:"/>
+                        <Property name="text" type="java.lang.String" value="Centros de suministro seleccionadas:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[370, 16]"/>
                         </Property>

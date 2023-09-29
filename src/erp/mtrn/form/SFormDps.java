@@ -153,6 +153,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbResetingForm;
     private boolean mbUpdatingForm;
     private boolean mbDocBeingImported;
+    private boolean mbMatRequestImport;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -541,6 +542,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryWizard = new javax.swing.JButton();
         jsEntry03 = new javax.swing.JSeparator();
         jbEntryViewLinks = new javax.swing.JButton();
+        jsEntry4 = new javax.swing.JSeparator();
+        jbEntryImportFromMatRequest = new javax.swing.JButton();
+        jbEntryViewMatReqLinks = new javax.swing.JButton();
         jbExportCsv = new javax.swing.JButton();
         jpEntriesControlsEast = new javax.swing.JPanel();
         jlAdjustmentSubtypeId = new javax.swing.JLabel();
@@ -1690,6 +1694,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryViewLinks.setToolTipText("Ver vínculos de la partida [Ctrl + L]");
         jbEntryViewLinks.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryViewLinks);
+
+        jsEntry4.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jsEntry4.setPreferredSize(new java.awt.Dimension(3, 23));
+        jpEntriesControlsWest.add(jsEntry4);
+
+        jbEntryImportFromMatRequest.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_b.gif"))); // NOI18N
+        jbEntryImportFromMatRequest.setToolTipText("Importar partidas de requisición [Ctrl + I]");
+        jbEntryImportFromMatRequest.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbEntryImportFromMatRequest);
+
+        jbEntryViewMatReqLinks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_link_b.gif"))); // NOI18N
+        jbEntryViewMatReqLinks.setToolTipText("Ver vínculos de requisición de la partida [Ctrl + L]");
+        jbEntryViewMatReqLinks.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbEntryViewMatReqLinks);
 
         jbExportCsv.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_file_csv.gif"))); // NOI18N
         jbExportCsv.setToolTipText("Exportar CSV [Ctrl + E]");
@@ -3441,6 +3459,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryImportFromDps.addActionListener(this);
         jbEntryWizard.addActionListener(this);
         jbEntryViewLinks.addActionListener(this);
+        jbEntryImportFromMatRequest.addActionListener(this);
+        jbEntryViewMatReqLinks.addActionListener(this);
         jbExportCsv.addActionListener(this);
         jbTaxRegionId.addActionListener(this);
         jbNotesNew.addActionListener(this);
@@ -3606,9 +3626,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
 
                         // import data from previous document:
-                                
+                              
                         try {
-                            SDataDps dpsModel = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                            SDataDps dpsModel;
+                            
+                            if (! mbMatRequestImport) {
+                                dpsModel = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                            }
+                            else {
+                                dpsModel = moParamDpsSource;
+                                if (dpsModel.getFkBizPartnerId_r() == 0) {
+                                    pickBizPartner();
+                                    if (moPickerBizPartner.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                                        releaseRecordUserSLock();
+                                        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+                                        setVisible(false);
+                                        return;
+                                    }
+                                }
+                            }
 
                             if (!STrnDpsUtilities.isDpsAuthorized(miClient, dpsModel)) {
                                 mbFormSettingsOk = goAhead = false;
@@ -3618,7 +3654,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 mbDocBeingImported = true;
                                 
                                 SDataDps dps = createNewDps(dpsModel);
-                                dps.getDbmsDpsEntries().clear();
+                                if (! mbMatRequestImport) {
+                                    dps.getDbmsDpsEntries().clear();
+                                }
 
                                 for (SDataDpsNotes notes : dps.getDbmsDpsNotes()) {
                                     notes.setIsRegistryEdited(true);    // force original document notes to be attached to new document even if they are not edited
@@ -3632,10 +3670,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     SFormUtilities.locateComboBoxItem(jcbAdjustmentSubtypeId, manParamAdjustmentSubtypeKey);
                                 }
                                 
-                                actionEntryImportFromDps(moParamDpsSource);
+                                if (! mbMatRequestImport) {
+                                    actionEntryImportFromDps(moParamDpsSource);
+                                }
                             }
                         }
                         catch (Exception e) {
+                            Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, e);
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
@@ -4919,6 +4960,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
                 entry.setPkEntryId(0);
                 entry.setIsRegistryNew(true); // force entries to be treated as new
+                if (mbMatRequestImport) {
+                    if (moBizPartnerBranch != null) {
+                        entry.setFkTaxRegionId(moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n());
+                    }
+                    else {
+                        entry.setFkTaxRegionId(miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n());
+                    }
+                }
             }
         }
         
@@ -5302,6 +5351,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryDiscountRetailChain.setEnabled(mbIsDpsAdjustment);
         jbEntryImportFromDps.setEnabled(mbIsDpsOrder || mbIsDpsInvoice || mbIsDpsAdjustment);
         jbEntryWizard.setEnabled(!mbIsDpsAdjustment);
+        jbEntryImportFromMatRequest.setEnabled((mbIsDpsEstimate || mbIsDpsOrder || mbIsDpsInvoice) && ! mbIsSales);
 
         jlAdjustmentSubtypeId.setEnabled(mbIsDpsAdjustment);
         jcbAdjustmentSubtypeId.setEnabled(mbIsDpsAdjustment);
@@ -5386,6 +5436,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbEntryDiscountRetailChain.setEnabled(false);
             jbEntryImportFromDps.setEnabled(false);
             jbEntryWizard.setEnabled(false);
+            jbEntryImportFromMatRequest.setEnabled(false);
 
             jbNotesNew.setEnabled(false);
             jbNotesEdit.setEnabled(false);
@@ -6611,6 +6662,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFormEntry.setValue(SDataConstants.BPSU_BP, moBizPartner);
                     moFormEntry.setValue(SDataConstants.BPSU_BPB, moBizPartnerBranch);
                     moFormEntry.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, postEmissionEditionAllowed);
+                    moFormEntry.setValue(SLibConstants.VALUE_IS_MAT_REQ, mbMatRequestImport);
                     moFormEntry.setEnableDataAddenda(isCfdAddendaRequired());
                     moFormEntry.setRegistry(entry);
 
@@ -7629,6 +7681,50 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
         }
+    }
+    
+    private void actionImportEntryFromMatReq() {
+        SDialogMatReqDpsLink oDialog = new SDialogMatReqDpsLink(miClient, moDps.getDpsTypeKey());
+        oDialog.setValue(SDataConstants.TRN_DPS, moDps);
+        oDialog.setFormVisible(true);
+        if (oDialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            ArrayList<SDataDpsEntry> lEntries = (ArrayList<SDataDpsEntry>) oDialog.getValue(SDataConstants.TRN_DPS_ETY);
+            for (SDataDpsEntry oEntryImported : lEntries) {
+                oEntryImported.setFkTaxRegionId(moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n());
+                moPaneGridEntries.addTableRow(new SDataDpsEntryRow(oEntryImported, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+            }
+            
+            mbMatRequestImport = true;
+            renderEntries();
+            calculateTotal();
+            try {
+                updateDpsEntryCfdiSettings();
+            }
+            catch (SQLException ex) {
+                miClient.showMsgBoxWarning(ex.getMessage());
+                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
+        }
+    }
+    
+    private void actionViewMatReqEntryLinks() {
+        int index = moPaneGridEntries.getTable().getSelectedRow();
+        SDataDpsEntry entry;
+
+        if (index != -1) {
+            entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(index).getData()).clone();
+
+            if (entry.getDbmsDpsEntryMatRequestLink() != null) {
+                SDialogDpsEtyMatReq oDialog = new SDialogDpsEtyMatReq(miClient);
+                oDialog.setFormParams(entry.getDbmsDpsEntryMatRequestLink().getDbmsMaterialRequestEntryKey(), 
+                                        entry.getDbmsDpsEntryMatRequestLink().getDbmsDpsKey(), 
+                                        (int[]) moDpsType.getPrimaryKey(), 
+                                        entry.getDbmsDpsEntryMatRequestLink().getQuantity());
+                oDialog.setVisible(true);
+            }
+        }
+
     }
     
     private void actionEntryCopy() {
@@ -9163,8 +9259,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbEntryDiscountRetailChain;
     private javax.swing.JButton jbEntryEdit;
     private javax.swing.JButton jbEntryImportFromDps;
+    private javax.swing.JButton jbEntryImportFromMatRequest;
     private javax.swing.JButton jbEntryNew;
     private javax.swing.JButton jbEntryViewLinks;
+    private javax.swing.JButton jbEntryViewMatReqLinks;
     private javax.swing.JButton jbEntryWizard;
     private javax.swing.JButton jbExchangeRate;
     private javax.swing.JButton jbExportCsv;
@@ -9394,6 +9492,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JSeparator jsEntry01;
     private javax.swing.JSeparator jsEntry02;
     private javax.swing.JSeparator jsEntry03;
+    private javax.swing.JSeparator jsEntry4;
     private javax.swing.JSeparator jsNotes01;
     private javax.swing.JSeparator jsNotes02;
     private javax.swing.JTextArea jtaCfdiRelated;
@@ -9540,6 +9639,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
         mbDocBeingImported = false;
+//        mbMatRequestImport = false;
 
         moDps = createNewDps(null);
         moLastDpsSource = null;
@@ -10077,6 +10177,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 }
                             }
                         }
+                        
+                        // validar cuando es importación de requisición que se hayan abierto todos los ítems???
+                        
+                        if (!validation.getIsError() && mbMatRequestImport) {
+                            for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                                SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+
+                                try {
+                                    if (! entry.getFlagOpenedByMatRequestImport()) { // condition for check items
+                                        validation.setMessage("Es necesario revisar la información de las partidas del documento cuando se importa una requisición.");
+                                        validation.setComponent(moPaneGridEntries);
+                                        jTabbedPane.setSelectedIndex(TAB_ETY);
+                                    }
+                                }
+                                catch (Exception e) {
+                                    SLibUtilities.printOutException(this, e);
+                                    validation.setMessage(e.getMessage());
+                                    validation.setComponent(moPaneGridEntries);
+                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                                    break;
+                                }
+                            }
+                        }
 
                         double prepaymentsCy = mdPrepaymentsCy;
                         double applicationsCy = 0;
@@ -10528,7 +10651,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // set business partner, set aswell business partner default preferences when document is new:
 
-        setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
+        if (! mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
+            setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
+        }
+        else if (moBizPartner != null) {
+            setBizPartner((int[]) moBizPartner.getPrimaryKey(), (int[]) moBizPartnerBranch.getPrimaryKey(), (int[]) moBizPartnerBranchAddress.getPrimaryKey());
+        }
         
         // check if payment way should be taken from document:
         if (moDps.getDbmsDataDpsCfd() != null && !moDps.getDbmsDataDpsCfd().getPaymentWay().isEmpty()) {
@@ -10584,6 +10712,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             catch (Exception ex) {
                 Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+        
+        if (mbMatRequestImport) {
+            renderEntries();
         }
 
         renderBasicSettings();
@@ -11115,6 +11247,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             case SLibConstants.VALUE_CURRENCY_LOCAL:
                 mbIsLocalCurrency = (Boolean) value;
                 break;
+            case SLibConstants.VALUE_IS_MAT_REQ:
+                mbMatRequestImport = (Boolean) value;
+                break;
             default:
         }
     }
@@ -11203,6 +11338,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbEntryViewLinks) {
                     actionEntryViewLinks();
+                }
+                else if (button == jbEntryImportFromMatRequest) {
+                    actionImportEntryFromMatReq();
+                }
+                else if (button == jbEntryViewMatReqLinks) {
+                    actionViewMatReqEntryLinks();
                 }
                 else if (button == jbExportCsv) {
                     actionExportCsv();
@@ -11433,7 +11574,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         try {
-            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, registry.getPrimaryKey());
+            boolean reset = false;
+            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, registry.getPrimaryKey(), reset);
         }
         catch (Exception ex) {
             Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);

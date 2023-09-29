@@ -6,19 +6,21 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
+import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
  * @author Isabel Servín
  */
-public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
+public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements SGridRow, Serializable {
     
     protected int mnPkMatConsumptionEntityId;
     protected int mnPkMatConsumptionSubentityId;
@@ -27,14 +29,13 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
-    */
-    protected String msFkCostCenterId;
-    /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    
+    protected String msXtaConsumptionEntityName;
 
     public SDbMaterialConsumptionSubentity() {
         super(SModConsts.TRN_MAT_CONS_SUBENT);
@@ -46,11 +47,12 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
     public void setName(String s) { msName = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
-    public void setFkCostCenterId(String s) { msFkCostCenterId = s; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
+    
+    public void setXtaConsumptionEntityName(String s) { msXtaConsumptionEntityName = s; }
     
     public int getPkMatConsumptionEntityId() { return mnPkMatConsumptionEntityId; }
     public int getPkMatConsumptionSubentityId() { return mnPkMatConsumptionSubentityId; }
@@ -58,11 +60,12 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
     public String getName() { return msName; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
-    public String getFkCostCenterId() { return msFkCostCenterId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public String getXtaConsumptionEntityName() { return msXtaConsumptionEntityName; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -85,11 +88,12 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
         msName = "";
         mbDeleted = false;
         mbSystem = false;
-        msFkCostCenterId = "";
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        msXtaConsumptionEntityName = "";
     }
 
     @Override
@@ -131,7 +135,10 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
         
-        msSql = "SELECT * " + getSqlFromWhere(pk);
+        msSql = "SELECT s.*, e.name FROM " + getSqlTable() + " AS s "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS e "
+                + "ON s.id_mat_cons_ent = e.id_mat_cons_ent "
+                + "WHERE s.id_mat_cons_ent = " + pk[0] + " AND s.id_mat_cons_subent = " + pk[1];
         resultSet = session.getStatement().executeQuery(msSql);
         if (!resultSet.next()) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
@@ -140,14 +147,15 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
             mnPkMatConsumptionEntityId = resultSet.getInt("id_mat_cons_ent");
             mnPkMatConsumptionSubentityId = resultSet.getInt("id_mat_cons_subent");
             msCode = resultSet.getString("code");
-            msName = resultSet.getString("name");
+            msName = resultSet.getString("s.name");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
-            msFkCostCenterId = resultSet.getString("fid_cc");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+            
+            msXtaConsumptionEntityName = resultSet.getString("e.name");
             
             mbRegistryNew = false;
         }
@@ -173,7 +181,6 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
                     "'" + msName + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
-                    "'" + msFkCostCenterId + "', " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -190,7 +197,6 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
                     "name = '" + msName + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                    "fid_cc = '" + msFkCostCenterId + "', " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -213,7 +219,6 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
         registry.setName(this.getName());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
-        registry.setFkCostCenterId(this.getFkCostCenterId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
@@ -222,5 +227,57 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         
         return registry;
+    }
+
+    @Override
+    public int[] getRowPrimaryKey() {
+        return new int[] { mnPkMatConsumptionEntityId, mnPkMatConsumptionSubentityId };
+    }
+
+    @Override
+    public String getRowCode() {
+        return "";
+    }
+
+    @Override
+    public String getRowName() {
+        return "";
+    }
+
+    @Override
+    public boolean isRowSystem() {
+        return false;
+    }
+
+    @Override
+    public boolean isRowDeletable() {
+        return true;
+    }
+
+    @Override
+    public boolean isRowEdited() {
+        return isRegistryEdited();
+    }
+
+    @Override
+    public void setRowEdited(boolean edited) {
+        setRegistryEdited(edited);
+    }
+
+    @Override
+    public Object getRowValueAt(int col) {
+        Object value = null;
+        
+        switch (col) {
+            case 0: value = msXtaConsumptionEntityName; break;
+            case 1: value = msName; break;
+        }
+        
+        return value;
+    }
+
+    @Override
+    public void setRowValueAt(Object value, int col) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -1558,6 +1558,22 @@ public abstract class SDataReadComponentItems {
                         "ORDER BY s.dns, s.id_dns, cl.id_ct_iog, cl.cl_iog ";
                 text = "serie folios de inventarios";
                 break;
+            case SDataConstants.TRN_MAT_CONS_ENT:
+                lenPk = 1;
+                sql = "SELECT id_mat_cons_ent AS f_id_1, name AS f_item " +
+                        "FROM trn_mat_cons_ent WHERE b_del = 0 ORDER BY name, id_mat_cons_ent ";
+                text = "entidades de consumo";
+                break;
+            case SDataConstants.TRN_MAT_CONS_SUBENT:
+                lenPk = 2;
+                sql = "SELECT id_mat_cons_ent AS f_id_1, id_mat_cons_subent AS f_id_2, name AS f_item " +
+                        "FROM trn_mat_cons_subent WHERE b_del = 0 ";
+                if (pk != null) {
+                    sql += "AND id_mat_cons_ent = " + ((int[]) pk)[0] + " ";
+                }
+                sql += "ORDER BY name, id_mat_cons_ent ";
+                text = "subentidades de consumo";
+                break;
             default:
         }
 

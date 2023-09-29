@@ -47,6 +47,7 @@ import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
+import erp.mtrn.form.SDialogMatReqDpsLink;
 import erp.mtrn.form.SDialogPrintCfdiMasive;
 import erp.mtrn.form.SDialogUpdateDpsDate;
 import erp.mtrn.form.SDialogUpdateDpsDeliveryAddress;
@@ -125,6 +126,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbResetPacFlags;
     private javax.swing.JButton jbImportCfdiWithOutPurchaseOrder;
     private javax.swing.JButton jbImportCfdiWithPurchaseOrder;
+    private javax.swing.JButton jbImportMatRequest;
     private javax.swing.JButton jbChangeDpsEntryItem;
     private javax.swing.JButton jbRestoreCfdStamped;
     private javax.swing.JButton jbRestoreCfdCancelAck;
@@ -261,6 +263,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbImportCfdiWithPurchaseOrder.setPreferredSize(new Dimension(23, 23));
         jbImportCfdiWithPurchaseOrder.addActionListener(this);
         jbImportCfdiWithPurchaseOrder.setToolTipText("Importar CFDI con orden de compra");
+        
+        jbImportMatRequest = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_MAT_REQ));
+        jbImportMatRequest.setPreferredSize(new Dimension(23, 23));
+        jbImportMatRequest.addActionListener(this);
+        jbImportMatRequest.setToolTipText("Importar requisición de materiales");
         
         jbChangeDpsEntryItem = new JButton(miClient.getImageIcon(SLibConstants.ICON_EDIT));
         jbChangeDpsEntryItem.setPreferredSize(new Dimension(23, 23));
@@ -454,6 +461,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperComponent(jbImport);
         addTaskBarUpperComponent(jbImportCfdiWithOutPurchaseOrder);
         addTaskBarUpperComponent(jbImportCfdiWithPurchaseOrder);
+        addTaskBarUpperComponent(jbImportMatRequest);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbChangeDpsEntryItem);
         addTaskBarUpperSeparator();
@@ -514,6 +522,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbImport.setEnabled(mbHasRightNew && createImportFinder);
         jbImportCfdiWithOutPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
         jbImportCfdiWithPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
+        jbImportMatRequest.setEnabled(mbIsCategoryPur);
         jbChangeDpsEntryItem.setEnabled(true);
         jbChangeDeliveryAddress.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
         jbChangeAgentSupervisor.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
@@ -717,6 +726,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         mvSuscriptors.add(SDataConstants.TRNX_DPS_AUDITED);
         mvSuscriptors.add(SDataConstants.USRU_USR);
         mvSuscriptors.add(SDataConstants.TRN_CFD);
+        mvSuscriptors.add(SModConsts.TRN_MAT_REQ);
+        mvSuscriptors.add(SModConsts.TRNX_MAT_REQ_PEND_SUP);
+        mvSuscriptors.add(SModConsts.TRNX_MAT_REQ_PEND_PUR);
 
         populateTable();
     }
@@ -782,7 +794,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     
     private boolean isRowSelected() {
         if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
-            miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+//            miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             return false;
         }
         return true;
@@ -985,6 +997,27 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
+            }
+        }
+    }
+    
+    private void actionImportMaterialRequest() {
+        SDialogMatReqDpsLink oDialog = new SDialogMatReqDpsLink(miClient, getDpsTypeKey());
+        oDialog.setValue(SDataConstants.TRN_DPS, null);
+        oDialog.setFormVisible(true);
+        if (oDialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            Object complement = new Object[] { getDpsTypeKey(), 
+                                                false, 
+                                                oDialog.getValue(SDataConstants.TRN_DPS), 
+                                                null, 
+                                                true,
+                                                true
+                                            };
+            
+            miClient.getGuiModule(mnModule).setFormComplement(complement);
+            if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
+                SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
             }
         }
     }
@@ -2827,6 +2860,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbImportCfdiWithPurchaseOrder){
                     actionImportCfdi(true);
+                }
+                else if (button == jbImportMatRequest){
+                    actionImportMaterialRequest();
                 }
                 else if (button == jbChangeDpsEntryItem) {
                     actionChangeDpsEntryItem();

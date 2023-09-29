@@ -8,7 +8,9 @@ package erp.mod.trn.form;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbConfEmployeeVsEntity;
 import erp.mod.trn.db.SDbMaterialConsumptionEntity;
-import erp.mod.trn.db.SDbMaterialConsumptionEntityEmployee;
+import erp.mod.trn.db.SDbMaterialConsumptionEntityUser;
+import erp.mod.trn.db.SDbMaterialConsumptionSubentity;
+import erp.mod.trn.db.SDbMaterialConsumptionSubentityUser;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
@@ -38,9 +40,13 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
     
     private SGridPaneForm moGridMatConsEnt;
     private SGridPaneForm moGridMatConsEntSelected;
+    private SGridPaneForm moGridMatConsSubent;
+    private SGridPaneForm moGridMatConsSubentSelected;
     
     private ArrayList<SDbMaterialConsumptionEntity> maMatConsEnt;
-    private ArrayList<SDbMaterialConsumptionEntityEmployee> maMatConsEntSelected;
+    private ArrayList<SDbMaterialConsumptionEntityUser> maMatConsEntSelected;
+    private ArrayList<SDbMaterialConsumptionSubentity> maMatConsSubent;
+    private ArrayList<SDbMaterialConsumptionSubentityUser> maMatConsSubentSelected;
     
 
     /**
@@ -64,8 +70,9 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
     private void initComponents() {
 
         jpRegistry = new javax.swing.JPanel();
-        jpConsumption = new javax.swing.JPanel();
+        jpEntity = new javax.swing.JPanel();
         jpEmployee = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         moTextEmployee = new sa.lib.gui.bean.SBeanFieldText();
         jpConsAvailable = new javax.swing.JPanel();
         jpConsAvailableLabel = new javax.swing.JPanel();
@@ -85,35 +92,58 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         jpConsSelectedLabel = new javax.swing.JPanel();
         jlConsSelected = new javax.swing.JLabel();
         jpGridConsSel = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jpSubentity = new javax.swing.JPanel();
+        jpSubAvailable = new javax.swing.JPanel();
+        jpSubAvailableLabel = new javax.swing.JPanel();
+        jlSubAvailable = new javax.swing.JLabel();
+        jpGridSubAva = new javax.swing.JPanel();
+        jpSubButtons = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jbSubAdd = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        jbSubAddAll = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        jbSubRemove = new javax.swing.JButton();
+        jPanel10 = new javax.swing.JPanel();
+        jbSubRemoveAll = new javax.swing.JButton();
+        jpSubSelected = new javax.swing.JPanel();
+        jpSubSelectedLabel = new javax.swing.JPanel();
+        jlSubSelected = new javax.swing.JLabel();
+        jpGridSubSel = new javax.swing.JPanel();
 
         jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jpConsumption.setLayout(new java.awt.BorderLayout());
+        jpEntity.setLayout(new java.awt.BorderLayout());
 
         jpEmployee.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setText("Empleado:");
+        jpEmployee.add(jLabel1);
 
         moTextEmployee.setEditable(false);
         moTextEmployee.setEnabled(false);
         moTextEmployee.setPreferredSize(new java.awt.Dimension(400, 23));
         jpEmployee.add(moTextEmployee);
 
-        jpConsumption.add(jpEmployee, java.awt.BorderLayout.NORTH);
+        jpEntity.add(jpEmployee, java.awt.BorderLayout.NORTH);
 
         jpConsAvailable.setLayout(new java.awt.BorderLayout());
 
         jpConsAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlConsAvailable.setText("Entidades de consumo disponibles:");
+        jlConsAvailable.setText("Centros de consumo disponibles:");
         jpConsAvailableLabel.add(jlConsAvailable);
 
         jpConsAvailable.add(jpConsAvailableLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridConsAva.setPreferredSize(new java.awt.Dimension(350, 330));
+        jpGridConsAva.setPreferredSize(new java.awt.Dimension(350, 190));
         jpGridConsAva.setLayout(new java.awt.BorderLayout());
         jpConsAvailable.add(jpGridConsAva, java.awt.BorderLayout.CENTER);
 
-        jpConsButtons.setLayout(new java.awt.GridLayout(10, 0));
+        jpConsButtons.setLayout(new java.awt.GridLayout(5, 0));
         jpConsButtons.add(jPanel1);
 
         jbConsAdd.setText(">");
@@ -142,25 +172,93 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpConsAvailable.add(jpConsButtons, java.awt.BorderLayout.EAST);
 
-        jpConsumption.add(jpConsAvailable, java.awt.BorderLayout.CENTER);
+        jpEntity.add(jpConsAvailable, java.awt.BorderLayout.CENTER);
 
         jpConsSelected.setLayout(new java.awt.BorderLayout());
 
         jpConsSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlConsSelected.setText("Entidades de consumo seleccionadas:");
+        jlConsSelected.setText("Centros de consumo seleccionadas:");
         jlConsSelected.setPreferredSize(new java.awt.Dimension(370, 16));
         jpConsSelectedLabel.add(jlConsSelected);
 
         jpConsSelected.add(jpConsSelectedLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridConsSel.setPreferredSize(new java.awt.Dimension(380, 330));
+        jpGridConsSel.setPreferredSize(new java.awt.Dimension(470, 200));
         jpGridConsSel.setLayout(new java.awt.BorderLayout());
         jpConsSelected.add(jpGridConsSel, java.awt.BorderLayout.CENTER);
 
-        jpConsumption.add(jpConsSelected, java.awt.BorderLayout.EAST);
+        jpEntity.add(jpConsSelected, java.awt.BorderLayout.EAST);
 
-        jpRegistry.add(jpConsumption, java.awt.BorderLayout.NORTH);
+        jpRegistry.add(jpEntity, java.awt.BorderLayout.NORTH);
+
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jpSubentity.setLayout(new java.awt.BorderLayout());
+
+        jpSubAvailable.setLayout(new java.awt.BorderLayout());
+
+        jpSubAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlSubAvailable.setText("Centros de consumo disponibles:");
+        jpSubAvailableLabel.add(jlSubAvailable);
+
+        jpSubAvailable.add(jpSubAvailableLabel, java.awt.BorderLayout.NORTH);
+
+        jpGridSubAva.setPreferredSize(new java.awt.Dimension(350, 190));
+        jpGridSubAva.setLayout(new java.awt.BorderLayout());
+        jpSubAvailable.add(jpGridSubAva, java.awt.BorderLayout.CENTER);
+
+        jpSubButtons.setLayout(new java.awt.GridLayout(5, 0));
+        jpSubButtons.add(jPanel6);
+
+        jbSubAdd.setText(">");
+        jbSubAdd.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel7.add(jbSubAdd);
+
+        jpSubButtons.add(jPanel7);
+
+        jbSubAddAll.setText(">>");
+        jbSubAddAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel8.add(jbSubAddAll);
+
+        jpSubButtons.add(jPanel8);
+
+        jbSubRemove.setText("<");
+        jbSubRemove.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel9.add(jbSubRemove);
+
+        jpSubButtons.add(jPanel9);
+
+        jbSubRemoveAll.setText("<<");
+        jbSubRemoveAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel10.add(jbSubRemoveAll);
+
+        jpSubButtons.add(jPanel10);
+
+        jpSubAvailable.add(jpSubButtons, java.awt.BorderLayout.EAST);
+
+        jpSubentity.add(jpSubAvailable, java.awt.BorderLayout.CENTER);
+
+        jpSubSelected.setLayout(new java.awt.BorderLayout());
+
+        jpSubSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlSubSelected.setText("Centros de consumo seleccionadas:");
+        jlSubSelected.setPreferredSize(new java.awt.Dimension(370, 16));
+        jpSubSelectedLabel.add(jlSubSelected);
+
+        jpSubSelected.add(jpSubSelectedLabel, java.awt.BorderLayout.NORTH);
+
+        jpGridSubSel.setPreferredSize(new java.awt.Dimension(470, 230));
+        jpGridSubSel.setLayout(new java.awt.BorderLayout());
+        jpSubSelected.add(jpGridSubSel, java.awt.BorderLayout.CENTER);
+
+        jpSubentity.add(jpSubSelected, java.awt.BorderLayout.EAST);
+
+        jPanel11.add(jpSubentity, java.awt.BorderLayout.NORTH);
+
+        jpRegistry.add(jPanel11, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
 
@@ -168,38 +266,59 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbConsAdd;
     private javax.swing.JButton jbConsAddAll;
     private javax.swing.JButton jbConsRemove;
     private javax.swing.JButton jbConsRemoveAll;
+    private javax.swing.JButton jbSubAdd;
+    private javax.swing.JButton jbSubAddAll;
+    private javax.swing.JButton jbSubRemove;
+    private javax.swing.JButton jbSubRemoveAll;
     private javax.swing.JLabel jlConsAvailable;
     private javax.swing.JLabel jlConsSelected;
+    private javax.swing.JLabel jlSubAvailable;
+    private javax.swing.JLabel jlSubSelected;
     private javax.swing.JPanel jpConsAvailable;
     private javax.swing.JPanel jpConsAvailableLabel;
     private javax.swing.JPanel jpConsButtons;
     private javax.swing.JPanel jpConsSelected;
     private javax.swing.JPanel jpConsSelectedLabel;
-    private javax.swing.JPanel jpConsumption;
     private javax.swing.JPanel jpEmployee;
+    private javax.swing.JPanel jpEntity;
     private javax.swing.JPanel jpGridConsAva;
     private javax.swing.JPanel jpGridConsSel;
+    private javax.swing.JPanel jpGridSubAva;
+    private javax.swing.JPanel jpGridSubSel;
     private javax.swing.JPanel jpRegistry;
+    private javax.swing.JPanel jpSubAvailable;
+    private javax.swing.JPanel jpSubAvailableLabel;
+    private javax.swing.JPanel jpSubButtons;
+    private javax.swing.JPanel jpSubSelected;
+    private javax.swing.JPanel jpSubSelectedLabel;
+    private javax.swing.JPanel jpSubentity;
     private sa.lib.gui.bean.SBeanFieldText moTextEmployee;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 800, 500);
+        SGuiUtils.setWindowBounds(this, 960, 600);
         
         moTextEmployee.setTextSettings("Empleado", 250);
         
-        // Entidades de consumo disponibles
+        // Centros de consumo disponibles
         
-        moGridMatConsEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT, 0, "Entidades de consumo") {
+        moGridMatConsEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT, 0, "Centros de consumo") {
             
             @Override
             public void initGrid() {
@@ -210,7 +329,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
 
                 return columns;
             }
@@ -219,9 +338,9 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         jpGridConsAva.add(moGridMatConsEnt);
         mvFormGrids.add(moGridMatConsEnt);
         
-        // Entidades de consumo seleccionadas
+        // Centros de consumo seleccionadas
         
-        moGridMatConsEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT_USR, 0, "Entidades de consumo seleccionadas") {
+        moGridMatConsEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT_USR, 0, "Centros de consumo seleccionadas") {
             
             @Override
             public void initGrid() {
@@ -232,7 +351,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 col.setEditable(true);
                 columns.add(col);
@@ -243,6 +362,55 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpGridConsSel.add(moGridMatConsEntSelected);
         mvFormGrids.add(moGridMatConsEntSelected);
+        
+        // Subcentros de consumo disponibles
+        
+        moGridMatConsSubent = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT, 0, "Centros de consumo") {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Centro de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subcentro de consumo"));
+
+                return columns;
+            }
+        };
+
+        jpGridSubAva.add(moGridMatConsSubent);
+        mvFormGrids.add(moGridMatConsSubent);
+        
+        // Centros de consumo seleccionadas
+        
+        moGridMatConsSubentSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_USR, 0, "Centros de consumo seleccionadas") {
+            
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+            
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
+
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Centro de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subcentro de consumo"));
+                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
+                col.setEditable(true);
+                columns.add(col);
+
+                return columns;
+            }
+        };
+
+        jpGridSubSel.add(moGridMatConsSubentSelected);
+        mvFormGrids.add(moGridMatConsSubentSelected);
         
         jpCommandRight.remove(jbEdit);
         jpCommandRight.remove(jbReadInfo);
@@ -255,7 +423,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;
-                for (SDbMaterialConsumptionEntityEmployee ee : maMatConsEntSelected) {
+                for (SDbMaterialConsumptionEntityUser ee : maMatConsEntSelected) {
                     if (resultSet.getInt(1) == ee.getPkMatConsumptionEntityId()) {
                         found = true;
                         break;
@@ -265,6 +433,31 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
                     SDbMaterialConsumptionEntity ce = new SDbMaterialConsumptionEntity();
                     ce.read(miClient.getSession(), new int[] { resultSet.getInt(1) });
                     maMatConsEnt.add(ce);
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void readMaterialConsumptionSubentities() {
+        try {
+            Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+            String sql = "SELECT id_mat_cons_ent, id_mat_cons_subent FROM trn_mat_cons_subent";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                boolean found = false;
+                for (SDbMaterialConsumptionSubentityUser ee : maMatConsSubentSelected) {
+                    if (resultSet.getInt(1) == ee.getPkMatConsumptionEntityId() && resultSet.getInt(2) == ee.getPkMatConsumptionSubentityId()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    SDbMaterialConsumptionSubentity ce = new SDbMaterialConsumptionSubentity();
+                    ce.read(miClient.getSession(), new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                    maMatConsSubent.add(ce);
                 }
             }
         }
@@ -289,11 +482,27 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         moGridMatConsEntSelected.populateGrid(vRows);
     }
     
+    private void populateGridMatConsSubent() {
+        Vector<SGridRow> vRows = new Vector<>();
+        if (maMatConsSubent.size() > 0) {
+            vRows.addAll(maMatConsSubent);
+        }
+        moGridMatConsSubent.populateGrid(vRows);
+    }
+    
+    private void populateGridMatConsSubentSelected() {
+        Vector<SGridRow> vRows = new Vector<>();
+        if (maMatConsSubentSelected.size() > 0) {
+            vRows.addAll(maMatConsSubentSelected);
+        }
+        moGridMatConsSubentSelected.populateGrid(vRows);
+    }
+    
     private void actionConsAdd() {
         try {
             int consId = ((SDbMaterialConsumptionEntity) moGridMatConsEnt.getSelectedGridRow()).getPkMatConsumptionEntityId();
             if (maMatConsEnt.remove((SDbMaterialConsumptionEntity) moGridMatConsEnt.getSelectedGridRow()) ) {
-                SDbMaterialConsumptionEntityEmployee ee = new SDbMaterialConsumptionEntityEmployee();
+                SDbMaterialConsumptionEntityUser ee = new SDbMaterialConsumptionEntityUser();
                 ee.setPkMatConsumptionEntityId(consId);
                 ee.readAuxMatConsEnt(miClient.getSession());
                 maMatConsEntSelected.add(ee);
@@ -310,7 +519,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
     private void actionConsAddAll() {
         try {
             for (SDbMaterialConsumptionEntity ce : maMatConsEnt) {
-                SDbMaterialConsumptionEntityEmployee ee = new SDbMaterialConsumptionEntityEmployee();
+                SDbMaterialConsumptionEntityUser ee = new SDbMaterialConsumptionEntityUser();
                 ee.setPkMatConsumptionEntityId(ce.getPkMatConsumptionEntityId());
                 ee.readAuxMatConsEnt(miClient.getSession());
                 maMatConsEntSelected.add(ee);
@@ -325,20 +534,75 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
     }
     
     private void actionConsRemove() {
-        maMatConsEnt.add(((SDbMaterialConsumptionEntityEmployee) moGridMatConsEntSelected.getSelectedGridRow()).getAuxMatConsEnt());
-        if (maMatConsEntSelected.remove(((SDbMaterialConsumptionEntityEmployee) moGridMatConsEntSelected.getSelectedGridRow()))) {
+        maMatConsEnt.add(((SDbMaterialConsumptionEntityUser) moGridMatConsEntSelected.getSelectedGridRow()).getAuxMatConsEnt());
+        if (maMatConsEntSelected.remove(((SDbMaterialConsumptionEntityUser) moGridMatConsEntSelected.getSelectedGridRow()))) {
             populateGridMatConsEnt();
             populateGridMatConsEntSelected();
         }
     }
 
     private void actionConsRemoveAll() {
-        for (SDbMaterialConsumptionEntityEmployee ee : maMatConsEntSelected) {
+        for (SDbMaterialConsumptionEntityUser ee : maMatConsEntSelected) {
             maMatConsEnt.add(ee.getAuxMatConsEnt());
         }
         maMatConsEntSelected.clear();
         populateGridMatConsEnt();
         populateGridMatConsEntSelected();
+    }
+    
+    private void actionSubAdd() {
+        try {
+            int consId = ((SDbMaterialConsumptionSubentity) moGridMatConsSubent.getSelectedGridRow()).getPkMatConsumptionEntityId();
+            int consSubId = ((SDbMaterialConsumptionSubentity) moGridMatConsSubent.getSelectedGridRow()).getPkMatConsumptionSubentityId();
+            if (maMatConsSubent.remove((SDbMaterialConsumptionSubentity) moGridMatConsSubent.getSelectedGridRow()) ) {
+                SDbMaterialConsumptionSubentityUser ee = new SDbMaterialConsumptionSubentityUser();
+                ee.setPkMatConsumptionEntityId(consId);
+                ee.setPkMatConsumptionSubentityId(consSubId);
+                ee.readAuxMatConsSubent(miClient.getSession());
+                maMatConsSubentSelected.add(ee);
+
+                populateGridMatConsSubent();
+                populateGridMatConsSubentSelected();
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+
+    private void actionSubAddAll() {
+        try {
+            for (SDbMaterialConsumptionSubentity ce : maMatConsSubent) {
+                SDbMaterialConsumptionSubentityUser ee = new SDbMaterialConsumptionSubentityUser();
+                ee.setPkMatConsumptionEntityId(ce.getPkMatConsumptionEntityId());
+                ee.setPkMatConsumptionSubentityId(ce.getPkMatConsumptionSubentityId());
+                ee.readAuxMatConsSubent(miClient.getSession());
+                maMatConsSubentSelected.add(ee);
+            }
+            maMatConsSubent.clear();
+            populateGridMatConsSubent();
+            populateGridMatConsSubentSelected();
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void actionSubRemove() {
+        maMatConsSubent.add(((SDbMaterialConsumptionSubentityUser) moGridMatConsSubentSelected.getSelectedGridRow()).getAuxMatConsSubent());
+        if (maMatConsSubentSelected.remove(((SDbMaterialConsumptionSubentityUser) moGridMatConsSubentSelected.getSelectedGridRow()))) {
+            populateGridMatConsSubent();
+            populateGridMatConsSubentSelected();
+        }
+    }
+
+    private void actionSubRemoveAll() {
+        for (SDbMaterialConsumptionSubentityUser ee : maMatConsSubentSelected) {
+            maMatConsSubent.add(ee.getAuxMatConsSubent());
+        }
+        maMatConsSubentSelected.clear();
+        populateGridMatConsSubent();
+        populateGridMatConsSubentSelected();
     }
     
     @Override
@@ -347,6 +611,10 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         jbConsAddAll.addActionListener(this);
         jbConsRemove.addActionListener(this);
         jbConsRemoveAll.addActionListener(this);
+        jbSubAdd.addActionListener(this);
+        jbSubAddAll.addActionListener(this);
+        jbSubRemove.addActionListener(this);
+        jbSubRemoveAll.addActionListener(this);
     }
 
     @Override
@@ -355,6 +623,10 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         jbConsAddAll.removeActionListener(this);
         jbConsRemove.removeActionListener(this);
         jbConsRemoveAll.removeActionListener(this);
+        jbSubAdd.removeActionListener(this);
+        jbSubAddAll.removeActionListener(this);
+        jbSubRemove.removeActionListener(this);
+        jbSubRemoveAll.removeActionListener(this);
     }
 
     @Override
@@ -363,6 +635,8 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         
         maMatConsEnt = new ArrayList<>();
         maMatConsEntSelected = new ArrayList<>();
+        maMatConsSubent = new ArrayList<>();
+        maMatConsSubentSelected = new ArrayList<>();
     }
 
     @Override
@@ -377,14 +651,21 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         
         moTextEmployee.setValue(moRegistry.getAuxBizPartner().getBizPartner());
         
-        for (SDbMaterialConsumptionEntityEmployee ee : moRegistry.getConsEntEmp()) {
+        for (SDbMaterialConsumptionEntityUser ee : moRegistry.getConsEntEmp()) {
             maMatConsEntSelected.add(ee);
         }
         
+        for (SDbMaterialConsumptionSubentityUser ee : moRegistry.getConsSubentEmp()) {
+            maMatConsSubentSelected.add(ee);
+        }
+        
         readMaterialConsumptionEntities();
+        readMaterialConsumptionSubentities();
         
         populateGridMatConsEnt();
         populateGridMatConsEntSelected();
+        populateGridMatConsSubent();
+        populateGridMatConsSubentSelected();
         
         addAllListeners();
     }
@@ -396,8 +677,13 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         if (registry.isRegistryNew()) { }
         
         registry.getConsEntEmp().clear();
-        for (SDbMaterialConsumptionEntityEmployee ee : maMatConsEntSelected) {
+        for (SDbMaterialConsumptionEntityUser ee : maMatConsEntSelected) {
             registry.getConsEntEmp().add(ee);
+        }
+        
+        registry.getConsSubentEmp().clear();
+        for (SDbMaterialConsumptionSubentityUser ee : maMatConsSubentSelected) {
+            registry.getConsSubentEmp().add(ee);
         }
         
         return registry;
@@ -409,7 +695,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         
         if (validation.isValid() && !maMatConsEntSelected.isEmpty()) {
             int defaults = 0;
-            for (SDbMaterialConsumptionEntityEmployee ee : maMatConsEntSelected) {
+            for (SDbMaterialConsumptionEntityUser ee : maMatConsEntSelected) {
                 if (ee.isDefault()) {
                     defaults++;
                 }
@@ -419,6 +705,32 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             }
             else if (defaults > 1) {
                 validation.setMessage("Hay mas de una entidad de consumo seleccionada como predeterminada.");
+            }
+        }
+        
+        if (validation.isValid() && !maMatConsSubentSelected.isEmpty()) {
+            int defaults = 0;
+            for (SDbMaterialConsumptionSubentityUser ee : maMatConsSubentSelected) {
+                if (ee.isDefault()) {
+                    defaults++;
+                }
+            }
+            if (defaults == 0) {
+                validation.setMessage("No ha seleccionado ninguna entidad de consumo como predeterminada.");
+            }
+            else if (defaults > 1) {
+                validation.setMessage("Hay mas de una entidad de consumo seleccionada como predeterminada.");
+            }
+        }
+        
+        if (validation.isValid()) {
+            for (SDbMaterialConsumptionEntityUser eu : maMatConsEntSelected) {
+                for (SDbMaterialConsumptionSubentityUser seu : maMatConsSubentSelected) {
+                    if (seu.getPkMatConsumptionEntityId() == eu.getPkMatConsumptionEntityId()) {
+                        validation.setMessage("No es necesario configurar centros de consumo que dependan de una entidad de consumo que ya esté configurada.");
+                        break;
+                    }
+                }
             }
         }
         
@@ -441,6 +753,18 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             }
             else if (button == jbConsRemoveAll) {
                 actionConsRemoveAll();
+            }
+            else if (button == jbSubAdd) {
+                actionSubAdd();
+            }
+            else if (button == jbSubAddAll) {
+                actionSubAddAll();
+            }
+            else if (button == jbSubRemove) {
+                actionSubRemove();
+            }
+            else if (button == jbSubRemoveAll) {
+                actionSubRemoveAll();
             }
         }
     }

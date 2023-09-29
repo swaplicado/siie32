@@ -22,13 +22,12 @@ import sa.lib.gui.SGuiSession;
 public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements SGridRow, Serializable {
     
     protected int mnPkMatConsumptionEntityId;
-    protected int mnPkUserId;
+    protected int mnPkLinkId;
+    protected int mnPkReferenceId;
     protected boolean mbDefault;
-    /*
-    protected int mnFkUserInsertId;
-    protected Date mtTsUserInsert;
-    */
-    
+    protected int mnFkUserId;
+    protected Date mtTsUser;
+
     protected SDbMaterialConsumptionEntity moAuxMatConsEnt;
 
     public SDbMaterialConsumptionEntityUser() {
@@ -36,19 +35,20 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
     }
     
     public void setPkMatConsumptionEntityId(int n) { mnPkMatConsumptionEntityId = n; }
-    public void setPkUserId(int n) { mnPkUserId = n; }
+    public void setPkLinkId(int n) { mnPkLinkId = n; }
+    public void setPkReferenceId(int n) { mnPkReferenceId = n; }
     public void setDefault(boolean b) { mbDefault = b; }
-    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
-    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
-
+    public void setFkUserId(int n) { mnFkUserId = n; }
+    public void setTsUser(Date t) { mtTsUser = t; }
     
     public void setAuxMatConsEnt(SDbMaterialConsumptionEntity o) { moAuxMatConsEnt = o; }
     
     public int getPkMatConsumptionEntityId() { return mnPkMatConsumptionEntityId; }
-    public int getPkUserId() { return mnPkUserId; }
+    public int getPkLinkId() { return mnPkLinkId; }
+    public int getPkReferenceId() { return mnPkReferenceId; }
     public boolean isDefault() { return mbDefault; }
-    public int getFkUserInsertId() { return mnFkUserInsertId; }
-    public Date getTsUserInsert() { return mtTsUserInsert; }
+    public int getFkUserId() { return mnFkUserId; }
+    public Date getTsUser() { return mtTsUser; }
     
     public SDbMaterialConsumptionEntity getAuxMatConsEnt() { return moAuxMatConsEnt; }
     
@@ -60,12 +60,13 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkMatConsumptionEntityId = pk[0];
-        mnPkUserId = pk[1];
+        mnPkLinkId = pk[1];
+        mnPkReferenceId = pk[2];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkMatConsumptionEntityId, mnPkUserId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkLinkId, mnPkReferenceId };
     }
 
     @Override
@@ -73,10 +74,11 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
         initBaseRegistry();
         
         mnPkMatConsumptionEntityId = 0;
-        mnPkUserId = 0;
+        mnPkLinkId = 0;
+        mnPkReferenceId = 0;
         mbDefault = false;
-        mnFkUserInsertId = 0;
-        mtTsUserInsert = null;
+        mnFkUserId = 0;
+        mtTsUser = null;
         
         moAuxMatConsEnt = null;
     }
@@ -89,13 +91,15 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
     @Override
     public String getSqlWhere() {
         return "WHERE id_mat_cons_ent = " + mnPkMatConsumptionEntityId + " " +
-                "AND id_usr = " + mnPkUserId + " ";
+                "AND id_link = " + mnPkLinkId + " " +
+                "AND id_ref = " + mnPkReferenceId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
         return "WHERE id_mat_cons_ent = " + pk[0] + " " +
-                "AND id_usr = " + pk[1] + " ";
+                "AND id_link = " + pk[1] + " " +
+                "AND id_ref = " + pk[2] + " ";
     }
 
     @Override
@@ -108,7 +112,7 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
         ResultSet resultSet;
         
         initRegistry();
-        initQueryMembers();
+        initQueryMembers(); 
         mnQueryResultId = SDbConsts.READ_ERROR;
         
         msSql = "SELECT * " + getSqlFromWhere(pk);
@@ -118,10 +122,11 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
         }
         else {
             mnPkMatConsumptionEntityId = resultSet.getInt("id_mat_cons_ent");
-            mnPkUserId = resultSet.getInt("id_usr");
+            mnPkLinkId = resultSet.getInt("id_link");
+            mnPkReferenceId = resultSet.getInt("id_ref");
             mbDefault = resultSet.getBoolean("b_default");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mnFkUserId = resultSet.getInt("fk_usr");
+            mtTsUser = resultSet.getTimestamp("ts_usr");
             
             readAuxMatConsEnt(session);
 
@@ -136,24 +141,26 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        mnFkUserInsertId = session.getUser().getPkUserId();
+        mnFkUserId = session.getUser().getPkUserId();
         
         if (mbRegistryNew) {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkMatConsumptionEntityId + ", " + 
-                    mnPkUserId + ", " + 
+                    mnPkLinkId + ", " + 
+                    mnPkReferenceId + ", " + 
                     (mbDefault ? 1 : 0) + ", " + 
-                    mnFkUserInsertId + ", " + 
-                    "NOW()" + " " + 
+                    mnFkUserId + ", " + 
+                    "NOW()" + " " +
                     ")";
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
                     //"id_mat_cons_ent = " + mnPkMatConsumptionEntityId + ", " +
-                    //"id_usr = " + mnPkUserId + ", " +
+                    //"id_link = " + mnPkLinkId + ", " +
+                    //"id_ref = " + mnPkReferenceId + ", " +
                     "b_default = " + (mbDefault ? 1 : 0) + " " +
-                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                    //"ts_usr_ins = " + "NOW()" + ", " +
+                    //"fk_usr = " + mnFkUserId + ", " +
+                    //"ts_usr = " + "NOW()" + ", " +
                     getSqlWhere();
         }
         
@@ -168,10 +175,11 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
         SDbMaterialConsumptionEntityUser registry = new SDbMaterialConsumptionEntityUser();
         
         registry.setPkMatConsumptionEntityId(this.getPkMatConsumptionEntityId());
-        registry.setPkUserId(this.getPkUserId());
+        registry.setPkLinkId(this.getPkLinkId());
+        registry.setPkReferenceId(this.getPkReferenceId());
         registry.setDefault(this.isDefault());
-        registry.setFkUserInsertId(this.getFkUserInsertId());
-        registry.setTsUserInsert(this.getTsUserInsert());
+        registry.setFkUserId(this.getFkUserId());
+        registry.setTsUser(this.getTsUser());
 
         registry.setRegistryNew(this.isRegistryNew());
         
@@ -180,7 +188,7 @@ public class SDbMaterialConsumptionEntityUser extends SDbRegistryUser implements
 
     @Override
     public int[] getRowPrimaryKey() {
-        return new int[] { mnPkMatConsumptionEntityId, mnPkUserId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkLinkId, mnPkReferenceId };
     }
 
     @Override
