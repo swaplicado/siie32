@@ -501,4 +501,13 @@ public abstract class SSscUtils {
         }
         return bLeapYear;
     }
+    
+    public static int getEmployeeAntiquity(final Date dateBenefits, final Date dateCutoff) {
+       String yearAnti = String.valueOf(SHrsUtils.getEmployeeSeniority(dateBenefits, dateCutoff));
+       String monthAnti = String.valueOf(SHrsUtils.getEmployeeSeniorityAntMonth(dateBenefits, dateCutoff));
+       String antiquityCompleteResult = yearAnti + "." + monthAnti;
+       int antiquityComplete = (int)(Math.round(Math.ceil(Double.parseDouble(antiquityCompleteResult))));
+       
+       return antiquityComplete;
+    }
 }

@@ -29,6 +29,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements FocusListener, ActionListener {
 
     private SFormMassiveUpdateSsc moFormMassiveUpdateSsc;
+    boolean isEmployeLim = false;
             
     /**
     * Creates new dialog SDialogMassiveUpdateSscPeriod
@@ -57,6 +58,9 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
         jPanel36 = new javax.swing.JPanel();
         jlBimester = new javax.swing.JLabel();
         moIntBimester = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel37 = new javax.swing.JPanel();
+        jckIsEmployeLimUma = new javax.swing.JCheckBox();
+        jlEmployeLimUma = new javax.swing.JLabel();
 
         setTitle("Actualización SBC de empleados:");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -77,7 +81,9 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
         jPanel16.setPreferredSize(new java.awt.Dimension(218, 110));
         jPanel16.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel35.setName(""); // NOI18N
+        jPanel35.setOpaque(false);
+        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 0));
 
         jlYear.setText("Ejercicio:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -87,8 +93,9 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
         jPanel35.add(moIntPeriodYear);
 
         jPanel16.add(jPanel35);
+        jPanel35.getAccessibleContext().setAccessibleDescription("");
 
-        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 0));
 
         jlBimester.setText("Bimestre:*");
         jlBimester.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -100,7 +107,16 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
 
         jPanel16.add(jPanel36);
 
-        jPanel15.add(jPanel16, java.awt.BorderLayout.PAGE_START);
+        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 0));
+        jPanel37.add(jckIsEmployeLimUma);
+
+        jlEmployeLimUma.setText("Incluir colaboradores con salario topado por UMA");
+        jlEmployeLimUma.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel37.add(jlEmployeLimUma);
+
+        jPanel16.add(jPanel37);
+
+        jPanel15.add(jPanel16, java.awt.BorderLayout.NORTH);
 
         jPanel1.add(jPanel15, java.awt.BorderLayout.CENTER);
 
@@ -117,7 +133,10 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
+    private javax.swing.JPanel jPanel37;
+    private javax.swing.JCheckBox jckIsEmployeLimUma;
     private javax.swing.JLabel jlBimester;
+    private javax.swing.JLabel jlEmployeLimUma;
     private javax.swing.JLabel jlYear;
     private sa.lib.gui.bean.SBeanFieldInteger moIntBimester;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
@@ -183,11 +202,12 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
        if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
                 dispose();
-
                 try {
+                    isEmployeLim  = jckIsEmployeLimUma.isSelected();
                     setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                    moFormMassiveUpdateSsc = new SFormMassiveUpdateSsc((SClientInterface) miClient, moIntPeriodYear.getValue(), moIntBimester.getValue());
+                    moFormMassiveUpdateSsc = new SFormMassiveUpdateSsc((SClientInterface) miClient, moIntPeriodYear.getValue(), moIntBimester.getValue(), isEmployeLim );
                     moFormMassiveUpdateSsc.formReset();
+                    jckIsEmployeLimUma.setSelected(false);
                 } catch (Exception ex) {
                     Logger.getLogger(SDialogMassiveUpdateSscPeriod.class.getName()).log(Level.SEVERE, null, ex);
                 }
