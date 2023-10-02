@@ -60,7 +60,7 @@ public class SFormWorkerTypeSalary extends SBeanForm {
 
         jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlWorkerType.setForeground(new java.awt.Color(0, 0, 255));
         jlWorkerType.setText("Tipo obrero:*");
@@ -72,7 +72,7 @@ public class SFormWorkerTypeSalary extends SBeanForm {
 
         jPanel2.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Inicio vigencia:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -81,7 +81,7 @@ public class SFormWorkerTypeSalary extends SBeanForm {
 
         jPanel2.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSalary.setText("Salario diario:*");
         jlSalary.setPreferredSize(new java.awt.Dimension(100, 23));

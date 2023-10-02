@@ -17,9 +17,11 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbCostCenter extends SDbRegistryUser {
+    
+    public static final int FIELD_CODE_CC = SDbRegistry.FIELD_BASE + 1;
 
     public SDbCostCenter() {
         super(SModConsts.FIN_CC);
@@ -86,6 +88,9 @@ public class SDbCostCenter extends SDbRegistryUser {
         msSql = "SELECT ";
 
         switch (field) {
+            case FIELD_CODE_CC:
+                msSql += "id_cc ";
+                break;
             case SDbRegistry.FIELD_CODE:
                 msSql += "code ";
                 break;
@@ -104,6 +109,7 @@ public class SDbCostCenter extends SDbRegistryUser {
         }
         else {
             switch (field) {
+                case FIELD_CODE_CC:
                 case SDbRegistry.FIELD_CODE:
                 case SDbRegistry.FIELD_NAME:
                     value = resultSet.getString(1);

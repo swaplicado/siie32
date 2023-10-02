@@ -25,7 +25,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormAccountingDeduction extends SBeanForm implements ActionListener {
 
@@ -91,9 +91,9 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel9.setLayout(new java.awt.BorderLayout());
 
-        jPanel12.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jPanel12.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDeduction.setText("Deducción:");
         jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -105,14 +105,14 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel12.add(jPanel6);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlReference.setText("Referencia:");
         jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlReference);
 
         moTextReference.setText("sBeanFieldText1");
-        moTextReference.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextReference.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel4.add(moTextReference);
 
         jPanel12.add(jPanel4);
@@ -143,13 +143,13 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel14.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBizPartner.setText("Asociado negocios:");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlBizPartner);
 
-        moKeyBizPartner.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyBizPartner.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel5.add(moKeyBizPartner);
 
         jbPickBizPartner.setText("...");
@@ -171,13 +171,13 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel14.add(jPanel5);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItem.setText("Ítem:");
         jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlItem);
 
-        moKeyItem.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyItem.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel7.add(moKeyItem);
 
         jbPickItem.setText("...");
@@ -194,7 +194,7 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel14.add(jPanel7);
 
-        jPanel19.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTax.setText("Impuesto:");
         jlTax.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -264,26 +264,26 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
+        SGuiUtils.setWindowBounds(this, 640, 400);
 
         moTextDeduction.setTextSettings(SGuiUtils.getLabelName(jlDeduction.getText()), 10);
         moTextReference.setTextSettings(SGuiUtils.getLabelName(jlReference.getText()), 100);
-        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, false);
-        moPanelCostCenter.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, false, true, false);
+        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
+        moPanelCostCenter.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, false, true, true);
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), false);
         moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem.getText()), false);
         moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), false);
 
-        moPanelAccount.setAccountNameWidth(275);
-        moPanelCostCenter.setAccountNameWidth(275);
+        moPanelAccount.setAccountNameWidth(500);
+        moPanelCostCenter.setAccountNameWidth(500);
 
         moPanelAccount.setComponentPrevious(moTextReference);
         moPanelAccount.setComponentNext(moPanelCostCenter.getTextNumberFirst());
         moPanelCostCenter.setComponentPrevious(moPanelAccount.getTextNumberFirst());
         moPanelCostCenter.setComponentNext(moKeyBizPartner);
         
-        moPanelAccount.resetPanel();
-        moPanelCostCenter.resetPanel();
+        moPanelAccount.initPanel();
+        moPanelCostCenter.initPanel();
         
         moFields.addField(moTextDeduction);
         moFields.addField(moTextReference);
@@ -321,25 +321,6 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
         }
     }
     
-    private void actionPickTax() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, SLibConsts.UNDEFINED, null);
-        picker.resetPicker();
-        picker.setPickerVisible(true);
-
-        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
-
-            if (key != null) {
-                if (key[0] != SLibConsts.UNDEFINED) {
-                    moKeyTax.setValue(new int[] { key[0], key[1] });
-                }
-            }
-        }
-    }
-    
     private void actionPickItem() {
         int[] key = null;
         SGuiOptionPicker picker = null;
@@ -359,6 +340,25 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
         }
     }
 
+    private void actionPickTax() {
+        int[] key = null;
+        SGuiOptionPicker picker = null;
+
+        picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, SLibConsts.UNDEFINED, null);
+        picker.resetPicker();
+        picker.setPickerVisible(true);
+
+        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            key = (int[]) picker.getOption();
+
+            if (key != null) {
+                if (key[0] != SLibConsts.UNDEFINED) {
+                    moKeyTax.setValue(new int[] { key[0], key[1] });
+                }
+            }
+        }
+    }
+    
     private void actionClearBizPartner() {
         moKeyBizPartner.setSelectedIndex(0);
         moKeyBizPartner.requestFocus();
@@ -470,8 +470,8 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         if (validation.isValid()) {
             validation = moPanelAccount.validatePanel();
-            
         }
+            
         return validation;
     }
 

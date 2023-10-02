@@ -5,7 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbShift;
+import erp.mod.hrs.db.SDbExpenseType;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -19,15 +19,15 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Sergio Flores
  */
-public class SFormShift extends SBeanForm {
+public class SFormExpenseType extends SBeanForm {
 
-    private SDbShift moRegistry;
+    private SDbExpenseType moRegistry;
 
     /**
-     * Creates new form SFormShift
+     * Creates new form SFormExpenseType
      */
-    public SFormShift(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_SHT, SLibConsts.UNDEFINED, title);
+    public SFormExpenseType(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_TP_EXP, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -124,7 +124,7 @@ public class SFormShift extends SBeanForm {
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbShift) registry;
+        moRegistry = (SDbExpenseType) registry;
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -134,7 +134,7 @@ public class SFormShift extends SBeanForm {
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
-            moRegistry.setSystem(false);    // all editable registries are non-system
+            moRegistry.setSystem(false); // all editable registries are non-system
             jtfRegistryKey.setText("");
         }
         else {
@@ -151,7 +151,7 @@ public class SFormShift extends SBeanForm {
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbShift registry = moRegistry.clone();
+        SDbExpenseType registry = moRegistry.clone();
 
         if (registry.isRegistryNew()) { }
 

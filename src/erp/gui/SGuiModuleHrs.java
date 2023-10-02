@@ -65,6 +65,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgCutoffCalendar;
     private javax.swing.JMenuItem jmiCfgWorkingDaySettings;
     private javax.swing.JMenuItem jmiCfgPaysheetCustomType;
+    private javax.swing.JMenu jmCfgAcc;
+    private javax.swing.JMenuItem jmiCfgAccPackCostCenters;
+    private javax.swing.JMenuItem jmiCfgAccPackExpenses;
+    private javax.swing.JMenuItem jmiCfgAccExpenseType;
     private javax.swing.JMenu jmCfgBkkEarning;
     private javax.swing.JMenuItem jmiCfgBkkEarningGlobal;
     private javax.swing.JMenuItem jmiCfgBkkEarningDepartament;
@@ -199,6 +203,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgCutoffCalendar = new JMenuItem("Calendario fechas de corte");
         jmiCfgWorkingDaySettings = new JMenuItem("Días laborables");
         jmiCfgPaysheetCustomType = new JMenuItem("Tipos de nómina de la empresa");
+        jmCfgAcc = new JMenu("Configuración de contabilización de nóminas");
+        jmiCfgAccPackCostCenters = new JMenuItem("Paquetes de centros de costos");
+        jmiCfgAccPackExpenses = new JMenuItem("Paquetes de gastos");
+        jmiCfgAccExpenseType = new JMenuItem("Tipos de gasto");
         jmCfgBkkEarning = new JMenu("Configuración contable de percepciones");
         jmiCfgBkkEarningGlobal = new JMenuItem("Globales");
         jmiCfgBkkEarningDepartament = new JMenuItem("Por departamento");
@@ -228,6 +236,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgPaysheetCustomType);
         jmCfg.addSeparator();
+        jmCfgAcc.add(jmiCfgAccPackCostCenters);
+        jmCfgAcc.add(jmiCfgAccPackExpenses);
+        jmCfgAcc.add(jmiCfgAccExpenseType);
+        jmCfg.add(jmCfgAcc);
         jmCfgBkkEarning.add(jmiCfgBkkEarningGlobal);
         jmCfgBkkEarning.add(jmiCfgBkkEarningDepartament);
         jmCfgBkkEarning.add(jmiCfgBkkEarningEmployee);
@@ -480,6 +492,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgCutoffCalendar.addActionListener(this);
         jmiCfgWorkingDaySettings.addActionListener(this);
         jmiCfgPaysheetCustomType.addActionListener(this);
+        jmiCfgAccPackCostCenters.addActionListener(this);
+        jmiCfgAccPackExpenses.addActionListener(this);
+        jmiCfgAccExpenseType.addActionListener(this);
         jmiCfgBkkEarningGlobal.addActionListener(this);
         jmiCfgBkkEarningDepartament.addActionListener(this);
         jmiCfgBkkEarningEmployee.addActionListener(this);
@@ -598,6 +613,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgCutoffCalendar.setEnabled(true);
         jmiCfgWorkingDaySettings.setEnabled(true);
         jmiCfgPaysheetCustomType.setEnabled(true);
+        jmCfgAcc.setEnabled(true);
+        jmiCfgAccPackCostCenters.setEnabled(true);
+        jmiCfgAccPackExpenses.setEnabled(true);
+        jmiCfgAccExpenseType.setEnabled(true);
         jmCfgBkkEarning.setEnabled(true);
         jmiCfgBkkEarningGlobal.setEnabled(true);
         jmiCfgBkkEarningDepartament.setEnabled(true);
@@ -977,6 +996,15 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgPaysheetCustomType) {
                 miClient.getSession().showView(SModConsts.HRSU_TP_PAY_SHT_CUS, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCfgAccPackCostCenters) {
+                miClient.getSession().showView(SModConsts.HRS_PACK_CC, 0, null);
+            }
+            else if (item == jmiCfgAccPackExpenses) {
+                miClient.getSession().showView(SModConsts.HRSU_PACK_EXP, 0, null);
+            }
+            else if (item == jmiCfgAccExpenseType) {
+                miClient.getSession().showView(SModConsts.HRSU_TP_EXP, 0, null);
             }
             else if (item == jmiCfgBkkEarningGlobal) {
                 miClient.getSession().showView(SModConsts.HRS_ACC_EAR, SModSysConsts.HRSS_TP_ACC_GBL, null);

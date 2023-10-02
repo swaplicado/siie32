@@ -155,10 +155,11 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_ITEM:
                 settings = new SGuiCatalogueSettings("Ítems", 1, 1);
+                settings.setCodeSettings(true, false);
                 sql = "SELECT i.id_item AS " + SDbConsts.FIELD_ID + "1, " +
                         (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item " :
                         (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + " AS " + SDbConsts.FIELD_ITEM + ", " +
+                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + " AS " + SDbConsts.FIELD_ITEM + ", i.item_key AS " + SDbConsts.FIELD_CODE + ", " +
                         "i.fid_igen AS " + SDbConsts.FIELD_FK + "1, u.symbol AS f_comp " +
                         "FROM " + SModConsts.TablesMap.get(type) + " AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +

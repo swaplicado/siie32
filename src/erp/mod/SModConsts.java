@@ -697,9 +697,12 @@ public abstract class SModConsts {
     public static final int HRS_DEP_CC = 2062034;
     public static final int HRSU_EMP = 2062051;
     public static final int HRSU_EMP_REL = 2062052;
-    public static final int HRSU_EMP_SUA = 2062053;
-    public static final int HRSU_EMP_IDSE = 2062054;
-    public static final int HRSU_TP_COD = 2062055;
+    public static final int HRSU_TP_EXP = 2062301;
+    public static final int HRSU_PACK_EXP = 2062311;
+    public static final int HRSU_PACK_EXP_ITEM = 2062312;
+    
+    public static final int HRSU_EMP_SUA = 2062053; // XXX 2023-09-07 Sergio Flores: Remove or change, it does not correspond to a DB table!
+    public static final int HRSU_EMP_IDSE = 2062054; // XXX 2023-09-07 Sergio Flores: Remove or change, it does not correspond to a DB table!
 
     public static final int HRS_SIE_PAY = 2063001;
     public static final int HRS_SIE_PAY_EMP = 2063002;
@@ -740,6 +743,13 @@ public abstract class SModConsts {
     public static final int HRS_AUT_DED = 2063122;
     public static final int HRS_ACC_EAR = 2063131;
     public static final int HRS_ACC_DED = 2063132;
+    public static final int HRS_PACK_CC = 2063301;
+    public static final int HRS_PACK_CC_CC = 2063302;
+    public static final int HRS_CFG_ACC_DEP = 2063311;
+    public static final int HRS_CFG_ACC_DEP_PACK_CC = 2063312;
+    public static final int HRS_CFG_ACC_EMP_PACK_CC = 2063322;
+    public static final int HRS_CFG_ACC_EAR = 2063331;
+    public static final int HRS_CFG_ACC_DED = 2063332;
     public static final int HRS_PAY = 2063201;
     public static final int HRS_PAY_RCP = 2063211;
     public static final int HRS_PAY_RCP_IMPORT = 2063215;
@@ -1340,7 +1350,6 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_CON, "erp.hrss_tp_con");
         TablesMap.put(HRSS_TP_REC_SCHE, "erp.hrss_tp_rec_sche");
         TablesMap.put(HRSS_TP_POS_RISK, "erp.hrss_tp_pos_risk");
-        TablesMap.put(HRSU_TP_COD, "erp.locu_sta");
         TablesMap.put(HRSS_TP_WORK_DAY, "erp.hrss_tp_work_day");
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
@@ -1361,6 +1370,9 @@ public abstract class SModConsts {
         TablesMap.put(HRSU_SHT, "erp.hrsu_sht");
         TablesMap.put(HRSU_EMP, "erp.hrsu_emp");
         TablesMap.put(HRSU_EMP_REL, "erp.hrsu_emp_rel");
+        TablesMap.put(HRSU_TP_EXP, "erp.hrsu_tp_exp");
+        TablesMap.put(HRSU_PACK_EXP, "erp.hrsu_pack_exp");
+        TablesMap.put(HRSU_PACK_EXP_ITEM, "erp.hrsu_pack_exp_item");
 
         TablesMap.put(HRS_SIE_PAY, "hrs_sie_pay");
         TablesMap.put(HRS_SIE_PAY_EMP, "hrs_sie_pay_emp");
@@ -1402,6 +1414,13 @@ public abstract class SModConsts {
         TablesMap.put(HRS_AUT_DED, "hrs_aut_ded");
         TablesMap.put(HRS_ACC_EAR, "hrs_acc_ear");
         TablesMap.put(HRS_ACC_DED, "hrs_acc_ded");
+        TablesMap.put(HRS_PACK_CC, "hrs_pack_cc");
+        TablesMap.put(HRS_PACK_CC_CC, "hrs_pack_cc_cc");
+        TablesMap.put(HRS_CFG_ACC_DEP, "hrs_cfg_acc_dep");
+        TablesMap.put(HRS_CFG_ACC_DEP_PACK_CC, "hrs_cfg_acc_dep_pack_cc");
+        TablesMap.put(HRS_CFG_ACC_EMP_PACK_CC, "hrs_cfg_acc_emp_pack_cc");
+        TablesMap.put(HRS_CFG_ACC_EAR, "hrs_cfg_acc_ear");
+        TablesMap.put(HRS_CFG_ACC_DED, "hrs_cfg_acc_ded");
         TablesMap.put(HRS_PAY, "hrs_pay");
         TablesMap.put(HRS_PAY_RCP, "hrs_pay_rcp");
         TablesMap.put(HRS_PAY_RCP_ISS, "hrs_pay_rcp_iss");

@@ -40,12 +40,17 @@ import erp.mod.hrs.db.SDbEmployeeType;
 import erp.mod.hrs.db.SDbEmployeeWageFactorAnnum;
 import erp.mod.hrs.db.SDbEmployeeWageLog;
 import erp.mod.hrs.db.SDbEmployeeWageSscBaseLog;
+import erp.mod.hrs.db.SDbExpenseType;
 import erp.mod.hrs.db.SDbFirstDayYear;
 import erp.mod.hrs.db.SDbHoliday;
 import erp.mod.hrs.db.SDbLoan;
 import erp.mod.hrs.db.SDbLoanTypeAdjustment;
 import erp.mod.hrs.db.SDbMwzType;
 import erp.mod.hrs.db.SDbMwzTypeWage;
+import erp.mod.hrs.db.SDbPackCostCenters;
+import erp.mod.hrs.db.SDbPackCostCentersCostCenter;
+import erp.mod.hrs.db.SDbPackExpenses;
+import erp.mod.hrs.db.SDbPackExpensesItem;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
@@ -90,6 +95,7 @@ import erp.mod.hrs.form.SFormDocBreach;
 import erp.mod.hrs.form.SFormEarning;
 import erp.mod.hrs.form.SFormEmployeeDismissalType;
 import erp.mod.hrs.form.SFormEmployeeType;
+import erp.mod.hrs.form.SFormExpenseType;
 import erp.mod.hrs.form.SFormFirstDayYear;
 import erp.mod.hrs.form.SFormHoliday;
 import erp.mod.hrs.form.SFormLoan;
@@ -98,6 +104,8 @@ import erp.mod.hrs.form.SFormLoanAdjustmentEarning;
 import erp.mod.hrs.form.SFormLoanTypeAdjustment;
 import erp.mod.hrs.form.SFormMwzType;
 import erp.mod.hrs.form.SFormMwzTypeWage;
+import erp.mod.hrs.form.SFormPackCostCenters;
+import erp.mod.hrs.form.SFormPackExpenses;
 import erp.mod.hrs.form.SFormPayroll;
 import erp.mod.hrs.form.SFormPaysheetCustomType;
 import erp.mod.hrs.form.SFormPosition;
@@ -141,12 +149,15 @@ import erp.mod.hrs.view.SViewEmployeeSua;
 import erp.mod.hrs.view.SViewEmployeeType;
 import erp.mod.hrs.view.SViewEmployeeWageLog;
 import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
+import erp.mod.hrs.view.SViewExpenseType;
 import erp.mod.hrs.view.SViewFirstDayYear;
 import erp.mod.hrs.view.SViewHoliday;
 import erp.mod.hrs.view.SViewLoan;
 import erp.mod.hrs.view.SViewLoanTypeAdjustment;
 import erp.mod.hrs.view.SViewMwzType;
 import erp.mod.hrs.view.SViewMwzTypeWage;
+import erp.mod.hrs.view.SViewPackCostCenters;
+import erp.mod.hrs.view.SViewPackExpenses;
 import erp.mod.hrs.view.SViewPayroll;
 import erp.mod.hrs.view.SViewPayrollBenefitEarningComplement;
 import erp.mod.hrs.view.SViewPayrollCfdi;
@@ -207,6 +218,9 @@ public class SModuleHrs extends SGuiModule {
     private SFormDepartmentCostCenter moFormDepartmentCenterCost;;
     private SFormPosition moFormPosition;
     private SFormShift moFormShift;
+    private SFormExpenseType moFormExpenseType;
+    private SFormPackExpenses moFormPackExpenses;
+    private SFormPackCostCenters moFormPackCostCenters;
     private SFormConfig moFormConfig;
     private SFormWorkingDaySettings moFormWorkingDaySettings;
     private SFormConditionalEarning moFormConditionalEarning;
@@ -448,6 +462,15 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSU_SHT:
                 registry = new SDbShift();
                 break;
+            case SModConsts.HRSU_TP_EXP:
+                registry = new SDbExpenseType();
+                break;
+            case SModConsts.HRSU_PACK_EXP:
+                registry = new SDbPackExpenses();
+                break;
+            case SModConsts.HRSU_PACK_EXP_ITEM:
+                registry = new SDbPackExpensesItem();
+                break;
             case SModConsts.HRS_DEP_CC:
                 registry = new SDbDepartmentCostCenter();
                 break;
@@ -564,6 +587,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_ACC_DED:
                 registry = new SDbAccountingDeduction();
+                break;
+            case SModConsts.HRS_PACK_CC:
+                registry = new SDbPackCostCenters();
+                break;
+            case SModConsts.HRS_PACK_CC_CC:
+                registry = new SDbPackCostCentersCostCenter();
                 break;
             case SModConsts.HRS_PAY:
                 registry = new SDbPayroll();
@@ -835,6 +864,12 @@ public class SModuleHrs extends SGuiModule {
                         + (where.isEmpty() ? "" : "AND " + where)
                         + "ORDER BY bp.bp, e.id_emp ";
                 break;
+            case SModConsts.HRSU_TP_EXP:
+                settings = new SGuiCatalogueSettings("Tipo gasto", 1);
+                settings.setCodeSettings(true, false);
+                sql = "SELECT id_tp_exp AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY name, id_tp_exp ";
+                break;
             case SModConsts.HRSU_EMP_IDSE:
                 settings = new SGuiCatalogueSettings("Alta IDSE", 1);
                 sql = "SELECT id_tp_acc AS " + SDbConsts.FIELD_ID + "1, IF(id_tp_acc = 1, 'ALTA EMPLEADOS', IF(id_tp_acc = 2, 'BAJA EMPLEADOS', IF(id_tp_acc = 3, 'MODIFICACIÓN EMPLEADOS', '') )) " + SDbConsts.FIELD_ITEM + " " 
@@ -947,6 +982,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSU_DEP:
                 view = new SViewDepartment(miClient, "Departamentos");
+                break;
+            case SModConsts.HRSU_TP_EXP:
+                view = new SViewExpenseType(miClient, "Tipos gasto");
+                break;
+            case SModConsts.HRSU_PACK_EXP:
+                view = new SViewPackExpenses(miClient, "Paquetes gastos");
                 break;
             case SModConsts.HRS_DEP_CC:
                 view = new SViewDepartmentCostCenter(miClient, "Departamentos y centros costo");
@@ -1135,6 +1176,9 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
+            case SModConsts.HRS_PACK_CC:
+                view = new SViewPackCostCenters(miClient, "Paquetes centros costos");
+                break;
             case SModConsts.HRS_PAY:
                 view = new SViewPayroll(miClient, "Nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
                 break;
@@ -1294,6 +1338,14 @@ public class SModuleHrs extends SGuiModule {
                 if (moFormShift == null) moFormShift = new SFormShift(miClient, "Turno");
                 form = moFormShift;
                 break;
+            case SModConsts.HRSU_TP_EXP:
+                if (moFormExpenseType == null) moFormExpenseType = new SFormExpenseType(miClient, "Tipo gasto");
+                form = moFormExpenseType;
+                break;
+            case SModConsts.HRSU_PACK_EXP:
+                if (moFormPackExpenses == null) moFormPackExpenses = new SFormPackExpenses(miClient, "Paquete gastos");
+                form = moFormPackExpenses;
+                break;
             case SModConsts.HRS_DEP_CC:
                 if (moFormDepartmentCenterCost == null) moFormDepartmentCenterCost = new SFormDepartmentCostCenter(miClient, "Departamentos con centros costo");
                 form = moFormDepartmentCenterCost;
@@ -1441,6 +1493,10 @@ public class SModuleHrs extends SGuiModule {
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
+                break;
+            case SModConsts.HRS_PACK_CC:
+                if (moFormPackCostCenters == null) moFormPackCostCenters = new SFormPackCostCenters(miClient, "Paquete centros de costo");
+                form = moFormPackCostCenters;
                 break;
             case SModConsts.HRS_PAY:
                 switch (subtype) {
