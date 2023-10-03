@@ -399,8 +399,8 @@ public abstract class SMaterialRequestUtils {
     
     public static SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
-        SGuiOptionPickerSettings settings = null;
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
+        SGuiOptionPickerSettings settings;
         SDialogItemPicker picker = new SDialogItemPicker();
         switch (type) {
             case SModConsts.ITMU_ITEM:

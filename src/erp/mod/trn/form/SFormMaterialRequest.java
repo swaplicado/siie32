@@ -1105,7 +1105,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moTextUnitPriceRef.setEnabled(enable);
         moTextItemKey.setEnabled(enable);
         jbPickItem.setEnabled(enable);
-        moBoolNewItem.setEnabled(enable);
+        moBoolNewItem.setEnabled(false); // Temporalmente inhabilitado para futura versión que retroceda a estatus de autorización (cambiar a enable)
         moTextItemDescription.setEnabled(!enable ? enable : moBoolNewItem.getValue());
         moDecQty.setEnabled(enable);
         moIntConsDays.setEnabled(enable);
@@ -1356,6 +1356,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
                 picker = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
                 picker.resetPicker();
+                picker.initComponentsCustom();
                 picker.setPickerVisible(true);
 
                 if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {

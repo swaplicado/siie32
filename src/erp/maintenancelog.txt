@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 220.1/ 2023-10-03
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Inhabilitación de la opción "Item nuevo" en requisiciones de materiales.
+2) Se agregó el doble click en el item picker de requisiciones.
+
+================================================================================
 SIIE 3.2 220.0/ 2023-09-26
 Edwin CARMONA
 Isabel Servín
