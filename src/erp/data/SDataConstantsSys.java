@@ -100,6 +100,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
     public static final String CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT = "TRN_MAT_REQ_PTY_DEFAULT";
     public static final String CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW = "TRN_MAT_REQ_ETY_ITEM_NEW";
+    public static final String CFG_PARAM_TRN_MAT_REQ_EST_SUBJECT = "TRN_MAT_REQ_EST_SUBJECT";
+    public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
     public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";

@@ -10,6 +10,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SMaterialRequestUtils;
+import erp.mod.trn.form.SDialogMaterialRequestEstimation;
 import erp.mod.trn.form.SDialogMaterialRequestSupply;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -46,14 +47,16 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
 
     private JButton mjbSupply;
     private JButton mjbToNew;
-    private JButton mjbToPur;
     private JButton mjbToSupply;
+    private JButton mjbToPur;
+    private JButton mjbToEstimate;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
     //private JButton mjbClose;
     //private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogMaterialRequestSupply moDialogSupply;
+    private SDialogMaterialRequestEstimation moDialogEstimate;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -73,8 +76,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private void initComponents() {
         mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_stk_out.gif")), "Suministrar", this);
         mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_new_main.gif")), "Regresar estatus nuevo", this);
-        mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar para compra", this);
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
+        mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar para compra", this);
+        mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar requisición", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
 //        mjbClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
@@ -94,6 +98,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToPur);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
         moTextToSearch = new JTextField("");
         moTextToSearch.setPreferredSize(new Dimension(150, 23));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
@@ -101,8 +106,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
         
         mjbSupply.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP);
-        mjbToPur.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && mnGridSubtype == SLibConsts.UNDEFINED);
         mjbToSupply.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR && mnGridSubtype == SLibConsts.UNDEFINED);
+        mjbToPur.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && mnGridSubtype == SLibConsts.UNDEFINED);
+        mjbToEstimate.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR);
         mjbToNew.setEnabled(mnGridSubtype == SLibConsts.UNDEFINED);
 
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
@@ -255,6 +261,33 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         }
     }
     
+    private void actionToEstimate() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición de materiales");
+                int[] key = (int[]) gridRow.getRowPrimaryKey();
+                moDialogEstimate.setValue(SModConsts.TRN_MAT_REQ, key);
+                moDialogEstimate.setVisible(true);
+
+                miClient.getSession().notifySuscriptors(mnGridType);
+            }
+        }
+    }
+    
     private void actionSearch() {
         if (jtTable.getRowCount() > 1) {
             String text = moTextToSearch.getText().trim();
@@ -328,7 +361,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
-                select = "i.item, i.item_key, u.unit, ve.id_ety, "
+                select = "i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                         + "SUM(ve.qty) AS org_qty, "
                         + "COALESCE(de.sumi_qty, 0) AS sumi_qty, "
                         + "COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, "
@@ -372,7 +405,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     + "1 - COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0)) AS per_x_pur, ";
             
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
-                select += "i.item, i.item_key, u.unit, ve.id_ety, "
+                select += "i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                         + "COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, "
                         + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per, "
                         + "COALESCE(req_pur.pur_qty, 0) AS pur_qty,"
@@ -517,6 +550,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ve.dt_req_n", "Fecha requerida partida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "i.item_key", "Clave"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.item", "Ítem"));
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "i.part_num", "# parte"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "org_qty", "Cant. requerida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "sumi_qty", "Cant. suministrada"));
             if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
@@ -594,11 +628,14 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             else if (button == mjbToNew) {
                 actionToNew();
             }
+            else if (button == mjbToSupply) {
+                actionToSupply();
+            }
             else if (button == mjbToPur) {
                 actionToPur();
             }
-            else if (button == mjbToSupply) {
-                actionToSupply();
+            else if (button == mjbToEstimate) {
+                actionToEstimate();
             }
             else if (button == mjbToSearch) {
                 actionSearch();

@@ -475,6 +475,9 @@ public abstract class SModConsts {
     public static final int TRN_MAT_REQ_ETY_NTS = 2023347;
     public static final int TRN_MAT_REQ_ETY_ITEM_CHG = 2023348;
     public static final int TRN_MAT_REQ_ST_LOG = 2023349;
+    public static final int TRN_EST_REQ = 2023352;
+    public static final int TRN_EST_REQ_ETY = 2023353;
+    public static final int TRN_EST_REQ_REC = 2023354;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -496,6 +499,8 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_PEND_SUP = 2024072;        // material requisitions pending supply
     public static final int TRNX_MAT_REQ_PEND_PUR = 2024074;        // material requisitions pending purchase
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;   // renglones de requisiciones en diálogo de segregaciones
+    public static final int TRNX_MAT_REQ_ESTIMATE = 2024076;   // diálogo de cotizaciones
+    public static final int TRNX_MAT_REQ_EST_PROVID_ROW = 2024077;   // renglones de cotizaciones
     public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_FUNC_EXPENSES = 2024336;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_CONF_USR_VS_ENT = 2024337;
@@ -1230,6 +1235,9 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAT_REQ_ETY_NTS, "trn_mat_req_ety_nts");
         TablesMap.put(TRN_MAT_REQ_ETY_ITEM_CHG, "trn_mat_req_ety_item_chg");
         TablesMap.put(TRN_MAT_REQ_ST_LOG, "trn_mat_req_st_log");
+        TablesMap.put(TRN_EST_REQ, "trn_est_req");
+        TablesMap.put(TRN_EST_REQ_ETY, "trn_est_req_ety");
+        TablesMap.put(TRN_EST_REQ_REC, "trn_est_req_rec");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");

@@ -85,6 +85,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -93,6 +94,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiSession;
+import sa.lib.mail.SMailSender;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
@@ -4521,7 +4523,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     
                     toRecipients.add(emailList);
 
-                    STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null);
+                    Object sender = null;
+                    Object images = null;
+                    STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images);
                     toRecipients.clear();
                 }
                 catch (java.lang.Exception e) {
@@ -4562,7 +4566,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         toRecipientsCC.add(string);
                     }
 
-                    STrnUtilities.sendMail(client, mmsType, qualityBody, "Análisis de calidad. Folio: " + getDpsNumber(), toRecipients, toRecipientsCC, null);
+                    Object sender = null;
+                    Object images = null;
+                    STrnUtilities.sendMail(client, mmsType, qualityBody, "Análisis de calidad. Folio: " + getDpsNumber(), toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images);
                     toRecipients.clear();
                 }
                 catch (Exception ex) {
