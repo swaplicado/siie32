@@ -419,6 +419,13 @@ public class SModuleTrn extends SGuiModule {
                                 + "WHERE NOT b_del "
                                 + "ORDER BY a.name";
                         break;
+                    case SModConsts.TRNX_MAT_REQ_STK_SUP:
+                        sql = "SELECT c.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(c.code, ' - ', c.name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS c "
+                                + "INNER JOIN trn_mat_cons_subent_cc AS s ON c.id_mat_cons_ent = s.id_mat_cons_ent "
+                                + "WHERE NOT c.b_del AND s.id_cc = 1 "
+                                + "ORDER BY name";
+                        break;
                     default:
                         sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                                 + "FROM " + SModConsts.TablesMap.get(type) + " "
@@ -784,7 +791,7 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormMaterialReq;
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
-                if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, "Requisición de materiales y centros de costo");
+                if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, subtype, "Requisición de materiales y centros de costo");
                 form = moFormMaterialRequestCostCenter;
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:

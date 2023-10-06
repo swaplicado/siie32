@@ -372,7 +372,33 @@
                             <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextReqNotes">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[895, 23]"/>
+                                  <Dimension value="[580, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlTypeReq">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Tipo requisici&#xf3;n:"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextTypeReq">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                                <Property name="enabled" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[73, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jb">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Lista &#xed;tems"/>
+                                <Property name="enabled" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

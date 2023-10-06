@@ -153,7 +153,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
     private void readCostCenters() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT pk_cc, id_cc FROM fin_cc WHERE NOT b_del AND lev = (SELECT MAX(lev) FROM fin_cc) ORDER BY id_cc";
+            String sql = "SELECT pk_cc, id_cc FROM fin_cc WHERE (lev = (SELECT MAX(lev) FROM fin_cc) AND NOT b_del) OR pk_cc = 1 ORDER BY id_cc";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;
