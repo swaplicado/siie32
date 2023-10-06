@@ -224,8 +224,8 @@ public class SDataDiogEtyMatConsEntCostCenter extends erp.lib.data.SDataRegistry
                 sql = "UPDATE " + SDataConstants.TablesMap.get(SDataConstants.TRN_DIOG_ETY_CONS_ENT_CC) + " SET " +
 //                    "id_diog_ety_ce_cc = " + mnPkDiogEntryConsEntCostCenter + ", " +
                     "percentage = " + mdPercentage + ", " +
-                    "fid_diog_doc = " + mnFkDiogYearId + ", " +
-                    "fid_diog_year = " + mnFkDiogDocId + ", " +
+                    "fid_diog_year = " + mnFkDiogYearId + ", " +
+                    "fid_diog_doc = " + mnFkDiogDocId + ", " +
                     "fid_diog_ety = " + mnFkDiogEntryId + ", " +
                     "fid_mat_sub_cons_ent = " + mnFkSubentMatConsumptionEntityId + ", " +
                     "fid_mat_sub_cons_sub_ent = " + mnFkSubentMatConsumptionSubentityId + ", " +
