@@ -403,14 +403,16 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
                     + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, "
                     + "COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0)) AS per_pur, "
-                    + "1 - COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0)) AS per_x_pur, ";
+                    + "IF ((1 - COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0))) < 0, 0, "
+                    + "1 - COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0))) AS per_x_pur, ";
             
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
                 select += "i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                         + "COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, "
                         + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per, "
                         + "COALESCE(req_pur.pur_qty, 0) AS pur_qty,"
-                        + "COALESCE(SUM(ve.qty) - COALESCE(de.sumi_qty, 0) - COALESCE(req_pur.pur_qty, 0), SUM(ve.qty) - COALESCE(de.sumi_qty, 0)) AS pen_pur_qty, "
+                        + "COALESCE(IF((SUM(ve.qty) - COALESCE(de.sumi_qty, 0) - COALESCE(req_pur.pur_qty, 0)) < 0, 0, (SUM(ve.qty) - COALESCE(de.sumi_qty, 0) - COALESCE(req_pur.pur_qty, 0))), "
+                        + "SUM(ve.qty) - COALESCE(de.sumi_qty, 0)) AS pen_pur_qty, "
                         + "rpe.name AS ety_pty, "
                         + "ve.dt_req_n, ";
                 join += "INNER JOIN erp.itmu_item AS i ON ve.fk_item = i.id_item "

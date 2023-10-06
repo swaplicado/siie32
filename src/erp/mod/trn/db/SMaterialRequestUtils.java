@@ -223,7 +223,7 @@ public abstract class SMaterialRequestUtils {
                 oDiog.setFkMatRequestId_n(oSupply.getFkMatRequestId());
                 oDiog.setFkBookkeepingYearId_n(0);
                 oDiog.setFkBookkeepingNumberId_n(0);
-                oDiog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART);
+                oDiog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT);
                 oDiog.setFkMaintUserId_n(user);
                 oDiog.setFkMaintUserSupervisorId(userSup);
                 oDiog.setFkMaintReturnUserId_n(0);
@@ -455,7 +455,8 @@ public abstract class SMaterialRequestUtils {
     public static ArrayList<SDataMaterialRequestRow> getMaterialRequest(SGuiClient client, final int idUser, final int idConsumeEntity, final int idConsumeSubentity, final String folio) {
         ArrayList<SDataMaterialRequestRow> rows = new ArrayList<>();
         try {
-            String sql = "SELECT id_mat_req FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " WHERE NOT b_del ";
+            String sql = "SELECT id_mat_req FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " WHERE NOT b_del "
+                    + "AND NOT b_clo_pur AND b_clo_prov AND fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " ";
             if (idUser > 0) {
                 sql += "AND fk_usr_req = " + idUser + " ";
             }

@@ -66,6 +66,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
     protected int mnParamMaintUserType;
     protected int mnItemDefaultId;
     protected int mnBizPartnerPicker;
+    protected int mnMailNumber;
     protected boolean mbAreSigned;
     protected String msSubjectDefault;
     protected String msBodyDefault;
@@ -518,11 +519,49 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     }
                 }
             }
+            
+            @Override
+            public void actionRowDelete() {
+                if (jbRowDelete.isEnabled()) {
+                    if (jtTable.getSelectedRowCount() == 0) {
+                        miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
+                    }
+                    else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
+                        SGridRow gridRow = null;
+                        SGridRow[] gridRows = getSelectedGridRows();
+                        int[] rows = jtTable.getSelectedRows();
+
+                        for (int i = 0; i < gridRows.length; i++) {
+                            gridRow = gridRows[i];
+
+                            if (gridRow.isRowSystem()) {
+                                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                            }
+                            else if (!gridRow.isRowDeletable()) {
+                                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_DELETABLE);
+                            }
+                            else {
+                                moModel.getGridRows().remove(moModel.getGridRows().indexOf(gridRow));
+                                moModel.renderGridRows();
+                                mnMailNumber--;
+
+                                setSelectedGridRow(rows[i] < moModel.getRowCount() ? rows[i] : moModel.getRowCount() - 1);
+
+                                mvDeletedRows.add(gridRow);
+                                if (miPaneFormOwner != null) {
+                                    miPaneFormOwner.notifyRowDelete(mnGridType, mnGridSubtype, rows[i], gridRow);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         };
         jpProviderMailRows.add(moGridProviderRows, BorderLayout.CENTER);
         
         mnSegregationId = 0;
         mnItemDefaultId = 0;
+        mnMailNumber = 1;
         
         moPanelMatRequest = new SPanelMaterialRequest((SClientInterface) miClient, "de origen");
         jpMaterialRequest.remove(jlPanelMatRequest);
@@ -581,7 +620,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                 oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
                 String notes = "";
                 for (SDbMaterialRequestEntryNote oNote : oMaterialRequestEntry.getChildNotes()) {
-                    notes += " - " + oNote.getNotes();
+                    notes += oNote.getNotes();
                 }
                 
                 oRow.setNotes(notes);
@@ -640,7 +679,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         String to = "";
         String cc = "";
         String cco = "";
-        String subject = msSubjectDefault + " REQ.-" + String.format("%05d", moMaterialRequest.getNumber());
+        String subject = msSubjectDefault + " REQ.-" + String.format("%05d", moMaterialRequest.getNumber()) + "-" + mnMailNumber;
         String body = msBodyDefault.replace("---", msBodyRows);
         
         if (providerId > 0) {
@@ -739,6 +778,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         
         if (moProviderRow == null) {
             moGridProviderRows.addGridRow(oRow);
+            mnMailNumber++;
         }
         moGridProviderRows.renderGridRows();
         
@@ -803,6 +843,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     moMaterialRequest.read(miClient.getSession(), pk);
                     if (moMaterialRequest.getQueryResultId() == SDbConsts.READ_OK) {
                         moPanelMatRequest.setMaterialRequest(moMaterialRequest);
+                        mnMailNumber = SMaterialRequestEstimationUtils.getNextMailNumberOfMatRequest(miClient.getSession().getStatement(), moMaterialRequest.getPkMatRequestId());
                         showMaterialRequestEntries(true);
                     }
                 }
@@ -887,7 +928,9 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         
         SMaterialRequestEstimationUtils.sendMails(miClient, lRows);
         String res = SMaterialRequestEstimationUtils.saveEstimationRequest(miClient, moMaterialRequest.getPkMatRequestId(), lEtyRows, lRows);
-        
+        mnMailNumber = SMaterialRequestEstimationUtils.getNextMailNumberOfMatRequest(miClient.getSession().getStatement(), moMaterialRequest.getPkMatRequestId());
+        moGridProviderRows.clearGridRows();
+
         jbSave.setEnabled(true);
     }
 }

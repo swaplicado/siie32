@@ -8,9 +8,13 @@ package erp.mod.trn.db;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
 import erp.mtrn.data.STrnUtilities;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +28,7 @@ import sa.lib.mail.SMailSender;
  *
  * @author Edwin Carmona
  */
-public class SMaterialRequestEstimationUtils {
+public abstract class SMaterialRequestEstimationUtils {
     
     public static String getSubjectOfEstimate(SGuiClient client) {
         try {
@@ -60,15 +64,14 @@ public class SMaterialRequestEstimationUtils {
         int ety = 1;
         String row = "";
         for (SMaterialRequestEntryRow estimationRow : estimationRows) {
-            row = "#" + SMaterialRequestEstimationUtils.padLeft(ety + "", 2, '0') + ".\n" + 
-                    SMaterialRequestEstimationUtils.padLeft(estimationRow.getAuxQuantityToEstimate() + "", 5, ' ')  + " " + 
-                    estimationRow.getAuxUnitCode() + " " +
-                    estimationRow.getAuxItemName() + " " + 
-                    estimationRow.getAuxPartNumber() +  " / " + 
-                    (estimationRow.getDateRequired() != null ? ("Fecha requerida entrega: " + SLibUtils.DateFormatDate.format(estimationRow.getDateRequired()) + " ") : "") +
+            row = "PARTIDA #" + SMaterialRequestEstimationUtils.padLeft(ety + "", 2, '0') + "\n" + 
+                    "CANTIDAD: " + SMaterialRequestEstimationUtils.padLeft(estimationRow.getAuxQuantityToEstimate() + "", 5, ' ')  + " " + estimationRow.getAuxUnitCode() + "     " +
+                    "CONCEPTO: " + estimationRow.getAuxItemName() + 
+                    ((estimationRow.getAuxPartNumber() != null && !estimationRow.getAuxPartNumber().isEmpty()) ? ("     " + estimationRow.getAuxPartNumber()) : "") + 
+                    (estimationRow.getDateRequired() != null ? ("\nFecha requerida entrega: " + SLibUtils.DateFormatDate.format(estimationRow.getDateRequired())) : "") +
                     (estimationRow.getNotes().isEmpty() ? "" : "\nComentarios: " + estimationRow.getNotes());
             
-            row += "\n";
+            row += "\n\n";
             
             rowsBody += row;
             ety++;
@@ -121,7 +124,7 @@ public class SMaterialRequestEstimationUtils {
                             "<html lang=\"es\">" +
                             "<body>";
             
-            body += "<p>" + SLibUtils.textToHtml(oProviderRow.getBody()).replaceAll("\n", "<br>") + "</p>";
+            body += "<p>" + SLibUtils.textToHtmlIgnoreWhiteSpace(oProviderRow.getBody()).replaceAll("\n", "<br>") + "</p>";
 
             // Firma
             body += "<img src=\"cid:AbcXyz123\">";
@@ -185,5 +188,25 @@ public class SMaterialRequestEstimationUtils {
         }
         
         return res;
+    }
+    
+    public static int getNextMailNumberOfMatRequest(Statement statement, final int matRequestId) {
+        try {
+            String sql = "SELECT " +
+                    "COUNT(*) + 1 AS mail_num " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ) + " AS est " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ_REC) + " AS estrec ON est.id_est_req = estrec.id_est_req " +
+                    "WHERE est.fk_mat_req_n = " + matRequestId + ";";
+            
+            ResultSet res = statement.getConnection().createStatement().executeQuery(sql);
+            if (res.next()) {
+                return res.getInt("mail_num");
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestEstimationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return 1;
     }
 }

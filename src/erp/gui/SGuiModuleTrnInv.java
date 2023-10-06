@@ -125,6 +125,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintStockToolMaint;
     private javax.swing.JMenuItem jmiMaintStockToolLost;
     private javax.swing.JMenuItem jmiMaintStockTool;
+    private javax.swing.JMenuItem jmiConsumeMaterial;
     private javax.swing.JMenuItem jmiMaintMovementPart;
     private javax.swing.JMenuItem jmiMaintMovementPartDetail;
     private javax.swing.JMenuItem jmiMaintMovementTool;
@@ -471,6 +472,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolMaint = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
         jmiMaintStockToolLost = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
         jmiMaintStockTool = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " (todas)");
+        jmiConsumeMaterial = new JMenuItem("Docs. consumos de materiales");
         jmiMaintMovementPart = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
         jmiMaintMovementPartDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase() + " a detalle");      
         jmiMaintMovementTool = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase());
@@ -491,6 +493,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuMaint.add(jmiMaintStockToolMaint);
         jmMenuMaint.add(jmiMaintStockToolLost);
         jmMenuMaint.add(jmiMaintStockTool);
+        jmMenuMaint.addSeparator();
+        jmMenuMaint.add(jmiConsumeMaterial);
         jmMenuMaint.addSeparator();
         jmMenuMaint.add(jmiMaintMovementPart);
         jmMenuMaint.add(jmiMaintMovementPartDetail);
@@ -514,6 +518,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolMaint.addActionListener(this);
         jmiMaintStockToolLost.addActionListener(this);
         jmiMaintStockTool.addActionListener(this);
+        jmiConsumeMaterial.addActionListener(this);
         jmiMaintMovementPart.addActionListener(this);
         jmiMaintMovementPartDetail.addActionListener(this);
         jmiMaintMovementTool.addActionListener(this);
@@ -823,6 +828,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolMaint.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
         jmiMaintStockToolLost.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
         jmiMaintStockTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiConsumeMaterial.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementPart.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementPartDetail.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
@@ -1271,6 +1277,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         case SModSysConsts.TRNX_MAINT_TOOL_LOST:
                             title += SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase();
                             break;
+                        case SModSysConsts.TRNX_CONS_MAT:
+                            title += "Consumo de materiales";
+                            break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
@@ -1688,6 +1697,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiMaintStockTool) {
                 showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL);
+            }
+            else if (item == jmiConsumeMaterial) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_CONS_MAT, SUtilConsts.PER_DOC);
             }
             else if (item == jmiMaintMovementPart) {
                 showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_DOC);

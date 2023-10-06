@@ -691,11 +691,13 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT = 151;      // in status of tools lent
     public static final int TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT = 152;     // in status of tools maintenance
     public static final int TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST = 153;      // in status of tools lost
+    public static final int TRNS_TP_MAINT_MOV_IN_CONS_MAT = 161; // in consumption of material
     public static final int TRNS_TP_MAINT_MOV_OUT_CONS_PART = 211;  // out consumption of parts
     public static final int TRNS_TP_MAINT_MOV_OUT_CONS_TOOL = 221;  // out consumption of tools
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT = 251;     // out status of tools lent
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT = 252;    // out status of tools maintenance
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
+    public static final int TRNS_TP_MAINT_MOV_OUT_CONS_MAT = 261; // out consumption of material
     
     public static final int TRNU_MAT_PRES_NA = 1; // not applicable
     
@@ -742,6 +744,7 @@ public abstract class SModSysConsts {
     
     public static final int TRNX_MAINT_PART = 11;
     public static final int TRNX_MAINT_TOOL = 12;
+    public static final int TRNX_CONS_MAT = 13;
     public static final int TRNX_MAINT_TOOL_AVL = 21;
     public static final int TRNX_MAINT_TOOL_LENT = 22;
     public static final int TRNX_MAINT_TOOL_MAINT = 23;

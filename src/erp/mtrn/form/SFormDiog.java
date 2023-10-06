@@ -36,6 +36,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -56,6 +57,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -1612,7 +1615,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
 
                             dpsEntry = moParamDpsSource.getDbmsDpsEntry(stockSupplyRow.getDpsEntryKey());
-
+                            
                             iogEntry = new SDataDiogEntry();
                             iogEntry.setPkYearId(SLibConstants.UNDEFINED);
                             iogEntry.setPkDocId(SLibConstants.UNDEFINED);
@@ -1656,6 +1659,21 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                             else {
                                 iogEntry.getAuxStockMoves().add(new STrnStockMove(new int[] { year, iogEntry.getFkItemId(), iogEntry.getFkUnitId(), SDataConstantsSys.TRNX_STK_LOT_DEF_ID, moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() }, iogEntry.getQuantity()));
+                            }
+                            
+                            if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                try {
+                                    SDbMaterialRequest oMatReq = new SDbMaterialRequest();
+                                    oMatReq.read(miClient.getSession(), dpsEntry.getDbmsDpsEntryMatRequestLink().getDbmsMaterialRequestKey());
+                                    
+                                    if (oMatReq.getTypeRequest().equals("S")) {
+                                        iogEntry.setFkMatRequestId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestId());
+                                        iogEntry.setFkMatRequestEtyId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestEntryId());
+                                    }
+                                }
+                                catch (Exception ex) {
+                                    Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
 
                             iogEntries.add(iogEntry);

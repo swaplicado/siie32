@@ -207,6 +207,45 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
         return stockMoves;
     }
+    
+    public String getConsumeCenterAsString() {
+        if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+            String text = "";
+            for (SDataDiogEtyMatConsEntCostCenter oCcCfg : mlAuxDiogEtyMatEntCcsConfigs) {
+                text += oCcCfg.getAuxEntConsumeName() + " / ";
+            }
+            
+            return text.substring(0, text.length() - 3); 
+        }
+        
+        return "";
+    }
+    
+    public String getSubConsumeCenterAsString() {
+        if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+            String text = "";
+            for (SDataDiogEtyMatConsEntCostCenter oCcCfg : mlAuxDiogEtyMatEntCcsConfigs) {
+                text += oCcCfg.getAuxSubEntConsumeName()+ " / ";
+            }
+            
+            return text.substring(0, text.length() - 3); 
+        }
+        
+        return "";
+    }
+    
+    public String getCostCenterAsString() {
+        if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+            String text = "";
+            for (SDataDiogEtyMatConsEntCostCenter oCcCfg : mlAuxDiogEtyMatEntCcsConfigs) {
+                text += oCcCfg.getAuxCostCenterName()+ " / ";
+            }
+            
+            return text.substring(0, text.length() - 3); 
+        }
+        
+        return "";
+    }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -479,7 +518,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 SDataDiogEtyMatConsEntCostCenter oDataConfig;
                 for (SMatConsumeSubEntCcConfig oConfig : lConfigs) {
                     oDataConfig = new SDataDiogEtyMatConsEntCostCenter();
-                    oDataConfig.setPercentage(oConfig.getPercentage());
+                    
+                    oDataConfig.setPercentage(oConfig.getPercentage() <= 0d ? 100d : oConfig.getPercentage());
                     oDataConfig.setFkDiogYearId(mnPkYearId);
                     oDataConfig.setFkDiogDocId(mnPkDocId);
                     oDataConfig.setFkDiogEntryId(mnPkEntryId);
@@ -487,6 +527,17 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     oDataConfig.setFkSubentMatConsumptionSubentityId(oConfig.getFkSubentMatConsumptionSubentityId());
                     oDataConfig.setFkCostCenterId(oConfig.getFkCostCenterId());
                     
+                    oDataConfig.save(connection);
+                }
+            }
+            else if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+                for (SDataDiogEtyMatConsEntCostCenter oDataConfig : mlAuxDiogEtyMatEntCcsConfigs) {
+                    oDataConfig.setPercentage(oDataConfig.getPercentage() <= 0d ? 100d : oDataConfig.getPercentage());
+                    oDataConfig.setIsRegistryNew(true);
+                    oDataConfig.setFkDiogYearId(mnPkYearId);
+                    oDataConfig.setFkDiogDocId(mnPkDocId);
+                    oDataConfig.setFkDiogEntryId(mnPkEntryId);
+
                     oDataConfig.save(connection);
                 }
             }

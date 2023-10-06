@@ -482,14 +482,23 @@ public class SDialogMatReqDpsLink extends javax.swing.JDialog implements erp.lib
                 oEntry.setFkUnitId(oTableRow.getItem().getFkUnitId());
                 oEntry.setFkOriginalUnitId(oTableRow.getItem().getFkUnitId());
                 oEntry.setIsPrepayment(oTableRow.getItem().getIsPrepayment());
+                oEntry.setIsInventoriable(oTableRow.getItem().getIsInventoriable());
 
                 oEntry.setDbmsFkItemGenericId(oTableRow.getItem().getFkItemGenericId());
                 oEntry.setDbmsOriginalUnitSymbol(oTableRow.getUnit().getSymbol());
                 oEntry.setFkDpsEntryTypeId(SDataConstantsSys.TRNS_TP_DPS_ETY_ORDY);
                 oEntry.setFkDpsAdjustmentTypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[0]);
                 oEntry.setFkDpsAdjustmentSubtypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[1]);
+                int idCc = 0;
                 if (oTableRow.getMaterialRequestEntry().getCcConfigs().size() > 0) {
-                    int idCc = oTableRow.getMaterialRequestEntry().getCcConfigs().get(0).getFkCostCenterId();
+                    idCc = oTableRow.getMaterialRequestEntry().getCcConfigs().get(0).getFkCostCenterId();
+                }
+                else {
+                    if (moMaterialRequest.getChildCostCenters() != null && moMaterialRequest.getChildCostCenters().size() > 0) {
+                        idCc = moMaterialRequest.getChildCostCenters().get(0).getPkCostCenterId();
+                    }
+                }
+                if (idCc > 0) {
                     oEntry.setFkCostCenterId_n(SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), idCc));
                 }
                 oEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
