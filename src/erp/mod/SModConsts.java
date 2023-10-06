@@ -517,6 +517,7 @@ public abstract class SModConsts {
     public static final int TRNX_DET_CC_GRP_VS_ITM = 2024348;
     public static final int TRNX_CONF_CC_GRP_VS_USR = 2024349;
     public static final int TRNX_DET_CC_GRP_VS_USR = 2024350;
+    public static final int TRNX_MAT_REQ_STK_SUP = 2024351;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     

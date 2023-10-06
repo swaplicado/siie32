@@ -222,6 +222,9 @@
                       <Dimension value="[75, 23]"/>
                     </Property>
                   </Properties>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="SFormMassiveUpdateSsc_jftDateChangeSsc"/>
+                  </AuxValues>
                 </Component>
                 <Component class="javax.swing.JButton" name="jbDateChangeSscPicker">
                   <Properties>

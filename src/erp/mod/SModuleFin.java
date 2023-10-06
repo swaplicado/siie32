@@ -379,7 +379,7 @@ public class SModuleFin extends SGuiModule {
                                 + "csccg.id_mat_cc_grp = ccgu.id_mat_cc_grp " 
                                 + "WHERE cscc.id_mat_cons_ent = " + pkConsSub[0] + " AND cscc.id_mat_cons_subent = " + pkConsSub[1] + " "
                                 + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ccgu.id_ref = " + idUsr + " "
-                                + "AND NOT cc.b_del ORDER BY cc.id_cc, cc.cc ";
+                                + "ORDER BY cc.id_cc, cc.cc ";
                         break;
                     default:
                         sql = "SELECT pk_cc AS " + SDbConsts.FIELD_ID + "1, CONCAT(id_cc, ' - ', cc) AS " + SDbConsts.FIELD_ITEM + " "
