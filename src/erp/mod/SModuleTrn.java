@@ -595,11 +595,22 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "Req x suministrar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de consumo x suministrar a detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "Requisiciones suministradas";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de consumo suministradas";
                         break;
-                    case SLibConsts.UNDEFINED: title = "Requisiciones x suministrar";
+                    case SLibConsts.UNDEFINED: title = "RM de consumo x suministrar";
+                        break;
+                }
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_SUP, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_STK_SUP:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de suministro x suministrar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de suministro suministradas";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "RM de suministro x suministrar";
                         break;
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_SUP, subtype, title, params);

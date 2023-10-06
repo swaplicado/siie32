@@ -1763,15 +1763,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqStockSupPend) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SLibConstants.UNDEFINED, params);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SLibConstants.UNDEFINED, params);
             }
             else if (item == jmiReqStockSupPendDet) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
             }
             else if (item == jmiReqStockSup) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PROVIDED, params);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SModSysConsts.TRNX_MAT_REQ_PROVIDED, params);
             }
             else if (item == jmiReqPurPend) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
