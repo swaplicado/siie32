@@ -10,7 +10,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SMaterialRequestUtils;
-import erp.mod.trn.form.SDialogMaterialRequestEstimation;
+//import erp.mod.trn.form.SDialogMaterialRequestEstimation;
 import erp.mod.trn.form.SDialogMaterialRequestSupply;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -56,7 +56,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     //private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogMaterialRequestSupply moDialogSupply;
-    private SDialogMaterialRequestEstimation moDialogEstimate;
+//    private SDialogMaterialRequestEstimation moDialogEstimate;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -98,7 +98,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToPur);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
+//        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
         moTextToSearch = new JTextField("");
         moTextToSearch.setPreferredSize(new Dimension(150, 23));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
@@ -261,32 +261,32 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         }
     }
     
-    private void actionToEstimate() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-            }
-            else {
-                moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición de materiales");
-                int[] key = (int[]) gridRow.getRowPrimaryKey();
-                moDialogEstimate.setValue(SModConsts.TRN_MAT_REQ, key);
-                moDialogEstimate.setVisible(true);
-
-                miClient.getSession().notifySuscriptors(mnGridType);
-            }
-        }
-    }
+//    private void actionToEstimate() {
+//        if (jtTable.getSelectedRowCount() != 1) {
+//            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+//        }
+//        else {
+//            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+//
+//            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+//                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+//            }
+//            else if (gridRow.isRowSystem()) {
+//                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+//            }
+//            else if (!gridRow.isUpdatable()) {
+//                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+//            }
+//            else {
+//                moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición de materiales");
+//                int[] key = (int[]) gridRow.getRowPrimaryKey();
+//                moDialogEstimate.setValue(SModConsts.TRN_MAT_REQ, key);
+//                moDialogEstimate.setVisible(true);
+//
+//                miClient.getSession().notifySuscriptors(mnGridType);
+//            }
+//        }
+//    }
     
     private void actionSearch() {
         if (jtTable.getRowCount() > 1) {
@@ -642,7 +642,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 actionToPur();
             }
             else if (button == mjbToEstimate) {
-                actionToEstimate();
+//                actionToEstimate();
             }
             else if (button == mjbToSearch) {
                 actionSearch();
