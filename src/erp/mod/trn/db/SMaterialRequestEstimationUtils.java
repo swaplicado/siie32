@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.mail.SMailSender;
@@ -132,7 +134,7 @@ public abstract class SMaterialRequestEstimationUtils {
                             "</html>";
             
             try {
-                STrnUtilities.sendMail((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ, body, oProviderRow.getSubject(), lTo, lCc, lCco, sender, inlineImages);
+                STrnUtilities.sendMail((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ, body, oProviderRow.getSubject(), lTo, lCc, lCco, sender, inlineImages, client.getSession().getCurrentDate());
             }
             catch (Exception ex) {
                 Logger.getLogger(SMaterialRequestEstimationUtils.class.getName()).log(Level.SEVERE, null, ex);

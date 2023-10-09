@@ -4523,9 +4523,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     
                     toRecipients.add(emailList);
 
-                    Object sender = null;
+                    SMailSender sender = null;
                     Object images = null;
-                    STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images);
+                    Date sentDate = null;
+                    STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
                     toRecipients.clear();
                 }
                 catch (java.lang.Exception e) {
@@ -4566,9 +4567,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         toRecipientsCC.add(string);
                     }
 
-                    Object sender = null;
+                    SMailSender sender = null;
                     Object images = null;
-                    STrnUtilities.sendMail(client, mmsType, qualityBody, "Análisis de calidad. Folio: " + getDpsNumber(), toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images);
+                    Date sentDate = null;
+                    STrnUtilities.sendMail(client, mmsType, qualityBody, "Análisis de calidad. Folio: " + getDpsNumber(), toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
                     toRecipients.clear();
                 }
                 catch (Exception ex) {

@@ -157,6 +157,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqStockSup;
     private javax.swing.JMenuItem jmiReqPurPend;
     private javax.swing.JMenuItem jmiReqPurPendDet;
+    private javax.swing.JMenuItem jmiReqEstDet;
+    private javax.swing.JMenuItem jmiReqPendEstDet;
     private javax.swing.JMenu jmMenuCatReq;
     private javax.swing.JMenuItem jmiReqMatPresentation;
     private javax.swing.JMenuItem jmiReqMatCostCenterGrp;
@@ -555,6 +557,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         
         jmiReqPurPend = new JMenuItem("RM por comprar");
         jmiReqPurPendDet = new JMenuItem("RM por comprar a detalle");
+        jmiReqEstDet = new JMenuItem("RM cotizadas a detalle");
+        jmiReqPendEstDet = new JMenuItem("RM por cotizar a detalle");
         
         jmMenuCatReq = new JMenu("Catálogos");
         jmiReqMatPresentation = new JMenuItem("Presentaciones de materiales");
@@ -608,6 +612,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStockSupPendReq.add(jmiReqStockSup);
         jmMenuReq.add(jmiReqPurPend);
         jmMenuReq.add(jmiReqPurPendDet);
+        jmMenuReq.add(jmiReqEstDet);
+        jmMenuReq.add(jmiReqPendEstDet);
         jmMenuReq.addSeparator();
         jmMenuReq.add(jmMenuCatReq);
         jmMenuCatReq.add(jmiReqMatPresentation);
@@ -653,6 +659,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqStockSup.addActionListener(this);
         jmiReqPurPend.addActionListener(this);
         jmiReqPurPendDet.addActionListener(this);
+        jmiReqEstDet.addActionListener(this);
+        jmiReqPendEstDet.addActionListener(this);
         jmiReqMatPresentation.addActionListener(this);
         jmiReqMatCostCenterGrp.addActionListener(this);
         jmiReqMatConsumptionEnt.addActionListener(this);
@@ -856,6 +864,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqStockSup.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
         jmiReqPurPend.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurPendDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqMatPresentation.setEnabled(hasRightMatReqAdm);
         jmiReqMatCostCenterGrp.setEnabled(hasRightMatReqAdm);
         jmiReqMatConsumptionEnt.setEnabled(hasRightMatReqAdm);
@@ -1792,6 +1802,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiReqPurPendDet) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+            }
+            else if (item == jmiReqEstDet) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_ESTIMATED, null);
+            }
+            else if (item == jmiReqPendEstDet) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE, null);
             }
             else if (item == jmiReqMatPresentation) {
                 miClient.getSession().showView(SModConsts.TRNU_MAT_PRES, SLibConstants.UNDEFINED, null);

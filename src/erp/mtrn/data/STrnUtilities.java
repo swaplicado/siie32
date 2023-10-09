@@ -1851,8 +1851,9 @@ public abstract class STrnUtilities {
                         + computeMailFooterEndTable();
                 
                 SMailSender sender = null;
-                SMailSender images = null;
-                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, (Map<String, String>) images);
+                Object images = null;
+                Date sentDate = null;
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, (Map<String, String>) images, sentDate);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");
@@ -3195,6 +3196,7 @@ public abstract class STrnUtilities {
      * @param subjectComplement Mail subject complement. Can be null or empty.
      * @param senderReceived In case be null the object sender is created
      * @param imagesMap
+     * @param sentDate
      * @throws java.lang.Exception
      */
     public static void sendMail(final SClientInterface client, final int mmsType, 
@@ -3203,7 +3205,8 @@ public abstract class STrnUtilities {
                                 final ArrayList<String> requestedRecipientsCc, 
                                 final ArrayList<String> requestedRecipientsBcc, 
                                 SMailSender senderReceived,
-                                final Map<String, String> imagesMap) throws Exception {
+                                final Map<String, String> imagesMap,
+                                final Date sentDate) throws Exception {
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         SDbMms mms = getMms(client, mmsType);
@@ -3259,6 +3262,10 @@ public abstract class STrnUtilities {
                     }
                     else {
                         oMail = new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc);
+                    }
+                    
+                    if (sentDate != null) {
+                        oMail.setSentDate(sentDate);
                     }
                     
                     oMail.send();

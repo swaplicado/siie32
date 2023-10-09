@@ -100,6 +100,7 @@ import erp.mod.trn.view.SViewMaterialPresentation;
 import erp.mod.trn.view.SViewMaterialProvisionEntity;
 import erp.mod.trn.view.SViewMaterialRequest;
 import erp.mod.trn.view.SViewMaterialRequestPending;
+import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewValCost;
@@ -625,6 +626,17 @@ public class SModuleTrn extends SGuiModule {
                         break;
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_EST:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "Req x cotizar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "Req cotizadas a detalle";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "Requisiciones x cotizar";
+                        break;
+                }
+                view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
                 break;
             case SModConsts.TRN_MAT_CONS_ENT:
                 view = new SViewMaterialConsumptionEntity(miClient, "Centros de consumo");

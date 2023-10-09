@@ -14,13 +14,11 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mod.SModConsts;
 import erp.mod.bps.db.SDbBizPartner;
-import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mod.trn.db.SDbMaterialRequestEntryNote;
 import erp.mod.trn.db.SMaterialRequestEntryRow;
 import erp.mod.trn.db.SMaterialRequestEstimationUtils;
-import erp.mod.trn.db.SMaterialRequestSupplyRow;
 import erp.mod.trn.db.SProviderMailRow;
 import erp.mtrn.form.SPanelMaterialRequest;
 import java.awt.BorderLayout;
@@ -61,10 +59,6 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
     protected ArrayList<SDbMaterialRequestEntry> mlMaterialRequestEntries;
     protected SGridPaneForm moGridMatReqEty;
     protected SGridPaneForm moGridProviderRows;
-    protected SDbMaintDiogSignature moMaintDiogSignature;
-    protected int mnSegregationId;
-    protected int mnParamMaintUserType;
-    protected int mnItemDefaultId;
     protected int mnBizPartnerPicker;
     protected int mnMailNumber;
     protected boolean mbAreSigned;
@@ -76,9 +70,6 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
     
     private erp.mtrn.form.SPanelMaterialRequest moPanelMatRequest;
     private erp.lib.form.SFormField moFieldBizPartner;
-    
-    protected ArrayList<SMaterialRequestSupplyRow> mlDbMaterialRequestSupplies;
-    protected ArrayList<SMaterialRequestSupplyRow> mlMemoryMaterialRequestSupplies;
 
     /**
      * Creates new form SDialogMaterialRequestEstimation
@@ -558,9 +549,6 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             }
         };
         jpProviderMailRows.add(moGridProviderRows, BorderLayout.CENTER);
-        
-        mnSegregationId = 0;
-        mnItemDefaultId = 0;
         mnMailNumber = 1;
         
         moPanelMatRequest = new SPanelMaterialRequest((SClientInterface) miClient, "de origen");
@@ -593,15 +581,11 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
      * Mostrar registros en la tabla superior
      */
     @SuppressWarnings("unchecked")
-    private void showMaterialRequestEntries(boolean bReset) {
+    private void showMaterialRequestEntries() {
         Vector<SGridRow> rows = new Vector<>();
 
         try {
             moGridMatReqEty.clearGridRows();
-            if (bReset) {
-                mbAreSigned = false;
-                mlDbMaterialRequestSupplies = new ArrayList<>();
-            }
             
             mlMaterialRequestEntries = moMaterialRequest.getChildEntries();
             for (SDbMaterialRequestEntry oMaterialRequestEntry : mlMaterialRequestEntries) {
@@ -666,6 +650,9 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             oMatReqRow.setAuxToEstimate(0d);
             oMatReqRow.setAuxIsToEstimate(false);
         }
+        
+        moGridMatReqEty.renderGridRows();
+        moGridMatReqEty.setSelectedGridRow(0);
     }
     
     private void actionPickBizPartner() {
@@ -844,7 +831,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     if (moMaterialRequest.getQueryResultId() == SDbConsts.READ_OK) {
                         moPanelMatRequest.setMaterialRequest(moMaterialRequest);
                         mnMailNumber = SMaterialRequestEstimationUtils.getNextMailNumberOfMatRequest(miClient.getSession().getStatement(), moMaterialRequest.getPkMatRequestId());
-                        showMaterialRequestEntries(true);
+                        showMaterialRequestEntries();
                     }
                 }
                 catch (Exception ex) {
