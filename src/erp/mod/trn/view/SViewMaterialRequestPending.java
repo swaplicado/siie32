@@ -363,9 +363,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
                 select = "i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                         + "SUM(ve.qty) AS org_qty, "
-                        + "COALESCE(de.sumi_qty, 0) AS sumi_qty, "
+                        + "COALESCE(SUM(de.sumi_qty), 0) AS sumi_qty, "
                         + "COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, "
-                        + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per, "
+                        + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per, "
                         + "rpe.name AS ety_pty, "
                         + "ve.dt_req_n, ";
                 join += "INNER JOIN erp.itmu_item AS i ON ve.fk_item = i.id_item "
@@ -374,13 +374,13 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 groupOrderBy = "ve.id_mat_req, ve.id_ety ";
                 subGroupOrderBy = "de.fid_mat_req_n, de.fid_mat_req_ety_n ";
                 where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = 'C' ";
-                subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
+//                subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 //having = "HAVING per < 1 "; // Descomentar para mostrar unicamente los que faltan por suministrar
             }
             else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED) {
                 select = "COUNT(ve.id_ety) AS ety, " 
-                        + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
-                        + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, ";
+                        + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_sumi, " 
+                        + "1 - COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_x_sumi, ";
                 where += (where.isEmpty() ? "" : "AND ") + "AND v.tp_req = 'C' ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
                 subGroupOrderBy = "de.fid_mat_req_n ";
@@ -388,10 +388,10 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             else if (mnGridSubtype == SLibConsts.UNDEFINED) {
                 select = "COUNT(ve.id_ety) AS ety, " 
-                        + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
-                        + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, ";
+                        + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_sumi, " 
+                        + "1 - COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_x_sumi, ";
                 where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = 'C' ";
-                subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
+//                subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
                 subGroupOrderBy = "de.fid_mat_req_n ";
                 //having = "HAVING per_sumi < 1 ";
@@ -399,20 +399,20 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         }
         else if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
             select = "SUM(ve.qty) AS org_qty, "
-                    + "COALESCE(de.sumi_qty, 0) AS sumi_qty, "
-                    + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
-                    + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, "
-                    + "COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0)) AS per_pur, "
-                    + "IF ((1 - COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0))) < 0, 0, "
-                    + "1 - COALESCE(req_pur.pur_qty, 0) / (SUM(ve.qty) - COALESCE(de.sumi_qty, 0))) AS per_x_pur, ";
+                    + "COALESCE(SUM(de.sumi_qty), 0) AS sumi_qty, "
+                    + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_sumi, " 
+                    + "1 - COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_x_sumi, "
+                    + "IF(COALESCE(SUM(req_pur.pur_qty), 0) > (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0)), (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0)), COALESCE(SUM(req_pur.pur_qty), 0)) / (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0)) AS per_pur, "
+                    + "IF((1 - COALESCE(SUM(req_pur.pur_qty), 0) / (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0))) < 0, 0, "
+                    + "1 - COALESCE(SUM(req_pur.pur_qty), 0) / (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0))) AS per_x_pur, ";
             
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
                 select += "i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                         + "COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, "
-                        + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per, "
-                        + "COALESCE(req_pur.pur_qty, 0) AS pur_qty,"
-                        + "COALESCE(IF((SUM(ve.qty) - COALESCE(de.sumi_qty, 0) - COALESCE(req_pur.pur_qty, 0)) < 0, 0, (SUM(ve.qty) - COALESCE(de.sumi_qty, 0) - COALESCE(req_pur.pur_qty, 0))), "
-                        + "SUM(ve.qty) - COALESCE(de.sumi_qty, 0)) AS pen_pur_qty, "
+                        + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per, "
+                        + "COALESCE(SUM(req_pur.pur_qty), 0) AS pur_qty,"
+                        + "COALESCE(IF((SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0) - COALESCE(SUM(req_pur.pur_qty), 0)) < 0, 0, (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0) - COALESCE(SUM(req_pur.pur_qty), 0))), "
+                        + "SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0)) AS pen_pur_qty, "
                         + "rpe.name AS ety_pty, "
                         + "ve.dt_req_n, ";
                 join += "INNER JOIN erp.itmu_item AS i ON ve.fk_item = i.id_item "
@@ -432,6 +432,11 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             
             where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
         }
+        
+        subWhere += "AND d.fid_ct_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[0] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[0] + ") ";
+        subWhere += "AND d.fid_cl_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[1] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[1] + ") ";
+        subWhere += "AND d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[2] + ") ";
+        
         if (usrId != 2 || !mbHasAdmRight) { // SUPER
             join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "  
                     +  "pe.id_mat_prov_ent = peu.id_mat_prov_ent ";
@@ -513,25 +518,24 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         msSql += "LEFT JOIN (SELECT "
                 + "ddmr.fid_mat_req, "
                 + "ddmr.fid_mat_req_ety, "
-                + "SUM(ddmr.qty * IF(1 = 1, 1, - 1)) AS pur_qty "
+                + "SUM(ddmr.qty) AS pur_qty "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS ddmr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON "
-                + "ddmr.fid_dps_year = dps.id_year AND ddmr.fid_dps_doc = dps.id_doc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dpsety ON "
                 + "ddmr.fid_dps_year = dpsety.id_year AND ddmr.fid_dps_doc = dpsety.id_doc AND ddmr.fid_dps_ety = dpsety.id_ety "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON ddmr.fid_mat_req = mr.id_mat_req "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON "
+                + "dpsety.id_year = dps.id_year AND dpsety.id_doc = dps.id_doc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS mre ON "
+                + "ddmr.fid_mat_req = mre.id_mat_req AND ddmr.fid_mat_req_ety = mre.id_ety "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON "
+                + "mre.id_mat_req = mr.id_mat_req "
                 + "WHERE "
                 + "NOT dps.b_del AND NOT dpsety.b_del AND NOT mr.b_del "
                 + "AND dps.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                 + "AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                 + "AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                + "\n #AND mr.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " "
-                + "\n #AND NOT mr.fk_usr_clo_pur "
-                + "\n GROUP BY ddmr.fid_mat_req "
-                + "ORDER BY ddmr.fid_mat_req) AS req_pur ON ve.id_mat_req = req_pur.fid_mat_req ";
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
-            msSql += "AND ve.id_ety = req_pur.fid_mat_req_ety ";
-        }
+                + "GROUP BY ddmr.fid_mat_req " + (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL ? ", ddmr.fid_mat_req_ety " : "")
+                + "ORDER BY ddmr.fid_mat_req) AS req_pur ON "
+                + "ve.id_mat_req = req_pur.fid_mat_req AND ve.id_ety = req_pur.fid_mat_req_ety ";
         msSql += join
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "GROUP BY " + groupOrderBy + " " 
