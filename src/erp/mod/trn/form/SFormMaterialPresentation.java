@@ -25,7 +25,7 @@ public class SFormMaterialPresentation extends sa.lib.gui.bean.SBeanForm {
     private SDbMaterialPresentation moRegistry;
     
     /**
-     * Creates new form SFormItemCost
+     * Creates new form SFormMaterialPresentation
      * @param client
      * @param title
      */
