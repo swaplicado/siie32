@@ -546,14 +546,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqRevAll = new JMenuItem("RM aprobadas/rechazadas");
         
         jmMenuConsSupPendReq = new JMenu("RM de consumo por suministrar");
-        jmiReqConsSupPend = new JMenuItem("RM de consumo por suministrar");
-        jmiReqConsSupPendDet = new JMenuItem("RM de consumo por suministrar a detalle");
-        jmiReqConsSup = new JMenuItem("RM de consumo suministradas");
+        jmiReqConsSupPend = new JMenuItem("RM por suministrar");
+        jmiReqConsSupPendDet = new JMenuItem("RM por suministrar a detalle");
+        jmiReqConsSup = new JMenuItem("RM suministradas");
         
         jmMenuStockSupPendReq = new JMenu("RM de suministro por suministrar");
-        jmiReqStockSupPend = new JMenuItem("RM de suministro por suministrar");
-        jmiReqStockSupPendDet = new JMenuItem("RM de suministro por suministrar a detalle");
-        jmiReqStockSup = new JMenuItem("RM de suministro suministradas");
+        jmiReqStockSupPend = new JMenuItem("RM por suministrar");
+        jmiReqStockSupPendDet = new JMenuItem("RM por suministrar a detalle");
+        jmiReqStockSup = new JMenuItem("RM suministradas");
         
         jmiReqPurPend = new JMenuItem("RM por comprar");
         jmiReqPurPendDet = new JMenuItem("RM por comprar a detalle");

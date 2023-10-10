@@ -128,6 +128,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 if (form.validateForm().isValid()) {
                     form.getRegistry().save(miClient.getSession());
                 }
+                this.refreshGridWithRefresh();
             }
             catch(Exception e) {
                 miClient.showMsgBoxError(e.getMessage());

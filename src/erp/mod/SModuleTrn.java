@@ -98,6 +98,7 @@ import erp.mod.trn.view.SViewMaterialConsumptionSubentity;
 import erp.mod.trn.view.SViewMaterialCostCenterGroup;
 import erp.mod.trn.view.SViewMaterialPresentation;
 import erp.mod.trn.view.SViewMaterialProvisionEntity;
+import erp.mod.trn.view.SViewMaterialRequesPendingSupply;
 import erp.mod.trn.view.SViewMaterialRequest;
 import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
@@ -253,6 +254,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAT_REQ:
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
+            case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 registry = new SDbMaterialRequest();
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
@@ -614,7 +616,7 @@ public class SModuleTrn extends SGuiModule {
                     case SLibConsts.UNDEFINED: title = "RM de suministro x suministrar";
                         break;
                 }
-                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_SUP, subtype, title, params);
+                view = new SViewMaterialRequesPendingSupply(miClient, SModConsts.TRNX_MAT_REQ_STK_SUP, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 switch(subtype) {
@@ -810,6 +812,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAT_REQ:
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
+            case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
                 form = moFormMaterialReq;
                 break;

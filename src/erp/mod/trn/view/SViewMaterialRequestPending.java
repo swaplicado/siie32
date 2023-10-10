@@ -380,8 +380,8 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED) {
                 select = "COUNT(ve.id_ety) AS ety, " 
                         + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_sumi, " 
-                        + "1 - COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_x_sumi, ";
-                where += (where.isEmpty() ? "" : "AND ") + "AND v.tp_req = 'C' ";
+                        + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, ";
+                where += (where.isEmpty() ? "" : "AND ") + " v.tp_req = 'C' ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
                 subGroupOrderBy = "de.fid_mat_req_n ";
                 having = "HAVING per_sumi >= 1 OR v.b_clo_prov ";
