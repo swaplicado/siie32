@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 222.0/ 2023-10-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de las requisiciones de materiales de tipo "S".
+2) Implementación de la importación de las entradas de inventarios desde archivo externo.
+
+================================================================================
 SIIE 3.2 220.1/ 2023-10-03
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
