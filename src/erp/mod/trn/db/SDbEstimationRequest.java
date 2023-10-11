@@ -25,9 +25,9 @@ public class SDbEstimationRequest extends SDbRegistryUser {
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
-    protected Date mtTsUserInsert;
-    protected Date mtTsUserUpdate;
     */
+    protected Date mtTsUser;
+//    protected Date mtTsUserUpdate;
     
     protected ArrayList<SDbEstimationRequestEntry> maChildEntries;
     protected ArrayList<SDbEstimationRequestRecipient> maRecipients;
@@ -96,14 +96,14 @@ public class SDbEstimationRequest extends SDbRegistryUser {
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
     public void setFkUserId(int n) { mnFkUserId = n; }
-    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
+    public void setTsUser(Date t) { mtTsUser = t; }
 
     public int getPkEstimationRequestId() { return mnPkEstimationRequestId; }
     public int getNumber() { return mnNumber; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
     public int getFkUserId() { return mnFkUserId; }
-    public Date getTsUserInsert() { return mtTsUserInsert; }
+    public Date getTsUser() { return mtTsUser; }
 
     public ArrayList<SDbEstimationRequestEntry> getChildEntries() { return maChildEntries; }
     public ArrayList<SDbEstimationRequestRecipient> getChildRecipients() { return maRecipients; }
@@ -129,7 +129,7 @@ public class SDbEstimationRequest extends SDbRegistryUser {
         mbDeleted = false;
         mnFkMatRequestId_n = 0;
         mnFkUserId = 0;
-        mtTsUserInsert = null;
+        mtTsUser = null;
         
         maChildEntries = new ArrayList<>();
         maRecipients = new ArrayList<>();
@@ -182,7 +182,7 @@ public class SDbEstimationRequest extends SDbRegistryUser {
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkMatRequestId_n = resultSet.getInt("fk_mat_req_n");
             mnFkUserId = resultSet.getInt("fk_usr");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mtTsUser = resultSet.getTimestamp("ts_usr");
             
             // Read aswell child registries:
             
@@ -230,7 +230,7 @@ public class SDbEstimationRequest extends SDbRegistryUser {
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_mat_req_n = " + mnFkMatRequestId_n + ", " +
                     "fk_usr = " + mnFkUserId + ", " +
-                    "ts_usr_ins = " + "NOW()" + " " +
+                    "ts_usr = " + "NOW()" + " " +
                     getSqlWhere();
         }
         
