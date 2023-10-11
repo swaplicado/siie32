@@ -426,6 +426,8 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         moTextCC.setTextCaseType(SGuiConsts.TEXT_CASE_LOWER);
         moTextCCO.setTextSettings(jlCCO.getText(), 250);
         moTextCCO.setTextCaseType(SGuiConsts.TEXT_CASE_LOWER);
+        moTextSubject.setTextSettings(jlSubject.getText(), 250);
+        moTextSubject.setTextCaseType(0);
         
         mnBizPartnerPicker = SDataConstants.BPSX_BP_SUP;
         
