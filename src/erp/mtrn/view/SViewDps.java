@@ -47,7 +47,7 @@ import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
-import erp.mtrn.form.SDialogMatReqDpsLink;
+import erp.mtrn.form.SDialogDpsMaterialRequestLink;
 import erp.mtrn.form.SDialogPrintCfdiMasive;
 import erp.mtrn.form.SDialogUpdateDpsDate;
 import erp.mtrn.form.SDialogUpdateDpsDeliveryAddress;
@@ -1002,7 +1002,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
     
     private void actionImportMaterialRequest() {
-        SDialogMatReqDpsLink oDialog = new SDialogMatReqDpsLink(miClient, getDpsTypeKey());
+        SDialogDpsMaterialRequestLink oDialog = new SDialogDpsMaterialRequestLink(miClient, getDpsTypeKey());
         oDialog.setValue(SDataConstants.TRN_DPS, null);
         oDialog.setFormVisible(true);
         if (oDialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {

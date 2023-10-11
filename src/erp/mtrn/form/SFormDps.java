@@ -7684,7 +7684,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private void actionImportEntryFromMatReq() {
-        SDialogMatReqDpsLink oDialog = new SDialogMatReqDpsLink(miClient, moDps.getDpsTypeKey());
+        SDialogDpsMaterialRequestLink oDialog = new SDialogDpsMaterialRequestLink(miClient, moDps.getDpsTypeKey());
         oDialog.setValue(SDataConstants.TRN_DPS, moDps);
         oDialog.setFormVisible(true);
         if (oDialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {

@@ -447,7 +447,7 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_REPL = 207053;
     public static final int TRN_DPS_DPS_SUPPLY = 207054;
     public static final int TRN_DPS_DPS_ADJ = 207055; 
-    public static final int TRN_DPS_DPS_MAT_REQ = 207066;
+    public static final int TRN_DPS_MAT_REQ = 207066;
     public static final int TRN_DPS_IOG_CHG = 207056;
     public static final int TRN_DPS_IOG_WAR = 207057;
     public static final int TRN_DPS_REC = 207058;
@@ -991,7 +991,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
         TablesMap.put(TRN_DPS_DPS_ADJ, "trn_dps_dps_adj");
-        TablesMap.put(TRN_DPS_DPS_MAT_REQ, "trn_dps_dps_mat_req");
+        TablesMap.put(TRN_DPS_MAT_REQ, "trn_dps_mat_req");
         TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
         TablesMap.put(TRN_DPS_REC, "trn_dps_rec");

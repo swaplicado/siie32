@@ -519,7 +519,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "ddmr.fid_mat_req, "
                 + "ddmr.fid_mat_req_ety, "
                 + "SUM(ddmr.qty) AS pur_qty "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS ddmr "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS ddmr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dpsety ON "
                 + "ddmr.fid_dps_year = dpsety.id_year AND ddmr.fid_dps_doc = dpsety.id_doc AND ddmr.fid_dps_ety = dpsety.id_ety "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON "

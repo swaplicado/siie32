@@ -175,7 +175,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> mvDbmsEntryCommissions;
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> mvDbmsEntryPrices;
     protected ArrayList<SDataDpsEntryAnalysis> mlDbmsDpsEntryAnalysis;
-    protected SDataDpsDpsMaterialRequestLink moDbmsDpsEntryMatRequestLink;
+    protected SDataDpsMaterialRequest moDbmsDpsEntryMatRequest;
 
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsSource;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsDestiny;
@@ -208,7 +208,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryCommissions = new Vector<>();
         mvDbmsEntryPrices = new Vector<>();
         mlDbmsDpsEntryAnalysis = new ArrayList<>();
-        moDbmsDpsEntryMatRequestLink = null;
+        moDbmsDpsEntryMatRequest = null;
 
         mvDbmsDpsLinksAsSource = new Vector<>();
         mvDbmsDpsLinksAsDestiny = new Vector<>();
@@ -455,7 +455,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsAddElektraParts(int n) { mnDbmsAddElektraParts = n; }
     public void setDbmsAddElektraPartPriceUnitary(double d) { mdDbmsAddElektraPartPriceUnitary = d; }
     public void setDbmsAddJsonData(java.lang.String s) { msDbmsAddJsonData = s; }
-    public void setDbmsDpsEntryMatRequestLink(SDataDpsDpsMaterialRequestLink o) { moDbmsDpsEntryMatRequestLink = o; }
+    public void setDbmsDpsEntryMatRequest(SDataDpsMaterialRequest o) { moDbmsDpsEntryMatRequest = o; }
 
     public int getDbmsFkItemGenericId() { return mnDbmsFkItemGenericId; }
     public boolean getDbmsItemGenDataShipDomesticReq() { return mbDbmsItemGenDataShipDomesticReq; }
@@ -498,7 +498,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> getDbmsEntryCommissions() { return mvDbmsEntryCommissions; }
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> getDbmsEntryPrices() { return mvDbmsEntryPrices; }
     public ArrayList<SDataDpsEntryAnalysis> getDbmsDpsEntryAnalysis() { return mlDbmsDpsEntryAnalysis; }
-    public SDataDpsDpsMaterialRequestLink getDbmsDpsEntryMatRequestLink() { return moDbmsDpsEntryMatRequestLink; }
+    public SDataDpsMaterialRequest getDbmsDpsEntryMatRequestLink() { return moDbmsDpsEntryMatRequest; }
 
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsSource() { return mvDbmsDpsLinksAsSource; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsDestiny() { return mvDbmsDpsLinksAsDestiny; }
@@ -690,7 +690,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryCommissions.clear();
         mvDbmsEntryPrices.clear();
         mlDbmsDpsEntryAnalysis.clear();
-        moDbmsDpsEntryMatRequestLink = null;
+        moDbmsDpsEntryMatRequest = null;
 
         mvDbmsDpsLinksAsSource.clear();
         mvDbmsDpsLinksAsDestiny.clear();
@@ -1121,22 +1121,22 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     
                     // Read Dps Ety links to Material Requests
                     sql = "SELECT "
-                            + " id_dps_dps_mat_req_id "
+                            + " id_dps_mat_req "
                             + "FROM "
-                            + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_MAT_REQ) + " "
+                            + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_MAT_REQ) + " "
                             + "WHERE "
                             + "fid_dps_year = " + mnPkYearId + " AND "
                             + "fid_dps_doc = " + mnPkDocId + " AND "
                             + "fid_dps_ety = " + mnPkEntryId + " "
-                            + "ORDER BY fid_mat_req ASC, fid_mat_req_ety ASC, id_dps_dps_mat_req_id ASC "
+                            + "ORDER BY fid_mat_req ASC, fid_mat_req_ety ASC, id_dps_mat_req ASC "
                             + "LIMIT 1;";
         
-                    moDbmsDpsEntryMatRequestLink = null;
+                    moDbmsDpsEntryMatRequest = null;
                     ResultSet resultLinks = statement.executeQuery(sql);
                     if (resultLinks.next()) {
-                        SDataDpsDpsMaterialRequestLink oEtyMatReqLink = new SDataDpsDpsMaterialRequestLink();
-                        oEtyMatReqLink.read(new int[] { resultLinks.getInt("id_dps_dps_mat_req_id") }, statement.getConnection().createStatement());
-                        moDbmsDpsEntryMatRequestLink = oEtyMatReqLink;
+                        SDataDpsMaterialRequest oEtyMatReqLink = new SDataDpsMaterialRequest();
+                        oEtyMatReqLink.read(new int[] { resultLinks.getInt("id_dps_mat_req") }, statement.getConnection().createStatement());
+                        moDbmsDpsEntryMatRequest = oEtyMatReqLink;
                     }
                     
                     mbFlagOpenedByMatRequestImport = true;
@@ -1477,20 +1477,20 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     }
                     
                     // Save dps mat reqs links
-                    if (moDbmsDpsEntryMatRequestLink != null) {
-                        String sql = "DELETE FROM trn_dps_dps_mat_req " +
+                    if (moDbmsDpsEntryMatRequest != null) {
+                        String sql = "DELETE FROM trn_dps_mat_req " +
                                 "WHERE fid_dps_year = " + mnPkYearId + " "
                                 + "AND fid_dps_doc = " + mnPkDocId + " "
                                 + "AND fid_dps_ety = " + mnPkEntryId + ";";
                         statement.execute(sql);
-                        moDbmsDpsEntryMatRequestLink.setPkDpsDpsMatReqId(0);
-                        moDbmsDpsEntryMatRequestLink.setFkDpsYearId(mnPkYearId);
-                        moDbmsDpsEntryMatRequestLink.setFkDpsDocId(mnPkDocId);
-                        moDbmsDpsEntryMatRequestLink.setFkDpsEntryId(mnPkEntryId);
-                        moDbmsDpsEntryMatRequestLink.setIsRegistryNew(true);
-                        moDbmsDpsEntryMatRequestLink.save(connection);
+                        moDbmsDpsEntryMatRequest.setPkDpsMatReqId(0);
+                        moDbmsDpsEntryMatRequest.setFkDpsYearId(mnPkYearId);
+                        moDbmsDpsEntryMatRequest.setFkDpsDocId(mnPkDocId);
+                        moDbmsDpsEntryMatRequest.setFkDpsEntryId(mnPkEntryId);
+                        moDbmsDpsEntryMatRequest.setIsRegistryNew(true);
+                        moDbmsDpsEntryMatRequest.save(connection);
 
-                        if (moDbmsDpsEntryMatRequestLink.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
+                        if (moDbmsDpsEntryMatRequest.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
                             throw new Exception("Ocurrió un error al guardar el vínculo con la requisición, contacte a soporte técnico");
                         }
                     }
@@ -1948,7 +1948,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.getDbmsEntryCommissions().addAll(mvDbmsEntryCommissions);
         clone.getDbmsEntryPrices().addAll(mvDbmsEntryPrices);
         clone.getDbmsDpsEntryAnalysis().addAll(mlDbmsDpsEntryAnalysis);
-        clone.setDbmsDpsEntryMatRequestLink(moDbmsDpsEntryMatRequestLink);
+        clone.setDbmsDpsEntryMatRequest(moDbmsDpsEntryMatRequest);
 
         clone.getDbmsDpsLinksAsSource().addAll(mvDbmsDpsLinksAsSource);
         clone.getDbmsDpsLinksAsDestiny().addAll(mvDbmsDpsLinksAsDestiny);

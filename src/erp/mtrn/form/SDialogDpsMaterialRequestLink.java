@@ -16,7 +16,7 @@ import erp.mod.fin.db.SFinUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SDataDpsDpsMaterialRequestLink;
+import erp.mtrn.data.SDataDpsMaterialRequest;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryNotes;
 import erp.mtrn.data.SDataMaterialRequestEntryLinkRow;
@@ -38,7 +38,7 @@ import javax.swing.event.ListSelectionEvent;
  *
  * @author Edwin Carmona
  */
-public class SDialogMatReqDpsLink extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, java.awt.event.ItemListener {
+public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, java.awt.event.ItemListener {
 
     private erp.client.SClientInterface miClient;
     private int mnOptionType;
@@ -60,7 +60,7 @@ public class SDialogMatReqDpsLink extends javax.swing.JDialog implements erp.lib
     /** Creates new form SDialogDpsLink
      * @param client
      * @param dpsType */
-    public SDialogMatReqDpsLink(erp.client.SClientInterface client, final int[] dpsType) {
+    public SDialogDpsMaterialRequestLink(erp.client.SClientInterface client, final int[] dpsType) {
         super(client.getFrame(), true);
         miClient = client;
         mnOptionType = SDataConstants.TRNX_DPS_MAT_REQ_LINKS;
@@ -389,7 +389,7 @@ public class SDialogMatReqDpsLink extends javax.swing.JDialog implements erp.lib
                 moMaterialRequest.read(miClient.getSession(), (int[]) moDialogPickerMatRequest.getSelectedPrimaryKey());
             }
             catch (Exception ex) {
-                Logger.getLogger(SDialogMatReqDpsLink.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SDialogDpsMaterialRequestLink.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             actionShowMaterialRequest();
@@ -514,7 +514,7 @@ public class SDialogMatReqDpsLink extends javax.swing.JDialog implements erp.lib
                 }
 
                 // Links con requisición de materiales
-                SDataDpsDpsMaterialRequestLink oDpsMatReqLink = new SDataDpsDpsMaterialRequestLink();
+                SDataDpsMaterialRequest oDpsMatReqLink = new SDataDpsMaterialRequest();
                 oDpsMatReqLink.setQuantity(oEntry.getOriginalQuantity());
                 oDpsMatReqLink.setValue(oEntry.getPriceUnitary());
                 oDpsMatReqLink.setValueCy(oEntry.getPriceUnitaryCy());
@@ -524,7 +524,7 @@ public class SDialogMatReqDpsLink extends javax.swing.JDialog implements erp.lib
                 oDpsMatReqLink.setFkMaterialRequestId(oTableRow.getMaterialRequestEntry().getPkMatRequestId());
                 oDpsMatReqLink.setFkMaterialRequestEntryId(oTableRow.getMaterialRequestEntry().getPkEntryId());
 
-                oEntry.setDbmsDpsEntryMatRequestLink(oDpsMatReqLink);
+                oEntry.setDbmsDpsEntryMatRequest(oDpsMatReqLink);
                 
                 // Notas de las partidas para indicar visualmente el link con la requisición
                 SDataDpsEntryNotes oNote = new SDataDpsEntryNotes();

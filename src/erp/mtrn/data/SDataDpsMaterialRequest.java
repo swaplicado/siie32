@@ -17,9 +17,9 @@ import java.util.logging.Logger;
  *
  * @author Edwin Carmona
  */
-public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataDpsMaterialRequest extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
-    protected int mnPkDpsDpsMatReqId;
+    protected int mnPkDpsMatReqId;
     protected double mdQuantity;
     protected double mdValue;
     protected double mdValueCy;
@@ -32,12 +32,12 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
     /**
      * Overrides java.lang.Object.clone() function.
      */
-    public SDataDpsDpsMaterialRequestLink() {
-        super(SDataConstants.TRN_DPS_DPS_MAT_REQ);
+    public SDataDpsMaterialRequest() {
+        super(SDataConstants.TRN_DPS_MAT_REQ);
         reset();
     }
 
-    public void setPkDpsDpsMatReqId(int n) { mnPkDpsDpsMatReqId = n; }
+    public void setPkDpsMatReqId(int n) { mnPkDpsMatReqId = n; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setValue(double d) { mdValue = d; }
     public void setValueCy(double d) { mdValueCy = d; }
@@ -47,7 +47,7 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
     public void setFkMaterialRequestId(int n) { mnFkMaterialRequestId = n; }
     public void setFkMaterialRequestEntryId(int n) { mnFkMaterialRequestEntryId = n; }
 
-    public int getPkDpsDpsMatReqId() { return mnPkDpsDpsMatReqId; }
+    public int getPkDpsMatReqId() { return mnPkDpsMatReqId; }
     public double getQuantity() { return mdQuantity; }
     public double getValue() { return mdValue; }
     public double getValueCy() { return mdValueCy; }
@@ -64,19 +64,19 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
-        mnPkDpsDpsMatReqId = ((int[]) pk)[0];
+        mnPkDpsMatReqId = ((int[]) pk)[0];
     }
 
     @Override
     public java.lang.Object getPrimaryKey() {
-        return new int[] { mnPkDpsDpsMatReqId };
+        return new int[] { mnPkDpsMatReqId };
     }
 
     @Override
     public void reset() {
         super.resetRegistry();
 
-        mnPkDpsDpsMatReqId = 0;
+        mnPkDpsMatReqId = 0;
         mdQuantity = 0;
         mdValue = 0;
         mdValueCy = 0;
@@ -97,15 +97,15 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
         reset();
 
         try {
-            sql = "SELECT * FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_MAT_REQ) + " " +
-                    "WHERE id_dps_dps_mat_req_id = " + key[0] + " ";
+            sql = "SELECT * FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_MAT_REQ) + " " +
+                    "WHERE id_dps_mat_req = " + key[0] + " ";
 
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
-                mnPkDpsDpsMatReqId = resultSet.getInt("id_dps_dps_mat_req_id");
+                mnPkDpsMatReqId = resultSet.getInt("id_dps_mat_req");
                 mdQuantity = resultSet.getDouble("qty");
                 mdValue = resultSet.getDouble("val");
                 mdValueCy = resultSet.getDouble("val_cur");
@@ -138,18 +138,18 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
 
         try {
             if (mbIsRegistryNew) {
-                sql = "SELECT COALESCE(MAX(id_dps_dps_mat_req_id) + 1, 1) AS new_id "
-                        + "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_MAT_REQ) + " ";
+                sql = "SELECT COALESCE(MAX(id_dps_mat_req) + 1, 1) AS new_id "
+                        + "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_MAT_REQ) + " ";
 
                 ResultSet resultSet = connection.createStatement().executeQuery(sql);
                 if (!resultSet.next()) {
                     throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
                 }
                 else {
-                    mnPkDpsDpsMatReqId = resultSet.getInt("new_id");
+                    mnPkDpsMatReqId = resultSet.getInt("new_id");
                     
-                    sql = "INSERT INTO " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_MAT_REQ) + " VALUES (" +
-                                mnPkDpsDpsMatReqId + ", " + 
+                    sql = "INSERT INTO " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_MAT_REQ) + " VALUES (" +
+                                mnPkDpsMatReqId + ", " + 
                                 mdQuantity + ", " + 
                                 mdValue + ", " + 
                                 mdValueCy + ", " + 
@@ -162,8 +162,8 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
                 }
             }
             else {
-                sql = "UPDATE " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_MAT_REQ) + " SET " +
-//                    "id_dps_dps_mat_req_id = " + mnPkDpsDpsMatReqId + ", " +
+                sql = "UPDATE " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_MAT_REQ) + " SET " +
+//                    "id_dps_mat_req = " + mnPkDpsDpsMatReqId + ", " +
                     "qty = " + mdQuantity + ", " +
                     "val = " + mdValue + ", " +
                     "val_cur = " + mdValueCy + ", " +
@@ -172,7 +172,7 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
                     "fid_dps_ety = " + mnFkDpsEntryId + ", " +
                     "fid_mat_req = " + mnFkMaterialRequestId + ", " +
                     "fid_mat_req_ety = " + mnFkMaterialRequestEntryId + " " +
-                    "WHERE id_dps_dps_mat_req_id = " + mnPkDpsDpsMatReqId + ";";
+                    "WHERE id_dps_mat_req = " + mnPkDpsMatReqId + ";";
             }
             
             connection.createStatement().execute(sql);
@@ -181,12 +181,12 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
         }
         catch (SQLException ex) {
-            Logger.getLogger(SDataDpsDpsMaterialRequestLink.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDataDpsMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, ex);
         }
         catch (Exception ex) {
-            Logger.getLogger(SDataDpsDpsMaterialRequestLink.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDataDpsMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, ex);
         }
@@ -199,10 +199,10 @@ public class SDataDpsDpsMaterialRequestLink extends erp.lib.data.SDataRegistry i
         return null;
     }
     
-    public SDataDpsDpsMaterialRequestLink clone() throws CloneNotSupportedException {
-        SDataDpsDpsMaterialRequestLink registry = new SDataDpsDpsMaterialRequestLink();
+    public SDataDpsMaterialRequest clone() throws CloneNotSupportedException {
+        SDataDpsMaterialRequest registry = new SDataDpsMaterialRequest();
         
-        registry.setPkDpsDpsMatReqId(this.getPkDpsDpsMatReqId());
+        registry.setPkDpsMatReqId(this.getPkDpsMatReqId());
         registry.setQuantity(this.getQuantity());
         registry.setValue(this.getValue());
         registry.setValueCy(this.getValueCy());

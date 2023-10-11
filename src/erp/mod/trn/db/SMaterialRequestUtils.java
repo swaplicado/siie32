@@ -498,7 +498,7 @@ public abstract class SMaterialRequestUtils {
      */
     public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType, final int[] pkDpsEtyExcluded) {
         String query = "SELECT SUM(dmr.qty) AS qty_linked FROM "
-                + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr "
+                + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dmr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON dmr.fid_dps_year = dety.id_year "
                                                                                         + "AND dmr.fid_dps_doc = dety.id_doc "
                                                                                         + "AND dmr.fid_dps_ety = dety.id_ety "
@@ -678,7 +678,7 @@ public abstract class SMaterialRequestUtils {
             "dpsmr.* " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS ety " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON ety.id_year = d.id_year AND ety.id_doc = d.id_doc " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dpsmr ON ety.id_year = dpsmr.fid_dps_year AND ety.id_doc = dpsmr.fid_dps_doc AND ety.id_ety = dpsmr.fid_dps_ety " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dpsmr ON ety.id_year = dpsmr.fid_dps_year AND ety.id_doc = dpsmr.fid_dps_doc AND ety.id_ety = dpsmr.fid_dps_ety " +
             "WHERE NOT d.b_del AND NOT ety.b_del AND dpsmr.fid_mat_req = " + pkMatReq[0] + ";";
         
         ResultSet resultSetDps = session.getStatement().getConnection().createStatement().executeQuery(sql);

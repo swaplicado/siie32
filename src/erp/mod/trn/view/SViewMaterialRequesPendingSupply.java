@@ -415,7 +415,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 + "ddmr.fid_mat_req, "
                 + "ddmr.fid_mat_req_ety, "
                 + "SUM(ddmr.qty * IF(1 = 1, 1, - 1)) AS pur_qty "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS ddmr "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS ddmr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON "
                 + "ddmr.fid_dps_year = dps.id_year AND ddmr.fid_dps_doc = dps.id_doc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dpsety ON "
