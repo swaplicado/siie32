@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 223.0/ 2023-10-11
+Edwin Omar CARMONA FIGUEROA
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de solicitudes de cotización.
+2) Trabajo en proceso de personalización de contabilización de documentos.
+
+================================================================================
 SIIE 3.2 222.0/ 2023-10-10
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -14,10 +22,10 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 220.0/ 2023-09-26
-Edwin CARMONA
-Isabel Servín
+Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Release estable de Requisiciones de materiales.
+1) Release estable de requisiciones de materiales.
 
 ================================================================================
 SIIE 3.2 219.0/ 2023-09-05

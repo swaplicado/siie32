@@ -636,7 +636,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Proveedor", 200);
                 }
                 else {
-                    //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.req_num", "Requisicion", STableConstants.WIDTH_CODE_DOC);  
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Proveedor", 200);
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave proveedor", 50);
                 }
