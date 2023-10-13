@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 224/ 2023-10-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación de de tipos de material.
+2) Creación de atributos de materiales.
+3) Creación de tipos de materiales vs atributos de materiales.
+4) Creación de tabla de item vs atributos de materiales.
+6) Modificación de ítems para agregar fk de tipo de material y sus atributos
+
+================================================================================
 SIIE 3.2 223.1/ 2023-10-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
