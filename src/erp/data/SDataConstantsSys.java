@@ -1348,7 +1348,9 @@ public abstract class SDataConstantsSys {
     /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ONE = 215;
     public static final int TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT = 216;
-
+    public static final int TRNX_DPS_CFD_PAY = 217;
+    public static final int TRNX_DPS_CFD_PAY_DONE = 218;
+    
     public static final int TRNX_SAL_TOT = 301;
     public static final int TRNX_SAL_TOT_MONTH = 302;
     public static final int TRNX_SAL_TOT_BY_BP = 303;
@@ -1497,6 +1499,12 @@ public abstract class SDataConstantsSys {
                 break;
             case TRNX_TP_DPS_ADJ:
                 name = "Notas crédito";
+                break;
+            case TRNX_DPS_CFD_PAY:
+                name = "Fact. pendientes rec. de pago";
+                break;
+            case TRNX_DPS_CFD_PAY_DONE:
+                name = "Fact. rec. de pago";
                 break;
             default:
         }

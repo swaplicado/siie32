@@ -19,26 +19,29 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbConfWarehouseVsEntity extends SDbRegistryUser {
+public class SDbConfWarehouseVsConsEntity extends SDbRegistryUser {
     
     protected int mnPkCompanyBranch;
     protected int mnPkWarehouse;
+    protected boolean mbDefault;
     
-    protected ArrayList<SDbMaterialProvisionEntityWarehouse> maProvEntWhs;
+    protected ArrayList<SDbMaterialConsumptionEntityWarehouse> maConsEntWhs;
     
     protected SDataCompanyBranchEntity moAuxCompBrEnt;
 
-    public SDbConfWarehouseVsEntity() {
-        super(SModConsts.TRNX_CONF_WHS_VS_ENT);
+    public SDbConfWarehouseVsConsEntity() {
+        super(SModConsts.TRNX_CONF_WHS_VS_CON_ENT);
     }
     
     public void setPkCompanyBranch(int n) { mnPkCompanyBranch = n; }  
     public void setPkWarehouse(int n) { mnPkWarehouse = n; } 
+    public void setDefault(boolean b) { mbDefault = b; }
     
     public int getPkCompanyBranch() { return mnPkCompanyBranch; }
     public int getPkWarehouse() { return mnPkWarehouse; }
+    public boolean getDefault() { return mbDefault; }
     
-    public ArrayList<SDbMaterialProvisionEntityWarehouse> getProvEntWhs() { return maProvEntWhs; }
+    public ArrayList<SDbMaterialConsumptionEntityWarehouse> getConsEntWhs() { return maConsEntWhs; }
 
     public SDataCompanyBranchEntity getAuxCompBrEnt() { return moAuxCompBrEnt; }
     
@@ -59,8 +62,9 @@ public class SDbConfWarehouseVsEntity extends SDbRegistryUser {
         
         mnPkCompanyBranch = 0;
         mnPkWarehouse = 0;
+        mbDefault = false;
         
-        maProvEntWhs = new ArrayList<>();
+        maConsEntWhs = new ArrayList<>();
         
         moAuxCompBrEnt = null;
     }
@@ -89,7 +93,7 @@ public class SDbConfWarehouseVsEntity extends SDbRegistryUser {
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet;
         Statement statement;
-        SDbMaterialProvisionEntityWarehouse prov;
+        SDbMaterialConsumptionEntityWarehouse cons;
         
         initRegistry();
         initQueryMembers();
@@ -99,14 +103,14 @@ public class SDbConfWarehouseVsEntity extends SDbRegistryUser {
         mnPkWarehouse = pk[1];
         
         statement = session.getDatabase().getConnection().createStatement();
-        msSql = "SELECT id_mat_prov_ent, id_cob, id_whs " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_WHS) + " " +
+        msSql = "SELECT id_mat_cons_ent, id_cob, id_whs " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_WHS) + " " +
                 "WHERE id_cob = " + mnPkCompanyBranch + " AND id_whs = " + mnPkWarehouse + " ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
-            prov = new SDbMaterialProvisionEntityWarehouse();
-            prov.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
-            maProvEntWhs.add(prov);
+            cons = new SDbMaterialConsumptionEntityWarehouse();
+            cons.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
+            maConsEntWhs.add(cons);
         }
         
         moAuxCompBrEnt = new SDataCompanyBranchEntity();
@@ -120,12 +124,13 @@ public class SDbConfWarehouseVsEntity extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_WHS) + " " + 
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_WHS) + " " + 
                 "WHERE id_cob = " + mnPkCompanyBranch + " AND id_whs = " + mnPkWarehouse + " ";
         session.getStatement().execute(msSql);
-        for (SDbMaterialProvisionEntityWarehouse ent : maProvEntWhs) {
+        for (SDbMaterialConsumptionEntityWarehouse ent : maConsEntWhs) {
             ent.setPkCompanyBranchId(mnPkCompanyBranch);
             ent.setPkWarehouseId(mnPkWarehouse);
+            ent.setDefault(mbDefault);
             ent.setRegistryNew(true);
             ent.save(session);
         }
@@ -135,14 +140,15 @@ public class SDbConfWarehouseVsEntity extends SDbRegistryUser {
     }
 
     @Override
-    public SDbConfWarehouseVsEntity clone() throws CloneNotSupportedException {
-        SDbConfWarehouseVsEntity registry = new SDbConfWarehouseVsEntity();
+    public SDbConfWarehouseVsConsEntity clone() throws CloneNotSupportedException {
+        SDbConfWarehouseVsConsEntity registry = new SDbConfWarehouseVsConsEntity();
         
         registry.setPkCompanyBranch(this.getPkCompanyBranch());
         registry.setPkWarehouse(this.getPkWarehouse());
+        registry.setDefault(this.getDefault());
         
-        for (SDbMaterialProvisionEntityWarehouse ew : this.getProvEntWhs()) {
-            registry.getProvEntWhs().add(ew);
+        for (SDbMaterialConsumptionEntityWarehouse ew : this.getConsEntWhs()) {
+            registry.getConsEntWhs().add(ew);
         }
         
         registry.setRegistryNew(this.isRegistryNew());

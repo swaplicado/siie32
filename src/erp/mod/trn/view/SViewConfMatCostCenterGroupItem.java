@@ -46,7 +46,7 @@ public class SViewConfMatCostCenterGroupItem extends SGridPaneView implements Ac
 
         moPaneSettings.setDeletedApplying(false);
         moPaneSettings.setSystemApplying(false);
-        moPaneSettings.setUserInsertApplying(true);
+        moPaneSettings.setUserInsertApplying(false);
         moPaneSettings.setUserUpdateApplying(false);
 
         filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_DELETED)).getValue();
@@ -59,7 +59,6 @@ public class SViewConfMatCostCenterGroupItem extends SGridPaneView implements Ac
                 + "v.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "IF(gi.id_link IS NULL, FALSE, TRUE) AS conf, "
                 + "gi.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                + "gi.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP) + " AS v "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS gi ON "
@@ -78,7 +77,6 @@ public class SViewConfMatCostCenterGroupItem extends SGridPaneView implements Ac
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Grupo de centro de costo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "conf", "Configurado"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         
         return columns;
     }
