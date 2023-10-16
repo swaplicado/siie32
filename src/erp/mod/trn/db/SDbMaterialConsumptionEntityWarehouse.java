@@ -19,65 +19,68 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser implements SGridRow, Serializable {
+public class SDbMaterialConsumptionEntityWarehouse extends SDbRegistryUser implements SGridRow, Serializable {
 
-    protected int mnPkMatProvisionEntityId;
+    protected int mnPkMatConsumptionEntityId;
     protected int mnPkCompanyBranchId;
     protected int mnPkWarehouseId;
+    protected boolean mbDefault;
     protected int mnFkUserId;
     protected Date mtTsUser;
     
-    protected SDbMaterialProvisionEntity moAuxMatProvEnt;
+    protected SDbMaterialConsumptionEntity moAuxMatConsEnt;
     
-    public SDbMaterialProvisionEntityWarehouse() {
-        super(SModConsts.TRN_MAT_PROV_ENT_WHS);
+    public SDbMaterialConsumptionEntityWarehouse() {
+        super(SModConsts.TRN_MAT_CONS_ENT_WHS);
     }
     
-    public void setPkMatProvisionEntityId(int n) { mnPkMatProvisionEntityId = n; }
+    public void setPkMatConsumptionEntityId(int n) { mnPkMatConsumptionEntityId = n; }
     public void setPkCompanyBranchId(int n) { mnPkCompanyBranchId = n; }
     public void setPkWarehouseId(int n) { mnPkWarehouseId = n; }
+    public void setDefault(boolean b) { mbDefault = b; }
     public void setFkUserId(int n) { mnFkUserInsertId = n; }
     public void setTsUser(Date t) { mtTsUserInsert = t; }
 
-    public void setAuxMatProvEnt(SDbMaterialProvisionEntity o) { moAuxMatProvEnt = o; }
+    public void setAuxMatConsEnt(SDbMaterialConsumptionEntity o) { moAuxMatConsEnt = o; }
     
-    public int getPkMatProvisionEntityId() { return mnPkMatProvisionEntityId; }
+    public int getPkMatConsumptionEntityId() { return mnPkMatConsumptionEntityId; }
     public int getPkCompanyBranchId() { return mnPkCompanyBranchId; }
     public int getPkWarehouseId() { return mnPkWarehouseId; }
+    public boolean isDefault() { return mbDefault; }
     public int getFkUserId() { return mnFkUserInsertId; }
     public Date getTsUser() { return mtTsUserInsert; }
 
-
-    public SDbMaterialProvisionEntity getAuxMatProvEnt() { return moAuxMatProvEnt; }
+    public SDbMaterialConsumptionEntity getAuxMatConsEnt() { return moAuxMatConsEnt; }
     
-    public void readAuxMatProvEnt(SGuiSession session) throws Exception {
-        moAuxMatProvEnt = new SDbMaterialProvisionEntity();
-        moAuxMatProvEnt.read(session, new int[] { mnPkMatProvisionEntityId });
+    public void readAuxMatConsEnt(SGuiSession session) throws Exception {
+        moAuxMatConsEnt = new SDbMaterialConsumptionEntity();
+        moAuxMatConsEnt.read(session, new int[] { mnPkMatConsumptionEntityId });
     }
     
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkMatProvisionEntityId = pk[0];
+        mnPkMatConsumptionEntityId = pk[0];
         mnPkCompanyBranchId = pk[1];
         mnPkWarehouseId = pk[2];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkMatProvisionEntityId, mnPkCompanyBranchId, mnPkWarehouseId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkCompanyBranchId, mnPkWarehouseId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkMatProvisionEntityId = 0;
+        mnPkMatConsumptionEntityId = 0;
         mnPkCompanyBranchId = 0;
         mnPkWarehouseId = 0;
+        mbDefault = false;
         mnFkUserInsertId = 0;
         mtTsUserInsert = null;
 
-        moAuxMatProvEnt = null;
+        moAuxMatConsEnt = null;
     }
 
     @Override
@@ -87,14 +90,14 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_mat_prov_ent = " + mnPkMatProvisionEntityId + " " + 
+        return "WHERE id_mat_cons_ent = " + mnPkMatConsumptionEntityId + " " + 
                 "AND id_cob = " + mnPkCompanyBranchId + " " + 
                 "AND id_whs = " + mnPkWarehouseId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_mat_prov_ent = " + pk[0] + " " + 
+        return "WHERE id_mat_cons_ent = " + pk[0] + " " + 
                 "AND id_cob = " + pk[1] + " " + 
                 "AND id_whs = " + pk[2] + " ";
     }
@@ -118,13 +121,14 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkMatProvisionEntityId = resultSet.getInt("id_mat_prov_ent");
+            mnPkMatConsumptionEntityId = resultSet.getInt("id_mat_cons_ent");
             mnPkCompanyBranchId = resultSet.getInt("id_cob");
             mnPkWarehouseId = resultSet.getInt("id_whs");
+            mbDefault = resultSet.getBoolean("b_default");
             mnFkUserId = resultSet.getInt("fk_usr");
             mtTsUser = resultSet.getTimestamp("ts_usr");
 
-            readAuxMatProvEnt(session);
+            readAuxMatConsEnt(session);
             
             mbRegistryNew = false;
         }
@@ -141,18 +145,20 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
         
         if (mbRegistryNew) {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                    mnPkMatProvisionEntityId + ", " + 
+                    mnPkMatConsumptionEntityId + ", " + 
                     mnPkCompanyBranchId + ", " + 
-                    mnPkWarehouseId + ", " + 
+                    mnPkWarehouseId + ", " +
+                    (mbDefault ? 1 : 0) + ", " + 
                     mnFkUserId + ", " + 
                     "NOW()" + " " + 
                     ")";
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    //"id_mat_prov_ent = " + mnPkMatProvisionEntityId + ", " +
+                    //"id_mat_cons_ent = " + mnPkMatProvisionEntityId + ", " +
                     //"id_cob = " + mnPkCompanyBranchId + ", " +
                     //"id_whs = " + mnPkWarehouseId + ", " +
+                    "b_default = " + (mbDefault ? 1 : 0) + ", " +
                     //"fk_usr = " + mnFkUserInsertId + ", " +
                     //"ts_usr = " + "NOW()" + " " +
                     getSqlWhere();
@@ -165,12 +171,13 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
     }
 
     @Override
-    public SDbMaterialProvisionEntityWarehouse clone() throws CloneNotSupportedException {
-        SDbMaterialProvisionEntityWarehouse registry = new SDbMaterialProvisionEntityWarehouse();
+    public SDbMaterialConsumptionEntityWarehouse clone() throws CloneNotSupportedException {
+        SDbMaterialConsumptionEntityWarehouse registry = new SDbMaterialConsumptionEntityWarehouse();
         
-        registry.setPkMatProvisionEntityId(this.getPkMatProvisionEntityId());
+        registry.setPkMatConsumptionEntityId(this.getPkMatConsumptionEntityId());
         registry.setPkCompanyBranchId(this.getPkCompanyBranchId());
         registry.setPkWarehouseId(this.getPkWarehouseId());
+        registry.setDefault(this.isDefault());
         registry.setFkUserId(this.getFkUserId());
         registry.setTsUser(this.getTsUser());
 
@@ -181,7 +188,7 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
 
     @Override
     public int[] getRowPrimaryKey() {
-        return new int[] { mnPkMatProvisionEntityId, mnPkCompanyBranchId, mnPkWarehouseId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkCompanyBranchId, mnPkWarehouseId };
     }
 
     @Override
@@ -219,7 +226,8 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
         Object value = null;
         
         switch (col) {
-            case 0: value = moAuxMatProvEnt.getName(); break;
+            case 0: value = moAuxMatConsEnt.getName(); break;
+            case 1: value = mbDefault; break;
         }
         
         return value;
@@ -227,7 +235,8 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
 
     @Override
     public void setRowValueAt(Object value, int col) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch (col) {
+            case 1: mbDefault = (boolean) value; break;
+        }
     }
-    
 }

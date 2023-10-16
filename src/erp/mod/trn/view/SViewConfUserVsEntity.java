@@ -64,10 +64,10 @@ public class SViewConfUserVsEntity extends SGridPaneView {
                 + "IF(csu.id_ref IS NULL, 0, 1) AS conf_sub, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "ceu.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + "_cons, "
-                + "peu.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + "_prov, "
+                + "peu.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + "_prov, "
                 + "csu.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + "_sub, "
                 + "ceu.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + "_cons, "
-                + "peu.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + "_prov, "
+                + "peu.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + "_prov, "
                 + "csu.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + "_sub, "
                 + "v.ts_edit AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "uic.usr AS " + SDbConsts.FIELD_USER_INS_NAME + "_cons, "
@@ -87,7 +87,7 @@ public class SViewConfUserVsEntity extends SGridPaneView {
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uis ON "
                 + "csu.fk_usr = uis.id_usr "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uip ON "
-                + "peu.fk_usr_ins = uip.id_usr "
+                + "peu.fk_usr = uip.id_usr "
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY v.usr, v.id_usr "; 
     }

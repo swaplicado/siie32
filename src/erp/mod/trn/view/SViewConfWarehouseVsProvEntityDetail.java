@@ -18,14 +18,14 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Isabel Servín
  */
-public class SViewConfWarehouseVsEntityDetail extends SGridPaneView {
+public class SViewConfWarehouseVsProvEntityDetail extends SGridPaneView {
     
     /**
      * @param client GUI client.
      * @param title View's GUI tab title.
      */
-    public SViewConfWarehouseVsEntityDetail(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_DET_WHS_VS_ENT, SLibConsts.UNDEFINED, title, null);
+    public SViewConfWarehouseVsProvEntityDetail(SGuiClient client, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_DET_WHS_VS_PRV_ENT, SLibConsts.UNDEFINED, title, null);
         initComponents();
     }
     
@@ -50,8 +50,8 @@ public class SViewConfWarehouseVsEntityDetail extends SGridPaneView {
                 + "j.name AS entidad, "
                 + "c.ent AS " + SDbConsts.FIELD_CODE + ", "
                 + "c.ent AS " + SDbConsts.FIELD_NAME + ", "
-                + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                + "v.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                + "v.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_WHS) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS j ON "
@@ -59,7 +59,7 @@ public class SViewConfWarehouseVsEntityDetail extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS c ON " 
                 + "v.id_cob = c.id_cob AND v.id_whs = id_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                + "v.fk_usr_ins = ui.id_usr "
+                + "v.fk_usr = ui.id_usr "
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY c.ent, j.name "; 
     }
