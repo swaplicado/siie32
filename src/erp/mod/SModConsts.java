@@ -465,6 +465,7 @@ public abstract class SModConsts {
     public static final int TRN_MAT_CONS_ENT = 2023335;
     public static final int TRN_MAT_CONS_ENT_BUDGET = 2023350;
     public static final int TRN_MAT_CONS_ENT_USR = 2023336;
+    public static final int TRN_MAT_CONS_ENT_WHS = 2023445;
     public static final int TRN_MAT_CONS_SUBENT = 2023337;
     public static final int TRN_MAT_CONS_SUBENT_USR = 2023338;
     public static final int TRN_MAT_CONS_SUBENT_CC = 2023339;
@@ -512,8 +513,8 @@ public abstract class SModConsts {
     public static final int TRNX_DET_USR_VS_ENT = 2024338;
     public static final int TRNX_CONF_EMP_VS_ENT = 2024339;
     public static final int TRNX_DET_EMP_VS_ENT = 2024340;
-    public static final int TRNX_CONF_WHS_VS_ENT = 2024341;
-    public static final int TRNX_DET_WHS_VS_ENT = 2024342;
+    public static final int TRNX_CONF_WHS_VS_PRV_ENT = 2024341;
+    public static final int TRNX_DET_WHS_VS_PRV_ENT = 2024342;
     public static final int TRNX_CONF_SUBENT_VS_CC = 2024343;
     public static final int TRNX_DET_SUBENT_VS_CC = 2024344;
     public static final int TRNX_CONF_SUBENT_VS_CC_GRP = 2024345;
@@ -523,6 +524,8 @@ public abstract class SModConsts {
     public static final int TRNX_CONF_CC_GRP_VS_USR = 2024349;
     public static final int TRNX_DET_CC_GRP_VS_USR = 2024350;
     public static final int TRNX_MAT_REQ_STK_SUP = 2024351;
+    public static final int TRNX_CONF_WHS_VS_CON_ENT = 2024352;
+    public static final int TRNX_DET_WHS_VS_CON_ENT = 2024353;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     
@@ -1231,6 +1234,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAT_CONS_ENT, "trn_mat_cons_ent");
         TablesMap.put(TRN_MAT_CONS_ENT_BUDGET, "trn_mat_cons_ent_budget");
         TablesMap.put(TRN_MAT_CONS_ENT_USR, "trn_mat_cons_ent_usr");
+        TablesMap.put(TRN_MAT_CONS_ENT_WHS, "trn_mat_cons_ent_whs");
         TablesMap.put(TRN_MAT_CONS_SUBENT, "trn_mat_cons_subent");
         TablesMap.put(TRN_MAT_CONS_SUBENT_USR, "trn_mat_cons_subent_usr");
         TablesMap.put(TRN_MAT_CONS_SUBENT_CC, "trn_mat_cons_subent_cc");

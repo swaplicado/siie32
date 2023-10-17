@@ -9,6 +9,13 @@ Edwin Omar CARMONA FIGUEROA
 6) Modificación de ítems para agregar fk de tipo de material y sus atributos
 
 ================================================================================
+
+SIIE 3.2 223.2/ 2023-10-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en las configuraciones para requisiciones.
+
+================================================================================
 SIIE 3.2 223.1/ 2023-10-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

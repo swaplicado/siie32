@@ -573,7 +573,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAccUsrCons = new JMenuItem("Usuarios vs centros de consumo a detalle");
         jmiReqAccUsrProv = new JMenuItem("Usuarios vs centros de suministro a detalle");
         jmiReqEmployeesEntities = new JMenuItem("Empleados vs centros de consumo");
-        jmiReqAccEmpCons = new JMenuItem("Empleados a centros de cosumo a detalle");
+        jmiReqAccEmpCons = new JMenuItem("Empleados vs centros de cosumo a detalle");
         
         jmMenuConfWhsReq = new JMenu("Configuración almacenes");
         jmiReqWarehouseProvisionEnt = new JMenuItem("Almacenes vs centros de suministro");
@@ -674,6 +674,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAccEmpCons.addActionListener(this);
         jmiReqWarehouseProvisionEnt.addActionListener(this);
         jmiReqAccWarehouseProv.addActionListener(this);
+        jmiReqWarehouseConsumptionEnt.addActionListener(this);
+        jmiReqAccWarehouseCons.addActionListener(this);
         jmiReqMatConsumptionSubentCC.addActionListener(this);
         jmiReqAccMatConsumptionSubentCC.addActionListener(this);
         jmiReqMatCostCenterGroupItem.addActionListener(this);
@@ -1843,10 +1845,16 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.TRNX_DET_EMP_VS_ENT, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiReqWarehouseProvisionEnt) {
-                miClient.getSession().showView(SModConsts.TRNX_CONF_WHS_VS_ENT, SLibConstants.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.TRNX_CONF_WHS_VS_PRV_ENT, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiReqAccWarehouseProv) {
-                miClient.getSession().showView(SModConsts.TRNX_DET_WHS_VS_ENT, SLibConstants.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.TRNX_DET_WHS_VS_PRV_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqWarehouseConsumptionEnt) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_WHS_VS_CON_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccWarehouseCons) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_WHS_VS_CON_ENT, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiReqMatConsumptionSubentCC) {
                 miClient.getSession().showView(SModConsts.TRNX_CONF_SUBENT_VS_CC, SLibConstants.UNDEFINED, null);

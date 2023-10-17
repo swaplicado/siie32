@@ -41,7 +41,7 @@ public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implemen
         String where = "";
         Object filter;
         
-        moPaneSettings = new SGridPaneSettings(1);
+        moPaneSettings = new SGridPaneSettings(3);
 
         moPaneSettings.setDeletedApplying(false);
         moPaneSettings.setSystemApplying(false);
@@ -49,10 +49,10 @@ public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implemen
         moPaneSettings.setUserUpdateApplying(true);
 
         msSql = "SELECT v.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, "
+                + "v.id_year AS " + SDbConsts.FIELD_ID + "2, "
+                + "v.id_period AS " + SDbConsts.FIELD_ID + "3, "
                 + "v.id_year AS " + SDbConsts.FIELD_CODE + ", "
-                + "v.id_year AS " + SDbConsts.FIELD_NAME + ", "
-                + "v.id_year, "
-                + "v.id_period, "
+                + "v.id_period AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt_start, "
                 + "v.dt_end, "
                 + "v.budget, "
@@ -79,8 +79,8 @@ public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implemen
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "name", "Centro de consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "id_year", "Año"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, "id_period", "Periodo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, SDbConsts.FIELD_CODE, "Año"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, SDbConsts.FIELD_NAME, "Periodo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_start", "Fecha inicial"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Fecha final"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "budget", "Presupuesto $"));
