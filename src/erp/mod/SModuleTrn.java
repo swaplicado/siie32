@@ -62,6 +62,7 @@ import erp.mod.trn.form.SFormMaterialConsumptionEntityBudget;
 import erp.mod.trn.form.SFormMaterialConsumptionSubentity;
 import erp.mod.trn.form.SFormMaterialCostCenterGroup;
 import erp.mod.trn.form.SFormMaterialPresentation;
+import erp.mod.trn.form.SFormMaterialProvisionEntity;
 import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMaterialRequestCostCenter;
 import erp.mod.trn.form.SFormMmsConfig;
@@ -137,6 +138,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaterialCostCenterGroup moFormMaterialCostCenterGroup;
     private SFormMaterialConsumptionEntity moFormMaterialConsumptionEntity;
     private SFormMaterialConsumptionSubentity moFormMaterialConsumptionSubentity;
+    private SFormMaterialProvisionEntity moFormMaterialProvisionEntity;
     private SFormMaterialPresentation moFormMaterialPresentation;
     private SFormConfUserVsEntity moFormUserVsEntity;
     private SFormConfEmployeeVsEntity moFormEmployeeVsEntity;
@@ -835,7 +837,11 @@ public class SModuleTrn extends SGuiModule {
                 if (moFormMaterialConsumptionSubentity == null) moFormMaterialConsumptionSubentity = new SFormMaterialConsumptionSubentity(miClient, "Subcentro de consumo");
                 form = moFormMaterialConsumptionSubentity;
                 break;
-            case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRN_MAT_PROV_ENT:
+                if (moFormMaterialProvisionEntity == null) moFormMaterialProvisionEntity = new SFormMaterialProvisionEntity(miClient, "Centro de suministro");
+                form = moFormMaterialProvisionEntity;
+                break;
+            case SModConsts.TRN_MAT_REQ: 
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
