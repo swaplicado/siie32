@@ -496,7 +496,7 @@ public class SMaterialRequestUtils {
      */
     public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType) {
         String query = "SELECT SUM(dmr.qty) AS qty_linked FROM " ;
-                + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr ";
+               // + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr ";
         
         if (dpsType != null) {
             query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON drm.id_year = dety.id_year "
