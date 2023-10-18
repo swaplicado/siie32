@@ -8,6 +8,7 @@ package erp.mitm.data;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.table.STableRow;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -114,7 +115,7 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
 
         try {
             sql = "SELECT * FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " WHERE id_mat_att = " + key[0] + " ";
-            resultSet = statement.executeQuery(sql);
+            resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
@@ -156,6 +157,7 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
                 computePrimaryKey(connection.createStatement());
                 mbIsDeleted = false;
                 mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
+                mnFkUserDeleteId = mbIsDeleted ? mnFkUserInsertId : SUtilConsts.USR_NA_ID;
 
                 sql = "INSERT INTO " + SDataConstants.TablesMap.get(mnRegistryType) + " VALUES (" +
                         mnPkMaterialAttributeId + ", " + 

@@ -620,9 +620,9 @@
                     </Component>
                     <Component class="javax.swing.JLabel" name="jLEntryConsEntity">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Centro consumo:"/>
+                        <Property name="text" type="java.lang.String" value="Centro cons.:*"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[90, 23]"/>
+                          <Dimension value="[75, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -632,7 +632,7 @@
                           <StringArray count="0"/>
                         </Property>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[150, 23]"/>
+                          <Dimension value="[200, 23]"/>
                         </Property>
                       </Properties>
                       <AuxValues>
@@ -642,9 +642,9 @@
                     <Component class="javax.swing.JLabel" name="jLEntrySubConsEntity">
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="4"/>
-                        <Property name="text" type="java.lang.String" value="Sub centro consumo:"/>
+                        <Property name="text" type="java.lang.String" value="Subcentro cons.:*"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[110, 23]"/>
+                          <Dimension value="[90, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -654,7 +654,7 @@
                           <StringArray count="0"/>
                         </Property>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[150, 23]"/>
+                          <Dimension value="[240, 23]"/>
                         </Property>
                       </Properties>
                       <AuxValues>
@@ -664,7 +664,7 @@
                     <Component class="javax.swing.JLabel" name="jLEntryCostCenter">
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="4"/>
-                        <Property name="text" type="java.lang.String" value="Centro costo:"/>
+                        <Property name="text" type="java.lang.String" value="Centro costo:*"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
                         </Property>
@@ -676,7 +676,7 @@
                           <StringArray count="0"/>
                         </Property>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[200, 23]"/>
+                          <Dimension value="[210, 23]"/>
                         </Property>
                       </Properties>
                       <AuxValues>
