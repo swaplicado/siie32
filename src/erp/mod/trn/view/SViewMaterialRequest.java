@@ -56,6 +56,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private SDialogAuthorizationCardex moDialogAuthCardex;
     private SDialogMaterialRequestSegregation moDialogSegregations;
     
+    private boolean hasSupReq;
     private boolean hasAuthRight;
     private boolean hasPetSupRight;
     
@@ -73,6 +74,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private void initComponents() {
         setRowButtonsEnabled(true);
         
+        hasSupReq = (((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight && 
+                ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight);
         hasAuthRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
         hasPetSupRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight &&
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
@@ -91,6 +94,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
         
+        jbNewSupReq.setEnabled(mbApplyNew);
         jbPrint.setEnabled(hasPetSupRight);
         jbPrint.setEnabled(true);
         jbAuthCardex.setEnabled(true);
