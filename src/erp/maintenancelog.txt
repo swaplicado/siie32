@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 223.3/ 2023-10-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de personalización de contabilización de documentos (solamente facturas por el momento, las NC quedan para otra ocasión.)
+
+================================================================================
 SIIE 3.2 223.2/ 2023-10-16
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -9,10 +15,6 @@ SIIE 3.2 223.1/ 2023-10-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Cambio en la obtención de centros de costo relacionados con un subcentro de consumo directamente sin tomar en cuenta ítems.
-SIIE 3.2 223.1/ 2023-10-20
-Sergio Abraham FLORES GUTIÉRREZ
---------------------------------------------------------------------------------
-1) Implementación de personalización de contabilización de documentos (solamente facturas por el momento, las NC quedan para otra ocasión.)
 
 ================================================================================
 SIIE 3.2 223.0/ 2023-10-11
