@@ -46,6 +46,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkContractorId_n;
     protected int mnFkWarehouseCompanyBranch_n;
     protected int mnFkWarehouseWarehouse_n;
+    protected int mnFkItemReferenceId_n;
     protected int mnFkUserCloseProvisionId;
     protected int mnFkUserClosePurchaseId;
     /*
@@ -105,6 +106,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setFkContractorId_n(int n) { mnFkContractorId_n = n; }
     public void setFkWarehouseCompanyBranch_n(int n) { mnFkWarehouseCompanyBranch_n = n; }
     public void setFkWarehouseWarehouse_n(int n) { mnFkWarehouseWarehouse_n = n; }
+    public void setFkItemReferenceId_n(int n) { mnFkItemReferenceId_n = n; }
     public void setFkUserCloseProvisionId(int n) { mnFkUserCloseProvisionId = n; }
     public void setFkUserClosePurchaseId(int n) { mnFkUserClosePurchaseId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -150,6 +152,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getFkContractorId_n() { return mnFkContractorId_n; }
     public int getFkWarehouseCompanyBranch_n() { return mnFkWarehouseCompanyBranch_n; }
     public int getFkWarehouseWarehouse_n() { return mnFkWarehouseWarehouse_n; }
+    public int getFkItemReferenceId_n() { return mnFkItemReferenceId_n; }
     public int getFkUserCloseProvisionId() { return mnFkUserCloseProvisionId; }
     public int getFkUserClosePurchaseId() { return mnFkUserClosePurchaseId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -234,6 +237,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnFkContractorId_n = 0;
         mnFkWarehouseCompanyBranch_n = 0;
         mnFkWarehouseWarehouse_n = 0;
+        mnFkItemReferenceId_n = 0;
         mnFkUserCloseProvisionId = 0;
         mnFkUserClosePurchaseId = 0;
         mnFkUserInsertId = 0;
@@ -330,6 +334,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkContractorId_n = resultSet.getInt("fk_contractor_n");
             mnFkWarehouseCompanyBranch_n = resultSet.getInt("fk_whs_cob_n");
             mnFkWarehouseWarehouse_n = resultSet.getInt("fk_whs_whs_n");
+            mnFkItemReferenceId_n = resultSet.getInt("fk_item_ref_n");
             mnFkUserCloseProvisionId = resultSet.getInt("fk_usr_clo_prov");
             mnFkUserClosePurchaseId = resultSet.getInt("fk_usr_clo_pur");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -480,6 +485,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") + 
                     (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") + 
                     (mnFkWarehouseWarehouse_n == 0 ? "NULL, " : mnFkWarehouseWarehouse_n + ", ") + 
+                    (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") + 
                     mnFkUserCloseProvisionId + ", " + 
                     mnFkUserClosePurchaseId + ", " + 
                     mnFkUserInsertId + ", " + 
@@ -534,6 +540,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_contractor_n = " + (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") +
                     "fk_whs_cob_n = " + (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") +
                     "fk_whs_whs_n = " + (mnFkWarehouseWarehouse_n == 0 ? "NULL, " : mnFkWarehouseWarehouse_n + ", ") +
+                    "fk_item_ref_n = " + (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") +
                     "fk_usr_clo_prov = " + mnFkUserCloseProvisionId + ", " +
                     "fk_usr_clo_pur = " + mnFkUserClosePurchaseId + ", " +
                     "fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -640,6 +647,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setFkContractorId_n(this.getFkContractorId_n());
         registry.setFkWarehouseCompanyBranch_n(this.getFkWarehouseCompanyBranch_n());
         registry.setFkWarehouseWarehouse_n(this.getFkWarehouseWarehouse_n());
+        registry.setFkItemReferenceId_n(this.getFkItemReferenceId_n());
         registry.setFkUserCloseProvisionId(this.getFkUserCloseProvisionId());
         registry.setFkUserClosePurchaseId(this.getFkUserClosePurchaseId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
