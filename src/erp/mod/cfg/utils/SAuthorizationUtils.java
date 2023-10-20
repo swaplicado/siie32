@@ -872,6 +872,8 @@ public abstract class SAuthorizationUtils {
     
     /**
      * Obtiene los ID de los usuarios asignados al nodo de autorización recibido.
+     * Determina usuarios asignados directamente a un nodo o usuarios asignados indirectamente
+     * mediante un puesto.
      * 
      * @param connection
      * @param idNode
@@ -879,16 +881,27 @@ public abstract class SAuthorizationUtils {
      * @return 
      */
     public static ArrayList<Integer> getUsersOfAutorizationNode(Connection connection, final int idNode) {
-        String sql = "SELECT canu.id_authorn_user "
+        String sql = "SELECT canu.id_authorn_user AS id_user "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_NODE_USR) + " AS canu "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " uu ON canu.id_authorn_user = uu.id_usr "
-                + "WHERE canu.id_authorn_node = " + idNode + " AND NOT canu.b_del AND NOT uu.b_del AND uu.b_act;";
+                + "WHERE canu.id_authorn_node = " + idNode + " AND NOT canu.b_del AND NOT uu.b_del AND uu.b_act "
+                + "UNION "
+                + "SELECT  usr.id_usr AS id_user "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_NODE_POS) + " AS apos "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " AS pos ON apos.id_authorn_pos = pos.id_pos "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON pos.id_pos = emp.fk_pos "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS usr ON emp.id_emp = usr.fid_bp_n "
+                + "WHERE "
+                + "NOT apos.b_del AND NOT emp.b_del "
+                + "AND NOT usr.b_del "
+                + "AND usr.b_act "
+                + "AND apos.id_authorn_node = " + idNode + ";";
         
         ArrayList<Integer> lUsers = new ArrayList<>();
         try {
             ResultSet res = connection.createStatement().executeQuery(sql);
             while (res.next()) {
-                lUsers.add(res.getInt("id_authorn_user"));
+                lUsers.add(res.getInt("id_user"));
             }
             
             return lUsers;
@@ -901,6 +914,70 @@ public abstract class SAuthorizationUtils {
         }
         
         return new ArrayList<>();
+    }
+    
+    /**
+     * Obtiene los ID de los puestos asignados al nodo de autorización recibido.
+     * 
+     * @param connection
+     * @param idNode
+     * 
+     * @return 
+     */
+    public static ArrayList<Integer> getJobPositionsOfAutorizationNode(Connection connection, final int idNode) {
+        String sql = "SELECT canu.id_authorn_pos "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_NODE_POS) + " AS canp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " pos ON canp.id_authorn_pos = pos.id_pos "
+                + "WHERE canp.id_authorn_node = " + idNode + " AND NOT canp.b_del AND NOT pos.b_del;";
+        
+        ArrayList<Integer> lPositions = new ArrayList<>();
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            while (res.next()) {
+                lPositions.add(res.getInt("id_authorn_pos"));
+            }
+            
+            return lPositions;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Obtiene el ID del puesto correspodiente al usuario recibido.
+     * Determina el puesto mediante el fk de asociado de negocio del usuario, en caso de no tenerlo retorna 0.
+     * 
+     * @param connection
+     * @param idUser
+     * @return 
+     */
+    public static int getPositionOfUser(Connection connection, final int idUser) {
+        String sql = "SELECT emp.fk_pos " +
+                        "FROM " +
+                        SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS usr " +
+                        "        INNER JOIN " +
+                        SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON usr.fid_bp_n = emp.id_emp " +
+                        "WHERE " +
+                        "usr.id_usr = " + idUser + ";";
+        
+        int idPosition = 0;
+        try {
+            ResultSet res = connection.createStatement().executeQuery(sql);
+            if (res.next()) {
+                idPosition = res.getInt("fk_pos");
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return idPosition;
     }
     
     /**

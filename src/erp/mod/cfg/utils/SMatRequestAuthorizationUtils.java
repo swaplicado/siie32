@@ -9,6 +9,7 @@ import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,9 +20,19 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SMatRequestAuthorizationUtils {
+public abstract class SMatRequestAuthorizationUtils {
     
-    public static int[] stringToIntArray(String input) {
+    public static final String CASE_CONSUME_ENTITY = "ConsumeEntity";
+    public static final String CASE_MAT_REQUEST_USER = "MatReqUser";
+    public static final String CASE_CREATOR_USER_POS = "CreatorUserPosition";
+    
+    /**
+     * Retorna un array list de los elementos contenidos en un string con el formato: [elem1, elem2, elem3]
+     * 
+     * @param input
+     * @return 
+     */
+    public static ArrayList<String> stringToIntArray(String input) {
         // Eliminar los corchetes al principio y al final del string
         input = input.substring(1, input.length() - 1);
         
@@ -29,12 +40,12 @@ public class SMatRequestAuthorizationUtils {
         String[] elements = input.split(",");
         
         // Crear un arreglo de enteros y convertir los elementos de string a int
-        int[] intArray = new int[elements.length];
-        for (int i = 0; i < elements.length; i++) {
-            intArray[i] = Integer.parseInt(elements[i]);
+        ArrayList<String> aArray = new ArrayList<>();
+        for (String sElement : elements) {
+            aArray.add(sElement.trim());
         }
         
-        return intArray;
+        return aArray;
     }
     
     /**
@@ -89,7 +100,7 @@ public class SMatRequestAuthorizationUtils {
         for (SCondition oCondition : lConditions) {
             switch (oCondition.getKeyName()) {
                 // Entidad de consumo igual a, o diferente a
-                case "ConsumeEntity":
+                case CASE_CONSUME_ENTITY:
                     ArrayList<Integer> lEntities = SMatRequestAuthorizationUtils.getConsumeEntitys(oMatReq);
                     int consumeEntity = Integer.parseInt(oCondition.getStrValue());
                     boolean apply = false;
@@ -119,17 +130,17 @@ public class SMatRequestAuthorizationUtils {
                     break;
                     
                 // Usuario de la requisición igual a, o diferente a
-                case "MatReqUser":
+                case CASE_MAT_REQUEST_USER:
                     int userReqMat = Integer.parseInt(oCondition.getStrValue());
                     boolean applyUsr = false;
                     switch (oCondition.getOperator()) {
                         case "=":
-                            if (oMatReq.getFkUserInsertId() == userReqMat) {
+                            if (oMatReq.getFkUserRequesterId() == userReqMat) {
                                 applyUsr = true;
                             }
                             break;
                         case "!=":
-                            if (oMatReq.getFkUserInsertId() != userReqMat) {
+                            if (oMatReq.getFkUserRequesterId() != userReqMat) {
                                 applyUsr = true;
                             }
                             break;
@@ -139,6 +150,34 @@ public class SMatRequestAuthorizationUtils {
                         return "-1";
                     }
                     
+                    break;
+                    
+                // Puesto del usuario en sesión, que ESTÉ EN o NO ESTÉ EN 
+                case CASE_CREATOR_USER_POS:
+                    // El valor del objeto string debe tener el formato [elem1, elem2, elem3]
+                    String elements = oCondition.getStrValue();
+                    ArrayList<String> lPositions = SMatRequestAuthorizationUtils.stringToIntArray(elements);
+                    boolean applyJob = false;
+                    int iPosition;
+                    try {
+                        iPosition = SAuthorizationUtils.getPositionOfUser(session.getStatement().getConnection(), oMatReq.getFkUserRequesterId());
+                    }
+                    catch (SQLException ex) {
+                        Logger.getLogger(SMatRequestAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+                        return "Ocurrió un error al leer el puesto de trabajo del usuario en sesión";
+                    }
+                    switch (oCondition.getOperator()) {
+                        case "IN":
+                            applyJob = lPositions.contains(iPosition + "");
+                            break;
+                        case "NOT IN":
+                            applyJob = ! lPositions.contains(iPosition + "");
+                            break;
+                    }
+                    
+                    if (! applyJob) {
+                        return "-1";
+                    }
                     break;
                     
                 default:

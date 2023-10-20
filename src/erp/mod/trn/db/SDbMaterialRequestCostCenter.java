@@ -102,10 +102,10 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
     public String getConsumptionInfo() {
         String description = "";
         if (moDbmsConsSubent != null) {
-            description = moDbmsConsSubent.getName();
+            description = moDbmsConsSubent.getXtaConsumptionEntityName() + "_" + moDbmsConsSubent.getName();
         }
         if (moDataCostCenter != null) {
-            description = (description.isEmpty() ? "" : " / ") + moDataCostCenter.getCostCenter();
+            description += (description.isEmpty() ? "" : " / ") + moDataCostCenter.getPkCostCenterIdXXX() + "_" + moDataCostCenter.getCostCenter();
         }
         
         return description;
