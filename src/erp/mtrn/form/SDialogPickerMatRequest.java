@@ -69,9 +69,6 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         jPanel6 = new javax.swing.JPanel();
         jlDpsClass = new javax.swing.JLabel();
         jtfDpsClass = new javax.swing.JTextField();
-        jPanel3 = new javax.swing.JPanel();
-        jlBizPartner = new javax.swing.JLabel();
-        jtfBizPartner = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jlOption = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -110,20 +107,6 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         jPanel6.add(jtfDpsClass);
 
         jPanel4.add(jPanel6);
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
-
-        jlBizPartner.setText("Asociado negocios:");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(jlBizPartner);
-
-        jtfBizPartner.setEditable(false);
-        jtfBizPartner.setText("BUSINESS PARTNER");
-        jtfBizPartner.setFocusable(false);
-        jtfBizPartner.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel3.add(jtfBizPartner);
-
-        jPanel4.add(jPanel3);
 
         jPanel5.setLayout(new java.awt.BorderLayout());
 
@@ -194,13 +177,14 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         moPaneOptions.setDoubleClickAction(this, "publicActionOk");
         jpOptions.add(moPaneOptions, BorderLayout.CENTER);
         
-        tableColumns = new STableColumnForm[5];
+        tableColumns = new STableColumnForm[6];
         
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro suministro", STableConstants.WIDTH_ITEM_2X);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", STableConstants.WIDTH_DOC_NUM);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia", 100);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usuario requisición", 150);
+        tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro de consumo", STableConstants.WIDTH_ITEM_2X);
 
         for (i = 0; i < tableColumns.length; i++) {
             moPaneOptions.addTableColumn(tableColumns[i]);
@@ -261,7 +245,6 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -270,12 +253,10 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRefresh;
     private javax.swing.JButton jbSeek;
-    private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlDpsClass;
     private javax.swing.JLabel jlOption;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpOptions;
-    private javax.swing.JTextField jtfBizPartner;
     private javax.swing.JTextField jtfDpsClass;
     private javax.swing.JTextField jtfSeek;
     // End of variables declaration//GEN-END:variables
@@ -313,10 +294,8 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         msRfcRec = "";
         moFilterKey = null;
 
-        jtfDpsClass.setText("");
-        jtfDpsClass.setToolTipText(null);
-        jtfBizPartner.setText("");
-        jtfBizPartner.setToolTipText(null);
+        jtfDpsClass.setText("REQUISICIÓN DE MATERIALES");
+        jtfDpsClass.setToolTipText("REQUISICIÓN DE MATERIALES");
 
         moPaneOptions.setTableRowSelection(0);
     }
@@ -402,18 +381,13 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         if (manDpsClassPk != null) {
             jtfDpsClass.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_CL_DPS, manDpsClassPk));
             jtfDpsClass.setToolTipText(jtfDpsClass.getText());
-            jtfBizPartner.setText(manBizPartnerPk == null ? SLibConstants.TXT_ALL : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, manBizPartnerPk));
-            jtfBizPartner.setToolTipText(manBizPartnerPk == null ? null : jtfBizPartner.getText());
         }
         else if (mnCfdType != SLibConstants.UNDEFINED) {
             jtfDpsClass.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_CFD, new int[] { mnCfdType }));
             jtfDpsClass.setToolTipText(jtfDpsClass.getText());
-            jtfBizPartner.setText(msRfcRec);
-            jtfBizPartner.setToolTipText(jtfBizPartner.getText());
         }
         
         jtfDpsClass.setCaretPosition(0);
-        jtfBizPartner.setCaretPosition(0);
     }
 
     @Override

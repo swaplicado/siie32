@@ -5,7 +5,9 @@
 package erp.mod.trn.form;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
@@ -27,6 +29,7 @@ import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnStockSegregationUtils;
 import static erp.mtrn.form.SFormMaintDiog.COLOR_NONSIGNED;
 import static erp.mtrn.form.SFormMaintDiog.COLOR_SIGNED;
+import erp.musr.data.SDataUser;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -79,7 +82,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     protected boolean mbAreSigned;
     
     private SGuiFieldKeyGroup moFieldKeyEntityGroup;
-    private SGuiFieldKeyGroup moFieldKeyConsumeEntityGroup;
     
     protected ArrayList<SMaterialRequestSupplyRow> mlDbMaterialRequestSupplies;
     protected ArrayList<SMaterialRequestSupplyRow> mlMemoryMaterialRequestSupplies;
@@ -430,7 +432,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         moFields.addField(moKeyWarehouseEntity);
         
         moFieldKeyEntityGroup = new SGuiFieldKeyGroup(miClient);
-        moFieldKeyConsumeEntityGroup = new SGuiFieldKeyGroup(miClient);
 
         moGridMatReqEty = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_ETY_ROW, SLibConsts.UNDEFINED, "Renglones de la requisición") {
             @Override
@@ -446,14 +447,14 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Concepto"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Requeridas"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Surtidas"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Suministradas"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Apartadas"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Existencias"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Pendiente"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "A suministrar");
                 col.setEditable(true);
                 gridColumnsForm.add(col);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Centro consumo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro consumo"));
 
                 return gridColumnsForm;
             }
@@ -476,7 +477,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Almacén"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Centro cons"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Subcentro cons"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Surtido"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Suministrado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Guardado"));
 
                 return gridColumnsForm;
@@ -658,6 +659,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
             moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDocLapsing_n()));
             */
+            SDataUser oUserRequester = (SDataUser) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.USRU_USR, new int[] { moMaterialRequest.getFkUserRequesterId() }, SLibConstants.EXEC_MODE_SILENT);
+            moTextRequest.setText(oUserRequester.getName());
             moTextEntity.setValue(moMaterialRequest.getAuxProvEntName());
 
             mlMemoryMaterialRequestSupplies = new ArrayList<>();
