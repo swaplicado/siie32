@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 223.1/ 2023-10-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de personalización de contabilización de documentos (solamente facturas por el momento, las NC quedan para otra ocasión.)
+
+================================================================================
 SIIE 3.2 223.0/ 2023-10-11
 Edwin Omar CARMONA FIGUEROA
 Sergio Abraham FLORES GUTIÉRREZ
