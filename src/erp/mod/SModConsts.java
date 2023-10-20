@@ -219,6 +219,8 @@ public abstract class SModConsts {
     public static final int ITMU_MAT_ATT = 1052513;
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
+    
+    public static final int ITMX_IGEN_INV = 1053001;
 
     /*
      * Finance
@@ -527,6 +529,8 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_STK_SUP = 2024351;
     public static final int TRNX_CONF_WHS_VS_CON_ENT = 2024352;
     public static final int TRNX_DET_WHS_VS_CON_ENT = 2024353;
+    public static final int TRNX_MAT_REQ_ITM_SUP = 2024354;
+    public static final int TRNX_MAT_REQ_ITM_SUP_SEL = 2024355;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     
