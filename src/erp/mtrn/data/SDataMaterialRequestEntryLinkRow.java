@@ -88,7 +88,8 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         mvValues.add(moAuxUnit.getSymbol());
         mvValues.add(mdQuantitySupplied);
         mvValues.add(mdQuantityLinked);
-        mvValues.add(moMatRequestEntry.getQuantity() - mdQuantitySupplied - mdQuantityLinked);
+        double qty = moMatRequestEntry.getQuantity() - mdQuantitySupplied - mdQuantityLinked;
+        mvValues.add(qty < 0d ? 0d : qty);
         mvValues.add(mdQuantityToLink);
         mvValues.add(moAuxUnit.getSymbol());
         mvValues.add(moMatRequestEntry.getPriceUnitary());
