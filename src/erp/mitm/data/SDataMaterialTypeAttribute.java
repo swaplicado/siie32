@@ -17,6 +17,8 @@ import sa.gui.util.SUtilConsts;
  * @author Edwin Carmona
  */
 public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    public static final int MAX_ATTRIBUTES = 15;
 
     protected int mnPkItemMaterialTypeId;
     protected int mnPkItemMaterialAttributeId;
@@ -103,7 +105,7 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
         try {
             sql = "SELECT * FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " "
                     + "WHERE id_tp_mat = " + key[0] + " AND id_mat_att = " + key[1] + " ";
-            resultSet = statement.executeQuery(sql);
+            resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }

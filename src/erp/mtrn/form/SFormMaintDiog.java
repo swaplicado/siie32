@@ -498,27 +498,27 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jbEntryDelete.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jbEntryDelete);
 
-        jLEntryConsEntity.setText("Centro consumo:");
-        jLEntryConsEntity.setPreferredSize(new java.awt.Dimension(90, 23));
+        jLEntryConsEntity.setText("Centro cons.:*");
+        jLEntryConsEntity.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jLEntryConsEntity);
 
-        jcbEntryConsEntity.setPreferredSize(new java.awt.Dimension(150, 23));
+        jcbEntryConsEntity.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel11.add(jcbEntryConsEntity);
 
         jLEntrySubConsEntity.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLEntrySubConsEntity.setText("Sub centro consumo:");
-        jLEntrySubConsEntity.setPreferredSize(new java.awt.Dimension(110, 23));
+        jLEntrySubConsEntity.setText("Subcentro cons.:*");
+        jLEntrySubConsEntity.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel11.add(jLEntrySubConsEntity);
 
-        jcbEntrySubConsEntity.setPreferredSize(new java.awt.Dimension(150, 23));
+        jcbEntrySubConsEntity.setPreferredSize(new java.awt.Dimension(240, 23));
         jPanel11.add(jcbEntrySubConsEntity);
 
         jLEntryCostCenter.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLEntryCostCenter.setText("Centro costo:");
+        jLEntryCostCenter.setText("Centro costo:*");
         jLEntryCostCenter.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jLEntryCostCenter);
 
-        jcbEntryCostCenter.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbEntryCostCenter.setPreferredSize(new java.awt.Dimension(210, 23));
         jPanel11.add(jcbEntryCostCenter);
 
         jPanel5.add(jPanel11);

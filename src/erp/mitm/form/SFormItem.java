@@ -162,6 +162,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldAttribute8;
     private erp.lib.form.SFormField moFieldAttribute9;
     private erp.lib.form.SFormField moFieldAttribute10;
+    private erp.lib.form.SFormField moFieldAttribute11;
+    private erp.lib.form.SFormField moFieldAttribute12;
+    private erp.lib.form.SFormField moFieldAttribute13;
+    private erp.lib.form.SFormField moFieldAttribute14;
+    private erp.lib.form.SFormField moFieldAttribute15;
 
     private erp.lib.table.STablePane moItemForeignLanguagePane;
     private erp.lib.table.STablePane moItemBarcodePane;
@@ -420,6 +425,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel19 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jtfMaterialType = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jtfPartNumberReadOnly = new javax.swing.JTextField();
         jPanel21 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jPanel20 = new javax.swing.JPanel();
@@ -453,6 +460,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpAttribute10 = new javax.swing.JPanel();
         jlAttribute10 = new javax.swing.JLabel();
         jtfAttribute10 = new javax.swing.JTextField();
+        jpAttribute11 = new javax.swing.JPanel();
+        jlAttribute11 = new javax.swing.JLabel();
+        jtfAttribute11 = new javax.swing.JTextField();
+        jpAttribute12 = new javax.swing.JPanel();
+        jlAttribute12 = new javax.swing.JLabel();
+        jtfAttribute12 = new javax.swing.JTextField();
+        jpAttribute13 = new javax.swing.JPanel();
+        jlAttribute13 = new javax.swing.JLabel();
+        jtfAttribute13 = new javax.swing.JTextField();
+        jpAttribute14 = new javax.swing.JPanel();
+        jlAttribute14 = new javax.swing.JLabel();
+        jtfAttribute14 = new javax.swing.JTextField();
+        jpAttribute15 = new javax.swing.JPanel();
+        jlAttribute15 = new javax.swing.JLabel();
+        jtfAttribute15 = new javax.swing.JTextField();
         jpCommand = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jtfPkItemId_Ro = new javax.swing.JTextField();
@@ -1419,8 +1441,16 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfMaterialType.setEditable(false);
         jtfMaterialType.setText("jTextField1");
-        jtfMaterialType.setPreferredSize(new java.awt.Dimension(500, 23));
+        jtfMaterialType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel19.add(jtfMaterialType);
+
+        jLabel5.setText("Número de parte:");
+        jLabel5.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jLabel5);
+
+        jtfPartNumberReadOnly.setEditable(false);
+        jtfPartNumberReadOnly.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jtfPartNumberReadOnly);
 
         jPanel17.add(jPanel19);
 
@@ -1432,7 +1462,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel17.add(jPanel21);
 
-        jPanel20.setLayout(new java.awt.GridLayout(10, 1));
+        jPanel20.setLayout(new java.awt.GridLayout(15, 1));
 
         jpAttribute1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
 
@@ -1553,6 +1583,66 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpAttribute10.add(jtfAttribute10);
 
         jPanel20.add(jpAttribute10);
+
+        jpAttribute11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
+
+        jlAttribute11.setText("Atributo 1:");
+        jlAttribute11.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpAttribute11.add(jlAttribute11);
+
+        jtfAttribute11.setText("jTextField1");
+        jtfAttribute11.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpAttribute11.add(jtfAttribute11);
+
+        jPanel20.add(jpAttribute11);
+
+        jpAttribute12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
+
+        jlAttribute12.setText("Atributo 1:");
+        jlAttribute12.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpAttribute12.add(jlAttribute12);
+
+        jtfAttribute12.setText("jTextField1");
+        jtfAttribute12.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpAttribute12.add(jtfAttribute12);
+
+        jPanel20.add(jpAttribute12);
+
+        jpAttribute13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
+
+        jlAttribute13.setText("Atributo 1:");
+        jlAttribute13.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpAttribute13.add(jlAttribute13);
+
+        jtfAttribute13.setText("jTextField1");
+        jtfAttribute13.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpAttribute13.add(jtfAttribute13);
+
+        jPanel20.add(jpAttribute13);
+
+        jpAttribute14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
+
+        jlAttribute14.setText("Atributo 1:");
+        jlAttribute14.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpAttribute14.add(jlAttribute14);
+
+        jtfAttribute14.setText("jTextField1");
+        jtfAttribute14.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpAttribute14.add(jtfAttribute14);
+
+        jPanel20.add(jpAttribute14);
+
+        jpAttribute15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
+
+        jlAttribute15.setText("Atributo 1:");
+        jlAttribute15.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpAttribute15.add(jlAttribute15);
+
+        jtfAttribute15.setText("jTextField1");
+        jtfAttribute15.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpAttribute15.add(jtfAttribute15);
+
+        jPanel20.add(jpAttribute15);
 
         jPanel17.add(jPanel20);
 
@@ -1824,6 +1914,17 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldAttribute9.setLengthMax(20);
         moFieldAttribute10 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAttribute10, jlAttribute10);
         moFieldAttribute10.setLengthMax(20);
+        moFieldAttribute11 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAttribute11, jlAttribute11);
+        moFieldAttribute11.setLengthMax(20);
+        moFieldAttribute12 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAttribute12, jlAttribute12);
+        moFieldAttribute12.setLengthMax(20);
+        moFieldAttribute13 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAttribute13, jlAttribute13);
+        moFieldAttribute13.setLengthMax(20);
+        moFieldAttribute14 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAttribute14, jlAttribute14);
+        moFieldAttribute14.setLengthMax(20);
+        moFieldAttribute15 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAttribute15, jlAttribute15);
+        moFieldAttribute15.setLengthMax(20);
+
         
         mvFields.add(moFieldFkItemGenericId);
         mvFields.add(moFieldFkItemLineId_n);
@@ -1905,6 +2006,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldAttribute8);
         mvFields.add(moFieldAttribute9);
         mvFields.add(moFieldAttribute10);
+        mvFields.add(moFieldAttribute11);
+        mvFields.add(moFieldAttribute12);
+        mvFields.add(moFieldAttribute13);
+        mvFields.add(moFieldAttribute14);
+        mvFields.add(moFieldAttribute15);
 
         moFormItemBarcode = new SFormItemBarcode(miClient);
         moFormItemForeignLanguage = new SFormItemForeignLanguage(miClient);
@@ -1937,6 +2043,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfPresentation.addFocusListener(this);
         jtfPresentationShort.addFocusListener(this);
         jtfCode.addFocusListener(this);
+        jtfPartNumber.addFocusListener(this);
 
         jckIsInventoriable.addItemListener(this);
         jcbFkItemGenericId.addItemListener(this);
@@ -1961,6 +2068,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfAttribute8.addKeyListener(this);
         jtfAttribute9.addKeyListener(this);
         jtfAttribute10.addKeyListener(this);
+        jtfAttribute11.addKeyListener(this);
+        jtfAttribute12.addKeyListener(this);
+        jtfAttribute13.addKeyListener(this);
+        jtfAttribute14.addKeyListener(this);
+        jtfAttribute15.addKeyListener(this);
 
         i = 0;
         tableColumnsItemForeignLanguage = new STableColumnForm[4];
@@ -2479,6 +2591,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlAttribute10.setText("");
         jtfAttribute10.setText("");
         moFieldAttribute10.setIsMandatory(false);
+        jlAttribute11.setText("");
+        jtfAttribute11.setText("");
+        moFieldAttribute11.setIsMandatory(false);
+        jlAttribute12.setText("");
+        jtfAttribute12.setText("");
+        moFieldAttribute12.setIsMandatory(false);
+        jlAttribute13.setText("");
+        jtfAttribute13.setText("");
+        moFieldAttribute13.setIsMandatory(false);
+        jlAttribute14.setText("");
+        jtfAttribute14.setText("");
+        moFieldAttribute14.setIsMandatory(false);
+        jlAttribute15.setText("");
+        jtfAttribute15.setText("");
+        moFieldAttribute15.setIsMandatory(false);
     }
     
     private void enableAttributes(boolean enable) {
@@ -2492,6 +2619,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfAttribute8.setEnabled(enable);
         jtfAttribute9.setEnabled(enable);
         jtfAttribute10.setEnabled(enable);
+        jtfAttribute11.setEnabled(enable);
+        jtfAttribute12.setEnabled(enable);
+        jtfAttribute13.setEnabled(enable);
+        jtfAttribute14.setEnabled(enable);
+        jtfAttribute15.setEnabled(enable);
     }
 
     private void computeItemKeyAndName() {
@@ -2664,6 +2796,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             if (jtfAttribute10.isEnabled()) {
                 msItemMaterialName += " " + jtfAttribute10.getText();
+            }
+            if (jtfAttribute11.isEnabled()) {
+                msItemMaterialName += " " + jtfAttribute11.getText();
+            }
+            if (jtfAttribute12.isEnabled()) {
+                msItemMaterialName += " " + jtfAttribute12.getText();
+            }
+            if (jtfAttribute13.isEnabled()) {
+                msItemMaterialName += " " + jtfAttribute13.getText();
+            }
+            if (jtfAttribute14.isEnabled()) {
+                msItemMaterialName += " " + jtfAttribute14.getText();
+            }
+            if (jtfAttribute15.isEnabled()) {
+                msItemMaterialName += " " + jtfAttribute15.getText();
             }
 
             jtfMaterialItemName.setText(msItemMaterialName);
@@ -3044,6 +3191,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         computeItemKeyAndName();
     }
     
+    private void focusLostPartNum() {
+        jtfPartNumberReadOnly.setText(jtfPartNumber.getText());
+    }
+    
     private void focusLostAtt(JTextField jtfAtt) {
         jtfAtt.setText(jtfAtt.getText().toUpperCase());
     }
@@ -3142,7 +3293,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         if (idMaterialType > 1) {
             mlAttributesCfg = SMaterialUtils.getAttributesOfType(miClient.getSession().getStatement(), idMaterialType);
             
-            if (moItem.getIsRegistryNew()) {
+            if (moItem == null || moItem.getIsRegistryNew()) {
                 jtfMaterialItemName.setText(moKeyFkMaterialTypeId_n.getSelectedItem().getItem().substring(0, moKeyFkMaterialTypeId_n.getSelectedItem().getItem().indexOf('-')));
             }
             else {
@@ -3211,6 +3362,31 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                         oCurrentTextField = jtfAttribute10;
                         oCurrentFormField = moFieldAttribute10;
                         break;
+                    case 11:
+                        oCurrentJLabel = jlAttribute11;
+                        oCurrentTextField = jtfAttribute11;
+                        oCurrentFormField = moFieldAttribute11;
+                        break;
+                    case 12:
+                        oCurrentJLabel = jlAttribute12;
+                        oCurrentTextField = jtfAttribute12;
+                        oCurrentFormField = moFieldAttribute12;
+                        break;
+                    case 13:
+                        oCurrentJLabel = jlAttribute13;
+                        oCurrentTextField = jtfAttribute13;
+                        oCurrentFormField = moFieldAttribute13;
+                        break;
+                    case 14:
+                        oCurrentJLabel = jlAttribute14;
+                        oCurrentTextField = jtfAttribute14;
+                        oCurrentFormField = moFieldAttribute14;
+                        break;
+                    case 15:
+                        oCurrentJLabel = jlAttribute15;
+                        oCurrentTextField = jtfAttribute15;
+                        oCurrentFormField = moFieldAttribute15;
+                        break;
                     default:
                         oCurrentJLabel = null;
                         oCurrentTextField = null;
@@ -3278,6 +3454,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -3405,6 +3582,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsVolumeVariable;
     private javax.swing.JLabel jlAttribute1;
     private javax.swing.JLabel jlAttribute10;
+    private javax.swing.JLabel jlAttribute11;
+    private javax.swing.JLabel jlAttribute12;
+    private javax.swing.JLabel jlAttribute13;
+    private javax.swing.JLabel jlAttribute14;
+    private javax.swing.JLabel jlAttribute15;
     private javax.swing.JLabel jlAttribute2;
     private javax.swing.JLabel jlAttribute3;
     private javax.swing.JLabel jlAttribute4;
@@ -3466,6 +3648,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlWeightGross;
     private javax.swing.JPanel jpAttribute1;
     private javax.swing.JPanel jpAttribute10;
+    private javax.swing.JPanel jpAttribute11;
+    private javax.swing.JPanel jpAttribute12;
+    private javax.swing.JPanel jpAttribute13;
+    private javax.swing.JPanel jpAttribute14;
+    private javax.swing.JPanel jpAttribute15;
     private javax.swing.JPanel jpAttribute2;
     private javax.swing.JPanel jpAttribute3;
     private javax.swing.JPanel jpAttribute4;
@@ -3488,6 +3675,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JRadioButton jrbStatusRestricted;
     private javax.swing.JTextField jtfAttribute1;
     private javax.swing.JTextField jtfAttribute10;
+    private javax.swing.JTextField jtfAttribute11;
+    private javax.swing.JTextField jtfAttribute12;
+    private javax.swing.JTextField jtfAttribute13;
+    private javax.swing.JTextField jtfAttribute14;
+    private javax.swing.JTextField jtfAttribute15;
     private javax.swing.JTextField jtfAttribute2;
     private javax.swing.JTextField jtfAttribute3;
     private javax.swing.JTextField jtfAttribute4;
@@ -3513,6 +3705,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfNetContent;
     private javax.swing.JTextField jtfNetContentUnitary;
     private javax.swing.JTextField jtfPartNumber;
+    private javax.swing.JTextField jtfPartNumberReadOnly;
     private javax.swing.JTextField jtfPkItemId_Ro;
     private javax.swing.JTextField jtfPresentation;
     private javax.swing.JTextField jtfPresentationShort;
@@ -3699,6 +3892,84 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                             validation.setComponent(jckIsFreePrice);
                             validation.setTabbedPaneIndex(1);
                         }
+                    }
+                }
+                
+                if (!validation.getIsError()) {
+                    if (moFieldAttribute1.getIsMandatory() && jtfAttribute1.isEnabled() && jtfAttribute1.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute1.getText() + "'.");
+                        validation.setComponent(jtfAttribute1);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute2.getIsMandatory() && jtfAttribute2.isEnabled() && jtfAttribute2.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute2.getText() + "'.");
+                        validation.setComponent(jtfAttribute2);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute3.getIsMandatory() && jtfAttribute3.isEnabled() && jtfAttribute3.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute3.getText() + "'.");
+                        validation.setComponent(jtfAttribute3);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute4.getIsMandatory() && jtfAttribute4.isEnabled() && jtfAttribute4.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute4.getText() + "'.");
+                        validation.setComponent(jtfAttribute4);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute5.getIsMandatory() && jtfAttribute5.isEnabled() && jtfAttribute5.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute5.getText() + "'.");
+                        validation.setComponent(jtfAttribute5);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute6.getIsMandatory() && jtfAttribute6.isEnabled() && jtfAttribute6.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute6.getText() + "'.");
+                        validation.setComponent(jtfAttribute6);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute7.getIsMandatory() && jtfAttribute7.isEnabled() && jtfAttribute7.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute7.getText() + "'.");
+                        validation.setComponent(jtfAttribute7);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute8.getIsMandatory() && jtfAttribute8.isEnabled() && jtfAttribute8.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute8.getText() + "'.");
+                        validation.setComponent(jtfAttribute8);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute9.getIsMandatory() && jtfAttribute9.isEnabled() && jtfAttribute9.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute9.getText() + "'.");
+                        validation.setComponent(jtfAttribute9);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute10.getIsMandatory() && jtfAttribute10.isEnabled() && jtfAttribute10.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute10.getText() + "'.");
+                        validation.setComponent(jtfAttribute10);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute11.getIsMandatory() && jtfAttribute11.isEnabled() && jtfAttribute11.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute11.getText() + "'.");
+                        validation.setComponent(jtfAttribute11);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute12.getIsMandatory() && jtfAttribute12.isEnabled() && jtfAttribute12.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute12.getText() + "'.");
+                        validation.setComponent(jtfAttribute12);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute13.getIsMandatory() && jtfAttribute13.isEnabled() && jtfAttribute13.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute13.getText() + "'.");
+                        validation.setComponent(jtfAttribute13);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute14.getIsMandatory() && jtfAttribute14.isEnabled() && jtfAttribute14.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute14.getText() + "'.");
+                        validation.setComponent(jtfAttribute14);
+                        validation.setTabbedPaneIndex(2);
+                    }
+                    if (moFieldAttribute15.getIsMandatory() && jtfAttribute15.isEnabled() && jtfAttribute15.getText().length() == 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlAttribute15.getText() + "'.");
+                        validation.setComponent(jtfAttribute15);
+                        validation.setTabbedPaneIndex(2);
                     }
                 }
             }
@@ -4001,6 +4272,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                     case 10:
                         oCurrentTextField = jtfAttribute10;
                         break;
+                    case 11:
+                        oCurrentTextField = jtfAttribute11;
+                        break;
+                    case 12:
+                        oCurrentTextField = jtfAttribute12;
+                        break;
+                    case 13:
+                        oCurrentTextField = jtfAttribute13;
+                        break;
+                    case 14:
+                        oCurrentTextField = jtfAttribute14;
+                        break;
+                    case 15:
+                        oCurrentTextField = jtfAttribute15;
+                        break;
                     default:
                         oCurrentTextField = null;
                         break;
@@ -4154,6 +4440,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             else if (textField == jtfCode) {
                 focusLostCode();
             }
+            else if (textField == jtfPartNumber) {
+                focusLostPartNum();
+            }
             else if (textField == jtfAttribute1) {
                 focusLostAtt(jtfAttribute1);
             }
@@ -4183,6 +4472,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             else if (textField == jtfAttribute10) {
                 focusLostAtt(jtfAttribute10);
+            }
+            else if (textField == jtfAttribute11) {
+                focusLostAtt(jtfAttribute11);
+            }
+            else if (textField == jtfAttribute12) {
+                focusLostAtt(jtfAttribute12);
+            }
+            else if (textField == jtfAttribute13) {
+                focusLostAtt(jtfAttribute13);
+            }
+            else if (textField == jtfAttribute14) {
+                focusLostAtt(jtfAttribute14);
+            }
+            else if (textField == jtfAttribute15) {
+                focusLostAtt(jtfAttribute15);
             }
         }
     }

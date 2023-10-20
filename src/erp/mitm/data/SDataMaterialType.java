@@ -59,6 +59,7 @@ public class SDataMaterialType extends erp.lib.data.SDataRegistry implements jav
     public boolean isIsCanEdit() { return mbIsCanEdit; }
     public boolean isIsCanDelete() { return mbIsCanDelete; }
     public boolean isIsDeleted() { return mbIsDeleted; }
+    public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -167,6 +168,7 @@ public class SDataMaterialType extends erp.lib.data.SDataRegistry implements jav
                 computePrimaryKey(connection.createStatement());
                 mbIsDeleted = false;
                 mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
+                mnFkUserDeleteId = mbIsDeleted ? mnFkUserInsertId : SUtilConsts.USR_NA_ID;
 
                 sql = "INSERT INTO " + SDataConstants.TablesMap.get(mnRegistryType) + " VALUES (" +
                         mnPkMaterialTypeId + ", " + 

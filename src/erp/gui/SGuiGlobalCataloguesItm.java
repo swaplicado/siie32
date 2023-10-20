@@ -8,7 +8,6 @@ package erp.gui;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.form.SFormOptionPicker;
-import erp.form.SFormOptionPickerItems;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
@@ -16,9 +15,7 @@ import erp.mitm.data.*;
 import erp.mitm.form.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import redis.clients.jedis.Jedis;
 import erp.form.SFormOptionPickerItems;
-import erp.lib.form.SFormField;
 
 /**
  *
@@ -50,6 +47,8 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiVarietyType;
     private javax.swing.JMenuItem jmiUnitType;
     private javax.swing.JMenuItem jmiLevelType;
+    private javax.swing.JMenuItem jmiMaterialType;
+    private javax.swing.JMenuItem jmiMaterialAttribute;
     private javax.swing.JMenuItem jmiItemPackage;
     private javax.swing.JMenuItem jmiItemBarcode;
     private javax.swing.JMenuItem jmiBizAreaItemGeneric;
@@ -66,6 +65,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
     private erp.mitm.form.SFormBrand moFormBrand;
     private erp.mitm.form.SFormManufacturer moFormManufacturer;
     private erp.mitm.form.SFormElement moFormElement;
+    private erp.mitm.form.SFormMaterialAttribute moFormMaterialAttribute;
     private erp.mitm.form.SFormVariety moFormVariety;
     private erp.mitm.form.SFormUnit moFormUnit;
     private erp.mitm.form.SFormBrandType moFormBrandType;
@@ -74,6 +74,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
     private erp.mitm.form.SFormVarietyType moFormVarietyType;
     private erp.mitm.form.SFormUnitType moFormUnitType;
     private erp.mitm.form.SFormItemLevelType moFormItemLevelType;
+    private erp.mitm.form.SFormMaterialType moFormMaterialType;
     private erp.mitm.form.SFormBizPartnerDescription moFormBizPartnerDescription;
 
     private erp.form.SFormOptionPicker moPickerItemCategory;
@@ -133,6 +134,8 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiVarietyType = new JMenuItem("Tipos de variedades");
         jmiUnitType = new JMenuItem("Tipos de unidades");
         jmiLevelType = new JMenuItem("Tipos de niveles");
+        jmiMaterialType = new JMenuItem("Tipos de material");
+        jmiMaterialAttribute = new JMenuItem("Atributos de materiales");
         jmiItemPackage = new JMenuItem("Conversiones de ítems");
         jmiItemBarcode = new JMenuItem("Códigos de barras de ítems");
         jmiBizAreaItemGeneric = new JMenuItem("Áreas de negocios de ítems genéricos");
@@ -166,6 +169,9 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmMenuItem.add(jmiUnitType);
         jmMenuItem.add(jmiLevelType);
         jmMenuItem.addSeparator();
+        jmMenuItem.add(jmiMaterialType);
+        jmMenuItem.add(jmiMaterialAttribute);
+        jmMenuItem.addSeparator();
         jmMenuItem.add(jmiItemPackage);
         jmMenuItem.add(jmiItemBarcode);
         jmMenuItem.add(jmiBizAreaItemGeneric);
@@ -196,6 +202,8 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiVarietyType.addActionListener(this);
         jmiUnitType.addActionListener(this);
         jmiLevelType.addActionListener(this);
+        jmiMaterialType.addActionListener(this);
+        jmiMaterialAttribute.addActionListener(this);
         jmiItemPackage.addActionListener(this);
         jmiItemBarcode.addActionListener(this);
         jmiBizAreaItemGeneric.addActionListener(this);
@@ -210,6 +218,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         moFormBrand = null;
         moFormManufacturer = null;
         moFormElement = null;
+        moFormMaterialAttribute = null;
         moFormVariety = null;
         moFormUnit = null;
         moFormBrandType = null;
@@ -218,6 +227,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         moFormVarietyType = null;
         moFormUnitType = null;
         moFormItemLevelType = null;
+        moFormMaterialType = null;
         moFormBizPartnerDescription = null;
 
         moPickerItemCategory = null;
@@ -348,6 +358,15 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     }
                     miForm = moFormItemLevelType;
                     break;
+                case SDataConstants.ITMU_TP_MAT:
+                    if (moFormMaterialType == null) {
+                        moFormMaterialType = new SFormMaterialType(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataMaterialType();
+                    }
+                    miForm = moFormMaterialType;
+                    break;
                 case SDataConstants.ITMU_UNIT:
                     if (moFormUnit == null) {
                         moFormUnit = new SFormUnit(miClient);
@@ -428,6 +447,15 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                         moRegistry = new SDataElement();
                     }
                     miForm = moFormElement;
+                    break;
+                case SDataConstants.ITMU_MAT_ATT:
+                    if (moFormMaterialAttribute == null) {
+                        moFormMaterialAttribute = new SFormMaterialAttribute(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataMaterialAttribute();
+                    }
+                    miForm = moFormMaterialAttribute;
                     break;
                 case SDataConstants.ITMU_CFG_ITEM_BP:
                     if (moFormBizPartnerDescription == null) {
@@ -553,6 +581,10 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     oViewClass = erp.mitm.view.SViewItemLevelType.class;
                     sViewTitle = "Tipos niveles";
                     break;
+                case SDataConstants.ITMU_TP_MAT:
+                    oViewClass = erp.mitm.view.SViewMaterialType.class;
+                    sViewTitle = "Tipos de material";
+                    break;
                 case SDataConstants.ITMU_UNIT:
                     oViewClass = erp.mitm.view.SViewUnit.class;
                     sViewTitle = "Unidades";
@@ -588,6 +620,10 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.ITMU_EMT:
                     oViewClass = erp.mitm.view.SViewElement.class;
                     sViewTitle = "Elementos";
+                    break;
+                case SDataConstants.ITMU_MAT_ATT:
+                    oViewClass = erp.mitm.view.SViewMaterialAttribute.class;
+                    sViewTitle = "Atributos de materiales";
                     break;
                 case SDataConstants.ITMX_ITEM_PACK:
                     oViewClass = erp.mitm.view.SViewItemPackage.class;
@@ -784,6 +820,9 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
             else if (item == jmiElement) {
                 showView(SDataConstants.ITMU_EMT);
             }
+            else if (item == jmiMaterialAttribute) {
+                showView(SDataConstants.ITMU_MAT_ATT);
+            }
             else if (item == jmiVariety) {
                 showView(SDataConstants.ITMU_VAR);
             }
@@ -807,6 +846,9 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
             }
             else if (item == jmiLevelType) {
                 showView(SDataConstants.ITMU_TP_LEV);
+            }
+            else if (item == jmiMaterialType) {
+                showView(SDataConstants.ITMU_TP_MAT);
             }
             else if (item == jmiItemPackage) {
                 showView(SDataConstants.ITMX_ITEM_PACK);
