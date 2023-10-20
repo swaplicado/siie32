@@ -504,7 +504,9 @@ public abstract class SDataConstants {
     public static final int TRN_DNC_DIOG = 207088;
     public static final int TRN_DNC_DIOG_DNS = 207089;
     public static final int TRN_DPS_UPD_DT_LOG = 207093;
-    public static final int TRN_DPS_CFD_PAY = 207203;
+    public static final int TRN_DPS_CFD_PAY = 207196;
+    public static final int TRN_DPS_CFD_PAY_DONE = 207197;
+    public static final int TRN_CFD_PAY = 207191;
 
     public static final int TRNX_DPS_RO_STK = 207504;
     public static final int TRNX_DPS_RO = 207505;
@@ -1054,6 +1056,8 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DNC_DIOG, "trn_dnc_diog");
         TablesMap.put(TRN_DNC_DIOG_DNS, "trn_dnc_diog_dns");
         TablesMap.put(TRN_DPS_CFD_PAY, "trn_dps_cfd_pay");
+        TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
 
         TablesMap.put(MKT_CFG_CUS, "mkt_cfg_cus");
         TablesMap.put(MKT_CFG_CUSB, "mkt_cfg_cusb");

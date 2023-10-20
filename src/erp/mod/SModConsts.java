@@ -484,7 +484,10 @@ public abstract class SModConsts {
     public static final int TRN_EST_REQ = 2023352;
     public static final int TRN_EST_REQ_ETY = 2023353;
     public static final int TRN_EST_REQ_REC = 2023354;
-
+    public static final int TRN_DPS_CFD_PAY = 2023096;
+    public static final int TRN_DPS_CFD_PAY_DONE = 2023097;
+    public static final int TRN_CFD_PAY = 2023091;
+    
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
     public static final int TRN_DNC_DIOG = 2023503;
@@ -1254,6 +1257,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_EST_REQ, "trn_est_req");
         TablesMap.put(TRN_EST_REQ_ETY, "trn_est_req_ety");
         TablesMap.put(TRN_EST_REQ_REC, "trn_est_req_rec");
+        TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");
