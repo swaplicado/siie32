@@ -299,7 +299,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
         jPanel20.add(jpReq1, java.awt.BorderLayout.WEST);
 
-        jpReq2.setLayout(new java.awt.GridLayout(3, 0));
+        jpReq2.setLayout(new java.awt.GridLayout(3, 0, 0, 5));
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -347,7 +347,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
         jPanel20.add(jpReq2, java.awt.BorderLayout.CENTER);
 
-        jpReq3.setLayout(new java.awt.GridLayout(3, 0));
+        jpReq3.setLayout(new java.awt.GridLayout(3, 0, 0, 5));
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
