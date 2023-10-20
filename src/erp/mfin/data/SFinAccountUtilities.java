@@ -112,6 +112,7 @@ public abstract class SFinAccountUtilities {
      * @param idTaxAccountType Account type. Constants defined in SDataConstantsSys class.
      * @param statement Database connection statement.
      * @return Account ID, if any, for parameters supplied, otherwise empty <code>String</code>.
+     * @throws java.lang.Exception
      */
     public static java.lang.String obtainTaxAccountId(
             int[] keyTax, int idDpsCategory, java.util.Date dateStart, int idTaxAccountType, java.sql.Statement statement) throws java.lang.Exception {

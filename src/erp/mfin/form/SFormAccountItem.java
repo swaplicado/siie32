@@ -602,8 +602,10 @@ public class SFormAccountItem extends javax.swing.JDialog implements erp.lib.for
         if (!validation.getIsError()) {
             // Validate account type percentages:
 
-            for (i = 0; i < moPaneEntries.getTableGuiRowCount() && !validation.getIsError(); i++) {
+            ROWS:
+            for (i = 0; i < moPaneEntries.getTableGuiRowCount(); i++) {
                 entry = (SDataAccountItemEntry) ((SDataAccountItemEntryRow) moPaneEntries.getTableRow(i)).getData();
+                
                 switch (entry.getFkBookkeepingRegistryTypeId()) {
                     case SDataConstantsSys.FINS_TP_BKR_ALL:
                         percentages[entry.getPkAccountItemTypeId() - 1][ALL] += entry.getPercentage();
@@ -619,6 +621,7 @@ public class SFormAccountItem extends javax.swing.JDialog implements erp.lib.for
                                 "es inválido en la posición " + (i + 1) + ".");
                         validation.setComponent(moPaneEntries.getTable());
                         validation.setTabbedPaneIndex(0);
+                        break ROWS;
                 }
             }
 
