@@ -685,8 +685,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         SMaterialRequestEntryRow oMatReqRow;
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
-            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSegregated() > 0) {
-                oMatReqRow.setAuxToSegregate(oMatReqRow.getQuantity() - oMatReqRow.getAuxSegregated());
+            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied() > 0) {
+                oMatReqRow.setAuxToSupply(oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied());
             }
         }
         
