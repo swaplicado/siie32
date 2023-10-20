@@ -6,6 +6,7 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +24,8 @@ public class SDbConfEmployeeVsEntity extends SDbRegistryUser {
     
     protected int mnPkEmployee;
     
-    protected ArrayList<SDbMaterialConsumptionEntityEmployee> maConsEntEmp;
+    protected ArrayList<SDbMaterialConsumptionEntityUser> maConsEntEmp;
+    protected ArrayList<SDbMaterialConsumptionSubentityUser> maConsSubentEmp;
     
     protected SDbBizPartner moAuxBizPartner;
 
@@ -35,7 +37,8 @@ public class SDbConfEmployeeVsEntity extends SDbRegistryUser {
     
     public int getPkEmployee() { return mnPkEmployee; }
     
-    public ArrayList<SDbMaterialConsumptionEntityEmployee> getConsEntEmp() { return maConsEntEmp; }
+    public ArrayList<SDbMaterialConsumptionEntityUser> getConsEntEmp() { return maConsEntEmp; }
+    public ArrayList<SDbMaterialConsumptionSubentityUser> getConsSubentEmp() { return maConsSubentEmp; }
     
     public SDbBizPartner getAuxBizPartner() { return moAuxBizPartner; }
     
@@ -56,6 +59,7 @@ public class SDbConfEmployeeVsEntity extends SDbRegistryUser {
         mnPkEmployee = 0;
         
         maConsEntEmp = new ArrayList<>();
+        maConsSubentEmp = new ArrayList<>();
         
         moAuxBizPartner = null;
     }
@@ -84,7 +88,8 @@ public class SDbConfEmployeeVsEntity extends SDbRegistryUser {
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet;
         Statement statement;
-        SDbMaterialConsumptionEntityEmployee cons;
+        SDbMaterialConsumptionEntityUser ent;
+        SDbMaterialConsumptionSubentityUser sub;
         
         initRegistry();
         initQueryMembers();
@@ -93,14 +98,24 @@ public class SDbConfEmployeeVsEntity extends SDbRegistryUser {
         mnPkEmployee = pk[0];
         
         statement = session.getDatabase().getConnection().createStatement();
-        msSql = "SELECT id_mat_cons_ent, id_emp " + 
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_EMP) + " " +
-                "WHERE id_emp = " + mnPkEmployee + " ";
+        msSql = "SELECT id_mat_cons_ent, id_link, id_ref " + 
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " " +
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_EMP + " AND id_ref = " + mnPkEmployee + " ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
-            cons = new SDbMaterialConsumptionEntityEmployee();
-            cons.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            maConsEntEmp.add(cons);
+            ent = new SDbMaterialConsumptionEntityUser();
+            ent.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
+            maConsEntEmp.add(ent);
+        }
+        
+        msSql = "SELECT id_mat_cons_ent, id_mat_cons_subent, id_link, id_ref " + 
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_USR) + " " +
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_EMP + " AND id_ref = " + mnPkEmployee + " ";
+        resultSet = statement.executeQuery(msSql);
+        while (resultSet.next()) {
+            sub = new SDbMaterialConsumptionSubentityUser();
+            sub.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4) });
+            maConsSubentEmp.add(sub);
         }
         
         moAuxBizPartner = new SDbBizPartner();
@@ -114,11 +129,22 @@ public class SDbConfEmployeeVsEntity extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_EMP) + " " +
-                "WHERE id_emp = " + mnPkEmployee + " ";
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " " +
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_EMP + " AND id_ref = " + mnPkEmployee + " ";
         session.getStatement().execute(msSql);
-        for (SDbMaterialConsumptionEntityEmployee ent : maConsEntEmp) {
-            ent.setPkEmployeeId(mnPkEmployee);
+        for (SDbMaterialConsumptionEntityUser ent : maConsEntEmp) {
+            ent.setPkLinkId(SModSysConsts.USRS_LINK_EMP);
+            ent.setPkReferenceId(mnPkEmployee);
+            ent.setRegistryNew(true);
+            ent.save(session);
+        }
+        
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_USR) + " " +
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_EMP + " AND id_ref = " + mnPkEmployee + " ";
+        session.getStatement().execute(msSql);
+        for (SDbMaterialConsumptionSubentityUser ent : maConsSubentEmp) {
+            ent.setPkLinkId(SModSysConsts.USRS_LINK_EMP);
+            ent.setPkReferenceId(mnPkEmployee);
             ent.setRegistryNew(true);
             ent.save(session);
         }
@@ -133,8 +159,12 @@ public class SDbConfEmployeeVsEntity extends SDbRegistryUser {
         
         registry.setPkEmployee(this.getPkEmployee());
         
-        for (SDbMaterialConsumptionEntityEmployee ee : this.getConsEntEmp()) {
+        for (SDbMaterialConsumptionEntityUser ee : this.getConsEntEmp()) {
             registry.getConsEntEmp().add(ee);
+        }
+        
+        for (SDbMaterialConsumptionSubentityUser ee : this.getConsSubentEmp()) {
+            registry.getConsSubentEmp().add(ee);
         }
         
         registry.setRegistryNew(this.isRegistryNew());

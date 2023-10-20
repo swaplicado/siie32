@@ -220,7 +220,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Claudio Peña, Edwin Carmona
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Claudio Peña
  */
 public abstract class SDataUtilities {
 
@@ -2831,6 +2831,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstantsSys.REP_FIN_AUX_ACC:
                 name = "reps/fin_aux_acc.jasper";
+                break;
+            case SDataConstantsSys.REP_FIN_AUX_ACC_DON:
+                name = "reps/fin_aux_acc_don.jasper";
                 break;
             case SDataConstantsSys.REP_FIN_REC:
                 name = "reps/fin_rec.jasper";

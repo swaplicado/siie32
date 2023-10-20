@@ -6,7 +6,7 @@
 package erp.mod.trn.form;
 
 import erp.mod.SModConsts;
-import erp.mod.trn.db.SDbConfWarehouseVsEntity;
+import erp.mod.trn.db.SDbConfWarehouseVsProvEntity;
 import erp.mod.trn.db.SDbMaterialProvisionEntity;
 import erp.mod.trn.db.SDbMaterialProvisionEntityWarehouse;
 import java.awt.event.ActionEvent;
@@ -32,9 +32,9 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Isabel Servín
  */
-public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListener {
+public class SFormConfWarehouseVsProvEntity extends SBeanForm implements ActionListener {
     
-    private SDbConfWarehouseVsEntity moRegistry;
+    private SDbConfWarehouseVsProvEntity moRegistry;
     
     private SGridPaneForm moGridMatProvEnt;
     private SGridPaneForm moGridMatProvEntSelected;
@@ -44,12 +44,12 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
     
 
     /**
-     * Creates new form SFormConfEmployeeVsEntity
+     * Creates new form SFormConfWarehouseVsProvEntity
      * @param client
      * @param title
      */
-    public SFormConfWarehouseVsEntity(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_CONF_WHS_VS_ENT, 0, title);
+    public SFormConfWarehouseVsProvEntity(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_CONF_WHS_VS_PRV_ENT, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -66,6 +66,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         jpRegistry = new javax.swing.JPanel();
         jpProvision = new javax.swing.JPanel();
         jpWarehouse = new javax.swing.JPanel();
+        jlWarehouse = new javax.swing.JLabel();
         moTextWarehouse = new sa.lib.gui.bean.SBeanFieldText();
         jpProvAvailable = new javax.swing.JPanel();
         jpProvAvailableLabel = new javax.swing.JPanel();
@@ -93,6 +94,9 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
 
         jpWarehouse.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
+        jlWarehouse.setText("Almacén:");
+        jpWarehouse.add(jlWarehouse);
+
         moTextWarehouse.setEditable(false);
         moTextWarehouse.setEnabled(false);
         moTextWarehouse.setPreferredSize(new java.awt.Dimension(400, 23));
@@ -104,7 +108,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
 
         jpProvAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlProvAvailable.setText("Entidades de suministro disponibles:");
+        jlProvAvailable.setText("Centros de suministro disponibles:");
         jpProvAvailableLabel.add(jlProvAvailable);
 
         jpProvAvailable.add(jpProvAvailableLabel, java.awt.BorderLayout.NORTH);
@@ -148,7 +152,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
 
         jpProvSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlProvSelected.setText("Entidades de suministro seleccionadas:");
+        jlProvSelected.setText("Centros de suministro seleccionadas:");
         jlProvSelected.setPreferredSize(new java.awt.Dimension(370, 16));
         jpProvSelectedLabel.add(jlProvSelected);
 
@@ -179,6 +183,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
     private javax.swing.JButton jbProvRemoveAll;
     private javax.swing.JLabel jlProvAvailable;
     private javax.swing.JLabel jlProvSelected;
+    private javax.swing.JLabel jlWarehouse;
     private javax.swing.JPanel jpGridProvAva;
     private javax.swing.JPanel jpGridProvSel;
     private javax.swing.JPanel jpProvAvailable;
@@ -197,9 +202,9 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         
         moTextWarehouse.setTextSettings("Almacén", 250);
         
-        // Entidades de consumo disponibles
+        // Centros de consumo disponibles
         
-        moGridMatProvEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT, 0, "Entidades de suministro") {
+        moGridMatProvEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT, 0, "Centros de suministro") {
             
             @Override
             public void initGrid() {
@@ -210,7 +215,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de suministro"));
 
                 return columns;
             }
@@ -219,9 +224,9 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         jpGridProvAva.add(moGridMatProvEnt);
         mvFormGrids.add(moGridMatProvEnt);
         
-        // Entidades de consumo seleccionadas
+        // Centros de suministro seleccionados
         
-        moGridMatProvEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT_WHS, 0, "Entidades de suministro seleccionadas") {
+        moGridMatProvEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT_WHS, 0, "Centros de suministro seleccionadas") {
             
             @Override
             public void initGrid() {
@@ -232,7 +237,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de suministro"));
                 //SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 //col.setEditable(true);
                 //columns.add(col);
@@ -367,7 +372,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbConfWarehouseVsEntity) registry;
+        moRegistry = (SDbConfWarehouseVsProvEntity) registry;
         
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -391,7 +396,7 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbConfWarehouseVsEntity registry = moRegistry.clone();
+        SDbConfWarehouseVsProvEntity registry = moRegistry.clone();
         
         if (registry.isRegistryNew()) { }
         

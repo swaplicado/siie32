@@ -25,7 +25,7 @@ public class SFormMaterialPresentation extends sa.lib.gui.bean.SBeanForm {
     private SDbMaterialPresentation moRegistry;
     
     /**
-     * Creates new form SFormItemCost
+     * Creates new form SFormMaterialPresentation
      * @param client
      * @param title
      */
@@ -81,7 +81,6 @@ public class SFormMaterialPresentation extends sa.lib.gui.bean.SBeanForm {
         jlPresentation.setPreferredSize(new java.awt.Dimension(130, 23));
         jPanel24.add(jlPresentation);
 
-        moTextPresentation.setEditable(false);
         moTextPresentation.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel24.add(moTextPresentation);
 

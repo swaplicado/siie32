@@ -841,28 +841,40 @@ public class SModuleHrs extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Empleado", 1);
                 String join = "";
                 String where = "";
-                
-                if (params == null || params.getType() == SGuiConsts.PARAM_REGS_ACT) {
-                    join = "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON e.id_emp = em.id_emp ";
-                    where = "e.b_act ";
+                switch (subtype) {
+                    case SModConsts.TRN_MAINT_USER:
+                        sql = "SELECT e.id_emp AS " + SDbConsts.FIELD_ID + "1, bp.bp AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS e "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
+                                + "e.id_emp = bp.id_bp "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAINT_USER) + " AS mu ON " 
+                                + "e.id_emp = mu.id_maint_user "
+                                + "WHERE mu.b_employee AND e.b_act AND NOT e.b_del AND NOT bp.b_del";
+                        break;
+                    default:
+                        if (params == null || params.getType() == SGuiConsts.PARAM_REGS_ACT) {
+                            join = "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON e.id_emp = em.id_emp ";
+                            where = "e.b_act ";
+                        }
+                        else if (params.getType() == SGuiConsts.PARAM_REGS_ALL) {
+                            join = "";
+                            where = "e.id_emp IN ("
+                                + "SELECT DISTINCT pr.id_emp "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del "
+                                + "ORDER BY pr.id_emp) ";
+                        }
+
+                        sql = "SELECT e.id_emp AS " + SDbConsts.FIELD_ID + "1, bp.bp AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS e "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON e.id_emp = bp.id_bp "
+                                + join
+                                + "WHERE NOT bp.b_del AND NOT e.b_del "
+                                + (where.isEmpty() ? "" : "AND " + where)
+                                + "ORDER BY bp.bp, e.id_emp ";
+                        break;
                 }
-                else if (params.getType() == SGuiConsts.PARAM_REGS_ALL) {
-                    join = "";
-                    where = "e.id_emp IN ("
-                        + "SELECT DISTINCT pr.id_emp "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                        + "WHERE NOT p.b_del AND NOT pr.b_del "
-                        + "ORDER BY pr.id_emp) ";
-                }
-                
-                sql = "SELECT e.id_emp AS " + SDbConsts.FIELD_ID + "1, bp.bp AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " AS e "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON e.id_emp = bp.id_bp "
-                        + join
-                        + "WHERE NOT bp.b_del AND NOT e.b_del "
-                        + (where.isEmpty() ? "" : "AND " + where)
-                        + "ORDER BY bp.bp, e.id_emp ";
                 break;
             case SModConsts.HRSU_TP_EXP:
                 settings = new SGuiCatalogueSettings("Tipo gasto", 1);

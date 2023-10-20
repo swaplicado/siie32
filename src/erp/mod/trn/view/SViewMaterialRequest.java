@@ -14,6 +14,7 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
+import erp.mod.trn.form.SFormMaterialRequest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import sa.lib.gui.SGuiParams;
  */
 public class SViewMaterialRequest extends SGridPaneView implements ActionListener {
 
+    private JButton jbNewSupReq;
     private JButton jbPrint;
     private JButton jbAuthCardex;
     private JButton jbAuthorize;
@@ -54,7 +56,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private SDialogAuthorizationCardex moDialogAuthCardex;
     private SDialogMaterialRequestSegregation moDialogSegregations;
     
+    private boolean hasSupReq;
     private boolean hasAuthRight;
+    private boolean hasPetSupRight;
     
     /**
      * @param client GUI client.
@@ -70,20 +74,28 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private void initComponents() {
         setRowButtonsEnabled(true);
         
+        hasSupReq = (((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight && 
+                ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight);
         hasAuthRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
+        hasPetSupRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight &&
+                ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         
+        jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva requisición de suministro", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Kardex de autorizaciones", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
         
+        getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
         
+        jbNewSupReq.setEnabled(mbApplyNew);
+        jbPrint.setEnabled(hasPetSupRight);
         jbPrint.setEnabled(true);
         jbAuthCardex.setEnabled(true);
         jbAuthorize.setEnabled(hasAuthRight);
@@ -108,6 +120,23 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             jbRowCopy.setEnabled(false);
             jbRowDisable.setEnabled(false);
             jbRowDelete.setEnabled(false);
+        }
+    }
+    
+    private void actionNewSupReq() {
+        if (jbNewSupReq.isEnabled()) {
+            try {
+                SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición de materiales", SModConsts.TRNX_MAT_REQ_STK_SUP);
+                form.setRegistry(new SDbMaterialRequest());
+                form.setVisible(true);
+                if (form.validateForm().isValid()) {
+                    form.getRegistry().save(miClient.getSession());
+                }
+                this.refreshGridWithRefresh();
+            }
+            catch(Exception e) {
+                miClient.showMsgBoxError(e.getMessage());
+            }
         }
     }
     
@@ -225,6 +254,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     
                     moDialogSegregations.setFormParams(key);
                     moDialogSegregations.setVisible(true);
+                    
+                    miClient.getSession().notifySuscriptors(mnGridType);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -244,6 +275,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     
     @Override
     public void prepareSqlQuery() {
+        String select = "";
         String where = "";
         String join = "";
         boolean needJoin = false;
@@ -264,9 +296,26 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         switch (mnGridMode) {
             case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
+                if (usrId != 2 ) { // SUPER
+                    needJoin = true;
+                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
+                            + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
+                }
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
+                join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
+                        + "v.id_mat_req = aut.res_pk_n1_n ";
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " ";
+                break;
+            case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH:
+                select += "uaut.usr AS autorizo, urej.usr AS rechazo, ";
+                join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
+                        + "v.id_mat_req = aut.res_pk_n1_n "
+                        + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uaut ON " 
+                        + "aut.fk_usr_authorn_n = uaut.id_usr "
+                        + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS urej ON " 
+                        + "aut.fk_usr_reject_n = urej.id_usr ";
+                where += (where.isEmpty() ? "" : "AND ") + "(aut.fk_usr_authorn_n IS NOT NULL OR aut.fk_usr_reject_n IS NOT NULL) AND aut.fk_usr_step = " + usrId + " ";
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " OR v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") " ;
@@ -285,22 +334,25 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
                 + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " " 
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
+                + "v.id_mat_req = mrc.id_mat_req "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
-                + "v.fk_ent_mat_cons_ent = ceu.id_mat_cons_ent AND ceu.id_usr = " + usrId + " ";
+                + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PET || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
             if (usrId != 2 ) { // SUPER
                 needJoin = true;
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
-                        + "OR peu.id_usr = " + usrId + " OR ceu.id_usr = " + usrId + ") ";
+                        + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") OR aut.fk_usr_step = " + usrId + ") ";
             }
         }
         
-        msSql = "SELECT v.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
+        msSql = "SELECT DISTINCT v.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt AS " + SDbConsts.FIELD_DATE + ", "
-                + "v.num AS folio, "
+                + "v.tp_req, "
+                + "LPAD(v.num, 6, 0) AS folio, "
                 + "v.dt_req_n, "
                 + "v.ref, "
                 + "v.b_ext_sys, "
@@ -313,8 +365,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "smpu.name AS comp_status, "
                 + "ur.usr AS usr_req, "
                 + "bmu.bp AS contractor, "
-                + "ce.code AS cons_ent, "
-                + "cse.code AS cons_subent, "
+                + "cob.ent, "
+                + select
                 + "CASE "
                     + "WHEN cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
@@ -358,12 +410,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_usr_req = ur.id_usr "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAINT_USER) + " AS mu ON "
                 + "v.fk_contractor_n = mu.id_maint_user "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS cob ON "
+                + "v.fk_whs_cob_n = cob.id_cob AND v.fk_whs_whs_n = cob.id_ent "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bmu ON "
                 + "mu.id_maint_user = bmu.id_bp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS ce ON "
-                + "v.fk_ent_mat_cons_ent = ce.id_mat_cons_ent "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " AS cse ON "
-                + "v.fk_subent_mat_cons_ent_n = cse.id_mat_cons_ent AND v.fk_subent_mat_cons_subent_n = cse.id_mat_cons_subent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
                 + "v.fk_usr_clo_prov = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ucp ON "
@@ -381,20 +431,24 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "prov_ent", "Ent. suministro"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "prov_ent", "Cen suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cons_ent", "Ent. consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cons_subent", "Subent. consumo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_req", "Tipo requisición", 20));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "contractor", "Contratista"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ref", "Referencia"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_pty", "Prioridad"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_status", "Estatus"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "auth_status", "Autorización"));
+        if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH) {
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "autorizo", "Autorizó"));
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "rechazo", "Rechazó"));
+        }
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "sum_status", "Suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "comp_status", "Compras"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cob.ent", "Almacén"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_L, "b_clo_prov", "Terminado suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_clo", "Usr terminado suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_usr_clo_prov", "Usr TS terminado suministro"));
@@ -422,6 +476,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
         moSuscriptionsSet.add(SModConsts.CFGU_AUTHORN_STEP);
+        moSuscriptionsSet.add(SModConsts.TRN_MAT_REQ);
+        moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_PEND_SUP);
+        moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_PEND_PUR);
     }
 
     @Override
@@ -429,7 +486,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbPrint) {
+            if (button == jbNewSupReq) {
+                actionNewSupReq();
+            }
+            else if (button == jbPrint) {
                 actionPrint();
             }
             else if (button == jbAuthCardex) {

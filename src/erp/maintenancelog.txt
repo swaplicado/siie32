@@ -1,4 +1,75 @@
 ================================================================================
+SIIE 3.2 225.0/ 2023-10-20
+Edwin Omar CARMONA FIGUEROA
+
+--------------------------------------------------------------------------------
+1)Configuración de autorizaciones mediante puestos de usuarios ligados a empleados.
+
+================================================================================
+SIIE 3.2 224.1/ 2023-10-18
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación de catálogos de tipos de materiales y atributos.
+2) Creación de catálogo de configuración de tipo de material vs atributos.
+
+================================================================================
+SIIE 3.2 224.0/ 2023-10-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación de de tipos de material.
+2) Creación de atributos de materiales.
+3) Creación de tipos de materiales vs atributos de materiales.
+4) Creación de tabla de item vs atributos de materiales.
+6) Modificación de ítems para agregar fk de tipo de material y sus atributos
+
+================================================================================
+SIIE 3.2 223.3/ 2023-10-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de personalización de contabilización de documentos (solamente facturas por el momento, las NC quedan para otra ocasión.)
+
+================================================================================
+SIIE 3.2 223.2/ 2023-10-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en las configuraciones para requisiciones.
+
+================================================================================
+SIIE 3.2 223.1/ 2023-10-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio en la obtención de centros de costo relacionados con un subcentro de consumo directamente sin tomar en cuenta ítems.
+
+================================================================================
+SIIE 3.2 223.0/ 2023-10-11
+Edwin Omar CARMONA FIGUEROA
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de solicitudes de cotización.
+2) Trabajo en proceso de personalización de contabilización de documentos.
+
+================================================================================
+SIIE 3.2 222.0/ 2023-10-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de las requisiciones de materiales de tipo "S".
+2) Implementación de la importación de las entradas de inventarios desde archivo externo.
+
+================================================================================
+SIIE 3.2 220.1/ 2023-10-03
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Inhabilitación de la opción "Item nuevo" en requisiciones de materiales.
+2) Se agregó el doble click en el item picker de requisiciones.
+
+================================================================================
+SIIE 3.2 220.0/ 2023-09-26
+Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Release estable de requisiciones de materiales.
+
+================================================================================
 SIIE 3.2 219.0/ 2023-09-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

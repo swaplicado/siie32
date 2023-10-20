@@ -17,17 +17,15 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel
+ * @author Isabel Servín
  */
 public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser implements SGridRow, Serializable {
 
     protected int mnPkMatProvisionEntityId;
     protected int mnPkCompanyBranchId;
     protected int mnPkWarehouseId;
-    /*
-    protected int mnFkUserInsertId;
-    protected Date mtTsUserInsert;
-    */
+    protected int mnFkUserId;
+    protected Date mtTsUser;
     
     protected SDbMaterialProvisionEntity moAuxMatProvEnt;
     
@@ -38,16 +36,16 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
     public void setPkMatProvisionEntityId(int n) { mnPkMatProvisionEntityId = n; }
     public void setPkCompanyBranchId(int n) { mnPkCompanyBranchId = n; }
     public void setPkWarehouseId(int n) { mnPkWarehouseId = n; }
-    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
-    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
+    public void setFkUserId(int n) { mnFkUserInsertId = n; }
+    public void setTsUser(Date t) { mtTsUserInsert = t; }
 
     public void setAuxMatProvEnt(SDbMaterialProvisionEntity o) { moAuxMatProvEnt = o; }
     
     public int getPkMatProvisionEntityId() { return mnPkMatProvisionEntityId; }
     public int getPkCompanyBranchId() { return mnPkCompanyBranchId; }
     public int getPkWarehouseId() { return mnPkWarehouseId; }
-    public int getFkUserInsertId() { return mnFkUserInsertId; }
-    public Date getTsUserInsert() { return mtTsUserInsert; }
+    public int getFkUserId() { return mnFkUserInsertId; }
+    public Date getTsUser() { return mtTsUserInsert; }
 
 
     public SDbMaterialProvisionEntity getAuxMatProvEnt() { return moAuxMatProvEnt; }
@@ -123,8 +121,8 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
             mnPkMatProvisionEntityId = resultSet.getInt("id_mat_prov_ent");
             mnPkCompanyBranchId = resultSet.getInt("id_cob");
             mnPkWarehouseId = resultSet.getInt("id_whs");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mnFkUserId = resultSet.getInt("fk_usr");
+            mtTsUser = resultSet.getTimestamp("ts_usr");
 
             readAuxMatProvEnt(session);
             
@@ -139,14 +137,14 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        mnFkUserInsertId = session.getUser().getPkUserId();
+        mnFkUserId = session.getUser().getPkUserId();
         
         if (mbRegistryNew) {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkMatProvisionEntityId + ", " + 
                     mnPkCompanyBranchId + ", " + 
                     mnPkWarehouseId + ", " + 
-                    mnFkUserInsertId + ", " + 
+                    mnFkUserId + ", " + 
                     "NOW()" + " " + 
                     ")";
         }
@@ -155,8 +153,8 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
                     //"id_mat_prov_ent = " + mnPkMatProvisionEntityId + ", " +
                     //"id_cob = " + mnPkCompanyBranchId + ", " +
                     //"id_whs = " + mnPkWarehouseId + ", " +
-                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                    //"ts_usr_ins = " + "NOW()" + " " +
+                    //"fk_usr = " + mnFkUserInsertId + ", " +
+                    //"ts_usr = " + "NOW()" + " " +
                     getSqlWhere();
         }
         
@@ -173,8 +171,8 @@ public class SDbMaterialProvisionEntityWarehouse extends SDbRegistryUser impleme
         registry.setPkMatProvisionEntityId(this.getPkMatProvisionEntityId());
         registry.setPkCompanyBranchId(this.getPkCompanyBranchId());
         registry.setPkWarehouseId(this.getPkWarehouseId());
-        registry.setFkUserInsertId(this.getFkUserInsertId());
-        registry.setTsUserInsert(this.getTsUserInsert());
+        registry.setFkUserId(this.getFkUserId());
+        registry.setTsUser(this.getTsUser());
 
         registry.setRegistryNew(this.isRegistryNew());
         

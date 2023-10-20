@@ -47,6 +47,7 @@ import erp.mcfg.data.SDataParamsCompany;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
+import erp.mfin.form.SPanelAccount;
 import erp.mfin.form.SPanelRecord;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataItemBizPartnerDescription;
@@ -63,6 +64,8 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
+import erp.mtrn.data.SDataDpsCustomAccEntry;
+import erp.mtrn.data.SDataDpsCustomAccEntryRow;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
 import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
@@ -95,6 +98,7 @@ import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
@@ -113,10 +117,14 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.gui.util.SUtilConsts;
@@ -125,6 +133,7 @@ import sa.lib.SLibMethod;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
@@ -132,9 +141,9 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  */
-public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
+public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.ChangeListener, javax.swing.event.ListSelectionListener, erp.lib.form.SFormExtendedInterface {
     
     private static final int TAB_ETY = 0; // entries
     private static final int TAB_MKT = 1; // marketing
@@ -142,7 +151,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int TAB_CFD_INT_COM = 3; // CFD International Commerce
     private static final int TAB_CFD_ADD = 4; // CFD Addenda
     private static final int TAB_CFD_XML = 5; // CFD XML file
-    private static final int CFDI_RELATED = 1; // Para obtener los CFDI relacionados
+    private static final int TAB_ACC = 6; // costomized accounting
+    private static final int CFDI_RELATED = 1; // para obtener los CFDI relacionados
+    private static final int ACTION_NEW = 1; // acción de captura: nuevo
+    private static final int ACTION_EDIT = 2; // acción de captura: modificación
+    private static final int DECS_PCT = 4; // 0.01% is 0.0001
     
     private static final int UUID_FIRST_SECC_LENGHT = 8;
 
@@ -153,6 +166,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbResetingForm;
     private boolean mbUpdatingForm;
     private boolean mbDocBeingImported;
+    private boolean mbMatRequestImport;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -260,6 +274,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartner;
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartnerBranch;
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartnerBranchAddress;
+    private erp.lib.form.SFormField moFieldAccItem;
+    private erp.lib.form.SFormField moFieldAccItemRef_n;
+    private erp.lib.form.SFormField moFieldAccQuantity;
+    private erp.lib.form.SFormField moFieldAccUnit;
+    private erp.lib.form.SFormField moFieldAccIsSubtotalPctApplying;
+    private erp.lib.form.SFormField moFieldAccSubtotalPct;
+    private erp.lib.form.SFormField moFieldAccSubtotalCy;
+    private erp.lib.form.SFormField moFieldAccConcept;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCfdCceGroupAddressee;
     
     private erp.mtrn.data.SDataDps moParamDpsSource;
@@ -324,6 +346,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.form.SFormOptionPickerBizPartner moPickerBizPartner;
     private erp.lib.table.STablePaneGrid moPaneGridEntries;
     private erp.lib.table.STablePaneGrid moPaneGridNotes;
+    private erp.lib.table.STablePaneGrid moPaneGridCustomAcc;
     private erp.mtrn.form.SFormDpsEntry moFormEntry;
     private erp.mtrn.form.SFormDpsEntryWizard moFormEntryWizard;
     private erp.mtrn.form.SFormDpsNotes moFormNotes;
@@ -343,6 +366,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private cfd.ver33.DElementComprobante moComprobante33;
     private cfd.ver40.DElementComprobante moComprobante40;
     private java.lang.String msXmlUuid;
+    private erp.mitm.data.SDataItem moAccItem;
+    private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
+    private int mnAccCurrentAction;
+    private double mdAccSubtotal;
+    private double mdAccSubtotalCy;
+    private double mdAccSubtotalPct;
+    private boolean mbCustomAccPrepared;
 
     /**
      * Creates new form DFormDps
@@ -399,7 +429,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlDate = new javax.swing.JLabel();
         jftDate = new javax.swing.JFormattedTextField();
         jbDate = new javax.swing.JButton();
-        jbTime = new javax.swing.JButton();
+        jbSetTime = new javax.swing.JButton();
         jckIsRebill = new javax.swing.JCheckBox();
         jPanel16 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
@@ -470,6 +500,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel13 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
         jckRecordUser = new javax.swing.JCheckBox();
+        jtbSwitchCustomAcc = new javax.swing.JToggleButton();
         jPanel34 = new javax.swing.JPanel();
         jtfRecordManualDateRo = new javax.swing.JTextField();
         jtfRecordManualBranchRo = new javax.swing.JTextField();
@@ -541,6 +572,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryWizard = new javax.swing.JButton();
         jsEntry03 = new javax.swing.JSeparator();
         jbEntryViewLinks = new javax.swing.JButton();
+        jsEntry4 = new javax.swing.JSeparator();
+        jbEntryImportFromMatRequest = new javax.swing.JButton();
+        jbEntryViewMatReqLinks = new javax.swing.JButton();
+        jsEntry5 = new javax.swing.JSeparator();
         jbExportCsv = new javax.swing.JButton();
         jpEntriesControlsEast = new javax.swing.JPanel();
         jlAdjustmentSubtypeId = new javax.swing.JLabel();
@@ -824,6 +859,52 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbCfdiRelated = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtaCfdiRelated = new javax.swing.JTextArea();
+        jpCustomAcc = new javax.swing.JPanel();
+        jpCustomAcc1 = new javax.swing.JPanel();
+        jpCustomAcc11 = new javax.swing.JPanel();
+        jpCustomAcc111 = new javax.swing.JPanel();
+        jpCustomAcc1111 = new javax.swing.JPanel();
+        jlAccItem = new javax.swing.JLabel();
+        jcbAccItem = new javax.swing.JComboBox();
+        jbPickAccItem = new javax.swing.JButton();
+        jpCustomAcc1112 = new javax.swing.JPanel();
+        jlAccItemRef_n = new javax.swing.JLabel();
+        jcbAccItemRef_n = new javax.swing.JComboBox();
+        jbPickAccItemRef_n = new javax.swing.JButton();
+        jpCustomAcc112 = new javax.swing.JPanel();
+        jlAccDummyCostCenter = new javax.swing.JLabel();
+        jpCustomAcc12 = new javax.swing.JPanel();
+        jpCustomAcc121 = new javax.swing.JPanel();
+        jlAccQuantity = new javax.swing.JLabel();
+        jtfAccQuantity = new javax.swing.JTextField();
+        jlAccUnit = new javax.swing.JLabel();
+        jcbAccUnit = new javax.swing.JComboBox();
+        jbPickAccUnit = new javax.swing.JButton();
+        jckAccIsSubtotalPctApplying = new javax.swing.JCheckBox();
+        jtfAccSubtotalPct = new javax.swing.JTextField();
+        jtfAccSubtotal = new javax.swing.JTextField();
+        jtfAccSubtotalCur = new javax.swing.JTextField();
+        jtfAccSubtotalCy = new javax.swing.JTextField();
+        jtfAccSubtotalCyCur = new javax.swing.JTextField();
+        jbExeWizardAccSubtotal = new javax.swing.JButton();
+        jpCustomAcc122 = new javax.swing.JPanel();
+        jPanel139 = new javax.swing.JPanel();
+        jlAccConcept = new javax.swing.JLabel();
+        jtfAccConcept = new javax.swing.JTextField();
+        jPanel142 = new javax.swing.JPanel();
+        jbCustomAccEntryNew = new javax.swing.JButton();
+        jbCustomAccEntryCopy = new javax.swing.JButton();
+        jbCustomAccEntryEdit = new javax.swing.JButton();
+        jbCustomAccEntryDelete = new javax.swing.JButton();
+        jbCustomAccEntryOk = new javax.swing.JButton();
+        jbCustomAccEntryCancel = new javax.swing.JButton();
+        jpCustomAcc2 = new javax.swing.JPanel();
+        jlAccSubtotal = new javax.swing.JLabel();
+        jtfAccSubtotalSubtotalPct = new javax.swing.JTextField();
+        jtfAccSubtotalSubtotal = new javax.swing.JTextField();
+        jtfAccSubtotalSubtotalCur = new javax.swing.JTextField();
+        jtfAccSubtotalSubtotalCy = new javax.swing.JTextField();
+        jtfAccSubtotalSubtotalCyCur = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
         jpControlsPk = new javax.swing.JPanel();
         jtfPkRo = new javax.swing.JTextField();
@@ -998,14 +1079,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbDate);
 
-        jbTime.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_clock.gif"))); // NOI18N
-        jbTime.setToolTipText("Seleccionar hora");
-        jbTime.setFocusable(false);
-        jbTime.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel11.add(jbTime);
+        jbSetTime.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_clock.gif"))); // NOI18N
+        jbSetTime.setToolTipText("Seleccionar hora");
+        jbSetTime.setFocusable(false);
+        jbSetTime.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbSetTime);
 
         jckIsRebill.setText("Re-emisión");
-        jckIsRebill.setPreferredSize(new java.awt.Dimension(83, 23));
+        jckIsRebill.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel11.add(jckIsRebill);
 
         jPanel57.add(jPanel11);
@@ -1056,7 +1137,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jtfDaysOfCredit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDaysOfCredit.setText("0");
-        jtfDaysOfCredit.setPreferredSize(new java.awt.Dimension(35, 23));
+        jtfDaysOfCredit.setPreferredSize(new java.awt.Dimension(47, 23));
         jPanel18.add(jtfDaysOfCredit);
 
         jbDateMaturity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -1312,8 +1393,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jckRecordUser.setText("Póliza contable:");
         jckRecordUser.setMargin(new java.awt.Insets(2, 0, 2, 2));
-        jckRecordUser.setPreferredSize(new java.awt.Dimension(150, 23));
+        jckRecordUser.setPreferredSize(new java.awt.Dimension(213, 23));
         jPanel19.add(jckRecordUser);
+
+        jtbSwitchCustomAcc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_custom_acc.gif"))); // NOI18N
+        jtbSwitchCustomAcc.setToolTipText("Personalizar contabilización");
+        jtbSwitchCustomAcc.setDisabledSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_custom_acc_on_disabled.gif"))); // NOI18N
+        jtbSwitchCustomAcc.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbSwitchCustomAcc.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_custom_acc_on.gif"))); // NOI18N
+        jPanel19.add(jtbSwitchCustomAcc);
 
         jPanel13.add(jPanel19);
 
@@ -1323,7 +1411,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfRecordManualDateRo.setText("01/01/2000");
         jtfRecordManualDateRo.setToolTipText("Fecha de la póliza contable");
         jtfRecordManualDateRo.setFocusable(false);
-        jtfRecordManualDateRo.setPreferredSize(new java.awt.Dimension(65, 23));
+        jtfRecordManualDateRo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel34.add(jtfRecordManualDateRo);
 
         jtfRecordManualBranchRo.setEditable(false);
@@ -1627,7 +1715,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpDocument.add(jpHeader, java.awt.BorderLayout.NORTH);
 
-        jpEntries.setLayout(new java.awt.BorderLayout());
+        jpEntries.setLayout(new java.awt.BorderLayout(0, 2));
 
         jpEntriesControls.setLayout(new java.awt.BorderLayout());
 
@@ -1691,6 +1779,24 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryViewLinks.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryViewLinks);
 
+        jsEntry4.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jsEntry4.setPreferredSize(new java.awt.Dimension(3, 23));
+        jpEntriesControlsWest.add(jsEntry4);
+
+        jbEntryImportFromMatRequest.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_b.gif"))); // NOI18N
+        jbEntryImportFromMatRequest.setToolTipText("Importar partidas de requisición de materiales");
+        jbEntryImportFromMatRequest.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbEntryImportFromMatRequest);
+
+        jbEntryViewMatReqLinks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_link_b.gif"))); // NOI18N
+        jbEntryViewMatReqLinks.setToolTipText("Ver vínculos de requisición de materiales de la partida");
+        jbEntryViewMatReqLinks.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbEntryViewMatReqLinks);
+
+        jsEntry5.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jsEntry5.setPreferredSize(new java.awt.Dimension(3, 23));
+        jpEntriesControlsWest.add(jsEntry5);
+
         jbExportCsv.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_file_csv.gif"))); // NOI18N
         jbExportCsv.setToolTipText("Exportar CSV [Ctrl + E]");
         jbExportCsv.setPreferredSize(new java.awt.Dimension(23, 23));
@@ -1701,16 +1807,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpEntriesControlsEast.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
         jlAdjustmentSubtypeId.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jlAdjustmentSubtypeId.setText("Tipo de ajuste: ");
-        jlAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlAdjustmentSubtypeId.setText("Tipo ajuste: ");
+        jlAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(75, 23));
         jpEntriesControlsEast.add(jlAdjustmentSubtypeId);
 
         jcbAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(200, 23));
         jpEntriesControlsEast.add(jcbAdjustmentSubtypeId);
 
         jlTaxRegionId.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jlTaxRegionId.setText("Región de impuestos: ");
-        jlTaxRegionId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlTaxRegionId.setText("Región impuestos: ");
+        jlTaxRegionId.setPreferredSize(new java.awt.Dimension(110, 23));
         jpEntriesControlsEast.add(jlTaxRegionId);
 
         jcbTaxRegionId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -2092,7 +2198,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jTabbedPane.addTab("Comercialización", jpMarketing);
 
-        jpNotes.setLayout(new java.awt.BorderLayout());
+        jpNotes.setLayout(new java.awt.BorderLayout(0, 2));
 
         jpNotesControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
@@ -2713,7 +2819,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCfdXml.setLayout(new java.awt.BorderLayout());
 
         jPanel73.setBorder(javax.swing.BorderFactory.createTitledBorder("XML:"));
-        jPanel73.setLayout(new java.awt.BorderLayout());
+        jPanel73.setLayout(new java.awt.BorderLayout(0, 2));
 
         jPanel74.setLayout(new java.awt.GridLayout(7, 2, 0, 2));
 
@@ -2908,6 +3014,223 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCfdXml.add(jPanel73, java.awt.BorderLayout.CENTER);
 
         jTabbedPane.addTab("CFD: XML", jpCfdXml);
+
+        jpCustomAcc.setBorder(javax.swing.BorderFactory.createTitledBorder("Personalización de contabilización:"));
+        jpCustomAcc.setLayout(new java.awt.BorderLayout(0, 2));
+
+        jpCustomAcc1.setLayout(new java.awt.BorderLayout(0, 1));
+
+        jpCustomAcc11.setLayout(new java.awt.BorderLayout());
+
+        jpCustomAcc111.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+
+        jpCustomAcc1111.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccItem.setText("Ítem partida:*");
+        jlAccItem.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc1111.add(jlAccItem);
+
+        jcbAccItem.setPreferredSize(new java.awt.Dimension(450, 23));
+        jpCustomAcc1111.add(jcbAccItem);
+
+        jbPickAccItem.setText("...");
+        jbPickAccItem.setFocusable(false);
+        jbPickAccItem.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc1111.add(jbPickAccItem);
+
+        jpCustomAcc111.add(jpCustomAcc1111);
+
+        jpCustomAcc1112.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccItemRef_n.setText("Ítem referencia:");
+        jlAccItemRef_n.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc1112.add(jlAccItemRef_n);
+
+        jcbAccItemRef_n.setPreferredSize(new java.awt.Dimension(450, 23));
+        jpCustomAcc1112.add(jcbAccItemRef_n);
+
+        jbPickAccItemRef_n.setText("...");
+        jbPickAccItemRef_n.setFocusable(false);
+        jbPickAccItemRef_n.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc1112.add(jbPickAccItemRef_n);
+
+        jpCustomAcc111.add(jpCustomAcc1112);
+
+        jpCustomAcc11.add(jpCustomAcc111, java.awt.BorderLayout.WEST);
+
+        jpCustomAcc112.setLayout(new java.awt.BorderLayout());
+
+        jlAccDummyCostCenter.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jlAccDummyCostCenter.setText("[Panel centro de costo-beneficio]");
+        jpCustomAcc112.add(jlAccDummyCostCenter, java.awt.BorderLayout.CENTER);
+
+        jpCustomAcc11.add(jpCustomAcc112, java.awt.BorderLayout.CENTER);
+
+        jpCustomAcc1.add(jpCustomAcc11, java.awt.BorderLayout.PAGE_START);
+
+        jpCustomAcc12.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+
+        jpCustomAcc121.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccQuantity.setText("Cantidad: *");
+        jlAccQuantity.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc121.add(jlAccQuantity);
+
+        jtfAccQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccQuantity.setText("0.0000");
+        jtfAccQuantity.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc121.add(jtfAccQuantity);
+
+        jlAccUnit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAccUnit.setText("Unidad partida:*");
+        jlAccUnit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc121.add(jlAccUnit);
+
+        jcbAccUnit.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpCustomAcc121.add(jcbAccUnit);
+
+        jbPickAccUnit.setText("...");
+        jbPickAccUnit.setFocusable(false);
+        jbPickAccUnit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc121.add(jbPickAccUnit);
+
+        jckAccIsSubtotalPctApplying.setText("%");
+        jckAccIsSubtotalPctApplying.setPreferredSize(new java.awt.Dimension(40, 23));
+        jpCustomAcc121.add(jckAccIsSubtotalPctApplying);
+
+        jtfAccSubtotalPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccSubtotalPct.setText("000.00%");
+        jtfAccSubtotalPct.setPreferredSize(new java.awt.Dimension(60, 23));
+        jpCustomAcc121.add(jtfAccSubtotalPct);
+
+        jtfAccSubtotal.setEditable(false);
+        jtfAccSubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccSubtotal.setText("0,000,000,000.00");
+        jtfAccSubtotal.setFocusable(false);
+        jtfAccSubtotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc121.add(jtfAccSubtotal);
+
+        jtfAccSubtotalCur.setEditable(false);
+        jtfAccSubtotalCur.setText("ERP");
+        jtfAccSubtotalCur.setFocusable(false);
+        jtfAccSubtotalCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc121.add(jtfAccSubtotalCur);
+
+        jtfAccSubtotalCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccSubtotalCy.setText("0,000,000,000.00");
+        jtfAccSubtotalCy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc121.add(jtfAccSubtotalCy);
+
+        jtfAccSubtotalCyCur.setEditable(false);
+        jtfAccSubtotalCyCur.setText("CUR");
+        jtfAccSubtotalCyCur.setFocusable(false);
+        jtfAccSubtotalCyCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc121.add(jtfAccSubtotalCyCur);
+
+        jbExeWizardAccSubtotal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
+        jbExeWizardAccSubtotal.setToolTipText("Asignar remanente");
+        jbExeWizardAccSubtotal.setFocusable(false);
+        jbExeWizardAccSubtotal.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc121.add(jbExeWizardAccSubtotal);
+
+        jpCustomAcc12.add(jpCustomAcc121);
+
+        jpCustomAcc122.setLayout(new java.awt.BorderLayout());
+
+        jPanel139.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccConcept.setText("Concepto:*");
+        jlAccConcept.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel139.add(jlAccConcept);
+
+        jtfAccConcept.setText("TEXT");
+        jtfAccConcept.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel139.add(jtfAccConcept);
+
+        jpCustomAcc122.add(jPanel139, java.awt.BorderLayout.WEST);
+
+        jPanel142.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jbCustomAccEntryNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
+        jbCustomAccEntryNew.setToolTipText("Crear partida [Ctrl + N]");
+        jbCustomAccEntryNew.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel142.add(jbCustomAccEntryNew);
+
+        jbCustomAccEntryCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_copy.gif"))); // NOI18N
+        jbCustomAccEntryCopy.setToolTipText("Copiar partida");
+        jbCustomAccEntryCopy.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel142.add(jbCustomAccEntryCopy);
+
+        jbCustomAccEntryEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbCustomAccEntryEdit.setToolTipText("Modificar partida [Ctrl + M]");
+        jbCustomAccEntryEdit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel142.add(jbCustomAccEntryEdit);
+
+        jbCustomAccEntryDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbCustomAccEntryDelete.setToolTipText("Eliminar partida [Ctrl + D]");
+        jbCustomAccEntryDelete.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel142.add(jbCustomAccEntryDelete);
+
+        jbCustomAccEntryOk.setText("Aceptar"); // NOI18N
+        jbCustomAccEntryOk.setToolTipText("[Ctrl + Enter]");
+        jbCustomAccEntryOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel142.add(jbCustomAccEntryOk);
+
+        jbCustomAccEntryCancel.setText("Cancelar"); // NOI18N
+        jbCustomAccEntryCancel.setToolTipText("[Escape]");
+        jPanel142.add(jbCustomAccEntryCancel);
+
+        jpCustomAcc122.add(jPanel142, java.awt.BorderLayout.CENTER);
+
+        jpCustomAcc12.add(jpCustomAcc122);
+
+        jpCustomAcc1.add(jpCustomAcc12, java.awt.BorderLayout.PAGE_END);
+
+        jpCustomAcc.add(jpCustomAcc1, java.awt.BorderLayout.NORTH);
+
+        jpCustomAcc2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jlAccSubtotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAccSubtotal.setText("Subtotal:");
+        jlAccSubtotal.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpCustomAcc2.add(jlAccSubtotal);
+
+        jtfAccSubtotalSubtotalPct.setEditable(false);
+        jtfAccSubtotalSubtotalPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccSubtotalSubtotalPct.setText("000.00%");
+        jtfAccSubtotalSubtotalPct.setFocusable(false);
+        jtfAccSubtotalSubtotalPct.setPreferredSize(new java.awt.Dimension(60, 23));
+        jpCustomAcc2.add(jtfAccSubtotalSubtotalPct);
+
+        jtfAccSubtotalSubtotal.setEditable(false);
+        jtfAccSubtotalSubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccSubtotalSubtotal.setText("0,000,000,000.00");
+        jtfAccSubtotalSubtotal.setFocusable(false);
+        jtfAccSubtotalSubtotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc2.add(jtfAccSubtotalSubtotal);
+
+        jtfAccSubtotalSubtotalCur.setEditable(false);
+        jtfAccSubtotalSubtotalCur.setText("ERP");
+        jtfAccSubtotalSubtotalCur.setFocusable(false);
+        jtfAccSubtotalSubtotalCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc2.add(jtfAccSubtotalSubtotalCur);
+
+        jtfAccSubtotalSubtotalCy.setEditable(false);
+        jtfAccSubtotalSubtotalCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccSubtotalSubtotalCy.setText("0,000,000,000.00");
+        jtfAccSubtotalSubtotalCy.setFocusable(false);
+        jtfAccSubtotalSubtotalCy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc2.add(jtfAccSubtotalSubtotalCy);
+
+        jtfAccSubtotalSubtotalCyCur.setEditable(false);
+        jtfAccSubtotalSubtotalCyCur.setText("CUR");
+        jtfAccSubtotalSubtotalCyCur.setFocusable(false);
+        jtfAccSubtotalSubtotalCyCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc2.add(jtfAccSubtotalSubtotalCyCur);
+
+        jpCustomAcc.add(jpCustomAcc2, java.awt.BorderLayout.SOUTH);
+
+        jTabbedPane.addTab("Contabilización", jpCustomAcc);
 
         jpDocument.add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
@@ -3206,6 +3529,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdiGblYear.setLengthMin(4);
         moFieldCfdiGblYear.setLengthMax(4);
         
+        // costomized-accounting fields:
+        
+        moFieldAccItem = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAccItem, jlAccItem);
+        moFieldAccItem.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccItem.setPickerButton(jbPickAccItem);
+        moFieldAccItemRef_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccItemRef_n, jlAccItemRef_n);
+        moFieldAccItemRef_n.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccItemRef_n.setPickerButton(jbPickAccItemRef_n);
+        moFieldAccQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccQuantity, jlAccQuantity);
+        moFieldAccQuantity.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
+        moFieldAccUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAccUnit, jlAccUnit);
+        moFieldAccUnit.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccUnit.setPickerButton(jbPickAccUnit);
+        moFieldAccIsSubtotalPctApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckAccIsSubtotalPctApplying);
+        moFieldAccIsSubtotalPctApplying.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccSubtotalPct = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccSubtotalPct, jckAccIsSubtotalPctApplying);
+        moFieldAccSubtotalPct.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccSubtotalPct.setIsPercent(true);
+        moFieldAccSubtotalPct.setDecimalFormat(SLibUtils.DecimalFormatPercentage2D);
+        moFieldAccSubtotalCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccSubtotalCy, jlAccSubtotal);
+        moFieldAccSubtotalCy.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccSubtotalCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldAccConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfAccConcept, jlAccConcept);
+        moFieldAccConcept.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccConcept.setLengthMax(100);
+        
         mvFields = new Vector<>();
         mvFields.add(moFieldDate);
         mvFields.add(moFieldNumberSeries);
@@ -3304,6 +3654,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldCfdiGblMonth);
         mvFields.add(moFieldCfdiGblYear);
         
+        mvFields.add(moFieldAccItem);
+        mvFields.add(moFieldAccItemRef_n);
+        mvFields.add(moFieldAccQuantity);
+        mvFields.add(moFieldAccUnit);
+        mvFields.add(moFieldAccIsSubtotalPctApplying);
+        mvFields.add(moFieldAccSubtotalPct);
+        mvFields.add(moFieldAccSubtotalCy);
+        mvFields.add(moFieldAccConcept);
+        
         moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
         
         if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
@@ -3386,6 +3745,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moPaneGridNotes.addTableColumn(aoTableColumns[i]);
         }
 
+        // Pane of costomized accounting entries:
+
+        moPaneGridCustomAcc = new STablePaneGrid(miClient);
+        moPaneGridCustomAcc.setDoubleClickAction(this, "publicActionDependentEdit");
+        jpCustomAcc.add(moPaneGridCustomAcc, BorderLayout.CENTER);
+
+        i = 0;
+        aoTableColumns = new STableColumnForm[11];
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", STableConstants.WIDTH_ITEM_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", STableConstants.WIDTH_ITEM_2X);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", 50);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Subtotal %", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererPercentage2D);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Subtotal $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo ", STableConstants.WIDTH_ACCOUNT_ID);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo", STableConstants.WIDTH_ACCOUNT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave ítem referencia", STableConstants.WIDTH_ITEM_KEY);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia", STableConstants.WIDTH_ITEM_2X);
+
+        for (i = 0; i < aoTableColumns.length; i++) {
+            moPaneGridCustomAcc.addTableColumn(aoTableColumns[i]);
+        }
+        
         // Own forms:
 
         moFormEntry = new SFormDpsEntry(miClient);
@@ -3416,6 +3802,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mnDeliveryType = SLibConsts.UNDEFINED;
         mnCfdXmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
 
+        try {
+            moPanelFkCostCenterId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
+            moPanelFkCostCenterId_n.setLabelsWidth(100);
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+
+        jpCustomAcc112.remove(jlAccDummyCostCenter);
+        jpCustomAcc112.add(moPanelFkCostCenterId_n, BorderLayout.NORTH);
+        
         // Action listeners:
 
         jbEdit.addActionListener(this);
@@ -3441,6 +3838,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryImportFromDps.addActionListener(this);
         jbEntryWizard.addActionListener(this);
         jbEntryViewLinks.addActionListener(this);
+        jbEntryImportFromMatRequest.addActionListener(this);
+        jbEntryViewMatReqLinks.addActionListener(this);
         jbExportCsv.addActionListener(this);
         jbTaxRegionId.addActionListener(this);
         jbNotesNew.addActionListener(this);
@@ -3468,7 +3867,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDeleteBillOfLading.addActionListener(this);
         jtbEntryFilter.addActionListener(this);
         jtbNotesFilter.addActionListener(this);
-        jbTime.addActionListener(this);
+        jbSetTime.addActionListener(this);
+        jtbSwitchCustomAcc.addActionListener(this);
+        jbPickAccItem.addActionListener(this);
+        jbPickAccItemRef_n.addActionListener(this);
+        jbPickAccUnit.addActionListener(this);
+        jbExeWizardAccSubtotal.addActionListener(this);
+        jbCustomAccEntryNew.addActionListener(this);
+        jbCustomAccEntryCopy.addActionListener(this);
+        jbCustomAccEntryEdit.addActionListener(this);
+        jbCustomAccEntryDelete.addActionListener(this);
+        jbCustomAccEntryOk.addActionListener(this);
+        jbCustomAccEntryCancel.addActionListener(this);
 
         // Focus listeners:
 
@@ -3481,8 +3891,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbAddAmc71SupplierGln.getEditor().getEditorComponent().addFocusListener(this);
         jcbAddAmc71CompanyGln.getEditor().getEditorComponent().addFocusListener(this);
         jcbAddAmc71CompanyBranchGln.getEditor().getEditorComponent().addFocusListener(this);
+        jtfAccSubtotalCy.addFocusListener(this);
+        jtfAccSubtotalPct.addFocusListener(this);
 
-        // Item listeners
+        // Item listeners:
 
         jckDateDoc.addItemListener(this);
         jckDateStartCredit.addItemListener(this);
@@ -3500,6 +3912,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbAddAmc71SupplierGln.addItemListener(this);
         jcbAddAmc71CompanyGln.addItemListener(this);
         jcbAddAmc71CompanyBranchGln.addItemListener(this);
+        jcbAccItem.addItemListener(this);
+        jckAccIsSubtotalPctApplying.addItemListener(this);
+        
+        // Change listeners:
+        
+        jTabbedPane.addChangeListener(this);
+        
+        // Action map:
 
         SFormUtilities.createActionMap(rootPane, this, "publicActionDependentNew", "dependentNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionDependentEdit", "dependentEdit", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
@@ -3509,6 +3929,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.createActionMap(rootPane, this, "publicActionEntryImportFromDps", "entryImport", KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionEntryWizard", "entryWizard", KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionEntryViewLinks", "entryViewLinks", KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "actionExportCsv", "exportCsv", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -3606,9 +4027,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
 
                         // import data from previous document:
-                                
+                              
                         try {
-                            SDataDps dpsModel = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                            SDataDps dpsModel;
+                            
+                            if (! mbMatRequestImport) {
+                                dpsModel = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                            }
+                            else {
+                                dpsModel = moParamDpsSource;
+                                if (dpsModel.getFkBizPartnerId_r() == 0) {
+                                    pickBizPartner();
+                                    if (moPickerBizPartner.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                                        releaseRecordUserSLock();
+                                        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+                                        setVisible(false);
+                                        return;
+                                    }
+                                }
+                            }
 
                             if (!STrnDpsUtilities.isDpsAuthorized(miClient, dpsModel)) {
                                 mbFormSettingsOk = goAhead = false;
@@ -3618,7 +4055,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 mbDocBeingImported = true;
                                 
                                 SDataDps dps = createNewDps(dpsModel);
-                                dps.getDbmsDpsEntries().clear();
+                                if (! mbMatRequestImport) {
+                                    dps.getDbmsDpsEntries().clear();
+                                }
 
                                 for (SDataDpsNotes notes : dps.getDbmsDpsNotes()) {
                                     notes.setIsRegistryEdited(true);    // force original document notes to be attached to new document even if they are not edited
@@ -3632,10 +4071,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     SFormUtilities.locateComboBoxItem(jcbAdjustmentSubtypeId, manParamAdjustmentSubtypeKey);
                                 }
                                 
-                                actionEntryImportFromDps(moParamDpsSource);
+                                if (! mbMatRequestImport) {
+                                    actionEntryImportFromDps(moParamDpsSource);
+                                }
                             }
                         }
                         catch (Exception e) {
+                            Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, e);
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
@@ -4162,6 +4604,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_EST) ||
             SLibUtilities.compareKeys(manDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
     }
+    
+    private boolean isLocalCurrency() {
+        return miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray());
+    }
 
     /**
      * Checks if CFD emission is required for current document.
@@ -4299,7 +4745,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             miClient.showMsgBoxWarning(e.getMessage());
         }
     }
-
+    
     private void renderEntries() {
         int sortingPosition = 0;
         SDataDpsEntry entry = null;
@@ -4555,7 +5001,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                 moFieldFkCurrencyId.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() != SLibConsts.UNDEFINED ? moBizPartnerCategory.getFkCurrencyId_n() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
 
-                if (miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray())) {
+                if (isLocalCurrency()) {
                     exr = 1;
                 }
                 else {
@@ -4612,7 +5058,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDate.setEditable(mbHasRightOrderDelay);
             jftDate.setFocusable(mbHasRightOrderDelay);
             jbDate.setEnabled(mbHasRightOrderDelay);
-            jbTime.setEnabled(mbHasRightOrderDelay && mbIsDpsTimeReq);
+            jbSetTime.setEnabled(mbHasRightOrderDelay && mbIsDpsTimeReq);
         }
     }
     
@@ -4919,6 +5365,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
                 entry.setPkEntryId(0);
                 entry.setIsRegistryNew(true); // force entries to be treated as new
+                if (mbMatRequestImport) {
+                    if (moBizPartnerBranch != null) {
+                        entry.setFkTaxRegionId(moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n());
+                    }
+                    else {
+                        entry.setFkTaxRegionId(miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n());
+                    }
+                }
             }
         }
         
@@ -4956,7 +5410,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         double quantity = 0;
         DecimalFormat format = miClient.getSessionXXX().getFormatters().getDecimalsValueFormat();
 
-        if (moFieldFkCurrencyId.getKeyAsIntArray()[0] == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+        if (isLocalCurrency()) {
             jtfSubtotalProvisional_rRo.setText("");
             jtfDiscountDoc_rRo.setText("");
             jtfSubtotal_rRo.setText("");
@@ -5296,12 +5750,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void updateDpsControlsStatus() {
         jckRecordUser.setEnabled(mbIsDpsInvoice || mbIsDpsAdjustment);
+        jtbSwitchCustomAcc.setEnabled(mbIsDpsInvoice/* || mbIsDpsAdjustment*/); // 2023-10-18 Sergio Flores: por ahora la contabilización personalizada sólo está disponible para facturas
 
         jbEntryNew.setEnabled(!mbIsDpsAdjustment);
         jbEntryCopy.setEnabled(!mbIsDpsAdjustment);
         jbEntryDiscountRetailChain.setEnabled(mbIsDpsAdjustment);
         jbEntryImportFromDps.setEnabled(mbIsDpsOrder || mbIsDpsInvoice || mbIsDpsAdjustment);
         jbEntryWizard.setEnabled(!mbIsDpsAdjustment);
+        jbEntryImportFromMatRequest.setEnabled((mbIsDpsEstimate || mbIsDpsOrder || mbIsDpsInvoice) && ! mbIsSales);
 
         jlAdjustmentSubtypeId.setEnabled(mbIsDpsAdjustment);
         jcbAdjustmentSubtypeId.setEnabled(mbIsDpsAdjustment);
@@ -5333,7 +5789,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDate.setEditable(false);
             jftDate.setFocusable(false);
             jbDate.setEnabled(false);
-            jbTime.setEnabled(false);
+            jbSetTime.setEnabled(false);
             jcbNumberSeries.setEnabled(false);
             jtfNumber.setEditable(false);
             jtfNumber.setFocusable(false);
@@ -5349,6 +5805,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jckRecordUser.setEnabled(false);
             jbRecordManualSelect.setEnabled(false);
             jbRecordManualView.setEnabled(false);
+            jtbSwitchCustomAcc.setEnabled(false);
 
             jckShipments.setEnabled(false);
             jtfShipments.setEditable(false);
@@ -5386,6 +5843,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbEntryDiscountRetailChain.setEnabled(false);
             jbEntryImportFromDps.setEnabled(false);
             jbEntryWizard.setEnabled(false);
+            jbEntryImportFromMatRequest.setEnabled(false);
 
             jbNotesNew.setEnabled(false);
             jbNotesEdit.setEnabled(false);
@@ -5435,6 +5893,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbFkProductionOrderId_n.setEnabled(false);
             
             enableCfdFields(false);   // disable CFD form tabs & fields
+            
+            enableCustomAccControls(false, false);
+            enableCustomAccFields(false, true);
         }
         else {
             mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
@@ -5442,7 +5903,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDate.setEditable(true);
             jftDate.setFocusable(true);
             jbDate.setEnabled(true);
-            jbTime.setEnabled(mbIsDpsTimeReq);
+            jbSetTime.setEnabled(mbIsDpsTimeReq);
             jcbNumberSeries.setEnabled(moDps.getIsRegistryNew() || !mbIsNumberSeriesRequired);
             jtfNumber.setEditable(mbIsNumberEditable);
             jtfNumber.setFocusable(mbIsNumberEditable);
@@ -5551,6 +6012,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbFkProductionOrderId_n.setEnabled(mbIsSales);
             
             enableCfdFields(true);    // enable CFD form tabs & fields
+            
+            enableCustomAccControls(true, false);
+            enableCustomAccFields(true, true);
         }
     }
 
@@ -5699,14 +6163,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                         else if (mbValidateLinkPeriod && dpsLinked.getDateDocDelivery_n() != null && moFieldDate.getDate().before(dpsLinked.getDateDocDelivery_n())) {
                             msg = "El valor del campo '" + jlDate.getText() + "' (" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + ")\nes anterior a la fecha 'entrega programada' del documento de origen '" +  dpsLinked.getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(dpsLinked.getDateDocDelivery_n()) + ").";
-                            if (miClient.showMsgBoxConfirm(msg + "\n ¿Desea continuar?") == JOptionPane.YES_OPTION) {
+                            if (miClient.showMsgBoxConfirm(msg + "\n¿Desea continuar?") == JOptionPane.YES_OPTION) {
                                 msg = "";
                             }
                             break DPS;
                         }
                         else if (mbValidateLinkPeriod && dpsLinked.getDateDocLapsing_n() != null && moFieldDate.getDate().after(dpsLinked.getDateDocLapsing_n())) {
                             msg = "El valor del campo '" + jlDate.getText() + "' (" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + ")\nes posterior a la fecha 'última entrega' del documento de origen '" +  dpsLinked.getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(dpsLinked.getDateDocLapsing_n()) + ").";
-                            if (miClient.showMsgBoxConfirm(msg + "\n ¿Desea continuar?") == JOptionPane.YES_OPTION) {
+                            if (miClient.showMsgBoxConfirm(msg + "\n¿Desea continuar?") == JOptionPane.YES_OPTION) {
                                 msg = "";
                             }
                             break DPS;
@@ -6424,6 +6888,212 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             setBizPartner(new int[] { key[0] }, new int[] { key[1] }, new int[] { key[1], key[2] });
         }
     }
+    
+    private boolean isCustomAccEnableable() {
+        return mnFormStatus == SLibConstants.FORM_STATUS_EDIT && mnAccCurrentAction != 0 && jcbAccItem.getSelectedIndex() > 0;
+    }
+    
+    private double getAccSubtotal() {
+        return SLibUtils.roundAmount(moFieldAccSubtotalCy.getDouble() * moDps.getExchangeRate());
+    }
+
+    /**
+     * Calculate subtotal of customized accounting.
+     * @param entryToExclude Entry to exclude. Can be <code>null</code>.
+     */
+    private void calculateCustomAccSubtotal(final SDataDpsCustomAccEntry entryToExclude) {
+        mdAccSubtotal = 0d;
+        mdAccSubtotalCy = 0d;
+        mdAccSubtotalPct = 0d;
+        
+        for (STableRow row : moPaneGridCustomAcc.getGridRows()) {
+            SDataDpsCustomAccEntry entry = (SDataDpsCustomAccEntry) row.getData();
+            if (entryToExclude == null || entryToExclude != entry) {
+                mdAccSubtotal = SLibUtils.roundAmount(mdAccSubtotal + entry.getSubtotal());
+                mdAccSubtotalCy = SLibUtils.roundAmount(mdAccSubtotalCy + entry.getSubtotalCy());
+                mdAccSubtotalPct = SLibUtils.round(mdAccSubtotalPct + entry.getSubtotalPct(), DECS_PCT);
+            }
+        }
+    }
+    
+    private void enableCustomAccControls(final boolean enableCrud, final boolean enableOkCancel) {
+        jbCustomAccEntryNew.setEnabled(enableCrud);
+        jbCustomAccEntryCopy.setEnabled(enableCrud);
+        jbCustomAccEntryEdit.setEnabled(enableCrud);
+        jbCustomAccEntryDelete.setEnabled(enableCrud);
+        jbCustomAccEntryOk.setEnabled(enableOkCancel);
+        jbCustomAccEntryCancel.setEnabled(enableOkCancel);
+        
+        moPaneGridCustomAcc.getTable().setEnabled(mnAccCurrentAction == 0);
+        moPaneGridCustomAcc.getTable().getTableHeader().setEnabled(mnAccCurrentAction == 0);
+    }
+    
+    private void enableCustomAccFields(final boolean enable, final boolean appliesToAccItem) {
+        if (!enable) {
+            if (appliesToAccItem) {
+                jcbAccItem.setEnabled(false);
+                
+                jbPickAccItem.setEnabled(false);
+            }
+            
+            jcbAccItemRef_n.setEnabled(false);
+            jtfAccQuantity.setEnabled(false);
+            jcbAccUnit.setEnabled(false);
+            jckAccIsSubtotalPctApplying.setEnabled(false);
+            jtfAccSubtotalPct.setEnabled(false);
+            jtfAccSubtotalCy.setEnabled(false);
+            jtfAccConcept.setEnabled(false);
+            
+            jbPickAccItemRef_n.setEnabled(false);
+            jbPickAccUnit.setEnabled(false);
+            jbExeWizardAccSubtotal.setEnabled(false);
+            
+            moPanelFkCostCenterId_n.enableFields(false);
+        }
+        else {
+            boolean enableable = isCustomAccEnableable();
+            boolean areThereEntries = !moPaneGridCustomAcc.getGridRows().isEmpty();
+            
+            if (appliesToAccItem) {
+                jcbAccItem.setEnabled(enableable);
+                
+                jbPickAccItem.setEnabled(enableable);
+            }
+            
+            jcbAccItemRef_n.setEnabled(enableable);
+            jtfAccQuantity.setEnabled(enableable);
+            jcbAccUnit.setEnabled(enableable);
+            jckAccIsSubtotalPctApplying.setEnabled(enableable && !areThereEntries);
+            jtfAccSubtotalPct.setEnabled(enableable && jckAccIsSubtotalPctApplying.isSelected());
+            jtfAccSubtotalCy.setEnabled(enableable && !jckAccIsSubtotalPctApplying.isSelected());
+            jtfAccConcept.setEnabled(enableable);
+            
+            jbPickAccItemRef_n.setEnabled(enableable);
+            jbPickAccUnit.setEnabled(enableable);
+            jbExeWizardAccSubtotal.setEnabled(enableable);
+            
+            moPanelFkCostCenterId_n.enableFields(enableable);
+        }
+    }
+    
+    private void clearCustomAccFields(final boolean appliesToAccItem) {
+        if (appliesToAccItem) {
+            moFieldAccItem.resetField();
+            itemStateChangedAccItem(false);
+        }
+        
+        moFieldAccItemRef_n.resetField();
+        moFieldAccQuantity.resetField();
+        moFieldAccUnit.resetField();
+        moFieldAccIsSubtotalPctApplying.resetField();
+        itemStateChangedAccIsSubtotalPctApplying(false);
+        moFieldAccSubtotalPct.resetField();
+        moFieldAccSubtotalCy.resetField();
+        moFieldAccConcept.resetField();
+        
+        moPanelFkCostCenterId_n.resetPanel();
+        
+        if (isLocalCurrency()) {
+            jtfAccSubtotal.setText("");
+        }
+        else {
+            jtfAccSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void renderAccItem(final boolean clearFields) {
+        if (clearFields) {
+            clearCustomAccFields(false);
+        }
+        
+        if (moAccItem == null) {
+            enableCustomAccFields(false, false);
+            
+            // update units:
+            
+            jcbAccUnit.removeAllItems();
+        }
+        else {
+            enableCustomAccFields(true, false);
+            
+            // update units:
+            
+            if (moAccItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA) {
+                SFormUtilities.populateComboBox(miClient, jcbAccUnit, SDataConstants.ITMU_UNIT, new Object[] { moAccItem.getDbmsDataUnit().getFkUnitTypeId(), moAccItem.getFkUnitAlternativeTypeId() });
+            }
+            else {
+                SFormUtilities.populateComboBox(miClient, jcbAccUnit, SDataConstants.ITMU_UNIT, new int[] { moAccItem.getDbmsDataUnit().getFkUnitTypeId() });
+            }
+            
+            moFieldAccUnit.setKey(new int[] { moAccItem.getFkUnitId() });
+            
+            // update percentage applying:
+            
+            moFieldAccIsSubtotalPctApplying.setBoolean(moPaneGridCustomAcc.getGridRows().isEmpty() ? true : ((SDataDpsCustomAccEntry) moPaneGridCustomAcc.getGridRows().get(0).getData()).getIsSubtotalPctApplying());
+            itemStateChangedAccIsSubtotalPctApplying(false);
+            
+            // update cost center:
+            
+            moPanelFkCostCenterId_n.enableFields(isCustomAccEnableable());
+
+            try {
+                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient, moAccItem.getPkItemId()));
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+            finally {
+                moPanelFkCostCenterId_n.refreshPanel();
+            }
+        }
+    }
+    
+    private void renderCustomAccEntry(final SDataDpsCustomAccEntry entry) {
+        mbUpdatingForm = true;
+        
+        if (entry == null) {
+            clearCustomAccFields(true);
+        }
+        else {
+            moFieldAccItem.setKey(new int[] { entry.getFkItemId() });
+            itemStateChangedAccItem(true);
+            moFieldAccItemRef_n.setKey(new int[] { entry.getFkItemRefId_n() });
+            moFieldAccQuantity.setDouble(entry.getQuantity());
+            moFieldAccUnit.setKey(new int[] { entry.getFkUnitId() });
+            moFieldAccIsSubtotalPctApplying.setBoolean(entry.getIsSubtotalPctApplying());
+            itemStateChangedAccIsSubtotalPctApplying(false);
+            moFieldAccSubtotalPct.setDouble(entry.getSubtotalPct());
+            moFieldAccSubtotalCy.setDouble(entry.getSubtotalCy());
+            moFieldAccConcept.setString(entry.getConcept());
+            
+            moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(entry.getFkCostCenterId_n().isEmpty() ? moPanelFkCostCenterId_n.getEmptyAccountId() : entry.getFkCostCenterId_n());
+            moPanelFkCostCenterId_n.refreshPanel();
+            
+            if (isLocalCurrency()) {
+                jtfAccSubtotal.setText("");
+            }
+            else {
+                jtfAccSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(entry.getSubtotal()));
+            }
+        }
+        
+        mbUpdatingForm = false;
+    }
+    
+    private void renderCustomAccSubtotal() {
+        calculateCustomAccSubtotal(null);
+        
+        if (isLocalCurrency() || mbResetingForm) {
+            jtfAccSubtotalSubtotal.setText("");
+        }
+        else {
+            jtfAccSubtotalSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(mdAccSubtotal));
+        }
+        
+        jtfAccSubtotalSubtotalCy.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(mdAccSubtotalCy));
+        jtfAccSubtotalSubtotalPct.setText(SLibUtils.DecimalFormatPercentage2D.format(mdAccSubtotalPct));
+    }
 
     private void actionDate() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
@@ -6611,6 +7281,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFormEntry.setValue(SDataConstants.BPSU_BP, moBizPartner);
                     moFormEntry.setValue(SDataConstants.BPSU_BPB, moBizPartnerBranch);
                     moFormEntry.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, postEmissionEditionAllowed);
+                    moFormEntry.setValue(SLibConstants.VALUE_IS_MAT_REQ, mbMatRequestImport);
                     moFormEntry.setEnableDataAddenda(isCfdAddendaRequired());
                     moFormEntry.setRegistry(entry);
 
@@ -7631,6 +8302,50 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
+    @SuppressWarnings("unchecked")
+    private void actionImportEntryFromMatRequest() {
+        SDialogDpsMaterialRequestLink oDialog = new SDialogDpsMaterialRequestLink(miClient, moDps.getDpsTypeKey());
+        oDialog.setValue(SDataConstants.TRN_DPS, moDps);
+        oDialog.setFormVisible(true);
+        if (oDialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            ArrayList<SDataDpsEntry> lEntries = (ArrayList<SDataDpsEntry>) oDialog.getValue(SDataConstants.TRN_DPS_ETY);
+            for (SDataDpsEntry oEntryImported : lEntries) {
+                oEntryImported.setFkTaxRegionId(moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n());
+                moPaneGridEntries.addTableRow(new SDataDpsEntryRow(oEntryImported, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+            }
+            
+            mbMatRequestImport = true;
+            renderEntries();
+            calculateTotal();
+            try {
+                updateDpsEntryCfdiSettings();
+            }
+            catch (SQLException ex) {
+                miClient.showMsgBoxWarning(ex.getMessage());
+                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
+        }
+    }
+    
+    private void actionViewMatReqEntryLinks() {
+        int index = moPaneGridEntries.getTable().getSelectedRow();
+        SDataDpsEntry entry;
+
+        if (index != -1) {
+            entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(index).getData()).clone();
+
+            if (entry.getDbmsDpsEntryMatRequestLink() != null) {
+                SDialogDpsEtyMatReq oDialog = new SDialogDpsEtyMatReq(miClient);
+                oDialog.setFormParams(entry.getDbmsDpsEntryMatRequestLink().getDbmsMaterialRequestEntryKey(), 
+                                        entry.getDbmsDpsEntryMatRequestLink().getDbmsDpsKey(), 
+                                        (int[]) moDpsType.getPrimaryKey(), 
+                                        entry.getDbmsDpsEntryMatRequestLink().getQuantity());
+                oDialog.setVisible(true);
+            }
+        }
+    }
+    
     private void actionEntryCopy() {
         if (jbEntryCopy.isEnabled()) {
             try {
@@ -7858,7 +8573,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdCceTotalUsd.setFieldValue(SLibUtils.roundAmount(xrtUsd == 0 ? 0.0 : moDps.getTotal_r() / xrtUsd));
         jtfCfdCceTotalUsd.requestFocusInWindow();
     }
-
+    
     @SuppressWarnings("deprecation")
     private void actionLoadFileXml() {
         FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
@@ -7987,7 +8702,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFilePdfJustLoaded = null;
     }
     
-    /* Isabel Servin 08/06/2022 Se comenta ya que pertenece a la forma anterior de relacionar un cfdi
+    /* Isabel Servin 08/06/2022 Se comenta ya que pertenece a la forma anterior de relacionar un CFDI
     private void actionCfdiCfdiRelated() {
         if (moDialogPickerDpsForCfdiRelated == null) {
             moDialogPickerDpsForCfdiRelated = new SDialogPickerDps(miClient, SDataConstants.TRN_DPS);
@@ -8158,7 +8873,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void actionTime() {
+    private void actionSetTime() {
         try {
             if (moDialogDpsTime == null) {
                 moDialogDpsTime = new SDialogDpsTime(miClient);
@@ -8173,6 +8888,485 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
+    private boolean canSwitchOnCustomAcc() {
+        boolean canSwitchOn = true;
+        
+        if (jcbFkCurrencyId.getSelectedIndex() <= 0) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkCurrencyId.getText() + "',\n"
+                    + "a fin de personalizar la contabilización del documento.");
+            jcbFkCurrencyId.requestFocusInWindow();
+            canSwitchOn = false;
+        }
+        else if (moPaneGridEntries.getGridRows().isEmpty()) {
+            miClient.showMsgBoxWarning("El documento debe tener al menos una partida,\n"
+                    + "a fin de personalizar su contabilización.");
+            jTabbedPane.setSelectedIndex(TAB_ETY);
+            canSwitchOn = false;
+        }
+        else {
+            ENTRIES:
+            for (STableRow row : moPaneGridEntries.getGridRows()) {
+                switch (((SDataDpsEntry) row.getData()).getOperationsType()) {
+                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS:               // operations
+                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:    // operations - application of advance invoiced as discount
+                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
+                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
+                        continue;
+                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:        // prepayments invoiced
+                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:        // adjustment of prepayments invoiced
+                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:    // application of prepayments invoiced
+                        miClient.showMsgBoxWarning("Todas las partidas del documento deben ser de operaciones o de operaciones con aplicación de anticipo facturado,\n"
+                                + "a fin de personalizar su contabilización.");
+                        jTabbedPane.setSelectedIndex(TAB_ETY);
+                        canSwitchOn = false;
+                        break ENTRIES;
+                    default:
+                        // nothing
+                }
+            }
+        }
+        
+        return canSwitchOn;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void prepareCustomAcc(final boolean invokeEntryCancel) {
+        if (!mbCustomAccPrepared) {
+            try {
+                mbUpdatingForm = true;
+                
+                getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                
+                // prepate tab settings:
+
+                jtfAccSubtotalCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+
+                if (isLocalCurrency()) {
+                    jtfAccSubtotalCyCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+                }
+                else {
+                    jtfAccSubtotalCyCur.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moDps.getFkCurrencyId() }));
+                }
+
+                jtfAccSubtotalSubtotalCur.setText(jtfAccSubtotalCur.getText());
+                jtfAccSubtotalSubtotalCyCur.setText(jtfAccSubtotalCyCur.getText());
+
+                SFormUtilities.populateComboBox(miClient, jcbAccItem, SDataConstants.ITMU_ITEM);
+                SFormUtilities.populateComboBox(miClient, jcbAccItemRef_n, SDataConstants.ITMU_ITEM);
+                
+                if (invokeEntryCancel) {
+                    actionCustomAccEntryCancel(true, true);
+                }
+
+                // preparation done:
+                mbCustomAccPrepared = true;
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+            finally {
+                getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                
+                mbUpdatingForm = false;
+            }
+        }
+    }
+    
+    private void dismissCustomAcc() {
+        try {
+            mbUpdatingForm = true;
+
+            getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            
+            // dismiss tab settings:
+
+            moDps.getDbmsDpsCustomAccEntries().clear();
+            moPaneGridCustomAcc.clearTableRows();
+            
+            // preparation ready to be started again:
+            mbCustomAccPrepared = false;
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        finally {
+            getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+            mbUpdatingForm = false;
+        }
+    }
+    
+    /**
+     * Switch on/of customized accounting.
+     * 
+     * ================================================================================
+     * Personalización de la contabilización del documento (facturas y NC).
+     * ================================================================================
+     * Fecha: 2023-10-12
+     * Autor: Sergio Abraham FLORES GUTIÉRREZ
+     * 
+     * OBJETIVO:
+     * Permitir contabilizar de forma discrecional el egreso o ingreso de una factura o NC, tanto de compras como de ventas.
+     * 
+     * Funcionalidades:
+     * + Hacer disponible la opción de personalización de la contabilización sólo en facturas y NC.
+     * + Validar que el documento, si es factura, no tenga partidas de facturación de anticipos.
+     * + Validar que el documento, si es NC, no tenga ajustes de facturación de anticipos o aplicaciones de anticipos facturados.
+     * + Repartir el subtotal del documento (importe antes de impuestos) en una o más partidas de contabilización independientes de sus partidas originales.
+     * + Las partidas de contabilización sólo se usan en la contabilización del documento.
+     * + Las partidas originales se usan para todas las funcionalidades del sistema, p. ej., movimientos de almacén, y para los reportes relacionados con documentos.
+     * 
+     * + Lógica de captura de la personalización de la contabilización del documento:
+     * - Indicar que se opta por personalizar la contabilización del documento dando clic en el botón correspondiente.
+     * - Iniciar la captura de partidas de contabilización dando clic en el botón Crear o Copiar, para habilitar los campos de captura.
+     * - Capturar el ítem, ítem de referencia (opcional), centro de costo (opcional), unidad de medida, cantidad y concepto contable.
+     * - Indicar la forma de repartir la proporción del subtotal del documento que corresponde a la partida de contabilización mediante la modalidad de porcentaje o monto directo.
+     * - Sólo es posible elegir la modalidad de porcentaje o monto directo en captura de la primer partida de contabilización.
+     * - Guardar los cambios, inhabilitando los campos de captura de partidas de contabilización.
+     * - Se puede modificar la partida de contabilización seleccionada dando clic en el botón Modificar.
+     * - Se puede eliminar la partida de contabilización seleccionada dando clic en el botón Eliminar.
+     * - Se debe actualizar la suma del subtotal personalizado en porcentaje o monto o ambos, según aplique.
+     * - Se puede agilizar la captura del porcentaje o proporción del subtotal de la última partida agregando el remanente en automático dando clic en el botón Ejecutar ayudante.
+     * - Se puede deseleccionar la opción de personalización de la contabilización, y se eliminarán todas las partidas de contabilización que hayan sido capturadas.
+     * - Al guardarse el documento, y si se optó por personalizar su contabilización, se debe validar que:
+     * - no haya una captura de partida de contabilización en marcha;
+     * - la suma del subtotal personalizado sea 100% o igual al subtotal del documento, según aplique.
+     * 
+     * + Al guardarse el documento, y si tiene partidas de contabilización:
+     * - la contabilización de los impuestos y la afectación del saldo del asociado de negocios se hace en base a las partidas originales del documento;
+     * - la contabilización del egreso o ingreso se hace en base a las partidas de contabilización.
+     * 
+     * NOTA: Por el momento sólo se implementa para facturas, dado que para NC es necesario agregar la suguiente información a cada partida de contabilización personalizada:
+     * 1. tipo de ajuste (desctuento, devolución, etc.)
+     * 2. partida de factura afectada (esto en particular requiere de mayor análisis especialmente en los casos en que el documento tenga un número distinto de partidas originales que partidas de contabilización personalizada.)
+     * ================================================================================
+     */
+    private void actionSwitchCustomAcc() {
+        if (jtbSwitchCustomAcc.isEnabled()) {
+            if (jtbSwitchCustomAcc.isSelected()) {
+                // switch just set on:
+                
+                String confirmation = "¿Está seguro que desea habilitar la contabilización personalizada del documento?";
+                
+                if (miClient.showMsgBoxConfirm(confirmation) == JOptionPane.YES_OPTION && canSwitchOnCustomAcc()) { // if YES selected & swtiching on allowed
+                    // first prepare tab settings, then enable tab:
+
+                    prepareCustomAcc(true);
+
+                    jTabbedPane.setEnabledAt(TAB_ACC, true);
+                    jTabbedPane.setSelectedIndex(TAB_ACC);
+                }
+                else {
+                    jtbSwitchCustomAcc.setSelected(false); // switch off again
+                }
+            }
+            else {
+                // switch just set off:
+                
+                String confirmation = "¿Está seguro que desea deshabilitar la contabilización personalizada del documento?"
+                        + (!moPaneGridCustomAcc.getGridRows().isEmpty() ? "\n¡Todas las partidas de personalización de contabilización existentes serán eliminadas!" : "");
+                
+                if (miClient.showMsgBoxConfirm(confirmation) == JOptionPane.YES_OPTION) { // if YES selected
+                    // first disable tab, then dismiss tab settings:
+                    
+                    jTabbedPane.setEnabledAt(TAB_ACC, false);
+                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                    
+                    dismissCustomAcc();
+                }
+                else {
+                    jtbSwitchCustomAcc.setSelected(true); // switch on again
+                }
+            }
+        }
+    }
+    
+    private void actionPickAccItem() {
+        mbUpdatingForm = true;
+        
+        if (miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldAccItem, null) == SLibConstants.FORM_RESULT_OK) {
+            itemStateChangedAccItem(true);
+        }
+        
+        mbUpdatingForm = false;
+    }
+    
+    private void actionPickAccItemRef_n() {
+        miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldAccItemRef_n, null);
+    }
+    
+    private void actionPickAccUnit() {
+        miClient.pickOption(SDataConstants.ITMU_UNIT, moFieldAccUnit, new int[] { moAccItem.getDbmsDataItemGeneric().getFkUnitTypeId() });
+    }
+    
+    private void actionExeWizardAccSubtotal() {
+        JComponent component;
+        
+        calculateCustomAccSubtotal(mnAccCurrentAction == ACTION_EDIT ? (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData() : null);
+        
+        if (jckAccIsSubtotalPctApplying.isSelected()) {
+            if (mdAccSubtotalPct >= 1d) {
+                moFieldAccSubtotalPct.setDouble(0d);
+            }
+            else {
+                moFieldAccSubtotalPct.setDouble(SLibUtils.round(1d - mdAccSubtotalPct, DECS_PCT));
+            }
+
+            component = moFieldAccSubtotalPct.getComponent();
+            
+            focusLostAccSubtotalPct(); // triggers entry's subtotals calculation
+        }
+        else {
+            if (mdAccSubtotalCy >= moDps.getSubtotalCy_r()) {
+                moFieldAccSubtotalCy.setDouble(0d);
+            }
+            else {
+                moFieldAccSubtotalCy.setDouble(SLibUtils.roundAmount(moDps.getSubtotalCy_r() - mdAccSubtotalCy));
+            }
+            
+            component = moFieldAccSubtotalCy.getComponent();
+        }
+        
+        component.requestFocusInWindow();
+    }
+    
+    private void startCustomAccEntryInput(final int currentAction) {
+        mnAccCurrentAction = currentAction;
+        
+        enableCustomAccControls(false, true);
+        
+        jbPickAccItem.setEnabled(true);
+        jcbAccItem.setEnabled(true);
+        jcbAccItem.requestFocusInWindow();
+    }
+    
+    private void actionCustomAccEntryNew() {
+        if (jbCustomAccEntryNew.isEnabled()) {
+            startCustomAccEntryInput(ACTION_NEW);
+            renderCustomAccEntry(null);
+        }
+    }
+    
+    private void actionCustomAccEntryCopy() {
+        if (jbCustomAccEntryCopy.isEnabled()) {
+            if (moPaneGridCustomAcc.getSelectedTableRow() == null) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                startCustomAccEntryInput(ACTION_NEW);
+                enableCustomAccFields(true, false);
+            }
+        }
+    }
+    
+    private void actionCustomAccEntryEdit() {
+        if (jbCustomAccEntryEdit.isEnabled()) {
+            if (moPaneGridCustomAcc.getSelectedTableRow() == null) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                startCustomAccEntryInput(ACTION_EDIT);
+                enableCustomAccFields(true, false);
+            }
+        }
+    }
+    
+    private void actionCustomAccEntryDelete() {
+        if (jbCustomAccEntryDelete.isEnabled()) {
+            if (moPaneGridCustomAcc.getSelectedTableRow() == null) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int index = moPaneGridCustomAcc.getTable().getSelectedRow();
+                moPaneGridCustomAcc.getGridRows().remove(moPaneGridCustomAcc.getTable().convertRowIndexToModel(index));
+                moPaneGridCustomAcc.renderTableRows();
+                moPaneGridCustomAcc.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : index - 1);
+                
+                renderCustomAccSubtotal();
+            }
+        }
+    }
+    
+    private void actionCustomAccEntryOk() {
+        if (jbCustomAccEntryOk.isEnabled()) {
+            boolean error = false;
+            String message = "";
+            JComponent component = null;
+            
+            // validate user input:
+            
+            ArrayList<SFormField> fields = new ArrayList<>();
+            fields.add(moFieldAccItem);
+            fields.add(moFieldAccItemRef_n);
+            fields.add(moFieldAccQuantity);
+            fields.add(moFieldAccUnit);
+            fields.add(moFieldAccIsSubtotalPctApplying);
+            fields.add(moFieldAccSubtotalPct);
+            fields.add(moFieldAccSubtotalCy);
+            fields.add(moFieldAccConcept);
+            
+            for (SFormField field : fields) {
+                if (!field.validateField()) {
+                    error = true;
+                    // message = ... message already displayed to user on field validation
+                    component = field.getComponent();
+                    break;
+                }
+            }
+            
+            boolean isCostCenterEmpty = moPanelFkCostCenterId_n.isEmptyAccountId() || moPanelFkCostCenterId_n.getCurrentInputCostCenter() == null;
+            double accSubtotal = getAccSubtotal();
+            
+            if (!error) {
+                if (moAccItem == null) {
+                    error = true;
+                    message = "El ítem relacionado con el campo '" + jlAccItem.getText() + "' no existe.";
+                    component = moFieldAccItem.getComponent();
+                }
+                else if (moAccItem.getIsPrepayment()) {
+                    error = true;
+                    message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccItem.getText() + "', no puede ser 'anticipo'.";
+                    component = moFieldAccItem.getComponent();
+                }
+                else {
+
+                    if (!isCostCenterEmpty) {
+                        String validation = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moDps.getDate());
+
+                        if (!validation.isEmpty()) {
+                            error = true;
+                            message = validation;
+                            component = moPanelFkCostCenterId_n.getFieldAccount().getComponent();
+                        }
+                    }
+
+                    if (!error) {
+                        // validate subtotal of customized accounting:
+
+                        calculateCustomAccSubtotal(mnAccCurrentAction == ACTION_EDIT ? (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData() : null);
+
+                        if (jckAccIsSubtotalPctApplying.isSelected() && SLibUtils.round(mdAccSubtotalPct + moFieldAccSubtotalPct.getDouble(), DECS_PCT) > 1d) {
+                            error = true;
+                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jckAccIsSubtotalPctApplying.getText() + "':\n"
+                                    + "no puede ser mayor a " + SLibUtils.DecimalFormatPercentage2D.format(SLibUtils.round(1d - mdAccSubtotalPct, DECS_PCT)) + ", "
+                                    + "porque se excede el valor máximo " + SLibUtils.DecimalFormatPercentage2D.format(1d) + ".";
+                            component = moFieldAccSubtotalPct.getComponent().isEnabled() ? moFieldAccSubtotalPct.getComponent() : null;
+                        }
+                        else if (SLibUtils.roundAmount(mdAccSubtotalCy + moFieldAccSubtotalCy.getDouble()) > moDps.getSubtotalCy_r()) {
+                            error = true;
+                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccSubtotal.getText() + "':\n"
+                                    + "no puede ser mayor a $" + SLibUtils.getDecimalFormatAmount().format(SLibUtils.roundAmount(moDps.getSubtotalCy_r() - mdAccSubtotalCy)) + ", "
+                                    + "porque se excede el subtotal del documento en la moneda original $" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotalCy_r()) + " " + jtfAccSubtotalCyCur.getText() + ".";
+                            component = moFieldAccSubtotalCy.getComponent();
+                        }
+                        else if (!isLocalCurrency() && SLibUtils.roundAmount(mdAccSubtotal + accSubtotal) > moDps.getSubtotal_r()) {
+                            error = true;
+                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccSubtotal.getText() + "':\n"
+                                    + "no puede ser mayor a $" + SLibUtils.getDecimalFormatAmount().format(SLibUtils.roundAmount(moDps.getSubtotal_r() - mdAccSubtotal)) + ", "
+                                    + "porque se excede el subtotal del documento en la moneda local $" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotal_r()) + " " + jtfAccSubtotalCur.getText() + ".";
+                            //component = ... there is not any field for local-currency subtotal
+                        }
+                    }
+                }
+            }
+            
+            if (error) {
+                jTabbedPane.setSelectedIndex(TAB_ACC);
+                
+                if (!message.isEmpty()) {
+                    miClient.showMsgBoxWarning(message);
+                }
+                
+                if (component != null) {
+                    component.requestFocusInWindow();
+                }
+            }
+            else {
+                // save entry:
+
+                SDataDpsCustomAccEntry entry;
+                SDataItem itemRef_n = jcbAccItemRef_n.getSelectedIndex() <= 0 ? null : (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldAccItemRef_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+
+                switch (mnAccCurrentAction) {
+                    case ACTION_NEW:
+                        entry = new SDataDpsCustomAccEntry();
+                        break;
+                    case ACTION_EDIT:
+                        entry = (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData();
+                        break;
+                    default:
+                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+                        return;
+                }
+
+                //entry.setPkYearId(...);
+                //entry.setPkDocId(...);
+                //entry.setPkAccEntryId(...);
+                entry.setConcept(moFieldAccConcept.getString());
+                entry.setQuantity(moFieldAccQuantity.getDouble());
+                entry.setIsSubtotalPctApplying(moFieldAccIsSubtotalPctApplying.getBoolean());
+                entry.setSubtotalPct(moFieldAccSubtotalPct.getDouble());
+                entry.setSubtotal(accSubtotal);
+                entry.setSubtotalCy(moFieldAccSubtotalCy.getDouble());
+                entry.setIsDeleted(false);
+                entry.setFkItemId(moFieldAccItem.getKeyAsIntArray()[0]);
+                entry.setFkUnitId(moFieldAccUnit.getKeyAsIntArray()[0]);
+                entry.setFkCostCenterId_n(isCostCenterEmpty ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString());
+                entry.setFkItemRefId_n(moFieldAccItemRef_n.getKeyAsIntArray()[0]);
+                entry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+                //entry.setFkUserEditId(...);
+                //entry.setFkUserDeleteId(...);
+                //entry.setUserNewTs(...);
+                //entry.setUserEditTs(...);
+                //entry.setUserDeleteTs(...);
+
+                entry.setDbmsItemKey(moAccItem.getKey());
+                entry.setDbmsItem(moAccItem.getItem());
+                entry.setDbmsUnitSymbol(moAccItem.getDbmsDataUnit().getSymbol());
+                entry.setDbmsCostCenter_n(isCostCenterEmpty ? "" : moPanelFkCostCenterId_n.getCurrentInputCostCenter().getCostCenter());
+                entry.setDbmsItemRefKey_n(itemRef_n == null ? "" : itemRef_n.getKey());
+                entry.setDbmsItemRef_n(itemRef_n == null ? "" : itemRef_n.getItem());
+                //entry.setDbmsUserNew(...);
+                //entry.setDbmsUserEdit(...);
+                //entry.setDbmsUserDelete(..);
+
+                // add or replace entry:
+
+                switch (mnAccCurrentAction) {
+                    case ACTION_NEW:
+                        moPaneGridCustomAcc.addTableRow(new SDataDpsCustomAccEntryRow(entry));
+                        moPaneGridCustomAcc.renderTableRows();
+                        moPaneGridCustomAcc.setTableRowSelection(moPaneGridCustomAcc.getTableGuiRowCount() - 1);
+                        break;
+                    case ACTION_EDIT:
+                        int selectedRow = moPaneGridCustomAcc.getTable().getSelectedRow();
+                        moPaneGridCustomAcc.setTableRow(new SDataDpsCustomAccEntryRow(entry), selectedRow);
+                        moPaneGridCustomAcc.renderTableRows();
+                        moPaneGridCustomAcc.setTableRowSelection(selectedRow);
+                        break;
+                    default:
+                        // nothing
+                }
+
+                renderCustomAccSubtotal();
+                actionCustomAccEntryCancel(false, false);
+            }
+        }
+    }
+    
+    private void actionCustomAccEntryCancel(final boolean forceCancel, final boolean renderSelectedEntry) {
+        if (jbCustomAccEntryCancel.isEnabled() || forceCancel) {
+            mnAccCurrentAction = 0;
+            
+            enableCustomAccControls(true, false);
+            enableCustomAccFields(false, true);
+            
+            if (renderSelectedEntry) {
+                valueChangedCustomAcc();
+            }
+        }
+    }
+
     private void focusLostDate() {
         renderDate();
         renderDateMaturity();
@@ -8213,6 +9407,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void focusLostAddAmc71CompanyBranchGln() {
         if (canClearAddAmc71CompanyBranchShipTo()) {
             itemStateChangedAddAmc71CompanyBranchGln();
+        }
+    }
+    
+    private void focusLostAccSubtotalPct() {
+        moFieldAccSubtotalCy.setDouble(SLibUtils.roundAmount(moDps.getSubtotalCy_r() * moFieldAccSubtotalPct.getDouble()));
+        focusLostAccSubtotalCy();
+    }
+    
+    private void focusLostAccSubtotalCy() {
+        if (isLocalCurrency()) {
+            jtfAccSubtotal.setText("");
+        }
+        else {
+            jtfAccSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(getAccSubtotal()));
         }
     }
 
@@ -8374,7 +9582,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     private void itemStateChangedFkCurrencyId(boolean calculateTotal) {
-        if (jcbFkCurrencyId.getSelectedIndex() <= 0 || miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray())) {
+        if (jcbFkCurrencyId.getSelectedIndex() <= 0 || isLocalCurrency()) {
             // Document in local currency:
 
             jtfExchangeRate.setEditable(false);
@@ -8616,6 +9824,71 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
+    private void itemStateChangedAccItem(final boolean clearFields) {
+        if (jcbAccItem.getSelectedIndex() <= 0) {
+            moAccItem = null;
+        }
+        else {
+            moAccItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldAccItem.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+        }
+
+        renderAccItem(clearFields);
+    }
+    
+    private void itemStateChangedAccIsSubtotalPctApplying(final boolean requestFocus) {
+        boolean enableable = isCustomAccEnableable();
+        
+        if (jckAccIsSubtotalPctApplying.isSelected()) {
+            jtfAccSubtotalPct.setEnabled(enableable);
+            jtfAccSubtotalCy.setEnabled(false);
+            
+            moFieldAccSubtotalCy.resetField();
+            
+            if (requestFocus) {
+                jtfAccSubtotalPct.requestFocusInWindow();
+            }
+        }
+        else {
+            jtfAccSubtotalPct.setEnabled(false);
+            jtfAccSubtotalCy.setEnabled(enableable);
+            
+            moFieldAccSubtotalPct.resetField();
+            
+            if (requestFocus) {
+                jtfAccSubtotalCy.requestFocusInWindow();
+            }
+        }
+    }
+    
+    private void stateChangedTabbedPane() {
+        if (jTabbedPane.getSelectedIndex() == TAB_ACC) { // customized-accounting tab
+            if (!moDps.getDbmsDpsCustomAccEntries().isEmpty() && !mbCustomAccPrepared) {
+                // Prepare customized-accounting controls and render entries until required:
+                
+                mbResetingForm = true; // same case as in method setRegistry()
+
+                prepareCustomAcc(false); // as well resets member mbCustomAccPrepared
+
+                for (SDataDpsCustomAccEntry entry : moDps.getDbmsDpsCustomAccEntries()) {
+                    entry.setIsRegistryEdited(true); // assure that entry will be saved
+                    moPaneGridCustomAcc.addTableRow(new SDataDpsCustomAccEntryRow(entry));
+                }
+
+                moPaneGridCustomAcc.renderTableRows();
+                moPaneGridCustomAcc.setTableRowSelection(0);
+                valueChangedCustomAcc();
+
+                mbResetingForm = false; // same case as in method setRegistry()
+                
+                renderCustomAccSubtotal(); // is sensible to member flag mbResetingForm
+            }
+        }
+    }
+    
+    private void valueChangedCustomAcc() {
+        renderCustomAccEntry(moPaneGridCustomAcc.getSelectedTableRow() == null ? null : (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData());
+    }
+    
     private void actionEdit() {
         boolean edit = false;
 
@@ -8729,6 +10002,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             validation = formValidate();
 
             if (validation.getIsError()) {
+                if (validation.getTabbedPaneIndex() != -1) {
+                    jTabbedPane.setSelectedIndex(validation.getTabbedPaneIndex());
+                }
                 if (validation.getComponent() != null) {
                     validation.getComponent().requestFocus();
                 }
@@ -8957,11 +10233,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     public void publicActionDependentEdit() throws SQLException {
-        if (jTabbedPane.getSelectedIndex() == 0) {
+        if (jTabbedPane.getSelectedIndex() == TAB_ETY) {
             actionEntryEdit();
         }
-        else if (jTabbedPane.getSelectedIndex() == 2) {
+        else if (jTabbedPane.getSelectedIndex() == TAB_NTS) {
             actionNotesEdit();
+        }
+        else if (jTabbedPane.getSelectedIndex() == TAB_ACC) {
+            actionCustomAccEntryEdit();
         }
     }
 
@@ -9045,7 +10324,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel130;
     private javax.swing.JPanel jPanel131;
+    private javax.swing.JPanel jPanel139;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel142;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
@@ -9145,6 +10426,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbCfdCceCalcTotalUsd;
     private javax.swing.JButton jbCfdiRelated;
     private javax.swing.JButton jbComputeTotal;
+    private javax.swing.JButton jbCustomAccEntryCancel;
+    private javax.swing.JButton jbCustomAccEntryCopy;
+    private javax.swing.JButton jbCustomAccEntryDelete;
+    private javax.swing.JButton jbCustomAccEntryEdit;
+    private javax.swing.JButton jbCustomAccEntryNew;
+    private javax.swing.JButton jbCustomAccEntryOk;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbDateDoc;
     private javax.swing.JButton jbDateDocDelivery_n;
@@ -9163,10 +10450,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbEntryDiscountRetailChain;
     private javax.swing.JButton jbEntryEdit;
     private javax.swing.JButton jbEntryImportFromDps;
+    private javax.swing.JButton jbEntryImportFromMatRequest;
     private javax.swing.JButton jbEntryNew;
     private javax.swing.JButton jbEntryViewLinks;
+    private javax.swing.JButton jbEntryViewMatReqLinks;
     private javax.swing.JButton jbEntryWizard;
     private javax.swing.JButton jbExchangeRate;
+    private javax.swing.JButton jbExeWizardAccSubtotal;
     private javax.swing.JButton jbExportCsv;
     private javax.swing.JButton jbFkCarrierId_n;
     private javax.swing.JButton jbFkCurrencyId;
@@ -9181,14 +10471,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbNotesEdit;
     private javax.swing.JButton jbNotesNew;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbPickAccItem;
+    private javax.swing.JButton jbPickAccItemRef_n;
+    private javax.swing.JButton jbPickAccUnit;
     private javax.swing.JButton jbPickSystemNotes;
     private javax.swing.JButton jbPrepayments;
     private javax.swing.JButton jbRecordManualSelect;
     private javax.swing.JButton jbRecordManualView;
     private javax.swing.JButton jbSalesAgent;
     private javax.swing.JButton jbSalesSupervisor;
+    private javax.swing.JButton jbSetTime;
     private javax.swing.JButton jbTaxRegionId;
-    private javax.swing.JButton jbTime;
+    private javax.swing.JComboBox jcbAccItem;
+    private javax.swing.JComboBox jcbAccItemRef_n;
+    private javax.swing.JComboBox jcbAccUnit;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyBranchGln;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyGln;
     private javax.swing.JComboBox<String> jcbAddAmc71SupplierGln;
@@ -9228,6 +10524,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbNumberSeries;
     private javax.swing.JComboBox jcbPlate;
     private javax.swing.JComboBox<SFormComponentItem> jcbTaxRegionId;
+    private javax.swing.JCheckBox jckAccIsSubtotalPctApplying;
     private javax.swing.JCheckBox jckCfdCceApplies;
     private javax.swing.JCheckBox jckDateDoc;
     private javax.swing.JCheckBox jckDateStartCredit;
@@ -9253,6 +10550,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JFormattedTextField jftDateMaturityRo;
     private javax.swing.JFormattedTextField jftDateShipment_nRo;
     private javax.swing.JFormattedTextField jftDateStartCredit;
+    private javax.swing.JLabel jlAccConcept;
+    private javax.swing.JLabel jlAccDummyCostCenter;
+    private javax.swing.JLabel jlAccItem;
+    private javax.swing.JLabel jlAccItemRef_n;
+    private javax.swing.JLabel jlAccQuantity;
+    private javax.swing.JLabel jlAccSubtotal;
+    private javax.swing.JLabel jlAccUnit;
     private javax.swing.JLabel jlAddAmc71CompanyBranchGln;
     private javax.swing.JLabel jlAddAmc71CompanyBranchGlnHint;
     private javax.swing.JLabel jlAddAmc71CompanyContact;
@@ -9378,6 +10682,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jpControlsPk;
     private javax.swing.JPanel jpControlsRecord;
     private javax.swing.JPanel jpCurrency;
+    private javax.swing.JPanel jpCustomAcc;
+    private javax.swing.JPanel jpCustomAcc1;
+    private javax.swing.JPanel jpCustomAcc11;
+    private javax.swing.JPanel jpCustomAcc111;
+    private javax.swing.JPanel jpCustomAcc1111;
+    private javax.swing.JPanel jpCustomAcc1112;
+    private javax.swing.JPanel jpCustomAcc112;
+    private javax.swing.JPanel jpCustomAcc12;
+    private javax.swing.JPanel jpCustomAcc121;
+    private javax.swing.JPanel jpCustomAcc122;
+    private javax.swing.JPanel jpCustomAcc2;
     private javax.swing.JPanel jpDocument;
     private javax.swing.JPanel jpEntries;
     private javax.swing.JPanel jpEntriesControls;
@@ -9394,11 +10709,26 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JSeparator jsEntry01;
     private javax.swing.JSeparator jsEntry02;
     private javax.swing.JSeparator jsEntry03;
+    private javax.swing.JSeparator jsEntry4;
+    private javax.swing.JSeparator jsEntry5;
     private javax.swing.JSeparator jsNotes01;
     private javax.swing.JSeparator jsNotes02;
     private javax.swing.JTextArea jtaCfdiRelated;
     private javax.swing.JToggleButton jtbEntryFilter;
     private javax.swing.JToggleButton jtbNotesFilter;
+    private javax.swing.JToggleButton jtbSwitchCustomAcc;
+    private javax.swing.JTextField jtfAccConcept;
+    private javax.swing.JTextField jtfAccQuantity;
+    private javax.swing.JTextField jtfAccSubtotal;
+    private javax.swing.JTextField jtfAccSubtotalCur;
+    private javax.swing.JTextField jtfAccSubtotalCy;
+    private javax.swing.JTextField jtfAccSubtotalCyCur;
+    private javax.swing.JTextField jtfAccSubtotalPct;
+    private javax.swing.JTextField jtfAccSubtotalSubtotal;
+    private javax.swing.JTextField jtfAccSubtotalSubtotalCur;
+    private javax.swing.JTextField jtfAccSubtotalSubtotalCy;
+    private javax.swing.JTextField jtfAccSubtotalSubtotalCyCur;
+    private javax.swing.JTextField jtfAccSubtotalSubtotalPct;
     private javax.swing.JTextField jtfAddAmc71CompanyContact;
     private javax.swing.JTextField jtfAddAmc71ShipToAddress;
     private javax.swing.JTextField jtfAddAmc71ShipToCity;
@@ -9482,8 +10812,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         int[] keyBp = new int[] { moDps.getFkBizPartnerId_r() };
         int[] keyBpb = new int[] { moDps.getFkBizPartnerBranchId() };
         int[] keyBpbAdd = new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() };
-        SDataDpsEntry entry = null;
-        SDataDpsNotes notes = null;
         
         if (!moDps.getAuxKeepDpsData()) {
             moDps = createNewDps(null);
@@ -9492,7 +10820,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             renderPk();
 
             for (STableRow row : moPaneGridEntries.getGridRows()) {
-                entry = (SDataDpsEntry) row.getData();
+                SDataDpsEntry entry = (SDataDpsEntry) row.getData();
                 entry.setPkEntryId(0);
                 entry.setIsRegistryNew(true);
 
@@ -9523,9 +10851,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
 
             for (STableRow row : moPaneGridNotes.getGridRows()) {
-                notes = (SDataDpsNotes) row.getData();
+                SDataDpsNotes notes = (SDataDpsNotes) row.getData();
                 notes.setPkNotesId(0);
                 notes.setIsRegistryNew(true);
+            }
+
+            for (STableRow row : moPaneGridCustomAcc.getGridRows()) {
+                SDataDpsCustomAccEntry entry = (SDataDpsCustomAccEntry) row.getData();
+                entry.setPkAccEntryId(0);
+                entry.setIsRegistryNew(true);
             }
         }
         
@@ -9590,6 +10924,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moPaneGridNotes.setGridViewStatus(STableConstants.VIEW_STATUS_ALIVE);
         jtbNotesFilter.setSelected(true);
 
+        moPaneGridCustomAcc.createTable();
+        moPaneGridCustomAcc.clearTableRows();
+        moPaneGridCustomAcc.setGridViewStatus(STableConstants.VIEW_STATUS_ALIVE);
+        moPaneGridCustomAcc.getTable().getSelectionModel().addListSelectionListener(this);
+        
+        // no filter for costomized-accounting entries
+
         moPickerBizPartner.formReset();
         moComboBoxGroupCfdCceGroupAddressee.reset();
 
@@ -9607,6 +10948,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckDateStartCredit.setSelected(false);
         jckRecordUser.setSelected(false);
         jckShipments.setSelected(false);
+        jckIsRebill.setSelected(false);
+        jtbSwitchCustomAcc.setSelected(false);
 
         moFieldDate.setFieldValue(moDps.getDate());
         moFieldDateDoc.setFieldValue(moDps.getDate());
@@ -9668,7 +11011,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mdOldDiscountDocPercentage = 0;
         mbOldIsDiscountDocApplying = false;
 
-        mbResetingForm = false;
+        mnAccCurrentAction = 0;
+        mbCustomAccPrepared = false;
+        renderCustomAccSubtotal();
         
         moDialogDpsTime = null;
         manDpsTime = null;
@@ -9677,6 +11022,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moTrnRelatedDocument = null;
         
         jtaCfdiRelated.setText("");
+        
+        mbResetingForm = false;
     }
 
     @Override
@@ -9795,7 +11142,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else if (moDps.getTotal_r() < 0) {
                     validation.setMessage("El total del documento no puede ser negativo.");
                     validation.setComponent(moPaneGridEntries);
-                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                    validation.setTabbedPaneIndex(TAB_ETY);
                 }
                 else {
                     // validate document number generated by system:
@@ -9884,7 +11231,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                 // validate exchange rate, if neccesary:
 
-                if (!validation.getIsError() && !miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray())) {
+                if (!validation.getIsError() && !isLocalCurrency()) {
                     if (SLibUtils.roundAmount(moFieldExchangeRate.getDouble()) == 1d && 
                             miClient.showMsgBoxConfirm("¡La moneda del documento es '" + moFieldFkCurrencyId.getString() + "'!\n"
                                     + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(1d) + "?") != JOptionPane.YES_OPTION) {
@@ -9991,17 +11338,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                     else if (isCfdEmissionRequired && moPaneGridEntries.getTableGuiRowCount() == 0) {
                         validation.setMessage("El documento debe tener al menos una partida.");
-                        jTabbedPane.setSelectedIndex(TAB_ETY);
+                        validation.setTabbedPaneIndex(TAB_ETY);
                     }
                     else if (mnSalesSupervisorId_n != 0 && mnSalesAgentId_n == 0) {
                         validation.setMessage("Se debe ingresar un valor para el campo '" + jlSalesAgent.getText() + "'.");
                         validation.setComponent(jbSalesAgent);
-                        jTabbedPane.setSelectedIndex(TAB_MKT);
+                        validation.setTabbedPaneIndex(TAB_MKT);
                     }
                     else if (mnSalesSupervisorId_n != 0 && mnSalesSupervisorId_n == mnSalesAgentId_n) {
                         validation.setMessage("Se debe ingresar un valor diferente para el campo '" + jlSalesAgent.getText() + "'.");
                         validation.setComponent(jbSalesAgent);
-                        jTabbedPane.setSelectedIndex(TAB_MKT);
+                        validation.setTabbedPaneIndex(TAB_MKT);
                     }
                     else {
                         // validate shipping information if Incoterm has been set:
@@ -10009,18 +11356,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && !moBizPartner.isDomestic(miClient) && moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
                             validation.setMessage("Se debe ingresar un valor diferente para el campo '" + jlFkIncotermId.getText() + "'.");
                             validation.setComponent(jcbFkIncotermId);
-                            jTabbedPane.setSelectedIndex(TAB_MKT);
+                            validation.setTabbedPaneIndex(TAB_MKT);
                         }
                         else if (moFieldFkIncotermId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_INC_NA) {
                             if (jcbFkSpotSrcId_n.isEnabled() && jcbFkSpotSrcId_n.getSelectedIndex() <= 0) {
                                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotSrcId_n.getText() + "'.");
                                 validation.setComponent(jcbFkSpotSrcId_n);
-                                jTabbedPane.setSelectedIndex(TAB_MKT);
+                                validation.setTabbedPaneIndex(TAB_MKT);
                             }
                             else if (jcbFkSpotDesId_n.isEnabled() && jcbFkSpotDesId_n.getSelectedIndex() <= 0) {
                                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotDesId_n.getText() + "'.");
                                 validation.setComponent(jcbFkSpotDesId_n);
-                                jTabbedPane.setSelectedIndex(TAB_MKT);
+                                validation.setTabbedPaneIndex(TAB_MKT);
                             }
                             else {
                                 switch (moFieldFkIncotermId.getKeyAsIntArray()[0]) {
@@ -10037,7 +11384,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         if (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_MOT_NA) {
                                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkModeOfTransportationTypeId.getText() + "'.");
                                             validation.setComponent(jcbFkModeOfTransportationTypeId);
-                                            jTabbedPane.setSelectedIndex(TAB_MKT);
+                                            validation.setTabbedPaneIndex(TAB_MKT);
                                         }
                                         break;
                                     case SModSysConsts.LOGS_INC_FAS:
@@ -10049,377 +11396,443 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         if (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_TP_MOT_SEA) {
                                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkModeOfTransportationTypeId.getText() + "'.");
                                             validation.setComponent(jcbFkModeOfTransportationTypeId);
-                                            jTabbedPane.setSelectedIndex(TAB_MKT);
+                                            validation.setTabbedPaneIndex(TAB_MKT);
                                         }
                                         break;
                                     default:
                                 }
                             }
                         }
+                    }
+                    
+                    // check if items of entries of this document need to be added from another source document:
 
-                        // check if items of entries of this document need to be added from another source document:
+                    if (!validation.getIsError()) {
+                        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
 
-                        if (!validation.getIsError()) {
-                            for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-                                SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
-
-                                try {
-                                    if (!mbHasRightOmitSourceDoc) { // condition for check items
-                                        STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
-                                    }
+                            try {
+                                if (!mbHasRightOmitSourceDoc) { // condition for check items
+                                    STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moDps.getDpsTypeKey(), entry.getFkItemId(), entry.hasDpsLinksAsDestiny());
                                 }
-                                catch (Exception e) {
-                                    SLibUtilities.printOutException(this, e);
-                                    validation.setMessage(e.getMessage());
+                            }
+                            catch (Exception e) {
+                                SLibUtilities.printOutException(this, e);
+                                validation.setMessage(e.getMessage());
+                                validation.setComponent(moPaneGridEntries);
+                                validation.setTabbedPaneIndex(TAB_ETY);
+                                break;
+                            }
+                        }
+                    }
+
+                    // validar cuando es importación de requisición que se hayan abierto todos los ítems???
+
+                    if (!validation.getIsError() && mbMatRequestImport) {
+                        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+
+                            try {
+                                if (! entry.getFlagOpenedByMatRequestImport()) { // condition for check items
+                                    validation.setMessage("Es necesario revisar la información de las partidas del documento cuando se importa una requisición.");
                                     validation.setComponent(moPaneGridEntries);
-                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                                    validation.setTabbedPaneIndex(TAB_ETY);
+                                }
+                            }
+                            catch (Exception e) {
+                                SLibUtilities.printOutException(this, e);
+                                validation.setMessage(e.getMessage());
+                                validation.setComponent(moPaneGridEntries);
+                                validation.setTabbedPaneIndex(TAB_ETY);
+                                break;
+                            }
+                        }
+                    }
+
+                    double prepaymentsCy = mdPrepaymentsCy;
+                    double applicationsCy = 0;
+
+                    // check prepayments:
+
+                    if (!validation.getIsError() && mdPrepaymentsCy != 0) {
+                        boolean operationsAvailable = false;
+
+                        for (STableRow row : moPaneGridEntries.getGridRows()) {
+                            SDataDpsEntry dpsEntry = (SDataDpsEntry) row.getData();
+                            if (dpsEntry.isAccountable()) {
+                                switch (dpsEntry.getOperationsType()) {
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:
+                                        prepaymentsCy = SLibUtils.round(prepaymentsCy + dpsEntry.getSubtotalCy_r(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:
+                                        prepaymentsCy = SLibUtils.round(prepaymentsCy - dpsEntry.getSubtotalCy_r(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:
+                                        applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:
+                                        applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
+                                        break;
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:
+                                        applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getSubtotalCy_r(), 2);
+                                        break;
+                                    default:
+                                        operationsAvailable = true;
+                                }
+                            }
+                        }
+
+                        if (applicationsCy > prepaymentsCy) {
+                            if (miClient.showMsgBoxConfirm("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
+                                    + "no debería ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + "." +
+                                    SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                validation.setMessage("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
+                                        + "NO debería ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
+                                validation.setComponent(moPaneGridEntries);
+                                validation.setTabbedPaneIndex(TAB_ETY);
+                            }
+                        }
+                        else if (mbIsDpsInvoice && operationsAvailable && prepaymentsCy > 0 && applicationsCy == 0) {
+                            if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos facturados a su favor por $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ","
+                                + "\n¿está seguro que NO desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Se deberían aplicar anticipos facturados en este documento.");
+                                validation.setComponent(moPaneGridEntries);
+                                validation.setTabbedPaneIndex(TAB_ETY);
+                            }
+                        }
+                    }
+
+                    // validate costomized complementary shipping data:
+
+                    if (!validation.getIsError() && mbIsSales && (mbIsDpsOrder || mbIsDpsInvoice)) {
+                        String shipmentMessageMissingData = validateRequiredShipmentData();
+
+                        if (!shipmentMessageMissingData.isEmpty()) {
+                                validation.setMessage(shipmentMessageMissingData);
+                                validation.setComponent(moPaneGridEntries);
+                                validation.setTabbedPaneIndex(TAB_ETY);
+                        }
+                        else {
+                            String shipmentMessage = validateProvisionalShipmentData();
+
+                            if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm(shipmentMessage) != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Es necesario revisar la información de las partidas del documento.");
+                                validation.setComponent(moPaneGridEntries);
+                                validation.setTabbedPaneIndex(TAB_ETY);
+                            }
+                        }
+                    }
+
+                    // validate contract's calendar of monthly deliveries:
+
+                    if (!validation.getIsError() && mbIsDpsContract) {
+                        try {
+                            int deliveryMonths;
+                            int periodMonths = SGuiUtilities.getPeriodMonths(moFieldDateDocDelivery_n.getDate(), moFieldDateDocLapsing_n.getDate());
+
+                            for (int row = 0; row < moPaneGridEntries.getTableGuiRowCount(); row++) {
+                                deliveryMonths = 0;
+
+                                // validate number of monthly deliveries on each document row, it must match the number of months of the delivery period of this document:
+
+                                for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
+                                     if (!price.getIsDeleted()) {
+                                         deliveryMonths++;
+                                     }
+                                }
+
+                                if (deliveryMonths != periodMonths) {
+                                    validation.setMessage("El número de entregas mensuales capturadas en la partida #" + (row + 1) + " "
+                                            + "no coincide con el número de los meses (" + periodMonths + ") del periodo de entrega del documento "
+                                            + "(del " + SLibUtils.DateFormatDate.format(moFieldDateDocDelivery_n.getDate()) + " al " + SLibUtils.DateFormatDate.format(moFieldDateDocLapsing_n.getDate()) + ").");
+                                    validation.setComponent(moPaneGridEntries);
+                                    validation.setTabbedPaneIndex(TAB_ETY);
                                     break;
                                 }
-                            }
-                        }
 
-                        double prepaymentsCy = mdPrepaymentsCy;
-                        double applicationsCy = 0;
-                        
-                        // check prepayments:
+                                // validate that all monthly delivery really belongs to delivery period of this document:
 
-                        if (!validation.getIsError() && mdPrepaymentsCy != 0) {
-                            boolean operationsAvailable = false;
-
-                            for (STableRow row : moPaneGridEntries.getGridRows()) {
-                                SDataDpsEntry dpsEntry = (SDataDpsEntry) row.getData();
-                                if (dpsEntry.isAccountable()) {
-                                    switch (dpsEntry.getOperationsType()) {
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:
-                                            prepaymentsCy = SLibUtils.round(prepaymentsCy + dpsEntry.getSubtotalCy_r(), 2);
+                                for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
+                                    if (!price.getIsDeleted()) {
+                                        if (!SLibTimeUtilities.isBelongingToPeriod(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth()), SLibTimeUtilities.getBeginOfMonth(moFieldDateDocDelivery_n.getDate()), SLibTimeUtilities.getEndOfMonth(moFieldDateDocLapsing_n.getDate()))) {
+                                            validation.setMessage("La entrega mensual '" + miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth())) + "' de la partida #" + (row + 1) + " "
+                                                    + "no se encuentra dentro del periodo de entrega del documento.");
+                                            validation.setComponent(moPaneGridEntries);
+                                            validation.setTabbedPaneIndex(TAB_ETY);
                                             break;
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:
-                                            prepaymentsCy = SLibUtils.round(prepaymentsCy - dpsEntry.getSubtotalCy_r(), 2);
-                                            break;
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:
-                                            applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
-                                            break;
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:
-                                            applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getDiscountDocCy(), 2);
-                                            break;
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:
-                                            applicationsCy = SLibUtils.round(applicationsCy + dpsEntry.getSubtotalCy_r(), 2);
-                                            break;
-                                        default:
-                                            operationsAvailable = true;
+                                        }
                                     }
                                 }
                             }
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.printOutException(this, e);
+                            validation.setMessage(e.toString());
+                            validation.setComponent(moPaneGridEntries);
+                            validation.setTabbedPaneIndex(TAB_ETY);
+                        }
+                    }
 
-                            if (applicationsCy > prepaymentsCy) {
-                                if (miClient.showMsgBoxConfirm("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
-                                        + "no debería ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + "." +
-                                        SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                    validation.setMessage("La aplicación de anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(applicationsCy) + " " + jtfCurrencyKeyRo.getText() + " "
-                                            + "NO debería ser mayor a los anticipos facturados $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ".");
-                                    validation.setComponent(moPaneGridEntries);
-                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                    if (!validation.getIsError() && (mbIsDpsInvoice || mbIsDpsAdjustment)) {
+                        // check manual accounting record:
+
+                        if (jckRecordUser.isSelected()) {
+                            if (moRecordUser == null) {
+                                validation.setMessage("No fue posible leer el registro '" + jckRecordUser.getText() + "'.");
+                                validation.setComponent(jbRecordManualSelect);
+                            }
+                            else if (moRecordUserSLock == null) {
+                                validation.setMessage("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.");
+                                validation.setComponent(jbRecordManualSelect);
+                            }
+                            else if (!SLibTimeUtilities.isBelongingToPeriod(moFieldDate.getDate(), moRecordUser.getPkYearId(), moRecordUser.getPkPeriodId())) {
+                                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_ERR_GUI_PER_DATE_REC + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDate.getText() + "'.");
+                                    validation.setComponent(jftDate);
+                                }
+                                else if (!SDataUtilities.isPeriodOpen(miClient, moRecordUser.getDate())) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                                    validation.setComponent(jckRecordUser);
                                 }
                             }
-                            else if (mbIsDpsInvoice && operationsAvailable && prepaymentsCy > 0 && applicationsCy == 0) {
-                                if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos facturados a su favor por $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ","
-                                    + "\n¿está seguro que NO desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
-                                    validation.setMessage("Se deberían aplicar anticipos facturados en este documento.");
-                                    validation.setComponent(moPaneGridEntries);
-                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+
+                            if (!validation.getIsError()) {
+                                try {
+                                    /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
+                                    SSrvUtils.verifyLockStatus(miClient.getSession(), moRecordUserLock);
+                                    */
+                                    /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
+                                    SRedisLockUtils.verifyLockStatus(miClient, moRecordUserRedisLock);
+                                    */
+                                    SLockUtils.verifyLockStatus(miClient, moRecordUserSLock);
+                                }
+                                catch (Exception e) {
+                                    validation.setMessage("No fue posible validar el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.\n" + e);
+                                    validation.setComponent(jbRecordManualSelect);
                                 }
                             }
                         }
 
-                        // validate custom complementary shipping data:
+                        // validate CFD emission:
 
-                        if (!validation.getIsError() && mbIsSales && (mbIsDpsOrder || mbIsDpsInvoice)) {
-                            String shipmentMessageMissingData = validateRequiredShipmentData();
-
-                            if (!shipmentMessageMissingData.isEmpty()) {
-                                    validation.setMessage(shipmentMessageMissingData);
-                                    validation.setComponent(moPaneGridEntries);
-                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                        if (!validation.getIsError() && isCfdEmissionRequired) {
+                            if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n() == null) {
+                                validation.setMessage("No se ha configurado un certificado de sello digital (CSD).");
                             }
-                            else {
-                                String shipmentMessage = validateProvisionalShipmentData();
-
-                                if (!shipmentMessage.isEmpty() && miClient.showMsgBoxConfirm(shipmentMessage) != JOptionPane.YES_OPTION) {
-                                    validation.setMessage("Es necesario revisar la información de las partidas del documento.");
-                                    validation.setComponent(moPaneGridEntries);
-                                    jTabbedPane.setSelectedIndex(TAB_ETY);
-                                }
+                            else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate().compareTo(moFieldDate.getDate()) > 0) {
+                                validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
+                                        "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
+                                        "La vigencia del certificado comienza el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate()) + ".");
                             }
-                        }
-
-                        // validate contract's calendar of monthly deliveries:
-
-                        if (!validation.getIsError() && mbIsDpsContract) {
-                            try {
-                                int deliveryMonths;
-                                int periodMonths = SGuiUtilities.getPeriodMonths(moFieldDateDocDelivery_n.getDate(), moFieldDateDocLapsing_n.getDate());
-
-                                for (int row = 0; row < moPaneGridEntries.getTableGuiRowCount(); row++) {
-                                    deliveryMonths = 0;
-
-                                    // validate number of monthly deliveries on each document row, it must match the number of months of the delivery period of this document:
-
-                                    for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
-                                         if (!price.getIsDeleted()) {
-                                             deliveryMonths++;
-                                         }
-                                    }
-
-                                    if (deliveryMonths != periodMonths) {
-                                        validation.setMessage("El número de entregas mensuales capturadas en la partida #" + (row + 1) + " "
-                                                + "no coincide con el número de los meses (" + periodMonths + ") del periodo de entrega del documento "
-                                                + "(del " + SLibUtils.DateFormatDate.format(moFieldDateDocDelivery_n.getDate()) + " al " + SLibUtils.DateFormatDate.format(moFieldDateDocLapsing_n.getDate()) + ").");
-                                        validation.setComponent(moPaneGridEntries);
-                                        jTabbedPane.setSelectedIndex(TAB_ETY);
+                            else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate().compareTo(moFieldDate.getDate()) < 0) {
+                                validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
+                                        "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
+                                        "El certificado expiró el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate()) + ".");
+                            }
+                            else if ((jcbGblPeriodicity.getSelectedIndex() > 0 && (jcbGblMonth.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
+                                    (jcbGblMonth.getSelectedIndex() > 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
+                                    (moFieldCfdiGblYear.getInteger() != 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || jcbGblMonth.getSelectedIndex() <= 0))) {
+                                validation.setMessage("Todos los campos con la información de la factura global deben contener un valor.");
+                                validation.setComponent(jcbGblPeriodicity);
+                            }
+                            else if (isCfdAddendaRequired()) {
+                                switch (moBizPartnerCategory.getFkCfdAddendaTypeId()) {
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
+                                        if (mbIsDpsInvoice && moFieldDateDocDelivery_n.getDate() == null) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocDelivery_n.getText() + "'.");
+                                            validation.setComponent(jftDateDocDelivery_n);
+                                        }
+                                        else if (moFieldAddSorianaRemisiónFecha.getDate() == null) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAddSorianaRemisiónFecha.getText() + "'.\n" + SLibConstants.MSG_ERR_GUI_DATE);
+                                            validation.setComponent(jftAddSorianaRemisiónFecha);
+                                            validation.setTabbedPaneIndex(TAB_CFD_ADD);
+                                        }
                                         break;
+
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
+                                        if (moFieldNumberReference.getString().isEmpty()) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jtfNumberReference.getToolTipText() + "'.");
+                                            validation.setComponent(jtfNumberReference);
+                                        }
+                                        break;
+
+                                    default:
+                                }
+                            }
+
+                            if (!validation.getIsError()) {
+                                 if ((isCfdCfdiRelatedRequired() || applicationsCy != 0) && jtaCfdiRelated.getText().isEmpty()) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jbCfdiRelated.getText() + "'.");
+                                    validation.setComponent(jbCfdiRelated);
+                                    validation.setTabbedPaneIndex(TAB_CFD_XML);
+                                 }
+                            }
+
+                            // Validate tax regime receptor:
+                            if (!validation.getIsError()) {
+                                if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && jcbCfdiTaxRegimeReceptor.getSelectedIndex() <= 0) {
+                                    validation.setMessage("El regimén fiscal del receptor debe de tener un valor.");
+                                    validation.setComponent(jcbCfdiTaxRegimeReceptor);
+                                }
+                            }
+
+                            // validate International Commerce settings:
+
+                            if (!validation.getIsError() && isCfdIntCommerceRequired()) {
+                                if (moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
+                                    validation.setComponent(jcbFkIncotermId);
+                                    validation.setTabbedPaneIndex(TAB_MKT);
+                                }
+                                else if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
+                                    validation.setComponent(jtfCfdCceNumberCertificateOrigin);
+                                    validation.setTabbedPaneIndex(TAB_CFD_INT_COM);
+
+                                }
+                                else if (moFieldCfdCceCertificateOrigin.getInteger() == 0 && !moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
+                                    validation.setComponent(jtfCfdCceNumberCertificateOrigin);
+                                    validation.setTabbedPaneIndex(TAB_CFD_INT_COM);
+                                }
+                                else if (jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() > 0 && jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0) {
+                                    validation.setMessage("Se puede especificar un valor para el campo '" + jlCfdCceFkBizPartnerAddressee.getText() + "' o para el campo '" + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "', pero no para ambos a la vez.");
+                                    validation.setComponent(jcbCfdCceFkBizPartnerAddressee);
+                                    validation.setTabbedPaneIndex(TAB_CFD_INT_COM);
+                                }
+                                else if ((jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0 || jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() > 0 || jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0) && 
+                                        (jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() <= 0 || jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() <= 0 || jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0)) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "', '" + jlCfdCceFkAddresseeBizPartnerBranch.getText() + "' y '" + jlCfdCceFkAddresseeBizPartnerBranchAddress.getText() + "'.");
+                                    validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
+                                    validation.setTabbedPaneIndex(TAB_CFD_INT_COM);
+                                }
+                                else {
+                                    // validate addressee:
+
+                                    if (jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() > 0) {
+                                        SDataBizPartnerAddressee addressee = (SDataBizPartnerAddressee) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP_ADDEE, moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                                        if (addressee.getFkCountryId_n() == 0 || addressee.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId()) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkBizPartnerAddressee.getText() + "':\n"
+                                                    + "el destinatario debe ser del extranjero.");
+                                            validation.setComponent(jcbCfdCceFkBizPartnerAddressee);
+                                            validation.setTabbedPaneIndex(TAB_CFD_INT_COM);
+                                        }
                                     }
+                                    else if (jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0) {
+                                        if (moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0] == moBizPartner.getPkBizPartnerId()) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "':\n"
+                                                    + "el destinatario debe ser distinto al receptor del comprobante.");
+                                            validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
+                                            validation.setTabbedPaneIndex(TAB_CFD_INT_COM);
+                                        }
+                                        else {
+                                            SDataBizPartnerBranchAddress address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                                            if (address.getFkCountryId_n() == 0 || address.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId()) {
+                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "':\n"
+                                                        + "el destinatario debe ser del extranjero.");
+                                                validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
+                                                validation.setTabbedPaneIndex(TAB_CFD_INT_COM);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
-                                    // validate that all monthly delivery really belongs to delivery period of this document:
+                            // validate CFDI usage when some item requires a specific one:
 
-                                    for (SDataDpsEntryPrice price : ((SDataDpsEntry) moPaneGridEntries.getTableRow(row).getData()).getDbmsEntryPrices()) {
-                                        if (!price.getIsDeleted()) {
-                                            if (!SLibTimeUtilities.isBelongingToPeriod(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth()), SLibTimeUtilities.getBeginOfMonth(moFieldDateDocDelivery_n.getDate()), SLibTimeUtilities.getEndOfMonth(moFieldDateDocLapsing_n.getDate()))) {
-                                                validation.setMessage("La entrega mensual '" + miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(SLibTimeUtilities.createDate(price.getContractPriceYear(), price.getContractPriceMonth())) + "' de la partida #" + (row + 1) + " "
-                                                        + "no se encuentra dentro del periodo de entrega del documento.");
-                                                validation.setComponent(moPaneGridEntries);
-                                                jTabbedPane.setSelectedIndex(TAB_ETY);
+                            if (!validation.getIsError()) {
+                                for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                                    SDataDpsEntry entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData());
+
+                                    for (SDataItemBizPartnerDescription description : moBizPartner.getDbmsItemBizPartnerDescription()) {
+                                        if (entry.getFkItemId() == description.getPkItemId() && !description.getCfdiUsage().isEmpty() && !description.getIsDeleted()) {
+                                            if (!moFieldCfdiCfdiUsage.getKey().toString().equals(description.getCfdiUsage())) {
+                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_CFDI_USE + "'" + description.getCfdiUsage() + "'.");
+                                                validation.setComponent(jcbCfdiCfdiUsage);
+                                                validation.setTabbedPaneIndex(TAB_CFD_XML);
                                                 break;
                                             }
                                         }
                                     }
                                 }
                             }
-                            catch (Exception e) {
-                                SLibUtilities.printOutException(this, e);
-                                validation.setMessage(e.toString());
-                                validation.setComponent(moPaneGridEntries);
-                                jTabbedPane.setSelectedIndex(TAB_ETY);
-                            }
                         }
 
-                        if (!validation.getIsError() && (mbIsDpsInvoice || mbIsDpsAdjustment)) {
-                            // check manual accounting record:
+                        if (!validation.getIsError() && jtbSwitchCustomAcc.isSelected() ) {
+                            // validate costomized accounting:
 
-                            if (jckRecordUser.isSelected()) {
-                                if (moRecordUser == null) {
-                                    validation.setMessage("No fue posible leer el registro '" + jckRecordUser.getText() + "'.");
-                                    validation.setComponent(jbRecordManualSelect);
-                                }
-                                else if (moRecordUserSLock == null) {
-                                    validation.setMessage("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.");
-                                    validation.setComponent(jbRecordManualSelect);
-                                }
-                                else if (!SLibTimeUtilities.isBelongingToPeriod(moFieldDate.getDate(), moRecordUser.getPkYearId(), moRecordUser.getPkPeriodId())) {
-                                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_ERR_GUI_PER_DATE_REC + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDate.getText() + "'.");
-                                        validation.setComponent(jftDate);
-                                    }
-                                    else if (!SDataUtilities.isPeriodOpen(miClient, moRecordUser.getDate())) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
-                                        validation.setComponent(jckRecordUser);
-                                    }
-                                }
-
-                                if (!validation.getIsError()) {
-                                    try {
-                                        /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
-                                        SSrvUtils.verifyLockStatus(miClient.getSession(), moRecordUserLock);
-                                        */
-                                        /* Bloque de codigo de respaldo correspondiente a la version con Redis de candado de acceso exclusivo a registro
-                                        SRedisLockUtils.verifyLockStatus(miClient, moRecordUserRedisLock);
-                                        */
-                                        SLockUtils.verifyLockStatus(miClient, moRecordUserSLock);
-                                    }
-                                    catch (Exception e) {
-                                        validation.setMessage("No fue posible validar el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.\n" + e);
-                                        validation.setComponent(jbRecordManualSelect);
-                                    }
-                                }
+                            if (!canSwitchOnCustomAcc()) {
+                                validation.setMessage("Realizar las correcciones indicadas para personalizar la contabilización del documento.");
                             }
-
-                            // validate CFD emission:
-
-                            if (!validation.getIsError() && isCfdEmissionRequired) {
-                                if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n() == null) {
-                                    validation.setMessage("No se ha configurado un certificado de sello digital (CSD).");
-                                }
-                                else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate().compareTo(moFieldDate.getDate()) > 0) {
-                                    validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
-                                            "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
-                                            "La vigencia del certificado comienza el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getDate()) + ".");
-                                }
-                                else if (miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate().compareTo(moFieldDate.getDate()) < 0) {
-                                    validation.setMessage("La vigencia del certificado de sello digital (CSD) actual es inválida para la fecha del documento " +
-                                            "(" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "):\n" +
-                                            "El certificado expiró el " + SLibUtils.DateFormatDate.format(miClient.getSessionXXX().getParamsCompany().getDbmsDataCertificate_n().getExpirationDate()) + ".");
-                                }
-                                else if ((jcbGblPeriodicity.getSelectedIndex() > 0 && (jcbGblMonth.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
-                                        (jcbGblMonth.getSelectedIndex() > 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || moFieldCfdiGblYear.getInteger() == 0)) ||
-                                        (moFieldCfdiGblYear.getInteger() != 0 && (jcbGblPeriodicity.getSelectedIndex() <= 0 || jcbGblMonth.getSelectedIndex() <= 0))) {
-                                    validation.setMessage("Todos los campos con la información de la factura global deben contener un valor.");
-                                    validation.setComponent(jcbGblPeriodicity);
-                                }
-                                else if (isCfdAddendaRequired()) {
-                                    switch (moBizPartnerCategory.getFkCfdAddendaTypeId()) {
-                                        case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-                                            if (mbIsDpsInvoice && moFieldDateDocDelivery_n.getDate() == null) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateDocDelivery_n.getText() + "'.");
-                                                validation.setComponent(jftDateDocDelivery_n);
-                                            }
-                                            else if (moFieldAddSorianaRemisiónFecha.getDate() == null) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAddSorianaRemisiónFecha.getText() + "'.\n" + SLibConstants.MSG_ERR_GUI_DATE);
-                                                validation.setComponent(jftAddSorianaRemisiónFecha);
-                                                jTabbedPane.setSelectedIndex(TAB_CFD_ADD);
-                                            }
-                                            break;
-
-                                        case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                                        case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                                        case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                                        case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
-                                            if (moFieldNumberReference.getString().isEmpty()) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jtfNumberReference.getToolTipText() + "'.");
-                                                validation.setComponent(jtfNumberReference);
-                                            }
-                                            break;
-
-                                        default:
-                                    }
-                                }
-
-                                if (!validation.getIsError()) {
-                                     if ((isCfdCfdiRelatedRequired() || applicationsCy != 0) && jtaCfdiRelated.getText().isEmpty()) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jbCfdiRelated.getText() + "'.");
-                                        validation.setComponent(jbCfdiRelated);
-                                        jTabbedPane.setSelectedIndex(TAB_CFD_XML);
-                                     }
-                                }
-                                
-                                // Validate tax regime receptor:
-                                if (!validation.getIsError()) {
-                                    if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && jcbCfdiTaxRegimeReceptor.getSelectedIndex() <= 0) {
-                                        validation.setMessage("El regimén fiscal del receptor debe de tener un valor.");
-                                        validation.setComponent(jcbCfdiTaxRegimeReceptor);
-                                    }
-                                }
-
-                                // validate International Commerce settings:
-
-                                if (!validation.getIsError() && isCfdIntCommerceRequired()) {
-                                    if (moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkIncotermId.getText() + "'.");
-                                        validation.setComponent(jcbFkIncotermId);
-                                        jTabbedPane.setSelectedIndex(TAB_MKT);
-                                    }
-                                    else if (moFieldCfdCceCertificateOrigin.getInteger() == 1 && moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
-                                        validation.setComponent(jtfCfdCceNumberCertificateOrigin);
-                                        jTabbedPane.setSelectedIndex(TAB_CFD_INT_COM);
-
-                                    }
-                                    else if (moFieldCfdCceCertificateOrigin.getInteger() == 0 && !moFieldCfdCceNumberCertificateOrigin.getString().isEmpty()) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdCceNumberCertificateOrigin.getText() + "'.");
-                                        validation.setComponent(jtfCfdCceNumberCertificateOrigin);
-                                        jTabbedPane.setSelectedIndex(TAB_CFD_INT_COM);
-                                    }
-                                    else if (jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() > 0 && jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0) {
-                                        validation.setMessage("Se puede especificar un valor para el campo '" + jlCfdCceFkBizPartnerAddressee.getText() + "' o para el campo '" + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "', pero no para ambos a la vez.");
-                                        validation.setComponent(jcbCfdCceFkBizPartnerAddressee);
-                                        jTabbedPane.setSelectedIndex(TAB_CFD_INT_COM);
-                                    }
-                                    else if ((jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0 || jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() > 0 || jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0) && 
-                                            (jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() <= 0 || jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() <= 0 || jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0)) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "', '" + jlCfdCceFkAddresseeBizPartnerBranch.getText() + "' y '" + jlCfdCceFkAddresseeBizPartnerBranchAddress.getText() + "'.");
-                                        validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
-                                        jTabbedPane.setSelectedIndex(TAB_CFD_INT_COM);
-                                    }
-                                    else {
-                                        // validate addressee:
-
-                                        if (jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() > 0) {
-                                            SDataBizPartnerAddressee addressee = (SDataBizPartnerAddressee) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP_ADDEE, moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
-                                            if (addressee.getFkCountryId_n() == 0 || addressee.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId()) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkBizPartnerAddressee.getText() + "':\n"
-                                                        + "el destinatario debe ser del extranjero.");
-                                                validation.setComponent(jcbCfdCceFkBizPartnerAddressee);
-                                                jTabbedPane.setSelectedIndex(TAB_CFD_INT_COM);
-                                            }
-                                        }
-                                        else if (jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0) {
-                                            if (moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0] == moBizPartner.getPkBizPartnerId()) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "':\n"
-                                                        + "el destinatario debe ser distinto al receptor del comprobante.");
-                                                validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
-                                                jTabbedPane.setSelectedIndex(TAB_CFD_INT_COM);
-                                            }
-                                            else {
-                                                SDataBizPartnerBranchAddress address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
-                                                if (address.getFkCountryId_n() == 0 || address.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId()) {
-                                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "':\n"
-                                                            + "el destinatario debe ser del extranjero.");
-                                                    validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
-                                                    jTabbedPane.setSelectedIndex(TAB_CFD_INT_COM);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // validate CFDI usage when some item requires a specific one:
-
-                                if (!validation.getIsError()) {
-                                    for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-                                        SDataDpsEntry entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData());
-
-                                        for (SDataItemBizPartnerDescription description : moBizPartner.getDbmsItemBizPartnerDescription()) {
-                                            if (entry.getFkItemId() == description.getPkItemId() && !description.getCfdiUsage().isEmpty() && !description.getIsDeleted()) {
-                                                if (!moFieldCfdiCfdiUsage.getKey().toString().equals(description.getCfdiUsage())) {
-                                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_CFDI_USE + "'" + description.getCfdiUsage() + "'.");
-                                                    validation.setComponent(jcbCfdiCfdiUsage);
-                                                    jTabbedPane.setSelectedIndex(TAB_CFD_XML);
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                            else if (mnAccCurrentAction != 0) {
+                                validation.setMessage("Se debe completar la captura actual de partidas de personalización de contabilización del documento.");
+                                validation.setTabbedPaneIndex(TAB_ACC);
                             }
-                        }
-                        
-                        if (!validation.getIsError()) {
-                            if (moComprobante33 != null && jckValidateOnSaveFileXml.isSelected()) {
-                                validation = validateCfdi33();
-                            }
-                            else if (moComprobante40 != null && jckValidateOnSaveFileXml.isSelected()) {
-                                validation = validateCfdi40();
-                            }
-                        }
-
-                        if (!validation.getIsError()) {
-                            // credit status of business partner:
-
-                            if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
-                                validation.setIsError(true);
-                                validation.setComponent(jftDate);
+                            else if (moPaneGridCustomAcc.getGridRows().isEmpty()) {
+                                validation.setMessage("El documento debe tener al menos una partida de personalización de contabilización.");
+                                validation.setTabbedPaneIndex(TAB_ACC);
                             }
                             else {
-                                // check if DPS can be saved:
+                                calculateCustomAccSubtotal(null);
 
-                                SDataDps dps = (SDataDps) getRegistry();
-                                SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_SAVE);
-                                SServerResponse response = null;
+                                if (!SLibUtils.compareAmount(moDps.getSubtotalCy_r(), mdAccSubtotalCy)) {
+                                    validation.setMessage("El subtotal del documento en la moneda original "
+                                            + "(" + jtfAccSubtotalCyCur.getText() + "), "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotalCy_r()) + ",\n"
+                                            + "no coincide con el subtotal de la personalización de contabilización, "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(mdAccSubtotalCy) + ".\n"
+                                            + "SUGERENCIA:\n"
+                                            + "Usar la utilería '" + jbExeWizardAccSubtotal.getToolTipText() + "' disponible al modificar la partida que requiera el ajuste.");
+                                    validation.setTabbedPaneIndex(TAB_ACC);
+                                }
+                                else if (!isLocalCurrency() && !SLibUtils.compareAmount(moDps.getSubtotal_r(), mdAccSubtotal)) {
+                                    validation.setMessage("El subtotal del documento en la moneda local "
+                                            + "(" + jtfAccSubtotalCur.getText() + "), "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotal_r()) + ",\n"
+                                            + "no coincide con el subtotal de la personalización de contabilización, "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(mdAccSubtotal) + ".\n"
+                                            + "SUGERENCIA:\n"
+                                            + "Usar la utilería '" + jbExeWizardAccSubtotal.getToolTipText() + "' disponible al modificar la partida que requiera el ajuste.");
+                                    validation.setTabbedPaneIndex(TAB_ACC);
+                                }
+                            }
+                        }
+                    }
 
-                                request.setPacket(dps);
-                                response = miClient.getSessionXXX().request(request);
+                    /*
+                     * IMPORTANT!: THIS IS THE VERY LAST BLOCK OF VALIDATIONS IN THIS SECTION!!!
+                     */
+                    if (!validation.getIsError()) {
+                        if (moComprobante33 != null && jckValidateOnSaveFileXml.isSelected()) {
+                            validation = validateCfdi33();
+                        }
+                        else if (moComprobante40 != null && jckValidateOnSaveFileXml.isSelected()) {
+                            validation = validateCfdi40();
+                        }
+                    }
+                    // WARNING!: PLEASE DO NOT ADD ANY CODE AROUND THIS LINE!!!
+                    if (!validation.getIsError()) {
+                        // credit status of business partner:
 
-                                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK || response.getResultType() != SLibConstants.DB_CAN_SAVE_YES) {
-                                    validation.setMessage(response.getMessage().isEmpty() ? SLibConstants.MSG_ERR_UTIL_UNKNOWN_ERR : response.getMessage());
-                                } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                        if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
+                            validation.setIsError(true);
+                            validation.setComponent(jftDate);
+                        }
+                        else {
+                            // check if DPS can be saved:
+
+                            SDataDps dps = (SDataDps) getRegistry();
+                            SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_SAVE);
+                            SServerResponse response = null;
+
+                            request.setPacket(dps);
+                            response = miClient.getSessionXXX().request(request);
+
+                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK || response.getResultType() != SLibConstants.DB_CAN_SAVE_YES) {
+                                validation.setMessage(response.getMessage().isEmpty() ? SLibConstants.MSG_ERR_UTIL_UNKNOWN_ERR : response.getMessage());
                             } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
                         } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
                     } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
@@ -10438,7 +11851,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
         } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
         // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-        return validation;
+        return validation; // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
     }
        
     @Override
@@ -10479,7 +11892,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldNumberSeries.setFieldValue(moDps.getNumberSeries());
         moFieldNumber.setFieldValue(moDps.getNumber());
         moFieldNumberReference.setFieldValue(moDps.getNumberReference());
-//        moFieldReqNum.setFieldValue(moDps.getReqNum());
         
         if (areNumberSeriesBySystem()) {
             if (moDps.getIsRegistryNew()) {
@@ -10517,8 +11929,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldShipments.setFieldValue(moDps.getShipments());
         moFieldIsLinked.setFieldValue(moDps.getIsLinked());
         moFieldIsClosed.setFieldValue(moDps.getIsClosed());
-        
-        moFieldFkProductionOrderId_n.setFieldValue(new int[] { moDps.getFkMfgYearId_n(), moDps.getFkMfgOrderId_n() });
 
         moFieldFkPaymentTypeId.setFieldValue(new int[] { moDps.getFkPaymentTypeId() });
         moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
@@ -10528,7 +11938,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // set business partner, set aswell business partner default preferences when document is new:
 
-        setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
+        if (! mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
+            setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
+        }
+        else if (moBizPartner != null) {
+            setBizPartner((int[]) moBizPartner.getPrimaryKey(), (int[]) moBizPartnerBranch.getPrimaryKey(), (int[]) moBizPartnerBranchAddress.getPrimaryKey());
+        }
         
         // check if payment way should be taken from document:
         if (moDps.getDbmsDataDpsCfd() != null && !moDps.getDbmsDataDpsCfd().getPaymentWay().isEmpty()) {
@@ -10539,6 +11954,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (moDps.getDbmsDataDpsCfd() != null && !moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty()) {
             moFieldCfdiPaymentMethod.setFieldValue(moDps.getDbmsDataDpsCfd().getPaymentMethod());
         }
+        
+        moFieldFkProductionOrderId_n.setFieldValue(new int[] { moDps.getFkMfgYearId_n(), moDps.getFkMfgOrderId_n() });
+        
+        moFieldFkContactId_n.setFieldValue(new int[] { moDps.getFkContactBizPartnerBranchId_n(), moDps.getFkContactContactId_n() }); // setBizPartner() populates contact combobox for sales documents
         
         // continue setting form field values:
         
@@ -10559,21 +11978,37 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldPlate.setFieldValue(moDps.getPlate());
         moFieldTicket.setFieldValue(moDps.getTicket());
         
+        // entries:
+        
         for (SDataDpsEntry entry : moDps.getDbmsDpsEntries()) {
             moPaneGridEntries.addTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
         }
+        
         moPaneGridEntries.renderTableRows();
         moPaneGridEntries.setTableRowSelection(0);
+        
+        // notes:
 
         for (SDataDpsNotes notes : moDps.getDbmsDpsNotes()) {
             if (notes.getPkNotesId() != SLibConstants.UNDEFINED || notes.getIsAllDocs()) {
                 moPaneGridNotes.addTableRow(new SDataDpsNotesRow(notes));
             }
         }
+        
         moPaneGridNotes.renderTableRows();
         moPaneGridNotes.setTableRowSelection(0);
-
-        moFieldFkContactId_n.setFieldValue(new int[] { moDps.getFkContactBizPartnerBranchId_n(), moDps.getFkContactContactId_n() }); // setBizPartner() populates contact combobox for sales documents
+        
+        // customized-accounting entries:
+        
+        /*
+         * NOTE FOR CUSTOM ACCOUNTING ENTRIES:
+         * Custom accounting entries should be rendered here, if exist,
+         * but they will be rendered until corresponding tab is selected.
+         */
+        
+        boolean thereAreCustomAccEntries = !moDps.getDbmsDpsCustomAccEntries().isEmpty();
+        
+        // user accounting record:
 
         if (!moDps.getIsRecordAutomatic()) {
             try {
@@ -10582,8 +12017,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             catch (Exception ex) {
+                SLibUtilities.renderException(this, ex);
                 Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+        
+        // tailor form extra data and controls:
+        
+        if (mbMatRequestImport) {
+            renderEntries();
         }
 
         renderBasicSettings();
@@ -10605,6 +12047,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckRecordUser.setSelected(!moDps.getIsRecordAutomatic());
         jckShipments.setSelected(moFieldShipments.getInteger() > 0);
         jckIsRebill.setSelected(moDps.getIsRebill());
+        jtbSwitchCustomAcc.setSelected(thereAreCustomAccEntries);
+        jTabbedPane.setEnabledAt(TAB_ACC, thereAreCustomAccEntries);
+        
         itemStateChangedDateDoc();
         itemStateChangedDateStartCredit();
         itemStateChangedRecordUser();
@@ -10861,7 +12306,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setFkCarrierId_n(moFieldFkCarrierId_n.getKeyAsIntArray()[0]);
             moDps.setFkVehicleTypeId_n(moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0]);
             moDps.setFkVehicleId_n(moFieldFkVehicleId_n.getKeyAsIntArray()[0]);
-//            moDps.setReqNum(moFieldReqNum.getString());
             
             //moDps.setFkSourceYearId_n(...
             //moDps.setFkSourceDocId_n(...
@@ -10887,6 +12331,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.getDbmsDpsNotes().clear();
             for (STableRow row : moPaneGridNotes.getGridRows()) {
                 moDps.getDbmsDpsNotes().add((SDataDpsNotes) row.getData());
+            }
+
+            moDps.getDbmsDpsCustomAccEntries().clear();
+            for (STableRow row : moPaneGridCustomAcc.getGridRows()) {
+                moDps.getDbmsDpsCustomAccEntries().add((SDataDpsCustomAccEntry) row.getData());
             }
 
             moDps.setDbmsCurrency(((SFormComponentItem) jcbFkCurrencyId.getSelectedItem()).getItem());
@@ -11115,6 +12564,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             case SLibConstants.VALUE_CURRENCY_LOCAL:
                 mbIsLocalCurrency = (Boolean) value;
                 break;
+            case SLibConstants.VALUE_IS_MAT_REQ:
+                mbMatRequestImport = (Boolean) value;
+                break;
             default:
         }
     }
@@ -11204,6 +12656,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else if (button == jbEntryViewLinks) {
                     actionEntryViewLinks();
                 }
+                else if (button == jbEntryImportFromMatRequest) {
+                    actionImportEntryFromMatRequest();
+                }
+                else if (button == jbEntryViewMatReqLinks) {
+                    actionViewMatReqEntryLinks();
+                }
                 else if (button == jbExportCsv) {
                     actionExportCsv();
                 }
@@ -11279,8 +12737,38 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else if (button == jbDeleteBillOfLading) {
                     actionDeleteBillOfLading();
                 }
-                else if (button == jbTime) {
-                    actionTime();
+                else if (button == jbSetTime) {
+                    actionSetTime();
+                }
+                else if (button == jbPickAccItem) {
+                    actionPickAccItem();
+                }
+                else if (button == jbPickAccItemRef_n) {
+                    actionPickAccItemRef_n();
+                }
+                else if (button == jbPickAccUnit) {
+                    actionPickAccUnit();
+                }
+                else if (button == jbExeWizardAccSubtotal) {
+                    actionExeWizardAccSubtotal();
+                }
+                else if (button == jbCustomAccEntryNew) {
+                    actionCustomAccEntryNew();
+                }
+                else if (button == jbCustomAccEntryCopy) {
+                    actionCustomAccEntryCopy();
+                }
+                else if (button == jbCustomAccEntryEdit) {
+                    actionCustomAccEntryEdit();
+                }
+                else if (button == jbCustomAccEntryDelete) {
+                    actionCustomAccEntryDelete();
+                }
+                else if (button == jbCustomAccEntryOk) {
+                    actionCustomAccEntryOk();
+                }
+                else if (button == jbCustomAccEntryCancel) {
+                    actionCustomAccEntryCancel(false, true);
                 }
             }
             catch (SQLException se) {
@@ -11298,6 +12786,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else if (toggleButton == jtbNotesFilter) {
                 actionNotesFilter();
+            }
+            else if (toggleButton == jtbSwitchCustomAcc) {
+                actionSwitchCustomAcc();
             }
         }
     }
@@ -11339,6 +12830,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             else if (textField == jcbAddAmc71CompanyBranchGln.getEditor().getEditorComponent()) {
                 focusLostAddAmc71CompanyBranchGln();
             }
+            else if (textField == jtfAccSubtotalPct) {
+                focusLostAccSubtotalPct();
+            }
+            else if (textField == jtfAccSubtotalCy) {
+                focusLostAccSubtotalCy();
+            }
         }
     }
 
@@ -11365,6 +12862,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (checkBox == jckIsDiscountDocPercentage) {
                     itemStateChangedIsDiscountDocPercentage(true);
+                }
+                else if (checkBox == jckAccIsSubtotalPctApplying) {
+                    itemStateChangedAccIsSubtotalPctApplying(true);
                 }
             }
             else if (e.getSource() instanceof javax.swing.JComboBox) {
@@ -11401,6 +12901,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     else if (comboBox == jcbAddAmc71CompanyBranchGln) {
                         itemStateChangedAddAmc71CompanyBranchGln();
                     }
+                    else if (comboBox == jcbAccItem) {
+                        itemStateChangedAccItem(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() instanceof JTabbedPane) {
+            if (e.getSource() == jTabbedPane) {
+                stateChangedTabbedPane();
+            }
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (!mbResetingForm && !mbUpdatingForm) {
+            if (!e.getValueIsAdjusting()) {
+                if (e.getSource() == moPaneGridCustomAcc.getTable().getSelectionModel()) {
+                    valueChangedCustomAcc();
                 }
             }
         }
@@ -11433,7 +12956,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         try {
-            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, registry.getPrimaryKey());
+            boolean reset = false;
+            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, registry.getPrimaryKey(), reset);
         }
         catch (Exception ex) {
             Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);

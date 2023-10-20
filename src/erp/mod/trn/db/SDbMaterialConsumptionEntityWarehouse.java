@@ -19,38 +19,39 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implements SGridRow, Serializable {
-    
+public class SDbMaterialConsumptionEntityWarehouse extends SDbRegistryUser implements SGridRow, Serializable {
+
     protected int mnPkMatConsumptionEntityId;
-    protected int mnPkEmployeeId;
+    protected int mnPkCompanyBranchId;
+    protected int mnPkWarehouseId;
     protected boolean mbDefault;
-    /*
-    protected int mnFkUserInsertId;
-    protected Date mtTsUserInsert;
-    */
+    protected int mnFkUserId;
+    protected Date mtTsUser;
     
     protected SDbMaterialConsumptionEntity moAuxMatConsEnt;
-
-    public SDbMaterialConsumptionEntityEmployee() {
-        super(SModConsts.TRN_MAT_CONS_ENT_EMP);
+    
+    public SDbMaterialConsumptionEntityWarehouse() {
+        super(SModConsts.TRN_MAT_CONS_ENT_WHS);
     }
     
     public void setPkMatConsumptionEntityId(int n) { mnPkMatConsumptionEntityId = n; }
-    public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
+    public void setPkCompanyBranchId(int n) { mnPkCompanyBranchId = n; }
+    public void setPkWarehouseId(int n) { mnPkWarehouseId = n; }
     public void setDefault(boolean b) { mbDefault = b; }
-    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
-    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
-    
+    public void setFkUserId(int n) { mnFkUserInsertId = n; }
+    public void setTsUser(Date t) { mtTsUserInsert = t; }
+
     public void setAuxMatConsEnt(SDbMaterialConsumptionEntity o) { moAuxMatConsEnt = o; }
     
     public int getPkMatConsumptionEntityId() { return mnPkMatConsumptionEntityId; }
-    public int getPkEmployeeId() { return mnPkEmployeeId; }
+    public int getPkCompanyBranchId() { return mnPkCompanyBranchId; }
+    public int getPkWarehouseId() { return mnPkWarehouseId; }
     public boolean isDefault() { return mbDefault; }
-    public int getFkUserInsertId() { return mnFkUserInsertId; }
-    public Date getTsUserInsert() { return mtTsUserInsert; }
-    
-    public SDbMaterialConsumptionEntity getAuxMatConsEnt() { return moAuxMatConsEnt; }
+    public int getFkUserId() { return mnFkUserInsertId; }
+    public Date getTsUser() { return mtTsUserInsert; }
 
+    public SDbMaterialConsumptionEntity getAuxMatConsEnt() { return moAuxMatConsEnt; }
+    
     public void readAuxMatConsEnt(SGuiSession session) throws Exception {
         moAuxMatConsEnt = new SDbMaterialConsumptionEntity();
         moAuxMatConsEnt.read(session, new int[] { mnPkMatConsumptionEntityId });
@@ -59,12 +60,13 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkMatConsumptionEntityId = pk[0];
-        mnPkEmployeeId = pk[1];
+        mnPkCompanyBranchId = pk[1];
+        mnPkWarehouseId = pk[2];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkMatConsumptionEntityId, mnPkEmployeeId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkCompanyBranchId, mnPkWarehouseId };
     }
 
     @Override
@@ -72,11 +74,12 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
         initBaseRegistry();
         
         mnPkMatConsumptionEntityId = 0;
-        mnPkEmployeeId = 0;
+        mnPkCompanyBranchId = 0;
+        mnPkWarehouseId = 0;
         mbDefault = false;
         mnFkUserInsertId = 0;
         mtTsUserInsert = null;
-        
+
         moAuxMatConsEnt = null;
     }
 
@@ -87,14 +90,16 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_mat_cons_ent = " + mnPkMatConsumptionEntityId + " " +
-                "AND id_emp = " + mnPkEmployeeId + " ";
+        return "WHERE id_mat_cons_ent = " + mnPkMatConsumptionEntityId + " " + 
+                "AND id_cob = " + mnPkCompanyBranchId + " " + 
+                "AND id_whs = " + mnPkWarehouseId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_mat_cons_ent = " + pk[0] + " " +
-                "AND id_emp = " + pk[1] + " ";
+        return "WHERE id_mat_cons_ent = " + pk[0] + " " + 
+                "AND id_cob = " + pk[1] + " " + 
+                "AND id_whs = " + pk[2] + " ";
     }
 
     @Override
@@ -112,18 +117,19 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
         
         msSql = "SELECT * " + getSqlFromWhere(pk);
         resultSet = session.getStatement().executeQuery(msSql);
-        if(!resultSet.next()) {
+        if (!resultSet.next()) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
             mnPkMatConsumptionEntityId = resultSet.getInt("id_mat_cons_ent");
-            mnPkEmployeeId = resultSet.getInt("id_emp");
+            mnPkCompanyBranchId = resultSet.getInt("id_cob");
+            mnPkWarehouseId = resultSet.getInt("id_whs");
             mbDefault = resultSet.getBoolean("b_default");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
-            
-            readAuxMatConsEnt(session);
+            mnFkUserId = resultSet.getInt("fk_usr");
+            mtTsUser = resultSet.getTimestamp("ts_usr");
 
+            readAuxMatConsEnt(session);
+            
             mbRegistryNew = false;
         }
         
@@ -135,24 +141,26 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        mnFkUserInsertId = session.getUser().getPkUserId();
+        mnFkUserId = session.getUser().getPkUserId();
         
         if (mbRegistryNew) {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkMatConsumptionEntityId + ", " + 
-                    mnPkEmployeeId + ", " + 
-                    (mbDefault ? 1 : 0) + ", " +
-                    mnFkUserInsertId + ", " + 
+                    mnPkCompanyBranchId + ", " + 
+                    mnPkWarehouseId + ", " +
+                    (mbDefault ? 1 : 0) + ", " + 
+                    mnFkUserId + ", " + 
                     "NOW()" + " " + 
                     ")";
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    //"id_mat_cons_ent = " + mnPkMatConsumptionEntityId + ", " +
-                    //"id_bp = " + mnPkEmployeeId + ", " +
+                    //"id_mat_cons_ent = " + mnPkMatProvisionEntityId + ", " +
+                    //"id_cob = " + mnPkCompanyBranchId + ", " +
+                    //"id_whs = " + mnPkWarehouseId + ", " +
                     "b_default = " + (mbDefault ? 1 : 0) + ", " +
-                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                    //"ts_usr_ins = " + "NOW()" + " " +
+                    //"fk_usr = " + mnFkUserInsertId + ", " +
+                    //"ts_usr = " + "NOW()" + " " +
                     getSqlWhere();
         }
         
@@ -163,14 +171,15 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
     }
 
     @Override
-    public SDbMaterialConsumptionEntityEmployee clone() throws CloneNotSupportedException {
-        SDbMaterialConsumptionEntityEmployee registry = new SDbMaterialConsumptionEntityEmployee();
+    public SDbMaterialConsumptionEntityWarehouse clone() throws CloneNotSupportedException {
+        SDbMaterialConsumptionEntityWarehouse registry = new SDbMaterialConsumptionEntityWarehouse();
         
         registry.setPkMatConsumptionEntityId(this.getPkMatConsumptionEntityId());
-        registry.setPkEmployeeId(this.getPkEmployeeId());
+        registry.setPkCompanyBranchId(this.getPkCompanyBranchId());
+        registry.setPkWarehouseId(this.getPkWarehouseId());
         registry.setDefault(this.isDefault());
-        registry.setFkUserInsertId(this.getFkUserInsertId());
-        registry.setTsUserInsert(this.getTsUserInsert());
+        registry.setFkUserId(this.getFkUserId());
+        registry.setTsUser(this.getTsUser());
 
         registry.setRegistryNew(this.isRegistryNew());
         
@@ -179,7 +188,7 @@ public class SDbMaterialConsumptionEntityEmployee extends SDbRegistryUser implem
 
     @Override
     public int[] getRowPrimaryKey() {
-        return new int [] { mnPkMatConsumptionEntityId, mnPkEmployeeId };
+        return new int[] { mnPkMatConsumptionEntityId, mnPkCompanyBranchId, mnPkWarehouseId };
     }
 
     @Override

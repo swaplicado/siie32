@@ -8,6 +8,7 @@ package erp.gui;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataRepConstants;
+import erp.form.SFormOptionPicker;
 import erp.gui.mod.cfg.SCfgMenu;
 import erp.gui.mod.cfg.SCfgMenuSection;
 import erp.gui.mod.cfg.SCfgMenuSectionItem;
@@ -15,6 +16,7 @@ import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
 import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
 import erp.mfin.data.SDataCostCenterItem;
@@ -233,6 +235,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary moDialogRepSalesPurchasesItemUnitaryPrice;
     private erp.mtrn.form.SDialogRepContractStock moDialogRepContractStock;
     private erp.mtrn.form.SDialogRepPurchasesUnitaryCost moDialogRepPurchasesUnitaryCost;
+    
+    private erp.form.SFormOptionPicker moPickerConsumeEntity;
 
     public SGuiModuleTrnPur(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_PUR);
@@ -1070,7 +1074,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                                     miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[2]);
                                 }
                                 else if (((Object[]) moFormComplement)[2] instanceof SDataDps) {
-                                    if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN })) {
+                                    // DUDA !
+                                    if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_EST, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN })) {
                                         miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[2]);
                                     }
                                 }
@@ -1082,6 +1087,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
                             if (((Object[]) moFormComplement).length >= 5) {
                                 miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[4]);
+                            }
+                            
+                            if (((Object[]) moFormComplement).length >= 6) {
+                                miForm.setValue(SLibConstants.VALUE_IS_MAT_REQ, ((Object[]) moFormComplement)[5]);
                             }
                         }
                     }
@@ -1414,7 +1423,22 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public erp.lib.form.SFormOptionPickerInterface getOptionPicker(int optionType) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SFormOptionPickerInterface picker = null;
+
+        try {
+            switch (optionType) {
+                case SDataConstants.TRN_MAT_CONS_ENT:
+                    picker = moPickerConsumeEntity = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerConsumeEntity);
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM_PICK);
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+
+        return picker;
     }
 
     @Override

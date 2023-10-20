@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class STrnStockMove implements java.io.Serializable {
 
@@ -66,24 +66,34 @@ public class STrnStockMove implements java.io.Serializable {
      * Creates stock move.
      * @param moveKey Stock move primary key (year, item, unit, lot, company branch, warehouse).
      * @param quantity Stock move quantity.
-     * @param value Stock move total value in local currency.
+     * @param totalValue Stock move total value in local currency.
      */
-    public STrnStockMove(int[] moveKey, double quantity, double value) {
-        this(moveKey, quantity, value, "", 0, 0);
+    public STrnStockMove(int[] moveKey, double quantity, double totalValue) {
+        this(moveKey, quantity, totalValue, "", 0, 0);
     }
     
-    public STrnStockMove(int[] moveKey, double quantity, double value, int maintUserId_n, int maintUserSupervisorId) {
-        this(moveKey, quantity, value, "", maintUserId_n, maintUserSupervisorId);
+    /**
+     * 
+     * @param moveKey
+     * @param quantity
+     * @param totalValue
+     * @param maintUserId_n
+     * @param maintUserSupervisorId 
+     */
+    public STrnStockMove(int[] moveKey, double quantity, double totalValue, int maintUserId_n, int maintUserSupervisorId) {
+        this(moveKey, quantity, totalValue, "", maintUserId_n, maintUserSupervisorId);
     }
 
     /**
      * Creates stock move.
      * @param moveKey Stock move primary key (year, item, unit, lot, company branch, warehouse).
      * @param quantity Stock move quantity.
-     * @param value Stock move total value in local currency.
+     * @param totalValue Stock move total value in local currency.
      * @param serialNumber Stock move serial number.
+     * @param maintUserId_n
+     * @param maintUserSupervisorId
      */
-    public STrnStockMove(int[] moveKey, double quantity, double value, String serialNumber, int maintUserId_n, int maintUserSupervisorId) {
+    public STrnStockMove(int[] moveKey, double quantity, double totalValue, String serialNumber, int maintUserId_n, int maintUserSupervisorId) {
         mnPkYearId = moveKey[0];
         mnPkItemId = moveKey[1];
         mnPkUnitId = moveKey[2];
@@ -91,7 +101,7 @@ public class STrnStockMove implements java.io.Serializable {
         mnPkCompanyBranchId = moveKey[4];
         mnPkWarehouseId = moveKey[5];
         mdQuantity = quantity;
-        mdValue = value;
+        mdValue = totalValue;
         msSerialNumber = serialNumber;
         mnMaintUserId_n = maintUserId_n;
         mnMaintUserSupervisorId = maintUserSupervisorId;

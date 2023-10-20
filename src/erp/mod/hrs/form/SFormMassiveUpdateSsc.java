@@ -13,11 +13,13 @@ import erp.lib.form.SFormValidation;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbEarning;
+import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbMassiveSalarySscBase;
-import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.db.ssc.SRowEmployeeSsc;
 import erp.mod.hrs.db.ssc.SSscUtils;
 import static erp.mod.hrs.db.ssc.SSscUtils.daysCalendarPeriod;
+import erp.mod.hrs.utils.SAnniversary;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -27,6 +29,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -70,20 +73,25 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
     
     protected SGridPaneForm moGridSbcEmployees;
     
+    protected int mnLimitUmasSsc = 25;
     protected erp.lib.table.STablePane moTablePane;
     protected ArrayList<SDbEarning> maEarnings;
     protected double SDbEmployees[];
+    protected double mdMaximumSalary;
+    protected boolean isEmployeLim;
     protected JButton mjbSelectAll;
     protected JButton mjbDeselectAll;
     protected JButton mjbReset;
     
+    private SDbEmployee moCurrentEmployee;
+    protected SAnniversary moAnniversary;
     /**
      * 
      * @param client
      * @param year
      * @param bimester 
      */
-    public SFormMassiveUpdateSsc(erp.client.SClientInterface client, int year, int bimester) throws Exception {
+    public SFormMassiveUpdateSsc(erp.client.SClientInterface client, int year, int bimester, boolean employeLimUmam) throws Exception {
         super(client.getFrame(), true);
         miClient = client;
         mnFormType = SDataConstants.FINU_TAX_BAS;
@@ -92,6 +100,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         mnBimester = bimester;
         mnMonthEnd = mnBimester * 2;
         mnMonthStart = mnMonthEnd - 1;
+        isEmployeLim = employeLimUmam;
         
         initComponents();
         initComponentsExtra();
@@ -240,6 +249,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
 
     private void initComponentsExtra() throws Exception {
         mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthEnd));
+        mdMaximumSalary = (SHrsUtils.getRecentUma(miClient.getSession(), mtDateEnd) * mnLimitUmasSsc );
 
         mvFields = new Vector<>();
         mjbSelectAll = new JButton("Seleccionar todos");
@@ -255,7 +265,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         jtfYear.setText("" + mnYear + "");
         jtfBimestre.setText("" + mnBimester + "");
         jftDateCut.setText(SLibUtils.DateFormatDate.format(mtDateEnd));
-
+        
         try {
             maEarnings = SSscUtils.getEarningPaidInPeriod(miClient.getSession(), mnYear, mnMonthStart, mnMonthEnd);
         }
@@ -281,7 +291,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días vacaciones", 50));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_2D, "Prima vacacional %", 50));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días aguinaldo", 50));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_8D, "Factor de integración", 150));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_8D, "Factor de integración", 100));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Ingreso diario $", 75));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC actual $", 75));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "SBC últ. cambio", 75));
@@ -296,7 +306,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC nuevo $", moGridSbcEmployees.getTable().getDefaultEditor(Double.class));
                 column.setEditable(true);
                 columns.add(column);
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia SBS $"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia SBC $"));
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado", moGridSbcEmployees.getTable().getDefaultEditor(Boolean.class));
                 column.setEditable(true);
                 columns.add(column);
@@ -322,7 +332,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         moGridSbcEmployees.setForm(null);
         moGridSbcEmployees.setPaneFormOwner(null);
         
-        moFieldDateChangeSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeSsc, jlDateCut);
+        moFieldDateChangeSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeSsc, jlDateChangeSsc);
         moFieldDateChangeSalary.setPickerButton(jbDateChangeSscPicker);
 
         mtDateStart = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthStart));
@@ -401,221 +411,258 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         String dateEnd = SLibUtils.DbmsDateFormatDate.format(dateLayoutEnd); 
         String pDateBoyCurr = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getBeginOfYear(dateLayoutEnd));
         String sql = "";
+        String sqlLimitEmploye = "";
         ResultSet resultSet = null;
         int auxEmployee = 0;
         
+        if (isEmployeLim == true) {
         String dateEndAnt = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.addDate(dateLayoutEnd, 0, -2, 0));
+        
+            try {
+               ArrayList<SRowEmployeeSsc> rows = SSscUtils.createEmployeeSbcRows(miClient.getSession(), layoutYear, mnMonthStart, mnMonthEnd);
 
-        try {
-            ArrayList<SRowEmployeeSsc> rows = SSscUtils.createEmployeeSbcRows(miClient.getSession(), layoutYear, mnMonthStart, mnMonthEnd);
-           
-            for (SRowEmployeeSsc row : rows) {
-                sql = "SELECT bp.id_bp AS _IdEmp, bp.bp AS _emp_name, e.num AS _emp_num, tp.name AS _pay_tp_name, " +
-                "e.dt_ben AS _emp_dt_ben, " +
-                "e.dt_sal_ssc AS SscLastUpdate , e.sal_ssc as SscCurrent, " +
-                "' " + dateEnd + " ' AS _p_dt_cutoff, " +
-                "@sen_raw:=CEILING(ROUND(DATEDIFF(' " + dateEnd + " ', e.dt_ben) / " + SHrsConsts.YEAR_DAYS + ", 4)) AS _sen_raw, " + 
-                "@sen_as_years:=TIMESTAMPDIFF(YEAR, e.dt_ben, ' " + dateEndAnt + " ') AS _sen_as_years, " +
-                "@sen_as_months:=TIMESTAMPDIFF(MONTH, e.dt_ben, ' " + dateEndAnt + " ') AS _sen_as_months, " +
-                "@curr_sal_wage:=(SELECT IF((SELECT COUNT(*) FROM hrs_emp_log_wage WHERE id_emp = " + row.getEmployee().getPkEmployeeId() + " AND dt BETWEEN ' " + dateStart + " ' AND ' " + dateEnd + " ') >= 1, 0, v.wage) AS wage " +
-                "FROM hrs_emp_log_wage AS v INNER JOIN erp.hrsu_emp AS emp ON v.id_emp = emp.id_emp WHERE v.b_del = 0 AND emp.b_act = 1  AND v.id_emp = " + row.getEmployee().getPkEmployeeId() + " AND v.dt <= ' " + dateEndAnt + " ' ORDER BY v.dt DESC LIMIT 1) as WageI, " +
-                "@curr_sal_day:=ROUND(IF(e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ",  e.sal , ((e.wage * " + SHrsConsts.YEAR_MONTHS + " ) / " + SHrsConsts.YEAR_DAYS + ")),2) AS DailyIncome, " +
-                "@curr_ben_anniv:=@sen_as_years + 1 AS _curr_ben_anniv, " +
-                "@curr_ben_year:=YEAR(ADDDATE(e.dt_ben, " +
-                "INTERVAL @sen_as_years YEAR)) AS _curr_ben_year, " +
-                "@prev_ben_anniv:=IF(@sen_as_years = 0, NULL, " +
-                "@sen_as_years) AS _prev_ben_anniv, " +
-                "@prev_ben_year:=IF(@sen_as_years = 0, NULL, " +
-                "@curr_ben_year - 1) AS _prev_ben_year, " +
-                "@curr_dt_base:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ", " +
-                "IF(e.dt_ben < ' " + pDateBoyCurr + " ', ' " + pDateBoyCurr + " ', e.dt_ben), " +
-                "ADDDATE(e.dt_ben, INTERVAL @sen_as_years YEAR)) AS _curr_dt_base, " +
-                "@curr_days_elapsed:=DATEDIFF(' " + dateEndAnt + " ', @curr_dt_base) AS _curr_days_elapsed, " +
-                "@curr_prop:=@curr_days_elapsed / " + SHrsConsts.YEAR_DAYS + " AS _curr_prop, " +
-                "@prev_dt_base:=IF(@sen_as_years = 0, NULL, IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ", IF(e.dt_ben < ' " + pDateBoyCurr + " ', ' " + pDateBoyCurr + " ', e.dt_ben), ADDDATE(e.dt_ben, INTERVAL @sen_as_years - 1 YEAR))) AS _prev_dt_base, " +
-                "@prev_days_elapsed:=IF(@sen_as_years = 0, NULL, " +
-                "DATEDIFF(' " + dateEndAnt + " ', @prev_dt_base) - @curr_days_elapsed) AS _prev_days_elapsed, " +
-                "@prev_prop:=IF(@sen_as_years = 0, NULL, @prev_days_elapsed / " + SHrsConsts.YEAR_DAYS + ") AS _prev_prop, " +
-                "@id_ben_day_pay:=(SELECT b.id_ben FROM hrs_ben AS b " +
-                "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ") AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n = e.fk_tp_pay ORDER BY b.dt_sta DESC , b.id_ben " +
-                "LIMIT 1) AS _id_ben_day_pay, " +
-                "@id_ben_day_all:=(SELECT b.id_ben FROM hrs_ben AS b WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ") AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n IS NULL " +
-                "ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1) AS _id_ben_day_all, " +
-                "@id_ben_day:=COALESCE(@id_ben_day_pay, @id_ben_day_all) AS _id_ben_day, " +
-                "@id_ben_bon_pay:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " <> " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", 0, (SELECT b.id_ben FROM hrs_ben AS b WHERE NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n = e.fk_tp_pay " +
-                "ORDER BY b.dt_sta DESC , b.id_ben " +
-                "LIMIT 1)) AS _id_ben_bon_pay, " +
-                "@id_ben_bon_all:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " <> " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", 0, " +
-                "(SELECT b.id_ben FROM hrs_ben AS b " +
-                "WHERE NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n IS NULL " +
-                "ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1)) AS _id_ben_bon_all, " +
-                "@id_ben_bon:=COALESCE(@id_ben_bon_pay, @id_ben_bon_all) AS _id_ben_bon, " +
-                "@ben_bon_name:=(SELECT b.name FROM hrs_ben AS b WHERE b.id_ben = @id_ben_bon) AS _ben_bon_name, " +
-                "@curr_ben_days:=COALESCE((SELECT br.ben_day " +
-                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_day AND (SELECT CEILING(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS _DiasAguinaldo, " +
-                "@curr_ben_days_prop:=@curr_ben_days * @curr_prop AS _curr_ben_days_prop, " +
-                "@curr_ben_amt_prop:=ROUND(@curr_sal_day * @curr_ben_days_prop, 2) AS _curr_ben_amt_prop, " +
-                "@curr_ben_bon_perc:=COALESCE((SELECT  " +
-                "br.ben_bon_per " +
-                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_bon AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") " +
-                "ORDER BY br.id_row " +
-                "LIMIT 1), 0) AS _curr_ben_bon_perc, " +
-                "@curr_ben_bon_amt_prop:=ROUND(@curr_ben_amt_prop * @curr_ben_bon_perc, 2) AS _curr_ben_bon_amt_prop, " +
-                "@prev_ben_days:=IF(@sen_as_years < 1, 0, " +
-                "COALESCE((SELECT br.ben_day " +
-                "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_day AND ((SELECT FLOOR(@sen_raw))- 1) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0)) AS _prev_ben_days, " +
-                "@prev_ben_days_prop:=@prev_ben_days * @prev_prop AS _prev_ben_days_prop, " +
-                "@prev_ben_amt_prop:=ROUND(@curr_sal_day * @prev_ben_days_prop, 2) AS _prev_ben_amt_prop, " +
-                "@prev_ben_bon_perc:=IF(@sen_as_years < 1, 0, " +
-                "COALESCE((SELECT br.ben_bon_per " +
-                "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_bon AND ((SELECT FLOOR(@sen_raw)) - 1) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") " +
-                "ORDER BY br.id_row " +
-                "LIMIT 1), 0)) AS _prev_ben_bon_perc, " +
-                "@prev_ben_bon_amt_prop:=ROUND(@prev_ben_amt_prop * @prev_ben_bon_perc, 2) AS _prev_ben_bon_amt_prop, " +
-                "@curr_pay_days:=COALESCE(tcur.ben_unt, 0.0) AS _curr_pay_days, " +
-                "@curr_pay_amt:=COALESCE(tcur.ben_amt, 0.0) AS _curr_pay_amt, " +
-                "@prev_pay_days:=COALESCE(tprev.ben_unt, 0.0) AS _prev_pay_days, " +
-                "@prev_pay_amt:=COALESCE(tprev.ben_amt, 0.0) AS _prev_pay_amt, " +
-                "COALESCE(@curr_ben_days_prop, 0.0) - @curr_pay_days AS _diff_curr_pay_days, " +
-                "COALESCE(IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", @curr_ben_bon_amt_prop, @curr_ben_amt_prop), 0.0) - @curr_pay_amt AS _diff_curr_pay_amt, " +
-                "COALESCE(@prev_ben_days_prop, 0.0) - @prev_pay_days AS _diff_prev_pay_days, " +
-                "COALESCE(IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", @prev_ben_bon_amt_prop, @prev_ben_amt_prop), 0.0) - @prev_pay_amt AS _diff_prev_pay_amt, " +
-                "@id_ben_bon_all:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC_BON + " <> " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", 0, " +
-                "(SELECT b.id_ben FROM hrs_ben AS b " +
-                "WHERE " +
-                "NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n IS NULL " +
-                "ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1)) AS _id_ben_bon_all, " +
-                "@id_ben_bon_pay:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC_BON + " <> " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", 0, " +
-                "(SELECT b.id_ben FROM hrs_ben AS b " +
-                "WHERE NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n = e.fk_tp_pay " +
-                "ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1)) AS _id_ben_bon_pay, " +
-                "@id_ben_bon:=COALESCE(@id_ben_bon_pay, @id_ben_bon_all) AS _id_ben_bon, " +
-                "@curr_ben_bon_perc:=COALESCE((SELECT br.ben_bon_per " +
-                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_bon AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsBonus, " +
-                "@id_ben_day:=COALESCE(@id_ben_day_pay, @id_ben_day_all) AS _id_ben_day, " +
-                "@curr_ben_days:=COALESCE((SELECT br.ben_day " + 
-                "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_day AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsDays, " +
-                "@id_ben_day_pay1:=(SELECT b.id_ben " +
-                "FROM hrs_ben AS b " +
-                "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + SModSysConsts.HRSS_TP_BEN_ANN_BON + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ") AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n = e.fk_tp_pay " +
-                "ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1) AS _id_ben_day_pay, " +
-                "@id_ben_day_all1:=(SELECT b.id_ben " +
-                "FROM hrs_ben AS b " +
-                "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + SModSysConsts.HRSS_TP_BEN_ANN_BON + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ") AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n IS NULL ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1) AS _id_ben_day_all, " +
-                "@id_ben_day1:=COALESCE(@id_ben_day_pay1, @id_ben_day_all1) AS _id_ben_day, " +
-                "@curr_ben_days_bon:=COALESCE((SELECT br.ben_day " +
-                "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_day1 AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS AnnualBonusDays, " +
-                "@factorI:=(((@curr_ben_days_bon / " + SHrsConsts.YEAR_DAYS + ") + ((@curr_ben_bon_perc * @curr_ben_days ) / " + SHrsConsts.YEAR_DAYS + ")) + 1 ) AS SscFactor, " +
-                "@SbcFac:=(@curr_sal_day * @factorI) AS SbcFac, " +
-                "(@Factori * @curr_sal_day) AS SscRaw " +
-                        
-                "FROM erp.bpsu_bp AS bp " +
-                "INNER JOIN erp.hrsu_emp AS e ON e.id_emp = bp.id_bp " +
-                "INNER JOIN erp.hrss_tp_pay AS tp ON e.fk_tp_pay = tp.id_tp_pay " +
-                "LEFT OUTER JOIN (SELECT t.id_emp, t.ben_year, t.ben_ann, " +
-                "SUM(t.ben_unt) AS ben_unt, " +
-                "SUM(t.ben_amt) AS ben_amt " +
-                "FROM (SELECT pre.id_emp, pre.ben_year, pre.ben_ann, " +
-                "SUM(pre.unt) AS ben_unt, " +
-                "SUM(pre.amt_r) AS ben_amt " +
-                "FROM hrs_pay AS p " +
-                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
-                "WHERE pre.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR(' " + dateEnd + " ') " +
-                "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, " +
-                "- SUM(prd.unt) AS ben_unt, " +
-                "- SUM(prd.amt_r) AS ben_amt " +
-                "FROM hrs_pay AS p " +
-                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
-                "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
-                "WHERE prd.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND e.b_act AND NOT p.b_del " + 
-                "AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR(' " + dateEnd + " ') " +
-                "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
-                "ORDER BY id_emp , ben_year , ben_ann) AS t " +
-                "GROUP BY id_emp , ben_year , ben_ann " +
-                "ORDER BY id_emp , ben_year , ben_ann) AS tcur ON tcur.id_emp = bp.id_bp " +
-                "LEFT OUTER JOIN (SELECT t.id_emp, t.ben_year, t.ben_ann, " +
-                "SUM(t.ben_unt) AS ben_unt, " +
-                "SUM(t.ben_amt) AS ben_amt " +
-                "FROM (SELECT pre.id_emp, pre.ben_year, pre.ben_ann, SUM(pre.unt) AS ben_unt, SUM(pre.amt_r) AS ben_amt " +
-                "FROM hrs_pay AS p " +
-                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
-                "WHERE pre.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
-                "AND pre.ben_year = YEAR(' " + dateEnd + " ') - 1 " +
-                "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, " +
-                "- SUM(prd.unt) AS ben_unt, " +
-                "- SUM(prd.amt_r) AS ben_amt " +
-                "FROM hrs_pay AS p " +
-                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
-                "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
-                "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = e.id_emp " +
-                "INNER JOIN erp.bpsu_bp AS bp ON va.id_emp = bp.id_bp " +
-                "INNER JOIN erp.usru_usr AS ui ON va.fk_usr_ins = ui.id_usr " +
-                "INNER JOIN erp.usru_usr AS uu ON va.fk_usr_upd = uu.id_usr " +
-                "WHERE prd.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del  AND prd.ben_year = YEAR(' " + dateEnd + " ') - 1 " +
-                "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
-                "ORDER BY id_emp , ben_year , ben_ann) AS t " +
-                "GROUP BY id_emp , ben_year , ben_ann " +
-                "ORDER BY id_emp , ben_year , ben_ann) AS tprev ON tprev.id_emp = bp.id_bp " +
-                "WHERE e.b_act AND NOT e.b_del AND e.b_act " +
-                "AND bp.id_bp = " + row.getEmployee().getPkEmployeeId() + "  " +
-                "and e.dt_sal_ssc <= ' " + dateStart + " ' " +
-                "ORDER BY bp.bp , bp.id_bp LIMIT 1" ;
+               for (SRowEmployeeSsc row : rows) {
+               moCurrentEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { row.getEmployee().getPkEmployeeId() });
 
-            Statement statement = miClient.getSession().getStatement().getConnection().createStatement();
-            resultSet = statement.executeQuery(sql);
-            earningExtra = 0;
-            int auxEarning = 0;
+               Date cutoffYearStart = SLibTimeUtils.getBeginOfYear(mtDateEnd);
 
-            int calendarDaysInPeriod = daysCalendarPeriod(layoutYear , mnMonthStart);
-            calendarDaysInPeriod = calendarDaysInPeriod + daysCalendarPeriod(layoutYear , mnMonthEnd);
+               if (moCurrentEmployee.getDateBenefits().after(cutoffYearStart)) {
+                   cutoffYearStart = moCurrentEmployee.getDateBenefits().after(mtDateEnd) ? mtDateEnd : moCurrentEmployee.getDateBenefits();
+               }
 
-            if (resultSet.next()) {
-                for( auxEarning = 0; auxEarning <= rows.get(auxEmployee).getSbcEarnings().size()-1; auxEarning++) {
-                earningExtra = earningExtra + rows.get(auxEmployee).getSbcEarnings().get(auxEarning).AmountTaxed;
-                }
+               sql = "SELECT bp.id_bp AS _IdEmp, bp.bp AS _emp_name, e.num AS _emp_num, tp.name AS _pay_tp_name, e.dt_ben AS _emp_dt_ben, e.dt_sal_ssc AS SscLastUpdate, " +
+                    "e.sal_ssc AS SscCurrent, '" + dateEnd + "' AS _p_dt_cutoff, @sen_raw:=CEILING(ROUND(DATEDIFF('" + dateEnd + "', e.dt_ben) / 365,4)) AS _sen_raw, " +
+                    "@curr_sal_wage:=(SELECT IF((SELECT COUNT(*) FROM hrs_emp_log_wage WHERE id_emp = " + row.getEmployee().getPkEmployeeId() + " AND dt " +
+                    "BETWEEN ' " + dateStart + " ' AND ' " + dateEnd + " ') >= 1, 0, v.wage) AS wage FROM hrs_emp_log_wage AS v INNER JOIN erp.hrsu_emp AS emp " +
+                    "ON v.id_emp = emp.id_emp WHERE v.b_del = 0 AND emp.b_act = 1  AND v.id_emp = " + row.getEmployee().getPkEmployeeId() + " AND v.dt <= ' " + dateEndAnt + " ' " +
+                    "ORDER BY v.dt DESC LIMIT 1) as WageI, " +
+                    "@curr_sal_day:=ROUND(IF(e.fk_tp_pay = 1, e.sal, ((e.wage * 12) / 365)), 2) AS salarioDiario, " +
+                    "@curr_dt_base:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ", " +
+                    "IF(e.dt_ben < ' " + pDateBoyCurr + " ', ' " + pDateBoyCurr + " ', e.dt_ben), " +
+                    "ADDDATE(e.dt_ben, INTERVAL @sen_as_years YEAR)) AS _curr_dt_base, " +
+                    "@VacationsDays:=(SELECT vac_day FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS VacationDays, " +
+                    "@annualBonusDays:=(SELECT ann_bon_day FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS AnnualBonusDays, " +
+                    "@primaVacacional:=(SELECT vac_bon_per FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS primavacaional, " +
+                    "@factorI:=(SELECT wage_fac FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS SscFactor, " +
+                    "@SbcFac:=(@curr_sal_day * @factorI) AS SbcFac, " +
+                    "@SbcFac1:=(@Factori * @curr_sal_day) AS SscRaw " +
+                    "FROM erp.bpsu_bp AS bp INNER JOIN erp.hrsu_emp AS e ON e.id_emp = bp.id_bp " +
+                    "INNER JOIN erp.hrss_tp_pay AS tp ON e.fk_tp_pay = tp.id_tp_pay " +
+                    "LEFT OUTER JOIN (SELECT t.id_emp, t.ben_year, t.ben_ann, SUM(t.ben_unt) AS ben_unt, SUM(t.ben_amt) AS ben_amt " +
+                    "FROM (SELECT pre.id_emp, pre.ben_year, pre.ben_ann, SUM(pre.unt) AS ben_unt, SUM(pre.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "WHERE pre.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') " +
+                    "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, - SUM(prd.unt) AS ben_unt, - SUM(prd.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "WHERE prd.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') " +
+                    "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS t " +
+                    "GROUP BY id_emp , ben_year , ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS tcur ON tcur.id_emp = bp.id_bp " +
+                    "LEFT OUTER JOIN (SELECT t.id_emp, t.ben_year, t.ben_ann, SUM(t.ben_unt) AS ben_unt, SUM(t.ben_amt) AS ben_amt FROM " +
+                    "(SELECT  pre.id_emp, pre.ben_year, pre.ben_ann, SUM(pre.unt) AS ben_unt, SUM(pre.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "WHERE pre.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') - 1 " +
+                    "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann " +
+                    "UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, - SUM(prd.unt) AS ben_unt, - SUM(prd.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = e.id_emp " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON va.id_emp = bp.id_bp " +
+                    "INNER JOIN erp.usru_usr AS ui ON va.fk_usr_ins = ui.id_usr " +
+                    "INNER JOIN erp.usru_usr AS uu ON va.fk_usr_upd = uu.id_usr " +
+                    "WHERE prd.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') - 1 " +
+                    "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS t " +
+                    "GROUP BY id_emp , ben_year , ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS tprev ON tprev.id_emp = bp.id_bp " +
+                    "WHERE e.b_act AND NOT e.b_del AND e.b_act AND bp.id_bp = " + row.getEmployee().getPkEmployeeId() + " AND e.dt_sal_ssc <= '" + dateStart + "' " + // sqlLimitEmploye + " " +
+                    "ORDER BY bp.bp , bp.id_bp " +
+                    "LIMIT 1";
 
-                auxEmployee++;
-                auxEarning++;
+                Statement statement = miClient.getSession().getStatement().getConnection().createStatement();
+                resultSet = statement.executeQuery(sql);
+                earningExtra = 0;
+                int auxEarning = 0;
 
-                row.getEmployee().getXtaEmployeeName();
-                row.getEmployee().getNumber();
-                row.getEmployee().getDateBenefits();
-                row.getEmployee().getPkEmployeeId();
-                row.getEmployee().getFkPaymentTypeId();
-                row.setVacationsDays(resultSet.getInt("VacationsDays"));
-                row.setVacationsBonus(resultSet.getDouble("VacationsBonus"));
-                row.setAnnualBonusDays(resultSet.getDouble("AnnualBonusDays"));
-                row.setSscFactor(resultSet.getDouble("SscFactor"));
-                row.setDailyIncome(resultSet.getDouble("DailyIncome"));
-                row.setSscCurrent(resultSet.getDouble("SscCurrent")); 
-                row.setSscLastUpdate(resultSet.getDate("SscLastUpdate"));
-                row.setSscRaw(resultSet.getDouble("SscRaw"));
-                row.setSscRaw(resultSet.getDouble("SscRaw"));
-                row.setSalaryDifferent(resultSet.getDouble("SscRaw")-resultSet.getDouble("SscCurrent"));
-                row.setPeriodDays(SLibTimeUtils.countPeriodDays(dateLayoudStart, dateLayoutEnd));
-                row.setVariableIncome(earningExtra);
-                row.computeSbc();
+                if (resultSet.next()) {
+                    for( auxEarning = 0; auxEarning <= rows.get(auxEmployee).getSbcEarnings().size()-1; auxEarning++) {
+                    earningExtra = earningExtra + rows.get(auxEmployee).getSbcEarnings().get(auxEarning).AmountTaxed;
+                    }
+
+                    auxEmployee++;
+                    auxEarning++;
+
+                    row.getEmployee().getXtaEmployeeName();
+                    row.getEmployee().getNumber();
+                    row.getEmployee().getDateBenefits();
+                    row.getEmployee().getPkEmployeeId();
+                    row.getEmployee().getFkPaymentTypeId();
+                    row.setVacationsDays(resultSet.getInt("VacationDays"));
+                    row.setVacationsBonus(resultSet.getDouble("primavacaional"));
+                    row.setAnnualBonusDays(resultSet.getDouble("AnnualBonusDays"));
+                    row.setSscFactor(resultSet.getDouble("SscFactor"));
+                    row.setDailyIncome(resultSet.getDouble("salarioDiario"));
+                    row.setSscCurrent(resultSet.getDouble("SscCurrent")); 
+                    row.setSscLastUpdate(resultSet.getDate("SscLastUpdate"));
+                    row.setSscRaw(resultSet.getDouble("SscRaw"));
+                    row.setSscRaw(resultSet.getDouble("SscRaw"));
+                    row.setSalaryDifferent(resultSet.getDouble("SscRaw") - resultSet.getDouble("SscCurrent"));
+                    row.setPeriodDays(SLibTimeUtils.countPeriodDays(dateLayoudStart, dateLayoutEnd));
+                    row.setVariableIncome(earningExtra);
+                    row.computeSbc();
+                    }
+            }
+
+                moGridSbcEmployees.populateGrid(new Vector<>(rows));
+                moGridSbcEmployees.setSelectedGridRow(0);  
+                refreshSbcEmployeesLabel();
+
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
             }
         }
+        else if (isEmployeLim == false ) {
+            String dateEndAnt = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.addDate(dateLayoutEnd, 0, -2, 0));
             
-        moGridSbcEmployees.populateGrid(new Vector<>(rows));
-        moGridSbcEmployees.setSelectedGridRow(0);
-        refreshSbcEmployeesLabel();
+            try {
+               ArrayList<SRowEmployeeSsc> rows = SSscUtils.createEmployeeSbcRows(miClient.getSession(), layoutYear, mnMonthStart, mnMonthEnd);
+
+               for (SRowEmployeeSsc row : rows) {
+               moCurrentEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { row.getEmployee().getPkEmployeeId() });
+
+               Date cutoffYearStart = SLibTimeUtils.getBeginOfYear(mtDateEnd);
+
+               if (moCurrentEmployee.getDateBenefits().after(cutoffYearStart)) {
+                   cutoffYearStart = moCurrentEmployee.getDateBenefits().after(mtDateEnd) ? mtDateEnd : moCurrentEmployee.getDateBenefits();
+               }
+
+               sql = "SELECT bp.id_bp AS _IdEmp, bp.bp AS _emp_name, e.num AS _emp_num, tp.name AS _pay_tp_name, e.dt_ben AS _emp_dt_ben, e.dt_sal_ssc AS SscLastUpdate, " +
+                    "e.sal_ssc AS SscCurrent, '" + dateEnd + "' AS _p_dt_cutoff, @sen_raw:=CEILING(ROUND(DATEDIFF('" + dateEnd + "', e.dt_ben) / 365,4)) AS _sen_raw, " +
+                    "@curr_sal_wage:=(SELECT IF((SELECT COUNT(*) FROM hrs_emp_log_wage WHERE id_emp = " + row.getEmployee().getPkEmployeeId() + " AND dt " +
+                    "BETWEEN ' " + dateStart + " ' AND ' " + dateEnd + " ') >= 1, 0, v.wage) AS wage FROM hrs_emp_log_wage AS v INNER JOIN erp.hrsu_emp AS emp " +
+                    "ON v.id_emp = emp.id_emp WHERE v.b_del = 0 AND emp.b_act = 1  AND v.id_emp = " + row.getEmployee().getPkEmployeeId() + " AND v.dt <= ' " + dateEndAnt + " ' " +
+                    "ORDER BY v.dt DESC LIMIT 1) as WageI, " +
+                    "@curr_sal_day:=ROUND(IF(e.fk_tp_pay = 1, e.sal, ((e.wage * 12) / 365)), 2) AS salarioDiario, " +
+                    "@curr_dt_base:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ", " +
+                    "IF(e.dt_ben < ' " + pDateBoyCurr + " ', ' " + pDateBoyCurr + " ', e.dt_ben), " +
+                    "ADDDATE(e.dt_ben, INTERVAL @sen_as_years YEAR)) AS _curr_dt_base, " +
+                    "@VacationsDays:=(SELECT vac_day FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS VacationDays, " +
+                    "@annualBonusDays:=(SELECT ann_bon_day FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS AnnualBonusDays, " +
+                    "@primaVacacional:=(SELECT vac_bon_per FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS primavacaional, " +
+                    "@factorI:=(SELECT wage_fac FROM " + miClient.getSession().getDatabase().getDbName() + ".HRS_EMP_WAGE_FAC_ANN where id_emp = " + row.getEmployee().getPkEmployeeId() + " and id_ann = @sen_raw) AS SscFactor, " +
+                    "@SbcFac:=(@curr_sal_day * @factorI) AS SbcFac, " +
+                    "@SbcFac1:=(@Factori * @curr_sal_day) AS SscRaw " +
+                    "FROM erp.bpsu_bp AS bp INNER JOIN erp.hrsu_emp AS e ON e.id_emp = bp.id_bp " +
+                    "INNER JOIN erp.hrss_tp_pay AS tp ON e.fk_tp_pay = tp.id_tp_pay " +
+                    "LEFT OUTER JOIN (SELECT t.id_emp, t.ben_year, t.ben_ann, SUM(t.ben_unt) AS ben_unt, SUM(t.ben_amt) AS ben_amt " +
+                    "FROM (SELECT pre.id_emp, pre.ben_year, pre.ben_ann, SUM(pre.unt) AS ben_unt, SUM(pre.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "WHERE pre.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') " +
+                    "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, - SUM(prd.unt) AS ben_unt, - SUM(prd.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "WHERE prd.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') " +
+                    "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS t " +
+                    "GROUP BY id_emp , ben_year , ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS tcur ON tcur.id_emp = bp.id_bp " +
+                    "LEFT OUTER JOIN (SELECT t.id_emp, t.ben_year, t.ben_ann, SUM(t.ben_unt) AS ben_unt, SUM(t.ben_amt) AS ben_amt FROM " +
+                    "(SELECT  pre.id_emp, pre.ben_year, pre.ben_ann, SUM(pre.unt) AS ben_unt, SUM(pre.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "WHERE pre.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') - 1 " +
+                    "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann " +
+                    "UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, - SUM(prd.unt) AS ben_unt, - SUM(prd.amt_r) AS ben_amt " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
+                    "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = e.id_emp " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON va.id_emp = bp.id_bp " +
+                    "INNER JOIN erp.usru_usr AS ui ON va.fk_usr_ins = ui.id_usr " +
+                    "INNER JOIN erp.usru_usr AS uu ON va.fk_usr_upd = uu.id_usr " +
+                    "WHERE prd.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') - 1 " +
+                    "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS t " +
+                    "GROUP BY id_emp , ben_year , ben_ann " +
+                    "ORDER BY id_emp , ben_year , ben_ann) AS tprev ON tprev.id_emp = bp.id_bp " +
+                    "WHERE e.b_act AND NOT e.b_del AND e.b_act AND bp.id_bp = " + row.getEmployee().getPkEmployeeId() + " AND e.dt_sal_ssc <= '" + dateStart + "' " +
+                    "ORDER BY bp.bp , bp.id_bp " +
+                    "LIMIT 1";
+
+                Statement statement = miClient.getSession().getStatement().getConnection().createStatement();
+                resultSet = statement.executeQuery(sql);
+                earningExtra = 0;
+                int auxEarning = 0;
+
+                if (resultSet.next()) {
+                    if (resultSet.getDouble("SscRaw") < mdMaximumSalary) {
+                        for( auxEarning = 0; auxEarning <= rows.get(auxEmployee).getSbcEarnings().size()-1; auxEarning++) {
+                        earningExtra = earningExtra + rows.get(auxEmployee).getSbcEarnings().get(auxEarning).AmountTaxed;
+                        }
+                    }
+
+                    auxEmployee++;
+                    auxEarning++;
+                        if (resultSet.getDouble("SscRaw") < mdMaximumSalary) {  
+                            row.getEmployee().getXtaEmployeeName();
+                            row.getEmployee().getNumber();
+                            row.getEmployee().getDateBenefits();
+                            row.getEmployee().getPkEmployeeId();
+                            row.getEmployee().getFkPaymentTypeId();
+                            row.setVacationsDays(resultSet.getInt("VacationDays"));
+                            row.setVacationsBonus(resultSet.getDouble("primavacaional"));
+                            row.setAnnualBonusDays(resultSet.getDouble("AnnualBonusDays"));
+                            row.setSscFactor(resultSet.getDouble("SscFactor"));
+                            row.setDailyIncome(resultSet.getDouble("salarioDiario"));
+                            row.setSscCurrent(resultSet.getDouble("SscCurrent")); 
+                            row.setSscLastUpdate(resultSet.getDate("SscLastUpdate"));
+                            row.setSscRaw(resultSet.getDouble("SscRaw"));
+                            row.setSscRaw(resultSet.getDouble("SscRaw"));
+                            row.setSalaryDifferent(resultSet.getDouble("SscRaw") - resultSet.getDouble("SscCurrent"));
+                            row.setPeriodDays(SLibTimeUtils.countPeriodDays(dateLayoudStart, dateLayoutEnd));
+                            row.setVariableIncome(earningExtra);
+                            row.computeSbc();
+                        }
+                    }
+                }   
+                if (resultSet.getDouble("SscRaw") < mdMaximumSalary) {
+                    moGridSbcEmployees.populateGrid(new Vector<>(rows));
+                    moGridSbcEmployees.setSelectedGridRow(0);  
+                    refreshSbcEmployeesLabel();
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
         
+        String earnings = "";
+        for (SDbEarning earning : maEarnings) {
+                   earnings += "- " + SLibUtils.textProperCase(earning.getName()) + "\n ";
         }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
+        
+        miClient.showMsgBoxInformation("Las percepciones pagadas no exentas para el calculo del SBC de este bimestre son:\n" + earnings + "" );
     }
     
     private void reset() {        
@@ -674,13 +721,13 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
     public void save(String Date) throws ParseException {
         SDbMassiveSalarySscBase massiveSalarySscBase = new SDbMassiveSalarySscBase();
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-        Date fechaDate = format.parse(jftDateChangeSsc.getText());
+        Date updateDateSbc = format.parse(jftDateChangeSsc.getText());
         
         for (SGridRow row : moGridSbcEmployees.getModel().getGridRows()) {
             SRowEmployeeSsc rowEmployeeSbc = (SRowEmployeeSsc) row;
             
             if (rowEmployeeSbc.isRowSelected()) {
-                massiveSalarySscBase.getSalarySscBases().add(rowEmployeeSbc.createSalarySscBase(miClient.getSession(), fechaDate));
+                massiveSalarySscBase.getSalarySscBases().add(rowEmployeeSbc.createSalarySscBase(miClient.getSession(), updateDateSbc));
             }
         }
         
@@ -716,12 +763,18 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
 
     @Override
     public void formReset() {
-        moFieldDateChangeSalary.setDate(miClient.getSession().getCurrentDate());
+        Calendar calendar = Calendar.getInstance();
+        Date updateDate = new Date();
+        calendar.setTime(mtDateEnd);
+        calendar.add(Calendar.DATE, 1);
+        updateDate =  calendar.getTime();
+        
+        moFieldDateChangeSalary.setDate(updateDate);      
+        
     }
 
     @Override
     public void formRefreshCatalogues() {
-        
     }
 
     @Override

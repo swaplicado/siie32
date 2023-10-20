@@ -45,6 +45,7 @@ public class SViewMaterialPresentation extends SGridPaneView implements ActionLi
         moPaneSettings = new SGridPaneSettings(1);
 
         moPaneSettings.setDeletedApplying(true);
+        moPaneSettings.setSystemApplying(true);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
 
@@ -59,6 +60,7 @@ public class SViewMaterialPresentation extends SGridPaneView implements ActionLi
                 + "v.fact_conv, "
                 + "u.unit, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "v.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -73,7 +75,7 @@ public class SViewMaterialPresentation extends SGridPaneView implements ActionLi
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (where.isEmpty() ? "" : "WHERE " + where)
-                + "ORDER BY v.name, v.id_mat_pres "; 
+                + "ORDER BY v.b_sys DESC, v.name, v.id_mat_pres "; 
     }
 
     @Override
@@ -85,6 +87,7 @@ public class SViewMaterialPresentation extends SGridPaneView implements ActionLi
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "fact_conv", "Factor de conversión"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "unit", "Unidad"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_UPD_NAME, SGridConsts.COL_TITLE_USER_UPD_NAME));

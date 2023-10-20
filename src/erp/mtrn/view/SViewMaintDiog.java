@@ -37,7 +37,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Claudio Peña, Sergio Flores, Edwin Carmona
  */
 public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -207,6 +207,30 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                     },
                 };
                 break;
+                
+            case SModSysConsts.TRNX_CONS_MAT:
+                toolTipTexts = new String[][] {
+                    new String[] {
+                        "Consumo materiales empleado",
+                        "Consumo materiales contratista"
+                    },
+                    new String[] {
+                        "Devolución materiales empleado",
+                        "Devolución materiales contratista"
+                    },
+                };
+                icons = new String[][] {
+                    new String[] {
+                        "icon_std_stk_adj_out_b",
+                        "icon_std_stk_inv_out_b"
+                    },
+                    new String[] {
+                        "icon_std_stk_adj_in_b",
+                        "icon_std_stk_inv_in_b"
+                    },
+                };
+                break;
+                
                 
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -472,6 +496,9 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         }
 
         switch (mnTabTypeAux01) {
+            case SModSysConsts.TRNX_CONS_MAT:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT + ") ";
+                break;
             case SModSysConsts.TRNX_MAINT_PART:
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + ") ";
                 break;
@@ -578,6 +605,17 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             int[] users = null;
 
             switch (mnTabTypeAux01) {
+                case SModSysConsts.TRNX_CONS_MAT:
+                    movements = new int[] {
+                        SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT,
+                        SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT
+                    };
+                    users = new int[] {
+                        SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE,
+                        SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR
+                    };
+                    break;
+                    
                 case SModSysConsts.TRNX_MAINT_PART:
                     movements = new int[] {
                         SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART,
@@ -635,7 +673,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             }
             
             if (button == jbAdjOut1) {
-                    actionMove(movements[0], users[0]);
+                actionMove(movements[0], users[0]);
             }
             else if (button == jbAdjOut2) {
                 actionMove(movements[0], users[1]);

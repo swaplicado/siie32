@@ -5,6 +5,7 @@
 
 package erp.musr.view;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
@@ -12,9 +13,13 @@ import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
+import erp.musr.form.SFormExportUser;
 import java.awt.Dimension;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
+import sa.lib.gui.SGuiConsts;
+import java.util.Vector;
 
 /**
  *
@@ -23,6 +28,7 @@ import sa.gui.util.SUtilConsts;
 public class SViewUser extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private javax.swing.JButton jbCopy;
+    private javax.swing.JButton jbExport;
     
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
@@ -43,6 +49,13 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         jbCopy.setToolTipText("Copiar usuario");
 
         addTaskBarUpperComponent(jbCopy);
+        
+        jbExport = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_UP));
+        jbExport.setPreferredSize(new Dimension(23, 23));
+        jbExport.addActionListener(this);
+        jbExport.setToolTipText("Exportar usuario");
+
+        addTaskBarUpperComponent(jbExport);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
@@ -130,6 +143,24 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             }
         }
     }
+    
+    public int showMsgBoxConfirm(String msg) {
+        return JOptionPane.showConfirmDialog(this, msg, SGuiConsts.MSG_BOX_CONFIRM, JOptionPane.YES_NO_OPTION);
+    }
+    
+    private void actionExport() {
+        if (jbExport.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int[] oUser = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                SFormExportUser moSFormExportUser = new SFormExportUser((SClientInterface) miClient);
+                moSFormExportUser.setValue(oUser[0], null);
+                moSFormExportUser.show();
+            }
+        }
+    }
 
     @Override
     public void createSqlQuery() {
@@ -165,6 +196,9 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             
             if (button == jbCopy) {
                 actionCopy();
+            }
+            else if (button == jbExport) {
+                actionExport();
             }
         }
     }

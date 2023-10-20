@@ -6,6 +6,7 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.usr.db.SDbUser;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,8 +25,9 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
     
     protected int mnPkUser;
     
-    protected ArrayList<SDbMaterialProvisionEntityUser> maProvEntUser;
     protected ArrayList<SDbMaterialConsumptionEntityUser> maConsEntUser;
+    protected ArrayList<SDbMaterialConsumptionSubentityUser> maConsSubentUser;
+    protected ArrayList<SDbMaterialProvisionEntityUser> maProvEntUser;
     
     protected String moUserName;
 
@@ -37,8 +39,9 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
     
     public int getPkUser() { return mnPkUser; }
     
-    public ArrayList<SDbMaterialProvisionEntityUser> getProvEntUser() { return maProvEntUser; }
     public ArrayList<SDbMaterialConsumptionEntityUser> getConsEntUser() { return maConsEntUser; }
+    public ArrayList<SDbMaterialConsumptionSubentityUser> getConsSubentUser() { return maConsSubentUser; }
+    public ArrayList<SDbMaterialProvisionEntityUser> getProvEntUser() { return maProvEntUser; }
     
     public String getUserName() { return moUserName; }
 
@@ -58,8 +61,9 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
         
         mnPkUser = 0;
         
-        maProvEntUser = new ArrayList<>();
         maConsEntUser = new ArrayList<>();
+        maConsSubentUser = new ArrayList<>();
+        maProvEntUser = new ArrayList<>();
         
         moUserName = "";
     }
@@ -88,8 +92,9 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet;
         Statement statement;
+        SDbMaterialConsumptionEntityUser consE;
+        SDbMaterialConsumptionSubentityUser consS;
         SDbMaterialProvisionEntityUser prov;
-        SDbMaterialConsumptionEntityUser cons;
         
         initRegistry();
         initQueryMembers();
@@ -98,6 +103,27 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
         mnPkUser = pk[0];
         
         statement = session.getDatabase().getConnection().createStatement();
+        
+        msSql = "SELECT id_mat_cons_ent, id_link, id_ref " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " " + 
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_USR + " AND id_ref = " + mnPkUser + " ";
+        resultSet = statement.executeQuery(msSql);
+        while (resultSet.next()) {
+            consE = new SDbMaterialConsumptionEntityUser();
+            consE.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
+            maConsEntUser.add(consE);
+        }
+        
+        msSql = "SELECT id_mat_cons_ent, id_mat_cons_subent, id_link, id_ref " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_USR) + " " + 
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_USR + " AND id_ref = " + mnPkUser + " ";
+        resultSet = statement.executeQuery(msSql);
+        while (resultSet.next()) {
+            consS = new SDbMaterialConsumptionSubentityUser();
+            consS.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4) });
+            maConsSubentUser.add(consS);
+        }
+        
         msSql = "SELECT id_mat_prov_ent, id_usr " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " " + 
                 "WHERE id_usr = " + mnPkUser + " ";
@@ -106,16 +132,6 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
             prov = new SDbMaterialProvisionEntityUser();
             prov.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
             maProvEntUser.add(prov);
-        }
-        
-        msSql = "SELECT id_mat_cons_ent, id_usr " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " " + 
-                "WHERE id_usr = " + mnPkUser + " ";
-        resultSet = statement.executeQuery(msSql);
-        while (resultSet.next()) {
-            cons = new SDbMaterialConsumptionEntityUser();
-            cons.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            maConsEntUser.add(cons);
         }
         
         SDbUser moAuxUser = new SDbUser();
@@ -129,19 +145,30 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " " +
-                "WHERE id_usr = " + mnPkUser + " ";
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " " +
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_USR + " AND id_ref = " + mnPkUser + " ";
         session.getStatement().execute(msSql);
-        for (SDbMaterialProvisionEntityUser ent : maProvEntUser) {
-            ent.setPkUserId(mnPkUser);
+        for (SDbMaterialConsumptionEntityUser ent : maConsEntUser) {
+            ent.setPkLinkId(SModSysConsts.USRS_LINK_USR);
+            ent.setPkReferenceId(mnPkUser);
             ent.setRegistryNew(true);
             ent.save(session);
         }
         
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " " +
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_USR) + " " +
+                "WHERE id_link = " + SModSysConsts.USRS_LINK_USR + " AND id_ref = " + mnPkUser + " ";
+        session.getStatement().execute(msSql);
+        for (SDbMaterialConsumptionSubentityUser ent : maConsSubentUser) {
+            ent.setPkLinkId(SModSysConsts.USRS_LINK_USR);
+            ent.setPkReferenceId(mnPkUser);
+            ent.setRegistryNew(true);
+            ent.save(session);
+        }
+        
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " " +
                 "WHERE id_usr = " + mnPkUser + " ";
         session.getStatement().execute(msSql);
-        for (SDbMaterialConsumptionEntityUser ent : maConsEntUser) {
+        for (SDbMaterialProvisionEntityUser ent : maProvEntUser) {
             ent.setPkUserId(mnPkUser);
             ent.setRegistryNew(true);
             ent.save(session);
@@ -157,12 +184,16 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
         
         registry.setPkUser(this.getPkUser());
         
-        for (SDbMaterialProvisionEntityUser eu : this.getProvEntUser()) {
-            registry.getProvEntUser().add(eu);
-        }
-        
         for (SDbMaterialConsumptionEntityUser eu : this.getConsEntUser()) {
             registry.getConsEntUser().add(eu);
+        }
+        
+        for (SDbMaterialConsumptionSubentityUser eu : this.getConsSubentUser()) {
+            registry.getConsSubentUser().add(eu);
+        }
+        
+        for (SDbMaterialProvisionEntityUser eu : this.getProvEntUser()) {
+            registry.getProvEntUser().add(eu);
         }
         
         registry.setRegistryNew(this.isRegistryNew());

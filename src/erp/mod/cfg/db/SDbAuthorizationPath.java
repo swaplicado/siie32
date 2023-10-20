@@ -5,7 +5,9 @@
 
 package erp.mod.cfg.db;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
+import erp.mod.cfg.utils.SAuthorizationConfigJSON;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -29,6 +31,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
     protected String msConditionField;
     protected String msConditionOperator;
     protected String msConditionValue;
+    protected String msConfigurationJson;
     protected int mnUserLevel;
     protected Date mtDateStart;
     protected Date mtDateEnd;
@@ -43,6 +46,8 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
 //    protected int mnFkUserUpdateId;
 //    protected Date mtTsUserInsert;
 //    protected Date mtTsUserUpdate;
+    
+    protected SAuthorizationConfigJSON moAuthConfigJson;
 
     public SDbAuthorizationPath() {
         super(SModConsts.CFGU_AUTHORN_PATH);
@@ -53,6 +58,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
     public void setConditionField(String s) { msConditionField = s; }
     public void setConditionOperator(String s) { msConditionOperator = s; }
     public void setConditionValue(String s) { msConditionValue = s; }
+    public void setConfigurationJson(String s) { msConfigurationJson = s; }
     public void setUserLevel(int n) { mnUserLevel = n; }
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
@@ -73,6 +79,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
     public String getConditionField() { return msConditionField; }
     public String getConditionOperator() { return msConditionOperator; }
     public String getConditionValue() { return msConditionValue; }
+    public String getConfigurationJson() { return msConfigurationJson; }
     public int getUserLevel() { return mnUserLevel; }
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
@@ -87,6 +94,8 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
 //    public int getFkUserUpdateId() { return mnFkUserUpdateId; }
 //    public Date getTsUserInsert() { return mtTsUserInsert; }
 //    public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public SAuthorizationConfigJSON getAuthorizationConfigObject() { return moAuthConfigJson; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -107,6 +116,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         msConditionField = "";
         msConditionOperator = "";
         msConditionValue = "";
+        msConfigurationJson = "";
         mnUserLevel = 0;
         mtDateStart = null;
         mtDateEnd = null;
@@ -119,6 +129,8 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        moAuthConfigJson = null;
     }
 
     @Override
@@ -168,6 +180,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
             msConditionField = resultSet.getString("cond_field");
             msConditionOperator = resultSet.getString("cond_operator");
             msConditionValue = resultSet.getString("cond_value");
+            msConfigurationJson = resultSet.getString("config_json");
             mnUserLevel = resultSet.getInt("lev");
             mtDateStart = resultSet.getDate("dt_sta");
             mtDateEnd = resultSet.getDate("dt_end_n");
@@ -182,7 +195,12 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-
+            
+            if (msConfigurationJson != null && msConfigurationJson.length() > 0) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                moAuthConfigJson = objectMapper.readValue(msConfigurationJson, SAuthorizationConfigJSON.class);
+            }
+            
             mbRegistryNew = false;
         }
 
@@ -207,6 +225,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
                     "'" + msConditionField + "', " + 
                     "'" + msConditionOperator + "', " + 
                     "'" + msConditionValue + "', " + 
+                    "'" + msConfigurationJson + "', " + 
                     mnUserLevel + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " + 
@@ -232,6 +251,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
                     "cond_field = '" + msConditionField + "', " +
                     "cond_operator = '" + msConditionOperator + "', " +
                     "cond_value = '" + msConditionValue + "', " +
+                    "config_json = '" + msConfigurationJson + "', " +
                     "lev = " + mnUserLevel + ", " +
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "dt_end_n = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
@@ -263,6 +283,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         registry.setConditionField(this.getConditionField());
         registry.setConditionOperator(this.getConditionOperator());
         registry.setConditionValue(this.getConditionValue());
+        registry.setConfigurationJson(this.getConfigurationJson());
         registry.setUserLevel(this.getUserLevel());
         registry.setDateStart(this.getDateStart());
         registry.setDateEnd(this.getDateEnd());

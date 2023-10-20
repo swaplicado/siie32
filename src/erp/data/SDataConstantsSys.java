@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -91,6 +91,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_PAYROLL_ACC_PROCESS = "HRS_PAYROLL_ACC_PROCESS";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
+    public static final String CFG_PARAM_HRS_SIIEAPP = "HRS_SIIEAPP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
     public static final String CFG_PARAM_HRS_VARIABLE_EARNINGS = "HRS_VARIABLE_EARNINGS";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
@@ -100,6 +101,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
     public static final String CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT = "TRN_MAT_REQ_PTY_DEFAULT";
     public static final String CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW = "TRN_MAT_REQ_ETY_ITEM_NEW";
+    public static final String CFG_PARAM_TRN_MAT_REQ_EST_SUBJECT = "TRN_MAT_REQ_EST_SUBJECT";
+    public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
     public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
@@ -317,11 +320,11 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_MFG_FG_DEV = 105056;
     public static final int PRV_INV_MFG_CON = 105057;
     public static final int PRV_INV_MAINT = 105058;
-    public static final int PRV_INV_REQ_MAT_REQ = 105061;
-    public static final int PRV_INV_REQ_MAT_REV = 105062;
-    public static final int PRV_INV_REQ_MAT_PROV = 105063;
-    public static final int PRV_INV_REQ_MAT_PUR = 105064;
-    public static final int PRV_INV_REQ_MAT_ADMOR = 105065;
+    public static final int PRV_INV_REQ_MAT_REQ = 105061;       // solicitante
+    public static final int PRV_INV_REQ_MAT_REV = 105062;       // revisor
+    public static final int PRV_INV_REQ_MAT_PROV = 105063;      // suministrador
+    public static final int PRV_INV_REQ_MAT_PUR = 105064;       // comprador
+    public static final int PRV_INV_REQ_MAT_ADMOR = 105065;     //administrador
     public static final int PRV_INV_REP = 105901;
 
     public static final int PRV_MKT_CUS_CFG = 106001;
@@ -1346,7 +1349,9 @@ public abstract class SDataConstantsSys {
     /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ONE = 215;
     public static final int TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT = 216;
-
+    public static final int TRNX_DPS_CFD_PAY = 217;
+    public static final int TRNX_DPS_CFD_PAY_DONE = 218;
+    
     public static final int TRNX_SAL_TOT = 301;
     public static final int TRNX_SAL_TOT_MONTH = 302;
     public static final int TRNX_SAL_TOT_BY_BP = 303;
@@ -1495,6 +1500,12 @@ public abstract class SDataConstantsSys {
                 break;
             case TRNX_TP_DPS_ADJ:
                 name = "Notas crédito";
+                break;
+            case TRNX_DPS_CFD_PAY:
+                name = "Fact. pendientes rec. de pago";
+                break;
+            case TRNX_DPS_CFD_PAY_DONE:
+                name = "Fact. rec. de pago";
                 break;
             default:
         }
@@ -1685,6 +1696,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_BPS_ACC_AGI_CRED = 206062;  // business partner accounts aging with credit information (credit days, credit limit, guarantee & insurance)
     public static final int REP_FIN_BPS_ACC_MOV_ORD = 206064;
     public static final int REP_FIN_EXC_DIFF = 206065;
+    public static final int REP_FIN_AUX_ACC_DON = 206066;
 
     public static final int REP_TRN_DPS_BPS = 207001;
     public static final int REP_TRN_DPS_UNP = 207002;
