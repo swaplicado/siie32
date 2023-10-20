@@ -74,8 +74,8 @@ public class SViewConfUserVsEntityDetail extends SGridPaneView {
                     + "j.name AS entidad, "
                     + "u.usr AS " + SDbConsts.FIELD_CODE + ", "
                     + "u.usr AS " + SDbConsts.FIELD_NAME + ", "
-                    + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                    + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                    + "v.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                    + "v.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                     + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
                     + "FROM " + SModConsts.TablesMap.get(mnGridSubtype) + " AS v "
                     + "INNER JOIN erp.usru_usr AS u ON " 
@@ -83,7 +83,7 @@ public class SViewConfUserVsEntityDetail extends SGridPaneView {
                     + "INNER JOIN trn_mat_prov_ent AS j ON " 
                     + "v.id_mat_prov_ent = j.id_mat_prov_ent " 
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                    + "v.fk_usr_ins = ui.id_usr "
+                    + "v.fk_usr = ui.id_usr "
                     + (where.isEmpty() ? "" : "WHERE " + where)
                     + "ORDER BY u.usr, j.name "; 
                 break;

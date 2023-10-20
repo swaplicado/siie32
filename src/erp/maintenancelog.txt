@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 223.2/ 2023-10-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en las configuraciones para requisiciones.
+
+================================================================================
+SIIE 3.2 223.1/ 2023-10-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio en la obtención de centros de costo relacionados con un subcentro de consumo directamente sin tomar en cuenta ítems.
 SIIE 3.2 223.1/ 2023-10-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

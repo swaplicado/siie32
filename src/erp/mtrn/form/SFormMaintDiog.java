@@ -805,9 +805,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         }
         else {
             SGuiParams params = new SGuiParams();
-            params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
             params.getParamsMap().put(SModConsts.TRN_MAT_CONS_SUBENT, ((SGuiItem) jcbEntrySubConsEntity.getSelectedItem()).getPrimaryKey());
-            miClient.getSession().populateCatalogue(jcbEntryCostCenter, SModConsts.FIN_CC, SModConsts.TRN_MAT_REQ, params);
+            miClient.getSession().populateCatalogue(jcbEntryCostCenter, SModConsts.FIN_CC, SModConsts.TRN_DIOG, params);
 
             jcbEntryCostCenter.setEnabled(jcbEntryCostCenter.getItemCount() > 1);
         }
