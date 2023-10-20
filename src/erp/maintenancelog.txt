@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 225/ 2023-10-20
+SIIE 3.2 225.0/ 2023-10-20
 Edwin Omar CARMONA FIGUEROA
 
 --------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ Edwin Omar CARMONA FIGUEROA
 2) Creación de catálogo de configuración de tipo de material vs atributos.
 
 ================================================================================
-SIIE 3.2 224/ 2023-10-13
+SIIE 3.2 224.0/ 2023-10-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Creación de de tipos de material.
@@ -23,7 +23,6 @@ Edwin Omar CARMONA FIGUEROA
 6) Modificación de ítems para agregar fk de tipo de material y sus atributos
 
 ================================================================================
-
 SIIE 3.2 223.3/ 2023-10-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
