@@ -501,6 +501,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 if (idCc > 0) {
                     oEntry.setFkCostCenterId_n(SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), idCc));
                 }
+                oEntry.setFkItemRefId_n(oTableRow.getMaterialRequestEntry().getFkItemReferenceId_n());
                 oEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 oEntry.setIsTaxesAutomaticApplying(true);
 

@@ -134,12 +134,23 @@ public class SModuleCfg extends SGuiModule {
                 /* Use of other parameters:
                  * subtype = Filter: Entity category ID. Can be 'SLibConsts.UNDEFINED' meaning that all categories are requested.
                  */
-                settings = new SGuiCatalogueSettings("Entidad", 2, 1);
-                sql = "SELECT id_cob AS " + SDbConsts.FIELD_ID + "1, id_ent AS " + SDbConsts.FIELD_ID + "2, ent AS " + SDbConsts.FIELD_ITEM + ", " +
-                        "id_cob AS " + SDbConsts.FIELD_FK + "1 " +
-                        "FROM " + SModConsts.TablesMap.get(type) + " " +
-                        "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_ct_ent = " + subtype) + " " +
-                        "ORDER BY id_cob, id_ent, ent ";
+                if (params == null) {
+                    settings = new SGuiCatalogueSettings("Entidad", 2, 1);
+                    sql = "SELECT id_cob AS " + SDbConsts.FIELD_ID + "1, id_ent AS " + SDbConsts.FIELD_ID + "2, ent AS " + SDbConsts.FIELD_ITEM + ", " +
+                            "id_cob AS " + SDbConsts.FIELD_FK + "1 " +
+                            "FROM " + SModConsts.TablesMap.get(type) + " " +
+                            "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_ct_ent = " + subtype) + " " +
+                            "ORDER BY id_cob, id_ent, ent ";
+                }
+                else { // Requisicion de materiales, relacionado a entidad de consumo
+                    settings = new SGuiCatalogueSettings("Almacén", 2, 1);
+                    sql = "SELECT v.id_cob AS " + SDbConsts.FIELD_ID + "1, v.id_ent AS " + SDbConsts.FIELD_ID + "2, v.ent AS " + SDbConsts.FIELD_ITEM + ", " +
+                            "v.id_cob AS " + SDbConsts.FIELD_FK + "1 " +
+                            "FROM " + SModConsts.TablesMap.get(type) + " AS v " +
+                            "INNER JOIN trn_mat_cons_ent_whs AS c ON v.id_cob = c.id_cob AND v.id_ent = c.id_whs " +
+                            "WHERE NOT b_del AND c.id_mat_cons_ent = " + params.getType() + " " + 
+                            "ORDER BY v.id_cob, v.id_ent, v.ent ";
+                }
                 break;
             case SModConsts.CFGU_CUR:
                 settings = new SGuiCatalogueSettings("Moneda", 1, 1, SLibConsts.DATA_TYPE_TEXT);
