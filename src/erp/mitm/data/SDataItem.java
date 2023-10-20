@@ -566,7 +566,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 }
                 
                 if (mnFkMaterialTypeId_n > 1) {
-                    sql = "SELECT id_att_mat FROM erp.itmu_item_att WHERE NOT b_del AND id_item = " + key[0] + " ORDER BY sort ASC ";
+                    sql = "SELECT id_att_mat FROM erp.itmu_item_att_mat WHERE NOT b_del AND id_item = " + key[0] + " ORDER BY sort ASC ";
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
                         SDataItemAttribute oAtt = new SDataItemAttribute();
@@ -727,7 +727,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     }
                 }
                 
-                sql = "DELETE FROM erp.itmu_item_att WHERE id_item = " + mnPkItemId + " ";
+                sql = "DELETE FROM erp.itmu_item_att_mat WHERE id_item = " + mnPkItemId + " ";
                 statement.execute(sql);
                 
                 for (SDataItemAttribute oAtt : mlItemAttributes) {

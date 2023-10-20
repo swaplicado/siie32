@@ -32,7 +32,7 @@ public class SDataItemAttribute extends erp.lib.data.SDataRegistry implements ja
     protected Date mtUserDeletedTs;
 
     public SDataItemAttribute() {
-        super(SDataConstants.ITMU_ITEM_ATT);
+        super(SDataConstants.ITMU_ITEM_ATT_MAT);
         reset();
     }
 
