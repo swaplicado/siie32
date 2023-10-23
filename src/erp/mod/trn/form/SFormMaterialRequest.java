@@ -1046,7 +1046,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     
     private void populateMatReqCC() {
         try {
-            Vector vRows = new Vector<>();
+            Vector<SGridRow> vRows = new Vector<>();
             if (maMatReqCC.size() > 0) {
                 for(SDbMaterialRequestCostCenter cc : maMatReqCC) {
                     cc.setRowConsBudWOReq(SMaterialRequestUtils.getConsumedBudget(miClient.getSession(), 
@@ -1408,6 +1408,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionItemStk() {
         try {
             if (jbItemStk.isEnabled()) {

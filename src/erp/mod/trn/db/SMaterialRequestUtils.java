@@ -397,6 +397,7 @@ public abstract class SMaterialRequestUtils {
         return ccg;
     }
     
+    @SuppressWarnings("unchecked")
     public static SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
         String sql = "";
         ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
