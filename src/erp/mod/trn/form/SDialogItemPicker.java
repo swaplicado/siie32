@@ -63,7 +63,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener 
 
     @Override
     public void keyReleased(KeyEvent e) {
-        Vector items = new Vector();
+        Vector<SGridRow> items = new Vector<>();
         String textToSearch = moTextItem.getValue();
         if (textToSearch.isEmpty()) {
             items.addAll(moAllRows);

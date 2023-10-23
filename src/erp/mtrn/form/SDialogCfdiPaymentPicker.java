@@ -143,6 +143,7 @@ public class SDialogCfdiPaymentPicker extends javax.swing.JDialog implements jav
     private javax.swing.JPanel jpControls;
     // End of variables declaration//GEN-END:variables
 
+    @SuppressWarnings("unchecked")
     public void setValue(int bp, int year, int doc) {
         mnDocYear = year;
         mnDocDoc = doc;

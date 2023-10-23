@@ -1851,9 +1851,9 @@ public abstract class STrnUtilities {
                         + computeMailFooterEndTable();
                 
                 SMailSender sender = null;
-                Object images = null;
+                Map<String, String> images = null;
                 Date sentDate = null;
-                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, (Map<String, String>) images, sentDate);
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, images, sentDate);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");

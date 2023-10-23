@@ -396,6 +396,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionChangeConsumeEntity() {
         if (moFieldFinderConsumeEntity.getKeyAsIntArray() != null && moFieldFinderConsumeEntity.getKeyAsIntArray()[0] > 0) {
             SFormUtilities.populateComboBox(miClient, jcbFinderConsSubEntity, SDataConstants.TRN_MAT_CONS_SUBENT, new int[] { moFieldFinderConsumeEntity.getKeyAsIntArray()[0] });
@@ -616,6 +617,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFinderUser, SDataConstants.USRU_USR);
         SFormUtilities.populateComboBox(miClient, jcbFinderConsEntity, SDataConstants.TRN_MAT_CONS_ENT);

@@ -145,7 +145,7 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key_local", "Moneda local", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_count_pay", "Pagos", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_count_cp", "XML de pagos", 50);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "done", "Marcado como terminado", 50);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "done", "Marcado como terminado", 50);
         
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);

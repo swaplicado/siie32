@@ -157,7 +157,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 int[] oUser = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                 SFormExportUser moSFormExportUser = new SFormExportUser((SClientInterface) miClient);
                 moSFormExportUser.setValue(oUser[0], null);
-                moSFormExportUser.show();
+                moSFormExportUser.setVisible(true);
             }
         }
     }
