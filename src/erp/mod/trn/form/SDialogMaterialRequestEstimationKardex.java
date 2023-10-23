@@ -373,6 +373,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         moTextCCO.setValue(oRow.getCco());
         moTextSubject.setValue(oRow.getSubject());
         jtAreaBody.setText(oRow.getBody());
+        jtAreaBody.setCaretPosition(0);
         
         moTextProvider.setToolTipText(oRow.getProvider());
         moTextTo.setToolTipText(oRow.getTo());
