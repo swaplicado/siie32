@@ -561,7 +561,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         msBodyDefault = SMaterialRequestEstimationUtils.getBodyOfEstimate(miClient);
         msBodyRows = "";
         
-        moGridProviderRows.populateGrid(new Vector());
+        moGridProviderRows.populateGrid(new Vector<>());
         moGridProviderRows.clearSortKeys();
         moGridProviderRows.clearGridRows();
         

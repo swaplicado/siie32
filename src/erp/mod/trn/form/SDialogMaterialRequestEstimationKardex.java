@@ -303,7 +303,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         };
         jpProviderMailRows.add(moGridProviderRows, BorderLayout.CENTER);
         
-        moGridProviderRows.populateGrid(new Vector());
+        moGridProviderRows.populateGrid(new Vector<>());
         moGridProviderRows.clearSortKeys();
         moGridProviderRows.clearGridRows();
         

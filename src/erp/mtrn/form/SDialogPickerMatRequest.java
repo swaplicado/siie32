@@ -318,7 +318,7 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
                                                                                             idConsumeEntity,
                                                                                             idConsumeSubEntity,
                                                                                             folio);
-        Vector<STableRow> vTableRows = new Vector();
+        Vector<STableRow> vTableRows = new Vector<>();
         for (STableRow oRow : lRows) {
             vTableRows.add(oRow);
         }

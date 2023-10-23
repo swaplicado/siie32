@@ -100,12 +100,12 @@ public abstract class SMaterialRequestEstimationUtils {
             if (oProviderRow.getTo().isEmpty()) {
                 continue;
             }
-            ArrayList<String> lTo = new ArrayList();
+            ArrayList<String> lTo = new ArrayList<>();
             String[] tos = oProviderRow.getTo().split(";");
             for (String to : tos) {
                 lTo.add(to.trim());
             }
-            ArrayList<String> lCc = new ArrayList();
+            ArrayList<String> lCc = new ArrayList<>();
             String[] ccs = oProviderRow.getCc().split(";");
             for (String cc : ccs) {
                 if (cc.isEmpty()) {
@@ -113,7 +113,7 @@ public abstract class SMaterialRequestEstimationUtils {
                 }
                 lCc.add(cc.trim());
             }
-            ArrayList<String> lCco = new ArrayList();
+            ArrayList<String> lCco = new ArrayList<>();
             String[] ccos = oProviderRow.getCco().split(";");
             for (String cco : ccos) {
                 if (cco.isEmpty()) {
