@@ -1,7 +1,6 @@
 ================================================================================
 SIIE 3.2 225.0/ 2023-10-20
 Edwin Omar CARMONA FIGUEROA
-
 --------------------------------------------------------------------------------
 1)Configuración de autorizaciones mediante puestos de usuarios ligados a empleados.
 
