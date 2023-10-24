@@ -100,7 +100,8 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
     }
     
     public double getQuantityRemaining() {
-     return moMatRequestEntry.getQuantity() - mdQuantitySupplied - mdQuantityLinked;
+        double qty = moMatRequestEntry.getQuantity() - mdQuantitySupplied - mdQuantityLinked;
+        return qty < 0d ? 0d : qty;
     }
     
     public double getQuantitySupplied() {

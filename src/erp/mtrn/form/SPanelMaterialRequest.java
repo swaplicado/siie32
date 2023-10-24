@@ -51,9 +51,6 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
         jPanel12 = new javax.swing.JPanel();
         jlProviderEntity = new javax.swing.JLabel();
         jtfProviderEntity = new javax.swing.JTextField();
-        jPanel7 = new javax.swing.JPanel();
-        jlConsumeEntity = new javax.swing.JLabel();
-        jtfConsumeEntity = new javax.swing.JTextField();
         jPanel62 = new javax.swing.JPanel();
         jlUserCreator = new javax.swing.JLabel();
         jtfUser = new javax.swing.JTextField();
@@ -73,33 +70,22 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
         jlSubtotalCy_r = new javax.swing.JLabel();
         jtfSubtotalCy_r = new javax.swing.JTextField();
         jtfSubtotalCy_rCurKey = new javax.swing.JTextField();
-        jPanel13 = new javax.swing.JPanel();
-        jlTaxChargedCy_r = new javax.swing.JLabel();
-        jtfTaxChargedCy_r = new javax.swing.JTextField();
-        jtfTaxChargedCy_rCurKey = new javax.swing.JTextField();
-        jPanel14 = new javax.swing.JPanel();
-        jlTaxRetainedCy_r = new javax.swing.JLabel();
-        jtfTaxRetainedCy_r = new javax.swing.JTextField();
-        jtfTaxRetainedCy_rCurKey = new javax.swing.JTextField();
         jPanel9 = new javax.swing.JPanel();
         jlTotalCy_r = new javax.swing.JLabel();
         jtfTotalCy_r = new javax.swing.JTextField();
         jtfTotalCy_rCurKey = new javax.swing.JTextField();
+        jPanel14 = new javax.swing.JPanel();
+        jlTaxRetainedCy_r = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jlConsumeEntity = new javax.swing.JLabel();
+        jPanel13 = new javax.swing.JPanel();
+        jtfConsumeEntity = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
-        jlBalanceCy = new javax.swing.JLabel();
-        jtfBalanceCy = new javax.swing.JTextField();
-        jtfBalanceCyCurKey = new javax.swing.JTextField();
-        jtfBalanceCyYear = new javax.swing.JTextField();
-        jPanel10 = new javax.swing.JPanel();
-        jlBalance = new javax.swing.JLabel();
-        jtfBalance = new javax.swing.JTextField();
-        jtfBalanceCurKey = new javax.swing.JTextField();
-        jtfBalanceYear = new javax.swing.JTextField();
 
         setLayout(new java.awt.BorderLayout());
 
         jpDps.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del documento:"));
-        jpDps.setLayout(new java.awt.GridLayout(7, 1, 0, 1));
+        jpDps.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -130,20 +116,6 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
         jPanel12.add(jtfProviderEntity);
 
         jpDps.add(jPanel12);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlConsumeEntity.setText("Centro de consumo:");
-        jlConsumeEntity.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel7.add(jlConsumeEntity);
-
-        jtfConsumeEntity.setEditable(false);
-        jtfConsumeEntity.setText("CONSUME ENTITY");
-        jtfConsumeEntity.setFocusable(false);
-        jtfConsumeEntity.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel7.add(jtfConsumeEntity);
-
-        jpDps.add(jPanel7);
 
         jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -216,7 +188,7 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
         add(jpDps, java.awt.BorderLayout.WEST);
 
         jpDpsValue.setBorder(javax.swing.BorderFactory.createTitledBorder("Valor del documento:"));
-        jpDpsValue.setLayout(new java.awt.GridLayout(7, 1, 0, 1));
+        jpDpsValue.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -242,48 +214,6 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
 
         jpDpsValue.add(jPanel19);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlTaxChargedCy_r.setText("Imptos. trasladados:");
-        jlTaxChargedCy_r.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel13.add(jlTaxChargedCy_r);
-
-        jtfTaxChargedCy_r.setEditable(false);
-        jtfTaxChargedCy_r.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfTaxChargedCy_r.setText("0,000,000,000.00");
-        jtfTaxChargedCy_r.setFocusable(false);
-        jtfTaxChargedCy_r.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel13.add(jtfTaxChargedCy_r);
-
-        jtfTaxChargedCy_rCurKey.setEditable(false);
-        jtfTaxChargedCy_rCurKey.setText("CUR");
-        jtfTaxChargedCy_rCurKey.setFocusable(false);
-        jtfTaxChargedCy_rCurKey.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel13.add(jtfTaxChargedCy_rCurKey);
-
-        jpDpsValue.add(jPanel13);
-
-        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlTaxRetainedCy_r.setText("Imptos. retenidos (-):");
-        jlTaxRetainedCy_r.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel14.add(jlTaxRetainedCy_r);
-
-        jtfTaxRetainedCy_r.setEditable(false);
-        jtfTaxRetainedCy_r.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfTaxRetainedCy_r.setText("0,000,000,000.00");
-        jtfTaxRetainedCy_r.setFocusable(false);
-        jtfTaxRetainedCy_r.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel14.add(jtfTaxRetainedCy_r);
-
-        jtfTaxRetainedCy_rCurKey.setEditable(false);
-        jtfTaxRetainedCy_rCurKey.setText("CUR");
-        jtfTaxRetainedCy_rCurKey.setFocusable(false);
-        jtfTaxRetainedCy_rCurKey.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel14.add(jtfTaxRetainedCy_rCurKey);
-
-        jpDpsValue.add(jPanel14);
-
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlTotalCy_r.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -308,61 +238,33 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
 
         jpDpsValue.add(jPanel9);
 
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlTaxRetainedCy_r.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel14.add(jlTaxRetainedCy_r);
+
+        jpDpsValue.add(jPanel14);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlConsumeEntity.setText("Centro de consumo:");
+        jlConsumeEntity.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel7.add(jlConsumeEntity);
+
+        jpDpsValue.add(jPanel7);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jtfConsumeEntity.setEditable(false);
+        jtfConsumeEntity.setText("CONSUME ENTITY");
+        jtfConsumeEntity.setFocusable(false);
+        jtfConsumeEntity.setPreferredSize(new java.awt.Dimension(385, 23));
+        jPanel13.add(jtfConsumeEntity);
+
+        jpDpsValue.add(jPanel13);
+
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlBalanceCy.setText("Saldo actual:");
-        jlBalanceCy.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel1.add(jlBalanceCy);
-
-        jtfBalanceCy.setEditable(false);
-        jtfBalanceCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfBalanceCy.setText("0,000,000,000.00");
-        jtfBalanceCy.setFocusable(false);
-        jtfBalanceCy.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel1.add(jtfBalanceCy);
-
-        jtfBalanceCyCurKey.setEditable(false);
-        jtfBalanceCyCurKey.setText("CUR");
-        jtfBalanceCyCurKey.setFocusable(false);
-        jtfBalanceCyCurKey.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel1.add(jtfBalanceCyCurKey);
-
-        jtfBalanceCyYear.setEditable(false);
-        jtfBalanceCyYear.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jtfBalanceCyYear.setText("2000");
-        jtfBalanceCyYear.setFocusable(false);
-        jtfBalanceCyYear.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel1.add(jtfBalanceCyYear);
-
         jpDpsValue.add(jPanel1);
-
-        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlBalance.setText("Saldo actual (ML):");
-        jlBalance.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel10.add(jlBalance);
-
-        jtfBalance.setEditable(false);
-        jtfBalance.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfBalance.setText("0,000,000,000.00");
-        jtfBalance.setFocusable(false);
-        jtfBalance.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel10.add(jtfBalance);
-
-        jtfBalanceCurKey.setEditable(false);
-        jtfBalanceCurKey.setText("CUR");
-        jtfBalanceCurKey.setFocusable(false);
-        jtfBalanceCurKey.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel10.add(jtfBalanceCurKey);
-
-        jtfBalanceYear.setEditable(false);
-        jtfBalanceYear.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jtfBalanceYear.setText("2000");
-        jtfBalanceYear.setFocusable(false);
-        jtfBalanceYear.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel10.add(jtfBalanceYear);
-
-        jpDpsValue.add(jPanel10);
 
         add(jpDpsValue, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -395,27 +297,12 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
             jtfExchangeRate.setText("");
 
             jtfSubtotalCy_r.setText("");
-            jtfTaxChargedCy_r.setText("");
-            jtfTaxRetainedCy_r.setText("");
             jtfTotalCy_r.setText("");
 
             jtfSubtotalCy_rCurKey.setText("");
-            jtfTaxChargedCy_rCurKey.setText("");
-            jtfTaxRetainedCy_rCurKey.setText("");
             jtfTotalCy_rCurKey.setText("");
 
             jckIsAuthorized.setSelected(false);
-
-            jlBalanceCy.setEnabled(false);
-            jlBalance.setEnabled(false);
-
-            jtfBalanceCy.setText("");
-            jtfBalanceCyCurKey.setText("");
-            jtfBalanceCyYear.setText("");
-
-            jtfBalance.setText("");
-            jtfBalanceCurKey.setText("");
-            jtfBalanceYear.setText("");
         }
         else {
             jtfProviderEntity.setText(moMaterialRequest.getAuxProvEntName());
@@ -434,34 +321,18 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
             jtfCurrency.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { 1 }, SLibConstants.DESCRIPTION_NAME));
             jtfExchangeRate.setText(miClient.getSessionXXX().getFormatters().getDecimalsExchangeRateFormat().format(1));
 
-            jtfSubtotalCy_r.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-            jtfTaxChargedCy_r.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-            jtfTaxRetainedCy_r.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-            jtfTotalCy_r.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
+            jtfSubtotalCy_r.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moMaterialRequest.getTotal_r()));
+            jtfTotalCy_r.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moMaterialRequest.getTotal_r()));
 
             jtfSubtotalCy_rCurKey.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_CUR, new int[] { 1 }, SLibConstants.DESCRIPTION_CODE));
-            jtfTaxChargedCy_rCurKey.setText(jtfSubtotalCy_rCurKey.getText());
-            jtfTaxRetainedCy_rCurKey.setText(jtfSubtotalCy_rCurKey.getText());
             jtfTotalCy_rCurKey.setText(jtfSubtotalCy_rCurKey.getText());
 
             jckIsAuthorized.setSelected(SAuthorizationUtils.isAuthorized(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, moMaterialRequest.getPrimaryKey()));
-
-            jlBalanceCy.setEnabled(false);
-            jlBalance.setEnabled(false);
-
-            jtfBalanceCy.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-            jtfBalanceCyCurKey.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-            jtfBalanceCyYear.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-
-            jtfBalance.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-            jtfBalanceCurKey.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
-            jtfBalanceYear.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
         }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
@@ -474,8 +345,6 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JCheckBox jckIsAuthorized;
-    private javax.swing.JLabel jlBalance;
-    private javax.swing.JLabel jlBalanceCy;
     private javax.swing.JLabel jlConsumeEntity;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlDate;
@@ -483,18 +352,11 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlProviderEntity;
     private javax.swing.JLabel jlSubtotalCy_r;
-    private javax.swing.JLabel jlTaxChargedCy_r;
     private javax.swing.JLabel jlTaxRetainedCy_r;
     private javax.swing.JLabel jlTotalCy_r;
     private javax.swing.JLabel jlUserCreator;
     private javax.swing.JPanel jpDps;
     private javax.swing.JPanel jpDpsValue;
-    private javax.swing.JTextField jtfBalance;
-    private javax.swing.JTextField jtfBalanceCurKey;
-    private javax.swing.JTextField jtfBalanceCy;
-    private javax.swing.JTextField jtfBalanceCyCurKey;
-    private javax.swing.JTextField jtfBalanceCyYear;
-    private javax.swing.JTextField jtfBalanceYear;
     private javax.swing.JTextField jtfConsumeEntity;
     private javax.swing.JTextField jtfCurrency;
     private javax.swing.JTextField jtfDate;
@@ -504,10 +366,6 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
     private javax.swing.JTextField jtfProviderEntity;
     private javax.swing.JTextField jtfSubtotalCy_r;
     private javax.swing.JTextField jtfSubtotalCy_rCurKey;
-    private javax.swing.JTextField jtfTaxChargedCy_r;
-    private javax.swing.JTextField jtfTaxChargedCy_rCurKey;
-    private javax.swing.JTextField jtfTaxRetainedCy_r;
-    private javax.swing.JTextField jtfTaxRetainedCy_rCurKey;
     private javax.swing.JTextField jtfTotalCy_r;
     private javax.swing.JTextField jtfTotalCy_rCurKey;
     private javax.swing.JTextField jtfUser;
