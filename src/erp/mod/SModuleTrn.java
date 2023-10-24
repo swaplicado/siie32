@@ -266,6 +266,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
+            case SModConsts.TRNX_MAT_REQ_EST:
                 registry = new SDbMaterialRequest();
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
@@ -845,6 +846,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
+            case SModConsts.TRNX_MAT_REQ_EST:
                 if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
                 form = moFormMaterialReq;
                 break;

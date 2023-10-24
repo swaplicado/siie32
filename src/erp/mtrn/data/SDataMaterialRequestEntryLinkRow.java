@@ -22,6 +22,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
     protected double mdQuantitySupplied;
     protected double mdQuantityToLink;
     protected double mdQuantityLinked;
+    protected double mdUnitaryPrice;
     protected double mdExceed;
     
     protected final SDbMaterialRequestEntry moMatRequestEntry;
@@ -44,6 +45,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         this.mdQuantitySupplied = 0d;
         this.mdQuantityLinked = 0d;
         this.mdQuantityToLink = 0d;
+        this.mdUnitaryPrice = 0d;
         this.mdExceed = 0d;
         this.mlDpsEntries = dpsEntries;
         
@@ -55,6 +57,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         double linkedFromDb = SMaterialRequestUtils.getQuantityLinkedOfReqEty(miClient.getSession(), moMatRequestEntry.getPrimaryKey(), maDpsType, this.maDpsPk == null ? null : this.maDpsPk);
         mdQuantityLinked = linkedFromDb + getMemoryLinkedQuantity();
         mdQuantitySupplied = SMaterialRequestUtils.getQuantitySupplied(miClient.getSession(), moMatRequestEntry.getPrimaryKey());
+        mdUnitaryPrice = moMatRequestEntry.getPriceUnitary();
     }
     
     private double getMemoryLinkedQuantity() {
@@ -92,7 +95,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         mvValues.add(qty < 0d ? 0d : qty);
         mvValues.add(mdQuantityToLink);
         mvValues.add(moAuxUnit.getSymbol());
-        mvValues.add(moMatRequestEntry.getPriceUnitary());
+        mvValues.add(mdUnitaryPrice);
         mvValues.add(mdExceed);
     }
     
@@ -126,6 +129,10 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
 
     public void setQuantityToLink(double mdToLinkQuantity) {
         mdQuantityToLink = mdToLinkQuantity;
+    }
+    
+    public double getUnitaryPrice() {
+        return (double) mvValues.get(9);
     }
     
     public SDataItem getItem() {

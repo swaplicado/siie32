@@ -474,10 +474,10 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 oEntry.setConcept(oTableRow.getItem().getName());
                 oEntry.setOriginalQuantity(oTableRow.getQuantityToLinkV());
                 oEntry.setQuantity(SLibUtilities.round(oEntry.getOriginalQuantity() * ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(oEntry.getFkItemId(), oEntry.getFkOriginalUnitId(), oEntry.getFkUnitId()), miClient.getSessionXXX().getParamsErp().getDecimalsQuantity()));
-                oEntry.setPriceUnitary(oTableRow.getMaterialRequestEntry().getPriceUnitary());
-                oEntry.setPriceUnitarySystem(oTableRow.getMaterialRequestEntry().getPriceUnitarySystem());
-                oEntry.setOriginalPriceUnitaryCy(oTableRow.getMaterialRequestEntry().getPriceUnitary());
-                oEntry.setOriginalPriceUnitarySystemCy(oTableRow.getMaterialRequestEntry().getPriceUnitarySystem());
+                oEntry.setPriceUnitary(oTableRow.getUnitaryPrice());
+                oEntry.setPriceUnitarySystem(oTableRow.getUnitaryPrice());
+                oEntry.setOriginalPriceUnitaryCy(oTableRow.getUnitaryPrice());
+                oEntry.setOriginalPriceUnitarySystemCy(oTableRow.getUnitaryPrice());
 
                 oEntry.setFkItemId(oTableRow.getItem().getPkItemId());
                 oEntry.setFkUnitId(oTableRow.getItem().getFkUnitId());

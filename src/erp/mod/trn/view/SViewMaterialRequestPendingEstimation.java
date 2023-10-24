@@ -6,6 +6,7 @@ package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -16,10 +17,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -40,6 +44,7 @@ import sa.lib.gui.SGuiParams;
  */
 public class SViewMaterialRequestPendingEstimation extends SGridPaneView implements ActionListener {
 
+    private JButton jbPrint;
     private JButton mjbToSupply;
     private JButton mjbToEstimate;
     private JButton mjbEstimationKardex;
@@ -67,6 +72,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
     }
     
     private void initComponents() {
+        jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar requisición", this);
         mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver solicitudes de cotización", this);
@@ -79,6 +85,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         jbRowDisable.setEnabled(false);
         jbRowCopy.setEnabled(false);
         
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
@@ -88,6 +95,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
         
+        jbPrint.setEnabled(true);
         mjbToSupply.setEnabled(true);
         mjbToEstimate.setEnabled(true);
         mjbEstimationKardex.setEnabled(mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ESTIMATED);
@@ -102,6 +110,38 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         
         msSeekQueryText = "";
+    }
+    
+    private void actionPrint() {
+        if (jbPrint.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        print(gridRow.getRowPrimaryKey()[0]);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void print(int idMatReq) throws Exception {
+        HashMap<String, Object> params;
+        
+        params = miClient.createReportParams();
+        params.put("nMatReqId", idMatReq);
+        
+        miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
     }
     
     private void actionToSupply() {
@@ -388,7 +428,10 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == mjbToSupply) {
+            if (button == jbPrint) {
+                actionPrint();
+            }
+            else if (button == mjbToSupply) {
                 actionToSupply();
             }
             else if (button == mjbToEstimate) {
