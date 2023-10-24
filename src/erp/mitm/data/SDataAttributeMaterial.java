@@ -18,7 +18,7 @@ import sa.gui.util.SUtilConsts;
  *
  * @author Edwin Carmona
  */
-public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataAttributeMaterial extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkMaterialAttributeId;
     protected String msName;
@@ -32,8 +32,8 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
     protected Date mtUserUpdatedTs;
     protected Date mtUserDeletedTs;
 
-    public SDataMaterialAttribute() {
-        super(SDataConstants.ITMU_MAT_ATT);
+    public SDataAttributeMaterial() {
+        super(SDataConstants.ITMU_ATT_MAT);
         reset();
     }
 
@@ -66,7 +66,7 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
 
         mnPkMaterialAttributeId = 0;
 
-        String sql = "SELECT COALESCE(MAX(id_mat_att), 0) + 1 FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " ";
+        String sql = "SELECT COALESCE(MAX(id_att_mat), 0) + 1 FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " ";
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             mnPkMaterialAttributeId = resultSet.getInt(1);
@@ -74,7 +74,7 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
     }
     
     private String getSqlWhere() {
-        return "WHERE id_mat_att = " + mnPkMaterialAttributeId + " ";
+        return "WHERE id_att_mat = " + mnPkMaterialAttributeId + " ";
     }
 
     @Override
@@ -114,13 +114,13 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
         reset();
 
         try {
-            sql = "SELECT * FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " WHERE id_mat_att = " + key[0] + " ";
+            sql = "SELECT * FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " WHERE id_att_mat = " + key[0] + " ";
             resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
-                mnPkMaterialAttributeId = resultSet.getInt("id_mat_att");
+                mnPkMaterialAttributeId = resultSet.getInt("id_att_mat");
                 msName = resultSet.getString("name");
                 mbIsCanEdit = resultSet.getBoolean("b_can_edit");
                 mbIsCanDelete = resultSet.getBoolean("b_can_del");
@@ -175,7 +175,7 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
             }
             else {
                 sql = "UPDATE " + SDataConstants.TablesMap.get(mnRegistryType) + " SET " +
-//                        "id_mat_att = " + mnPkMaterialAttributeId + ", " +
+//                        "id_att_mat = " + mnPkMaterialAttributeId + ", " +
                         "name = '" + msName + "', " +
                         "b_can_edit = " + (mbIsCanEdit ? 1 : 0) + ", " +
                         "b_can_del = " + (mbIsCanDelete ? 1 : 0) + ", " +
@@ -208,8 +208,8 @@ public class SDataMaterialAttribute extends erp.lib.data.SDataRegistry implement
     }
     
     @Override
-    public SDataMaterialAttribute clone() throws CloneNotSupportedException {
-        SDataMaterialAttribute registry = new SDataMaterialAttribute();
+    public SDataAttributeMaterial clone() throws CloneNotSupportedException {
+        SDataAttributeMaterial registry = new SDataAttributeMaterial();
 
         registry.setPkMaterialAttributeId(this.getPkMaterialAttributeId());
         registry.setName(this.getName());

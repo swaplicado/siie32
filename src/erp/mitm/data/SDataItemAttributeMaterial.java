@@ -16,7 +16,7 @@ import sa.gui.util.SUtilConsts;
  *
  * @author Edwin Carmona
  */
-public class SDataItemAttribute extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkItemId;
     protected int mnPkAttributeId;
@@ -31,7 +31,7 @@ public class SDataItemAttribute extends erp.lib.data.SDataRegistry implements ja
     protected Date mtUserUpdatedTs;
     protected Date mtUserDeletedTs;
 
-    public SDataItemAttribute() {
+    public SDataItemAttributeMaterial() {
         super(SDataConstants.ITMU_ITEM_ATT_MAT);
         reset();
     }
@@ -204,8 +204,8 @@ public class SDataItemAttribute extends erp.lib.data.SDataRegistry implements ja
     }
     
     @Override
-    public SDataItemAttribute clone() throws CloneNotSupportedException {
-        SDataItemAttribute registry = new SDataItemAttribute();
+    public SDataItemAttributeMaterial clone() throws CloneNotSupportedException {
+        SDataItemAttributeMaterial registry = new SDataItemAttributeMaterial();
 
         registry.setPkItemId(this.getPkItemId());
         registry.setPkAttributeId(this.getPkAttributeId());

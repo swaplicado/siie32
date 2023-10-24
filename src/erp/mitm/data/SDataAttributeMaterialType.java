@@ -16,7 +16,7 @@ import sa.gui.util.SUtilConsts;
  *
  * @author Edwin Carmona
  */
-public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataAttributeMaterialType extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     public static final int MAX_ATTRIBUTES = 15;
 
@@ -32,8 +32,8 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
     protected Date mtUserUpdatedTs;
     protected Date mtUserDeletedTs;
 
-    public SDataMaterialTypeAttribute() {
-        super(SDataConstants.ITMU_TP_MAT_ATT);
+    public SDataAttributeMaterialType() {
+        super(SDataConstants.ITMU_TP_ATT_MAT);
         reset();
     }
 
@@ -62,7 +62,7 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
     public Date getUserDeletedTs() { return mtUserDeletedTs; }
     
     private String getSqlWhere() {
-        return "WHERE id_tp_mat = " + mnPkItemMaterialTypeId + " AND id_mat_att = " + mnPkItemMaterialAttributeId + " ";
+        return "WHERE id_tp_mat = " + mnPkItemMaterialTypeId + " AND id_att_mat = " + mnPkItemMaterialAttributeId + " ";
     }
 
     @Override
@@ -104,14 +104,14 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
 
         try {
             sql = "SELECT * FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " "
-                    + "WHERE id_tp_mat = " + key[0] + " AND id_mat_att = " + key[1] + " ";
+                    + "WHERE id_tp_mat = " + key[0] + " AND id_att_mat = " + key[1] + " ";
             resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
                 mnPkItemMaterialTypeId = resultSet.getInt("id_tp_mat");
-                mnPkItemMaterialAttributeId = resultSet.getInt("id_mat_att");
+                mnPkItemMaterialAttributeId = resultSet.getInt("id_att_mat");
                 mnSortingPos = resultSet.getInt("sort");
                 mbIsRequired = resultSet.getBoolean("b_req");
                 mbIsDeleted = resultSet.getBoolean("b_del");
@@ -163,7 +163,7 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
             else {
                 sql = "UPDATE " + SDataConstants.TablesMap.get(mnRegistryType) + " SET " +
 //                        "id_tp_mat = " + mnPkItemMaterialTypeId + ", " +
-//                        "id_mat_att = " + mnPkItemMaterialAttributeId + ", " +
+//                        "id_att_mat = " + mnPkItemMaterialAttributeId + ", " +
                         "sort = " + mnSortingPos + ", " +
                         "b_req = " + (mbIsRequired ? 1 : 0) + ", " +
                         "b_del = " + (mbIsDeleted ? 1 : 0) + ", " +
@@ -195,8 +195,8 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
     }
     
     @Override
-    public SDataMaterialTypeAttribute clone() throws CloneNotSupportedException {
-        SDataMaterialTypeAttribute registry = new SDataMaterialTypeAttribute();
+    public SDataAttributeMaterialType clone() throws CloneNotSupportedException {
+        SDataAttributeMaterialType registry = new SDataAttributeMaterialType();
 
         registry.setPkItemMaterialTypeId(this.getPkItemMaterialTypeId());
         registry.setPkItemMaterialAttributeId(this.getPkItemMaterialAttributeId());

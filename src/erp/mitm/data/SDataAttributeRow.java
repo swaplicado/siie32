@@ -18,7 +18,7 @@ public class SDataAttributeRow extends erp.lib.table.STableRow {
 
     @Override
     public void prepareTableRow() {
-        SDataMaterialAttribute att = (SDataMaterialAttribute) moData;
+        SDataAttributeMaterial att = (SDataAttributeMaterial) moData;
 
         mvValues.clear();
         mvValues.add(att.getName());

@@ -27,7 +27,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.mitm.data.SDataBrand;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemAttribute;
+import erp.mitm.data.SDataItemAttributeMaterial;
 import erp.mitm.data.SDataItemBarcode;
 import erp.mitm.data.SDataItemBarcodeRow;
 import erp.mitm.data.SDataItemForeignLanguage;
@@ -35,7 +35,7 @@ import erp.mitm.data.SDataItemForeignLanguageRow;
 import erp.mitm.data.SDataItemGeneric;
 import erp.mitm.data.SDataItemLine;
 import erp.mitm.data.SDataManufacturer;
-import erp.mitm.data.SDataMaterialAttribute;
+import erp.mitm.data.SDataAttributeMaterial;
 import erp.mitm.data.SDataUnit;
 import erp.mitm.data.SDataUnitType;
 import erp.mitm.data.SDataVariety;
@@ -179,8 +179,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mitm.data.SDataItemLine moItemLine;
     private erp.mitm.data.SDataItem moItem;
 
-    private ArrayList<SDataMaterialAttribute> mlAttributesCfg;
-    private ArrayList<SDataItemAttribute> mlAttributes;
+    private ArrayList<SDataAttributeMaterial> mlAttributesCfg;
+    private ArrayList<SDataItemAttributeMaterial> mlAttributes;
     /**
      * Creates new form SFormItem
      * @param client
@@ -3309,7 +3309,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             JTextField oCurrentTextField = null;
             JLabel oCurrentJLabel = null;
             SFormField oCurrentFormField = null;
-            for (SDataMaterialAttribute oAttribute : mlAttributesCfg) {
+            for (SDataAttributeMaterial oAttribute : mlAttributesCfg) {
                 name = oAttribute.getName() + ":*";
                 switch (index) {
                     case 1:
@@ -4229,11 +4229,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkCfdProdServId_n(moKeyCfdProdServId_n.getSelectedIndex() <= 0 ? 0 : moKeyCfdProdServId_n.getValue()[0]);
         moItem.setFkMaterialTypeId_n(moKeyFkMaterialTypeId_n.getSelectedIndex() <= 0 ? 1 : moKeyFkMaterialTypeId_n.getValue()[0]);
         if (mlAttributesCfg != null && mlAttributesCfg.size() > 0) {
-            SDataItemAttribute oAtt;
+            SDataItemAttributeMaterial oAtt;
             int attNumber = 1;
             JTextField oCurrentTextField;
-            for (SDataMaterialAttribute oAttCfg : mlAttributesCfg) {
-                oAtt = new SDataItemAttribute();
+            for (SDataAttributeMaterial oAttCfg : mlAttributesCfg) {
+                oAtt = new SDataItemAttributeMaterial();
                 oAtt.setPkAttributeId(oAttCfg.getPkMaterialAttributeId());
                 oAtt.setSortingPos(attNumber);
                 oAtt.setIsRequired(true);
