@@ -110,7 +110,7 @@ public class SFormMaterialConsumptionEntity extends sa.lib.gui.bean.SBeanForm {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 640, 400);
         
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 5);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 6);
         moTextConsumptionEntity.setTextSettings(SGuiUtils.getLabelName(jlConsumptionEntity), 50, 1);
         
         moFields.addField(moTextCode);
