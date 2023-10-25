@@ -123,7 +123,7 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         SGuiUtils.setWindowBounds(this, 640, 400);
         
         moKeyConsEntEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsumptionEntity), true);
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 5);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
         moTextConsumptionSubentity.setTextSettings(SGuiUtils.getLabelName(jlConsumptionSubentity), 50, 1);
         
         moFields.addField(moKeyConsEntEty);
