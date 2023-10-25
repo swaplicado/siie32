@@ -16,7 +16,7 @@ import sa.gui.util.SUtilConsts;
  *
  * @author Edwin Carmona
  */
-public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataTypeMaterialAttribute extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
     public static final int MAX_ATTRIBUTES = 15;
 
@@ -32,8 +32,8 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
     protected Date mtUserUpdatedTs;
     protected Date mtUserDeletedTs;
 
-    public SDataMaterialTypeAttribute() {
-        super(SDataConstants.ITMU_TP_MAT_ATT);
+    public SDataTypeMaterialAttribute() {
+        super(SDataConstants.ITMU_TP_MAT_MAT_ATT);
         reset();
     }
 
@@ -195,8 +195,8 @@ public class SDataMaterialTypeAttribute extends erp.lib.data.SDataRegistry imple
     }
     
     @Override
-    public SDataMaterialTypeAttribute clone() throws CloneNotSupportedException {
-        SDataMaterialTypeAttribute registry = new SDataMaterialTypeAttribute();
+    public SDataTypeMaterialAttribute clone() throws CloneNotSupportedException {
+        SDataTypeMaterialAttribute registry = new SDataTypeMaterialAttribute();
 
         registry.setPkItemMaterialTypeId(this.getPkItemMaterialTypeId());
         registry.setPkItemMaterialAttributeId(this.getPkItemMaterialAttributeId());

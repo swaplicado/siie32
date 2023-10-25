@@ -609,6 +609,14 @@
                                     </Property>
                                   </Properties>
                                 </Component>
+                                <Component class="javax.swing.JCheckBox" name="jckIsMaterial">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="Es material"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[125, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
                               </SubComponents>
                             </Container>
                             <Container class="javax.swing.JPanel" name="jpRegistry2214">

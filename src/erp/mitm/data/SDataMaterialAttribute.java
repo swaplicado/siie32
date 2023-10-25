@@ -8,7 +8,6 @@ package erp.mitm.data;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.table.STableRow;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;

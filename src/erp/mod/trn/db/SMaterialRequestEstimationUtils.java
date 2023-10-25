@@ -89,7 +89,6 @@ public abstract class SMaterialRequestEstimationUtils {
     public static void sendMails(SGuiClient client, ArrayList<SProviderMailRow> lProviderRows) {
         SDbMms mms = STrnUtilities.getMms((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ);
         SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
-//        sender.setMailFrom("AETH");
         String img = "firmas/" + client.getSession().getUser().getName() + ".jpg";
         String basePath = System.getProperty("user.dir");
         String imageFilePath = basePath + "/" + img;

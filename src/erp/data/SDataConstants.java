@@ -250,8 +250,8 @@ public abstract class SDataConstants {
     public static final int ITMU_ITEM_BARC = 205011;
     public static final int ITMU_CFG_ITEM_LAN = 205012;
     public static final int ITMU_CFG_ITEM_BP = 205013;
-    public static final int ITMU_TP_MAT_ATT = 205029;
-    public static final int ITMU_ITEM_ATT_MAT = 205030;
+    public static final int ITMU_TP_MAT_MAT_ATT = 205029;
+    public static final int ITMU_ITEM_MAT_ATT = 205030;
     public static final int ITMU_MATCH_ITEM_CPT_BP = 205051;
     public static final int ITMU_TP_UNIT = 205014;
     public static final int ITMU_TP_LEV = 205015;
@@ -841,8 +841,8 @@ public abstract class SDataConstants {
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
-        TablesMap.put(ITMU_TP_MAT_ATT, "erp.itmu_mat_tp_att");
-        TablesMap.put(ITMU_ITEM_ATT_MAT, "erp.itmu_item_att_mat");
+        TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
+        TablesMap.put(ITMU_ITEM_MAT_ATT, "erp.itmu_item_mat_att");
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");

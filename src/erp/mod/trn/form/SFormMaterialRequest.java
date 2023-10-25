@@ -1844,7 +1844,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moTextAuthStatus.setValue(moRegistry.getAuxAuthStatus());
         
-        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_SUP || getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_SUP || 
+            getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_PUR ||
+            getFormSubtype() == SModConsts.TRNX_MAT_REQ_EST) {
             jbSave.setEnabled(false);
             jbSaveAndSend.setEnabled(false);
         }
