@@ -25,7 +25,7 @@ public class SViewMaterialAttribute extends erp.lib.table.STableTab implements j
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
     public SViewMaterialAttribute(erp.client.SClientInterface client, java.lang.String tabTitle) {
-        super(client, tabTitle, SDataConstants.ITMU_ATT_MAT);
+        super(client, tabTitle, SDataConstants.ITMU_MAT_ATT);
         initComponents();
     }
 
@@ -42,7 +42,7 @@ public class SViewMaterialAttribute extends erp.lib.table.STableTab implements j
         STableColumn[] aoTableColumns = new STableColumn[10];
 
         i = 0;
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "matt.id_att_mat");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "matt.id_mat_att");
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
@@ -119,10 +119,10 @@ public class SViewMaterialAttribute extends erp.lib.table.STableTab implements j
             }
         }
 
-        msSql = "SELECT matt.id_att_mat, matt.name, matt.b_can_edit, matt.b_can_del, matt.b_del, " +
+        msSql = "SELECT matt.id_mat_att, matt.name, matt.b_can_edit, matt.b_can_del, matt.b_del, " +
                 "matt.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", " +
                 "matt.fid_usr_new, matt.fid_usr_edit, matt.fid_usr_del, matt.ts_new, matt.ts_edit, matt.ts_del, un.usr, ue.usr, ud.usr " +
-                "FROM " + SDataConstants.TablesMap.get(SDataConstants.ITMU_ATT_MAT) + " AS matt " +
+                "FROM " + SDataConstants.TablesMap.get(SDataConstants.ITMU_MAT_ATT) + " AS matt " +
                 "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.USRU_USR) + " AS un ON " +
                 "matt.fid_usr_new = un.id_usr " +
                 "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.USRU_USR) + " AS ue ON " +
@@ -130,7 +130,7 @@ public class SViewMaterialAttribute extends erp.lib.table.STableTab implements j
                 "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.USRU_USR) + " AS ud ON " +
                 "matt.fid_usr_del = ud.id_usr " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-                "ORDER BY matt.name, matt.id_att_mat ";
+                "ORDER BY matt.name, matt.id_mat_att ";
     }
 
     @Override

@@ -200,8 +200,8 @@ public abstract class SModConsts {
     public static final int ITMU_ITEM_BARC = 1052007;
     public static final int ITMU_CFG_ITEM_LAN = 1052008;
     public static final int ITMU_CFG_ITEM_BP = 1052009;
-    public static final int ITMU_TP_ATT_MAT = 1052010;
-    public static final int ITMU_ITEM_ATT_MAT = 1052011;
+    public static final int ITMU_TP_MAT_MAT_ATT = 1052010;
+    public static final int ITMU_ITEM_MAT_ATT = 1052011;
     public static final int ITMU_MATCH_ITEM_CPT_BP = 1052021;
 
     public static final int ITMU_TP_LEV = 1052501;
@@ -216,7 +216,7 @@ public abstract class SModConsts {
     public static final int ITMU_TP_EMT = 1052510;
     public static final int ITMU_EMT = 1052511;
     public static final int ITMU_TP_MAT = 1052512;
-    public static final int ITMU_ATT_MAT = 1052513;
+    public static final int ITMU_MAT_ATT = 1052513;
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
     
@@ -995,8 +995,8 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
-        TablesMap.put(ITMU_TP_ATT_MAT, "erp.itmu_tp_att_mat");
-        TablesMap.put(ITMU_ITEM_ATT_MAT, "erp.itmu_item_att_mat");
+        TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
+        TablesMap.put(ITMU_ITEM_MAT_ATT, "erp.itmu_item_mat_att");
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP, "erp.itmu_match_item_cpt_bp");
 
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
@@ -1011,7 +1011,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_TP_EMT, "erp.itmu_tp_emt");
         TablesMap.put(ITMU_EMT, "erp.itmu_emt");
         TablesMap.put(ITMU_TP_MAT, "erp.itmu_tp_mat");
-        TablesMap.put(ITMU_ATT_MAT, "erp.itmu_att_mat");
+        TablesMap.put(ITMU_MAT_ATT, "erp.itmu_mat_att");
 
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP_COMP, "itmu_match_item_cpt_bp_comp");
         

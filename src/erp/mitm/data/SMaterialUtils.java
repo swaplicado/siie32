@@ -19,21 +19,21 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SMaterialUtils {
     
-    public static ArrayList<SDataAttributeMaterial> getAttributesOfType(java.sql.Statement statement, final int idMaterialType) {
+    public static ArrayList<SDataMaterialAttribute> getAttributesOfType(java.sql.Statement statement, final int idMaterialType) {
         ResultSet res = null;
         try {
-            String sql = "SELECT id_att_mat "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_ATT_MAT) + " "
+            String sql = "SELECT id_mat_att "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT_MAT_ATT) + " "
                     + "WHERE NOT b_del "
                     + (idMaterialType > 0 ? ("AND id_tp_mat = " + idMaterialType + " ") : "")
-                    + "ORDER BY sort ASC LIMIT " + SDataAttributeMaterialType.MAX_ATTRIBUTES + ";";
+                    + "ORDER BY sort ASC LIMIT " + SDataTypeMaterialAttribute.MAX_ATTRIBUTES + ";";
             
             res = statement.getConnection().createStatement().executeQuery(sql);
-            ArrayList<SDataAttributeMaterial> lAttributes = new ArrayList<>();
-            SDataAttributeMaterial oAttribute;
+            ArrayList<SDataMaterialAttribute> lAttributes = new ArrayList<>();
+            SDataMaterialAttribute oAttribute;
             while (res.next()) {
-                oAttribute = new SDataAttributeMaterial();
-                oAttribute.read(new int[] { res.getInt("id_att_mat") }, statement);
+                oAttribute = new SDataMaterialAttribute();
+                oAttribute.read(new int[] { res.getInt("id_mat_att") }, statement);
                 lAttributes.add(oAttribute);
             }
             
@@ -46,20 +46,20 @@ public abstract class SMaterialUtils {
         return null;
     }
     
-    public static ArrayList<SDataAttributeMaterial> getAllAttributes(java.sql.Statement statement) {
+    public static ArrayList<SDataMaterialAttribute> getAllAttributes(java.sql.Statement statement) {
         ResultSet res = null;
         try {
-            String sql = "SELECT id_att_mat "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ATT_MAT) + " "
+            String sql = "SELECT id_mat_att "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_MAT_ATT) + " "
                     + "WHERE NOT b_del "
                     + "ORDER BY name ASC;";
             
             res = statement.getConnection().createStatement().executeQuery(sql);
-            ArrayList<SDataAttributeMaterial> lAttributes = new ArrayList<>();
-            SDataAttributeMaterial oAttribute;
+            ArrayList<SDataMaterialAttribute> lAttributes = new ArrayList<>();
+            SDataMaterialAttribute oAttribute;
             while (res.next()) {
-                oAttribute = new SDataAttributeMaterial();
-                oAttribute.read(new int[] { res.getInt("id_att_mat") }, statement);
+                oAttribute = new SDataMaterialAttribute();
+                oAttribute.read(new int[] { res.getInt("id_mat_att") }, statement);
                 lAttributes.add(oAttribute);
             }
             
@@ -72,18 +72,18 @@ public abstract class SMaterialUtils {
         return null;
     }
     
-    public static void saveSelectedAttributes(SGuiSession session, ArrayList<SDataAttributeMaterial> lNewAttributes, final int idMaterialType) {
+    public static void saveSelectedAttributes(SGuiSession session, ArrayList<SDataMaterialAttribute> lNewAttributes, final int idMaterialType) {
         try {
             String sql = "DELETE "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_ATT_MAT) + " "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT_MAT_ATT) + " "
                     + "WHERE id_tp_mat = " + idMaterialType + ";";
 
             session.getStatement().getConnection().createStatement().execute(sql);
             
             int sortOrder = 1;
-            SDataAttributeMaterialType oCfg;
-            for (SDataAttributeMaterial oNewAttribute : lNewAttributes) {
-                oCfg = new SDataAttributeMaterialType();
+            SDataTypeMaterialAttribute oCfg;
+            for (SDataMaterialAttribute oNewAttribute : lNewAttributes) {
+                oCfg = new SDataTypeMaterialAttribute();
                 oCfg.setPkItemMaterialAttributeId(oNewAttribute.getPkMaterialAttributeId());
                 oCfg.setPkItemMaterialTypeId(idMaterialType);
                 oCfg.setSortingPos(sortOrder);

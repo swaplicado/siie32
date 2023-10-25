@@ -108,7 +108,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected erp.mitm.data.SDataItemGeneric moDbmsDataItemGeneric;
     protected java.util.Vector<erp.mitm.data.SDataItemBarcode> mvDbmsItemBarcodes;
     protected java.util.Vector<erp.mitm.data.SDataItemForeignLanguage> mvDbmsItemForeignLanguageDescriptions;
-    protected ArrayList<SDataItemAttributeMaterial> mlItemAttributes;
+    protected ArrayList<SDataItemMaterialAttribute> mlItemAttributes;
 
     public SDataItem() {
         super(SDataConstants.ITMU_ITEM);
@@ -286,7 +286,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public erp.mitm.data.SDataItemGeneric getDbmsDataItemGeneric() { return moDbmsDataItemGeneric; }
     public java.util.Vector<SDataItemBarcode> getDbmsItemBarcodes() { return mvDbmsItemBarcodes; }
     public java.util.Vector<SDataItemForeignLanguage> getDbmsItemForeignLanguageDescriptions() { return mvDbmsItemForeignLanguageDescriptions; }
-    public ArrayList<SDataItemAttributeMaterial> getDbmsItemAttributes() { return mlItemAttributes; }
+    public ArrayList<SDataItemMaterialAttribute> getDbmsItemAttributes() { return mlItemAttributes; }
 
     public int getDbmsFkDefaultItemRefId_n() {
         int id = mnFkDefaultItemRefId_n;
@@ -566,11 +566,11 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 }
                 
                 if (mnFkMaterialTypeId_n > 1) {
-                    sql = "SELECT id_att_mat FROM erp.itmu_item_att_mat WHERE NOT b_del AND id_item = " + key[0] + " ORDER BY sort ASC ";
+                    sql = "SELECT id_mat_att FROM erp.itmu_item_mat_att WHERE NOT b_del AND id_item = " + key[0] + " ORDER BY sort ASC ";
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
-                        SDataItemAttributeMaterial oAtt = new SDataItemAttributeMaterial();
-                        if (oAtt.read(new int[] { mnPkItemId, resultSet.getInt("id_att_mat") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        SDataItemMaterialAttribute oAtt = new SDataItemMaterialAttribute();
+                        if (oAtt.read(new int[] { mnPkItemId, resultSet.getInt("id_mat_att") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {
@@ -727,10 +727,10 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     }
                 }
                 
-                sql = "DELETE FROM erp.itmu_item_att_mat WHERE id_item = " + mnPkItemId + " ";
+                sql = "DELETE FROM erp.itmu_item_mat_att WHERE id_item = " + mnPkItemId + " ";
                 statement.execute(sql);
                 
-                for (SDataItemAttributeMaterial oAtt : mlItemAttributes) {
+                for (SDataItemMaterialAttribute oAtt : mlItemAttributes) {
                     oAtt.setPkItemId(mnPkItemId);
                     if (oAtt.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);

@@ -16,7 +16,7 @@ import sa.gui.util.SUtilConsts;
  *
  * @author Edwin Carmona
  */
-public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataItemMaterialAttribute extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkItemId;
     protected int mnPkAttributeId;
@@ -31,8 +31,8 @@ public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry imple
     protected Date mtUserUpdatedTs;
     protected Date mtUserDeletedTs;
 
-    public SDataItemAttributeMaterial() {
-        super(SDataConstants.ITMU_ITEM_ATT_MAT);
+    public SDataItemMaterialAttribute() {
+        super(SDataConstants.ITMU_ITEM_MAT_ATT);
         reset();
     }
 
@@ -63,7 +63,7 @@ public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry imple
     public Date getUserDeletedTs() { return mtUserDeletedTs; }
     
     private String getSqlWhere() {
-        return "WHERE id_item = " + mnPkItemId + " AND id_att_mat = " + mnPkAttributeId + " ";
+        return "WHERE id_item = " + mnPkItemId + " AND id_mat_att = " + mnPkAttributeId + " ";
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry imple
         try {
             sql = "SELECT * FROM " + SDataConstants.TablesMap.get(mnRegistryType) + " "
                     + "WHERE id_item = " + key[0] + " AND "
-                    + "id_att_mat = " + key[1] + " ";
+                    + "id_mat_att = " + key[1] + " ";
             
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -116,7 +116,7 @@ public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry imple
             }
             else {
                 mnPkItemId = resultSet.getInt("id_item");
-                mnPkAttributeId = resultSet.getInt("id_att_mat");
+                mnPkAttributeId = resultSet.getInt("id_mat_att");
                 msAttributeValue = resultSet.getString("att_value");
                 mnSortingPos = resultSet.getInt("sort");
                 mbIsRequired = resultSet.getBoolean("b_req");
@@ -171,7 +171,7 @@ public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry imple
             else {
                 sql = "UPDATE " + SDataConstants.TablesMap.get(mnRegistryType) + " SET " +
 //                        "id_item = " + mnPkItemId + ", " +
-//                        "id_att_mat = " + mnPkAttributeId + ", " +
+//                        "id_mat_att = " + mnPkAttributeId + ", " +
                         "att_value = '" + msAttributeValue + "', " +
                         "sort = " + mnSortingPos + ", " +
                         "b_req = " + (mbIsRequired ? 1 : 0) + ", " +
@@ -204,8 +204,8 @@ public class SDataItemAttributeMaterial extends erp.lib.data.SDataRegistry imple
     }
     
     @Override
-    public SDataItemAttributeMaterial clone() throws CloneNotSupportedException {
-        SDataItemAttributeMaterial registry = new SDataItemAttributeMaterial();
+    public SDataItemMaterialAttribute clone() throws CloneNotSupportedException {
+        SDataItemMaterialAttribute registry = new SDataItemMaterialAttribute();
 
         registry.setPkItemId(this.getPkItemId());
         registry.setPkAttributeId(this.getPkAttributeId());

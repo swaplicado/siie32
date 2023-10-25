@@ -10,7 +10,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STablePane;
 import erp.mitm.data.SDataAttributeRow;
-import erp.mitm.data.SDataAttributeMaterial;
+import erp.mitm.data.SDataMaterialAttribute;
 import erp.mitm.data.SMaterialUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -221,14 +221,14 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
     }
     
     private void setAttributes() {
-        ArrayList<SDataAttributeMaterial> lAllAttributes = SMaterialUtils.getAllAttributes(miClient.getSession().getStatement());
-        ArrayList<SDataAttributeMaterial> lSelectedAttributes = SMaterialUtils.getAttributesOfType(miClient.getSession().getStatement(), mnMaterialTypeId);
+        ArrayList<SDataMaterialAttribute> lAllAttributes = SMaterialUtils.getAllAttributes(miClient.getSession().getStatement());
+        ArrayList<SDataMaterialAttribute> lSelectedAttributes = SMaterialUtils.getAttributesOfType(miClient.getSession().getStatement(), mnMaterialTypeId);
         
-        ArrayList<SDataAttributeMaterial> lAvailableAttributes = new ArrayList<>();
+        ArrayList<SDataMaterialAttribute> lAvailableAttributes = new ArrayList<>();
         
-        for (SDataAttributeMaterial oAttA : lAllAttributes) {
+        for (SDataMaterialAttribute oAttA : lAllAttributes) {
             boolean bFound = false;
-            for (SDataAttributeMaterial oAttB : lSelectedAttributes) {
+            for (SDataMaterialAttribute oAttB : lSelectedAttributes) {
                 if (oAttA.getPkMaterialAttributeId() == oAttB.getPkMaterialAttributeId()) {
                     bFound = true;
                     break;
@@ -242,7 +242,7 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
         moPanelAvailableAttributes.createTable(null);
         moPanelAvailableAttributes.clearTableRows();
         
-        for (SDataAttributeMaterial oAttAvailable : lAvailableAttributes) {
+        for (SDataMaterialAttribute oAttAvailable : lAvailableAttributes) {
             moPanelAvailableAttributes.addTableRow(new SDataAttributeRow(oAttAvailable));
         }
         
@@ -252,7 +252,7 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
         moPanelSelectedAttributes.createTable(null);
         moPanelSelectedAttributes.clearTableRows();
         
-        for (SDataAttributeMaterial oAttSelected : lSelectedAttributes) {
+        for (SDataMaterialAttribute oAttSelected : lSelectedAttributes) {
             moPanelSelectedAttributes.addTableRow(new SDataAttributeRow(oAttSelected));
         }
         
@@ -261,7 +261,7 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
     }
     
     private void actionAdd() {
-        SDataAttributeMaterial selected = (SDataAttributeMaterial) moPanelAvailableAttributes.getSelectedTableRow().getData();
+        SDataMaterialAttribute selected = (SDataMaterialAttribute) moPanelAvailableAttributes.getSelectedTableRow().getData();
         moPanelSelectedAttributes.addTableRow(new SDataAttributeRow(selected));
         moPanelAvailableAttributes.removeTableRow(moPanelAvailableAttributes.getTable().getSelectedRow());
         
@@ -270,7 +270,7 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
     }
     
     private void actionRemove() {
-        SDataAttributeMaterial selected = (SDataAttributeMaterial) moPanelSelectedAttributes.getSelectedTableRow().getData();
+        SDataMaterialAttribute selected = (SDataMaterialAttribute) moPanelSelectedAttributes.getSelectedTableRow().getData();
         moPanelAvailableAttributes.addTableRow(new SDataAttributeRow(selected));
         moPanelSelectedAttributes.removeTableRow(moPanelSelectedAttributes.getTable().getSelectedRow());
         
@@ -285,8 +285,8 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
             return;
         }
         
-        SDataAttributeMaterial current = (SDataAttributeMaterial) moPanelSelectedAttributes.getSelectedTableRow().getData();
-        SDataAttributeMaterial upAtt = (SDataAttributeMaterial) moPanelSelectedAttributes.getTableRow(index - 1).getData();
+        SDataMaterialAttribute current = (SDataMaterialAttribute) moPanelSelectedAttributes.getSelectedTableRow().getData();
+        SDataMaterialAttribute upAtt = (SDataMaterialAttribute) moPanelSelectedAttributes.getTableRow(index - 1).getData();
         
         moPanelSelectedAttributes.getTableModel().getTableRows().set(index, new SDataAttributeRow(upAtt));
         moPanelSelectedAttributes.getTableModel().getTableRows().set(index - 1, new SDataAttributeRow(current));
@@ -302,8 +302,8 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
             return;
         }
         
-        SDataAttributeMaterial current = (SDataAttributeMaterial) moPanelSelectedAttributes.getSelectedTableRow().getData();
-        SDataAttributeMaterial downAtt = (SDataAttributeMaterial) moPanelSelectedAttributes.getTableRow(index + 1).getData();
+        SDataMaterialAttribute current = (SDataMaterialAttribute) moPanelSelectedAttributes.getSelectedTableRow().getData();
+        SDataMaterialAttribute downAtt = (SDataMaterialAttribute) moPanelSelectedAttributes.getTableRow(index + 1).getData();
         
         moPanelSelectedAttributes.getTableModel().getTableRows().set(index, new SDataAttributeRow(downAtt));
         moPanelSelectedAttributes.getTableModel().getTableRows().set(index + 1, new SDataAttributeRow(current));
@@ -313,11 +313,11 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
     }
 
     private void actionOk() {
-        ArrayList<SDataAttributeMaterial> lSelectedAttributes = new ArrayList<>();
+        ArrayList<SDataMaterialAttribute> lSelectedAttributes = new ArrayList<>();
         
-        SDataAttributeMaterial obj;
+        SDataMaterialAttribute obj;
         for (int i = 0; i < moPanelSelectedAttributes.getTable().getRowCount(); i++) {
-            obj = (erp.mitm.data.SDataAttributeMaterial) moPanelSelectedAttributes.getTableRow(i).getData();
+            obj = (erp.mitm.data.SDataMaterialAttribute) moPanelSelectedAttributes.getTableRow(i).getData();
             lSelectedAttributes.add(obj);
         }
         

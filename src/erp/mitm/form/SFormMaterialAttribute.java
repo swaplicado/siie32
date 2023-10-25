@@ -16,7 +16,7 @@ import erp.lib.SLibConstants;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
-import erp.mitm.data.SDataAttributeMaterial;
+import erp.mitm.data.SDataMaterialAttribute;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -35,7 +35,7 @@ public class SFormMaterialAttribute extends javax.swing.JDialog implements erp.l
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.mitm.data.SDataAttributeMaterial moMaterialAttribute;
+    private erp.mitm.data.SDataMaterialAttribute moMaterialAttribute;
     private erp.lib.form.SFormField moFieldName;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
@@ -44,7 +44,7 @@ public class SFormMaterialAttribute extends javax.swing.JDialog implements erp.l
     public SFormMaterialAttribute(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        mnFormType = SDataConstants.ITMU_ATT_MAT;
+        mnFormType = SDataConstants.ITMU_MAT_ATT;
 
         initComponents();
         initComponentsExtra();
@@ -264,7 +264,7 @@ public class SFormMaterialAttribute extends javax.swing.JDialog implements erp.l
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
-        moMaterialAttribute = (SDataAttributeMaterial) registry;
+        moMaterialAttribute = (SDataMaterialAttribute) registry;
 
         moFieldName.setFieldValue(moMaterialAttribute.getName());
         moFieldIsDeleted.setFieldValue(moMaterialAttribute.isIsDeleted());
@@ -277,7 +277,7 @@ public class SFormMaterialAttribute extends javax.swing.JDialog implements erp.l
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         if (moMaterialAttribute == null) {
-            moMaterialAttribute = new SDataAttributeMaterial();
+            moMaterialAttribute = new SDataMaterialAttribute();
             moMaterialAttribute.setFkUserInsertId(miClient.getSession().getUser().getPkUserId());
         }
         else {

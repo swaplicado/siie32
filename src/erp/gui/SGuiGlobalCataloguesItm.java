@@ -448,12 +448,12 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     }
                     miForm = moFormElement;
                     break;
-                case SDataConstants.ITMU_ATT_MAT:
+                case SDataConstants.ITMU_MAT_ATT:
                     if (moFormMaterialAttribute == null) {
                         moFormMaterialAttribute = new SFormMaterialAttribute(miClient);
                     }
                     if (pk != null) {
-                        moRegistry = new SDataAttributeMaterial();
+                        moRegistry = new SDataMaterialAttribute();
                     }
                     miForm = moFormMaterialAttribute;
                     break;
@@ -621,7 +621,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     oViewClass = erp.mitm.view.SViewElement.class;
                     sViewTitle = "Elementos";
                     break;
-                case SDataConstants.ITMU_ATT_MAT:
+                case SDataConstants.ITMU_MAT_ATT:
                     oViewClass = erp.mitm.view.SViewMaterialAttribute.class;
                     sViewTitle = "Atributos de materiales";
                     break;
@@ -821,7 +821,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                 showView(SDataConstants.ITMU_EMT);
             }
             else if (item == jmiMaterialAttribute) {
-                showView(SDataConstants.ITMU_ATT_MAT);
+                showView(SDataConstants.ITMU_MAT_ATT);
             }
             else if (item == jmiVariety) {
                 showView(SDataConstants.ITMU_VAR);
