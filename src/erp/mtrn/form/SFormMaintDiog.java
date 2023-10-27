@@ -848,8 +848,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jcbEntryCostCenter.setEnabled(false);
             jtfEntryQuantity.setEditable(false);
             jtfEntryQuantity.setFocusable(false);
-            jtfEntryValueUnit.setEditable(false);
-            jtfEntryValueUnit.setFocusable(false);
+            jtfEntryValueUnit.setEditable(isConsumeCenterMov());
+            jtfEntryValueUnit.setFocusable(isConsumeCenterMov());
             jtfEntryValue.setEditable(false);
             jtfEntryValue.setFocusable(false);
 
@@ -883,8 +883,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jcbEntryCostCenter.setEnabled(isConsumeCenterMov());
             jtfEntryQuantity.setEditable(true);
             jtfEntryQuantity.setFocusable(true);
-            jtfEntryValueUnit.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
-            jtfEntryValueUnit.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
+            jtfEntryValueUnit.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN || isConsumeCenterMov());
+            jtfEntryValueUnit.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN || isConsumeCenterMov());
             jtfEntryValue.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
             jtfEntryValue.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
 
@@ -901,7 +901,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         return moMaintDiogSignature != null && (moMaintDiogSignature.isRegistryNew() || (!moDiog.getIsRegistryNew() && !moMaintDiogSignature.getTsUserInsert().before(moDiog.getUserEditTs())));
     }
     
-    private boolean isConsumeCenterMov() {
+    private boolean isConsumeCenterMov() { //obligatorio
         return mnParamMaintMovementType == SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT ||
                 mnParamMaintMovementType == SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT;
     }
@@ -1292,6 +1292,10 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     jtfEntryQuantity.requestFocus();
                 }
                 else if (moFieldEntryValueUnit.getDouble() == 0 && mnIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar una partida sin valor?") != JOptionPane.YES_OPTION) {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnit.getText() + "'.");
+                    jtfEntryValueUnit.requestFocus();
+                }
+                else if (isConsumeCenterMov() && moFieldEntryValueUnit.getDouble() == 0) {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnit.getText() + "'.");
                     jtfEntryValueUnit.requestFocus();
                 }

@@ -521,7 +521,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jLabel7.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel45.add(jLabel7);
 
-        jlUnitPrice.setText("Precio u.:*");
+        jlUnitPrice.setText("Precio u.:");
         jlUnitPrice.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel45.add(jlUnitPrice);
         jPanel45.add(moDecUnitPrice);
@@ -578,7 +578,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jLabel1.setPreferredSize(new java.awt.Dimension(131, 23));
         jPanel47.add(jLabel1);
 
-        jlUnitPriceRef.setText("Ref. precio u.:*");
+        jlUnitPriceRef.setText("Ref. precio u.:");
         jlUnitPriceRef.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel47.add(jlUnitPriceRef);
         jPanel47.add(moTextUnitPriceRef);
@@ -907,9 +907,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moKeyUnit.setKeySettings(miClient, SGuiUtils.getLabelName("Unidad"), true);
         moIntConsDays.setIntegerSettings(SGuiUtils.getLabelName(jlConsDays), SGuiConsts.GUI_TYPE_INT, false);
         moDecUnitPriceSis.setDecimalSettings(SGuiUtils.getLabelName(jlUnitPriceSist), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moDecUnitPrice.setDecimalSettings(SGuiUtils.getLabelName(jlUnitPrice), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecUnitPrice.setDecimalSettings(SGuiUtils.getLabelName(jlUnitPrice), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecTotalEty.setDecimalSettings(SGuiUtils.getLabelName(jlUnitPrice), SGuiConsts.GUI_TYPE_DEC_AMT, true);
-        moTextUnitPriceRef.setTextSettings(SGuiUtils.getLabelName(jlUnitPriceRef), 15);
+        moTextUnitPriceRef.setTextSettings(SGuiUtils.getLabelName(jlUnitPriceRef), 15, 0);
         moKeyItemRefEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlItemRefEty), false);
         moKeyConsEntEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsEntEty), false);
         moKeyConsSubentEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsSubentEty), false);

@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 225.3/ 2023-10-27
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en las vistas de facturas de compras con CFDI de pagos por anexar y anexados.
+2) Adición de las vistas de consumo de materiales en el módulo de inventarios.
+3) Se quitó la obligatoriedad en el precio unitario y la referencia en la forma de requisiciones de materiales.
+4) Corrección en la forma de la obtención del nombre del asociado de negocios al imprimir las facturas.
+5) Se agregó la validación antes de crear una nota de crédito que la factura asociada contenga un UUID.
+
+================================================================================
 SIIE 3.2 225.2/ 2023-10-27
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------

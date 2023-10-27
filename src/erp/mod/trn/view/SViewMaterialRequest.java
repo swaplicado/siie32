@@ -308,6 +308,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " ";
                 break;
             case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH:
+                needJoin = true;
                 select += "uaut.usr AS autorizo, urej.usr AS rechazo, ";
                 join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
                         + "v.id_mat_req = aut.res_pk_n1_n "
@@ -365,6 +366,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "smpu.name AS comp_status, "
                 + "ur.usr AS usr_req, "
                 + "bmu.bp AS contractor, "
+                + "iref.item_key, "
                 + "cob.ent, "
                 + select
                 + "CASE "
@@ -412,6 +414,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_contractor_n = mu.id_maint_user "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS cob ON "
                 + "v.fk_whs_cob_n = cob.id_cob AND v.fk_whs_whs_n = cob.id_ent "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS iref ON "
+                + "v.fk_item_ref_n = iref.id_item "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bmu ON "
                 + "mu.id_maint_user = bmu.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
@@ -436,6 +440,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_req", "Tipo requisición", 20));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "item_key", "Ítem referencia"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "contractor", "Contratista"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ref", "Referencia"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));

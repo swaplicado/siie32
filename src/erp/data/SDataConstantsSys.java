@@ -1502,10 +1502,10 @@ public abstract class SDataConstantsSys {
                 name = "Notas crédito";
                 break;
             case TRNX_DPS_CFD_PAY:
-                name = "Fact. pendientes rec. de pago";
+                name = "CFDI pagos x anexar";
                 break;
             case TRNX_DPS_CFD_PAY_DONE:
-                name = "Fact. rec. de pago";
+                name = "CFDI pagos anexados";
                 break;
             default:
         }

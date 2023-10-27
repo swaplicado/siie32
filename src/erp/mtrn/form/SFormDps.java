@@ -7662,7 +7662,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     goAhead = false;
                                 }
                             }
-
+                            
                             if (goAhead) {
                                 // A.2. Remove from just picked source DPS all registries linked to current DPS:
 
@@ -7849,6 +7849,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         else {
                             // B.2. Remove from just picked source DPS all adjustment registries linked to current DPS:
 
+                            if (oDpsSource.getDbmsDataCfd().getUuid().isEmpty()) {
+                                miClient.showMsgBoxWarning("El documento origen no tiene UUID, por lo cual al emitir el XML de ajuste no tendrá la relación correspondiente.");
+                            }
+                            
                             for (SDataDpsEntry dpsSourceEntry : oDpsSource.getDbmsDpsEntries()) {
                                 for (i = 0; i < dpsSourceEntry.getDbmsDpsAdjustmentsAsDps().size(); ) {
                                     if (!SLibUtilities.compareKeys(moDps.getPrimaryKey(), dpsSourceEntry.getDbmsDpsAdjustmentsAsDps().get(i).getDbmsDpsAdjustmentKey())) {

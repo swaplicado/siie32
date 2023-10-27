@@ -114,7 +114,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 225.2"; // fecha release: 2023-10-27
+    public static final String APP_RELEASE = "3.2 225.3"; // fecha release: 2023-10-27
     public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -220,6 +220,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconArrowRight;
     private ImageIcon moIconBizPartnerExport;
     private ImageIcon moIconCal;
+    private ImageIcon moIconShipIntDel;
+    private ImageIcon moIconShipIntRet;
     private ImageIcon moIconModuleCfg;
     private ImageIcon moIconModuleFin;
     private ImageIcon moIconModulePur;
@@ -756,6 +758,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconArrowLeft = new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif"));
         moIconArrowRight = new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif"));
         moIconBizPartnerExport = new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_export.gif"));
+        moIconShipIntDel = new ImageIcon(getClass().getResource("/erp/img/icon_std_ship_int_del.gif"));
+        moIconShipIntRet = new ImageIcon(getClass().getResource("/erp/img/icon_std_ship_int_ret.gif"));
         moIconCal = new ImageIcon(getClass().getResource("/erp/img/gui_cal.gif"));
         moIconModuleCfg = new ImageIcon(getClass().getResource("/erp/img/icon_mod_cfg.png"));
         moIconModuleFin = new ImageIcon(getClass().getResource("/erp/img/icon_mod_fin.png"));
@@ -2228,7 +2232,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_DOC_DELIVERY:
                 imageIcon = moIconDocDelivery;
-                break;
+                break; 
             case SLibConstants.ICON_FILTER_BP:
                 imageIcon = moIconFilterBp;
                 break;
@@ -2267,6 +2271,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_BP_EXPORT:
                 imageIcon = moIconBizPartnerExport;
+                break;
+            case SLibConstants.ICON_SHIP_INT_DEL:
+                imageIcon = moIconShipIntDel;
+                break;
+            case SLibConstants.ICON_SHIP_INT_RET:
+                imageIcon = moIconShipIntRet;
                 break;
             case SLibConstants.ICON_GUI_CAL:
                 imageIcon = moIconCal;
