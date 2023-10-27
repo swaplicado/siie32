@@ -1,13 +1,10 @@
 ================================================================================
-SIIE 3.2 225.3/ 2023-10-27
-Jhonatan Claudio PEÑA HERNANDEZ
---------------------------------------------------------------------------------
-1) Correción de la constante de la vista de auxiliares contables
-================================================================================
 SIIE 3.2 225.2/ 2023-10-27
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Adición de colunma credtio y debito en la vista de auxiliares contables
+1) Adición de colunma crédito y débito en la vista de auxiliares contables.
+2) Correción de la constante de la vista de auxiliares contables.
+
 ================================================================================
 SIIE 3.2 225.1/ 2023-10-25
 Edwin Omar CARMONA FIGUEROA

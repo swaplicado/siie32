@@ -2324,7 +2324,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepAccountConcept(miClient, SDataConstants.FINU_TP_TAX_CPT).setVisible(true);
             }
             else if (item == jmiRepViewAccMovsDetail) {
-                showView(SDataConstants.FINX_ACCOUNTING, SDataConstants.FINX_MOVES_ABH);
+                showView(SDataConstants.FINX_ACCOUNTING, SDataConstants.FINX_MOVES_ACC_DET_VIEW);
             }
             else if (item == jmiRepContributionMargin) {
                 new SDialogRepContributionMargin(miClient.getSession().getClient(), "Reporte margen de contribución").setVisible(true);
