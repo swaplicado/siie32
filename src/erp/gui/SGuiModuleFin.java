@@ -1729,7 +1729,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                             oViewClass = erp.mfin.view.SViewAccountMoves.class;
                             sViewTitle = "Movimientos de cuentas contables";
                             break;
-                        case SDataConstants.FINX_MOVES_ABH:
+                        case SDataConstants.FINX_MOVES_ACC_DET_VIEW:
                             oViewClass = erp.mfin.view.SViewAuxDetaill.class;
                             sViewTitle = "Auxiliares contables a detalle";
                             break;
