@@ -56,7 +56,7 @@ public class SDialogCfdiPaymentPicker extends javax.swing.JDialog implements jav
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Fijar hora del documento");
+        setTitle("Seleccionar CFDI de pagos");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -66,11 +66,6 @@ public class SDialogCfdiPaymentPicker extends javax.swing.JDialog implements jav
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jlCfdList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
         jlCfdPayList.setViewportView(jlCfdList);
 
         jPanel2.add(jlCfdPayList, java.awt.BorderLayout.CENTER);
@@ -148,7 +143,7 @@ public class SDialogCfdiPaymentPicker extends javax.swing.JDialog implements jav
         mnDocYear = year;
         mnDocDoc = doc;
         try {
-            String sql = "SELECT * FROM " + SClientUtils.getComplementaryDbName(miClient.getSession().getDatabase().getConnection()) + ".trn_cfd_pay WHERE bp = " + bp + " "
+            String sql = "SELECT * FROM " + SClientUtils.getComplementaryDbName(miClient.getSession().getDatabase().getConnection()) + ".trn_cfd_pay WHERE bp_id = " + bp + " "
                     + "ORDER BY id_cfd_pay DESC";
             ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
             DefaultListModel e = new DefaultListModel();

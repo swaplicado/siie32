@@ -207,6 +207,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportStockMoves;
     private javax.swing.JMenuItem jmiReportStockMovesSumSum;
     private javax.swing.JMenuItem jmiReportStockTrackingLot;
+    private javax.swing.JMenuItem jmiReportMatCons;
+    private javax.swing.JMenuItem jmiReportMatConsCC;
+    private javax.swing.JMenuItem jmiReportMatConsCCRes;
     private javax.swing.JMenu jmMenuRepStats;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendMass;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendEntryMass;
@@ -733,16 +736,26 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportStockMoves = new JMenuItem("Reporte de movimientos de inventarios...");
         jmiReportStockMovesSumSum = new JMenuItem("Resumen de movimientos de inventarios...");
         jmiReportStockTrackingLot = new JMenuItem("Reporte de rastreo de lotes...");
+        jmiReportMatCons = new JMenuItem("Consumo de materiales");
+        jmiReportMatConsCC = new JMenuItem("Centros de consumo y consumo de materiales");
+        jmiReportMatConsCCRes = new JMenuItem("Centros de consumo y consumo de materiales resumen");
         jmMenuRep.add(jmiReportStock);
         jmMenuRep.add(jmiReportStockPeriod);
         jmMenuRep.add(jmiReportStockMoves);
         jmMenuRep.add(jmiReportStockMovesSumSum);
         jmMenuRep.add(jmiReportStockTrackingLot);
+        jmMenuRep.addSeparator();
+        jmMenuRep.add(jmiReportMatCons);
+        jmMenuRep.add(jmiReportMatConsCC);
+        jmMenuRep.add(jmiReportMatConsCCRes);
         jmiReportStock.addActionListener(this);
         jmiReportStockPeriod.addActionListener(this);
         jmiReportStockMoves.addActionListener(this);
         jmiReportStockMovesSumSum.addActionListener(this);
         jmiReportStockTrackingLot.addActionListener(this);
+        jmiReportMatCons.addActionListener(this);
+        jmiReportMatConsCC.addActionListener(this);
+        jmiReportMatConsCCRes.addActionListener(this);
 
         jmMenuRepStats = new JMenu("Estadísticas de producción");
         jmiRepStatsMfgConsumePendMass = new JMenuItem("Masa de insumos y productos por consumir");
@@ -1928,6 +1941,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportStockTrackingLot) {
                 menuRepStockTrackingLot();
+            }
+            else if (item == jmiReportMatCons) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_CONS, SLibConstants.UNDEFINED, null); 
+            }
+            else if (item == jmiReportMatConsCC) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_CONS_CC, SLibConstants.UNDEFINED, null); 
+            }
+            else if (item == jmiReportMatConsCCRes) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_CONS_CC, SModConsts.TRNX_MAT_CONS_CC_R, null); 
             }
             else if (item == jmiIogStockTheoricalCost) {
                 miClient.getSession().showView(SModConsts.TRNX_INV_VAL_COST_QRY, SLibConstants.UNDEFINED, null);

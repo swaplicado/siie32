@@ -59,6 +59,7 @@ public class SViewConfMatConsSubentityVsCostCenter extends SGridPaneView impleme
                 + "v.code AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "c.name AS entidad, "
+                + "c.code AS c_entidad, "
                 + "IF(sc.id_cc IS NULL, FALSE, TRUE) AS conf, "
                 + "sc.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
@@ -79,6 +80,7 @@ public class SViewConfMatConsSubentityVsCostCenter extends SGridPaneView impleme
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, "Código"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Subcentro de consumo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "c_entidad", "Código centro de consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "entidad", "Centro de consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "conf", "Configurado"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

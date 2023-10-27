@@ -7,6 +7,7 @@ package erp.mtrn.view;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -15,6 +16,9 @@ import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
+import erp.mbps.data.SDataBizPartner;
+import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfdPayment;
 import erp.mtrn.form.SDialogCfdiPaymentPicker;
 import java.awt.Cursor;
@@ -41,12 +45,17 @@ import sa.lib.xml.SXmlUtils;
 public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     
     private javax.swing.JButton jbViewLinks;
+    private javax.swing.JButton jbViewAccountingRecord;
+    private javax.swing.JButton jbViewAccountingDetailsDps;
+    private javax.swing.JButton jbViewAccountingDetailsBizPartner;
     private javax.swing.JButton jbUploadXml;
     private javax.swing.JButton jbVinculeXml;
     private javax.swing.JButton jbRemoveXml;
     private javax.swing.JButton jbDownloadXml;
     private javax.swing.JButton jbMarkXml;
     private javax.swing.JButton jbDismarkXml;
+    
+    private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     
@@ -63,37 +72,58 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
         jbViewLinks.addActionListener(this);
         jbViewLinks.setToolTipText("Ver vínculos del documento");
         
-        jbUploadXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_ADD));
+        jbViewAccountingRecord = new JButton(miClient.getImageIcon(SLibConstants.ICON_QUERY_REC));
+        jbViewAccountingRecord.setPreferredSize(new Dimension(23, 23));
+        jbViewAccountingRecord.addActionListener(this);
+        jbViewAccountingRecord.setToolTipText("Ver póliza contable");
+
+        jbViewAccountingDetailsDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_QUERY_DOC));
+        jbViewAccountingDetailsDps.setPreferredSize(new Dimension(23, 23));
+        jbViewAccountingDetailsDps.addActionListener(this);
+        jbViewAccountingDetailsDps.setToolTipText("Ver movimientos documento");
+
+        jbViewAccountingDetailsBizPartner = new JButton(miClient.getImageIcon(SLibConstants.ICON_QUERY_BP));
+        jbViewAccountingDetailsBizPartner.setPreferredSize(new Dimension(23, 23));
+        jbViewAccountingDetailsBizPartner.addActionListener(this);
+        jbViewAccountingDetailsBizPartner.setToolTipText("Ver movimientos asociado de negocios");
+        
+        jbUploadXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
         jbUploadXml.setPreferredSize(new Dimension(23, 23));
         jbUploadXml.addActionListener(this);
-        jbUploadXml.setToolTipText("Cargar XML de pagos");
+        jbUploadXml.setToolTipText("Anexar CFDI de pagos");
         
         jbVinculeXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_ADD));
         jbVinculeXml.setPreferredSize(new Dimension(23, 23));
         jbVinculeXml.addActionListener(this);
-        jbVinculeXml.setToolTipText("Vincular XML de pagos");
+        jbVinculeXml.setToolTipText("Vincular CFDI de pagos");
         
         jbRemoveXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_REM));
         jbRemoveXml.setPreferredSize(new Dimension(23, 23));
         jbRemoveXml.addActionListener(this);
-        jbRemoveXml.setToolTipText("Eliminar XML de pagos");
+        jbRemoveXml.setToolTipText("Eliminar todos los CFDI de pagos");
         
         jbDownloadXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
         jbDownloadXml.setPreferredSize(new Dimension(23, 23));
         jbDownloadXml.addActionListener(this);
-        jbDownloadXml.setToolTipText("Descargar XML de pagos");
+        jbDownloadXml.setToolTipText("Descargar todos los CFDI de pagos");
         
-        jbMarkXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_EDIT));
+        jbMarkXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_SHIP_INT_DEL));
         jbMarkXml.setPreferredSize(new Dimension(23, 23));
         jbMarkXml.addActionListener(this);
-        jbMarkXml.setToolTipText("Marcar como concluido a complemento de pago");
+        jbMarkXml.setToolTipText("Marcar como terminada");
         
-        jbDismarkXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_EDIT));
+        jbDismarkXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_SHIP_INT_RET));
         jbDismarkXml.setPreferredSize(new Dimension(23, 23));
         jbDismarkXml.addActionListener(this);
-        jbDismarkXml.setToolTipText("Desmarcar como concluido a complemento de pago");
+        jbDismarkXml.setToolTipText("Desmarcar como terminada");
         
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewLinks);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jbViewAccountingRecord);
+        addTaskBarUpperComponent(jbViewAccountingDetailsDps);
+        addTaskBarUpperComponent(jbViewAccountingDetailsBizPartner);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbUploadXml);
         addTaskBarUpperComponent(jbVinculeXml);
         addTaskBarUpperComponent(jbRemoveXml);
@@ -102,10 +132,14 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
         addTaskBarUpperComponent(jbDismarkXml);
         
         jbViewLinks.setEnabled(true);
-        jbUploadXml.setEnabled(true);
-        jbVinculeXml.setEnabled(true);
+        jbUploadXml.setEnabled(getTabTypeAux01() != SDataConstantsSys.TRNX_DPS_CFD_PAY_DONE);
+        jbVinculeXml.setEnabled(getTabTypeAux01() != SDataConstantsSys.TRNX_DPS_CFD_PAY_DONE);
         jbRemoveXml.setEnabled(true);
         jbDownloadXml.setEnabled(true);
+        jbMarkXml.setEnabled(getTabTypeAux01() != SDataConstantsSys.TRNX_DPS_CFD_PAY_DONE);
+        jbDismarkXml.setEnabled(getTabTypeAux01() == SDataConstantsSys.TRNX_DPS_CFD_PAY_DONE);
+        
+        moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
         
         int i;
        
@@ -145,7 +179,7 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key_local", "Moneda local", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_count_pay", "Pagos", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_count_cp", "XML de pagos", 50);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "done", "Marcado como terminado", 50);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "done", "Terminada", 50);
         
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -161,7 +195,6 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
         mvSuscriptors.add(SDataConstants.TRN_DPS);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
         mvSuscriptors.add(SDataConstants.BPSU_BPB);
-        mvSuscriptors.add(SDataConstants.TRN_DPS_CFD_PAY);
 
         populateTable();
     }
@@ -174,6 +207,53 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
         if (jbViewLinks.isEnabled()) {
             if (isRowSelected()) {
                 SModuleUtilities.showDocumentLinks(miClient, moTablePane.getSelectedTableRow());
+            }
+        }
+    }
+    
+    private void actionViewAccountingRecord() {
+        if (jbViewAccountingRecord.isEnabled()) {
+            if (isRowSelected()) {
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                
+                if (dps.getDbmsRecordKey() == null) {
+                    miClient.showMsgBoxInformation("El documento no tiene póliza contable.");
+                }
+                else {
+                    miClient.getGuiModule(SDataConstants.MOD_FIN).showForm(SDataConstants.FINX_REC_RO, dps.getDbmsRecordKey());
+                }
+            }
+        }
+    }
+
+    private void actionViewAccountingDetailsDps() {
+        if (jbViewAccountingDetailsDps.isEnabled()) {
+            if (isRowSelected()) {
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+
+                moDialogAccountingMoveDpsBizPartner.refreshAccountingDetail();
+                moDialogAccountingMoveDpsBizPartner.setParamBizPartnerName(bizPartner.getBizPartner());
+                moDialogAccountingMoveDpsBizPartner.setParamDpsNumber(dps.getNumberSeries() + (dps.getNumberSeries().length() == 0 ? "" : "-") + dps.getNumber());
+                moDialogAccountingMoveDpsBizPartner.setParamDpsKey(moTablePane.getSelectedTableRow().getPrimaryKey());
+                moDialogAccountingMoveDpsBizPartner.setParamBizPartnerKey(null);
+                moDialogAccountingMoveDpsBizPartner.showAccountingDetail(miClient.getSessionXXX().getWorkingYear(), miClient.getSessionXXX().getWorkingDate());
+            }
+        }
+    }
+
+    private void actionViewAccountingDetailsBizPartner() {
+        if (jbViewAccountingDetailsDps.isEnabled()) {
+            if (isRowSelected()) {
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+
+                moDialogAccountingMoveDpsBizPartner.refreshAccountingDetail();
+                moDialogAccountingMoveDpsBizPartner.setParamBizPartnerName(bizPartner.getBizPartner());
+                moDialogAccountingMoveDpsBizPartner.setParamDpsNumber("");
+                moDialogAccountingMoveDpsBizPartner.setParamDpsKey(null);
+                moDialogAccountingMoveDpsBizPartner.setParamBizPartnerKey(new int[] { dps.getFkBizPartnerId_r() });
+                moDialogAccountingMoveDpsBizPartner.showAccountingDetail(miClient.getSessionXXX().getWorkingYear(), miClient.getSessionXXX().getWorkingDate());
             }
         }
     }
@@ -207,7 +287,7 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
                             pay.setAuxBizPartner(bpId);
                             if (pay.save(miClient.getSession().getDatabase().getConnection()) == SLibConstants.DB_ACTION_SAVE_OK) { 
                                 miClient.showMsgBoxInformation("XML anexado.");
-                                moTablePane.repaint();
+                                actionReload();
                             }
                         }
                         else {
@@ -237,6 +317,7 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
                     SDialogCfdiPaymentPicker pic = new SDialogCfdiPaymentPicker(miClient);
                     pic.setValue(bpId, ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
                     pic.setVisible(true);
+                    actionReload();
                 }
                 catch (Exception e) {
                     miClient.showMsgBoxWarning(e.getMessage());
@@ -265,7 +346,7 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
                             pay.save(miClient.getSession().getDatabase().getConnection());
                         }
                         miClient.showMsgBoxInformation("XML de pagos elimidados.");
-                        moTablePane.renderTableRows();
+                        actionReload();
                     }
                 }
                 catch (Exception e) {
@@ -280,27 +361,33 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
             if (isRowSelected()) {
                 try {
                     miClient.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        File fileAux = miClient.getFileChooser().getSelectedFile();
-                        miClient.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
-                        String sql = "SELECT id_cfd_pay FROM trn_dps_cfd_pay "
-                                    + "WHERE id_year = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + " "
-                                    + "AND id_doc = " + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1];
-                        ResultSet resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sql);
-                        while (resultSet.next()) {
-                            SDataDpsCfdPayment pay = new SDataDpsCfdPayment();
-                            pay.read(new int[] {
-                                ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0],
-                                ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1],
-                                resultSet.getInt(1)
-                            }, miClient.getSession().getStatement());
-                            miClient.getFileChooser().setSelectedFile(new File(fileAux, pay.getAuxCfdName()));
-                            File file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
-                            try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"))) {
-                                bw.write(pay.getAuxCfd());
+                    String sql = "SELECT id_cfd_pay FROM trn_dps_cfd_pay "
+                                + "WHERE id_year = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + " "
+                                + "AND id_doc = " + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1];
+                    ResultSet resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sql);
+                    if (!resultSet.next()){
+                        miClient.showMsgBoxInformation("La factura no tiene CFDIs de pago anexados.");
+                    }
+                    else {
+                        if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                            File fileAux = miClient.getFileChooser().getSelectedFile();
+                            miClient.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
+                            resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sql);
+                            while (resultSet.next()) {
+                                SDataDpsCfdPayment pay = new SDataDpsCfdPayment();
+                                pay.read(new int[] {
+                                    ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0],
+                                    ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1],
+                                    resultSet.getInt(1)
+                                }, miClient.getSession().getStatement());
+                                miClient.getFileChooser().setSelectedFile(new File(fileAux, pay.getAuxCfdName()));
+                                File file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
+                                try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"))) {
+                                    bw.write(pay.getAuxCfd());
+                                }
                             }
+                            miClient.showMsgBoxInformation("XML de pagos descargados con éxito.");
                         }
-                        miClient.showMsgBoxInformation("XML de pagos descargados con éxito.");
                     }
                 }
                 catch (HeadlessException | SQLException | IOException e) {
@@ -313,11 +400,13 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
     private void actionMark(){
         if (isRowSelected()) {
             try {
-                String sql = "INSERT INTO trn_dps_cfd_pay_done VALUES "
-                            + "(" + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + ", "
-                            + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1] + ", " + miClient.getSession().getUser().getPkUserId() + ", NOW())";
-                miClient.getSession().getDatabase().getConnection().createStatement().execute(sql);
-                
+                if (miClient.showMsgBoxConfirm("La factura se marcará como 'terminada' y aparecerá en la vista de facturas con CFDI de pagos anexados.\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
+                    String sql = "INSERT INTO trn_dps_cfd_pay_done VALUES "
+                                + "(" + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + ", "
+                                + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1] + ", " + miClient.getSession().getUser().getPkUserId() + ", NOW())";
+                    miClient.getSession().getDatabase().getConnection().createStatement().execute(sql);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                }
             }
             catch (Exception e){
                 System.out.println("error");
@@ -328,10 +417,13 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
     private void actionDismark(){
         if (isRowSelected()) {
             try {
-                String sql = "DELETE FROM trn_dps_cfd_pay_done WHERE "
-                            + "id_year = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + " AND id_doc = "
-                            + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1] + " ";
-                miClient.getSession().getDatabase().getConnection().createStatement().execute(sql);
+                if (miClient.showMsgBoxConfirm("La factura se desmarcará como 'terminada' y aparecerá en la vista de facturas con CFDI de pagos por anexar.\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
+                    String sql = "DELETE FROM trn_dps_cfd_pay_done WHERE "
+                                + "id_year = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + " AND id_doc = "
+                                + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1] + " ";
+                    miClient.getSession().getDatabase().getConnection().createStatement().execute(sql);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                }
             }
             catch (Exception e){
                 System.out.println("error");
@@ -362,7 +454,7 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
 
     @Override
     public void createSqlQuery() {
-        java.lang.String sqlWhere = "";
+        java.lang.String sqlWhere = " dt > '2023-04-30' AND ";
         erp.lib.table.STableSetting setting;
         
         if (getTabTypeAux01() == SDataConstantsSys.TRNX_DPS_CFD_PAY_DONE) {
@@ -448,6 +540,15 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
 
                 if (button == jbViewLinks) {
                     actionViewLinks();
+                }
+                else if (button == jbViewAccountingRecord) {
+                    actionViewAccountingRecord();
+                }
+                else if (button == jbViewAccountingDetailsDps) {
+                    actionViewAccountingDetailsDps();
+                }
+                else if (button == jbViewAccountingDetailsBizPartner) {
+                    actionViewAccountingDetailsBizPartner();
                 }
                 else if (button == jbUploadXml) {
                     actionUploadXml();

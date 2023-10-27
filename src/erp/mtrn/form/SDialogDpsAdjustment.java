@@ -56,7 +56,8 @@ public class SDialogDpsAdjustment extends javax.swing.JDialog implements erp.lib
     private erp.mtrn.data.SDataDps moParamDps;
     private erp.mtrn.form.SPanelDps moPanelDps;
 
-    /** Creates new form SDialogDpsAdjustment */
+    /** Creates new form SDialogDpsAdjustment
+     * @param client */
     public SDialogDpsAdjustment(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -342,7 +343,7 @@ public class SDialogDpsAdjustment extends javax.swing.JDialog implements erp.lib
             entry.setAmountToDiscount(entry.getValues().get(COL_AMT_TO_DISCOUNT) == null ? 0d : ((Number) entry.getValues().get(COL_AMT_TO_DISCOUNT)).doubleValue());
         }
     }
-
+    
     private void actionSetEverything() {
         int index = moTablePane.getTable().getSelectedRow();
         SDataEntryDpsDpsAdjustment entry = null;
@@ -477,7 +478,7 @@ public class SDialogDpsAdjustment extends javax.swing.JDialog implements erp.lib
 
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
             SDataEntryDpsDpsAdjustment entry = (SDataEntryDpsDpsAdjustment) moTablePane.getTableRow(i);
-
+            
             if (isAdjustmentReturn()) {
                 if (entry.getQuantityToReturn() > 0) {
                     if (entry.getQuantityToReturn() > entry.getQuantityNet()) {

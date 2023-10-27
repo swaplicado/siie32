@@ -111,6 +111,8 @@ import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
+import erp.mod.trn.view.SViewReportMaterialConsuption;
+import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
 import erp.mod.trn.view.SViewValCost;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
@@ -744,6 +746,16 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_DET_CC_GRP_VS_USR:
                 view = new SViewConfMatCostCenterGroupUserDetail(miClient, "Grupo centro costo x usuarios detalle");
+                break;
+            case SModConsts.TRNX_MAT_CONS:
+                view = new SViewReportMaterialConsuption(miClient, "Consumo de materiales");
+                break;
+            case SModConsts.TRNX_MAT_CONS_CC:
+                switch (subtype) {
+                    case SModConsts.TRNX_MAT_CONS_CC_R: title = "CC por consumo de materiales resumen"; break;
+                    default: title = "CC por consumo de materiales"; break;
+                }
+                view = new SViewReportMaterialConsuptionCC(miClient, subtype, title);
                 break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");

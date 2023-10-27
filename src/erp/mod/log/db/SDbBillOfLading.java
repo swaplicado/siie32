@@ -1145,9 +1145,9 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 }
             }
             
-            // Pedimentos:
+            // Documentación aduanera:
             
-            //ArrayList<DElementPedimentos> pedimento = mercancia.getEltPedimentos();
+            //ArrayList<DElementDocumentacionAduanera> docAdu = mercancia.getEltDocumentacionAduanera();
             
             mercancias.add(mercancia);
         }

@@ -381,8 +381,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace = new JMenuItem("Rastreo de vínculos de facturas");
         jmiDpsDocChangeItem = new JMenuItem("Historial modificación facturas ítem/concepto");
         jmiDpsDpsItemAll = new JMenuItem("Historial modificación documentos");
-        jmiDpsCfdPay = new JMenuItem("Facturas de compras con complemento de pago pendiente");
-        jmiDpsCfdPayDone = new JMenuItem("Facturas de compras con complemento de pago anexado");
+        jmiDpsCfdPay = new JMenuItem("Facturas de compras con CFDI de pagos por anexar");
+        jmiDpsCfdPayDone = new JMenuItem("Facturas de compras con CFDI de pagos anexados");
         jmiDpsAutPending = new JMenuItem("Facturas por autorizar");
         jmiDpsAutAutorized = new JMenuItem("Facturas autorizadas");
         jmiDpsAutReject = new JMenuItem("Facturas rechazadas");
