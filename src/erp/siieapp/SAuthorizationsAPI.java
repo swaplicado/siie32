@@ -216,6 +216,7 @@ public class SAuthorizationsAPI {
         return jsonDr;
     }
 
+    @SuppressWarnings("unchecked")
     public String getSteps(int pk) {
         ArrayList<SDbAuthorizationStep> res = new ArrayList<>();
         res = SAuthorizationUtils.getResourceAuthSteps(oSession, 1, new int[]{pk});

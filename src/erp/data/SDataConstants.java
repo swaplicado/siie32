@@ -250,8 +250,8 @@ public abstract class SDataConstants {
     public static final int ITMU_ITEM_BARC = 205011;
     public static final int ITMU_CFG_ITEM_LAN = 205012;
     public static final int ITMU_CFG_ITEM_BP = 205013;
-    public static final int ITMU_TP_MAT_ATT = 205029;
-    public static final int ITMU_ITEM_ATT_MAT = 205030;
+    public static final int ITMU_TP_MAT_MAT_ATT = 205029;
+    public static final int ITMU_ITEM_MAT_ATT = 205030;
     public static final int ITMU_MATCH_ITEM_CPT_BP = 205051;
     public static final int ITMU_TP_UNIT = 205014;
     public static final int ITMU_TP_LEV = 205015;
@@ -390,7 +390,7 @@ public abstract class SDataConstants {
     public static final int FINX_REC_W_XML = 206521;
     public static final int FINX_REC_CFD_DIRECT = 206522;
     public static final int FINX_REC_CFD_INDIRECT = 206523;
-    public static final int FINX_MOVES_ABH = 206524;
+    public static final int FINX_MOVES_ACC_DET_VIEW = 206524;
     
     public static final int TRNS_CT_DPS = 207001;
     public static final int TRNS_CL_DPS = 207002;
@@ -504,7 +504,9 @@ public abstract class SDataConstants {
     public static final int TRN_DNC_DIOG = 207088;
     public static final int TRN_DNC_DIOG_DNS = 207089;
     public static final int TRN_DPS_UPD_DT_LOG = 207093;
-    public static final int TRN_DPS_CFD_PAY = 207203;
+    public static final int TRN_DPS_CFD_PAY = 207196;
+    public static final int TRN_DPS_CFD_PAY_DONE = 207197;
+    public static final int TRN_CFD_PAY = 207191;
 
     public static final int TRNX_DPS_RO_STK = 207504;
     public static final int TRNX_DPS_RO = 207505;
@@ -839,8 +841,8 @@ public abstract class SDataConstants {
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
-        TablesMap.put(ITMU_TP_MAT_ATT, "erp.itmu_mat_tp_att");
-        TablesMap.put(ITMU_ITEM_ATT_MAT, "erp.itmu_item_att_mat");
+        TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
+        TablesMap.put(ITMU_ITEM_MAT_ATT, "erp.itmu_item_mat_att");
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
@@ -1054,6 +1056,8 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DNC_DIOG, "trn_dnc_diog");
         TablesMap.put(TRN_DNC_DIOG_DNS, "trn_dnc_diog_dns");
         TablesMap.put(TRN_DPS_CFD_PAY, "trn_dps_cfd_pay");
+        TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
 
         TablesMap.put(MKT_CFG_CUS, "mkt_cfg_cus");
         TablesMap.put(MKT_CFG_CUSB, "mkt_cfg_cusb");

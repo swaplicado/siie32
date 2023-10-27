@@ -125,6 +125,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsLinksTrace;
     private javax.swing.JMenuItem jmiDpsDocChangeItem;
     private javax.swing.JMenuItem jmiDpsDpsItemAll;
+    private javax.swing.JMenuItem jmiDpsCfdPay;
+    private javax.swing.JMenuItem jmiDpsCfdPayDone;
     private javax.swing.JMenuItem jmiDpsAutPending;
     private javax.swing.JMenuItem jmiDpsAutAutorized;
     private javax.swing.JMenuItem jmiDpsAutReject;
@@ -379,6 +381,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace = new JMenuItem("Rastreo de vínculos de facturas");
         jmiDpsDocChangeItem = new JMenuItem("Historial modificación facturas ítem/concepto");
         jmiDpsDpsItemAll = new JMenuItem("Historial modificación documentos");
+        jmiDpsCfdPay = new JMenuItem("Facturas de compras con complemento de pago pendiente");
+        jmiDpsCfdPayDone = new JMenuItem("Facturas de compras con complemento de pago anexado");
         jmiDpsAutPending = new JMenuItem("Facturas por autorizar");
         jmiDpsAutAutorized = new JMenuItem("Facturas autorizadas");
         jmiDpsAutReject = new JMenuItem("Facturas rechazadas");
@@ -398,6 +402,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.addSeparator();
         jmDps.add(jmiDpsDocChangeItem);
         jmDps.add(jmiDpsDpsItemAll);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsCfdPay);
+        jmDps.add(jmiDpsCfdPayDone);
         jmDps.addSeparator();
         jmDps.add(jmiDpsAutPending);
         jmDps.add(jmiDpsAutAutorized);
@@ -654,6 +661,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace.addActionListener(this);
         jmiDpsDocChangeItem.addActionListener(this);
         jmiDpsDpsItemAll.addActionListener(this);
+        jmiDpsCfdPay.addActionListener(this);
+        jmiDpsCfdPayDone.addActionListener(this);
         jmiDpsAutPending.addActionListener(this);
         jmiDpsAutAutorized.addActionListener(this);
         jmiDpsAutReject.addActionListener(this);
@@ -781,6 +790,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace.setEnabled(hasRightDocTransaction);
         jmiDpsDocChangeItem.setEnabled(hasRightDocTransaction);
         jmiDpsDpsItemAll.setEnabled(hasRightDocTransaction);
+        jmiDpsCfdPay.setEnabled(hasRightDocTransaction);
+        jmiDpsCfdPayDone.setEnabled(hasRightDocTransaction);
         jmiDpsAudPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAudAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAnnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
@@ -1171,6 +1182,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRN_DPS:
                     oViewClass = erp.mtrn.view.SViewDps.class;
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02);
+                    break;
+                    
+                case SDataConstants.TRN_DPS_CFD_PAY:
+                    oViewClass = erp.mtrn.view.SViewDpsCfdPayment.class;
+                    sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType01);
                     break;
                 
                 case SDataConstants.TRNX_DPS_DETAIL:
@@ -1631,6 +1647,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsDpsItemAll) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+            }
+            else if (item == jmiDpsCfdPay) {
+                showView(SDataConstants.TRN_DPS_CFD_PAY, SDataConstantsSys.TRNX_DPS_CFD_PAY);
+            }
+            else if (item == jmiDpsCfdPayDone) {
+                showView(SDataConstants.TRN_DPS_CFD_PAY, SDataConstantsSys.TRNX_DPS_CFD_PAY_DONE);
             }
             else if (item == jmiDpsAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_PEND);

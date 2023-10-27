@@ -1,9 +1,21 @@
 ================================================================================
+SIIE 3.2 225.2/ 2023-10-27
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Adición de colunma crédito y débito en la vista de auxiliares contables.
+2) Correción de la constante de la vista de auxiliares contables.
+
+================================================================================
+SIIE 3.2 225.1/ 2023-10-25
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de funcionalidades del catálogo de materiales por cambio en nombres de tablas en la BD.
+
+================================================================================
 SIIE 3.2 225.0/ 2023-10-20
 Edwin Omar CARMONA FIGUEROA
-
 --------------------------------------------------------------------------------
-1)Configuración de autorizaciones mediante puestos de usuarios ligados a empleados.
+1) Configuración de autorizaciones mediante puestos de usuarios ligados a empleados.
 
 ================================================================================
 SIIE 3.2 224.1/ 2023-10-18

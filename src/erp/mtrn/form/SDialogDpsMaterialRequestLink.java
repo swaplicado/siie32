@@ -186,7 +186,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
         jlPanelMatRequest.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jlPanelMatRequest.setText("[Panel de documento de requisición]");
-        jlPanelMatRequest.setPreferredSize(new java.awt.Dimension(100, 200));
+        jlPanelMatRequest.setPreferredSize(new java.awt.Dimension(100, 180));
         jpDps.add(jlPanelMatRequest, java.awt.BorderLayout.NORTH);
 
         jpOptions.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas del documento disponibles para vinculación:"));
@@ -344,16 +344,29 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
     private boolean validateQuantitiesToLink() {
         boolean warning = false;
+        boolean minorZero = false;
         SDataMaterialRequestEntryLinkRow entry = null;
-
+        double totalQty = 0d;
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
             entry = (SDataMaterialRequestEntryLinkRow) moTablePane.getTableRow(i);
             if (entry.getQuantityToLinkV() > entry.getQuantityRemaining()) {
                 warning = true;
+            }
+            if (entry.getQuantityToLinkV() < 0d) {
+                minorZero = true;
                 break;
             }
+            totalQty += entry.getQuantityToLinkV();
         }
 
+        if (minorZero) {
+            miClient.showMsgBoxWarning("No puede vincular cantidades negativas");
+            return false;
+        }
+        if (totalQty <= 0d) {
+            miClient.showMsgBoxWarning("Tiene que vincular al menos una partida");
+            return false;
+        }
         if (warning) {
             return miClient.showMsgBoxConfirm("Algunas partidas rebasan la cantidad de la requisición \n ¿Desea continuar?") == JOptionPane.YES_OPTION;
         }
@@ -396,6 +409,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionChangeConsumeEntity() {
         if (moFieldFinderConsumeEntity.getKeyAsIntArray() != null && moFieldFinderConsumeEntity.getKeyAsIntArray()[0] > 0) {
             SFormUtilities.populateComboBox(miClient, jcbFinderConsSubEntity, SDataConstants.TRN_MAT_CONS_SUBENT, new int[] { moFieldFinderConsumeEntity.getKeyAsIntArray()[0] });
@@ -473,10 +487,10 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 oEntry.setConcept(oTableRow.getItem().getName());
                 oEntry.setOriginalQuantity(oTableRow.getQuantityToLinkV());
                 oEntry.setQuantity(SLibUtilities.round(oEntry.getOriginalQuantity() * ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(oEntry.getFkItemId(), oEntry.getFkOriginalUnitId(), oEntry.getFkUnitId()), miClient.getSessionXXX().getParamsErp().getDecimalsQuantity()));
-                oEntry.setPriceUnitary(oTableRow.getMaterialRequestEntry().getPriceUnitary());
-                oEntry.setPriceUnitarySystem(oTableRow.getMaterialRequestEntry().getPriceUnitarySystem());
-                oEntry.setOriginalPriceUnitaryCy(oTableRow.getMaterialRequestEntry().getPriceUnitary());
-                oEntry.setOriginalPriceUnitarySystemCy(oTableRow.getMaterialRequestEntry().getPriceUnitarySystem());
+                oEntry.setPriceUnitary(oTableRow.getUnitaryPrice());
+                oEntry.setPriceUnitarySystem(oTableRow.getUnitaryPrice());
+                oEntry.setOriginalPriceUnitaryCy(oTableRow.getUnitaryPrice());
+                oEntry.setOriginalPriceUnitarySystemCy(oTableRow.getUnitaryPrice());
 
                 oEntry.setFkItemId(oTableRow.getItem().getPkItemId());
                 oEntry.setFkUnitId(oTableRow.getItem().getFkUnitId());
@@ -501,6 +515,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 if (idCc > 0) {
                     oEntry.setFkCostCenterId_n(SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), idCc));
                 }
+                oEntry.setFkItemRefId_n(oTableRow.getMaterialRequestEntry().getFkItemReferenceId_n());
                 oEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 oEntry.setIsTaxesAutomaticApplying(true);
 
@@ -615,6 +630,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbFinderUser, SDataConstants.USRU_USR);
         SFormUtilities.populateComboBox(miClient, jcbFinderConsEntity, SDataConstants.TRN_MAT_CONS_ENT);

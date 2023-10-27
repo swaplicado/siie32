@@ -1729,9 +1729,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                             oViewClass = erp.mfin.view.SViewAccountMoves.class;
                             sViewTitle = "Movimientos de cuentas contables";
                             break;
-                        case SDataConstants.FINX_MOVES_ABH:
+                        case SDataConstants.FINX_MOVES_ACC_DET_VIEW:
                             oViewClass = erp.mfin.view.SViewAuxDetaill.class;
-                            sViewTitle = "Reporte Abraham";
+                            sViewTitle = "Auxiliares contables a detalle";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -2324,7 +2324,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepAccountConcept(miClient, SDataConstants.FINU_TP_TAX_CPT).setVisible(true);
             }
             else if (item == jmiRepViewAccMovsDetail) {
-                showView(SDataConstants.FINX_ACCOUNTING, SDataConstants.FINX_MOVES_ABH);
+                showView(SDataConstants.FINX_ACCOUNTING, SDataConstants.FINX_MOVES_ACC_DET_VIEW);
             }
             else if (item == jmiRepContributionMargin) {
                 new SDialogRepContributionMargin(miClient.getSession().getClient(), "Reporte margen de contribución").setVisible(true);

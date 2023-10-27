@@ -397,6 +397,7 @@ public abstract class SMaterialRequestUtils {
         return ccg;
     }
     
+    @SuppressWarnings("unchecked")
     public static SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
         String sql = "";
         ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
@@ -430,6 +431,11 @@ public abstract class SMaterialRequestUtils {
                                 + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
                                 + "ORDER BY a.item_key, a.item, a.id_item ";
                         break;
+                    case SLibConstants.UNDEFINED:
+                        sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
+                                + "WHERE NOT a.b_del ";
                 }
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));

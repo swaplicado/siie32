@@ -23,10 +23,10 @@ public abstract class SMaterialUtils {
         ResultSet res = null;
         try {
             String sql = "SELECT id_mat_att "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT_ATT) + " "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT_MAT_ATT) + " "
                     + "WHERE NOT b_del "
                     + (idMaterialType > 0 ? ("AND id_tp_mat = " + idMaterialType + " ") : "")
-                    + "ORDER BY sort ASC LIMIT " + SDataMaterialTypeAttribute.MAX_ATTRIBUTES + ";";
+                    + "ORDER BY sort ASC LIMIT " + SDataTypeMaterialAttribute.MAX_ATTRIBUTES + ";";
             
             res = statement.getConnection().createStatement().executeQuery(sql);
             ArrayList<SDataMaterialAttribute> lAttributes = new ArrayList<>();
@@ -75,15 +75,15 @@ public abstract class SMaterialUtils {
     public static void saveSelectedAttributes(SGuiSession session, ArrayList<SDataMaterialAttribute> lNewAttributes, final int idMaterialType) {
         try {
             String sql = "DELETE "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT_ATT) + " "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT_MAT_ATT) + " "
                     + "WHERE id_tp_mat = " + idMaterialType + ";";
 
             session.getStatement().getConnection().createStatement().execute(sql);
             
             int sortOrder = 1;
-            SDataMaterialTypeAttribute oCfg;
+            SDataTypeMaterialAttribute oCfg;
             for (SDataMaterialAttribute oNewAttribute : lNewAttributes) {
-                oCfg = new SDataMaterialTypeAttribute();
+                oCfg = new SDataTypeMaterialAttribute();
                 oCfg.setPkItemMaterialAttributeId(oNewAttribute.getPkMaterialAttributeId());
                 oCfg.setPkItemMaterialTypeId(idMaterialType);
                 oCfg.setSortingPos(sortOrder);

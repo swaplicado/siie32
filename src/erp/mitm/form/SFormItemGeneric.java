@@ -76,6 +76,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private erp.lib.form.SFormField moFieldIsItemKeyEditable;
     private erp.lib.form.SFormField moFieldIsItemNameEditable;
     private erp.lib.form.SFormField moFieldIsBulk;
+    private erp.lib.form.SFormField moFieldIsMaterial;
     private erp.lib.form.SFormField moFieldIsInventoriable;
     private erp.lib.form.SFormField moFieldIsLotApplying;
     private erp.lib.form.SFormField moFieldDaysForExpiration;
@@ -226,6 +227,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jckIsItemKeyEditable = new javax.swing.JCheckBox();
         jpRegistry2215 = new javax.swing.JPanel();
         jckIsBulk = new javax.swing.JCheckBox();
+        jckIsMaterial = new javax.swing.JCheckBox();
         jpRegistry2214 = new javax.swing.JPanel();
         jckIsInventoriable = new javax.swing.JCheckBox();
         jckIsLotApplying = new javax.swing.JCheckBox();
@@ -635,6 +637,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jckIsBulk.setText("Es a granel");
         jckIsBulk.setPreferredSize(new java.awt.Dimension(125, 23));
         jpRegistry2215.add(jckIsBulk);
+
+        jckIsMaterial.setText("Es material");
+        jckIsMaterial.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpRegistry2215.add(jckIsMaterial);
 
         jpRegistry221.add(jpRegistry2215);
 
@@ -1372,6 +1378,8 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldIsItemNameEditable.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsBulk = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsBulk);
         moFieldIsBulk.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldIsMaterial = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsMaterial);
+        moFieldIsMaterial.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsInventoriable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsInventoriable);
         moFieldIsInventoriable.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsLotApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsLotApplying);
@@ -1530,6 +1538,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldIsItemKeyEditable);
         mvFields.add(moFieldIsItemNameEditable);
         mvFields.add(moFieldIsBulk);
+        mvFields.add(moFieldIsMaterial);
         mvFields.add(moFieldIsInventoriable);
         mvFields.add(moFieldIsLotApplying);
         mvFields.add(moFieldDaysForExpiration);
@@ -2310,6 +2319,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JCheckBox jckIsMassApplying;
     private javax.swing.JCheckBox jckIsMassUnitaryApplying;
     private javax.swing.JCheckBox jckIsMassVariable;
+    private javax.swing.JCheckBox jckIsMaterial;
     private javax.swing.JCheckBox jckIsNetContentApplying;
     private javax.swing.JCheckBox jckIsNetContentUnitaryApplying;
     private javax.swing.JCheckBox jckIsNetContentVariable;
@@ -2733,6 +2743,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldIsItemKeyEditable.setFieldValue(moItemGeneric.getIsItemKeyEditable());
         moFieldIsItemNameEditable.setFieldValue(moItemGeneric.getIsItemNameEditable());
         moFieldIsBulk.setFieldValue(moItemGeneric.getIsBulk());
+        moFieldIsMaterial.setFieldValue(moItemGeneric.getIsMaterial());
         moFieldIsInventoriable.setFieldValue(moItemGeneric.getIsInventoriable());
         renderIsInventoriableSettings();
         moFieldIsLotApplying.setFieldValue(moItemGeneric.getIsLotApplying());
@@ -2856,6 +2867,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moItemGeneric.setIsItemKeyEditable(moFieldIsItemKeyEditable.getBoolean());
         moItemGeneric.setIsItemNameEditable(moFieldIsItemNameEditable.getBoolean());
         moItemGeneric.setIsBulk(moFieldIsBulk.getBoolean());
+        moItemGeneric.setIsMaterial(moFieldIsMaterial.getBoolean());
         moItemGeneric.setIsInventoriable(moFieldIsInventoriable.getBoolean());
         moItemGeneric.setIsLotApplying(moFieldIsLotApplying.getBoolean());
         moItemGeneric.setDaysForExpiration(moFieldDaysForExpiration.getInteger());

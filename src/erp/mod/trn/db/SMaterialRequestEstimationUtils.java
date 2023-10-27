@@ -89,7 +89,6 @@ public abstract class SMaterialRequestEstimationUtils {
     public static void sendMails(SGuiClient client, ArrayList<SProviderMailRow> lProviderRows) {
         SDbMms mms = STrnUtilities.getMms((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ);
         SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
-//        sender.setMailFrom("AETH");
         String img = "firmas/" + client.getSession().getUser().getName() + ".jpg";
         String basePath = System.getProperty("user.dir");
         String imageFilePath = basePath + "/" + img;
@@ -100,12 +99,12 @@ public abstract class SMaterialRequestEstimationUtils {
             if (oProviderRow.getTo().isEmpty()) {
                 continue;
             }
-            ArrayList<String> lTo = new ArrayList();
+            ArrayList<String> lTo = new ArrayList<>();
             String[] tos = oProviderRow.getTo().split(";");
             for (String to : tos) {
                 lTo.add(to.trim());
             }
-            ArrayList<String> lCc = new ArrayList();
+            ArrayList<String> lCc = new ArrayList<>();
             String[] ccs = oProviderRow.getCc().split(";");
             for (String cc : ccs) {
                 if (cc.isEmpty()) {
@@ -113,7 +112,7 @@ public abstract class SMaterialRequestEstimationUtils {
                 }
                 lCc.add(cc.trim());
             }
-            ArrayList<String> lCco = new ArrayList();
+            ArrayList<String> lCco = new ArrayList<>();
             String[] ccos = oProviderRow.getCco().split(";");
             for (String cco : ccos) {
                 if (cco.isEmpty()) {

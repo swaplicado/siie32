@@ -130,7 +130,6 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         jlAux2 = new javax.swing.JLabel();
         jbAddProviderRow = new javax.swing.JButton();
         jPanel19 = new javax.swing.JPanel();
-        jpRequisitionMaterialRows1 = new javax.swing.JPanel();
         jpProviderMailRows = new javax.swing.JPanel();
         jPanel22 = new javax.swing.JPanel();
         jpCommands4 = new javax.swing.JPanel();
@@ -199,11 +198,12 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
 
         jPanel8.setLayout(new java.awt.BorderLayout());
 
+        jpBenefit1.setPreferredSize(new java.awt.Dimension(1005, 290));
         jpBenefit1.setLayout(new java.awt.BorderLayout());
 
         jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del correo:"));
         jPanel10.setPreferredSize(new java.awt.Dimension(400, 180));
-        jPanel10.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
+        jPanel10.setLayout(new java.awt.GridLayout(10, 1, 0, 1));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -304,14 +304,10 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
 
         jPanel19.setLayout(new java.awt.BorderLayout());
 
-        jpRequisitionMaterialRows1.setBorder(javax.swing.BorderFactory.createTitledBorder("Proveedores:"));
-        jpRequisitionMaterialRows1.setPreferredSize(new java.awt.Dimension(100, 250));
-        jpRequisitionMaterialRows1.setLayout(new java.awt.BorderLayout());
-
+        jpProviderMailRows.setBorder(javax.swing.BorderFactory.createTitledBorder("Proveedores:"));
+        jpProviderMailRows.setPreferredSize(new java.awt.Dimension(100, 220));
         jpProviderMailRows.setLayout(new java.awt.BorderLayout());
-        jpRequisitionMaterialRows1.add(jpProviderMailRows, java.awt.BorderLayout.CENTER);
-
-        jPanel19.add(jpRequisitionMaterialRows1, java.awt.BorderLayout.NORTH);
+        jPanel19.add(jpProviderMailRows, java.awt.BorderLayout.NORTH);
 
         jPanel8.add(jPanel19, java.awt.BorderLayout.CENTER);
 
@@ -404,7 +400,6 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
     private javax.swing.JPanel jpMaterialRequest;
     private javax.swing.JPanel jpOptions;
     private javax.swing.JPanel jpProviderMailRows;
-    private javax.swing.JPanel jpRequisitionMaterialRows1;
     private javax.swing.JTextArea jtAreaBody;
     private sa.lib.gui.bean.SBeanFieldText moTextCC;
     private sa.lib.gui.bean.SBeanFieldText moTextCCO;
@@ -561,7 +556,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         msBodyDefault = SMaterialRequestEstimationUtils.getBodyOfEstimate(miClient);
         msBodyRows = "";
         
-        moGridProviderRows.populateGrid(new Vector());
+        moGridProviderRows.populateGrid(new Vector<>());
         moGridProviderRows.clearSortKeys();
         moGridProviderRows.clearGridRows();
         

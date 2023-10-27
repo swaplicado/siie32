@@ -200,8 +200,8 @@ public abstract class SModConsts {
     public static final int ITMU_ITEM_BARC = 1052007;
     public static final int ITMU_CFG_ITEM_LAN = 1052008;
     public static final int ITMU_CFG_ITEM_BP = 1052009;
-    public static final int ITMU_TP_MAT_ATT = 1052010;
-    public static final int ITMU_ITEM_ATT_MAT = 1052011;
+    public static final int ITMU_TP_MAT_MAT_ATT = 1052010;
+    public static final int ITMU_ITEM_MAT_ATT = 1052011;
     public static final int ITMU_MATCH_ITEM_CPT_BP = 1052021;
 
     public static final int ITMU_TP_LEV = 1052501;
@@ -219,6 +219,8 @@ public abstract class SModConsts {
     public static final int ITMU_MAT_ATT = 1052513;
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
+    
+    public static final int ITMX_IGEN_INV = 1053001;
 
     /*
      * Finance
@@ -484,7 +486,10 @@ public abstract class SModConsts {
     public static final int TRN_EST_REQ = 2023352;
     public static final int TRN_EST_REQ_ETY = 2023353;
     public static final int TRN_EST_REQ_REC = 2023354;
-
+    public static final int TRN_DPS_CFD_PAY = 2023096;
+    public static final int TRN_DPS_CFD_PAY_DONE = 2023097;
+    public static final int TRN_CFD_PAY = 2023091;
+    
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
     public static final int TRN_DNC_DIOG = 2023503;
@@ -527,6 +532,8 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_STK_SUP = 2024351;
     public static final int TRNX_CONF_WHS_VS_CON_ENT = 2024352;
     public static final int TRNX_DET_WHS_VS_CON_ENT = 2024353;
+    public static final int TRNX_MAT_REQ_ITM_SUP = 2024354;
+    public static final int TRNX_MAT_REQ_ITM_SUP_SEL = 2024355;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     
@@ -998,8 +1005,8 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
-        TablesMap.put(ITMU_TP_MAT_ATT, "erp.itmu_mat_tp_att");
-        TablesMap.put(ITMU_ITEM_ATT_MAT, "erp.itmu_item_att_mat");
+        TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
+        TablesMap.put(ITMU_ITEM_MAT_ATT, "erp.itmu_item_mat_att");
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP, "erp.itmu_match_item_cpt_bp");
 
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
@@ -1264,6 +1271,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_EST_REQ, "trn_est_req");
         TablesMap.put(TRN_EST_REQ_ETY, "trn_est_req_ety");
         TablesMap.put(TRN_EST_REQ_REC, "trn_est_req_rec");
+        TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");

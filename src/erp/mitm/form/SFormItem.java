@@ -27,7 +27,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.mitm.data.SDataBrand;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemAttribute;
+import erp.mitm.data.SDataItemMaterialAttribute;
 import erp.mitm.data.SDataItemBarcode;
 import erp.mitm.data.SDataItemBarcodeRow;
 import erp.mitm.data.SDataItemForeignLanguage;
@@ -180,7 +180,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mitm.data.SDataItem moItem;
 
     private ArrayList<SDataMaterialAttribute> mlAttributesCfg;
-    private ArrayList<SDataItemAttribute> mlAttributes;
+    private ArrayList<SDataItemMaterialAttribute> mlAttributes;
     /**
      * Creates new form SFormItem
      * @param client
@@ -1427,7 +1427,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel18.add(jLabel2);
 
         jtfMaterialItemName.setEditable(false);
-        jtfMaterialItemName.setText("jTextField1");
         jtfMaterialItemName.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel18.add(jtfMaterialItemName);
 
@@ -1440,7 +1439,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel19.add(jLabel3);
 
         jtfMaterialType.setEditable(false);
-        jtfMaterialType.setText("jTextField1");
         jtfMaterialType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel19.add(jtfMaterialType);
 
@@ -2274,6 +2272,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
             jtfProductionTime.setEnabled(false);
             jtfProductionCost.setEnabled(false);
+            
+            moKeyFkMaterialTypeId_n.setSelectedIndex(0);
+            moKeyFkMaterialTypeId_n.setEnabled(false);
+            itemStateFkMaterialTypeId();
         }
         else {
             moItemGeneric = (SDataItemGeneric) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IGEN, moFieldFkItemGenericId.getKey(), SLibConstants.EXEC_MODE_SILENT);
@@ -2495,6 +2497,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             else {
                 jtfProductionTime.setEnabled(false);
                 jtfProductionCost.setEnabled(true);
+            }
+            
+            if (moItemGeneric.getIsMaterial()) {
+                moKeyFkMaterialTypeId_n.setSelectedIndex(1);
+                moKeyFkMaterialTypeId_n.setEnabled(true);
             }
         }
 
@@ -3289,7 +3296,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         enableAttributes(false);
         
         mlAttributesCfg = null;
-        int idMaterialType = moKeyFkMaterialTypeId_n.getSelectedIndex() <= 0 ? 0 : moKeyFkMaterialTypeId_n.getValue()[0];
+        int idMaterialType = 0;
+        idMaterialType = moKeyFkMaterialTypeId_n.getSelectedIndex() <= 0 ? 0 : moKeyFkMaterialTypeId_n.getValue()[0];
         if (idMaterialType > 1) {
             mlAttributesCfg = SMaterialUtils.getAttributesOfType(miClient.getSession().getStatement(), idMaterialType);
             
@@ -4229,11 +4237,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkCfdProdServId_n(moKeyCfdProdServId_n.getSelectedIndex() <= 0 ? 0 : moKeyCfdProdServId_n.getValue()[0]);
         moItem.setFkMaterialTypeId_n(moKeyFkMaterialTypeId_n.getSelectedIndex() <= 0 ? 1 : moKeyFkMaterialTypeId_n.getValue()[0]);
         if (mlAttributesCfg != null && mlAttributesCfg.size() > 0) {
-            SDataItemAttribute oAtt;
+            SDataItemMaterialAttribute oAtt;
             int attNumber = 1;
             JTextField oCurrentTextField;
             for (SDataMaterialAttribute oAttCfg : mlAttributesCfg) {
-                oAtt = new SDataItemAttribute();
+                oAtt = new SDataItemMaterialAttribute();
                 oAtt.setPkAttributeId(oAttCfg.getPkMaterialAttributeId());
                 oAtt.setSortingPos(attNumber);
                 oAtt.setIsRequired(true);
