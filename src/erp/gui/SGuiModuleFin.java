@@ -1731,7 +1731,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                             break;
                         case SDataConstants.FINX_MOVES_ABH:
                             oViewClass = erp.mfin.view.SViewAuxDetaill.class;
-                            sViewTitle = "Reporte Abraham";
+                            sViewTitle = "Auxiliares contables a detalle";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);

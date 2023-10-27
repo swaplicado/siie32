@@ -88,7 +88,7 @@ public class SViewAuxDetaill extends erp.lib.table.STableTab {
 
         moTablePane.reset();
 
-        aoTableColumns = new STableColumn[8];
+        aoTableColumns = new STableColumn[9];
 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "CentrosCosto", "Centro de costo ", STableConstants.WIDTH_ACCOUNT);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "Gastos", "Gastos", STableConstants.WIDTH_ACCOUNT);
@@ -97,6 +97,7 @@ public class SViewAuxDetaill extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "concepto", "Concepto", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "fecha","Fecha", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "poliza", "Poliza", STableConstants.WIDTH_RECORD_NUM);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.credit", "Haber $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re.debit", "Debe $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
        
@@ -161,7 +162,7 @@ public class SViewAuxDetaill extends erp.lib.table.STableTab {
                 "SUBSTRING(f.acc ,7 )AS Gastos,  f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", f.code) AS CtaContable, " +
                 "CONCAT_WS(' - ',i.item_key, i.item) AS item, " +
                 "re.concept AS concepto, r.dt AS fecha, " +
-                "CONCAT_WS (' ',bkc.code, cob.code, CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) ) AS poliza, re.debit " +
+                "CONCAT_WS (' ',bkc.code, cob.code, CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) ) AS poliza, re.credit, re.debit " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
                 "INNER JOIN fin_acc AS f ON re.fid_acc = f.id_acc " +
