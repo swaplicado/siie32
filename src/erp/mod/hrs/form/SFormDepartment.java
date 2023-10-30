@@ -106,7 +106,7 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel5.add(moTextName);
 
         jPanel2.add(jPanel5);

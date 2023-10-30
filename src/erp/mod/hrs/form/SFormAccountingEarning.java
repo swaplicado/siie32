@@ -99,8 +99,7 @@ public class SFormAccountingEarning extends SBeanForm implements ActionListener 
         jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlEarning);
 
-        moTextEarning.setText("sBeanFieldText2");
-        moTextEarning.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextEarning.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel6.add(moTextEarning);
 
         jPanel12.add(jPanel6);
@@ -111,7 +110,6 @@ public class SFormAccountingEarning extends SBeanForm implements ActionListener 
         jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlReference);
 
-        moTextReference.setText("sBeanFieldText1");
         moTextReference.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel4.add(moTextReference);
 

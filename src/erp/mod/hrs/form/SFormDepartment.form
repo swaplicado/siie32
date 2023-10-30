@@ -93,7 +93,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextName">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[300, 23]"/>
+                      <Dimension value="[350, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
