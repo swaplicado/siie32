@@ -29,11 +29,13 @@ public class SDbDepartment extends SDbRegistryUser {
     protected int mnPkDepartmentId;
     protected String msCode;
     protected String msName;
-    protected int mnFkSuperiorDepartmentId_n;
-    protected int mnFkTitularEmployeeId_n;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
+    */
+    protected int mnFkSuperiorDepartmentId_n;
+    protected int mnFkTitularEmployeeId_n;
+    /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
