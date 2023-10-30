@@ -134,7 +134,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiVarietyType = new JMenuItem("Tipos de variedades");
         jmiUnitType = new JMenuItem("Tipos de unidades");
         jmiLevelType = new JMenuItem("Tipos de niveles");
-        jmiMaterialType = new JMenuItem("Tipos de material");
+        jmiMaterialType = new JMenuItem("Familias de insumos");
         jmiMaterialAttribute = new JMenuItem("Atributos de materiales");
         jmiItemPackage = new JMenuItem("Conversiones de ítems");
         jmiItemBarcode = new JMenuItem("Códigos de barras de ítems");
@@ -583,7 +583,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     break;
                 case SDataConstants.ITMU_TP_MAT:
                     oViewClass = erp.mitm.view.SViewMaterialType.class;
-                    sViewTitle = "Tipos de material";
+                    sViewTitle = "Familias de insumos";
                     break;
                 case SDataConstants.ITMU_UNIT:
                     oViewClass = erp.mitm.view.SViewUnit.class;

@@ -61,7 +61,7 @@ public class SViewMaterialType extends erp.lib.table.STableTab implements java.a
         }
 
         i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tmat.name", "Tipo material", 250);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tmat.name", "Familia insumo", 250);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tmat.code", "Código", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tmat.prefix", "Prefijo", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "tmat.b_can_edit", "Modificable", STableConstants.WIDTH_BOOLEAN_2X);
@@ -98,7 +98,7 @@ public class SViewMaterialType extends erp.lib.table.STableTab implements java.a
                     miClient.showMsgBoxWarning(STableConstants.MSG_WAR_REGISTRY_NO_EDITABLE);
                 }
                 else {
-                    moTypeAttributesForm.setMaterialType("", ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
+                    moTypeAttributesForm.setMaterialType(((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                     moTypeAttributesForm.setVisible(true);
                 }
             }

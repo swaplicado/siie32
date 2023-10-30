@@ -78,7 +78,7 @@ public class SFormMaterialType extends javax.swing.JDialog implements erp.lib.fo
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Elemento");
+        setTitle("Familia de insumo");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
