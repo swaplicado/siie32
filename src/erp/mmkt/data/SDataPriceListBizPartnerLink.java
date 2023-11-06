@@ -14,7 +14,7 @@ import java.util.Date;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Claudio Peña
  */
 public class SDataPriceListBizPartnerLink extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -70,10 +70,10 @@ public class SDataPriceListBizPartnerLink extends erp.lib.data.SDataRegistry imp
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
-        mnPkLinkId = ((int[]) pk)[0];
-        mnPkReference1Id = ((int[]) pk)[1];
-        mnPkReference2Id = ((int[]) pk)[2];
-        mtPkDateStartId = ((java.util.Date[]) pk)[3];
+        mnPkLinkId = (int)((Object[]) pk)[0];
+        mnPkReference1Id = (int)((Object[]) pk)[1];
+        mnPkReference2Id = (int)((Object[]) pk)[2];
+        mtPkDateStartId = (Date)((Object[]) pk)[3];
     }
 
     @Override

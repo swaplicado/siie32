@@ -46,7 +46,7 @@ public class SViewConfMatConsSubentityVsCostCenter extends SGridPaneView impleme
 
         moPaneSettings.setDeletedApplying(false);
         moPaneSettings.setSystemApplying(false);
-        moPaneSettings.setUserInsertApplying(true);
+        moPaneSettings.setUserInsertApplying(false);
         moPaneSettings.setUserUpdateApplying(false);
 
         filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_DELETED)).getValue();
@@ -59,9 +59,9 @@ public class SViewConfMatConsSubentityVsCostCenter extends SGridPaneView impleme
                 + "v.code AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "c.name AS entidad, "
+                + "c.code AS c_entidad, "
                 + "IF(sc.id_cc IS NULL, FALSE, TRUE) AS conf, "
                 + "sc.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                + "sc.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS c ON "
@@ -79,11 +79,11 @@ public class SViewConfMatConsSubentityVsCostCenter extends SGridPaneView impleme
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, "Código"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Subentidad de consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "entidad", "Entidad de consumo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Subcentro de consumo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "c_entidad", "Código centro de consumo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "entidad", "Centro de consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "conf", "Configurado"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         
         return columns;
     }

@@ -7,10 +7,12 @@ package erp.mtrn.data;
 
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.data.SDataRegistry;
 import erp.data.SDataConstants;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,6 +28,10 @@ public class SDataDiogEtyMatConsEntCostCenter extends erp.lib.data.SDataRegistry
     protected int mnFkSubentMatConsumptionEntityId;
     protected int mnFkSubentMatConsumptionSubentityId;
     protected int mnFkCostCenterId;
+    
+    protected String msAuxEntConsumeName;
+    protected String msAuxSubEntConsumeName;
+    protected String msAuxCostCenterName;
 
     public SDataDiogEtyMatConsEntCostCenter() {
         super(SDataConstants.TRN_DIOG_ETY_CONS_ENT_CC);
@@ -50,6 +56,55 @@ public class SDataDiogEtyMatConsEntCostCenter extends erp.lib.data.SDataRegistry
     public int getFkSubentMatConsumptionSubentityId() { return mnFkSubentMatConsumptionSubentityId; }
     public int getFkCostCenterId() { return mnFkCostCenterId; }
     
+    public String getAuxEntConsumeName() { return msAuxEntConsumeName; }
+    public String getAuxSubEntConsumeName() { return msAuxSubEntConsumeName; }
+    public String getAuxCostCenterName() { return msAuxCostCenterName; }
+    
+    public void readAuxs(java.sql.Statement statement) {
+        msAuxEntConsumeName = "";
+        msAuxSubEntConsumeName = "";
+        msAuxCostCenterName = "";
+        String sql = "";
+        
+        try {
+            if (mnFkSubentMatConsumptionEntityId > 0) {
+                sql = "SELECT CONCAT(ent.code, '-', ent.name) AS ent_name "
+                        + "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_MAT_CONS_ENT) + " AS ent "
+                        + "WHERE ent.id_mat_cons_ent = " + mnFkSubentMatConsumptionEntityId + ";";
+
+                ResultSet res = statement.getConnection().createStatement().executeQuery(sql);
+                if (res.next()) {
+                    msAuxEntConsumeName = res.getString("ent_name");
+                }
+                
+                if (mnFkSubentMatConsumptionSubentityId > 0) {
+                    sql = "SELECT CONCAT(sent.code, '-', sent.name) AS sent_name "
+                            + "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_MAT_CONS_SUBENT) + " AS sent "
+                            + "WHERE sent.id_mat_cons_ent = " + mnFkSubentMatConsumptionEntityId + " "
+                            + "AND sent.id_mat_cons_subent = " + mnFkSubentMatConsumptionSubentityId + ";";
+
+                    res = statement.getConnection().createStatement().executeQuery(sql);
+                    if (res.next()) {
+                        msAuxSubEntConsumeName = res.getString("sent_name");
+                    }
+                }
+            }
+            if (mnFkCostCenterId > 0) {
+                    sql = "SELECT CONCAT(cc.id_cc, '-', cc.cc) AS cc_name "
+                            + "FROM " + SDataConstants.TablesMap.get(SDataConstants.FIN_CC) + " AS cc "
+                            + "WHERE cc.pk_cc = " + mnFkCostCenterId + ";";
+
+                ResultSet res = statement.getConnection().createStatement().executeQuery(sql);
+                if (res.next()) {
+                    msAuxCostCenterName = res.getString("cc_name");
+                }
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SDataDiogEtyMatConsEntCostCenter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkDiogEntryConsEntCostCenter = ((int[]) pk)[0];
@@ -72,6 +127,10 @@ public class SDataDiogEtyMatConsEntCostCenter extends erp.lib.data.SDataRegistry
         mnFkSubentMatConsumptionEntityId = 0;
         mnFkSubentMatConsumptionSubentityId = 0;
         mnFkCostCenterId = 0;
+        
+        msAuxEntConsumeName = "";
+        msAuxSubEntConsumeName = "";
+        msAuxCostCenterName = "";
     }
     
     @Override
@@ -84,22 +143,36 @@ public class SDataDiogEtyMatConsEntCostCenter extends erp.lib.data.SDataRegistry
         reset();
         
         try {
-            sql = "SELECT * FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DIOG_ETY_CONS_ENT_CC) + " " +
-                    "WHERE id_diog_ety_ce_cc = " + key[0];
+            sql = "SELECT m.*,"
+                    + "CONCAT(ent.code, '-', ent.name) AS ent_name, "
+                    + "CONCAT(sent.code, '-', sent.name) AS sent_name, "
+                    + "CONCAT(cc.id_cc, '-', cc.cc) AS cc_name "
+                    + "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DIOG_ETY_CONS_ENT_CC) + " AS m " +
+                    "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_MAT_CONS_ENT) + " AS ent "
+                        + "ON m.fid_mat_sub_cons_ent = ent.id_mat_cons_ent " +
+                    "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_MAT_CONS_SUBENT) + " AS sent "
+                        + "ON m.fid_mat_sub_cons_ent = ent.id_mat_cons_ent AND m.fid_mat_sub_cons_sub_ent = sent.id_mat_cons_subent " +
+                    "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.FIN_CC) + " AS cc "
+                        + "ON m.fid_cc = cc.pk_cc " +
+                    "WHERE m.id_diog_ety_ce_cc = " + key[0];
 
             resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
-                mnPkDiogEntryConsEntCostCenter = resultSet.getInt("id_diog_ety_ce_cc");
-                mdPercentage = resultSet.getDouble("percentage");
-                mnFkDiogYearId = resultSet.getInt("fid_diog_doc");
-                mnFkDiogDocId = resultSet.getInt("fid_diog_year");
-                mnFkDiogEntryId = resultSet.getInt("fid_diog_ety");
-                mnFkSubentMatConsumptionEntityId = resultSet.getInt("fid_mat_sub_cons_ent");
-                mnFkSubentMatConsumptionSubentityId = resultSet.getInt("fid_mat_sub_cons_sub_ent");
-                mnFkCostCenterId = resultSet.getInt("fid_cc");
+                mnPkDiogEntryConsEntCostCenter = resultSet.getInt("m.id_diog_ety_ce_cc");
+                mdPercentage = resultSet.getDouble("m.percentage");
+                mnFkDiogYearId = resultSet.getInt("m.fid_diog_doc");
+                mnFkDiogDocId = resultSet.getInt("m.fid_diog_year");
+                mnFkDiogEntryId = resultSet.getInt("m.fid_diog_ety");
+                mnFkSubentMatConsumptionEntityId = resultSet.getInt("m.fid_mat_sub_cons_ent");
+                mnFkSubentMatConsumptionSubentityId = resultSet.getInt("m.fid_mat_sub_cons_sub_ent");
+                mnFkCostCenterId = resultSet.getInt("m.fid_cc");
+                
+                msAuxEntConsumeName = resultSet.getString("ent_name");
+                msAuxSubEntConsumeName = resultSet.getString("sent_name");
+                msAuxCostCenterName = resultSet.getString("cc_name");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -151,8 +224,8 @@ public class SDataDiogEtyMatConsEntCostCenter extends erp.lib.data.SDataRegistry
                 sql = "UPDATE " + SDataConstants.TablesMap.get(SDataConstants.TRN_DIOG_ETY_CONS_ENT_CC) + " SET " +
 //                    "id_diog_ety_ce_cc = " + mnPkDiogEntryConsEntCostCenter + ", " +
                     "percentage = " + mdPercentage + ", " +
-                    "fid_diog_doc = " + mnFkDiogYearId + ", " +
-                    "fid_diog_year = " + mnFkDiogDocId + ", " +
+                    "fid_diog_year = " + mnFkDiogYearId + ", " +
+                    "fid_diog_doc = " + mnFkDiogDocId + ", " +
                     "fid_diog_ety = " + mnFkDiogEntryId + ", " +
                     "fid_mat_sub_cons_ent = " + mnFkSubentMatConsumptionEntityId + ", " +
                     "fid_mat_sub_cons_sub_ent = " + mnFkSubentMatConsumptionSubentityId + ", " +

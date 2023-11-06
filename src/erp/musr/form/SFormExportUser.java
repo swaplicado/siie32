@@ -149,6 +149,7 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionExport(){
 //        ArrayList<SDataUserAppRow> arrApps = new ArrayList<>();
         int i;
@@ -186,7 +187,7 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
             boolean res = oExport.exportUser(user, moBizPartner, VecApps);
             if(res){
                 miClient.showMsgBoxInformation("Usuario exportado con éxito");
-                this.show(false);
+                this.setVisible(false);
             }
         } catch (Exception e) {
             Logger.getLogger(SFormExportUser.class.getName()).log(Level.SEVERE, null, e);

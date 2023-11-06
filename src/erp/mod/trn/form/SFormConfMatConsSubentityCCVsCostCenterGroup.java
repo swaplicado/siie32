@@ -82,7 +82,7 @@ public class SFormConfMatConsSubentityCCVsCostCenterGroup extends SBeanForm {
 
         jpEntityData.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlEntity.setText("Entidad:");
+        jlEntity.setText("Centro:");
         jlEntity.setPreferredSize(new java.awt.Dimension(100, 16));
         jpEntityData.add(jlEntity);
 
@@ -91,7 +91,7 @@ public class SFormConfMatConsSubentityCCVsCostCenterGroup extends SBeanForm {
         moTextEntity.setPreferredSize(new java.awt.Dimension(250, 23));
         jpEntityData.add(moTextEntity);
 
-        jlSubentity.setText("Subentidad:");
+        jlSubentity.setText("Subcentro:");
         jlSubentity.setPreferredSize(new java.awt.Dimension(100, 16));
         jpEntityData.add(jlSubentity);
 
@@ -157,8 +157,8 @@ public class SFormConfMatConsSubentityCCVsCostCenterGroup extends SBeanForm {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 880, 550);
         
-        moTextEntity.setTextSettings("Entidad", 250);
-        moTextSubentity.setTextSettings("Subentidad", 250);
+        moTextEntity.setTextSettings("Centro", 250);
+        moTextSubentity.setTextSettings("Subcentro", 250);
         moTextCodeCC.setTextSettings("Codigo CC", 250);
         moTextCC.setTextSettings("Centro de costo", 250);
         

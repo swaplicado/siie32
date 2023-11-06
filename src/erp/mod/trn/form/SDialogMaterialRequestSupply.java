@@ -5,7 +5,9 @@
 package erp.mod.trn.form;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
@@ -20,7 +22,6 @@ import erp.mod.trn.db.SMaterialRequestSupplyRow;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
-import erp.mtrn.data.STrnConsumeUtils;
 import erp.mtrn.data.STrnMaintConstants;
 import erp.mtrn.data.STrnMaintUtilities;
 import erp.mtrn.data.STrnStock;
@@ -28,6 +29,7 @@ import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnStockSegregationUtils;
 import static erp.mtrn.form.SFormMaintDiog.COLOR_NONSIGNED;
 import static erp.mtrn.form.SFormMaintDiog.COLOR_SIGNED;
+import erp.musr.data.SDataUser;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,7 +63,6 @@ import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
-import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
@@ -81,7 +82,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     protected boolean mbAreSigned;
     
     private SGuiFieldKeyGroup moFieldKeyEntityGroup;
-    private SGuiFieldKeyGroup moFieldKeyConsumeEntityGroup;
     
     protected ArrayList<SMaterialRequestSupplyRow> mlDbMaterialRequestSupplies;
     protected ArrayList<SMaterialRequestSupplyRow> mlMemoryMaterialRequestSupplies;
@@ -134,10 +134,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         jPanel3 = new javax.swing.JPanel();
         jpRequisitionMaterialRows = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        moCheckModifyConsEntity = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moKeyConsumeEntity = new sa.lib.gui.bean.SBeanFieldKey();
-        moKeySubConsumeEntity = new sa.lib.gui.bean.SBeanFieldKey();
+        jlAux = new javax.swing.JLabel();
         jbSupply = new javax.swing.JButton();
         jbSupplyAll = new javax.swing.JButton();
         jpReqMaterialRows = new javax.swing.JPanel();
@@ -157,7 +154,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Surtidos de requisición de materiales");
+        setTitle("Suministro de requisición de materiales");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -273,27 +270,17 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel13.add(jLabel1);
+        jlAux.setPreferredSize(new java.awt.Dimension(715, 23));
+        jPanel13.add(jlAux);
 
-        moCheckModifyConsEntity.setText("Modificar entidad de consumo");
-        moCheckModifyConsEntity.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel13.add(moCheckModifyConsEntity);
-
-        moKeyConsumeEntity.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel13.add(moKeyConsumeEntity);
-
-        moKeySubConsumeEntity.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel13.add(moKeySubConsumeEntity);
-
-        jbSupply.setText("Surtir");
+        jbSupply.setText("Suministrar");
         jbSupply.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jbSupply.setPreferredSize(new java.awt.Dimension(100, 23));
+        jbSupply.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jbSupply);
 
-        jbSupplyAll.setText("Surtir todo");
+        jbSupplyAll.setText("Suministrar todo");
         jbSupplyAll.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jbSupplyAll.setPreferredSize(new java.awt.Dimension(100, 23));
+        jbSupplyAll.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jbSupplyAll);
 
         jpRequisitionMaterialRows.add(jPanel13, java.awt.BorderLayout.NORTH);
@@ -303,7 +290,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
 
         jPanel3.add(jpRequisitionMaterialRows, java.awt.BorderLayout.NORTH);
 
-        jpSupplyRows.setBorder(javax.swing.BorderFactory.createTitledBorder("Surtido:"));
+        jpSupplyRows.setBorder(javax.swing.BorderFactory.createTitledBorder("Suministrado:"));
         jpSupplyRows.setLayout(new java.awt.BorderLayout());
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -380,7 +367,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel12;
@@ -403,6 +389,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     private javax.swing.JButton jbSign;
     private javax.swing.JButton jbSupply;
     private javax.swing.JButton jbSupplyAll;
+    private javax.swing.JLabel jlAux;
     private javax.swing.JLabel jlEntity;
     private javax.swing.JLabel jlInfo;
     private javax.swing.JLabel jlMaintUser;
@@ -419,11 +406,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     private javax.swing.JPanel jpSegRows;
     private javax.swing.JPanel jpSupplyRows;
     private javax.swing.JTextField jtfSignatureStatus;
-    private sa.lib.gui.bean.SBeanFieldBoolean moCheckModifyConsEntity;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyConsumeEntity;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMaintUser;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMaintUserSupervisor;
-    private sa.lib.gui.bean.SBeanFieldKey moKeySubConsumeEntity;
     private sa.lib.gui.bean.SBeanFieldKey moKeyWarehouseCompanyBranch;
     private sa.lib.gui.bean.SBeanFieldKey moKeyWarehouseEntity;
     private sa.lib.gui.bean.SBeanFieldText moTextEntity;
@@ -443,16 +427,11 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         moKeyWarehouseEntity.setKeySettings(miClient, SGuiUtils.getLabelName(jlWarehouseEntity), false);
         moKeyMaintUser.setKeySettings(miClient, SGuiUtils.getLabelName(jlMaintUser), true);
         moKeyMaintUserSupervisor.setKeySettings(miClient, SGuiUtils.getLabelName(jlMaintUserSupervisor), false);
-        moKeyConsumeEntity.setKeySettings(miClient, SGuiUtils.getLabelName(jlWarehouseEntity), false);
-        moKeySubConsumeEntity.setKeySettings(miClient, SGuiUtils.getLabelName(jlWarehouseEntity), false);
         
         moFields.addField(moKeyWarehouseCompanyBranch);
         moFields.addField(moKeyWarehouseEntity);
-        moFields.addField(moKeyConsumeEntity);
-        moFields.addField(moKeySubConsumeEntity);
         
         moFieldKeyEntityGroup = new SGuiFieldKeyGroup(miClient);
-        moFieldKeyConsumeEntityGroup = new SGuiFieldKeyGroup(miClient);
 
         moGridMatReqEty = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_ETY_ROW, SLibConsts.UNDEFINED, "Renglones de la requisición") {
             @Override
@@ -468,14 +447,14 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Concepto"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Requeridas"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Surtidas"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Suministradas"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Apartadas"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Existencias"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Pendiente"));
-                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "A surtir");
+                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "A suministrar");
                 col.setEditable(true);
                 gridColumnsForm.add(col);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Entidad consumo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro consumo"));
 
                 return gridColumnsForm;
             }
@@ -496,9 +475,9 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Almacén"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Entidad cons"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Subentidad cons"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Surtido"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Centro cons"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Subcentro cons"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Suministrado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Guardado"));
 
                 return gridColumnsForm;
@@ -533,24 +512,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         catch (NullPointerException ex) {
             Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
         }
-        moCheckModifyConsEntity.setValue(false);
-        changeCheckConsumeEntity();
-    }
-    
-    private void actionChangeConsumeEntity() {
-        moKeySubConsumeEntity.setEnabled(false);
-        moKeySubConsumeEntity.removeAllItems();
-        
-        if (((SGuiItem) moKeyConsumeEntity.getSelectedItem()) == null || ((SGuiItem) moKeyConsumeEntity.getSelectedItem()).getPrimaryKey().length == 0) {
-            moKeySubConsumeEntity.setEnabled(false);
-        }
-        else {
-            SGuiParams params = new SGuiParams();
-            params.setKey(moKeyConsumeEntity.getValue());
-            miClient.getSession().populateCatalogue(moKeySubConsumeEntity, SModConsts.TRN_MAT_CONS_SUBENT, SLibConstants.UNDEFINED, params);
-
-            moKeySubConsumeEntity.setEnabled(moKeySubConsumeEntity.getItemCount() > 0);
-        }
     }
     
     private void loadEntryMatRequestSelected() {
@@ -561,21 +522,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         if (oMaterialRequestEntry != null) {
             showSupplyEntries(oMaterialRequestEntry);
         }
-    }
-    
-    private void changeCheckConsumeEntity() {
-        moKeyConsumeEntity.setEnabled(moCheckModifyConsEntity.isSelected());
-        moKeySubConsumeEntity.setEnabled(moCheckModifyConsEntity.isSelected());
-        
-        if (moCheckModifyConsEntity.isSelected()) {
-            int idConsumeEntity = STrnConsumeUtils.getDefaultEntityOfUser(miClient.getSession(), miClient.getSession().getUser().getPkUserId());
-            SGuiUtils.locateItem(moKeyConsumeEntity, new int[] { idConsumeEntity });
-        }
-        else {
-            moKeyConsumeEntity.setSelectedIndex(-1);
-        }
-        
-        this.actionChangeConsumeEntity();
     }
 
     /**
@@ -605,7 +551,10 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
                                                                             SMaterialRequestEntryRow.FORM_SUPPLY,
                                                                             oMaterialRequestEntry.getFkItemId(), 
-                                                                            oMaterialRequestEntry.getFkUnitId()
+                                                                            oMaterialRequestEntry.getFkUnitId(),
+                                                                            oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
+                                                                                    moMaterialRequest.getConsumptionInfo() : 
+                                                                                    oMaterialRequestEntry.getConsumptionInfo()
                                                                             );
                 
                 oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
@@ -705,11 +654,13 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
      */
     private void initMaterialRequestData() {
         try {
-            moTextNumber.setValue(moMaterialRequest.getNumber() + "");
+            moTextNumber.setValue(String.format("%05d", moMaterialRequest.getNumber()));
             /*
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
             moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDocLapsing_n()));
             */
+            SDataUser oUserRequester = (SDataUser) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.USRU_USR, new int[] { moMaterialRequest.getFkUserRequesterId() }, SLibConstants.EXEC_MODE_SILENT);
+            moTextRequest.setText(oUserRequester.getName());
             moTextEntity.setValue(moMaterialRequest.getAuxProvEntName());
 
             mlMemoryMaterialRequestSupplies = new ArrayList<>();
@@ -722,7 +673,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     }
     
     /**
-     * Apartar todo
+     * Suministrar todo
      */
     private void actionSupplyAll() {
         if (moKeyWarehouseEntity.getSelectedIndex() == 0 || moKeyWarehouseCompanyBranch.getSelectedIndex() == 0) {
@@ -734,8 +685,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         SMaterialRequestEntryRow oMatReqRow;
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
-            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSegregated() > 0) {
-                oMatReqRow.setAuxToSegregate(oMatReqRow.getQuantity() - oMatReqRow.getAuxSegregated());
+            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied() > 0) {
+                oMatReqRow.setAuxToSupply(oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied());
             }
         }
         
@@ -758,15 +709,15 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
             if (oMatReqRow.getAuxToSupply() > 0) {
                 if (oMatReqRow.getFkItemId() == mnItemDefaultId) {
-                    miClient.showMsgBoxWarning("No se puede surtir esta partida, el ítem debe ser cambiado.");
+                    miClient.showMsgBoxWarning("No se puede suministrar esta partida, el ítem debe ser cambiado.");
                     return;
                 }
                 if (oMatReqRow.getAuxToSupply() > oMatReqRow.getAuxStock()) {
-                    miClient.showMsgBoxWarning("No puede surtir más de lo que hay en existencia.");
+                    miClient.showMsgBoxWarning("No puede suministrar más de lo que hay en existencia.");
                     return;
                 }
                 if (oMatReqRow.getAuxToSupply() > (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied())) {
-                    miClient.showMsgBoxWarning("No puede surtir más de lo restante por surtir.");
+                    miClient.showMsgBoxWarning("No puede suministrar más de lo restante por suministrar.");
                     return;
                 }
                 dToSupply += oMatReqRow.getAuxToSupply();
@@ -774,7 +725,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         }
         
         if (dToSupply == 0d) {
-            miClient.showMsgBoxWarning("No hay nada que surtir.");
+            miClient.showMsgBoxWarning("No hay nada que suministrar.");
             return;
         }
         
@@ -1119,9 +1070,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         moKeyWarehouseEntity.addItemListener(this);
         moKeyMaintUser.addItemListener(this);
         moKeyMaintUserSupervisor.addItemListener(this);
-        moKeyConsumeEntity.addItemListener(this);
-        moKeySubConsumeEntity.addItemListener(this);
-        moCheckModifyConsEntity.addItemListener(this);
     }
 
     @Override
@@ -1136,9 +1084,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         moKeyWarehouseEntity.removeItemListener(this);
         moKeyMaintUser.removeItemListener(this);
         moKeyMaintUserSupervisor.removeItemListener(this);
-        moKeyConsumeEntity.removeItemListener(this);
-        moKeySubConsumeEntity.removeItemListener(this);
-        moCheckModifyConsEntity.removeItemListener(this);
     }
 
     @Override
@@ -1149,11 +1094,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         moFieldKeyEntityGroup.populateCatalogues();
         
         miClient.getSession().populateCatalogue(moKeyMaintUser, SModConsts.TRN_MAINT_USER, mnParamMaintUserType, null);
-        
-        moFieldKeyConsumeEntityGroup.initGroup();
-        moFieldKeyConsumeEntityGroup.addFieldKey(moKeyConsumeEntity, SModConsts.TRN_MAT_CONS_ENT, SLibConsts.UNDEFINED, null);
-        moFieldKeyConsumeEntityGroup.addFieldKey(moKeySubConsumeEntity, SModConsts.TRN_MAT_CONS_SUBENT, SLibConsts.UNDEFINED, null);
-        moFieldKeyConsumeEntityGroup.populateCatalogues();
     }
 
     @Override
@@ -1200,18 +1140,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 boolean bReset = false;
                 showMaterialRequestEntries(bReset);
             }
-            else if (comboBox == moKeyConsumeEntity) {
-                actionChangeConsumeEntity();
-            }
             else if (comboBox == moKeyMaintUser) {
                 populateMaintUserSupervisor();
-            }
-        }
-        else if (e.getSource() instanceof SBeanFieldBoolean) {
-            SBeanFieldBoolean bean = (SBeanFieldBoolean) e.getSource();
-            
-            if (bean == moCheckModifyConsEntity) {
-                changeCheckConsumeEntity();
             }
         }
     }

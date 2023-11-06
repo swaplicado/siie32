@@ -84,6 +84,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     protected boolean mbIsDataShipInternationalReq;
     protected boolean mbIsDataShipQualityReq;
     protected boolean mbIsItemReferenceRequired;
+    protected boolean mbIsMaterial;
     protected boolean mbIsDeleted;
     protected int mnFkItemGroupId;
     protected int mnFkItemCategoryId;
@@ -180,6 +181,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public void setIsDataShipInternationalReq(boolean b) { mbIsDataShipInternationalReq = b; }
     public void setIsDataShipQualityReq(boolean b) { mbIsDataShipQualityReq = b; }
     public void setIsItemReferenceRequired(boolean b) { mbIsItemReferenceRequired = b; }
+    public void setIsMaterial(boolean b) { mbIsMaterial = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkItemGroupId(int n) { mnFkItemGroupId = n; }
     public void setFkItemCategoryId(int n) { mnFkItemCategoryId = n; }
@@ -267,6 +269,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public boolean getIsDataShipInternationalReq() { return mbIsDataShipInternationalReq; }
     public boolean getIsDataQualityReq() { return mbIsDataShipQualityReq; }
     public boolean getIsItemReferenceRequired() { return mbIsItemReferenceRequired; }
+    public boolean getIsMaterial() { return mbIsMaterial; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkItemGroupId() { return mnFkItemGroupId; }
     public int getFkItemCategoryId() { return mnFkItemCategoryId; }
@@ -375,6 +378,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
         mbIsDataShipInternationalReq = false;
         mbIsDataShipQualityReq = false;
         mbIsItemReferenceRequired = false;
+        mbIsMaterial = false;
         mbIsDeleted = false;
         mnFkItemGroupId = 0;
         mnFkItemCategoryId = 0;
@@ -487,6 +491,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                 mbIsDataShipInternationalReq = resultSet.getBoolean("igen.b_ship_int");
                 mbIsDataShipQualityReq = resultSet.getBoolean("igen.b_ship_qlt");
                 mbIsItemReferenceRequired = resultSet.getBoolean("igen.b_item_ref");
+                mbIsMaterial = resultSet.getBoolean("igen.b_mat");
                 mbIsDeleted = resultSet.getBoolean("igen.b_del");
                 mnFkItemGroupId = resultSet.getInt("igen.fid_igrp");
                 mnFkItemCategoryId = resultSet.getInt("igen.fid_ct_item");
@@ -627,6 +632,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
             callableStatement.setBoolean(nParam++, mbIsDataShipInternationalReq);
             callableStatement.setBoolean(nParam++, mbIsDataShipQualityReq);
             callableStatement.setBoolean(nParam++, mbIsItemReferenceRequired);
+            callableStatement.setBoolean(nParam++, mbIsMaterial);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkItemGroupId);
             callableStatement.setInt(nParam++, mnFkItemCategoryId);

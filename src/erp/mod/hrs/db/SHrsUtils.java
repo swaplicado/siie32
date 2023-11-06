@@ -867,15 +867,16 @@ public abstract class SHrsUtils {
     public static ArrayList<Integer> prepareSqlQueryHigh(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        String sql = "SELECT id_emp "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " 
-                + "WHERE dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
-                + "dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
-                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + " AND id_log = 1;";
+        String sql = "SELECT h.id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " AS h " 
+                + "INNER JOIN erp.hrsu_emp AS emp ON h.id_emp = emp.id_emp "
+                + "WHERE h.dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
+                + "h.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
+                + "AND NOT h.b_del AND h.b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + " AND h.id_log = 1 ORDER BY emp.lastname1;";
 
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                employeeIds.add(resultSet.getInt("id_emp"));                  
+                employeeIds.add(resultSet.getInt("h.id_emp"));                  
             }
         }
         
@@ -919,15 +920,16 @@ public abstract class SHrsUtils {
     private static ArrayList<Integer> prepareSqlQueryMod(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        String sql = "SELECT id_emp "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " " 
-                + "WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
-                + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
-                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del AND id_log > 1 GROUP BY id_emp;";
-
+        String sql = "SELECT ss.id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " AS ss " 
+                + "INNER JOIN erp.hrsu_emp AS emp ON ss.id_emp = emp.id_emp "
+                + "WHERE ss.dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
+                + "ss.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
+                + "AND ss.sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND emp.b_act = 1 AND NOT ss.b_del AND ss.id_log > 1 GROUP BY ss.id_emp "
+                + "ORDER BY emp.lastname1 ";
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                employeeIds.add(resultSet.getInt("id_emp"));                  
+                employeeIds.add(resultSet.getInt("ss.id_emp"));                  
             }
         }
         
@@ -945,15 +947,16 @@ public abstract class SHrsUtils {
     private static ArrayList<Integer> prepareSqlQueryLow(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        String sql = "SELECT id_emp "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " "
-                + "WHERE dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
-                + "dt_dis_n <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
-                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + ";"; 
+        String sql = "SELECT h.id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " AS h "
+                + "INNER JOIN erp.hrsu_emp AS emp ON h.id_emp = emp.id_emp "
+                + "WHERE h.dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
+                + "h.dt_dis_n <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
+                + "AND NOT h.b_del AND h.b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " ORDER BY emp.lastname1 ;"; 
 
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                employeeIds.add(resultSet.getInt("id_emp"));                  
+                employeeIds.add(resultSet.getInt("h.id_emp"));                  
             }
         }
         
@@ -2044,8 +2047,7 @@ public abstract class SHrsUtils {
                             + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
                             + "INNER JOIN cfg_param_co AS par "
                             + "INNER JOIN hrs_cfg AS cfg "
-                            + "WHERE ssc.dt >= '" + dateSta + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
-                            + "AND emp.id_emp = " + pkUser ; 
+                            + "WHERE NOT ssc.b_del AND emp.id_emp = " + pkUser + " ORDER BY ssc.dt DESC LIMIT 1" ; 
 
                     resultSetHeader = client.getSession().getStatement().executeQuery(sql);
 
@@ -4115,7 +4117,7 @@ public abstract class SHrsUtils {
 
         return days;
     }
-    
+    // xxx123 refactorizar
     public static double getSbcIntegrationFactor(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {
         int seniority = 0;
         int daysTableAnnualBonus = 0;

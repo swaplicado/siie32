@@ -96,6 +96,7 @@ public abstract class SLibConstants {
     public static final int ICON_DOC_DELIVERY = 1112;
     public static final int ICON_DOC_IMPORT_CFD = 1113;
     public static final int ICON_DOC_IMPORT_CFD_ORD = 1114;
+    public static final int ICON_DOC_IMPORT_MAT_REQ = 1117;
     public static final int ICON_DOC_XML_DIRECT = 1115;
     public static final int ICON_DOC_XML_INDIRECT = 1116;
     public static final int ICON_FILTER_BP = 1201;
@@ -112,6 +113,8 @@ public abstract class SLibConstants {
     public static final int ICON_ARROW_RIGHT = 1504;
     public static final int ICON_BP_EXPORT = 1505;
     public static final int ICON_GUI_CAL = 1601;
+    public static final int ICON_SHIP_INT_DEL = 1701;
+    public static final int ICON_SHIP_INT_RET = 1702;
 
     public static final int GUI_DATE_PICKER_DATE = 1;
     public static final int GUI_DATE_PICKER_DATE_PERIOD = 2;
@@ -146,6 +149,7 @@ public abstract class SLibConstants {
     public static final int VALUE_EXC_RATE_SYS = 8;
     public static final int VALUE_CURRENCY = 9;
     public static final int VALUE_CURRENCY_LOCAL = 10;
+    public static final int VALUE_IS_MAT_REQ = 15;
     public static final int VALUE_INV_NOT = 11;
     public static final int VALUE_INV_ONLY = 12;
     public static final int VALUE_IS_COPY = 13;

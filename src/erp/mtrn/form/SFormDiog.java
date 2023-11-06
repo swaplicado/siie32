@@ -36,6 +36,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -55,11 +56,20 @@ import erp.mtrn.data.STrnUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -136,7 +146,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForFinish;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForReturn;
 
-    /** Creates new form SFormDiog */
+    /** Creates new form SFormDiog
+     * @param client */
     public SFormDiog(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -245,6 +256,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfDpsSourceNumber = new javax.swing.JTextField();
         jtfDpsSourceBizPartner = new javax.swing.JTextField();
         jbEntryImport = new javax.swing.JButton();
+        jbExternalFile = new javax.swing.JButton();
         jpDiogEntries = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlValue = new javax.swing.JLabel();
@@ -733,6 +745,11 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jbEntryImport.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel13.add(jbEntryImport);
 
+        jbExternalFile.setText("Cargar archivo");
+        jbExternalFile.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbExternalFile.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel13.add(jbExternalFile);
+
         jPanel5.add(jPanel13);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.PAGE_START);
@@ -905,6 +922,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jbEntryPickLot.addActionListener(this);
         jbEntryDelete.addActionListener(this);
         jbEntryImport.addActionListener(this);
+        jbExternalFile.addActionListener(this);
         jbEntryViewLots.addActionListener(this);
         jtbSwitchProdOrderDestiny.addActionListener(this);
         jtfEntryTextToFind.addActionListener(this);
@@ -1187,6 +1205,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             jbEntryClear.setEnabled(false);
             jbEntryDelete.setEnabled(false);
             jbEntryImport.setEnabled(false);
+            jbExternalFile.setEnabled(false);
             jcbDiogAdjustmentType.setEnabled(false);
         }
         else {
@@ -1220,6 +1239,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             jbEntryClear.setEnabled(enable);
             jbEntryDelete.setEnabled(true);
             jbEntryImport.setEnabled(moParamDpsSource != null || moProdOrderSource != null || SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV));
+            jbExternalFile.setEnabled(true);
             jcbDiogAdjustmentType.setEnabled(STrnUtilities.isIogTypeAdjustment(manParamIogTypeKey));
         }
 
@@ -1612,7 +1632,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
 
                             dpsEntry = moParamDpsSource.getDbmsDpsEntry(stockSupplyRow.getDpsEntryKey());
-
+                            
                             iogEntry = new SDataDiogEntry();
                             iogEntry.setPkYearId(SLibConstants.UNDEFINED);
                             iogEntry.setPkDocId(SLibConstants.UNDEFINED);
@@ -1656,6 +1676,21 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                             else {
                                 iogEntry.getAuxStockMoves().add(new STrnStockMove(new int[] { year, iogEntry.getFkItemId(), iogEntry.getFkUnitId(), SDataConstantsSys.TRNX_STK_LOT_DEF_ID, moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() }, iogEntry.getQuantity()));
+                            }
+                            
+                            if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                try {
+                                    SDbMaterialRequest oMatReq = new SDbMaterialRequest();
+                                    oMatReq.read(miClient.getSession(), dpsEntry.getDbmsDpsEntryMatRequestLink().getDbmsMaterialRequestKey());
+                                    
+                                    if (oMatReq.getTypeRequest().equals("S")) {
+                                        iogEntry.setFkMatRequestId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestId());
+                                        iogEntry.setFkMatRequestEtyId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestEntryId());
+                                    }
+                                }
+                                catch (Exception ex) {
+                                    Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
 
                             iogEntries.add(iogEntry);
@@ -2797,6 +2832,187 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             }
         }
     }
+    
+    private void actionExternalFile() {
+        if (jbExternalFile.isEnabled()) {
+            try {
+                String separador = ",";
+                String error = "Errores:\n";
+                int errors = 0;
+                String warning = "Advertencias:\n";
+                int warnings = 0;
+                Statement statement  = miClient.getSession().getDatabase().getConnection().createStatement();
+                FileFilter filter = new FileNameExtensionFilter("CSV file", "csv");
+                miClient.getFileChooser().repaint();
+                miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
+                miClient.getFileChooser().setFileFilter(filter);
+            
+                if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".csv")) {
+                        String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                        BufferedReader br = new BufferedReader(new FileReader(absolutePath));
+                        String line = br.readLine();
+                        while (line != null) {
+                            String[] fields = line.split(separador);
+                            boolean item = false;
+                            int unit = 0;
+                            if (!fields[0].toLowerCase().equals("clave")) {
+                                String sql = "SELECT id_item, fid_unit FROM erp.itmu_item WHERE item_key = '" + fields[0].toUpperCase() + "'";
+                                try (ResultSet resultSet = statement.executeQuery(sql)) {
+                                    if (resultSet.next()) {
+                                        moEntryItem = new SDataItem();
+                                        moEntryItem.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
+                                        unit = resultSet.getInt(2);
+                                        item = true;
+                                    }
+                                    else {
+                                        errors++;
+                                        error += errors + "- El ítem con la clave " + fields[0].toUpperCase() + " no existe en la base de datos.\n";
+                                    }
+                                }
+                                if (item) {
+                                    sql = "SELECT id_unit FROM erp.itmu_unit WHERE symbol = '" + fields[3].toLowerCase() + "'";
+                                    try (ResultSet resultSet = statement.executeQuery(sql)) {
+                                        if (resultSet.next()) {
+                                            if (unit != resultSet.getInt(1)) {
+                                                errors++;
+                                                error += errors + "- La unidad " + fields[3].toLowerCase() + " no coincide con el ítem " + fields[0].toUpperCase() + ".\n";
+                                            }
+                                        }
+                                        else {
+                                            errors++;
+                                            error += errors + "- La unidad " + fields[3].toLowerCase() + " no existe en la base de datos.\n";
+                                        }
+                                    }
+                                    if (validateAppropriateWarehousesItem(moEntryItem.getPkItemId())) {
+                                        if (moEntryItem.getIsLotApplying() && fields[4].toUpperCase().isEmpty()) {
+                                            errors++;
+                                            error += errors + "- El ítem con la clave " + fields[0].toUpperCase() + " requiere un lote y este no tiene especificado uno.\n";
+                                        }
+                                        else if (!moEntryItem.getIsLotApplying() && !fields[4].toUpperCase().isEmpty()) {
+                                            errors++;
+                                            error += errors + "- El ítem con la clave " + fields[0].toUpperCase() + " no requiere un lote y este tiene especificado uno.\n";
+                                        }
+                                        else if (moEntryItem.getIsLotApplying() && !fields[4].toUpperCase().isEmpty()) {
+                                            sql = "SELECT dt_exp_n, b_block FROM trn_lot WHERE id_item = " + moEntryItem.getPkItemId() + " AND id_unit = " + unit + " AND lot = '" + fields[4].toUpperCase() + "'";
+                                            ResultSet resultSet = statement.executeQuery(sql);
+                                            if (resultSet.next()) {
+                                                String date = SLibUtils.DateFormatDate.format(resultSet.getDate(1));
+                                                if (!date.equals(fields[5])) {
+                                                    errors++;
+                                                    error += errors + "- La fecha de expiración del lote " + fields[5].toUpperCase() + " no corresponde con la fecha especificada en el archivo csv.\n";
+                                                }
+                                                if (resultSet.getBoolean(2)) {
+                                                    warnings++;
+                                                    warning += warnings + "- El lote " + fields[4].toUpperCase() + " está bloqueado.\n";
+                                                }
+                                            }                                            
+                                        }
+                                    }
+                                    else {
+                                        errors++;
+                                        error += errors + "- El ítem con la clave " + fields[0].toUpperCase() + " no esta configurado con el almacén seleccionado.\n";
+                                    }
+                                    if (fields[2].isEmpty()) {
+                                        errors++;
+                                        error += errors + "- El ítem con la clave " + fields[0].toUpperCase() + " no tiene asignada una cantidad válida.\n";
+                                    }
+                                    if (fields[6].isEmpty()) {
+                                        warnings++;
+                                        warning += warnings + "- El ítem con la clave " + fields[0].toUpperCase() + " no tiene asignado un precio unitario.\n";
+                                    }
+                                    if (SLibUtilities.parseDouble(fields[2]) * SLibUtilities.parseDouble(fields[6]) != SLibUtilities.parseDouble(fields[7])) {
+                                        warnings++;
+                                        warning += warnings + "- El resultado de la multiplicación del precio u. y la cantidad en el ítem con la clave " + fields[0].toUpperCase() + " no es correcta.\n";
+                                    }
+                                }
+                            }
+                            
+                            line = br.readLine();
+                        }
+                        
+                        SDialogShowDiogErrors er = new SDialogShowDiogErrors(error, warning, errors, warnings);
+                        if (errors > 0) {
+                            er.setVisible(true);
+                        }
+                        else {
+                            int ans = 0;
+                            if (warnings > 0) {
+                                er.setVisible(true);
+                                ans = miClient.showMsgBoxConfirm("¿Desea continuar con la inserción a pesar de las advertencias?");
+                            }
+                            if (ans == JOptionPane.OK_OPTION) {
+                                // Volver a leer para agregar
+                                br = new BufferedReader(new FileReader(absolutePath));
+                                line = br.readLine();
+
+                                while (line != null) {
+                                    moStockMoveEntry = null;
+                                    String[] fields = line.split(separador);
+                                    if (!fields[0].toLowerCase().equals("clave")) {
+                                        String sql = "SELECT id_item FROM erp.itmu_item WHERE item_key = '" + fields[0].toUpperCase() + "'";
+                                        try (ResultSet resultSet = statement.executeQuery(sql)) {
+                                            if (resultSet.next()) {
+                                                moEntryItem = new SDataItem();
+                                                moEntryItem.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
+                                                moFieldEntryQuantity.setDouble(SLibUtilities.parseDouble(fields[2]));
+                                                moFieldEntryValueUnitary.setDouble(SLibUtilities.parseDouble(fields[6]));
+                                                moFieldEntryValue.setDouble(SLibUtilities.parseDouble(fields[7]));
+                                                if (moEntryItem.getIsLotApplying()) {
+                                                    sql = "SELECT id_lot FROM trn_lot WHERE id_item = " + moEntryItem.getPkItemId() + " AND id_unit = " + moEntryItem.getFkUnitId() + " AND lot = '" + fields[4].toUpperCase() + "'";
+                                                    ResultSet resultSetlot = miClient.getSession().getStatement().executeQuery(sql);
+                                                    if (resultSetlot.next()) {
+                                                        int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
+                                                        int[] moveKey = new int[] { 
+                                                            year, 
+                                                            moEntryItem.getPkItemId(), 
+                                                            moEntryItem.getFkUnitId(), 
+                                                            resultSetlot.getInt(1), 
+                                                            moWarehouseSource.getPkCompanyBranchId(),
+                                                            moWarehouseSource.getPkEntityId()
+                                                        };
+                                                        moStockMoveEntry = new STrnStockMove(moveKey, SLibUtilities.parseDouble(fields[2]));           
+                                                        moStockMoveEntry.setFkMaintUserSupervisorId(1);
+                                                    }
+                                                    else {
+                                                        int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
+                                                        int[] moveKey = new int[] { 
+                                                            year, 
+                                                            moEntryItem.getPkItemId(), 
+                                                            moEntryItem.getFkUnitId(), 
+                                                            0, 
+                                                            moWarehouseSource.getPkCompanyBranchId(),
+                                                            moWarehouseSource.getPkEntityId()
+                                                        };
+                                                        moStockMoveEntry = new STrnStockMove(moveKey, SLibUtilities.parseDouble(fields[2]));
+                                                        moStockMoveEntry.setAuxLot(fields[4].toUpperCase());
+                                                        if (!fields[5].isEmpty()) {
+                                                            String[] date = fields[5].split("/");
+                                                            moStockMoveEntry.setAuxLotDateExpiration(SLibTimeUtilities.createDate(SLibUtils.parseInt(date[2]), SLibUtils.parseInt(date[1]), SLibUtils.parseInt(date[0])));
+                                                        }
+                                                        moStockMoveEntry.setFkMaintUserSupervisorId(1);
+                                                    }
+                                                }
+                                                actionEntryAdd();
+                                            }
+                                        }
+                                    }
+
+                                    line = br.readLine();
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("El archivo sólo puede ser CSV.");
+                    }
+                }
+            }
+            catch (Exception e) {
+                miClient.showMsgBoxWarning(e.getMessage());            
+            }
+        }
+    }
 
     private void actionEntryViewLots() {
         boolean canEdit = false;
@@ -2889,6 +3105,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         jbEntryImport.setEnabled(mnFormStatus == SLibConstants.FORM_STATUS_EDIT && moParamDpsSource != null || moProdOrderSource != null || SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV));
+        jbExternalFile.setEnabled(SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV));
         jcbDiogAdjustmentType.setEnabled(mnFormStatus == SLibConstants.FORM_STATUS_EDIT && STrnUtilities.isIogTypeAdjustment(manParamIogTypeKey));
 
         if (!STrnUtilities.needsIogTypeProdOrderDestiny(manParamIogTypeKey) || jcbProdOrderSource.getSelectedIndex() <= 0) {
@@ -3032,6 +3249,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JButton jbEntryImport;
     private javax.swing.JButton jbEntryPickLot;
     private javax.swing.JButton jbEntryViewLots;
+    private javax.swing.JButton jbExternalFile;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbProdOrderDestiny;
     private javax.swing.JButton jbProdOrderSource;
@@ -3753,6 +3971,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             else if (button == jbEntryImport) {
                 actionEntryImport();
+            }
+            else if (button == jbExternalFile) {
+                actionExternalFile();
             }
             else if (button == jbEntryViewLots) {
                 actionEntryViewLots();

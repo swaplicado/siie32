@@ -26,6 +26,10 @@ import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbDepartment;
 import erp.mod.hrs.db.SDbDepartmentCostCenter;
+import erp.mod.hrs.db.SDbDocAdminRecord;
+import erp.mod.hrs.db.SDbDocAdminRecordPreceptSubsection;
+import erp.mod.hrs.db.SDbDocBreach;
+import erp.mod.hrs.db.SDbDocBreachPreceptSubsection;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeBenefitTables;
@@ -50,6 +54,9 @@ import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SDbPaysheetCustomType;
 import erp.mod.hrs.db.SDbPosition;
 import erp.mod.hrs.db.SDbPrePayrollCutoffCalendar;
+import erp.mod.hrs.db.SDbPrecept;
+import erp.mod.hrs.db.SDbPreceptSection;
+import erp.mod.hrs.db.SDbPreceptSubsection;
 import erp.mod.hrs.db.SDbShift;
 import erp.mod.hrs.db.SDbSsContributionTable;
 import erp.mod.hrs.db.SDbSsContributionTableRow;
@@ -78,6 +85,8 @@ import erp.mod.hrs.form.SFormCutoffCalendar;
 import erp.mod.hrs.form.SFormDeduction;
 import erp.mod.hrs.form.SFormDepartment;
 import erp.mod.hrs.form.SFormDepartmentCostCenter;
+import erp.mod.hrs.form.SFormDocAdminRecord;
+import erp.mod.hrs.form.SFormDocBreach;
 import erp.mod.hrs.form.SFormEarning;
 import erp.mod.hrs.form.SFormEmployeeDismissalType;
 import erp.mod.hrs.form.SFormEmployeeType;
@@ -118,6 +127,10 @@ import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
 import erp.mod.hrs.view.SViewDepartmentCostCenter;
+import erp.mod.hrs.view.SViewDocAdminRecord;
+import erp.mod.hrs.view.SViewDocAdminRecordSummary;
+import erp.mod.hrs.view.SViewDocBreach;
+import erp.mod.hrs.view.SViewDocBreachSummary;
 import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeBenefitTables;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
@@ -230,6 +243,8 @@ public class SModuleHrs extends SGuiModule {
     private SFormBenefitAdjustmentEarning moFormBenefitAdjustmentEarning;
     private SFormLoanAdjustmentDeduction moFormLoanAdjustmentDeduction;
     private SFormLoanAdjustmentEarning moFormLoanAdjustmentEarning;
+    private SFormDocBreach moFormDocBreach;
+    private SFormDocAdminRecord moFormDocAdminRecord;
 
     private SBeanOptionPicker moPickerEarnings;
     private SBeanOptionPicker moPickerDeductions;
@@ -573,6 +588,27 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_ADV_SET:
                 registry = new SDbAdvanceSettlement();
+                break;
+            case SModConsts.HRS_PREC:
+                registry = new SDbPrecept();
+                break;
+            case SModConsts.HRS_PREC_SEC:
+                registry = new SDbPreceptSection();
+                break;
+            case SModConsts.HRS_PREC_SUBSEC:
+                registry = new SDbPreceptSubsection();
+                break;
+            case SModConsts.HRS_DOC_BREACH:
+                registry = new SDbDocBreach();
+                break;
+            case SModConsts.HRS_DOC_BREACH_PREC_SUBSEC:
+                registry = new SDbDocBreachPreceptSubsection();
+                break;
+            case SModConsts.HRS_DOC_ADM_REC:
+                registry = new SDbDocAdminRecord();
+                break;
+            case SModConsts.HRS_DOC_ADM_REC_PREC_SUBSEC:
+                registry = new SDbDocAdminRecordPreceptSubsection();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -1144,6 +1180,18 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_ADV_SET:
                 view = new SViewAdvanceSettlement(miClient, "Control adelantos liquidación");
                 break;
+            case SModConsts.HRS_DOC_BREACH:
+                view = new SViewDocBreach(miClient, "Infracciones");
+                break;
+            case SModConsts.HRSX_DOC_BREACH_SUM:
+                view = new SViewDocBreachSummary(miClient, "Infracciones x empleado");
+                break;
+            case SModConsts.HRS_DOC_ADM_REC:
+                view = new SViewDocAdminRecord(miClient, "Actas administrativas");
+                break;
+            case SModConsts.HRSX_DOC_ADM_REC_SUM:
+                view = new SViewDocAdminRecordSummary(miClient, "Actas administrativas x empleado");
+                break;
             case SModConsts.HRSX_PAY_REC:
                 view = new SViewPayrollReceiptRecord(miClient, "Recibos nóminas vs. pólizas contables");
                 break;
@@ -1448,6 +1496,14 @@ public class SModuleHrs extends SGuiModule {
                 if (moAdvanceSettlement == null) moAdvanceSettlement = new SFormAdvanceSettlement(miClient, "Control de adelanto de liquidación");
                 form = moAdvanceSettlement;
                 break;
+            case SModConsts.HRS_DOC_BREACH:
+                if (moFormDocBreach == null) moFormDocBreach = new SFormDocBreach(miClient, "Infracción");
+                form = moFormDocBreach;
+                break;
+            case SModConsts.HRS_DOC_ADM_REC:
+                if (moFormDocAdminRecord == null) moFormDocAdminRecord = new SFormDocAdminRecord(miClient, "Acta administrativa");
+                form = moFormDocAdminRecord;
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -1498,6 +1554,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSR_POS:
                 guiReport = new SGuiReport("reps/hrsr_pos.jasper", "Reporte de posiciones");
+                break;
+            case SModConsts.HRSR_DOC_BREACH:
+                guiReport = new SGuiReport("reps/hrs_doc_breach.jasper", "Infracción");
+                break;
+            case SModConsts.HRSR_DOC_ADM_REC:
+                guiReport = new SGuiReport("reps/hrs_doc_adm_rec.jasper", "Acta administrativa");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

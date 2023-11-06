@@ -98,6 +98,18 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
         moDbmsEntBudget = new SDbMaterialConsumptionEntityBudget();
         moDbmsEntBudget.read(session, new int[] { mnFkBudgetMatConsumptionEntityId, mnFkBudgetYearId, mnFkBudgetPeriodId });
     }
+    
+    public String getConsumptionInfo() {
+        String description = "";
+        if (moDbmsConsSubent != null) {
+            description = moDbmsConsSubent.getXtaConsumptionEntityName() + "_" + moDbmsConsSubent.getName();
+        }
+        if (moDataCostCenter != null) {
+            description += (description.isEmpty() ? "" : " / ") + moDataCostCenter.getPkCostCenterIdXXX() + "_" + moDataCostCenter.getCostCenter();
+        }
+        
+        return description;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

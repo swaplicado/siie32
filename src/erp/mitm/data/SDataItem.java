@@ -13,6 +13,7 @@ import erp.mod.SModSysConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -74,6 +75,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected int mnFkItemGenericId;
     protected int mnFkItemLineId_n;
     protected int mnFkItemStatusId;
+    protected int mnFkMaterialTypeId_n;
     protected int mnFkUnitId;
     protected int mnFkUnitUnitsContainedId;
     protected int mnFkUnitUnitsVirtualId;
@@ -106,11 +108,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected erp.mitm.data.SDataItemGeneric moDbmsDataItemGeneric;
     protected java.util.Vector<erp.mitm.data.SDataItemBarcode> mvDbmsItemBarcodes;
     protected java.util.Vector<erp.mitm.data.SDataItemForeignLanguage> mvDbmsItemForeignLanguageDescriptions;
+    protected ArrayList<SDataItemMaterialAttribute> mlItemAttributes;
 
     public SDataItem() {
         super(SDataConstants.ITMU_ITEM);
         mvDbmsItemBarcodes = new Vector<>();
         mvDbmsItemForeignLanguageDescriptions = new Vector<>();
+        mlItemAttributes = new ArrayList<>();
         reset();
     }
 
@@ -167,6 +171,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setFkItemGenericId(int n) { mnFkItemGenericId = n; }
     public void setFkItemLineId_n(int n) { mnFkItemLineId_n = n; }
     public void setFkItemStatusId(int n) { mnFkItemStatusId = n; }
+    public void setFkMaterialTypeId_n(int n) { mnFkMaterialTypeId_n = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkUnitUnitsContainedId(int n) { mnFkUnitUnitsContainedId = n; }
     public void setFkUnitUnitsVirtualId(int n) { mnFkUnitUnitsVirtualId = n; }
@@ -248,6 +253,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int getFkItemGenericId() { return mnFkItemGenericId; }
     public int getFkItemLineId_n() { return mnFkItemLineId_n; }
     public int getFkItemStatusId() { return mnFkItemStatusId; }
+    public int getFkMaterialType_n() { return mnFkMaterialTypeId_n; }
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkUnitUnitsContainedId() { return mnFkUnitUnitsContainedId; }
     public int getFkUnitUnitsVirtualId() { return mnFkUnitUnitsVirtualId; }
@@ -280,6 +286,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public erp.mitm.data.SDataItemGeneric getDbmsDataItemGeneric() { return moDbmsDataItemGeneric; }
     public java.util.Vector<SDataItemBarcode> getDbmsItemBarcodes() { return mvDbmsItemBarcodes; }
     public java.util.Vector<SDataItemForeignLanguage> getDbmsItemForeignLanguageDescriptions() { return mvDbmsItemForeignLanguageDescriptions; }
+    public ArrayList<SDataItemMaterialAttribute> getDbmsItemAttributes() { return mlItemAttributes; }
 
     public int getDbmsFkDefaultItemRefId_n() {
         int id = mnFkDefaultItemRefId_n;
@@ -379,6 +386,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnFkItemGenericId = 0;
         mnFkItemLineId_n = 0;
         mnFkItemStatusId = 0;
+        mnFkMaterialTypeId_n = 0;
         mnFkUnitId = 0;
         mnFkUnitUnitsContainedId = 0;
         mnFkUnitUnitsVirtualId = 0;
@@ -411,6 +419,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         moDbmsDataItemGeneric = null;
         mvDbmsItemBarcodes.clear();
         mvDbmsItemForeignLanguageDescriptions.clear();
+        mlItemAttributes.clear();
     }
 
     @Override
@@ -483,6 +492,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mnFkItemGenericId = resultSet.getInt("fid_igen");
                 mnFkItemLineId_n = resultSet.getInt("fid_line_n");
                 mnFkItemStatusId = resultSet.getInt("fid_st_item");
+                mnFkMaterialTypeId_n = resultSet.getInt("fid_tp_mat_n");
                 mnFkUnitId = resultSet.getInt("fid_unit");
                 mnFkUnitUnitsContainedId = resultSet.getInt("fid_unit_units_cont");
                 mnFkUnitUnitsVirtualId = resultSet.getInt("fid_unit_units_virt");
@@ -554,7 +564,21 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                         mvDbmsItemForeignLanguageDescriptions.add(desc);
                     }
                 }
-
+                
+                if (mnFkMaterialTypeId_n > 1) {
+                    sql = "SELECT id_mat_att FROM erp.itmu_item_mat_att WHERE NOT b_del AND id_item = " + key[0] + " ORDER BY sort ASC ";
+                    resultSet = statement.executeQuery(sql);
+                    while (resultSet.next()) {
+                        SDataItemMaterialAttribute oAtt = new SDataItemMaterialAttribute();
+                        if (oAtt.read(new int[] { mnPkItemId, resultSet.getInt("id_mat_att") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                        else {
+                            mlItemAttributes.add(oAtt);
+                        }
+                    }
+                }
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -591,7 +615,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -645,6 +669,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setInt(nParam++, mnFkItemGenericId);
             if (mnFkItemLineId_n > 0) callableStatement.setInt(nParam++, mnFkItemLineId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkItemStatusId);
+            if (mnFkMaterialTypeId_n > 0) callableStatement.setInt(nParam++, mnFkMaterialTypeId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkUnitId);
             callableStatement.setInt(nParam++, mnFkUnitUnitsContainedId);
             callableStatement.setInt(nParam++, mnFkUnitUnitsVirtualId);
@@ -698,6 +723,16 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 for (i = 0; i < mvDbmsItemForeignLanguageDescriptions.size(); i++) {
                     mvDbmsItemForeignLanguageDescriptions.get(i).setPkItemId(mnPkItemId);
                     if (mvDbmsItemForeignLanguageDescriptions.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+                
+                sql = "DELETE FROM erp.itmu_item_mat_att WHERE id_item = " + mnPkItemId + " ";
+                statement.execute(sql);
+                
+                for (SDataItemMaterialAttribute oAtt : mlItemAttributes) {
+                    oAtt.setPkItemId(mnPkItemId);
+                    if (oAtt.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }

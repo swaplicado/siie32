@@ -74,7 +74,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
 
         jpEntity.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlEntity.setText("Entidad:");
+        jlEntity.setText("Centro:");
         jlEntity.setPreferredSize(new java.awt.Dimension(70, 16));
         jpEntity.add(jlEntity);
 
@@ -83,7 +83,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
         moTextEntity.setPreferredSize(new java.awt.Dimension(250, 23));
         jpEntity.add(moTextEntity);
 
-        jlSubentity.setText("Subentidad:");
+        jlSubentity.setText("Subcentro:");
         jlSubentity.setPreferredSize(new java.awt.Dimension(70, 16));
         jpEntity.add(jlSubentity);
 
@@ -119,8 +119,8 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 880, 550);
         
-        moTextEntity.setTextSettings("Entidad", 250);
-        moTextSubentity.setTextSettings("Subentidad", 250);
+        moTextEntity.setTextSettings("Centro", 250);
+        moTextSubentity.setTextSettings("Subcentro", 250);
         
         moGridCostCenter = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_CC, 0, "Centros de costo") {
             
@@ -153,7 +153,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
     private void readCostCenters() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT pk_cc, id_cc FROM fin_cc WHERE NOT b_del AND lev = (SELECT MAX(lev) FROM fin_cc) ORDER BY id_cc";
+            String sql = "SELECT pk_cc, id_cc FROM fin_cc WHERE (lev = (SELECT MAX(lev) FROM fin_cc) AND NOT b_del) OR pk_cc = 1 ORDER BY id_cc";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;

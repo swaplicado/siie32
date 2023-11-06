@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDataDiogMaintMovementEntryRow extends erp.lib.table.STableRow {
 
@@ -25,12 +25,13 @@ public class SDataDiogMaintMovementEntryRow extends erp.lib.table.STableRow {
         mvValues.add(diogEntry.getDbmsItem());
 //        mvValues.add(diogEntry.getDbmsPartNum());
         mvValues.add(diogEntry.getDbmsMaintArea());
-//        mvValues.add(diogEntry.getDbmsConsumeEntity());
-//        mvValues.add(diogEntry.getDbmsSubConsumeEntity());
         mvValues.add(diogEntry.getOriginalQuantity());
         mvValues.add(diogEntry.getDbmsOriginalUnitSymbol());
         mvValues.add(diogEntry.getOriginalValueUnitary());
         mvValues.add(diogEntry.getValue());
+        mvValues.add(diogEntry.getConsumeCenterAsString());
+        mvValues.add(diogEntry.getSubConsumeCenterAsString());
+        mvValues.add(diogEntry.getCostCenterAsString());
         mvValues.add(diogEntry.getIsDeleted());
         mvValues.add(diogEntry.getDbmsUserNew());
         mvValues.add(diogEntry.getUserNewTs());

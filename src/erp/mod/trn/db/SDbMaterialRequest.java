@@ -26,6 +26,7 @@ import sa.lib.gui.SGuiSession;
 public class SDbMaterialRequest extends SDbRegistryUser {
     
     protected int mnPkMatRequestId;
+    protected String msTypeRequest;
     protected int mnNumber;
     protected Date mtDate;
     protected Date mtDateRequest_n;
@@ -43,6 +44,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkMatPurchaseStatusId;
     protected int mnFkUserRequesterId;
     protected int mnFkContractorId_n;
+    protected int mnFkWarehouseCompanyBranch_n;
+    protected int mnFkWarehouseWarehouse_n;
+    protected int mnFkItemReferenceId_n;
     protected int mnFkUserCloseProvisionId;
     protected int mnFkUserClosePurchaseId;
     /*
@@ -82,6 +86,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     }
     
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
+    public void setTypeRequest(String s) { msTypeRequest = s; }
     public void setNumber(int n) { mnNumber = n; }
     public void setDate(Date t) { mtDate = t; }
     public void setDateRequest_n(Date t) { mtDateRequest_n = t; }
@@ -99,6 +104,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setFkMatPurchaseStatusId(int n) { mnFkMatPurchaseStatusId = n; }
     public void setFkUserRequesterId(int n) { mnFkUserRequesterId = n; }
     public void setFkContractorId_n(int n) { mnFkContractorId_n = n; }
+    public void setFkWarehouseCompanyBranch_n(int n) { mnFkWarehouseCompanyBranch_n = n; }
+    public void setFkWarehouseWarehouse_n(int n) { mnFkWarehouseWarehouse_n = n; }
+    public void setFkItemReferenceId_n(int n) { mnFkItemReferenceId_n = n; }
     public void setFkUserCloseProvisionId(int n) { mnFkUserCloseProvisionId = n; }
     public void setFkUserClosePurchaseId(int n) { mnFkUserClosePurchaseId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -124,6 +132,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
     
     public int getPkMatRequestId() { return mnPkMatRequestId; }
+    public String getTypeRequest() { return msTypeRequest; }
     public int getNumber() { return mnNumber; }
     public Date getDate() { return mtDate; }
     public Date getDateRequest_n() { return mtDateRequest_n; }
@@ -141,6 +150,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getFkMatPurchaseStatusId() { return mnFkMatPurchaseStatusId; }
     public int getFkUserRequesterId() { return mnFkUserRequesterId; }
     public int getFkContractorId_n() { return mnFkContractorId_n; }
+    public int getFkWarehouseCompanyBranch_n() { return mnFkWarehouseCompanyBranch_n; }
+    public int getFkWarehouseWarehouse_n() { return mnFkWarehouseWarehouse_n; }
+    public int getFkItemReferenceId_n() { return mnFkItemReferenceId_n; }
     public int getFkUserCloseProvisionId() { return mnFkUserCloseProvisionId; }
     public int getFkUserClosePurchaseId() { return mnFkUserClosePurchaseId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -170,6 +182,15 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public boolean getAuxLastProvClosedSta() { return mbAuxLastProvClosedSta; }
     public boolean getAuxLastPurClosedSta() { return mbAuxLastPurClosedSta; }
     
+    public String getConsumptionInfo() {
+        String description = "";
+        for (SDbMaterialRequestCostCenter oCc : maChildCostCenters) {
+            description += oCc.getConsumptionInfo() + " ";
+        }
+        
+        return description;
+    }
+    
     private void saveLog(SGuiSession session) throws Exception {
         SDbMaterialRequestStatusLog log = new SDbMaterialRequestStatusLog();
         log.setPkMatRequestId(mnPkMatRequestId);
@@ -196,6 +217,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         initBaseRegistry();
         
         mnPkMatRequestId = 0;
+        msTypeRequest = "";
         mnNumber = 0;
         mtDate = null;
         mtDateRequest_n = null;
@@ -213,6 +235,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnFkMatPurchaseStatusId = 0;
         mnFkUserRequesterId = 0;
         mnFkContractorId_n = 0;
+        mnFkWarehouseCompanyBranch_n = 0;
+        mnFkWarehouseWarehouse_n = 0;
+        mnFkItemReferenceId_n = 0;
         mnFkUserCloseProvisionId = 0;
         mnFkUserClosePurchaseId = 0;
         mnFkUserInsertId = 0;
@@ -289,6 +314,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         }
         else {
             mnPkMatRequestId = resultSet.getInt("id_mat_req");
+            msTypeRequest = resultSet.getString("tp_req");
             mnNumber = resultSet.getInt("num");
             mtDate = resultSet.getDate("dt");
             mtDateRequest_n = resultSet.getDate("dt_req_n");
@@ -306,6 +332,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkMatPurchaseStatusId = resultSet.getInt("fk_st_mat_pur");
             mnFkUserRequesterId = resultSet.getInt("fk_usr_req");
             mnFkContractorId_n = resultSet.getInt("fk_contractor_n");
+            mnFkWarehouseCompanyBranch_n = resultSet.getInt("fk_whs_cob_n");
+            mnFkWarehouseWarehouse_n = resultSet.getInt("fk_whs_whs_n");
+            mnFkItemReferenceId_n = resultSet.getInt("fk_item_ref_n");
             mnFkUserCloseProvisionId = resultSet.getInt("fk_usr_clo_prov");
             mnFkUserClosePurchaseId = resultSet.getInt("fk_usr_clo_pur");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -436,6 +465,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkMatRequestId + ", " + 
+                    "'" + msTypeRequest + "', " + 
                     mnNumber + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " + 
                     (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") + 
@@ -453,6 +483,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     mnFkMatPurchaseStatusId + ", " + 
                     mnFkUserRequesterId + ", " + 
                     (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") + 
+                    (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") + 
+                    (mnFkWarehouseWarehouse_n == 0 ? "NULL, " : mnFkWarehouseWarehouse_n + ", ") + 
+                    (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") + 
                     mnFkUserCloseProvisionId + ", " + 
                     mnFkUserClosePurchaseId + ", " + 
                     mnFkUserInsertId + ", " + 
@@ -487,6 +520,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     //"id_mat_req = " + mnPkMatRequestId + ", " +
+                    "tp_req = '" + msTypeRequest + "', " +
                     "num = " + mnNumber + ", " +
                     "dt = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
                     "dt_req_n = " + (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") +
@@ -504,6 +538,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_st_mat_pur = " + mnFkMatPurchaseStatusId + ", " +
                     "fk_usr_req = " + mnFkUserRequesterId + ", " +
                     "fk_contractor_n = " + (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") +
+                    "fk_whs_cob_n = " + (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") +
+                    "fk_whs_whs_n = " + (mnFkWarehouseWarehouse_n == 0 ? "NULL, " : mnFkWarehouseWarehouse_n + ", ") +
+                    "fk_item_ref_n = " + (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") +
                     "fk_usr_clo_prov = " + mnFkUserCloseProvisionId + ", " +
                     "fk_usr_clo_pur = " + mnFkUserClosePurchaseId + ", " +
                     "fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -558,7 +595,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         // Si el estatus de requisición esta "En autorización"
         if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_AUTH) {
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
-            SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
+            boolean reset = false;
+            SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId }, reset);
             mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
             
             mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
@@ -589,6 +627,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         SDbMaterialRequest registry = new SDbMaterialRequest();
         
         registry.setPkMatRequestId(this.getPkMatRequestId());
+        registry.setTypeRequest(this.getTypeRequest());
         registry.setNumber(this.getNumber());
         registry.setDate(this.getDate());
         registry.setDateRequest_n(this.getDateRequest_n());
@@ -606,6 +645,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setFkMatPurchaseStatusId(this.getFkMatPurchaseStatusId());
         registry.setFkUserRequesterId(this.getFkUserRequesterId());
         registry.setFkContractorId_n(this.getFkContractorId_n());
+        registry.setFkWarehouseCompanyBranch_n(this.getFkWarehouseCompanyBranch_n());
+        registry.setFkWarehouseWarehouse_n(this.getFkWarehouseWarehouse_n());
+        registry.setFkItemReferenceId_n(this.getFkItemReferenceId_n());
         registry.setFkUserCloseProvisionId(this.getFkUserCloseProvisionId());
         registry.setFkUserClosePurchaseId(this.getFkUserClosePurchaseId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
@@ -644,5 +686,4 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         
         return registry;
     }
-    
 }

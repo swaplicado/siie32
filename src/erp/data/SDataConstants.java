@@ -250,6 +250,8 @@ public abstract class SDataConstants {
     public static final int ITMU_ITEM_BARC = 205011;
     public static final int ITMU_CFG_ITEM_LAN = 205012;
     public static final int ITMU_CFG_ITEM_BP = 205013;
+    public static final int ITMU_TP_MAT_MAT_ATT = 205029;
+    public static final int ITMU_ITEM_MAT_ATT = 205030;
     public static final int ITMU_MATCH_ITEM_CPT_BP = 205051;
     public static final int ITMU_TP_UNIT = 205014;
     public static final int ITMU_TP_LEV = 205015;
@@ -262,6 +264,8 @@ public abstract class SDataConstants {
     public static final int ITMU_MFR = 205020;
     public static final int ITMU_TP_EMT = 205023;
     public static final int ITMU_EMT = 205021;
+    public static final int ITMU_TP_MAT = 205027;
+    public static final int ITMU_MAT_ATT = 205028;
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 205151;
 
     public static final int ITMX_ITEM_BY_KEY = 205501;
@@ -386,6 +390,7 @@ public abstract class SDataConstants {
     public static final int FINX_REC_W_XML = 206521;
     public static final int FINX_REC_CFD_DIRECT = 206522;
     public static final int FINX_REC_CFD_INDIRECT = 206523;
+    public static final int FINX_MOVES_ACC_DET_VIEW = 206524;
     
     public static final int TRNS_CT_DPS = 207001;
     public static final int TRNS_CL_DPS = 207002;
@@ -446,15 +451,17 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_REPL = 207053;
     public static final int TRN_DPS_DPS_SUPPLY = 207054;
     public static final int TRN_DPS_DPS_ADJ = 207055; 
+    public static final int TRN_DPS_MAT_REQ = 207066;
     public static final int TRN_DPS_IOG_CHG = 207056;
     public static final int TRN_DPS_IOG_WAR = 207057;
     public static final int TRN_DPS_REC = 207058;
+    public static final int TRN_DPS_CUSTOM_ACC_ETY = 207251;
     public static final int TRN_DIOG = 207059;
     public static final int TRN_DIOG_NTS = 207060;
     public static final int TRN_DIOG_ETY = 207061;
     public static final int TRN_DIOG_REC = 207062;
-    public static final int TRN_DIOG_CONS_ENT_CC = 207063;
-    public static final int TRN_DIOG_ETY_CONS_ENT_CC = 207064;
+    public static final int TRN_DIOG_CONS_ENT_CC = 207064;
+    public static final int TRN_DIOG_ETY_CONS_ENT_CC = 207065;
     public static final int TRN_CTR = 207070;
     public static final int TRN_CTR_ETY = 207071;
     public static final int TRN_DSM = 207072;
@@ -484,6 +491,8 @@ public abstract class SDataConstants {
     public static final int TRN_PAY_PAY_TAX = 2023403;
     public static final int TRN_PAY_PAY_DOC = 207404;
     public static final int TRN_PAY_PAY_DOC_TAX = 207405;
+    public static final int TRN_MAT_CONS_ENT = 207406;
+    public static final int TRN_MAT_CONS_SUBENT = 207407;
     public static final int TRN_PAC = 207097;
     public static final int TRN_TP_CFD_PAC = 207098;
     public static final int TRN_SIGN = 207085;
@@ -495,6 +504,9 @@ public abstract class SDataConstants {
     public static final int TRN_DNC_DIOG = 207088;
     public static final int TRN_DNC_DIOG_DNS = 207089;
     public static final int TRN_DPS_UPD_DT_LOG = 207093;
+    public static final int TRN_DPS_CFD_PAY = 207196;
+    public static final int TRN_DPS_CFD_PAY_DONE = 207197;
+    public static final int TRN_CFD_PAY = 207191;
 
     public static final int TRNX_DPS_RO_STK = 207504;
     public static final int TRNX_DPS_RO = 207505;
@@ -530,6 +542,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_LINKS = 207536;
     public static final int TRNX_DPS_LINKS_TRACE = 207537;
     public static final int TRNX_DPS_SUPPLY = 207538;
+    public static final int TRNX_DPS_MAT_REQ_LINKS = 207539;
 
     public static final int TRNX_DPS_SUPPLY_PEND = 207541;
     public static final int TRNX_DPS_SUPPLY_PEND_ETY = 207542;
@@ -828,6 +841,8 @@ public abstract class SDataConstants {
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
+        TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
+        TablesMap.put(ITMU_ITEM_MAT_ATT, "erp.itmu_item_mat_att");
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
@@ -839,6 +854,8 @@ public abstract class SDataConstants {
         TablesMap.put(ITMU_MFR, "erp.itmu_mfr");
         TablesMap.put(ITMU_TP_EMT, "erp.itmu_tp_emt");
         TablesMap.put(ITMU_EMT, "erp.itmu_emt");
+        TablesMap.put(ITMU_TP_MAT, "erp.itmu_tp_mat");
+        TablesMap.put(ITMU_MAT_ATT, "erp.itmu_mat_att");
 
         TablesMap.put(FINS_TP_BKR, "erp.fins_tp_bkr");
         TablesMap.put(FINS_TP_ACC_MOV, "erp.fins_tp_acc_mov");
@@ -986,9 +1003,11 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
         TablesMap.put(TRN_DPS_DPS_ADJ, "trn_dps_dps_adj");
+        TablesMap.put(TRN_DPS_MAT_REQ, "trn_dps_mat_req");
         TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
         TablesMap.put(TRN_DPS_REC, "trn_dps_rec");
+        TablesMap.put(TRN_DPS_CUSTOM_ACC_ETY, "trn_dps_custom_acc_ety");
         TablesMap.put(TRN_DIOG, "trn_diog");
         TablesMap.put(TRN_DIOG_NTS, "trn_diog_nts");
         TablesMap.put(TRN_DIOG_ETY, "trn_diog_ety");
@@ -1024,6 +1043,8 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_PAY_PAY_TAX, "trn_pay_pay_tax");
         TablesMap.put(TRN_PAY_PAY_DOC, "trn_pay_pay_doc");
         TablesMap.put(TRN_PAY_PAY_DOC_TAX, "trn_pay_pay_doc_tax");
+        TablesMap.put(TRN_MAT_CONS_ENT, "trn_mat_cons_ent");
+        TablesMap.put(TRN_MAT_CONS_SUBENT, "trn_mat_cons_subent");
         TablesMap.put(TRN_PAC, "trn_pac");
         TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
         TablesMap.put(TRN_SIGN, "trn_sign");
@@ -1034,6 +1055,9 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");
         TablesMap.put(TRN_DNC_DIOG, "trn_dnc_diog");
         TablesMap.put(TRN_DNC_DIOG_DNS, "trn_dnc_diog_dns");
+        TablesMap.put(TRN_DPS_CFD_PAY, "trn_dps_cfd_pay");
+        TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
 
         TablesMap.put(MKT_CFG_CUS, "mkt_cfg_cus");
         TablesMap.put(MKT_CFG_CUSB, "mkt_cfg_cusb");

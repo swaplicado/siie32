@@ -6,7 +6,6 @@ package erp.mod.trn.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SMaterialRequestUtils;
@@ -37,10 +36,11 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
     /**
      * Creates new form SFormMaterialRequestCostCenter
      * @param client
+     * @param type
      * @param title
      */
-    public SFormMaterialRequestCostCenter(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ_CC, SLibConstants.UNDEFINED, title);
+    public SFormMaterialRequestCostCenter(SGuiClient client, int type, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ_CC, type, title);
         initComponents();
         initComponentsCustom();
     }
@@ -198,10 +198,18 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
         SGuiParams params = new SGuiParams();
         params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
         
-        moFieldKeyConsEntity.initGroup();
-        moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
-        moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
-        moFieldKeyConsEntity.populateCatalogues();
+        if (getFormSubtype()== SModConsts.TRNX_MAT_REQ_STK_SUP) {
+            moFieldKeyConsEntity.initGroup();
+            moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, SModConsts.TRNX_MAT_REQ_STK_SUP, null);
+            moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, SLibConsts.UNDEFINED, null);
+            moFieldKeyConsEntity.populateCatalogues();
+        }
+        else {
+            moFieldKeyConsEntity.initGroup();
+            moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
+            moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
+            moFieldKeyConsEntity.populateCatalogues();
+        }
     }
 
     @Override
@@ -224,6 +232,17 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
         setFormEditable(true);
 
         addAllListeners();
+        
+        if (moKeyConsEnt.getItemCount() == 2) {
+            moKeyConsEnt.setSelectedIndex(1);
+        } 
+        if (moKeyConsSubent.getItemCount() == 2) {
+            moKeyConsSubent.setSelectedIndex(1);
+        } 
+        
+        if (getFormSubtype()== SModConsts.TRNX_MAT_REQ_STK_SUP) {
+            moDecPer.setValue(1.0);
+        }
     }
 
     @Override
@@ -282,6 +301,9 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
             params.getParamsMap().put(SModConsts.TRN_MAT_CONS_SUBENT, moKeyConsSubent.getValue());
             miClient.getSession().populateCatalogue(moKeyCC, SModConsts.FIN_CC, SModConsts.TRN_MAT_REQ, params);
             moKeyCC.setEnabled(true);
+            if (moKeyCC.getItemCount() == 2) {
+                moKeyCC.setSelectedIndex(1);
+            } 
         }
     }
 
@@ -297,6 +319,9 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
             params.getParamsMap().put(SLibConsts.DATA_TYPE_DATE, miClient.getSession().getSystemYear());
             miClient.getSession().populateCatalogue(moKeyBudget, SModConsts.TRN_MAT_CONS_ENT_BUDGET, SModConsts.TRN_MAT_REQ, params);
             moKeyBudget.setEnabled(true);
+            if (moKeyBudget.getItemCount() == 2) {
+                moKeyBudget.setSelectedIndex(1);
+            } 
         }
     }
 }

@@ -6,9 +6,9 @@
 package erp.mod.trn.form;
 
 import erp.mod.SModConsts;
-import erp.mod.trn.db.SDbConfWarehouseVsEntity;
-import erp.mod.trn.db.SDbMaterialProvisionEntity;
-import erp.mod.trn.db.SDbMaterialProvisionEntityWarehouse;
+import erp.mod.trn.db.SDbConfWarehouseVsConsEntity;
+import erp.mod.trn.db.SDbMaterialConsumptionEntity;
+import erp.mod.trn.db.SDbMaterialConsumptionEntityWarehouse;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
@@ -32,24 +32,24 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Isabel Servín
  */
-public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListener {
+public class SFormConfWarehouseVsConsEntity extends SBeanForm implements ActionListener {
     
-    private SDbConfWarehouseVsEntity moRegistry;
+    private SDbConfWarehouseVsConsEntity moRegistry;
     
-    private SGridPaneForm moGridMatProvEnt;
-    private SGridPaneForm moGridMatProvEntSelected;
+    private SGridPaneForm moGridMatConsEnt;
+    private SGridPaneForm moGridMatConsEntSelected;
     
-    private ArrayList<SDbMaterialProvisionEntity> maMatProvEnt;
-    private ArrayList<SDbMaterialProvisionEntityWarehouse> maMatProvEntSelected;
+    private ArrayList<SDbMaterialConsumptionEntity> maMatConsEnt;
+    private ArrayList<SDbMaterialConsumptionEntityWarehouse> maMatConsEntSelected;
     
 
     /**
-     * Creates new form SFormConfEmployeeVsEntity
+     * Creates new form SFormConfWarehouseVsConsEntity
      * @param client
      * @param title
      */
-    public SFormConfWarehouseVsEntity(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_CONF_WHS_VS_ENT, 0, title);
+    public SFormConfWarehouseVsConsEntity(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_CONF_WHS_VS_CON_ENT, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -70,22 +70,22 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         moTextWarehouse = new sa.lib.gui.bean.SBeanFieldText();
         jpProvAvailable = new javax.swing.JPanel();
         jpProvAvailableLabel = new javax.swing.JPanel();
-        jlProvAvailable = new javax.swing.JLabel();
-        jpGridProvAva = new javax.swing.JPanel();
+        jlConsAvailable = new javax.swing.JLabel();
+        jpGridConsAva = new javax.swing.JPanel();
         jpProvButtons = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jbProvAdd = new javax.swing.JButton();
+        jbConsAdd = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jbProvAddAll = new javax.swing.JButton();
+        jbConsAddAll = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
-        jbProvRemove = new javax.swing.JButton();
+        jbConsRemove = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
-        jbProvRemoveAll = new javax.swing.JButton();
+        jbConsRemoveAll = new javax.swing.JButton();
         jpProvSelected = new javax.swing.JPanel();
         jpProvSelectedLabel = new javax.swing.JPanel();
-        jlProvSelected = new javax.swing.JLabel();
-        jpGridProvSel = new javax.swing.JPanel();
+        jlConsSelected = new javax.swing.JLabel();
+        jpGridConsSel = new javax.swing.JPanel();
 
         jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpRegistry.setLayout(new java.awt.BorderLayout());
@@ -108,39 +108,39 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
 
         jpProvAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlProvAvailable.setText("Entidades de suministro disponibles:");
-        jpProvAvailableLabel.add(jlProvAvailable);
+        jlConsAvailable.setText("Centros de consumo disponibles:");
+        jpProvAvailableLabel.add(jlConsAvailable);
 
         jpProvAvailable.add(jpProvAvailableLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridProvAva.setPreferredSize(new java.awt.Dimension(350, 330));
-        jpGridProvAva.setLayout(new java.awt.BorderLayout());
-        jpProvAvailable.add(jpGridProvAva, java.awt.BorderLayout.CENTER);
+        jpGridConsAva.setPreferredSize(new java.awt.Dimension(350, 330));
+        jpGridConsAva.setLayout(new java.awt.BorderLayout());
+        jpProvAvailable.add(jpGridConsAva, java.awt.BorderLayout.CENTER);
 
         jpProvButtons.setLayout(new java.awt.GridLayout(10, 0));
         jpProvButtons.add(jPanel1);
 
-        jbProvAdd.setText(">");
-        jbProvAdd.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel2.add(jbProvAdd);
+        jbConsAdd.setText(">");
+        jbConsAdd.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel2.add(jbConsAdd);
 
         jpProvButtons.add(jPanel2);
 
-        jbProvAddAll.setText(">>");
-        jbProvAddAll.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel3.add(jbProvAddAll);
+        jbConsAddAll.setText(">>");
+        jbConsAddAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel3.add(jbConsAddAll);
 
         jpProvButtons.add(jPanel3);
 
-        jbProvRemove.setText("<");
-        jbProvRemove.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel4.add(jbProvRemove);
+        jbConsRemove.setText("<");
+        jbConsRemove.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel4.add(jbConsRemove);
 
         jpProvButtons.add(jPanel4);
 
-        jbProvRemoveAll.setText("<<");
-        jbProvRemoveAll.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel5.add(jbProvRemoveAll);
+        jbConsRemoveAll.setText("<<");
+        jbConsRemoveAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel5.add(jbConsRemoveAll);
 
         jpProvButtons.add(jPanel5);
 
@@ -152,15 +152,15 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
 
         jpProvSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlProvSelected.setText("Entidades de suministro seleccionadas:");
-        jlProvSelected.setPreferredSize(new java.awt.Dimension(370, 16));
-        jpProvSelectedLabel.add(jlProvSelected);
+        jlConsSelected.setText("Centros de consumo seleccionadas:");
+        jlConsSelected.setPreferredSize(new java.awt.Dimension(370, 16));
+        jpProvSelectedLabel.add(jlConsSelected);
 
         jpProvSelected.add(jpProvSelectedLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridProvSel.setPreferredSize(new java.awt.Dimension(380, 330));
-        jpGridProvSel.setLayout(new java.awt.BorderLayout());
-        jpProvSelected.add(jpGridProvSel, java.awt.BorderLayout.CENTER);
+        jpGridConsSel.setPreferredSize(new java.awt.Dimension(380, 330));
+        jpGridConsSel.setLayout(new java.awt.BorderLayout());
+        jpProvSelected.add(jpGridConsSel, java.awt.BorderLayout.CENTER);
 
         jpProvision.add(jpProvSelected, java.awt.BorderLayout.EAST);
 
@@ -177,15 +177,15 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JButton jbProvAdd;
-    private javax.swing.JButton jbProvAddAll;
-    private javax.swing.JButton jbProvRemove;
-    private javax.swing.JButton jbProvRemoveAll;
-    private javax.swing.JLabel jlProvAvailable;
-    private javax.swing.JLabel jlProvSelected;
+    private javax.swing.JButton jbConsAdd;
+    private javax.swing.JButton jbConsAddAll;
+    private javax.swing.JButton jbConsRemove;
+    private javax.swing.JButton jbConsRemoveAll;
+    private javax.swing.JLabel jlConsAvailable;
+    private javax.swing.JLabel jlConsSelected;
     private javax.swing.JLabel jlWarehouse;
-    private javax.swing.JPanel jpGridProvAva;
-    private javax.swing.JPanel jpGridProvSel;
+    private javax.swing.JPanel jpGridConsAva;
+    private javax.swing.JPanel jpGridConsSel;
     private javax.swing.JPanel jpProvAvailable;
     private javax.swing.JPanel jpProvAvailableLabel;
     private javax.swing.JPanel jpProvButtons;
@@ -202,9 +202,9 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         
         moTextWarehouse.setTextSettings("Almacén", 250);
         
-        // Entidades de consumo disponibles
+        // Centros de consumo disponibles
         
-        moGridMatProvEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT, 0, "Entidades de suministro") {
+        moGridMatConsEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT, 0, "Centros de consumo") {
             
             @Override
             public void initGrid() {
@@ -215,18 +215,18 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
 
                 return columns;
             }
         };
 
-        jpGridProvAva.add(moGridMatProvEnt);
-        mvFormGrids.add(moGridMatProvEnt);
+        jpGridConsAva.add(moGridMatConsEnt);
+        mvFormGrids.add(moGridMatConsEnt);
         
-        // Entidades de consumo seleccionadas
+        // Centros de consumo seleccionados
         
-        moGridMatProvEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_PROV_ENT_WHS, 0, "Entidades de suministro seleccionadas") {
+        moGridMatConsEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT_WHS, 0, "Centros de consumo seleccionados") {
             
             @Override
             public void initGrid() {
@@ -237,39 +237,39 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de suministro"));
-                //SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
-                //col.setEditable(true);
-                //columns.add(col);
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de suministro"));
+                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
+                col.setEditable(true);
+                columns.add(col);
 
                 return columns;
             }
         };
 
-        jpGridProvSel.add(moGridMatProvEntSelected);
-        mvFormGrids.add(moGridMatProvEntSelected);
+        jpGridConsSel.add(moGridMatConsEntSelected);
+        mvFormGrids.add(moGridMatConsEntSelected);
         
         jpCommandRight.remove(jbEdit);
         jpCommandRight.remove(jbReadInfo);
     }
     
-    private void readMaterialProvisionEntities() {
+    private void readMaterialConsumptionEntities() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT id_mat_prov_ent FROM trn_mat_prov_ent";
+            String sql = "SELECT id_mat_cons_ent FROM trn_mat_cons_ent";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;
-                for (SDbMaterialProvisionEntityWarehouse ew : maMatProvEntSelected) {
-                    if (resultSet.getInt(1) == ew.getPkMatProvisionEntityId()) {
+                for (SDbMaterialConsumptionEntityWarehouse ew : maMatConsEntSelected) {
+                    if (resultSet.getInt(1) == ew.getPkMatConsumptionEntityId()) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    SDbMaterialProvisionEntity pe = new SDbMaterialProvisionEntity();
-                    pe.read(miClient.getSession(), new int[] { resultSet.getInt(1) });
-                    maMatProvEnt.add(pe);
+                    SDbMaterialConsumptionEntity ce = new SDbMaterialConsumptionEntity();
+                    ce.read(miClient.getSession(), new int[] { resultSet.getInt(1) });
+                    maMatConsEnt.add(ce);
                 }
             }
         }
@@ -278,33 +278,33 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         }
     }
     
-    private void populateGridMatProvEnt() {
+    private void populateGridMatConsEnt() {
         Vector<SGridRow> vRows = new Vector<>();
-        if (maMatProvEnt.size() > 0) {
-            vRows.addAll(maMatProvEnt);
+        if (maMatConsEnt.size() > 0) {
+            vRows.addAll(maMatConsEnt);
         }
-        moGridMatProvEnt.populateGrid(vRows);
+        moGridMatConsEnt.populateGrid(vRows);
     }
     
-    private void populateGridMatProvEntSelected() {
+    private void populateGridMatConsEntSelected() {
         Vector<SGridRow> vRows = new Vector<>();
-        if (maMatProvEntSelected.size() > 0) {
-            vRows.addAll(maMatProvEntSelected);
+        if (maMatConsEntSelected.size() > 0) {
+            vRows.addAll(maMatConsEntSelected);
         }
-        moGridMatProvEntSelected.populateGrid(vRows);
+        moGridMatConsEntSelected.populateGrid(vRows);
     }
     
-    private void actionProvAdd() {
+    private void actionConsAdd() {
         try {
-            int provId = ((SDbMaterialProvisionEntity) moGridMatProvEnt.getSelectedGridRow()).getPkMatProvisionEntityId();
-            if (maMatProvEnt.remove((SDbMaterialProvisionEntity) moGridMatProvEnt.getSelectedGridRow()) ) {
-                SDbMaterialProvisionEntityWarehouse ew = new SDbMaterialProvisionEntityWarehouse();
-                ew.setPkMatProvisionEntityId(provId);
-                ew.readAuxMatProvEnt(miClient.getSession());
-                maMatProvEntSelected.add(ew);
+            int consId = ((SDbMaterialConsumptionEntity) moGridMatConsEnt.getSelectedGridRow()).getPkMatConsumptionEntityId();
+            if (maMatConsEnt.remove((SDbMaterialConsumptionEntity) moGridMatConsEnt.getSelectedGridRow()) ) {
+                SDbMaterialConsumptionEntityWarehouse ew = new SDbMaterialConsumptionEntityWarehouse();
+                ew.setPkMatConsumptionEntityId(consId);
+                ew.readAuxMatConsEnt(miClient.getSession());
+                maMatConsEntSelected.add(ew);
 
-                populateGridMatProvEnt();
-                populateGridMatProvEntSelected();
+                populateGridMatConsEnt();
+                populateGridMatConsEntSelected();
             }
         }
         catch (Exception e) {
@@ -312,67 +312,67 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         }
     }
 
-    private void actionProvAddAll() {
+    private void actionConsAddAll() {
         try {
-            for (SDbMaterialProvisionEntity pe : maMatProvEnt) {
-                SDbMaterialProvisionEntityWarehouse ew = new SDbMaterialProvisionEntityWarehouse();
-                ew.setPkMatProvisionEntityId(pe.getPkMatProvisionEntityId());
-                ew.readAuxMatProvEnt(miClient.getSession());
-                maMatProvEntSelected.add(ew);
+            for (SDbMaterialConsumptionEntity ce : maMatConsEnt) {
+                SDbMaterialConsumptionEntityWarehouse ew = new SDbMaterialConsumptionEntityWarehouse();
+                ew.setPkMatConsumptionEntityId(ce.getPkMatConsumptionEntityId());
+                ew.readAuxMatConsEnt(miClient.getSession());
+                maMatConsEntSelected.add(ew);
             }
-            maMatProvEnt.clear();
-            populateGridMatProvEnt();
-            populateGridMatProvEntSelected();
+            maMatConsEnt.clear();
+            populateGridMatConsEnt();
+            populateGridMatConsEntSelected();
         }
         catch (Exception e) {
             miClient.showMsgBoxError(e.getMessage());
         }
     }
     
-    private void actionProvRemove() {
-        maMatProvEnt.add(((SDbMaterialProvisionEntityWarehouse) moGridMatProvEntSelected.getSelectedGridRow()).getAuxMatProvEnt());
-        if (maMatProvEntSelected.remove(((SDbMaterialProvisionEntityWarehouse) moGridMatProvEntSelected.getSelectedGridRow()))) {
-            populateGridMatProvEnt();
-            populateGridMatProvEntSelected();
+    private void actionConsRemove() {
+        maMatConsEnt.add(((SDbMaterialConsumptionEntityWarehouse) moGridMatConsEntSelected.getSelectedGridRow()).getAuxMatConsEnt());
+        if (maMatConsEntSelected.remove(((SDbMaterialConsumptionEntityWarehouse) moGridMatConsEntSelected.getSelectedGridRow()))) {
+            populateGridMatConsEnt();
+            populateGridMatConsEntSelected();
         }
     }
 
-    private void actionProvRemoveAll() {
-        for (SDbMaterialProvisionEntityWarehouse ew : maMatProvEntSelected) {
-            maMatProvEnt.add(ew.getAuxMatProvEnt());
+    private void actionConsRemoveAll() {
+        for (SDbMaterialConsumptionEntityWarehouse ew : maMatConsEntSelected) {
+            maMatConsEnt.add(ew.getAuxMatConsEnt());
         }
-        maMatProvEntSelected.clear();
-        populateGridMatProvEnt();
-        populateGridMatProvEntSelected();
+        maMatConsEntSelected.clear();
+        populateGridMatConsEnt();
+        populateGridMatConsEntSelected();
     }
     
     @Override
     public void addAllListeners() {
-        jbProvAdd.addActionListener(this);
-        jbProvAddAll.addActionListener(this);
-        jbProvRemove.addActionListener(this);
-        jbProvRemoveAll.addActionListener(this);
+        jbConsAdd.addActionListener(this);
+        jbConsAddAll.addActionListener(this);
+        jbConsRemove.addActionListener(this);
+        jbConsRemoveAll.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        jbProvAdd.removeActionListener(this);
-        jbProvAddAll.removeActionListener(this);
-        jbProvRemove.removeActionListener(this);
-        jbProvRemoveAll.removeActionListener(this);
+        jbConsAdd.removeActionListener(this);
+        jbConsAddAll.removeActionListener(this);
+        jbConsRemove.removeActionListener(this);
+        jbConsRemoveAll.removeActionListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
         moTextWarehouse.setValue("");
         
-        maMatProvEnt = new ArrayList<>();
-        maMatProvEntSelected = new ArrayList<>();
+        maMatConsEnt = new ArrayList<>();
+        maMatConsEntSelected = new ArrayList<>();
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbConfWarehouseVsEntity) registry;
+        moRegistry = (SDbConfWarehouseVsConsEntity) registry;
         
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -382,27 +382,28 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         
         moTextWarehouse.setValue(moRegistry.getAuxCompBrEnt().getEntity());
         
-        for (SDbMaterialProvisionEntityWarehouse ew : moRegistry.getProvEntWhs()) {
-            maMatProvEntSelected.add(ew);
+        for (SDbMaterialConsumptionEntityWarehouse ew : moRegistry.getConsEntWhs()) {
+            maMatConsEntSelected.add(ew);
         }
         
-        readMaterialProvisionEntities();
+        readMaterialConsumptionEntities();
         
-        populateGridMatProvEnt();
-        populateGridMatProvEntSelected();
+        populateGridMatConsEnt();
+        populateGridMatConsEntSelected();
         
         addAllListeners();
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbConfWarehouseVsEntity registry = moRegistry.clone();
+        SDbConfWarehouseVsConsEntity registry = moRegistry.clone();
         
         if (registry.isRegistryNew()) { }
         
-        registry.getProvEntWhs().clear();
-        for (SDbMaterialProvisionEntityWarehouse ew : maMatProvEntSelected) {
-            registry.getProvEntWhs().add(ew);
+        registry.getConsEntWhs().clear();
+        for (SDbMaterialConsumptionEntityWarehouse ew : maMatConsEntSelected) {
+            registry.getConsEntWhs().add(ew);
+            registry.setDefault(ew.isDefault());
         }
         
         return registry;
@@ -420,17 +421,17 @@ public class SFormConfWarehouseVsEntity extends SBeanForm implements ActionListe
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbProvAdd) {
-                actionProvAdd();
+            if (button == jbConsAdd) {
+                actionConsAdd();
             }
-            else if (button == jbProvAddAll) {
-                actionProvAddAll();
+            else if (button == jbConsAddAll) {
+                actionConsAddAll();
             }
-            else if (button == jbProvRemove) {
-                actionProvRemove();
+            else if (button == jbConsRemove) {
+                actionConsRemove();
             }
-            else if (button == jbProvRemoveAll) {
-                actionProvRemoveAll();
+            else if (button == jbConsRemoveAll) {
+                actionConsRemoveAll();
             }
         }
     }

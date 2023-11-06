@@ -921,6 +921,30 @@ public abstract class SLibUtilities {
 
         return sError;
     }
+   
+   public static boolean validateEmails(String sEmails) {
+        // Expresión regular para validar correos electrónicos
+        String regex = "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b";
+
+        // Patrón de la expresión regular
+        Pattern pattern = Pattern.compile(regex);
+
+        // Dividir la cadena en correos separados por ";"
+        String[] mails = sEmails.split(";");
+
+        // Validar cada correo en la cadena
+        for (String mail : mails) {
+            // Crear un matcher para el correo actual
+            Matcher matcher = pattern.matcher(mail.trim());
+
+            // Verificar si el correo coincide con el patrón
+            if (!matcher.matches()) {
+                return false; // El correo no es válido
+            }
+        }
+
+        return true; // Todos los correos son válidos
+    }
 
     public static void launchFile(final java.lang.String filePath) {
         try {

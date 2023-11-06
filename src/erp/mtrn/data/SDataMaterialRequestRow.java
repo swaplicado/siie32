@@ -45,6 +45,7 @@ public class SDataMaterialRequestRow extends erp.lib.table.STableRow {
         mvValues.add(moMatRequest.getDate());
         mvValues.add(moMatRequest.getReference());
         mvValues.add(msUserRequester);
+        mvValues.add(moMatRequest.getConsumptionInfo());
     }
     
     

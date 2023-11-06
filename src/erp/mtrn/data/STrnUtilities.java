@@ -609,7 +609,7 @@ public abstract class STrnUtilities {
         return SLibUtilities.belongsTo(iogTypeKey, new int[][] {
             SDataConstantsSys.TRNS_TP_IOG_OUT_PUR_PUR, SDataConstantsSys.TRNS_TP_IOG_IN_SAL_SAL });
     }
-
+    
     /**
      * @param iogTypeKey IOG type key. Constants defined in SDataConstantsSys.
      */
@@ -1629,7 +1629,16 @@ public abstract class STrnUtilities {
             else {
                 if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                     bizPartnerUserSend = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
-                    userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                    //Si es un pedido mandar el correo del institucional
+                    if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
+                        userMail = ((SDataUser) client.getSession().getUser()).getEmail();
+                        if (userMail.isEmpty()) {
+                            userMail = mms.getUser();
+                        }
+                    }
+                    else {
+                        userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                    }
                 }
                 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
@@ -1841,7 +1850,10 @@ public abstract class STrnUtilities {
                         + body 
                         + computeMailFooterEndTable();
                 
-                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc);
+                SMailSender sender = null;
+                Map<String, String> images = null;
+                Date sentDate = null;
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, images, sentDate);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");
@@ -3182,10 +3194,19 @@ public abstract class STrnUtilities {
      * @param requestedRecipientsBcc Recipients blind carbon copy for mail.
      * @param body Mail body.
      * @param subjectComplement Mail subject complement. Can be null or empty.
+     * @param senderReceived In case be null the object sender is created
+     * @param imagesMap
+     * @param sentDate
      * @throws java.lang.Exception
      */
-    public static void sendMail(final SClientInterface client, final int mmsType, final String body, final String subjectComplement, 
-            final ArrayList<String> requestedRecipientsTo, final ArrayList<String> requestedRecipientsCc, final ArrayList<String> requestedRecipientsBcc) throws Exception {
+    public static void sendMail(final SClientInterface client, final int mmsType, 
+                                final String body, final String subjectComplement, 
+                                final ArrayList<String> requestedRecipientsTo, 
+                                final ArrayList<String> requestedRecipientsCc, 
+                                final ArrayList<String> requestedRecipientsBcc, 
+                                SMailSender senderReceived,
+                                final Map<String, String> imagesMap,
+                                final Date sentDate) throws Exception {
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         SDbMms mms = getMms(client, mmsType);
@@ -3204,7 +3225,7 @@ public abstract class STrnUtilities {
                 }
                 
                 if (requestedRecipientsCc != null && !requestedRecipientsCc.isEmpty()) {
-                    for(String recipient: recipientsCc) {
+                    for(String recipient: requestedRecipientsCc) {
                         recipientsCc.addAll(Arrays.asList(SLibUtils.textExplode(recipient, ";")));
                     }
                 }
@@ -3226,9 +3247,28 @@ public abstract class STrnUtilities {
             }
             else {
                 try {
-                    SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                    SMailSender sender;
+                    if (senderReceived == null) {
+                        sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                    }
+                    else {
+                        sender = senderReceived;
+                    }
                     String subject = mms.getTextSubject() + (subjectComplement != null && !subjectComplement.isEmpty() ? " " + SLibUtils.textTrim(subjectComplement) : "");
-                    new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc).send();
+                    SMail oMail = null;
+                    if (imagesMap != null && !imagesMap.isEmpty()) {
+                        oMail = new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc);
+                        oMail.getInlineImages().putAll(imagesMap);
+                    }
+                    else {
+                        oMail = new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc);
+                    }
+                    
+                    if (sentDate != null) {
+                        oMail.setSentDate(sentDate);
+                    }
+                    
+                    oMail.send();
                 } 
                 catch (Exception e) {
                     SLibUtilities.renderException(STrnUtilities.class.getName(), e);

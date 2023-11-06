@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona, Isabel Servín
  */
-public class SMaterialRequestUtils {
+public abstract class SMaterialRequestUtils {
     
     public static SDataStockSegregation getSegregationOfMaterialRequest(SGuiSession session, final int idMaterialRequest) {
         String query = "SELECT id_stk_seg "
@@ -223,7 +223,7 @@ public class SMaterialRequestUtils {
                 oDiog.setFkMatRequestId_n(oSupply.getFkMatRequestId());
                 oDiog.setFkBookkeepingYearId_n(0);
                 oDiog.setFkBookkeepingNumberId_n(0);
-                oDiog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART);
+                oDiog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT);
                 oDiog.setFkMaintUserId_n(user);
                 oDiog.setFkMaintUserSupervisorId(userSup);
                 oDiog.setFkMaintReturnUserId_n(0);
@@ -397,10 +397,11 @@ public class SMaterialRequestUtils {
         return ccg;
     }
     
+    @SuppressWarnings("unchecked")
     public static SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
-        SGuiOptionPickerSettings settings = null;
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
+        SGuiOptionPickerSettings settings;
         SDialogItemPicker picker = new SDialogItemPicker();
         switch (type) {
             case SModConsts.ITMU_ITEM:
@@ -430,6 +431,11 @@ public class SMaterialRequestUtils {
                                 + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
                                 + "ORDER BY a.item_key, a.item, a.id_item ";
                         break;
+                    case SLibConstants.UNDEFINED:
+                        sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
+                                + "WHERE NOT a.b_del ";
                 }
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
@@ -455,7 +461,8 @@ public class SMaterialRequestUtils {
     public static ArrayList<SDataMaterialRequestRow> getMaterialRequest(SGuiClient client, final int idUser, final int idConsumeEntity, final int idConsumeSubentity, final String folio) {
         ArrayList<SDataMaterialRequestRow> rows = new ArrayList<>();
         try {
-            String sql = "SELECT id_mat_req FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " WHERE NOT b_del ";
+            String sql = "SELECT id_mat_req FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " WHERE NOT b_del "
+                    + "AND NOT b_clo_pur AND b_clo_prov AND fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " ";
             if (idUser > 0) {
                 sql += "AND fk_usr_req = " + idUser + " ";
             }
@@ -492,24 +499,33 @@ public class SMaterialRequestUtils {
      * @param session
      * @param pkMatReqEty llave primaria de la partida de la requisición
      * @param dpsType tipo de documento, si este es nulo, no filtra y muestra la suma de todas las referencias de todos los tipos de documento
+     * @param pkDpsEtyExcluded
      * @return 
      */
-    public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType) {
-        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM " ;
-                + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_MAT_REQ) + " AS dmr ";
-        
-        if (dpsType != null) {
-            query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON drm.id_year = dety.id_year "
-                                                                                            + "AND drm.id_doc = dety.id_doc "
-                                                                                            + "AND drm.id_ety = dety.id_ety ";
-            query += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON dety.id_year = d.id_year "
+    public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType, final int[] pkDpsEtyExcluded) {
+        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM "
+                + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dmr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON dmr.fid_dps_year = dety.id_year "
+                                                                                        + "AND dmr.fid_dps_doc = dety.id_doc "
+                                                                                        + "AND dmr.fid_dps_ety = dety.id_ety "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON dety.id_year = d.id_year "
                                                                                             + "AND dety.id_doc = d.id_doc ";
+        if (dpsType != null) {
             query += "AND d.fid_ct_dps = " + dpsType[0]  + " " +
                    "AND d.fid_cl_dps = " + dpsType[1]  + " " +
                    "AND d.fid_tp_dps = " + dpsType[2]  + " ";
         }
         
-        query += "WHERE dmr.id_mat_req = " + pkMatReqEty[0] + " AND dmr.id_mat_req_ety = " + pkMatReqEty[1] + " ";
+        query += "WHERE NOT dety.b_del AND NOT d.b_del AND dmr.fid_mat_req = " + pkMatReqEty[0] + " AND dmr.fid_mat_req_ety = " + pkMatReqEty[1] + " ";
+        
+        if (pkDpsEtyExcluded != null) {
+            if (pkDpsEtyExcluded.length == 2) {
+                query += "AND dmr.fid_dps_year <> " + pkDpsEtyExcluded[0] + " AND dmr.fid_dps_doc <> " + pkDpsEtyExcluded[1] + " ";
+            }
+            if (pkDpsEtyExcluded.length == 3) {
+                query += "AND dmr.fid_dps_year <> " + pkDpsEtyExcluded[0] + " AND dmr.fid_dps_doc <> " + pkDpsEtyExcluded[1] + " AND dmr.fid_dps_ety <> " + pkDpsEtyExcluded[2];
+            }
+        }
         
         try {
             ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
@@ -551,6 +567,7 @@ public class SMaterialRequestUtils {
         
         return 0d;
     }
+    
     /*
      * Devuelve la cantidad de presupuesto que ha sido pedido a un centro de consumo, se excluyen los documentos eliminados y rechazados
      * @param session 
@@ -584,7 +601,7 @@ public class SMaterialRequestUtils {
         return consBud;
     }
     
-    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfisFromMatReq(Connection conn, final int idMatRequest) {
+    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfigsFromMatReq(Connection conn, final int idMatRequest) {
         ResultSet resultSet;
         
         String query = "SELECT * "
@@ -598,8 +615,8 @@ public class SMaterialRequestUtils {
             while (resultSet.next()) {
                 oConfig = new SMatConsumeSubEntCcConfig();
                 oConfig.setFkMaterialRequestId(idMatRequest);
-                oConfig.setFkSubentMatConsumptionEntityId(resultSet.getInt("fk_subent_mat_cons_ent"));
-                oConfig.setFkSubentMatConsumptionSubentityId(resultSet.getInt("fk_subent_mat_cons_subent"));
+                oConfig.setFkSubentMatConsumptionEntityId(resultSet.getInt("id_mat_subent_cons_ent"));
+                oConfig.setFkSubentMatConsumptionSubentityId(resultSet.getInt("id_mat_subent_cons_subent"));
                 oConfig.setFkCostCenterId(resultSet.getInt("id_cc"));
 
                 lConfigs.add(oConfig);
@@ -613,7 +630,7 @@ public class SMaterialRequestUtils {
         }
     }
     
-    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfisFromMatReqEty(Connection conn, final int[] pkMatRequestEntry) {
+    public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfigsFromMatReqEty(Connection conn, final int[] pkMatRequestEntry) {
         ResultSet resultSet;
         
         String query = "SELECT * "
@@ -645,6 +662,65 @@ public class SMaterialRequestUtils {
         catch (SQLException ex) {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
             return new ArrayList<>();
+        }
+    }
+    
+    public static String hasLinksMaterialRequest(SGuiSession session, int[] pkMatReq) throws SQLException {
+        String sql = "SELECT ety.* FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS ety "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS di ON ety.id_year = di.id_year "
+                    + "AND ety.id_doc = di.id_doc "
+                    + "WHERE ety.fid_mat_req_n = " + pkMatReq[0] + " "
+                    + "AND NOT ety.b_del "
+                    + "AND NOT di.b_del;";
+        
+        String message = "";
+        ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        
+        if (resultSet.next()) {
+            message = "La requisición tiene suministros de almacén.";
+        }
+        
+        sql = "SELECT " +
+            "dpsmr.* " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS ety " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON ety.id_year = d.id_year AND ety.id_doc = d.id_doc " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dpsmr ON ety.id_year = dpsmr.fid_dps_year AND ety.id_doc = dpsmr.fid_dps_doc AND ety.id_ety = dpsmr.fid_dps_ety " +
+            "WHERE NOT d.b_del AND NOT ety.b_del AND dpsmr.fid_mat_req = " + pkMatReq[0] + ";";
+        
+        ResultSet resultSetDps = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        
+        if (resultSetDps.next()) {
+            message = "La requisición tiene vínculos con documentos de compra.";
+        }
+
+        return message;
+    }
+    
+    public static String updateStatusOfMaterialRequest(SGuiSession session, int[] pkMatReq, int statusId) {
+        try {
+            SDbMaterialRequest req = new SDbMaterialRequest();
+            req.read(session, pkMatReq);
+            req.setFkMatRequestStatusId(statusId);
+            
+            if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
+                SAuthorizationUtils.deleteStepsOfAuthorization(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, pkMatReq);
+            }
+            else if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
+                req.setCloseProvision(true);
+                req.setClosePurchase(false);
+            }
+            else if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
+                req.setCloseProvision(false);
+                req.setClosePurchase(true);
+            }
+            
+            req.save(session);
+            
+            return "";
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
         }
     }
 }

@@ -134,7 +134,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpConsAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlConsAvailable.setText("Entidades de consumo disponibles:");
+        jlConsAvailable.setText("Centros de consumo disponibles:");
         jpConsAvailableLabel.add(jlConsAvailable);
 
         jpConsAvailable.add(jpConsAvailableLabel, java.awt.BorderLayout.NORTH);
@@ -178,7 +178,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpConsSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlConsSelected.setText("Entidades de consumo seleccionadas:");
+        jlConsSelected.setText("Centros de consumo seleccionadas:");
         jlConsSelected.setPreferredSize(new java.awt.Dimension(370, 16));
         jpConsSelectedLabel.add(jlConsSelected);
 
@@ -200,7 +200,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpSubAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlSubAvailable.setText("Entidades de consumo disponibles:");
+        jlSubAvailable.setText("Centros de consumo disponibles:");
         jpSubAvailableLabel.add(jlSubAvailable);
 
         jpSubAvailable.add(jpSubAvailableLabel, java.awt.BorderLayout.NORTH);
@@ -244,7 +244,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpSubSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlSubSelected.setText("Entidades de consumo seleccionadas:");
+        jlSubSelected.setText("Centros de consumo seleccionadas:");
         jlSubSelected.setPreferredSize(new java.awt.Dimension(370, 16));
         jpSubSelectedLabel.add(jlSubSelected);
 
@@ -316,9 +316,9 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         
         moTextEmployee.setTextSettings("Empleado", 250);
         
-        // Entidades de consumo disponibles
+        // Centros de consumo disponibles
         
-        moGridMatConsEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT, 0, "Entidades de consumo") {
+        moGridMatConsEnt = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT, 0, "Centros de consumo") {
             
             @Override
             public void initGrid() {
@@ -329,7 +329,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
 
                 return columns;
             }
@@ -338,9 +338,9 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         jpGridConsAva.add(moGridMatConsEnt);
         mvFormGrids.add(moGridMatConsEnt);
         
-        // Entidades de consumo seleccionadas
+        // Centros de consumo seleccionadas
         
-        moGridMatConsEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT_USR, 0, "Entidades de consumo seleccionadas") {
+        moGridMatConsEntSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_ENT_USR, 0, "Centros de consumo seleccionadas") {
             
             @Override
             public void initGrid() {
@@ -351,7 +351,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 col.setEditable(true);
                 columns.add(col);
@@ -363,9 +363,9 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         jpGridConsSel.add(moGridMatConsEntSelected);
         mvFormGrids.add(moGridMatConsEntSelected);
         
-        // Subentidades de consumo disponibles
+        // Subcentros de consumo disponibles
         
-        moGridMatConsSubent = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT, 0, "Entidades de consumo") {
+        moGridMatConsSubent = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT, 0, "Centros de consumo") {
             
             @Override
             public void initGrid() {
@@ -376,8 +376,8 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Entidad de consumo"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subentidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Centro de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subcentro de consumo"));
 
                 return columns;
             }
@@ -386,9 +386,9 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
         jpGridSubAva.add(moGridMatConsSubent);
         mvFormGrids.add(moGridMatConsSubent);
         
-        // Entidades de consumo seleccionadas
+        // Centros de consumo seleccionadas
         
-        moGridMatConsSubentSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_USR, 0, "Entidades de consumo seleccionadas") {
+        moGridMatConsSubentSelected = new SGridPaneForm(miClient, SModConsts.TRN_MAT_CONS_SUBENT_USR, 0, "Centros de consumo seleccionadas") {
             
             @Override
             public void initGrid() {
@@ -399,8 +399,8 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Entidad de consumo"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subentidad de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Centro de consumo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Subcentro de consumo"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 col.setEditable(true);
                 columns.add(col);
@@ -727,7 +727,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
             for (SDbMaterialConsumptionEntityUser eu : maMatConsEntSelected) {
                 for (SDbMaterialConsumptionSubentityUser seu : maMatConsSubentSelected) {
                     if (seu.getPkMatConsumptionEntityId() == eu.getPkMatConsumptionEntityId()) {
-                        validation.setMessage("No es necesario configurar subentidades de consumo que dependan de una entidad de consumo que ya esté configurada.");
+                        validation.setMessage("No es necesario configurar centros de consumo que dependan de una entidad de consumo que ya esté configurada.");
                         break;
                     }
                 }

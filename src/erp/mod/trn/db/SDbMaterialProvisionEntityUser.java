@@ -24,11 +24,8 @@ public class SDbMaterialProvisionEntityUser extends SDbRegistryUser implements S
     protected int mnPkMatProvisionEntityId;
     protected int mnPkUserId;
     protected boolean mbDefault;
-    /*
-    protected int mnFkUserInsertId;
-    protected Date mtTsUserInsert;
-    */
-
+    protected int mnFkUserId;
+    protected Date mtTsUser;
     
     protected SDbMaterialProvisionEntity moAuxMatProvEnt;
 
@@ -39,8 +36,8 @@ public class SDbMaterialProvisionEntityUser extends SDbRegistryUser implements S
     public void setPkMatProvisionEntityId(int n) { mnPkMatProvisionEntityId = n; }
     public void setPkUserId(int n) { mnPkUserId = n; }
     public void setDefault(boolean b) { mbDefault = b; }
-    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
-    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
+    public void setFkUserId(int n) { mnFkUserId = n; }
+    public void setTsUser(Date t) { mtTsUser = t; }
 
     
     public void setAuxMatProvEnt(SDbMaterialProvisionEntity o) { moAuxMatProvEnt = o; }
@@ -48,8 +45,8 @@ public class SDbMaterialProvisionEntityUser extends SDbRegistryUser implements S
     public int getPkMatProvisionEntityId() { return mnPkMatProvisionEntityId; }
     public int getPkUserId() { return mnPkUserId; }
     public boolean isDefault() { return mbDefault; }
-    public int getFkUserInsertId() { return mnFkUserInsertId; }
-    public Date getTsUserInsert() { return mtTsUserInsert; }
+    public int getFkUserId() { return mnFkUserId; }
+    public Date getTsUser() { return mtTsUser; }
 
     
     public SDbMaterialProvisionEntity getAuxMatProvEnt() { return moAuxMatProvEnt; }
@@ -77,8 +74,8 @@ public class SDbMaterialProvisionEntityUser extends SDbRegistryUser implements S
         mnPkMatProvisionEntityId = 0;
         mnPkUserId = 0;
         mbDefault = false;
-        mnFkUserInsertId = 0;
-        mtTsUserInsert = null;
+        mnFkUserId = 0;
+        mtTsUser = null;
         
         moAuxMatProvEnt = null;
     }
@@ -122,8 +119,8 @@ public class SDbMaterialProvisionEntityUser extends SDbRegistryUser implements S
             mnPkMatProvisionEntityId = resultSet.getInt("id_mat_prov_ent");
             mnPkUserId = resultSet.getInt("id_usr");
             mbDefault = resultSet.getBoolean("b_default");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mnFkUserId = resultSet.getInt("fk_usr");
+            mtTsUser = resultSet.getTimestamp("ts_usr");
             
             readAuxMatProvEnt(session);
 
@@ -138,14 +135,14 @@ public class SDbMaterialProvisionEntityUser extends SDbRegistryUser implements S
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        mnFkUserInsertId = session.getUser().getPkUserId();
+        mnFkUserId = session.getUser().getPkUserId();
         
         if (mbRegistryNew) {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkMatProvisionEntityId + ", " + 
                     mnPkUserId + ", " + 
                     (mbDefault ? 1 : 0) + ", " +
-                    mnFkUserInsertId + ", " + 
+                    mnFkUserId + ", " + 
                     "NOW()" + " " + 
                     ")";
         }
@@ -172,8 +169,8 @@ public class SDbMaterialProvisionEntityUser extends SDbRegistryUser implements S
         registry.setPkMatProvisionEntityId(this.getPkMatProvisionEntityId());
         registry.setPkUserId(this.getPkUserId());
         registry.setDefault(this.isDefault());
-        registry.setFkUserInsertId(this.getFkUserInsertId());
-        registry.setTsUserInsert(this.getTsUserInsert());
+        registry.setFkUserId(this.getFkUserId());
+        registry.setTsUser(this.getTsUser());
 
         registry.setRegistryNew(this.isRegistryNew());
         

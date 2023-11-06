@@ -8,6 +8,7 @@ package erp.gui;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataRepConstants;
+import erp.form.SFormOptionPicker;
 import erp.gui.mod.cfg.SCfgMenu;
 import erp.gui.mod.cfg.SCfgMenuSection;
 import erp.gui.mod.cfg.SCfgMenuSectionItem;
@@ -15,6 +16,7 @@ import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
 import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
 import erp.mfin.data.SDataCostCenterItem;
@@ -123,6 +125,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsLinksTrace;
     private javax.swing.JMenuItem jmiDpsDocChangeItem;
     private javax.swing.JMenuItem jmiDpsDpsItemAll;
+    private javax.swing.JMenuItem jmiDpsCfdPay;
+    private javax.swing.JMenuItem jmiDpsCfdPayDone;
     private javax.swing.JMenuItem jmiDpsAutPending;
     private javax.swing.JMenuItem jmiDpsAutAutorized;
     private javax.swing.JMenuItem jmiDpsAutReject;
@@ -233,6 +237,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary moDialogRepSalesPurchasesItemUnitaryPrice;
     private erp.mtrn.form.SDialogRepContractStock moDialogRepContractStock;
     private erp.mtrn.form.SDialogRepPurchasesUnitaryCost moDialogRepPurchasesUnitaryCost;
+    
+    private erp.form.SFormOptionPicker moPickerConsumeEntity;
 
     public SGuiModuleTrnPur(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_PUR);
@@ -375,6 +381,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace = new JMenuItem("Rastreo de vínculos de facturas");
         jmiDpsDocChangeItem = new JMenuItem("Historial modificación facturas ítem/concepto");
         jmiDpsDpsItemAll = new JMenuItem("Historial modificación documentos");
+        jmiDpsCfdPay = new JMenuItem("Facturas de compras con CFDI de pagos por anexar");
+        jmiDpsCfdPayDone = new JMenuItem("Facturas de compras con CFDI de pagos anexados");
         jmiDpsAutPending = new JMenuItem("Facturas por autorizar");
         jmiDpsAutAutorized = new JMenuItem("Facturas autorizadas");
         jmiDpsAutReject = new JMenuItem("Facturas rechazadas");
@@ -394,6 +402,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.addSeparator();
         jmDps.add(jmiDpsDocChangeItem);
         jmDps.add(jmiDpsDpsItemAll);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsCfdPay);
+        jmDps.add(jmiDpsCfdPayDone);
         jmDps.addSeparator();
         jmDps.add(jmiDpsAutPending);
         jmDps.add(jmiDpsAutAutorized);
@@ -650,6 +661,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace.addActionListener(this);
         jmiDpsDocChangeItem.addActionListener(this);
         jmiDpsDpsItemAll.addActionListener(this);
+        jmiDpsCfdPay.addActionListener(this);
+        jmiDpsCfdPayDone.addActionListener(this);
         jmiDpsAutPending.addActionListener(this);
         jmiDpsAutAutorized.addActionListener(this);
         jmiDpsAutReject.addActionListener(this);
@@ -777,6 +790,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsLinksTrace.setEnabled(hasRightDocTransaction);
         jmiDpsDocChangeItem.setEnabled(hasRightDocTransaction);
         jmiDpsDpsItemAll.setEnabled(hasRightDocTransaction);
+        jmiDpsCfdPay.setEnabled(hasRightDocTransaction);
+        jmiDpsCfdPayDone.setEnabled(hasRightDocTransaction);
         jmiDpsAudPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAudAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAnnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
@@ -1070,7 +1085,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                                     miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[2]);
                                 }
                                 else if (((Object[]) moFormComplement)[2] instanceof SDataDps) {
-                                    if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN })) {
+                                    // DUDA !
+                                    if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_EST, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN })) {
                                         miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[2]);
                                     }
                                 }
@@ -1082,6 +1098,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
                             if (((Object[]) moFormComplement).length >= 5) {
                                 miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[4]);
+                            }
+                            
+                            if (((Object[]) moFormComplement).length >= 6) {
+                                miForm.setValue(SLibConstants.VALUE_IS_MAT_REQ, ((Object[]) moFormComplement)[5]);
                             }
                         }
                     }
@@ -1162,6 +1182,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRN_DPS:
                     oViewClass = erp.mtrn.view.SViewDps.class;
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02);
+                    break;
+                    
+                case SDataConstants.TRN_DPS_CFD_PAY:
+                    oViewClass = erp.mtrn.view.SViewDpsCfdPayment.class;
+                    sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType01);
                     break;
                 
                 case SDataConstants.TRNX_DPS_DETAIL:
@@ -1414,7 +1439,22 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public erp.lib.form.SFormOptionPickerInterface getOptionPicker(int optionType) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SFormOptionPickerInterface picker = null;
+
+        try {
+            switch (optionType) {
+                case SDataConstants.TRN_MAT_CONS_ENT:
+                    picker = moPickerConsumeEntity = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerConsumeEntity);
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM_PICK);
+            }
+        }
+        catch (java.lang.Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+
+        return picker;
     }
 
     @Override
@@ -1607,6 +1647,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsDpsItemAll) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+            }
+            else if (item == jmiDpsCfdPay) {
+                showView(SDataConstants.TRN_DPS_CFD_PAY, SDataConstantsSys.TRNX_DPS_CFD_PAY);
+            }
+            else if (item == jmiDpsCfdPayDone) {
+                showView(SDataConstants.TRN_DPS_CFD_PAY, SDataConstantsSys.TRNX_DPS_CFD_PAY_DONE);
             }
             else if (item == jmiDpsAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_PUR_DOC_AUT_PEND);

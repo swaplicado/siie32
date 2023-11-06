@@ -38,12 +38,12 @@ import sa.lib.gui.SGuiDate;
  */
 public class SViewAbsence extends SGridPaneView implements ActionListener {
 
-    private SGridFilterDatePeriod moFilterDatePeriod;
     private JButton jbCloseAbsence;
     private JButton jbShowCardex;
     private JButton jbShowInability;
     private JButton jbShowInabilityMov;
     private JButton jbShowAbsence;
+    private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelEmployee moFilterEmployee;
     private SGridFilterPanel moFilterAbsenceClass;
     private SGridFilterPanel moFilterBusinessPartner;
@@ -65,13 +65,14 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        
         jbCloseAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Cerrar incidencia", this);
         jbShowCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         jbShowInability = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col.gif")), "Importación de datos de incapacidades", this);
         jbShowInabilityMov = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col_cash.gif")), "Importación de movimientos de datos de incapacidades", this);
         jbShowAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_pay_cash.gif")), "Importación de datos de ausentismo", this);
         
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseAbsence);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowInability);

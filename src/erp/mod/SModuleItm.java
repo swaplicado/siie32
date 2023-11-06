@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda
+ * @author Juan Barajas, Uriel Castañeda, Edwin Carmona
  */
 public class SModuleItm extends SGuiModule {
 
@@ -132,10 +132,20 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_IGEN:
                 settings = new SGuiCatalogueSettings("Ítem genérico", 1, 1);
-                sql = "SELECT id_igen AS " + SDbConsts.FIELD_ID + "1, CONCAT(igen, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + ", fid_igrp AS " + SDbConsts.FIELD_FK + "1 " +
-                        "FROM " + SModConsts.TablesMap.get(type) + " " +
-                        "WHERE b_del = 0 " +
-                        "ORDER BY igen, id_igen ";
+                switch (subtype) {
+                    case SModConsts.ITMX_IGEN_INV:
+                        sql = "SELECT id_igen AS " + SDbConsts.FIELD_ID + "1, CONCAT(igen, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + ", fid_igrp AS " + SDbConsts.FIELD_FK + "1 " +
+                                "FROM " + SModConsts.TablesMap.get(type) + " " +
+                                "WHERE NOT b_del AND b_inv " +
+                                "ORDER BY igen, id_igen ";
+                        break;
+                    case SLibConsts.UNDEFINED:
+                        sql = "SELECT id_igen AS " + SDbConsts.FIELD_ID + "1, CONCAT(igen, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + ", fid_igrp AS " + SDbConsts.FIELD_FK + "1 " +
+                                "FROM " + SModConsts.TablesMap.get(type) + " " +
+                                "WHERE b_del = 0 " +
+                                "ORDER BY igen, id_igen ";
+                        break;
+                }
                 break;
             case SModConsts.ITMU_LINE:
                 settings = new SGuiCatalogueSettings("Línea de ítems", 1, 1);
@@ -183,6 +193,12 @@ public class SModuleItm extends SGuiModule {
                       "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " WHERE b_del = 0 " +
                       "ORDER BY unit, id_unit" ;
                 break;        
+            case SModConsts.ITMU_TP_MAT:
+                settings = new SGuiCatalogueSettings("Tipo de material", 1);
+                sql = "SELECT id_tp_mat AS " + SDbConsts.FIELD_ID + "1, " + " CONCAT(prefix,'-',name) AS " + SDbConsts.FIELD_ITEM + " " + 
+                      "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT) + " WHERE b_del = 0 " +
+                      "ORDER BY prefix, name" ;
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

@@ -74,8 +74,8 @@ public class SViewConfUserVsEntityDetail extends SGridPaneView {
                     + "j.name AS entidad, "
                     + "u.usr AS " + SDbConsts.FIELD_CODE + ", "
                     + "u.usr AS " + SDbConsts.FIELD_NAME + ", "
-                    + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                    + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                    + "v.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                    + "v.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                     + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
                     + "FROM " + SModConsts.TablesMap.get(mnGridSubtype) + " AS v "
                     + "INNER JOIN erp.usru_usr AS u ON " 
@@ -83,7 +83,7 @@ public class SViewConfUserVsEntityDetail extends SGridPaneView {
                     + "INNER JOIN trn_mat_prov_ent AS j ON " 
                     + "v.id_mat_prov_ent = j.id_mat_prov_ent " 
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                    + "v.fk_usr_ins = ui.id_usr "
+                    + "v.fk_usr = ui.id_usr "
                     + (where.isEmpty() ? "" : "WHERE " + where)
                     + "ORDER BY u.usr, j.name "; 
                 break;
@@ -95,7 +95,7 @@ public class SViewConfUserVsEntityDetail extends SGridPaneView {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_NAME, "Usuario"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Entidad", "Entidad"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "entidad", "Centro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "b_default", "Predeterminado"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

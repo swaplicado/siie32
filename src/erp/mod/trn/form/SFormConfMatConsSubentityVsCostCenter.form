@@ -58,7 +58,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlEntity">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Entidad:"/>
+                    <Property name="text" type="java.lang.String" value="Centro:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[70, 16]"/>
                     </Property>
@@ -75,7 +75,7 @@
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlSubentity">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Subentidad:"/>
+                    <Property name="text" type="java.lang.String" value="Subcentro:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[70, 16]"/>
                     </Property>

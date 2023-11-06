@@ -966,6 +966,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         if (moRegistry.isRegistryNew()) {
             boolean isBeingCopied = moRegistry.getPkEarningId() != 0;
+            
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
             

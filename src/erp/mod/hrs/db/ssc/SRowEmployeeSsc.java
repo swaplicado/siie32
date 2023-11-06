@@ -8,6 +8,7 @@ package erp.mod.hrs.db.ssc;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SHrsUtils;
+import erp.mod.hrs.utils.SAnniversary;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
@@ -53,7 +54,8 @@ public class SRowEmployeeSsc implements SGridRow {
     protected double mdSscFinal;
     protected double mdSalaryDifferent;
     protected boolean mbRowSelected;
-    
+    protected SAnniversary moAnniversary;
+   
     /* Lista de las percepciones del período (bimestre) a procesar. */
     protected ArrayList<SSscEarning> maSbcEarnings;
     
@@ -85,6 +87,7 @@ public class SRowEmployeeSsc implements SGridRow {
         mbRowSelected = false;
         
         maSbcEarnings = new ArrayList<>();
+        moAnniversary = moEmployee.createAnniversary(periodEnd);
     }
 
     public SDbEmployee getEmployee() { return moEmployee; }
@@ -203,7 +206,7 @@ public class SRowEmployeeSsc implements SGridRow {
                 case 2:
                     value = moEmployee.getDateBenefits();
                     break;
-                case 3:
+                case 3: 
                     value = SSscUtils.getEmployeeAntiquity(moEmployee.getDateBenefits(), mtPeriodEnd);
                     break;
                 case 4:
@@ -242,7 +245,7 @@ public class SRowEmployeeSsc implements SGridRow {
                     value = mdVariableIncome;
                     break;
                 case 14:
-                    value = mnPeriodDays;//
+                    value = mnPeriodDays;
                     break;
                 case 15:
                     value = mnAbsenceEffectiveDaysSuggested;
