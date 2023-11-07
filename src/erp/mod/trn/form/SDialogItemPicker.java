@@ -76,6 +76,9 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener 
                 else if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(1).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
                     items.add(item);
                 }
+                else if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(2).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
+                    items.add(item);
+                }
             }
         }
         moGridPicker.populateGrid(items);
