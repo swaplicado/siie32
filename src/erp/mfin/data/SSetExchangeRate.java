@@ -353,52 +353,82 @@ public class SSetExchangeRate {
     }
 
     public static void main(String[] args) {
-            SClientUtils cl = new SClientUtils();
-            JSONObject json = new JSONObject();
-            String result = "";
-            json.put("dbHost","192.168.1.100");
-            json.put("dbName", "erp");
-            json.put("dbPort", "3306");
-            json.put("dbUser","root");
-            json.put("dbPass", "msroot");
-            json.put("dbMainId", "2852");
-            
-            //JSONObject cabecera = new JSONObject();
-            //cabecera.put("idEstReq", 2);
-            
-//            JSONObject ety = new JSONObject();
-//            ety.put("idDoc", 11454);
-//            ety.put("idYear", 2023);
-            
-            JSONObject ec = new JSONObject();
-            ec.put("idBp", 887);
-            ec.put("idYear", 2023);
-            ec.put("dateIni", "2023-08-01");
-            ec.put("dateFin", "2023-08-31");
-            ec.put("idDB", 2852);
-            
-            SGuiSession oSession;
         try {
-            oSession = cl.setSession(json.toString(),ec.toString());
-            SAccountStatusApi api = new SAccountStatusApi(oSession);
-            //SPurcharseOrdersAPI api = new SPurcharseOrdersAPI(oSession);
-            //SEstimateRequestAPI api = new SEstimateRequestAPI(oSession);
-            //result = api.getRows(Integer.parseInt(jsonObject.get("idResource").toString()));
-            //
-            //result = api.getResoursesEty(ety.toString());
-            //result = api.getResources(cabecera.toString());
-            result = api.getResources(ec.toString());
-            System.out.println(result);
-        } catch (SConfigException ex) {
-            Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (org.json.simple.parser.ParseException ex) {
-            Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            SParamsApp paramsApp = new SParamsApp();
 
+            if (!paramsApp.read()) {
+                throw new Exception(erp.SClient.ERR_PARAMS_APP_READING);
+            }
+
+            //conect to erp database
+            SDbDatabase dbErp = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+            int result = dbErp.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(),
+                    paramsApp.getDatabaseName(), paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
+
+            if (result != SDbConsts.CONNECTION_OK) {
+                throw new Exception(SDbConsts.ERR_MSG_DB_CONNECTION);
+            }
+
+            ArrayList bankNbDays = readBankNbDay(dbErp.getConnection());
+
+            if (isActualDayBankBussDay(bankNbDays)) {
+                // total databases:
+
+                ArrayList<String> companiesDb = new ArrayList<>();
+
+                String sql = "SELECT bd "
+                        + "FROM erp.cfgu_co ;";
+
+                try (ResultSet resultSet = dbErp.getConnection().createStatement().executeQuery(sql)) {
+                    while (resultSet.next()) {
+                        String bd = resultSet.getString("bd");
+                        companiesDb.add(bd);
+                    }
+                }
+
+                Double valueExchangeRate = readXmlExchangeRate();
+
+                for (Object companiesDb1 : companiesDb) {
+                    // connect to company database:
+
+                    SDbDatabase dbCompany = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+                    result = dbCompany.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(), companiesDb1.toString(), paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
+                    if (result == SDbConsts.CONNECTION_OK) {
+                        int exchangeRatePolicy = getExchangeRatePolicy(dbCompany.getConnection());
+                        ArrayList<String> exchangeRateDays = setExchangeRateDays(exchangeRatePolicy, bankNbDays);
+                        saveExchangeRate(dbCompany.getConnection(), valueExchangeRate, exchangeRateDays);
+                    }
+                }
+            }
+
+        } 
+        catch (Exception e) {
+            try{
+                    Logger logger = Logger.getLogger("logs/logsExchangeRate_");
+                    logger.setUseParentHandlers(false);
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy_MM");
+                    FileHandler fh;
+                    fh = new FileHandler("logs/logsExchangeRate_" + format.format(Calendar.getInstance().getTime()) + ".log", true);
+                    logger.addHandler(fh);
+                    SimpleFormatter formatter = new SimpleFormatter() {
+                            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            
+                            public String format() {
+                                return String.format("%s \n", dateFormat.format(Calendar.getInstance().getTime()));
+                            }
+                    };
+                    fh.setFormatter(formatter);
+                    String message = " - " + e;
+                    logger.info(message);
+                    fh.close();
+                } catch (SecurityException ex) {
+                    Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            System.err.println(e);
+            
+        }
     }
 
 }
