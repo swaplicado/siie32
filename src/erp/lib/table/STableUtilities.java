@@ -72,36 +72,39 @@ public abstract class STableUtilities {
         int nComparison = 0;
         
         nMiddleRow = pnFirstRow + ((pnLastRow - pnFirstRow) / 2);
-        nComparison = psValue.compareToIgnoreCase(
-        (((java.lang.String) tablePane.getTable().getValueAt(nMiddleRow, pnCol)).length() > psValue.length() ?
-        ((java.lang.String) tablePane.getTable().getValueAt(nMiddleRow, pnCol)).substring(0, psValue.length()) :
-        (java.lang.String) tablePane.getTable().getValueAt(nMiddleRow, pnCol)));
+        
+        if (nMiddleRow != 0) {
+            nComparison = psValue.compareToIgnoreCase(
+            (((java.lang.String) tablePane.getTable().getValueAt(nMiddleRow, pnCol)).length() > psValue.length() ?
+            ((java.lang.String) tablePane.getTable().getValueAt(nMiddleRow, pnCol)).substring(0, psValue.length()) :
+            (java.lang.String) tablePane.getTable().getValueAt(nMiddleRow, pnCol)));
 
-        if (nComparison == 0) {
-            return nMiddleRow;
-        }
+            if (nComparison == 0) {
+                return nMiddleRow;
+            }
 
-        if (poSortOrder == SortOrder.ASCENDING) {
-            if (nComparison < 0) {
-                if ((nMiddleRow - 1) >= pnFirstRow) {
-                    return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, psValue);
+            if (poSortOrder == SortOrder.ASCENDING) {
+                if (nComparison < 0) {
+                    if ((nMiddleRow - 1) >= pnFirstRow) {
+                        return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, psValue);
+                    }
+                }
+                else {
+                    if (pnLastRow >= (nMiddleRow + 1)) {
+                        return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, psValue);
+                    }
                 }
             }
-            else {
-                if (pnLastRow >= (nMiddleRow + 1)) {
-                    return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, psValue);
+            else if (poSortOrder == SortOrder.DESCENDING) {
+                if (nComparison < 0) {
+                    if (pnLastRow >= (nMiddleRow + 1)) {
+                        return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, psValue);
+                    }
                 }
-            }
-        }
-        else if (poSortOrder == SortOrder.DESCENDING) {
-            if (nComparison < 0) {
-                if (pnLastRow >= (nMiddleRow + 1)) {
-                    return seek(tablePane, pnCol, poSortOrder, nMiddleRow + 1, pnLastRow, psValue);
-                }
-            }
-            else {
-                if ((nMiddleRow - 1) >= pnFirstRow) {
-                    return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, psValue);
+                else {
+                    if ((nMiddleRow - 1) >= pnFirstRow) {
+                        return seek(tablePane, pnCol, poSortOrder, pnFirstRow, nMiddleRow - 1, psValue);
+                    }
                 }
             }
         }
@@ -250,7 +253,7 @@ public abstract class STableUtilities {
                             }
                         }
                         catch (Exception e) {
-                            SLibUtilities.printOutException(STableUtilities.class, e);
+                            //SLibUtilities.printOutException(STableUtilities.class, e);
                         }
 
                         // Scroll to value:
@@ -334,7 +337,7 @@ public abstract class STableUtilities {
                 }
             }
             catch (Exception e) {
-                SLibUtilities.printOutException(STableUtilities.class, e);
+                //SLibUtilities.printOutException(STableUtilities.class, e);
             }
 
             row++;
@@ -537,5 +540,57 @@ public abstract class STableUtilities {
         }
 
         return value;
+    }
+
+    public static void searchValue(STablePane tablePane, String valueToSearch, boolean fromTop) {
+        int row = 0;
+        int col = 0;
+        int rows = tablePane.getTableModelRowCount();
+        int cols = tablePane.getTableModelColumnCount();
+        String valueToSearchUpper = valueToSearch.toUpperCase();
+        
+        if (!valueToSearchUpper.isEmpty()) {
+            if (rows > 0) {
+                row:
+                for (row = fromTop ? 0 : (tablePane.getTable().getSelectedRow() + 1); row < rows; row++) {
+                    col:
+                    for (col = 0; col < cols; col++) {
+                        if (tablePane.getTable().getValueAt(row, col) != null) {
+                            if (tablePane.getTable().getValueAt(row, col).toString().toUpperCase().contains(valueToSearchUpper)) {
+                                tablePane.setTableRowSelection(row);
+                                break row;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public static void searchValueCol(STablePane tablePane, String valueToSearch) {
+        int row = 0;
+        int col = 0;
+        int rows = tablePane.getTableModelRowCount();
+        int cols = tablePane.getTableModelColumnCount();
+        String valueToSearchUpper = valueToSearch.toUpperCase();
+        
+        if (!valueToSearchUpper.isEmpty()) {
+            if (rows > 0) {
+                row:
+                for (row = (tablePane.getTable().getSelectedRow()); row < rows; row++) {
+                    col:
+                    for (col = tablePane.getTable().getSelectedColumn() + 1; col < cols; col++) {
+                        if (col == cols - 1) tablePane.setTableColumnSelection(0);
+                        if (tablePane.getTable().getValueAt(row, col) != null) {
+                            if (tablePane.getTable().getValueAt(row, col).toString().toUpperCase().contains(valueToSearchUpper)) {
+                                tablePane.setTableRowSelection(row);
+                                tablePane.setTableColumnSelection(col);
+                                break row;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

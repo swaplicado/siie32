@@ -1,8 +1,11 @@
 ================================================================================
 SIIE 3.2 225.6/ 2023-11-09
-Edwin Omar CARMONA FIGUEROA
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Actualización de montos al importar requisiciones de materiales
+2) Cambios al formato de impresión de la requisición de materiales.
+3) Adición del campo de número de parte en las partidas en la forma de requisiciones de materiales.
+4) Refactorización general en las búsquedas de las vistas.
 
 ================================================================================
 SIIE 3.2 225.5/ 2023-11-07

@@ -17,6 +17,7 @@ import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SFormMaterialRequest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -153,7 +154,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 }
                 else {
                     try {
-                        print(gridRow.getRowPrimaryKey()[0]);
+                        createParamsMap(gridRow.getRowPrimaryKey()[0]);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -264,11 +265,27 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
-    private void print(int idMatReq) throws Exception {
+    private void createParamsMap(int idMatReq) throws Exception {
+        String aut = "";
+        String rec = "";
+        String sql = "SELECT ua.usr autorizo, ur.usr rechazo, comments comentario " +
+                "FROM cfgu_authorn_step AS a " +
+                "LEFT JOIN erp.usru_usr AS ua ON a.fk_usr_authorn_n = ua.id_usr " +
+                "LEFT JOIN erp.usru_usr AS ur ON a.fk_usr_reject_n = ur.id_usr " + 
+                "WHERE a.res_pk_n1_n = " + idMatReq + " AND fk_tp_authorn = 1";
+        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            aut += resultSet.getString("autorizo") + "; ";
+            String com = resultSet.getString("comentario");
+            rec += resultSet.getString("rechazo") != null ? resultSet.getString("rechazo") + (com.isEmpty() ? "; " : "(" + com + "); ") : "";
+        }
+        
         HashMap<String, Object> params;
         
         params = miClient.createReportParams();
         params.put("nMatReqId", idMatReq);
+        params.put("sMatReqAut", aut);
+        params.put("sMatReqRec", rec);
         
         miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
     }
