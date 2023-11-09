@@ -8,6 +8,7 @@ package erp.musr.form;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadRegistries;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormComponentItem;
@@ -31,20 +32,30 @@ import erp.musr.data.SDataUser;
 import erp.musr.data.SProcUserNameVal;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
+import erp.siieapp.SUserExportUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import org.json.simple.parser.ParseException;
+import sa.lib.SLibMethod;
+import sa.lib.gui.SGuiClient;
 import sa.lib.srv.SSrvConsts;
 
 /**
  *
  * @author Sergio Flores, Alfonso Flores, Sergio Flores
  */
-public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, erp.lib.form.SFormExtendedInterface {
 
     private int mnFormType;
     private int mnFormResult;
@@ -4159,5 +4170,25 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                 setDefualtEntity(SDataConstantsSys.CFGS_CT_ENT_PLANT);
             }
         }
+    }
+
+    @Override
+    public SLibMethod getPostSaveMethod(SDataRegistry registry) {
+        SLibMethod method = null;
+        SDataUser oDataUser = (SDataUser) SDataUtilities.readRegistry(miClient, SDataConstants.USRU_USR, registry.getPrimaryKey(), SLibConstants.EXEC_MODE_STEALTH);
+        
+        if(!moUser.getIsActive() || moUser.getIsDeleted()){
+            SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
+            boolean res = false;
+            try {
+                res = oExport.unactiveUser(moUser.getPkUserId(), moUser.getIsActive(), moUser.getIsDeleted());
+            } catch (SQLException ex) {
+                Logger.getLogger(SFormUser.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                Logger.getLogger(SFormUser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return method;
     }
 }
