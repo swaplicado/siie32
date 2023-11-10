@@ -15,6 +15,8 @@ public class SPurcharseOrdersData {
     String  date;
     String dateStartCred;
     String dateDocDelivery;
+    String serie;
+    String folio;
     String numRef;
     int daysCred;
     float excRate;
@@ -121,6 +123,14 @@ public class SPurcharseOrdersData {
         return fCurKeyLocal;
     }
 
+    public String getSerie() {
+        return serie;
+    }
+
+    public String getFolio() {
+        return folio;
+    }
+    
     public void setIdYear(int idYear) {
         this.idYear = idYear;
     }
@@ -209,5 +219,11 @@ public class SPurcharseOrdersData {
         this.fCurKeyLocal = fCurKeyLocal;
     }
 
-        
+    public void setSerie(String serie) {
+        this.serie = serie;
+    }
+
+    public void setFolio(String folio) {
+        this.folio = folio;
+    }    
 }

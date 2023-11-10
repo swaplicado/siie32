@@ -38,14 +38,18 @@ public class SEstimateRequestAPI {
        String jsonDr = "";
         ArrayList<SEstimateRequestData> lERData = new ArrayList<>();
         int bp = 0;
-        String year = "";
+        String date = "";
+        String arregloAuxiliar = "";
         
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
             root = (JSONObject) parser.parse(sJson);
             bp = Integer.parseInt(root.get("idBp").toString());
-            year = root.get("year").toString();
+            date = root.get("date").toString();
+            arregloAuxiliar = arregloAuxiliar + root.get("aBp").toString();
+            arregloAuxiliar = arregloAuxiliar.replace("[", "(");
+            arregloAuxiliar = arregloAuxiliar.replace("]", ")");
             
         } catch (ParseException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -59,8 +63,8 @@ public class SEstimateRequestAPI {
                 + " INNER JOIN trn_est_req_rec AS rr "
                 + " ON er.id_est_req = rr.id_est_req "
                 + " WHERE er.b_del = 0 AND rr.b_del = 0 "
-                + " AND YEAR(ts_usr) = " + year 
-                + " AND rr.fk_bp_n = " + bp + " ";
+                + " AND ts_usr > " + date 
+                + " AND rr.fk_bp_n IN " + arregloAuxiliar + " ";
                 
                 
 

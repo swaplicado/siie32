@@ -39,14 +39,18 @@ public class SPurcharseOrdersAPI {
         String jsonDr = "";
         ArrayList<SPurcharseOrdersData> lOCData = new ArrayList<>();
         int bp = 0;
-        String year = "";
+        String date = "";
+        String arregloAuxiliar = "";
         
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
             root = (JSONObject) parser.parse(sJson);
             bp = Integer.parseInt(root.get("idBp").toString());
-            year = root.get("year").toString();
+            date = root.get("date").toString();
+            arregloAuxiliar = arregloAuxiliar + root.get("aBp").toString();
+            arregloAuxiliar = arregloAuxiliar.replace("[", "(");
+            arregloAuxiliar = arregloAuxiliar.replace("]", ")");  
             
         } catch (ParseException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -61,6 +65,7 @@ public class SPurcharseOrdersAPI {
                 + "d.dt_start_cred, "
                 + "d.dt_doc_lapsing_n, "
                 + "d.dt_doc_delivery_n, "
+                + "d.num_ser AS serie, d.num AS folio, "
                 + "CONCAT(d.num_ser, "
                 + " IF(LENGTH(d.num_ser) = 0, '', '-'), "
                 + " d.num) AS f_num, "
@@ -107,8 +112,8 @@ public class SPurcharseOrdersAPI {
                 + " AND d.fid_st_dps_authorn = 4 "
                 + " AND d.b_authorn = 1 "
                 + " AND d.fid_func IN (1,2,3,4,5,6) "
-                + " AND YEAR(d.dt) = " + year 
-                + " AND bp.id_bp = " + bp + " ";
+                + " AND d.dt > '" + date + "' " 
+                + " AND bp.id_bp IN " + arregloAuxiliar + " ";
                 
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
@@ -121,6 +126,8 @@ public class SPurcharseOrdersAPI {
                 ocd.setDate(res.getString("d.dt"));
                 ocd.setDateStartCred(res.getString("d.dt_start_cred"));
                 ocd.setDateDocDelivery(res.getString("d.dt_doc_delivery_n"));
+                ocd.setSerie(res.getString("serie"));
+                ocd.setFolio(res.getString("folio"));
                 ocd.setNumRef(res.getString("f_num"));
                 ocd.setDaysCred(res.getInt("d.days_cred"));
                 ocd.setStot(res.getDouble("d.stot_r"));
