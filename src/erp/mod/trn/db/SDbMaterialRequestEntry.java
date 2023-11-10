@@ -513,18 +513,19 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         switch (row) {
             case 0: value = mbNewItem ? "" : moDataItem.getCode(); break;
             case 1: value = mbNewItem ? getDescription() : moDataItem.getName(); break;
-            case 2: value = moDataItemRef == null ? "" : moDataItemRef.getCode(); break;
-            case 3: value = mdQuantity; break;
-            case 4: value = mbNewItem ? "" : moDataItem.getDbmsDataUnit().getSymbol(); break;
-            case 5: value = mdTotal_r; break;
-            case 6: value = mbNewItem; break;
-            case 7: value = moDbmsPresentation != null ? moDbmsPresentation.getName(): ""; break;
-            case 8: value = mdFactorConvertion; break;
-            case 9: value = mnCosnsumptionEstimated; break;
-            case 10: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
-            case 11: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
-            case 12: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
-            case 13: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
+            case 2: value = mbNewItem ? "" : moDataItem.getPartNumber(); break;
+            case 3: value = moDataItemRef == null ? "" : moDataItemRef.getCode(); break;
+            case 4: value = mdQuantity; break;
+            case 5: value = mbNewItem ? "" : moDataItem.getDbmsDataUnit().getSymbol(); break;
+            case 6: value = mdTotal_r; break;
+            case 7: value = mbNewItem; break;
+            case 8: value = moDbmsPresentation != null ? moDbmsPresentation.getName(): ""; break;
+            case 9: value = mdFactorConvertion; break;
+            case 10: value = mnCosnsumptionEstimated; break;
+            case 11: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
+            case 12: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
+            case 13: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
+            case 14: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
         }
         
         return value;

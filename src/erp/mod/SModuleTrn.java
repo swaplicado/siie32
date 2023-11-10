@@ -474,6 +474,15 @@ public class SModuleTrn extends SGuiModule {
                                 + "WHERE NOT b_del "
                                 + "ORDER BY a.name";
                         break;
+                    case SModConsts.TRNX_MAT_REQ_STK_SUP:
+                        sql = "SELECT c.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, c.id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , CONCAT(c.code, ' - ', c.name) AS " + SDbConsts.FIELD_ITEM + ", "
+                                + "c.id_mat_cons_ent AS " + SDbConsts.FIELD_FK + "1 "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS c "
+                                + "INNER JOIN trn_mat_cons_subent_cc AS s ON c.id_mat_cons_ent = s.id_mat_cons_ent "
+                                + "WHERE NOT c.b_del AND s.id_cc = 1 "
+                                + (params != null && params.getKey() != null ? "AND c.id_mat_cons_ent = " + params.getKey()[0] : "") + " " 
+                                + "ORDER BY c.name";
+                        break;
                     default:
                         sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + ", "
                                 + "id_mat_cons_ent AS " + SDbConsts.FIELD_FK + "1 "

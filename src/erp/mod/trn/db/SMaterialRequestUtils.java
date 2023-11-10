@@ -414,7 +414,8 @@ public abstract class SMaterialRequestUtils {
                         }
                         in += (in.isEmpty() ? "" : ")");
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
-                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3 " 
                                 + "FROM ("
                                 + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
@@ -429,16 +430,18 @@ public abstract class SMaterialRequestUtils {
                                 + "WHERE NOT a.b_del AND a.id_mat_cc_grp IN " + in + " "
                                 + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
                                 + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
-                                + "ORDER BY a.item_key, a.item, a.id_item ";
+                                + "ORDER BY a.item_key, a.item, a.id_item, a.part_num ";
                         break;
                     case SLibConstants.UNDEFINED:
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
-                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3 " 
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
                                 + "WHERE NOT a.b_del ";
                 }
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Parte"));
                 settings = new SGuiOptionPickerSettings("Ítem", sql, gridColumns, 1);
                 
                 picker.setPickerSettings(client, type, subtype, settings);

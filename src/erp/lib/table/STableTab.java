@@ -121,6 +121,9 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
         jpSouth = new javax.swing.JPanel();
         jpSouth1 = new javax.swing.JPanel();
         jtfRows = new javax.swing.JTextField();
+        jtfGridSearch = new javax.swing.JTextField();
+        jbGridSearchNext = new javax.swing.JButton();
+        jbGridSearchNextCol = new javax.swing.JButton();
         jpSouth2 = new javax.swing.JPanel();
         jtbAutoReload = new javax.swing.JToggleButton();
 
@@ -193,7 +196,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
         add(jpNorth, java.awt.BorderLayout.NORTH);
 
         jpSouth.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 0, 0, 0));
-        jpSouth.setLayout(new java.awt.GridLayout(1, 0));
+        jpSouth.setLayout(new java.awt.BorderLayout());
 
         jpSouth1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
@@ -204,7 +207,36 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
         jtfRows.setPreferredSize(new java.awt.Dimension(100, 23));
         jpSouth1.add(jtfRows);
 
-        jpSouth.add(jpSouth1);
+        jtfGridSearch.setToolTipText("Buscar (Ctrl+B)");
+        jtfGridSearch.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfGridSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfGridSearchActionPerformed(evt);
+            }
+        });
+        jpSouth1.add(jtfGridSearch);
+
+        jbGridSearchNext.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cmd_grid_next_row.gif"))); // NOI18N
+        jbGridSearchNext.setToolTipText("Siguiente renglón (F3)");
+        jbGridSearchNext.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbGridSearchNext.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbGridSearchNextActionPerformed(evt);
+            }
+        });
+        jpSouth1.add(jbGridSearchNext);
+
+        jbGridSearchNextCol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cmd_grid_next.gif"))); // NOI18N
+        jbGridSearchNextCol.setToolTipText("Siguiente renglón (F3)");
+        jbGridSearchNextCol.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbGridSearchNextCol.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbGridSearchNextColActionPerformed(evt);
+            }
+        });
+        jpSouth1.add(jbGridSearchNextCol);
+
+        jpSouth.add(jpSouth1, java.awt.BorderLayout.WEST);
 
         jpSouth2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 3, 0));
 
@@ -214,7 +246,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
         jtbAutoReload.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/swi_action_on.gif"))); // NOI18N
         jpSouth2.add(jtbAutoReload);
 
-        jpSouth.add(jpSouth2);
+        jpSouth.add(jpSouth2, java.awt.BorderLayout.EAST);
 
         add(jpSouth, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
@@ -222,6 +254,18 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         focusTab();
     }//GEN-LAST:event_formComponentShown
+
+    private void jtfGridSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfGridSearchActionPerformed
+        actionGridSearchValue();
+    }//GEN-LAST:event_jtfGridSearchActionPerformed
+
+    private void jbGridSearchNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbGridSearchNextActionPerformed
+        actionGridSearchNextValue();
+    }//GEN-LAST:event_jbGridSearchNextActionPerformed
+
+    private void jbGridSearchNextColActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbGridSearchNextColActionPerformed
+        actionGridSearchNextColValue();
+    }//GEN-LAST:event_jbGridSearchNextColActionPerformed
 
     private void initComponentsCustom() {
         mbFirstTime = true;
@@ -828,12 +872,39 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
             }
         }
     }
+    
+    public void actionGridSearchValue() {
+        String text = jtfGridSearch.getText().trim(); // just a simple trim
+        
+        if (!text.isEmpty() && moTablePane.getTableGuiRowCount() > 0) {
+            STableUtilities.searchValue(moTablePane, text, true);
+            jbGridSearchNext.requestFocusInWindow();
+        }
+    }
+    
+    public void actionGridSearchNextValue() {
+        String text = jtfGridSearch.getText().trim(); // just a simple trim
+        
+        if (!text.isEmpty() && moTablePane.getTableGuiRowCount() > 0) {
+            STableUtilities.searchValue(moTablePane, text, false);
+        }
+    }
+    
+    public void actionGridSearchNextColValue() {
+        String text = jtfGridSearch.getText().trim(); // just a simple trim
+        
+        if (!text.isEmpty() && moTablePane.getTableGuiRowCount() > 0) {
+            STableUtilities.searchValueCol(moTablePane, text);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jbClearSettings;
     protected javax.swing.JButton jbDelete;
     protected javax.swing.JButton jbEdit;
     private javax.swing.JButton jbExportCsv;
+    private javax.swing.JButton jbGridSearchNext;
+    private javax.swing.JButton jbGridSearchNextCol;
     protected javax.swing.JButton jbNew;
     private javax.swing.JButton jbReload;
     private javax.swing.JButton jbSeek;
@@ -845,6 +916,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
     private javax.swing.JPanel jpSouth1;
     private javax.swing.JPanel jpSouth2;
     protected javax.swing.JToggleButton jtbAutoReload;
+    private javax.swing.JTextField jtfGridSearch;
     private javax.swing.JTextField jtfRows;
     private javax.swing.JTextField jtfSeek;
     // End of variables declaration//GEN-END:variables

@@ -201,7 +201,7 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
         if (getFormSubtype()== SModConsts.TRNX_MAT_REQ_STK_SUP) {
             moFieldKeyConsEntity.initGroup();
             moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, SModConsts.TRNX_MAT_REQ_STK_SUP, null);
-            moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, SLibConsts.UNDEFINED, null);
+            moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, SModConsts.TRNX_MAT_REQ_STK_SUP, null);
             moFieldKeyConsEntity.populateCatalogues();
         }
         else {
