@@ -592,6 +592,12 @@ public abstract class SAuthorizationUtils {
                         // Crear renglón de autorización
                         lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
                     }
+                    
+                    for (SDbAuthorizationStep oStep : lSteps) {
+                        if (! SAuthorizationUtils.stepExists(session, oStep)) {
+                            oStep.save(session);
+                        }
+                    }
                 }
                 break;
             case AUTH_TYPE_DPS:
@@ -601,14 +607,14 @@ public abstract class SAuthorizationUtils {
                         // Crear renglones de autorización
                         lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
                     }
+                    
+                    for (SDbAuthorizationStep oStep : lSteps) {
+                        if (! SAuthorizationUtils.stepExists(session, oStep)) {
+                            oStep.save(session);
+                        }
+                    }
                 }
                 break;
-        }
-        
-        for (SDbAuthorizationStep oStep : lSteps) {
-            if (! SAuthorizationUtils.stepExists(session, oStep)) {
-                oStep.save(session);
-            }
         }
     }
     
