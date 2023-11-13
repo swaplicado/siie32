@@ -612,7 +612,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             }
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 
-                    (prov.isEmpty() ? "" : "AND " + prov) +
+                    (prov.isEmpty() ? "" : "AND " + prov + " ") +
                     getSqlWhere();
             session.getStatement().execute(msSql);
             
