@@ -21,43 +21,48 @@ public class SViewExpenseType extends SGridPaneView {
 
     public SViewExpenseType(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSU_TP_EXP, 0, title);
-        setRowButtonsEnabled(true, true, true, false, true);
+        initComponentsCustom();
     }
 
+    private void initComponentsCustom() {
+        setRowButtonsEnabled(true, true, true, false, true);
+    }
+    
     @Override
     public void prepareSqlQuery() {
         String sql = "";
         Object filter = null;
 
         moPaneSettings = new SGridPaneSettings(1);
+        moPaneSettings.setDeletedApplying(true);
         moPaneSettings.setSystemApplying(true);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "te.b_del = 0 ";
         }
 
         msSql = "SELECT "
-                + "v.id_tp_exp AS " + SDbConsts.FIELD_ID + "1, "
-                + "v.code AS " + SDbConsts.FIELD_CODE + ", "
-                + "v.name AS " + SDbConsts.FIELD_NAME + ", "
-                + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "v.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", "
-                + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
-                + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
-                + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
+                + "te.id_tp_exp AS " + SDbConsts.FIELD_ID + "1, "
+                + "te.code AS " + SDbConsts.FIELD_CODE + ", "
+                + "te.name AS " + SDbConsts.FIELD_NAME + ", "
+                + "te.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "te.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", "
+                + "te.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                + "te.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
+                + "te.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                + "te.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EXP) + " AS v "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EXP) + " AS te "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                + "v.fk_usr_ins = ui.id_usr "
+                + "te.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
-                + "v.fk_usr_upd = uu.id_usr "
+                + "te.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.name, v.id_tp_exp ";
+                + "ORDER BY te.name, te.code, te.id_tp_exp ";
     }
 
     @Override

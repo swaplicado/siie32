@@ -19,25 +19,30 @@ import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneForm;
+import sa.lib.grid.SGridPaneFormOwner;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
 
 /**
- *
+ * Configuración de paquetes de gastos y sus ítems por tipo de gasto.
+ * Aplica para la modalidad de configuración de contabilización 'dinámica'.
  * @author Sergio Flores
  */
-public class SFormPackExpenses extends SBeanForm implements ActionListener {
+public class SFormPackExpenses extends SBeanForm implements SGridPaneFormOwner, ActionListener {
 
     private SDbPackExpenses moRegistry;
     private SGridPaneForm moGridItems;
 
     /**
-     * Creates new form SFormPackExpenses
+     * Creates new form SFormPackExpenses.
+     * @param client GUI client.
+     * @param title Form title.
      */
     public SFormPackExpenses(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_PACK_EXP, 0, title);
@@ -63,6 +68,8 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
         jPanel5 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
+        jlTotalExpenses = new javax.swing.JLabel();
+        jtfTotalExpenses = new javax.swing.JTextField();
         jpExpenses = new javax.swing.JPanel();
         jpExpensesNorth = new javax.swing.JPanel();
         jpExpensesNorth1 = new javax.swing.JPanel();
@@ -101,6 +108,18 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
         moTextName.setText("TEXT");
         moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel5.add(moTextName);
+
+        jlTotalExpenses.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlTotalExpenses.setText("Gastos:");
+        jlTotalExpenses.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlTotalExpenses);
+
+        jtfTotalExpenses.setEditable(false);
+        jtfTotalExpenses.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfTotalExpenses.setText("0 de 0");
+        jtfTotalExpenses.setFocusable(false);
+        jtfTotalExpenses.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel5.add(jtfTotalExpenses);
 
         jPanel2.add(jPanel5);
 
@@ -170,11 +189,13 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
     private javax.swing.JLabel jlExpenseType;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlName;
+    private javax.swing.JLabel jlTotalExpenses;
     private javax.swing.JPanel jpExpenses;
     private javax.swing.JPanel jpExpensesNorth;
     private javax.swing.JPanel jpExpensesNorth1;
     private javax.swing.JPanel jpExpensesNorth2;
     private javax.swing.JPanel jpExpensesNorth3;
+    private javax.swing.JTextField jtfTotalExpenses;
     private sa.lib.gui.bean.SBeanFieldKey moKeyExpenseType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyItem;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
@@ -196,7 +217,7 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
         
         moFields.setFormButton(jbAddExpense);
         
-        moGridItems = new SGridPaneForm(miClient, SModConsts.HRSU_PACK_EXP_ITEM, 0, "Gastos") {
+        moGridItems = new SGridPaneForm(miClient, SModConsts.HRSU_PACK_EXP_ITEM, 0, "Ítems de gastos") {
             
             @Override
             public void initGrid() {
@@ -216,6 +237,12 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
         };
         
         jpExpenses.add(moGridItems, BorderLayout.CENTER);
+        moGridItems.setPaneFormOwner(this);
+    }
+    
+    private void updateTotalExpenses() {
+        int total = moKeyExpenseType.getItemCount() - 1;
+        jtfTotalExpenses.setText("" + moGridItems.getTable().getRowCount() + " de " + total);
     }
     
     private void actionPerformedPickItem() {
@@ -271,6 +298,7 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
                 moGridItems.setSelectedGridRow(moGridItems.getTable().getRowCount() - 1);
 
                 actionPerformedClearExpense();
+                updateTotalExpenses();
             }
         }
     }
@@ -314,7 +342,9 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
+            
             moRegistry.setSystem(false); // all editable registries are non-system
+            
             jtfRegistryKey.setText("");
         }
         else {
@@ -328,6 +358,7 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
         moKeyItem.resetField();
         
         moGridItems.populateGrid(new Vector<>(moRegistry.getChildItems()));
+        updateTotalExpenses();
 
         setFormEditable(true);
         
@@ -365,9 +396,46 @@ public class SFormPackExpenses extends SBeanForm implements ActionListener {
                 validation.setMessage("Se deben capturar los gastos del paquete.");
                 validation.setComponent(moKeyExpenseType);
             }
+            else {
+                for (int index = 1; index < moKeyExpenseType.getItemCount(); index++) { // skip first item
+                    boolean found = false;
+                    SGuiItem guiItem = (SGuiItem) moKeyExpenseType.getItemAt(index);
+                    
+                    for (SGridRow row : moGridItems.getModel().getGridRows()) {
+                        if (((SDbPackExpensesItem) row).getPkExpenseTypeId() == guiItem.getPrimaryKey()[0]) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        validation.setMessage("Falta capturar en el paquete el tipo de gasto '" + guiItem.toString() + "'.");
+                        validation.setComponent(moKeyExpenseType);
+                        moKeyExpenseType.setSelectedIndex(index);
+                        break;
+                    }
+                }
+            }
         }
         
         return validation;
+    }
+
+    @Override
+    public void notifyRowNew(int gridType, int gridSubtype, int row, SGridRow gridRow) {
+        
+    }
+
+    @Override
+    public void notifyRowEdit(int gridType, int gridSubtype, int row, SGridRow gridRow) {
+        
+    }
+
+    @Override
+    public void notifyRowDelete(int gridType, int gridSubtype, int row, SGridRow gridRow) {
+        if (gridType == SModConsts.HRSU_PACK_EXP_ITEM) {
+            updateTotalExpenses();
+        }
     }
 
     @Override

@@ -32,7 +32,8 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
 
 /**
- *
+ * Configuración de paquetes de centros de costo y sus centros de costo con porcentaje de prorrateo.
+ * Aplica para la modalidad de configuración de contabilización 'dinámica'.
  * @author Sergio Flores
  */
 public class SFormPackCostCenters extends SBeanForm implements SGridPaneFormOwner, ActionListener {
@@ -42,7 +43,9 @@ public class SFormPackCostCenters extends SBeanForm implements SGridPaneFormOwne
     private int mnCostCenterMask;
 
     /**
-     * Creates new form SFormPackCostCenters
+     * Creates new form SFormPackCostCenters.
+     * @param client GUI client.
+     * @param title Form title.
      */
     public SFormPackCostCenters(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_PACK_CC, 0, title);
@@ -109,7 +112,7 @@ public class SFormPackCostCenters extends SBeanForm implements SGridPaneFormOwne
 
         jlTotalProration.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlTotalProration.setText("% prorrateo:");
-        jlTotalProration.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlTotalProration.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlTotalProration);
 
         jtfTotalProration.setEditable(false);
@@ -326,7 +329,9 @@ public class SFormPackCostCenters extends SBeanForm implements SGridPaneFormOwne
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
+            
             moRegistry.setSystem(false); // all editable registries are non-system
+            
             jtfRegistryKey.setText("");
         }
         else {

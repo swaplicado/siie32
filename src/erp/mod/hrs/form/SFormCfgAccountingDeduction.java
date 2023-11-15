@@ -4,16 +4,20 @@
  */
 package erp.mod.hrs.form;
 
+import erp.data.SDataConstantsSys;
 import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModDataConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.db.SDbAccountingDeduction;
+import erp.mod.hrs.db.SDbCfgAccountingDeduction;
+import erp.mod.hrs.db.SDbDeduction;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.JButton;
-import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -21,22 +25,26 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
 
 /**
- * Configuración de la contabilización de deducciones según su nivel de configuración.
- * Aplica para la modalidad de configuración de contabilización 'original'.
- * @author Juan Barajas, Sergio Flores
+ * Configuración de la contabilización de las percepciones que lo requieran.
+ * Aplica para la modalidad de configuración de contabilización 'dinámica'.
+ * @author Sergio Flores
  */
-public class SFormAccountingDeduction extends SBeanForm implements ActionListener {
+public class SFormCfgAccountingDeduction extends SBeanForm implements ActionListener, ItemListener {
 
-    private SDbAccountingDeduction moRegistry;
+    private SDbCfgAccountingDeduction moRegistry;
+    private SDbDeduction moDeduction;
 
     /**
-     * Creates new form SFormAccountingDeduction
+     * Creates new form SFormCfgAccountingDeduction.
+     * @param client GUI client.
+     * @param title Form title.
      */
-    public SFormAccountingDeduction(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_ACC_DED, SLibConsts.UNDEFINED, title);
+    public SFormCfgAccountingDeduction(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_CFG_ACC_DED, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -52,33 +60,27 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlDeduction = new javax.swing.JLabel();
-        moTextDeduction = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel4 = new javax.swing.JPanel();
-        jlReference = new javax.swing.JLabel();
-        moTextReference = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel10 = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
+        moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel8 = new javax.swing.JPanel();
+        jlAccountingRecordType = new javax.swing.JLabel();
+        jtfAccountingRecordType = new javax.swing.JTextField();
+        jPanel10 = new javax.swing.JPanel();
         moPanelAccount = new erp.gui.account.SBeanPanelAccount();
-        jPanel3 = new javax.swing.JPanel();
-        moPanelCostCenter = new erp.gui.account.SBeanPanelAccount();
-        jPanel11 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jlPackCostCenters = new javax.swing.JLabel();
+        moKeyPackCostCenters = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel4 = new javax.swing.JPanel();
+        jlPackExpenses = new javax.swing.JLabel();
+        moKeyPackExpenses = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel5 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         moKeyBizPartner = new sa.lib.gui.bean.SBeanFieldKey();
         jbPickBizPartner = new javax.swing.JButton();
         jbClearBizPartner = new javax.swing.JButton();
-        jbSameEmploye = new javax.swing.JButton();
-        jPanel7 = new javax.swing.JPanel();
-        jlItem = new javax.swing.JLabel();
-        moKeyItem = new sa.lib.gui.bean.SBeanFieldKey();
-        jbPickItem = new javax.swing.JButton();
-        jbClearItem = new javax.swing.JButton();
         jPanel19 = new javax.swing.JPanel();
         jlTax = new javax.swing.JLabel();
         moKeyTax = new sa.lib.gui.bean.SBeanFieldKey();
@@ -90,57 +92,63 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel9.setLayout(new java.awt.BorderLayout());
-
         jPanel12.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDeduction.setText("Deducción:");
+        jlDeduction.setForeground(java.awt.Color.blue);
+        jlDeduction.setText("Deducción:*");
         jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlDeduction);
 
-        moTextDeduction.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel6.add(moTextDeduction);
+        moKeyDeduction.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel6.add(moKeyDeduction);
 
         jPanel12.add(jPanel6);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlReference.setText("Referencia:");
-        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlReference);
+        jlAccountingRecordType.setText("Registro contable:");
+        jlAccountingRecordType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlAccountingRecordType);
 
-        moTextReference.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel4.add(moTextReference);
+        jtfAccountingRecordType.setEditable(false);
+        jtfAccountingRecordType.setFocusable(false);
+        jtfAccountingRecordType.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel8.add(jtfAccountingRecordType);
 
-        jPanel12.add(jPanel4);
+        jPanel12.add(jPanel8);
 
-        jPanel9.add(jPanel12, java.awt.BorderLayout.PAGE_START);
-
-        jPanel2.add(jPanel9, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jPanel12, java.awt.BorderLayout.NORTH);
 
         jPanel10.setLayout(new java.awt.BorderLayout());
-
-        jPanel13.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
-
-        jPanel8.setLayout(new java.awt.BorderLayout());
-        jPanel8.add(moPanelAccount, java.awt.BorderLayout.CENTER);
-
-        jPanel13.add(jPanel8);
-
-        jPanel3.setLayout(new java.awt.BorderLayout());
-        jPanel3.add(moPanelCostCenter, java.awt.BorderLayout.CENTER);
-
-        jPanel13.add(jPanel3);
-
-        jPanel10.add(jPanel13, java.awt.BorderLayout.CENTER);
+        jPanel10.add(moPanelAccount, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel10, java.awt.BorderLayout.CENTER);
 
-        jPanel11.setLayout(new java.awt.BorderLayout());
+        jPanel14.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
-        jPanel14.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPackCostCenters.setText("Paquete CC:*");
+        jlPackCostCenters.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlPackCostCenters);
+
+        moKeyPackCostCenters.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel7.add(moKeyPackCostCenters);
+
+        jPanel14.add(jPanel7);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPackExpenses.setText("Paquete gastos:*");
+        jlPackExpenses.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlPackExpenses);
+
+        moKeyPackExpenses.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel4.add(moKeyPackExpenses);
+
+        jPanel14.add(jPanel4);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -163,35 +171,7 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
         jbClearBizPartner.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel5.add(jbClearBizPartner);
 
-        jbSameEmploye.setText("Mismo empleado");
-        jbSameEmploye.setMargin(new java.awt.Insets(2, 5, 2, 5));
-        jbSameEmploye.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel5.add(jbSameEmploye);
-
         jPanel14.add(jPanel5);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlItem.setText("Ítem:");
-        jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlItem);
-
-        moKeyItem.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel7.add(moKeyItem);
-
-        jbPickItem.setText("...");
-        jbPickItem.setToolTipText("Seleccionar ítem");
-        jbPickItem.setFocusable(false);
-        jbPickItem.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel7.add(jbPickItem);
-
-        jbClearItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_del.gif"))); // NOI18N
-        jbClearItem.setToolTipText("Limpiar ítem");
-        jbClearItem.setFocusable(false);
-        jbClearItem.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel7.add(jbClearItem);
-
-        jPanel14.add(jPanel7);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -216,9 +196,7 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
 
         jPanel14.add(jPanel19);
 
-        jPanel11.add(jPanel14, java.awt.BorderLayout.PAGE_START);
-
-        jPanel2.add(jPanel11, java.awt.BorderLayout.SOUTH);
+        jPanel2.add(jPanel14, java.awt.BorderLayout.SOUTH);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
@@ -228,84 +206,65 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbClearBizPartner;
-    private javax.swing.JButton jbClearItem;
     private javax.swing.JButton jbClearTax;
     private javax.swing.JButton jbPickBizPartner;
-    private javax.swing.JButton jbPickItem;
     private javax.swing.JButton jbPickTax;
-    private javax.swing.JButton jbSameEmploye;
+    private javax.swing.JLabel jlAccountingRecordType;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlDeduction;
-    private javax.swing.JLabel jlItem;
-    private javax.swing.JLabel jlReference;
+    private javax.swing.JLabel jlPackCostCenters;
+    private javax.swing.JLabel jlPackExpenses;
     private javax.swing.JLabel jlTax;
+    private javax.swing.JTextField jtfAccountingRecordType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartner;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyItem;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDeduction;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPackCostCenters;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPackExpenses;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
     private erp.gui.account.SBeanPanelAccount moPanelAccount;
-    private erp.gui.account.SBeanPanelAccount moPanelCostCenter;
-    private sa.lib.gui.bean.SBeanFieldText moTextDeduction;
-    private sa.lib.gui.bean.SBeanFieldText moTextReference;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 640, 400);
 
-        moTextDeduction.setTextSettings(SGuiUtils.getLabelName(jlDeduction.getText()), 10);
-        moTextReference.setTextSettings(SGuiUtils.getLabelName(jlReference.getText()), 100);
-        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
-        moPanelCostCenter.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, false, true, true);
+        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeduction), true);
+        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, true);
+        moKeyPackCostCenters.setKeySettings(miClient, SGuiUtils.getLabelName(jlPackCostCenters), true);
+        moKeyPackExpenses.setKeySettings(miClient, SGuiUtils.getLabelName(jlPackExpenses), true);
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), false);
-        moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem.getText()), false);
         moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), false);
 
         moPanelAccount.setAccountNameWidth(500);
-        moPanelCostCenter.setAccountNameWidth(500);
 
-        moPanelAccount.setComponentPrevious(moTextReference);
-        moPanelAccount.setComponentNext(moPanelCostCenter.getTextNumberFirst());
-        moPanelCostCenter.setComponentPrevious(moPanelAccount.getTextNumberFirst());
-        moPanelCostCenter.setComponentNext(moKeyBizPartner);
+        moPanelAccount.setComponentPrevious(moKeyDeduction);
+        moPanelAccount.setComponentNext(moKeyPackExpenses); // this control stands after cost centers package, but the latter is not always enabled
         
         moPanelAccount.initPanel();
-        moPanelCostCenter.initPanel();
         
-        moFields.addField(moTextDeduction);
-        moFields.addField(moTextReference);
+        moFields.addField(moKeyDeduction);
+        moFields.addField(moKeyPackCostCenters);
+        moFields.addField(moKeyPackExpenses);
         moFields.addField(moKeyBizPartner);
-        moFields.addField(moKeyItem);
         moFields.addField(moKeyTax);
 
         moFields.setFormButton(jbSave);
     }
     
-    @Override
-    protected void windowActivated() {
-        if (mbFirstActivation) {
-            mbFirstActivation = false;
-            moPanelAccount.getTextNumberFirst().requestFocus();
-        }
-    }
-
     private void actionPickBizPartner() {
         int[] key = null;
         SGuiOptionPicker picker = null;
 
-        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BANK_ACC, SLibConsts.UNDEFINED, null);
+        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BANK_ACC, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
@@ -313,7 +272,7 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
             key = (int[]) picker.getOption();
 
             if (key != null) {
-                if (key[0] != SLibConsts.UNDEFINED) {
+                if (key[0] != 0) {
                     moKeyBizPartner.setValue(new int[] { key[0] });
                     moKeyBizPartner.requestFocusInWindow();
                 }
@@ -321,31 +280,11 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
         }
     }
     
-    private void actionPickItem() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_ITM_N).getOptionPicker(SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
-        picker.resetPicker();
-        picker.setPickerVisible(true);
-
-        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
-
-            if (key != null) {
-                if (key[0] != SLibConsts.UNDEFINED) {
-                    moKeyItem.setValue(new int[] { key[0] });
-                    moKeyItem.requestFocusInWindow();
-                }
-            }
-        }
-    }
-
     private void actionPickTax() {
         int[] key = null;
         SGuiOptionPicker picker = null;
 
-        picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, SLibConsts.UNDEFINED, null);
+        picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
@@ -353,7 +292,7 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
             key = (int[]) picker.getOption();
 
             if (key != null) {
-                if (key[0] != SLibConsts.UNDEFINED) {
+                if (key[0] != 0) {
                     moKeyTax.setValue(new int[] { key[0], key[1] });
                     moKeyTax.requestFocusInWindow();
                 }
@@ -366,102 +305,119 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
         moKeyBizPartner.requestFocus();
     }
 
-    private void actionClearItem() {
-        moKeyItem.setSelectedIndex(0);
-        moKeyItem.requestFocus();
-    }
-
     private void actionClearTax() {
         moKeyTax.setSelectedIndex(0);
         moKeyTax.requestFocus();
     }
     
-    private void actionSameEmployee() {
-        moKeyBizPartner.setValue(new int[] { moRegistry.getPkReferenceId() });
+    private void updatePackCostCentersStatus() {
+        moKeyPackCostCenters.setEnabled(moDeduction != null && moDeduction.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL);
     }
-
+    
+    private void itemStateChangedDeduction() {
+        moDeduction = null;
+        jtfAccountingRecordType.setText("");
+        moKeyPackCostCenters.setEnabled(false);
+        moKeyPackCostCenters.setValue(new int[] { SDataConstantsSys.NA });
+        
+        if (moKeyDeduction.getSelectedIndex() > 0) {
+            moDeduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeduction.getValue());
+        }
+        
+        if (moDeduction != null) {
+            jtfAccountingRecordType.setText((String) miClient.getSession().readField(SModConsts.HRSS_TP_ACC, new int[] { moDeduction.getFkAccountingRecordTypeId() }, SDbRegistry.FIELD_NAME));
+            jtfAccountingRecordType.setCaretPosition(0);
+            
+            updatePackCostCentersStatus();
+        }
+    }
+    
     @Override
     public void addAllListeners() {
         jbPickBizPartner.addActionListener(this);
-        jbPickItem.addActionListener(this);
         jbPickTax.addActionListener(this);
         jbClearBizPartner.addActionListener(this);
-        jbClearItem.addActionListener(this);
         jbClearTax.addActionListener(this);
-        jbSameEmploye.addActionListener(this);
+        moKeyDeduction.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         jbPickBizPartner.removeActionListener(this);
-        jbPickItem.removeActionListener(this);
         jbPickTax.removeActionListener(this);
         jbClearBizPartner.removeActionListener(this);
-        jbClearItem.removeActionListener(this);
         jbClearTax.removeActionListener(this);
-        jbSameEmploye.removeActionListener(this);
+        moKeyDeduction.removeItemListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyItem, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyTax, SModConsts.FINU_TAX, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyDeduction, SModConsts.HRS_DED, 0, null);
+        miClient.getSession().populateCatalogue(moKeyPackCostCenters, SModConsts.HRS_PACK_CC, SModDataConsts.OPC_ALL, null);
+        miClient.getSession().populateCatalogue(moKeyPackExpenses, SModConsts.HRSU_PACK_EXP, SModDataConsts.OPC_ALL, null);
+        miClient.getSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, 0, null);
+        miClient.getSession().populateCatalogue(moKeyTax, SModConsts.FINU_TAX, 0, null);
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbAccountingDeduction) registry;
-
-        mnFormResult = SLibConsts.UNDEFINED;
+        moRegistry = (SDbCfgAccountingDeduction) registry;
+        
+        mnFormResult = 0;
         mbFirstActivation = true;
-
+        
         removeAllListeners();
         reloadCatalogues();
-
+        
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
+            
+            moRegistry.setFkAccountId(SDataConstantsSys.NA);
+            moRegistry.setFkPackExpensesId(SDataConstantsSys.NA);
+            moRegistry.setFkPackCostCentersId(SDataConstantsSys.NA);
+            
             jtfRegistryKey.setText("");
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
-
-        moTextDeduction.setValue(moRegistry.getAuxDeduction());
-        moTextReference.setValue(moRegistry.getAuxReference());
+        
+        moKeyDeduction.setValue(new int[] { moRegistry.getPkDeductionId() });
+        itemStateChangedDeduction();
+        moKeyPackCostCenters.setValue(new int[] { moRegistry.getFkPackCostCentersId() });
         moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountId() }, SDbRegistry.FIELD_CODE), "", false, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED));
-        if (moRegistry.getFkCostCenterId_n() != SLibConsts.UNDEFINED) {
-            moPanelCostCenter.setSelectedAccount(new SAccount(moRegistry.getFkCostCenterId_n(), (String) miClient.getSession().readField(SModConsts.FIN_CC, new int[] { moRegistry.getFkCostCenterId_n() }, SDbRegistry.FIELD_CODE), "", false, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED));
+        moKeyPackExpenses.setValue(new int[] { moRegistry.getFkPackExpensesId() });
+        moKeyBizPartner.setValue(new int[] { moRegistry.getFkBizPartnerId_n() });
+        moKeyTax.setValue(new int[] { moRegistry.getFkTaxBasicId_n(), moRegistry.getFkTaxTaxId_n() });
+        
+        setFormEditable(true);
+        updatePackCostCentersStatus();
+        
+        if (moRegistry.isRegistryNew()) {
+            moKeyDeduction.setEnabled(true);
         }
         else {
-            moPanelCostCenter.setSelectedAccount(null);
+            moKeyDeduction.setEnabled(false);
         }
-        moKeyBizPartner.setValue(new int[] { moRegistry.getFkBizPartnerId_n() });
-        moKeyItem.setValue(new int[] { moRegistry.getFkItemId_n() });
-        moKeyTax.setValue(new int[] { moRegistry.getFkTaxBasicId_n(), moRegistry.getFkTaxTaxId_n() });
-
-        setFormEditable(true);
         
-        moTextDeduction.setEditable(false);
-        moTextReference.setEditable(false);
-        
-        jbSameEmploye.setEnabled(moRegistry.getPkAccountingTypeId() == SModSysConsts.HRSS_TP_ACC_EMP);
-
         addAllListeners();
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbAccountingDeduction registry = moRegistry.clone();
+        SDbCfgAccountingDeduction registry = moRegistry.clone();
 
-        if (registry.isRegistryNew()) {}
+        if (registry.isRegistryNew()) {
+            registry.setPkDeductionId(moKeyDeduction.getValue()[0]);
+        }
         
-        registry.setFkAccountId(moPanelAccount.getSelectedAccount().getAccountId());
-        registry.setFkCostCenterId_n(moPanelCostCenter.getSelectedAccount() == null ? SLibConsts.UNDEFINED : moPanelCostCenter.getSelectedAccount().getAccountId());
-        registry.setFkBizPartnerId_n(moKeyBizPartner.getSelectedIndex() == 0 ? SLibConsts.UNDEFINED : moKeyBizPartner.getValue()[0]);
-        registry.setFkItemId_n(moKeyItem.getSelectedIndex() == 0 ? SLibConsts.UNDEFINED : moKeyItem.getValue()[0]);
-        registry.setFkTaxBasicId_n(moKeyTax.getSelectedIndex() == 0 ? SLibConsts.UNDEFINED : moKeyTax.getValue()[0]);
-        registry.setFkTaxTaxId_n(moKeyTax.getSelectedIndex() == 0 ? SLibConsts.UNDEFINED : moKeyTax.getValue()[1]);
+        registry.setFkAccountId(moPanelAccount.getSelectedAccount() != null ? moPanelAccount.getSelectedAccount().getAccountId() : SDataConstantsSys.NA);
+        registry.setFkBizPartnerId_n(moKeyBizPartner.getSelectedIndex() == 0 ? 0 : moKeyBizPartner.getValue()[0]);
+        registry.setFkTaxBasicId_n(moKeyTax.getSelectedIndex() == 0 ? 0 : moKeyTax.getValue()[0]);
+        registry.setFkTaxTaxId_n(moKeyTax.getSelectedIndex() == 0 ? 0 : moKeyTax.getValue()[1]);
+        registry.setFkPackExpensesId(moKeyPackExpenses.getValue()[0]);
+        registry.setFkPackCostCentersId(moKeyPackCostCenters.getValue()[0]);
+        registry.setFkAccountingRecordTypeId(moDeduction.getFkAccountingRecordTypeId());
 
         return registry;
     }
@@ -471,7 +427,24 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            validation = moPanelAccount.validatePanel();
+            if (moRegistry.isRegistryNew()) {
+                try {
+                    int id = moKeyDeduction.getValue()[0]; // convenience variable
+                    
+                    if (SDbCfgAccountingDeduction.countExistingRegistries(miClient.getSession(), id) > 0) {
+                        throw new Exception("Ya existe un registro para la deducción '" + miClient.getSession().readField(SModConsts.HRS_DED, new int[] { id }, SDbRegistry.FIELD_NAME) + "'."
+                                + "\nSi no visualiza el registro existente en la vista, busque entre los registros eliminados.");
+                    }
+                }
+                catch (Exception e) {
+                    validation.setMessage(e.getMessage());
+                    validation.setComponent(moKeyDeduction);
+                }
+            }
+            
+            if (validation.isValid()) {
+                validation = moPanelAccount.validatePanel();
+            }
         }
             
         return validation;
@@ -485,23 +458,25 @@ public class SFormAccountingDeduction extends SBeanForm implements ActionListene
             if (button == jbPickBizPartner) {
                 actionPickBizPartner();
             }
-            else if (button == jbPickItem) {
-                actionPickItem();
-            }
             else if (button == jbPickTax) {
                 actionPickTax();
             }
             else if (button == jbClearBizPartner) {
                 actionClearBizPartner();
             }
-            else if (button == jbClearItem) {
-                actionClearItem();
-            }
             else if (button == jbClearTax) {
                 actionClearTax();
             }
-            else if (button == jbSameEmploye) {
-                actionSameEmployee();
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+            
+            if (field == moKeyDeduction) {
+                itemStateChangedDeduction();
             }
         }
     }

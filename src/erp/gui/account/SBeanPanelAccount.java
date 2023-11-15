@@ -757,7 +757,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
             }
             else if (mbOnlyExistingAccounts && account == null && accountStd.compareTo(SAccountUtils.composeCodeStdMin()) != 0) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlNumber) + "'.\n"
-                        + "(" + SGuiUtils.getLabelName(jlNumber) + " " + SAccountConsts.TXT_EXISTING+ ")");
+                        + "(" + SGuiUtils.getLabelName(jlNumber) + " " + SAccountConsts.TXT_EXISTING + ")");
                 validation.setComponent(moTextCodeLevel1);
             }
             else if (mbOnlyTerminalAccounts && account != null && maoAccounts[0] != null && account.getLevel() != ((SAccountLedger) maoAccounts[0]).getDeep()) {

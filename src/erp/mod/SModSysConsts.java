@@ -1081,7 +1081,11 @@ public abstract class SModSysConsts {
 
     public static final int HRSU_SHT_NA = 1; // Not applicable
 
+    public static final int HRSU_PACK_EXP_NA = 1; // Not applicable
+    
     public static final int HRS_BEN_ND = 0; // Not defined
+    
+    public static final int HRS_PACK_CC_NA = 1; // Not applicable
     
     public static final int HRS_AUT_GBL = 1;
     public static final int HRS_AUT_EMP = 2;

@@ -62,17 +62,6 @@ public class SDbCfgAccountingDepartment extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     @Override
-    public boolean canSave(final SGuiSession session) throws SQLException, Exception {
-        boolean can = super.canSave(session);
-        
-        if (can) {
-            can = SHrsFinUtils.validateAccount(session, mnFkAccountId, 0, mnFkBizPartnerId_n, 0, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
-        }
-        
-        return can;
-    }
-
-    @Override
     public void setPrimaryKey(int[] pk) {
         mnPkDepartmentId = pk[0];
     }
@@ -152,6 +141,17 @@ public class SDbCfgAccountingDepartment extends SDbRegistryUser {
     }
 
     @Override
+    public boolean canSave(final SGuiSession session) throws SQLException, Exception {
+        boolean can = super.canSave(session);
+        
+        if (can) {
+            can = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
+        }
+        
+        return can;
+    }
+
+    @Override
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
@@ -218,7 +218,7 @@ public class SDbCfgAccountingDepartment extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
-        registry.setRegistryNew(true);
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

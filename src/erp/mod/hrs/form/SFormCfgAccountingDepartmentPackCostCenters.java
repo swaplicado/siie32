@@ -15,17 +15,20 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanForm;
 
 /**
- *
+ * Configuración de los paquetes de gastos para la contabilización de departamentos.
+ * Aplica para la modalidad de configuración de contabilización 'dinámica'.
  * @author Sergio Flores
  */
-public class SFormCfgAccountingDepartmentCostCenters extends SBeanForm {
+public class SFormCfgAccountingDepartmentPackCostCenters extends SBeanForm {
 
     private SDbCfgAccountingDepartmentPackCostCenters moRegistry;
 
     /**
-     * Creates new form SFormCfgAccountingDepartmentCostCenters
+     * Creates new form SFormCfgAccountingDepartmentCostCenters.
+     * @param client GUI client.
+     * @param title Form title.
      */
-    public SFormCfgAccountingDepartmentCostCenters(SGuiClient client, String title) {
+    public SFormCfgAccountingDepartmentPackCostCenters(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_CFG_ACC_DEP_PACK_CC, 0, title);
         initComponents();
         initComponentsCustom();
@@ -61,7 +64,7 @@ public class SFormCfgAccountingDepartmentCostCenters extends SBeanForm {
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDepartment.setForeground(java.awt.Color.blue);
-        jlDepartment.setText("Departamento:");
+        jlDepartment.setText("Departamento:*");
         jlDepartment.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlDepartment);
 
@@ -153,6 +156,8 @@ public class SFormCfgAccountingDepartmentCostCenters extends SBeanForm {
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             moRegistry.setSystem(false); // all editable registries are non-system
+            
+            moRegistry.setDateStart(miClient.getSession().getCurrentDate());
             
             jtfRegistryKey.setText("");
         }

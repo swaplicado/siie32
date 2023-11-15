@@ -1115,7 +1115,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                             throw new Exception(sMsg + "'cuenta contable' ('" + sMap_acc + "') tiene un inconveniente:\n" + sVal);
                         }
 
-                        oAccountMajor = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { oAccount.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                        oAccountMajor = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { oAccount.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
                     }
 
                     // Validate cost center:

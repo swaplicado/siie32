@@ -18,6 +18,8 @@ import erp.mod.fin.db.SFinUtils;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
@@ -63,6 +65,12 @@ public abstract class SHrsFinUtils {
         return true;
     }
     
+    /**
+     * Delete payroll record entries.
+     * @param session
+     * @param payrollId
+     * @throws Exception 
+     */
     public static void deletePayrollRecordEntries(final SGuiSession session, final int payrollId) throws Exception {
         String sql;
         
@@ -108,7 +116,130 @@ public abstract class SHrsFinUtils {
     }
     
     /**
-     * Validate if exists any accounting settings for all earning and deduction of the payroll.
+     * Get accounting records of requested payroll.
+     * @param session User session.
+     * @param payrollId ID of payroll.
+     * @param receipts Number of receipts in payroll.
+     * @return If existing, accounting records of requested payroll, otherwise an empty string is returned.
+     * @throws java.lang.Exception
+     */
+    public static String getAccountingRecords(final SGuiSession session, final int payrollId, final int receipts) throws Exception {
+        int bookkept = 0;
+        String records = "";
+        
+        String sql = "SELECT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, "
+                + "r.dt, r.concept, bkc.code, cob.code, COUNT(*) AS _count "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN hrs_acc_pay AS ap ON ap.id_pay = p.id_pay "
+                + "INNER JOIN hrs_acc_pay_rcp AS apr ON apr.id_pay = ap.id_pay AND apr.id_acc = ap.id_acc AND apr.id_emp = pr.id_emp "
+                + "INNER JOIN fin_rec AS r ON r.id_year = apr.fid_rec_year AND r.id_per = apr.fid_rec_per AND r.id_bkc = apr.fid_rec_bkc AND r.id_tp_rec = apr.fid_rec_tp_rec AND r.id_num = apr.fid_rec_num "
+                + "INNER JOIN fin_bkc AS bkc ON bkc.id_bkc = r.id_bkc "
+                + "INNER JOIN erp.bpsu_bpb AS cob ON cob.id_bpb = r.fid_cob "
+                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT ap.b_del AND "
+                + "p.id_pay = " + payrollId + " "
+                + "GROUP BY r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept "
+                + "ORDER BY r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept;";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                records += (records.isEmpty() ? "" : "\n")
+                        + "- En la póliza contable '"
+                        + SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("r.id_year")) + "-"
+                        + SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("r.id_per")) + " "
+                        + resultSet.getString("bkc.code") + " "
+                        + resultSet.getString("cob.code") + " "
+                        + resultSet.getString("r.id_tp_rec") + "-"
+                        + RecordNumberFormat.format(resultSet.getInt("r.id_num")) + "', "
+                        + "del " + SLibUtils.DateFormatDate.format(resultSet.getDate("r.dt")) + ", "
+                        + "\"" + resultSet.getString("r.concept") + "\", hay "
+                        + (resultSet.getInt("_count") == 1 ? "un recibo" : SLibUtils.DecimalFormatInteger.format(resultSet.getInt("_count")) + " recibos") + ".";
+                bookkept += resultSet.getInt("_count");
+            }
+        }
+        
+        records += (records.isEmpty() ? "" : "\n")
+                + "Número de recibos contabilizados: " + SLibUtils.DecimalFormatInteger.format(bookkept) + " de " + SLibUtils.DecimalFormatInteger.format(receipts) + " "
+                + "(" + SLibUtils.DecimalFormatPercentage2D.format(receipts != 0 ? bookkept / (double) receipts : 0) + ").\n"
+                + (bookkept < receipts ? "Número de recibos por contabilizar: " + SLibUtils.DecimalFormatInteger.format(receipts - bookkept) + "." : "");
+        
+        return records;
+    }
+    
+    /**
+     * Actualizar las configuraciones de contabilización faltantes de percepciones y deducciones (procesamiento original), así como borrar las configuraciones obsoletas.
+     * @param session User session.
+     * @throws java.lang.Exception
+     */
+    public static void restoreAccountingSettings(final SGuiSession session) throws Exception {
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            // Recuperar configuraciones de contabilización cuyas percepciones o deducciones estén activas:
+            
+            int[] accountingTypes = new int[] { SModSysConsts.HRSS_TP_ACC_GBL, SModSysConsts.HRSS_TP_ACC_DEP, SModSysConsts.HRSS_TP_ACC_EMP };
+            
+            String[] updatesUndel = new String[accountingTypes.length];
+            for (int i = 0; i < updatesUndel.length; i++) {
+                updatesUndel[i] = "UPDATE hrs_acc_ear SET b_del = 0, fk_usr_upd = " + session.getUser().getPkUserId() + ", ts_usr_upd = NOW() "
+                        + "WHERE id_tp_acc = " + accountingTypes[i] + " AND b_del AND id_ear IN (SELECT id_ear FROM hrs_ear WHERE fk_tp_acc_cfg = " + accountingTypes[i] + " AND NOT b_del);";
+            }
+            
+            // Borrar configuraciones de contabilización cuyos departamentos estén eliminados o cuyos empleados estén eliminados o inactivos:
+            
+            String[] updatesDel = new String[] {
+                "UPDATE hrs_acc_ear SET b_del = 1, fk_usr_upd = " + session.getUser().getPkUserId() + ", ts_usr_upd = NOW() "
+                    + "WHERE NOT b_del AND id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND id_ref IN (SELECT id_dep FROM erp.hrsu_dep WHERE b_del);",
+                "UPDATE hrs_acc_ear SET b_del = 1, fk_usr_upd = " + session.getUser().getPkUserId() + ", ts_usr_upd = NOW() "
+                    + "WHERE NOT b_del AND id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND id_ref IN (SELECT id_emp FROM erp.hrsu_emp WHERE b_del OR NOT b_act);"
+            };
+            
+            // Crear configuraciones de contabilización faltantes:
+            
+            String[] inserts = new String[] {
+                "INSERT INTO hrs_acc_ear "
+                    + "SELECT c.id_ear, " + SModSysConsts.HRSS_TP_ACC_GBL + ", 0, 0, 1, NULL, NULL, NULL, NULL, NULL, " + session.getUser().getPkUserId() + ", 1, NOW(), NOW() "
+                    + "FROM hrs_ear AS c "
+                    + "WHERE NOT c.b_del AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND "
+                    + "NOT EXISTS (SELECT * FROM hrs_acc_ear AS ac WHERE ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ear = c.id_ear AND ac.id_ref = 0) "
+                    + "ORDER BY c.id_ear;",
+                "INSERT INTO hrs_acc_ear "
+                    + "SELECT c.id_ear, " + SModSysConsts.HRSS_TP_ACC_DEP + ", d.id_dep, 0, 1, NULL, NULL, NULL, NULL, NULL, " + session.getUser().getPkUserId() + ", 1, NOW(), NOW() "
+                    + "FROM hrs_ear AS c "
+                    + "INNER JOIN erp.hrsu_dep AS d "
+                    + "WHERE NOT c.b_del AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND NOT d.b_del AND "
+                    + "NOT EXISTS (SELECT * FROM hrs_acc_ear AS ac WHERE ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ear = c.id_ear AND ac.id_ref = d.id_dep) "
+                    + "ORDER BY c.id_ear, d.id_dep;",
+                "INSERT INTO hrs_acc_ear "
+                    + "SELECT c.id_ear, " + SModSysConsts.HRSS_TP_ACC_EMP + ", e.id_emp, 0, 1, NULL, NULL, NULL, NULL, NULL, " + session.getUser().getPkUserId() + ", 1, NOW(), NOW() "
+                    + "FROM hrs_ear AS c "
+                    + "INNER JOIN erp.hrsu_emp AS e "
+                    + "INNER JOIN hrs_emp_member AS em ON em.id_emp = e.id_emp "
+                    + "WHERE NOT c.b_del AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND NOT e.b_del AND e.b_act AND "
+                    + "NOT EXISTS (SELECT * FROM hrs_acc_ear AS ac WHERE ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ear = c.id_ear AND ac.id_ref = e.id_emp) "
+                    + "ORDER BY c.id_ear, e.id_emp;"
+            };
+            
+            int i = 0;
+            String[] sqls = new String[updatesUndel.length + updatesDel.length + inserts.length];
+            
+            for (String sql : updatesUndel) {
+                sqls[i++] = sql;
+            }
+            for (String sql : updatesDel) {
+                sqls[i++] = sql;
+            }
+            for (String sql : inserts) {
+                sqls[i++] = sql;
+            }
+            
+            for (String sql : sqls) {
+                statement.execute(sql); // para percepciones
+                statement.execute(sql.replaceAll("_ear", "_ded")); // para deducciones
+            }
+        }
+    }
+    
+    /**
+     * Validate if exists any accounting settings (original processing) for all earning and deduction of the payroll.
      * @param session User GUI session.
      * @param payrollId payroll ID to validate.
      * @return
@@ -191,190 +322,223 @@ public abstract class SHrsFinUtils {
         return true;
     }
     
-    /**
-     * Validate payroll accounting configuration.
-     * @param session User GUI session.
-     * @param accountId ID of account.
-     * @param costCenterId ID of cost center.
-     * @param bizPartnerId ID of business partner.
-     * @param itemId ID of item.
-     * @param taxBasicId ID of basic tax.
-     * @param taxTaxId ID of tax.
-     * @return <code>true</code> if configurations is valid.
-     * @throws Exception 
+    /** Validate that all required settings of accounting configurations (dynamic proccessing) are ready and available.
+     * @param session User session.
+     * @param payrollId ID of payroll.
+     * @param employeeIds Array of ID of employees.
+     * @return <code>true</code> if all settings are ready and available.
+     * @throws java.lang.Exception
      */
-    public static boolean validateAccount(final SGuiSession session, final int accountId, final int costCenterId, final int bizPartnerId, final int itemId, final int taxBasicId, final int taxTaxId) throws Exception {
-        String validationMsg;
-        
-        String accountPk = SFinUtils.getAccountFormerIdXXX(session, accountId);
-        
-        SDataAccount account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { accountPk }, SLibConstants.EXEC_MODE_VERBOSE);
-        validationMsg = SDataUtilities.validateAccount((SClientInterface) session.getClient(), account, null, false);
-        if (!validationMsg.isEmpty()) {
-            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\n" + validationMsg);
-        }
-        
-        SDataAccount accountLedger = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
-        validationMsg = SDataUtilities.validateAccount((SClientInterface) session.getClient(), accountLedger, null, true);
-        if (!validationMsg.isEmpty()) {
-            throw new Exception("La cuenta contable de mayor ('" + account.getDbmsPkAccountMajorId() + "') tiene un inconveniente:\n" + validationMsg);
-        }
-        
-        if (account.getIsRequiredCostCenter() || accountLedger.getIsRequiredCostCenter() || accountLedger.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) {
-            if (costCenterId == SLibConsts.UNDEFINED) {
-                throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
-            }
-            else {
-                String costCenterPk = SFinUtils.getCostCenterFormerIdXXX(session, costCenterId);
-                
-                SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_CC, new Object[] { costCenterPk }, SLibConstants.EXEC_MODE_VERBOSE);
-                validationMsg = SDataUtilities.validateCostCenter((SClientInterface) session.getClient(), costCenter, null);
-                if (validationMsg.length() != 0) {
-                    throw new Exception("'El centro de costo ('" + costCenterPk + "') tiene un inconveniente:\n" + validationMsg);
+    public static boolean validateCfgAccountingSettings(final SGuiSession session, final int payrollId, final int[] employeeIds) throws Exception {
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String sql;
+            ResultSet resultSet;
+            
+            // validate payroll's earnings:
+            
+            sql = "SELECT DISTINCT e.code, e.name, e.id_ear, e.fk_tp_acc_rec "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                    + "AND p.id_pay = " + payrollId + " AND pr.id_emp IN (" + StringUtils.join(ArrayUtils.toObject(employeeIds), ",") + ") "
+                    + "ORDER BY e.code, e.name, e.id_ear;";
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                switch (resultSet.getInt("e.fi_tp_acc_rec")) {
+                    case SModSysConsts.HRSS_TP_ACC_GBL:
+                        SDbCfgAccountingEarning cfgAccountingEarning = (SDbCfgAccountingEarning) session.readRegistry(SModConsts.HRS_CFG_ACC_EAR, new int[] { resultSet.getInt("e.id_ear") });
+                        break;
+                        
+                    case SModSysConsts.HRSS_TP_ACC_DEP:
+                    case SModSysConsts.HRSS_TP_ACC_EMP:
+                        break;
+                        
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
+                                + "(Tipo de registro contable en la configuración de contabilización de la percepción '" + resultSet.getString("e.name") + "'.)");
                 }
             }
-        }
-        
-        int nSystemType = accountLedger.getFkAccountSystemTypeId();
-        
-        if ((accountLedger.getIsRequiredBizPartner() || SLibUtils.belongsTo(nSystemType, new int[] {
-            SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR })) &&
-                bizPartnerId == SLibConsts.UNDEFINED) {
-            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere asociado de negocios y no está definido.");
-        }
-        if ((accountLedger.getIsRequiredItem() || accountLedger.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) &&
-                itemId == SLibConsts.UNDEFINED) {
-            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere ítem y no está definido.");
-        }
-        if (SLibUtils.belongsTo(nSystemType, new int[] {
-            SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT }) &&
-                taxBasicId == SLibConsts.UNDEFINED && taxTaxId == SLibConsts.UNDEFINED) {
-            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere impuesto y no está definido.");
         }
         
         return true;
     }
     
     /**
-     * Actualizar las configuraciones de contabilización faltantes de percepciones y deducciones, así como borrar las configuraciones obsoletas.
-     * @param session User session.
-     * @throws java.lang.Exception
+     * Get account by its numeric ID.
+     * @param session
+     * @param accountId
+     * @return 
      */
-    public static void updateAccountingConfigs(final SGuiSession session) throws Exception {
-        try (Statement statement = session.getStatement().getConnection().createStatement()) {
-            // Recuperar configuraciones de contabilización cuyas percepciones o deducciones estén activas:
-            
-            int[] accountingTypes = new int[] { SModSysConsts.HRSS_TP_ACC_GBL, SModSysConsts.HRSS_TP_ACC_DEP, SModSysConsts.HRSS_TP_ACC_EMP };
-            
-            String[] updatesUndel = new String[accountingTypes.length];
-            for (int i = 0; i < updatesUndel.length; i++) {
-                updatesUndel[i] = "UPDATE hrs_acc_ear SET b_del = 0, fk_usr_upd = " + session.getUser().getPkUserId() + ", ts_usr_upd = NOW() "
-                        + "WHERE id_tp_acc = " + accountingTypes[i] + " AND b_del AND id_ear IN (SELECT id_ear FROM hrs_ear WHERE fk_tp_acc_cfg = " + accountingTypes[i] + " AND NOT b_del);";
+    public static SDataAccount getAccount(final SGuiSession session, final int accountId) {
+        String accountPk = SFinUtils.getAccountFormerIdXXX(session, accountId);
+        return (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { accountPk }, SLibConstants.EXEC_MODE_VERBOSE);
+    }
+    
+    /**
+     * Get ledger account from given account.
+     * @param session
+     * @param account
+     * @return 
+     */
+    public static SDataAccount getAccountLedger(final SGuiSession session, SDataAccount account) {
+        return (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
+    }
+    
+    /**
+     * Get cost center by its numeric ID.
+     * @param session
+     * @param costCenterId
+     * @return 
+     */
+    public static SDataCostCenter getCostCenter(final SGuiSession session, final int costCenterId) {
+        String costCenterPk = SFinUtils.getCostCenterFormerIdXXX(session, costCenterId);
+        return (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_CC, new Object[] { costCenterPk }, SLibConstants.EXEC_MODE_VERBOSE);
+    }
+    
+    /**
+     * Validate account.
+     * @param session
+     * @param account
+     * @throws Exception 
+     */
+    private static void validateAccount(final SGuiSession session, SDataAccount account, final boolean validatingLedger) throws Exception {
+        String message = SDataUtilities.validateAccount((SClientInterface) session.getClient(), account, null, validatingLedger);
+        if (!message.isEmpty()) {
+            String accountPk = (account != null ? "'" + SFinUtils.getAccountFormerIdXXX(session, account.getPkAccountId()) + "' ": "");
+            throw new Exception("La cuenta contable " + accountPk + "tiene este inconveniente:\n"
+                    + message);
+        }
+    }
+    
+    /**
+     * Validate cost center.
+     * @param session
+     * @param costCenter
+     * @throws Exception 
+     */
+    private static void validateCostCenter(final SGuiSession session, SDataCostCenter costCenter) throws Exception {
+        String message = SDataUtilities.validateCostCenter((SClientInterface) session.getClient(), costCenter, null);
+        if (message.length() != 0) {
+            String costCenterPk = (costCenter != null ? "'" + SFinUtils.getCostCenterFormerIdXXX(session, costCenter.getPkCostCenterId()) + "' ": "");
+            throw new Exception("La centro de costos " + costCenterPk + "tiene este inconveniente:\n"
+                    + message);
+        }
+    }
+    
+    public static boolean isAccountTypeForResults(final SDataAccount account) {
+        return account.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES;
+    }
+    
+    public static boolean isAccountSystemTypeForBizPartner(final SDataAccount account) {
+        int[] types = new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR };
+        
+        return SLibUtils.belongsTo(account.getFkAccountSystemTypeId(), types);
+    }
+    
+    public static boolean isAccountSystemTypeForTax(final SDataAccount account) {
+        int[] types = new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT };
+        
+        return SLibUtils.belongsTo(account.getFkAccountSystemTypeId(), types);
+    }
+    
+    /**
+     * Validate cost center for given account and ledger account.
+     * @param session
+     * @param account
+     * @param accountLedger
+     * @param costCenterId
+     * @throws Exception 
+     */
+    public static void validateAccountCostCenter(final SGuiSession session, final SDataAccount account, final SDataAccount accountLedger, final int costCenterId) throws Exception {
+        if (account.getIsRequiredCostCenter() || accountLedger.getIsRequiredCostCenter() || isAccountTypeForResults(accountLedger)) {
+            if (costCenterId == 0) {
+                throw new Exception("La cuenta contable '" + account.getPkAccountIdXXX() + "' tiene este inconveniente:\n"
+                        + "Requiere centro de costos, pero no ha sido definido.");
             }
-            
-            // Borrar configuraciones de contabilización cuyos departamentos estén eliminados o cuyos empleados estén eliminados o inactivos:
-            
-            String[] updatesDel = new String[] {
-                "UPDATE hrs_acc_ear SET b_del = 1, fk_usr_upd = " + session.getUser().getPkUserId() + ", ts_usr_upd = NOW() "
-                    + "WHERE NOT b_del AND id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND id_ref IN (SELECT id_dep FROM erp.hrsu_dep WHERE b_del);",
-                "UPDATE hrs_acc_ear SET b_del = 1, fk_usr_upd = " + session.getUser().getPkUserId() + ", ts_usr_upd = NOW() "
-                    + "WHERE NOT b_del AND id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND id_ref IN (SELECT id_emp FROM erp.hrsu_emp WHERE b_del OR NOT b_act);"
-            };
-            
-            // Crear configuraciones de contabilización faltantes:
-            
-            String[] inserts = new String[] {
-                "INSERT INTO hrs_acc_ear "
-                    + "SELECT c.id_ear, " + SModSysConsts.HRSS_TP_ACC_GBL + ", 0, 0, 1, NULL, NULL, NULL, NULL, NULL, " + session.getUser().getPkUserId() + ", 1, NOW(), NOW() "
-                    + "FROM hrs_ear AS c "
-                    + "WHERE NOT c.b_del AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND "
-                    + "NOT EXISTS (SELECT * FROM hrs_acc_ear AS ac WHERE ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ear = c.id_ear AND ac.id_ref = 0) "
-                    + "ORDER BY c.id_ear;",
-                "INSERT INTO hrs_acc_ear "
-                    + "SELECT c.id_ear, " + SModSysConsts.HRSS_TP_ACC_DEP + ", d.id_dep, 0, 1, NULL, NULL, NULL, NULL, NULL, " + session.getUser().getPkUserId() + ", 1, NOW(), NOW() "
-                    + "FROM hrs_ear AS c "
-                    + "INNER JOIN erp.hrsu_dep AS d "
-                    + "WHERE NOT c.b_del AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND NOT d.b_del AND "
-                    + "NOT EXISTS (SELECT * FROM hrs_acc_ear AS ac WHERE ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ear = c.id_ear AND ac.id_ref = d.id_dep) "
-                    + "ORDER BY c.id_ear, d.id_dep;",
-                "INSERT INTO hrs_acc_ear "
-                    + "SELECT c.id_ear, " + SModSysConsts.HRSS_TP_ACC_EMP + ", e.id_emp, 0, 1, NULL, NULL, NULL, NULL, NULL, " + session.getUser().getPkUserId() + ", 1, NOW(), NOW() "
-                    + "FROM hrs_ear AS c "
-                    + "INNER JOIN erp.hrsu_emp AS e "
-                    + "INNER JOIN hrs_emp_member AS em ON em.id_emp = e.id_emp "
-                    + "WHERE NOT c.b_del AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND NOT e.b_del AND e.b_act AND "
-                    + "NOT EXISTS (SELECT * FROM hrs_acc_ear AS ac WHERE ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ear = c.id_ear AND ac.id_ref = e.id_emp) "
-                    + "ORDER BY c.id_ear, e.id_emp;"
-            };
-            
-            int i = 0;
-            String[] sqls = new String[updatesUndel.length + updatesDel.length + inserts.length];
-            
-            for (String sql : updatesUndel) {
-                sqls[i++] = sql;
-            }
-            for (String sql : updatesDel) {
-                sqls[i++] = sql;
-            }
-            for (String sql : inserts) {
-                sqls[i++] = sql;
-            }
-            
-            for (String sql : sqls) {
-                statement.execute(sql); // para percepciones
-                statement.execute(sql.replaceAll("_ear", "_ded")); // para deducciones
+            else {
+                SDataCostCenter costCenter = getCostCenter(session, costCenterId);
+                validateCostCenter(session, costCenter);
             }
         }
     }
     
     /**
-     * Get accounting records of requested payroll.
-     * @param session User session.
-     * @param payrollId ID of payroll.
-     * @param receipts Number of receipts in payroll.
-     * @return If existing, accounting records of requested payroll, otherwise an empty string is returned.
-     * @throws java.lang.Exception
+     * Validate item for given account and ledger account.
+     * @param account
+     * @param accountLedger
+     * @param itemId
+     * @throws Exception 
      */
-    public static String getAccountingRecords(final SGuiSession session, final int payrollId, final int receipts) throws Exception {
-        int bookkept = 0;
-        String records = "";
+    public static void validateAccountItem(final SDataAccount account, final SDataAccount accountLedger, final int itemId) throws Exception {
+        if ((account.getIsRequiredItem() || accountLedger.getIsRequiredItem() || isAccountTypeForResults(accountLedger)) && itemId == 0) {
+            throw new Exception("La cuenta contable '" + account.getPkAccountIdXXX() + "' tiene este inconveniente:\n"
+                    + "Requiere ítem, pero no ha sido definido.");
+        }
+    }
+    
+    /**
+     * Validate business partner for given account and ledger account.
+     * @param account
+     * @param accountLedger
+     * @param bizPartnerId
+     * @throws Exception 
+     */
+    public static void validateAccountBizPartner(final SDataAccount account, final SDataAccount accountLedger, final int bizPartnerId) throws Exception {
+        if ((account.getIsRequiredBizPartner() || accountLedger.getIsRequiredBizPartner() || isAccountSystemTypeForBizPartner(accountLedger)) && bizPartnerId == 0) {
+            throw new Exception("La cuenta contable '" + account.getPkAccountIdXXX() + "' tiene este inconveniente:\n"
+                    + "Requiere asociado de negocios, pero no ha sido definido.");
+        }
+    }
+    
+    /**
+     * Validate tax for given account and ledger account.
+     * @param account
+     * @param accountLedger
+     * @param taxBasicId
+     * @param taxTaxId
+     * @throws Exception 
+     */
+    public static void validateAccountTax(final SDataAccount account, final SDataAccount accountLedger, final int taxBasicId, final int taxTaxId) throws Exception {
+        if (isAccountSystemTypeForTax(accountLedger) && (taxBasicId == 0 || taxTaxId == 0)) {
+            throw new Exception("La cuenta contable '" + account.getPkAccountIdXXX() + "' tiene este inconveniente:\n"
+                    + "Requiere impuesto, pero no ha sido definido.");
+        }
+    }
+    
+    /**
+     * Validate payroll accounting configuration.
+     * @param session User GUI session.
+     * @param accountId ID of account.
+     * @param costCenterId ID of cost center. Set to -1 to skip validation of cost center.
+     * @param bizPartnerId ID of business partner. Set to -1 to skip validation of business partner.
+     * @param itemId ID of item. Set to -1 to skip validation of item.
+     * @param taxBasicId ID of basic tax. Tax validation cannot be skipped.
+     * @param taxTaxId ID of tax. Tax validation cannot be skipped.
+     * @return <code>true</code> if configurations is valid.
+     * @throws Exception 
+     */
+    public static boolean validateAccount(final SGuiSession session, final int accountId, final int costCenterId, final int bizPartnerId, final int itemId, final int taxBasicId, final int taxTaxId) throws Exception {
+        SDataAccount account = getAccount(session, accountId);
+        validateAccount(session, account, false);
         
-        String sql = "SELECT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, "
-                + "r.dt, r.concept, bkc.code, cob.code, COUNT(*) AS _count "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                + "INNER JOIN hrs_acc_pay AS ap ON ap.id_pay = p.id_pay "
-                + "INNER JOIN hrs_acc_pay_rcp AS apr ON apr.id_pay = ap.id_pay AND apr.id_acc = ap.id_acc AND apr.id_emp = pr.id_emp "
-                + "INNER JOIN fin_rec AS r ON r.id_year = apr.fid_rec_year AND r.id_per = apr.fid_rec_per AND r.id_bkc = apr.fid_rec_bkc AND r.id_tp_rec = apr.fid_rec_tp_rec AND r.id_num = apr.fid_rec_num "
-                + "INNER JOIN fin_bkc AS bkc ON bkc.id_bkc = r.id_bkc "
-                + "INNER JOIN erp.bpsu_bpb AS cob ON cob.id_bpb = r.fid_cob "
-                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT ap.b_del AND "
-                + "p.id_pay = " + payrollId + " "
-                + "GROUP BY r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept "
-                + "ORDER BY r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept;";
+        SDataAccount accountLedger = getAccountLedger(session, account);
+        validateAccount(session, accountLedger, true);
         
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            while (resultSet.next()) {
-                records += (records.isEmpty() ? "" : "\n")
-                        + "- En la póliza contable '"
-                        + SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("r.id_year")) + "-"
-                        + SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("r.id_per")) + " "
-                        + resultSet.getString("bkc.code") + " "
-                        + resultSet.getString("cob.code") + " "
-                        + resultSet.getString("r.id_tp_rec") + "-"
-                        + RecordNumberFormat.format(resultSet.getInt("r.id_num")) + "', "
-                        + "del " + SLibUtils.DateFormatDate.format(resultSet.getDate("r.dt")) + ", "
-                        + "\"" + resultSet.getString("r.concept") + "\", hay "
-                        + (resultSet.getInt("_count") == 1 ? "un recibo" : SLibUtils.DecimalFormatInteger.format(resultSet.getInt("_count")) + " recibos") + ".";
-                bookkept += resultSet.getInt("_count");
-            }
+        if (costCenterId != -1) {
+            validateAccountCostCenter(session, account, accountLedger, costCenterId);
         }
         
-        records += (records.isEmpty() ? "" : "\n")
-                + "Número de recibos contabilizados: " + SLibUtils.DecimalFormatInteger.format(bookkept) + " de " + SLibUtils.DecimalFormatInteger.format(receipts) + " "
-                + "(" + SLibUtils.DecimalFormatPercentage2D.format(receipts != 0 ? bookkept / (double) receipts : 0) + ").\n"
-                + (bookkept < receipts ? "Número de recibos por contabilizar: " + SLibUtils.DecimalFormatInteger.format(receipts - bookkept) + "." : "");
+        if (bizPartnerId != -1) {
+            validateAccountBizPartner(account, accountLedger, bizPartnerId);
+        }
         
-        return records;
+        if (itemId != -1) {
+            validateAccountItem(account, accountLedger, itemId);
+        }
+        
+        validateAccountTax(account, accountLedger, taxBasicId, taxTaxId);
+        
+        return true;
     }
 }
