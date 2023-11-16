@@ -12,6 +12,7 @@ import erp.mod.hrs.link.db.SShareDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.hrs.link.db.SCancelResponse;
 import erp.mod.hrs.link.db.SConfigException;
+import erp.mod.hrs.link.db.SEarningResponse;
 import erp.mod.hrs.link.db.SIncidentResponse;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
@@ -269,6 +270,31 @@ public class SUtilsJSON {
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
             return jsonInString2;
         }   
+    }
+    
+    public static String earningData(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+        
+        SEarningJSON objResponse = new SEarningJSON();
+        SEarningResponse EarningResponse = new SEarningResponse();
+        SShareDB sDb = new SShareDB();
+        
+        try {
+             // revisar si hay incidencias para esas fechas
+            EarningResponse = sDb.getEarnings(sJsonInc);
+           
+            
+            objResponse.response = EarningResponse;
+            
+            // Java objects to JSON string - pretty-print
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+        } catch (ParseException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+        } 
     }
     
     /**

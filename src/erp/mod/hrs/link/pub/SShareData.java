@@ -238,4 +238,13 @@ public class SShareData {
             return null;
         }
     }
+    
+    public String getEarnings(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.earningData(sJsonInc);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
 }

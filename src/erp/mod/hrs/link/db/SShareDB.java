@@ -31,6 +31,7 @@ import erp.mod.SModuleHrs;
 import erp.mod.hrs.db.SDbAbsence;
 import static erp.mod.hrs.link.db.SCancelResponse.RESPONSE_CONSUME;
 import static erp.mod.hrs.link.db.SCancelResponse.RESPONSE_OK_CAN;
+import static erp.mod.hrs.link.db.SEarningResponse.RESPONSE_OK;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_INS;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
@@ -73,6 +74,7 @@ public class SShareDB {
      * @throws ClassNotFoundException
      * @throws SConfigException
      */
+    
     @SuppressWarnings("unchecked")
     private ArrayList<SCompany> getDatabasesWithPayroll() throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
@@ -1627,5 +1629,153 @@ public class SShareDB {
                 
             }
         return lPlanVac;
+    }
+    
+    public SEarningResponse getEarnings(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException, ParseException{
+        ResultSet resultSet;
+        int company = 0;
+
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+        SEarningResponse objResponse = new SEarningResponse();
+        
+        if (conn == null) {
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+            return objResponse;
+        }
+        
+        JSONParser parser = new JSONParser();
+        JSONObject root;
+        root = (JSONObject) parser.parse(sJsonInc);
+        JSONArray rows = (JSONArray) root.get("rows");
+        
+        // lista para colocar los empleados
+        ArrayList<SEmployeeEar> lEmp = new ArrayList();
+        
+        for (int i = 0 ; rows.size() > i ; i++){
+            boolean bonusFlag = false;
+            // clase para colocar el empleado
+            SEmployeeEar empEar = new SEmployeeEar();
+            
+            JSONObject row = (JSONObject) rows.get(i);
+            company = Integer.parseInt(row.get("company_id").toString());
+            String companies = "SELECT * "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
+                                        + "WHERE id_co = " + company ;
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(companies);
+            if(!resultSet.next()){
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("El id de la empresa no corresponde con nuestros registros");
+                return objResponse;
+            } 
+            // query percepciones de empresa del empleado
+            SMySqlClass empresa = new SMySqlClass();
+            Connection conn_empresa = empresa.connect("", "", resultSet.getString("bd"), "", "");
+            
+            String earnings = "SELECT payroll.fis_year, payroll.num, payroll.dt_sta, payroll.dt_end,"
+                                + " receipt.id_emp, earnings.fk_ear, earnings.unt"
+                                + " FROM hrs_pay AS payroll"
+                                + " INNER JOIN HRS_PAY_RCP AS receipt ON payroll.id_pay = receipt.id_pay"
+                                + " INNER JOIN HRS_PAY_RCP_EAR AS earnings ON receipt.id_pay = earnings.id_pay AND receipt.id_emp = earnings.id_emp"
+                                + " WHERE payroll.fis_year = " + root.get("year")
+                                + " AND payroll.num = " + root.get("num")
+                                + " AND receipt.id_emp = " + row.get("id_emp")
+                                + " AND payroll.fk_tp_pay = " + root.get("type_pay")
+                    // tipo normal de nomina
+                                + " AND payroll.fk_tp_pay_sht = 1"
+                    // tipo sueldos y salarios
+                                + " AND payroll.fk_tp_pay_sht_cus = 2"
+                                + " AND payroll.b_del = 0 AND receipt.b_del = 0 AND earnings.b_del = 0";
+            
+            Statement stConEar = conn_empresa.createStatement();
+            resultSet = stConEar.executeQuery(earnings);
+            
+            // arraylist para colocar los SEarning
+            ArrayList<SEarning> lEar = new ArrayList();
+     
+            while(resultSet.next()){
+                // clase para colocar los ear
+                 SEarning earning = new SEarning();
+                earning.setId_ear(resultSet.getInt("earnings.fk_ear"));
+                earning.setUnit_ear(resultSet.getDouble("earnings.unt"));
+                
+                lEar.add(earning);
+            }
+            //termina la query
+            //query para saber si se gano bonos
+            String bonus = "SELECT payroll.fis_year, payroll.num, payroll.dt_sta, payroll.dt_end,"
+                                + " receipt.id_emp, earnings.fk_ear, earnings.unt"
+                                + " FROM hrs_pay AS payroll"
+                                + " INNER JOIN HRS_PAY_RCP AS receipt ON payroll.id_pay = receipt.id_pay"
+                                + " INNER JOIN HRS_PAY_RCP_EAR AS earnings ON receipt.id_pay = earnings.id_pay AND receipt.id_emp = earnings.id_emp"
+                                + " WHERE payroll.fis_year = " + root.get("year")
+                                + " AND payroll.num = " + root.get("num")
+                                + " AND receipt.id_emp = " + row.get("id_emp")
+                                + " AND payroll.fk_tp_pay = " + root.get("type_pay")
+                    // tipo especial de nomina
+                                + " AND payroll.fk_tp_pay_sht = 2"
+                    // tipo vales de despensa
+                                + " AND payroll.fk_tp_pay_sht_cus = 3"
+                                + " AND payroll.b_del = 0 AND receipt.b_del = 0 AND earnings.b_del = 0";
+            
+            Statement stConBon = conn_empresa.createStatement();
+            resultSet = stConBon.executeQuery(bonus);
+            if(resultSet.next()){
+                bonusFlag = true;
+            }else{
+                bonusFlag = false;
+            }
+            //termina la query para saber de bonos
+            // query percepciones de empresa pruebas y
+            conn_empresa = empresa.connect("", "", "erp_pbas_y", "", "");
+            
+            earnings = "SELECT payroll.fis_year, payroll.num, payroll.dt_sta, payroll.dt_end,"
+                                + " receipt.id_emp, earnings.fk_ear, earnings.unt"
+                                + " FROM hrs_pay AS payroll"
+                                + " INNER JOIN HRS_PAY_RCP AS receipt ON payroll.id_pay = receipt.id_pay"
+                                + " INNER JOIN HRS_PAY_RCP_EAR AS earnings ON receipt.id_pay = earnings.id_pay AND receipt.id_emp = earnings.id_emp"
+                                + " WHERE payroll.fis_year = " + root.get("year")
+                                + " AND payroll.num = " + root.get("num")
+                                + " AND receipt.id_emp = " + row.get("id_emp")
+                                + " AND payroll.fk_tp_pay = " + root.get("type_pay")
+                    // tipo especial de nomina
+                                + " AND payroll.fk_tp_pay_sht = 2"
+                    // tipo especial
+                                + " AND payroll.fk_tp_pay_sht_cus = 4"
+                                + " AND payroll.b_del = 0 AND receipt.b_del = 0 AND earnings.b_del = 0";
+            
+            stConEar = conn_empresa.createStatement();
+            resultSet = stConEar.executeQuery(earnings);
+            
+            
+            
+     
+            while(resultSet.next()){
+                // clase para colocar los ear
+                SEarning earning = new SEarning();
+                earning.setId_ear(resultSet.getInt("earnings.fk_ear"));
+                earning.setUnit_ear(resultSet.getDouble("earnings.unt"));
+                
+                lEar.add(earning);
+            }
+            // termina query
+            
+            empEar.setId_emp(Integer.parseInt(row.get("id_emp").toString())); 
+            empEar.setId_company(company);
+            empEar.setHave_bonus(bonusFlag);
+            empEar.setEarnings(lEar);
+            
+            lEmp.add(empEar);
+        }
+        objResponse.setCode(RESPONSE_OK);
+        objResponse.setMessage("se a contestado correctamente");
+        objResponse.setEmpEar(lEmp);
+        
+        
+        return objResponse;
+         
     }
 }
