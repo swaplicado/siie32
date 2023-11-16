@@ -586,27 +586,29 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             
             mlMaterialRequestEntries = moMaterialRequest.getChildEntries();
             for (SDbMaterialRequestEntry oMaterialRequestEntry : mlMaterialRequestEntries) {
-                SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
-                                                                            SMaterialRequestEntryRow.FORM_ESTIMATE,
-                                                                            oMaterialRequestEntry.getFkItemId(), 
-                                                                            oMaterialRequestEntry.getFkUnitId(),
-                                                                            oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
-                                                                                    moMaterialRequest.getConsumptionInfo() : 
-                                                                                    oMaterialRequestEntry.getConsumptionInfo()
-                                                                            );
-                
-                oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
-                oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
-                oRow.setQuantity(oMaterialRequestEntry.getQuantity());
-                oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
-                String notes = "";
-                for (SDbMaterialRequestEntryNote oNote : oMaterialRequestEntry.getChildNotes()) {
-                    notes += oNote.getNotes();
+                if (! oMaterialRequestEntry.isDeleted()) {
+                    SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
+                                                                                SMaterialRequestEntryRow.FORM_ESTIMATE,
+                                                                                oMaterialRequestEntry.getFkItemId(), 
+                                                                                oMaterialRequestEntry.getFkUnitId(),
+                                                                                oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
+                                                                                        moMaterialRequest.getConsumptionInfo() : 
+                                                                                        oMaterialRequestEntry.getConsumptionInfo()
+                                                                                );
+
+                    oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
+                    oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
+                    oRow.setQuantity(oMaterialRequestEntry.getQuantity());
+                    oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
+                    String notes = "";
+                    for (SDbMaterialRequestEntryNote oNote : oMaterialRequestEntry.getChildNotes()) {
+                        notes += oNote.getNotes();
+                    }
+
+                    oRow.setNotes(notes);
+
+                    rows.add(oRow);
                 }
-                
-                oRow.setNotes(notes);
-                
-                rows.add(oRow);
             }
 
             moGridMatReqEty.populateGrid(rows, this);
