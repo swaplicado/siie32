@@ -1255,12 +1255,11 @@ public abstract class SAuthorizationUtils {
             
             if (! ids.isEmpty()) {
                 ids = ids.substring(0, ids.length() - 1);
+                sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " SET b_del = true "
+                        + "WHERE id_authorn_step IN (" + ids + ");";
+
+                session.getStatement().getConnection().createStatement().executeUpdate(sql);
             }
-            
-            sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " SET b_del = true "
-                    + "WHERE id_authorn_step IN (" + ids + ");";
-            
-            session.getStatement().getConnection().createStatement().executeUpdate(sql);
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);

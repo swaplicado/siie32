@@ -1,3 +1,7 @@
+SIIE 3.2 225.7/ 2023-11-16
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Procesamiento de los pasos de autorización cuando la RM regresa a nuevo.
 ================================================================================
 SIIE 3.2 225.6/ 2023-11-09
 Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
