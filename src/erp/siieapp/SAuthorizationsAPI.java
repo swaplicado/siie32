@@ -132,26 +132,17 @@ public class SAuthorizationsAPI {
                 + "trn_get_cons_info(tmr.id_mat_req, 2) AS s_ent_cons, "
                 + "trn_get_cons_info(tmr.id_mat_req, 3) AS f_cc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS tmr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS ve ON "
-                + "tmr.id_mat_req = ve.id_mat_req "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS v ON "
                 + "v.res_pk_n1_n = tmr.id_mat_req "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGS_TP_AUTHORN) + " AS cta ON "
                 + "v.fk_tp_authorn = cta.id_tp_authorn "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS entc ON "
-                + "ve.fk_ent_mat_cons_ent_n = entc.id_mat_cons_ent "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " AS sentc ON "
-                + "ve.fk_subent_mat_cons_ent_n = sentc.id_mat_cons_ent AND ve.fk_subent_mat_cons_subent_n = sentc.id_mat_cons_subent "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS fcc ON "
-                + "ve.fk_cc_n = fcc.pk_cc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON "
                 + "tmr.fk_mat_prov_ent = pe.id_mat_prov_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
                 + "tmr.fk_usr_req = ur.id_usr "
                 + "LEFT JOIN erp.trnu_mat_req_pty as pty ON tmr.fk_mat_req_pty = pty.id_mat_req_pty "
                 + "WHERE "
-                + "NOT tmr.b_del "
-                + "GROUP BY res_pk_n1_n, res_pk_n2_n, res_pk_n3_n, res_pk_n4_n, res_pk_n5_n ";
+                + "NOT tmr.b_del ";
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataResponse dr = new SDataResponse();
@@ -173,6 +164,8 @@ public class SAuthorizationsAPI {
                         au.setSupplierEntity(res.getString("prov_ent"));
                         au.setFkPriority(res.getInt("fk_mat_req_pty"));
                         au.setPriority(res.getString("priority"));
+                        au.setDataTypeName("DOCUMENTO");
+                        au.setDataType(2);
 
                         break;
                     case SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST:
@@ -189,6 +182,8 @@ public class SAuthorizationsAPI {
                         au.setSupplierEntity(res.getString("prov_ent"));
                         au.setFkPriority(res.getInt("fk_mat_req_pty"));
                         au.setPriority(res.getString("priority"));
+                        au.setDataTypeName("REQUISICIÓN");
+                        au.setDataType(1);
                         
                         break;
                     default:
@@ -205,13 +200,13 @@ public class SAuthorizationsAPI {
                         au.setSupplierEntity(res.getString("prov_ent"));
                         au.setFkPriority(res.getInt("fk_mat_req_pty"));
                         au.setPriority(res.getString("priority"));
+                        au.setDataTypeName("REQUISICIÓN");
+                        au.setDataType(1);
                         
                     break;
                 }
                 au.setAuthorizationStatusName(res.getString("doc_authorn_status"));
                 au.setAuthorizationTypeName(res.getString("authorn_type"));
-                au.setDataTypeName(res.getString("authorn_type"));
-                au.setDataType(res.getInt("fk_tp_authorn"));
                 au.setAuthorizationStatus(res.getInt("authorn_status"));
                 lAuthData.add(au);
             }
