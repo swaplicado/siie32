@@ -81,7 +81,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasPetSupRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight &&
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         
-        jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva requisición de suministro", this);
+        jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva requisición de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Kardex de autorizaciones", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
@@ -315,8 +315,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
-                            + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
+                    where += (where.isEmpty() ? "" : "AND ") + "v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " ";
                 }
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
@@ -338,6 +337,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " OR v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") " ;
                 break;
+            case SModConsts.TRN_MAT_CONS_ENT_USR:
+                if (usrId != 2 ) { // SUPER
+                    needJoin = true;
+                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
+                            + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
+                }
             default:
                 filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
                 if (filter != null && ((int[]) filter).length == 1) {
@@ -356,7 +361,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.id_mat_req = mrc.id_mat_req "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
                 + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
-        
         
         if (usrId != 2 ) { // SUPER
             needJoin = true;

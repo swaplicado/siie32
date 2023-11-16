@@ -198,18 +198,10 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
         SGuiParams params = new SGuiParams();
         params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
         
-        if (getFormSubtype()== SModConsts.TRNX_MAT_REQ_STK_SUP) {
-            moFieldKeyConsEntity.initGroup();
-            moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, SModConsts.TRNX_MAT_REQ_STK_SUP, null);
-            moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, SModConsts.TRNX_MAT_REQ_STK_SUP, null);
-            moFieldKeyConsEntity.populateCatalogues();
-        }
-        else {
-            moFieldKeyConsEntity.initGroup();
-            moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
-            moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
-            moFieldKeyConsEntity.populateCatalogues();
-        }
+        moFieldKeyConsEntity.initGroup();
+        moFieldKeyConsEntity.addFieldKey(moKeyConsEnt, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
+        moFieldKeyConsEntity.addFieldKey(moKeyConsSubent, SModConsts.TRN_MAT_CONS_SUBENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
+        moFieldKeyConsEntity.populateCatalogues();
     }
 
     @Override
@@ -227,7 +219,13 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
         moKeyCC.setValue(new int[] { moRegistry.getPkCostCenterId() });
         moKeyBudget.setValue(new int[] { moRegistry.getFkBudgetMatConsumptionEntityId(), moRegistry.getFkBudgetYearId(), moRegistry.getFkBudgetPeriodId() });
         jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
-        moDecPer.setValue(moRegistry.getPercentage());
+        
+        if (moRegistry.isRegistryNew()) {
+            moDecPer.setValue(1.0);
+        }
+        else {
+            moDecPer.setValue(moRegistry.getPercentage());
+        }
         
         setFormEditable(true);
 
@@ -240,9 +238,6 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
             moKeyConsSubent.setSelectedIndex(1);
         } 
         
-        if (getFormSubtype()== SModConsts.TRNX_MAT_REQ_STK_SUP) {
-            moDecPer.setValue(1.0);
-        }
     }
 
     @Override

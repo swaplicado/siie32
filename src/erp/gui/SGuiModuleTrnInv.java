@@ -140,6 +140,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintArea;
     
     private javax.swing.JMenu jmMenuReq;
+    private javax.swing.JMenuItem jmiReqAll;
     private javax.swing.JMenu jmMenuPetReq;
     private javax.swing.JMenuItem jmiReqPetNew;
     private javax.swing.JMenuItem jmiReqPetTbAuth;
@@ -539,6 +540,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         
         jmMenuReq = new JMenu("Requisiciones materiales");
         
+        jmiReqAll = new JMenuItem("Requisiciones de materiales");
+        
         jmMenuPetReq = new JMenu("Mis RM");
         jmiReqPetNew = new JMenuItem("Mis RM nuevas");
         jmiReqPetTbAuth = new JMenuItem("Mis RM por autorizar");
@@ -553,7 +556,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqConsSupPendDet = new JMenuItem("RM por suministrar a detalle");
         jmiReqConsSup = new JMenuItem("RM suministradas");
         
-        jmMenuStockSupPendReq = new JMenu("RM de suministro por suministrar");
+        jmMenuStockSupPendReq = new JMenu("RM de resurtido por suministrar");
         jmiReqStockSupPend = new JMenuItem("RM por suministrar");
         jmiReqStockSupPendDet = new JMenuItem("RM por suministrar a detalle");
         jmiReqStockSup = new JMenuItem("RM suministradas");
@@ -597,6 +600,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAccMatCostCenterGroupUser = new JMenuItem("Grupo centro de costo vs usuarios/empleados a detalle");
         
         jmMenuReq.add(jmMenuPetReq);
+        jmMenuPetReq.add(jmiReqAll);
         jmMenuPetReq.add(jmiReqPetNew);
         jmMenuPetReq.add(jmiReqPetTbAuth);
         jmMenuPetReq.add(jmiReqPetTbProcc);
@@ -647,6 +651,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuConfCostCenterGrpReq.add(jmiReqMatCostCenterGroupUser);
         jmMenuConfCostCenterGrpReq.add(jmiReqAccMatCostCenterGroupUser);
         
+        jmiReqAll.addActionListener(this);
         jmiReqPetNew.addActionListener(this);
         jmiReqPetTbAuth.addActionListener(this);
         jmiReqPetTbProcc.addActionListener(this);
@@ -865,6 +870,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserToolMaintProv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintArea.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmMenuReq.setEnabled(hasRightMatReqPet || hasRightMatReqRev || hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqAll.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
         jmiReqPetNew.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
         jmiReqPetTbAuth.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
         jmiReqPetTbProcc.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
@@ -1761,6 +1767,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiMaintArea) {
                 miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAll) {
+                SGuiParams params = new SGuiParams(SModConsts.TRN_MAT_CONS_ENT_USR);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_PET, params);
             }
             else if (item == jmiReqPetNew) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNS_ST_MAT_REQ_NEW);

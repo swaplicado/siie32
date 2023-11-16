@@ -1,8 +1,15 @@
+================================================================================
 SIIE 3.2 225.7/ 2023-11-16
 Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Procesamiento de los pasos de autorización cuando la RM regresa a nuevo.
 2) Filtro de partidas de RM
+3) Reetiquetado de las requisiciones de suministro a resurtido.
+4) Se quito el filtro en la forma de selección de centros de costo para las requisiciones de resurtido.
+5) Correcciones en la pantalla de configuración de grupos de centros de costo vs. usuarios.
+6) Reestructuración de los botones en la partida de requisiciones de materiales.
+7) Se habilitó el campo "Ítem nuevo" y se creó la funcionalidad para asignarle el ítem correspondiente cuando se es suministrador o comprador. 
+
 ================================================================================
 SIIE 3.2 225.6/ 2023-11-09
 Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN

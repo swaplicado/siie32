@@ -309,7 +309,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty ";
                 groupOrderBy = "ve.id_mat_req, ve.id_ety ";
                 subGroupOrderBy = "de.fid_mat_req_n, de.fid_mat_req_ety_n ";
-                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = 'S' ";
+                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_R + "' ";
                 subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 //having = "HAVING per < 1 "; // Descomentar para mostrar unicamente los que faltan por suministrar
             }
@@ -317,7 +317,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 select = "COUNT(ve.id_ety) AS ety, " 
                         + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
                         + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, ";
-                where += (where.isEmpty() ? "" : "AND ") + " v.tp_req = 'S' ";
+                where += (where.isEmpty() ? "" : "AND ") + " v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_R + "' ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
                 subGroupOrderBy = "de.fid_mat_req_n ";
                 having = "HAVING per_sumi >= 1 OR v.b_clo_prov ";
@@ -326,7 +326,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 select = "COUNT(ve.id_ety) AS ety, " 
                         + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
                         + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, ";
-                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = 'S' ";
+                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_R + "' ";
                 subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
                 subGroupOrderBy = "de.fid_mat_req_n ";
