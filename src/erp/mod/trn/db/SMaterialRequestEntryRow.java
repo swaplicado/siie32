@@ -47,6 +47,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     protected double mdAuxToSupply;
     protected double mdAuxToEstimate;
     protected boolean mbAuxBulk;
+    protected boolean mbAuxIsEstimated;
     protected boolean mbAuxEstimate;
     
     SClientInterface miClient;
@@ -67,6 +68,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
         msAuxConsumeEntity = consumeEntity;
         mtDateRequest = null;
         msNotes = "";
+        mbAuxIsEstimated = false;
         
         try {
             this.readAuxs();
@@ -98,6 +100,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public void setAuxStock(double mdAuxStock) { this.mdAuxStock = mdAuxStock; }
     public void setAuxToSegregate(double mdAuxToSegregate) { this.mdAuxToSegregate = mdAuxToSegregate; }
     public void setAuxToSupply(double mdAuxToSupply) { this.mdAuxToSupply = mdAuxToSupply; }
+    public void setAuxIsEstimated(boolean mbAuxIsEstimated) { this.mbAuxIsEstimated = mbAuxIsEstimated; }
     public void setAuxToEstimate(double mdAuxToEstimate) { this.mdAuxToEstimate = mdAuxToEstimate; }
     public void setAuxIsToEstimate(boolean mbAuxEstimate) { this.mbAuxEstimate = mbAuxEstimate; }
 
@@ -122,6 +125,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public double getAuxToSegregate() { return mdAuxToSegregate; }
     public double getAuxToSupply() { return mdAuxToSupply; }
     public double getAuxQuantityToEstimate() { return mdAuxToEstimate; }
+    public boolean getAuxIsEstimated() { return mbAuxIsEstimated; }
     public boolean isToEstimate() { return mbAuxEstimate; }
 
     @Override
@@ -251,7 +255,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
                     value = mdAuxToEstimate;
                     break;
                 case 7:
-                    value = false;
+                    value = mbAuxIsEstimated;
                     break;
                 case 8:
                     value = mbAuxEstimate;

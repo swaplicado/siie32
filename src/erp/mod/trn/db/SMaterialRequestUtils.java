@@ -726,4 +726,22 @@ public abstract class SMaterialRequestUtils {
             return ex.getMessage();
         }
     }
+    
+    public static boolean hasMatReqEtyEstimation(SGuiSession session, int[] pkMatReqEty) {
+        String sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ_ETY) + " "
+                    + "WHERE fk_mat_req_n = " + pkMatReqEty[0] + " "
+                    + "AND fk_mat_req_ety_n = " + pkMatReqEty[1] + " "
+                    + "AND NOT b_del;";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        
+            return resultSet.next();
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
 }

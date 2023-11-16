@@ -19,6 +19,7 @@ import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mod.trn.db.SDbMaterialRequestEntryNote;
 import erp.mod.trn.db.SMaterialRequestEntryRow;
 import erp.mod.trn.db.SMaterialRequestEstimationUtils;
+import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SProviderMailRow;
 import erp.mtrn.form.SPanelMaterialRequest;
 import java.awt.BorderLayout;
@@ -600,13 +601,12 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                     oRow.setQuantity(oMaterialRequestEntry.getQuantity());
                     oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
+                    oRow.setAuxIsEstimated(SMaterialRequestUtils.hasMatReqEtyEstimation(miClient.getSession(), oMaterialRequestEntry.getPrimaryKey()));
                     String notes = "";
                     for (SDbMaterialRequestEntryNote oNote : oMaterialRequestEntry.getChildNotes()) {
                         notes += oNote.getNotes();
                     }
-
                     oRow.setNotes(notes);
-
                     rows.add(oRow);
                 }
             }
@@ -684,7 +684,6 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                 }
                 
                 bpName = oBp.getBizPartner();
-                
             }
             catch (Exception ex) {
                 Logger.getLogger(SDialogMaterialRequestEstimation.class.getName()).log(Level.SEVERE, null, ex);
@@ -880,6 +879,10 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             }
             else if (button == jbNext) {
                 jTPGeneralPanel.setSelectedIndex(1);
+                String subject = msSubjectDefault + " REQ.-" + String.format("%05d", moMaterialRequest.getNumber()) + "-" + mnMailNumber;
+                String body = msBodyDefault.replace("---", msBodyRows);
+                moTextSubject.setValue(subject);
+                jtAreaBody.setText(body);
             }
             else if (button == jbPrevious) {
                 jTPGeneralPanel.setSelectedIndex(0);
@@ -918,6 +921,8 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             String res = SMaterialRequestEstimationUtils.saveEstimationRequest(miClient, moMaterialRequest.getPkMatRequestId(), lEtyRows, lRows);
             mnMailNumber = SMaterialRequestEstimationUtils.getNextMailNumberOfMatRequest(miClient.getSession().getStatement(), moMaterialRequest.getPkMatRequestId());
             moGridProviderRows.clearGridRows();
+            
+            this.setValue(SModConsts.TRN_MAT_REQ, moMaterialRequest.getPrimaryKey());
         }
         catch (Exception e) {
             
