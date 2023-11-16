@@ -12,6 +12,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogMaterialRequestEstimation;
+import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSupply;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -49,6 +50,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
 
     private JButton mjbSupply;
     private JButton mjbToNew;
+    private JButton jbLogCardex;
     private JButton jbPrint;
     private JButton mjbToSupply;
     private JButton mjbToPur;
@@ -60,6 +62,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogMaterialRequestSupply moDialogSupply;
     private SDialogMaterialRequestEstimation moDialogEstimate;
+    private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -78,7 +81,8 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     
     private void initComponents() {
         mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_stk_out.gif")), "Suministrar", this);
-        mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_new_main.gif")), "Regresar estatus nuevo", this);
+        mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar estatus nuevo", this);
+        jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Bitácora de cambios", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar para compra", this);
@@ -100,6 +104,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToPur);
@@ -115,6 +120,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbToPur.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && mnGridSubtype == SLibConsts.UNDEFINED);
         mjbToEstimate.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR);
         mjbToNew.setEnabled(mnGridSubtype == SLibConsts.UNDEFINED);
+        jbLogCardex.setEnabled(true);
         jbPrint.setEnabled(true);
 
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
@@ -129,6 +135,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         }
         
         moDialogSupply = new SDialogMaterialRequestSupply(miClient, "Surtidos de la requisición");
+        moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         
         msSeekQueryText = "";
     }
@@ -202,6 +209,34 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 catch (SQLException ex) {
                     Logger.getLogger(SViewMaterialRequestPending.class.getName()).log(Level.SEVERE, null, ex);
                     SLibUtils.showException(this, ex);
+                }
+            }
+        }
+    }
+    
+    private void actionLog() {
+        int[] key;
+        
+        if (jbLogCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                        moDialogLogsCardex.setFormParams(key[0]);
+                        moDialogLogsCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -672,6 +707,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             else if (button == mjbToNew) {
                 actionToNew();
+            }
+            else if (button == jbLogCardex) {
+                actionLog();
             }
             else if (button == jbPrint) {
                 actionPrint();

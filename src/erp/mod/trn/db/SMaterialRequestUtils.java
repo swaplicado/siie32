@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -701,6 +704,17 @@ public abstract class SMaterialRequestUtils {
     
     public static String updateStatusOfMaterialRequest(SGuiSession session, int[] pkMatReq, int statusId) {
         try {
+            JTextArea textArea = new JTextArea(5, 40); // Set the number of rows and columns
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            int option = JOptionPane.showOptionDialog(null, scrollPane, "Ingrese comentario/observación:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+            String reason = "";
+            if (option == JOptionPane.OK_OPTION) {
+                reason = textArea.getText();
+            }
+            else {
+                return "Acción cancelada";
+            }
+            
             SDbMaterialRequest req = new SDbMaterialRequest();
             req.read(session, pkMatReq);
             req.setFkMatRequestStatusId(statusId);
@@ -717,6 +731,7 @@ public abstract class SMaterialRequestUtils {
                 req.setClosePurchase(true);
             }
             
+            req.setAuxCommentsChangeStatus_n(reason);
             req.save(session);
             
             return "";
@@ -743,5 +758,40 @@ public abstract class SMaterialRequestUtils {
         }
         
         return false;
+    }
+    
+    /**
+     * Determina si la partida de una RM ya ha sido agregada a una solicitud de cotización.
+     * Basándose en la tabla @see SModConsts.TRN_MAT_REQ_ST_LOG
+     * 
+     * @param session
+     * @param pkMatReq
+     * 
+     * @return true si la partida ya fue cotizada
+     */
+    public static ArrayList<SDbMaterialRequestStatusLog> getMaterialRequestLogs(SGuiSession session, int pkMatReq) {
+        String sql = "SELECT id_log FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG) + " "
+                    + "WHERE id_mat_req = " + pkMatReq + " ;";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+            ArrayList<SDbMaterialRequestStatusLog> lLogs = new ArrayList<>();
+            SDbMaterialRequestStatusLog oLog;
+            while (resultSet.next()) {
+                oLog = new SDbMaterialRequestStatusLog();
+                oLog.read(session, new int[] { pkMatReq, resultSet.getInt("id_log") });
+                lLogs.add(oLog);
+            }
+            
+            return lLogs;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 }

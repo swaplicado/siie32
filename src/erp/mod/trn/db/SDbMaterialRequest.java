@@ -74,6 +74,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnAuxReqAuthStatusIdOld;
     protected int mnAuxReqProvStatusIdOld;
     protected int mnAuxReqPurStatusIdOld;
+    protected String msAuxCommentsChangeStatus_n;
     protected String msAuxProvEntName;
     
     protected String msAuxAuthUser;
@@ -127,6 +128,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxReqAuthStatusIdOld(int n) { mnAuxReqAuthStatusIdOld = n; }
     public void setAuxReqProvStatusIdOld(int n) { mnAuxReqProvStatusIdOld = n; }
     public void setAuxReqPurStatusIdOld(int n) { mnAuxReqPurStatusIdOld = n; }
+    public void setAuxCommentsChangeStatus_n(String s) { msAuxCommentsChangeStatus_n = s; }
     
     public void setAuxLastProvClosedSta(boolean b) { mbAuxLastProvClosedSta = b; }
     public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
@@ -175,7 +177,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getAuxReqAuthStatusId() { return mnAuxReqAuthStatusId; }
     public int getAuxReqAuthStatusIdOld() { return mnAuxReqAuthStatusIdOld; }
     public int getAuxReqProvStatusIdOld() { return mnAuxReqProvStatusIdOld; }
-    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; } 
+    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; }
+    public String getAuxCommentsChangeStatus_n() { return msAuxCommentsChangeStatus_n; }
     
     public String getAuxProvEntName() { return msAuxProvEntName; }
     
@@ -194,6 +197,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     private void saveLog(SGuiSession session) throws Exception {
         SDbMaterialRequestStatusLog log = new SDbMaterialRequestStatusLog();
         log.setPkMatRequestId(mnPkMatRequestId);
+        log.setComments_n(msAuxCommentsChangeStatus_n == null ? "" : msAuxCommentsChangeStatus_n);
         log.setFkMatRequestStatusId(mnFkMatRequestStatusId);
         log.setFkMatRequestAuthotizationStatusId(mnAuxReqAuthStatusId);
         log.setFkMatProvisionStatusId(mnFkMatProvisionStatusId);
@@ -261,6 +265,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnAuxReqAuthStatusIdOld = 0;
         mnAuxReqProvStatusIdOld = 0;
         mnAuxReqPurStatusIdOld = 0;
+        msAuxCommentsChangeStatus_n = null;
         
         msAuxProvEntName = "";
         mbAuxLastProvClosedSta = false;
