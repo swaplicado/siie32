@@ -602,6 +602,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     oRow.setQuantity(oMaterialRequestEntry.getQuantity());
                     oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
                     oRow.setAuxIsEstimated(SMaterialRequestUtils.hasMatReqEtyEstimation(miClient.getSession(), oMaterialRequestEntry.getPrimaryKey()));
+                    oRow.setIsItemNew(oMaterialRequestEntry.isNewItem());
                     String notes = "";
                     for (SDbMaterialRequestEntryNote oNote : oMaterialRequestEntry.getChildNotes()) {
                         notes += oNote.getNotes();
@@ -631,8 +632,10 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         SMaterialRequestEntryRow oMatReqRow;
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
-            oMatReqRow.setAuxToEstimate(oMatReqRow.getQuantity());
-            oMatReqRow.setAuxIsToEstimate(true);
+            if (! oMatReqRow.isItemNew()) {
+                oMatReqRow.setAuxToEstimate(oMatReqRow.getQuantity());
+                oMatReqRow.setAuxIsToEstimate(true);
+            }
         }
         
         moGridMatReqEty.renderGridRows();

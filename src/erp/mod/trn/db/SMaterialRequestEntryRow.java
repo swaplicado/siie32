@@ -30,6 +30,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     protected Date mtDateRequest;
     protected String msNotes;
     //protected boolean mbDeleted;
+    protected boolean mbItemNew;
     protected int mnFkItemId;
     protected int mnFkUnitId;
     protected int mnFkConsumeEntityId_n;
@@ -94,6 +95,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public void setQuantity(double d) { mdQuantity = d; }
     public void setDateRequest(Date t) { mtDateRequest = t; }
     public void setNotes(String s) { msNotes = s; }
+    public void setIsItemNew(boolean b) { mbItemNew = b; }
 
     public void setAuxSegregated(double mdAuxSegregated) { this.mdAuxSegregated = mdAuxSegregated; }
     public void setAuxSupplied(double mdAuxSupplied) { this.mdAuxSupplied = mdAuxSupplied; }
@@ -109,6 +111,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public double getQuantity() { return mdQuantity; }
     public Date getDateRequired() { return mtDateRequest; }
     public String getNotes() { return msNotes; }
+    public boolean isItemNew() { return mbItemNew; }
     
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
@@ -334,6 +337,13 @@ public class SMaterialRequestEntryRow implements SGridRow {
                 case 7:
                     break;
                 case 8:
+                    if ((boolean) value) {
+                        if (mbItemNew) {
+                            JOptionPane.showMessageDialog(null, "No se puede cotizar esta partida, el ítem debe ser cambiado.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                    
                     mbAuxEstimate = (boolean) value;
                     if (mbAuxEstimate) {
                         mdAuxToEstimate = mdQuantity;
