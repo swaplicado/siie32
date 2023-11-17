@@ -77,6 +77,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     
     private SFormMaterialRequestCostCenter moFormMatReqCC;
     
+    private SDialogItemPicker moDialogPickerItem;
+    private SDialogItemPicker moDialogPickerItemRef;
+    
     private boolean isEtyNew;
     private boolean isCapturingData;
     private boolean isRegistryEditable;
@@ -145,6 +148,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jlItemRef = new javax.swing.JLabel();
         moKeyItemRef = new sa.lib.gui.bean.SBeanFieldKey();
         jbPickItemRef = new javax.swing.JButton();
+        jlInfo = new javax.swing.JLabel();
         jpReq3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jlDateReq = new javax.swing.JLabel();
@@ -342,7 +346,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlItemRef.setText("Ítem referencia:");
+        jlItemRef.setText("Concepto o gasto:*");
         jlItemRef.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlItemRef);
 
@@ -354,6 +358,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jbPickItemRef.setFocusable(false);
         jbPickItemRef.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel16.add(jbPickItemRef);
+
+        jlInfo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_info.png"))); // NOI18N
+        jlInfo.setToolTipText("Puede ser el GP o el GA dependiendo de lo que se necesite.");
+        jlInfo.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel16.add(jlInfo);
 
         jpReq2.add(jPanel16);
 
@@ -471,7 +480,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moTextItemDescription.setPreferredSize(new java.awt.Dimension(445, 23));
         jPanel30.add(moTextItemDescription);
 
-        jlItemRefEty.setText("Ítem referencia:");
+        jlItemRefEty.setText("Cpto. o gasto:");
         jlItemRefEty.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel30.add(jlItemRefEty);
 
@@ -825,6 +834,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private javax.swing.JLabel jlDateReqEty;
     private javax.swing.JLabel jlEtyNotes;
     private javax.swing.JLabel jlFactConv;
+    private javax.swing.JLabel jlInfo;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlItemRef;
     private javax.swing.JLabel jlItemRefEty;
@@ -915,7 +925,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moKeyUsrReq.setKeySettings(miClient, SGuiUtils.getLabelName(jlUsrReq), true);
         moKeyContractor.setKeySettings(miClient, SGuiUtils.getLabelName(jlContractor), false);
         moTextReferecnce.setTextSettings(SGuiUtils.getLabelName(jlReference), 25, 0);
-        moKeyItemRef.setKeySettings(miClient, SGuiUtils.getLabelName(jlItemRef), false);
+        moKeyItemRef.setKeySettings(miClient, SGuiUtils.getLabelName(jlItemRef), true);
         moDateReq.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateReq), false);
         moKeyPriReq.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriReq), true);
         moTextReqStatus.setTextSettings(SGuiUtils.getLabelName("Estatus"), 100, 0);
@@ -1073,6 +1083,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         hasUserProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         hasUserProvPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight ||
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
+        
+        moDialogPickerItem = null;
+        moDialogPickerItemRef = null;
     }
     
     private void populateMatReqCC() {
@@ -1508,8 +1521,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private void actionPickItem() {
         try {
             int[] itemId; 
-            SDialogItemPicker picker;
-
+            
             if (moGridMatReqCC.getTable().getRowCount() >= 1 || moKeyCostCenterEty.getSelectedIndex() >= 1) {
                 ArrayList<SDbMaterialCostCenterGroup> ccg = new ArrayList<>();
                 for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
@@ -1530,13 +1542,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
                 params.getParamsMap().put(SModConsts.TRN_MAT_CC_GRP, ccg);
 
-                picker = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
-                picker.resetPicker();
-                picker.initComponentsCustom();
-                picker.setPickerVisible(true);
+                moDialogPickerItem = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
+                moDialogPickerItem.resetPicker();
+                moDialogPickerItem.initComponentsCustom();
+                moDialogPickerItem.setPickerVisible(true);
 
-                if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-                    itemId = (int[]) picker.getOption();
+                if (moDialogPickerItem.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+                    itemId = (int[]) moDialogPickerItem.getOption();
 
                     if (itemId != null) {
                         readItemEty(itemId);
@@ -1563,15 +1575,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     
     private void actionPickItemRef() {
         int[] itemId; 
-        SDialogItemPicker picker;
         
-        picker = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
-        picker.resetPicker();
-        picker.initComponentsCustom();
-        picker.setPickerVisible(true);
+        moDialogPickerItemRef = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        moDialogPickerItemRef.resetPicker();
+        moDialogPickerItemRef.initComponentsCustom();
+        moDialogPickerItemRef.setPickerVisible(true);
 
-        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            itemId = (int[]) picker.getOption();
+        if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            itemId = (int[]) moDialogPickerItemRef.getOption();
 
             if (itemId != null) {
                 moKeyItemRef.setValue(itemId);
@@ -1581,15 +1592,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     
     private void actionPickItemRefEty() {
         int[] itemId; 
-        SDialogItemPicker picker;
         
-        picker = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
-        picker.resetPicker();
-        picker.initComponentsCustom();
-        picker.setPickerVisible(true);
+        moDialogPickerItemRef = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        moDialogPickerItemRef.resetPicker();
+        moDialogPickerItemRef.initComponentsCustom();
+        moDialogPickerItemRef.setPickerVisible(true);
 
-        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            itemId = (int[]) picker.getOption();
+        if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            itemId = (int[]) moDialogPickerItemRef.getOption();
 
             if (itemId != null) {
                 moKeyItemRefEty.setValue(itemId);
