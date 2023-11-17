@@ -13,6 +13,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
+import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SFormMaterialRequest;
 import java.awt.event.ActionEvent;
@@ -49,12 +50,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbNewSupReq;
     private JButton jbPrint;
     private JButton jbAuthCardex;
+    private JButton jbLogCardex;
     private JButton jbAuthorize;
     private JButton jbReject;
     private JButton jbSegregate;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
+    private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
     private SDialogMaterialRequestSegregation moDialogSegregations;
     
     private boolean hasSupReq;
@@ -84,6 +87,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva requisición de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Kardex de autorizaciones", this);
+        jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Bitácora de cambios", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
@@ -91,6 +95,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
@@ -99,6 +104,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbPrint.setEnabled(hasPetSupRight);
         jbPrint.setEnabled(true);
         jbAuthCardex.setEnabled(true);
+        jbLogCardex.setEnabled(true);
         jbAuthorize.setEnabled(hasAuthRight);
         jbReject.setEnabled(hasAuthRight);
         jbSegregate.setEnabled(hasAuthRight);
@@ -114,6 +120,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterMatReqStatus);
         
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
+        moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
         
         if (mnGridMode != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
@@ -183,6 +190,34 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     
                         moDialogAuthCardex.setFormParams(SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ), key);
                         moDialogAuthCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+    private void actionLog() {
+        int[] key;
+        
+        if (jbLogCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                        moDialogLogsCardex.setFormParams(key[0]);
+                        moDialogLogsCardex.setVisible(true);
                     }
                 }
                 catch (Exception ex) {
@@ -522,6 +557,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbAuthCardex) {
                 actionCardex();
+            }
+            else if (button == jbLogCardex) {
+                actionLog();
             }
             else if (button == jbAuthorize) {
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_AUTHORIZE);
