@@ -411,6 +411,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());
                 oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
+                oRow.setIsItemNew(oMaterialRequestEntry.isNewItem());
                 
                 double dSegregated = 0d;
                 if (mnSegregationId > 0) {

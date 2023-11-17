@@ -5,6 +5,7 @@ Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 1) Implementar la captura de texto opcional en el pase "hacia adelante" o "hacia atrás" en el cambio de estatus de las RM.
 2) Implementar kardex de status
 3) Refactorización del nombre del campo "comentarios a notas".
+4) Validación de no permitir suministrar, cotizar, o vincular partidas con ítem nuevo.
 
 ================================================================================
 SIIE 3.2 225.7/ 2023-11-16

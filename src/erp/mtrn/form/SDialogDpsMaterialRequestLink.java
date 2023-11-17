@@ -312,7 +312,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
         if (moMaterialRequest != null) {
             for (SDbMaterialRequestEntry entry : moMaterialRequest.getChildEntries()) {
-                if (! entry.isDeleted()) {
+                if (! entry.isDeleted() && ! entry.isNewItem()) {
                     SDataMaterialRequestEntryLinkRow entryLink = null;
                     if (moDps == null) {
                         entryLink = new SDataMaterialRequestEntryLinkRow(miClient, 
