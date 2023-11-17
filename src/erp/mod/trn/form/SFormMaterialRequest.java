@@ -346,7 +346,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlItemRef.setText("Concepto o gasto:*");
+        jlItemRef.setText("Concepto/gasto:*");
         jlItemRef.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlItemRef);
 
@@ -360,7 +360,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jPanel16.add(jbPickItemRef);
 
         jlInfo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_info.png"))); // NOI18N
-        jlInfo.setToolTipText("Puede ser el GP o el GA dependiendo de lo que se necesite.");
+        jlInfo.setToolTipText("Corresponde al concepto o gasto para contabilización");
         jlInfo.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel16.add(jlInfo);
 
@@ -480,7 +480,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moTextItemDescription.setPreferredSize(new java.awt.Dimension(445, 23));
         jPanel30.add(moTextItemDescription);
 
-        jlItemRefEty.setText("Cpto. o gasto:");
+        jlItemRefEty.setText("Concepto/gasto:");
         jlItemRefEty.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel30.add(jlItemRefEty);
 
@@ -1047,7 +1047,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código ítem"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem", 350));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Número parte"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Ítem referencia"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Concepto/gasto"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Cantidad"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Importe"));
