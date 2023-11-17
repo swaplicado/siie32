@@ -600,11 +600,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAccMatCostCenterGroupUser = new JMenuItem("Grupo centro de costo vs usuarios/empleados a detalle");
         
         jmMenuReq.add(jmMenuPetReq);
-        jmMenuPetReq.add(jmiReqAll);
         jmMenuPetReq.add(jmiReqPetNew);
         jmMenuPetReq.add(jmiReqPetTbAuth);
         jmMenuPetReq.add(jmiReqPetTbProcc);
         jmMenuPetReq.add(jmiReqPetAll);
+        jmMenuReq.addSeparator();
+        jmMenuReq.add(jmiReqAll);
         jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqRevTbAuth);
         jmMenuReq.add(jmiReqRevAll);
