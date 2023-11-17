@@ -23,7 +23,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser implements SGri
     
     protected int mnPkMatRequestId;
     protected int mnPkLogId;
-    protected String msComments_n;
+    protected String msNotes_n;
     protected int mnFkMatRequestStatusId;
     protected int mnFkMatRequestAuthotizationStatusId;
     protected int mnFkMatProvisionStatusId;
@@ -43,7 +43,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser implements SGri
 
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
     public void setPkLogId(int n) { mnPkLogId = n; }
-    public void setComments_n(String s) { msComments_n = s; }
+    public void setNotes_n(String s) { msNotes_n = s; }
     public void setFkMatRequestStatusId(int n) { mnFkMatRequestStatusId = n; }
     public void setFkMatRequestAuthotizationStatusId(int n) { mnFkMatRequestAuthotizationStatusId = n; }
     public void setFkMatProvisionStatusId(int n) { mnFkMatProvisionStatusId = n; }
@@ -53,7 +53,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser implements SGri
     
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkLogId() { return mnPkLogId; }
-    public String getComments_n() { return msComments_n; }
+    public String getNotes_n() { return msNotes_n; }
     public int getFkMatRequestStatusId() { return mnFkMatRequestStatusId; }
     public int getFkMatRequestAuthorizationStatusId() { return mnFkMatRequestAuthotizationStatusId; }
     public int getFkMatProvisionStatusId() { return mnFkMatProvisionStatusId; }
@@ -76,7 +76,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser implements SGri
     public void initRegistry() {
         mnPkMatRequestId = 0;
         mnPkLogId = 0;
-        msComments_n = null;
+        msNotes_n = null;
         mnFkMatRequestStatusId = 0;
         mnFkMatRequestAuthotizationStatusId = 0;
         mnFkMatProvisionStatusId = 0;
@@ -151,7 +151,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser implements SGri
         }
         else {
             mnPkLogId = resultSet.getInt("id_log");
-            msComments_n = resultSet.getString("comments_n");
+            msNotes_n = resultSet.getString("notes_n");
             mnFkMatRequestStatusId = resultSet.getInt("fk_st_mat_req");
             mnFkMatRequestAuthotizationStatusId = resultSet.getInt("fk_st_mat_authorn");
             mnFkMatProvisionStatusId = resultSet.getInt("fk_st_mat_prov");
@@ -183,7 +183,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser implements SGri
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
                     mnPkMatRequestId + ", " + 
                     mnPkLogId + ", " + 
-                    (msComments_n == null ? "null" : ("'" + msComments_n + "'")) + ", " + 
+                    (msNotes_n == null ? "null" : ("'" + msNotes_n + "'")) + ", " + 
                     mnFkMatRequestStatusId + ", " + 
                     mnFkMatRequestAuthotizationStatusId + ", " + 
                     mnFkMatProvisionStatusId + ", " + 
@@ -254,7 +254,7 @@ public class SDbMaterialRequestStatusLog extends SDbRegistryUser implements SGri
                 value = msAuxUser;
                 break;
             case 4:
-                value = msComments_n;
+                value = msNotes_n;
                 break;
             default:
                 break;

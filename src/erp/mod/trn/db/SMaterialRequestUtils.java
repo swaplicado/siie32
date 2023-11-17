@@ -731,7 +731,7 @@ public abstract class SMaterialRequestUtils {
                 req.setClosePurchase(true);
             }
             
-            req.setAuxCommentsChangeStatus_n(reason);
+            req.setAuxNotesChangeStatus_n(reason);
             req.save(session);
             
             return "";
