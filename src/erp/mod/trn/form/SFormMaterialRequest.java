@@ -1542,9 +1542,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
                 params.getParamsMap().put(SModConsts.TRN_MAT_CC_GRP, ccg);
 
-                moDialogPickerItem = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
+                if (moDialogPickerItem == null) {
+                    moDialogPickerItem = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
+                }
+                
                 moDialogPickerItem.resetPicker();
                 moDialogPickerItem.initComponentsCustom();
+                moDialogPickerItem.setItemPickerInvDefault(true);
                 moDialogPickerItem.setPickerVisible(true);
 
                 if (moDialogPickerItem.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1576,9 +1580,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private void actionPickItemRef() {
         int[] itemId; 
         
-        moDialogPickerItemRef = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        if (moDialogPickerItemRef == null) {
+            moDialogPickerItemRef = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        }
+        
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
+        moDialogPickerItemRef.setItemPickerInvDefault(false);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1593,9 +1601,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private void actionPickItemRefEty() {
         int[] itemId; 
         
-        moDialogPickerItemRef = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        if (moDialogPickerItemRef == null) {
+            moDialogPickerItemRef = SMaterialRequestUtils.getOptionPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        }
+        
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
+        moDialogPickerItemRef.setItemPickerInvDefault(false);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1754,6 +1766,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 isCapturingData = false;
                 clearEntryControls();
                 enableEntryControls(false);
+                jbEditEty.setEnabled(true);
+                jbDeleteEty.setEnabled(true);
             }
         }
     }

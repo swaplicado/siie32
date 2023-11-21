@@ -399,7 +399,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         if (usrId != 2 ) { // SUPER
             needJoin = true;
-            where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
+            if (mnGridMode != SModConsts.TRN_MAT_CONS_ENT_USR) {
+                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
+            }
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
                 where += (where.isEmpty() ? "" : "AND ") + "(v.ts_usr_ins = " + usrId + " "
                         + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") OR aut.fk_usr_step = " + usrId + ") ";

@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 226.1/ 2023-11-21
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación para diferenciar de los ítems inventariables y de los no inventariables en el dialogo de picker en las RM.
+
+================================================================================
 SIIE 3.2 226.0/ 2023-11-16
 Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

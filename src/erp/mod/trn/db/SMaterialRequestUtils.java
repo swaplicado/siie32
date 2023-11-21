@@ -44,6 +44,8 @@ import sa.lib.gui.SGuiSession;
  * @author Edwin Carmona, Isabel Servín
  */
 public abstract class SMaterialRequestUtils {
+
+    public static String ITEM_INV = "is_inv";
     
     public static SDataStockSegregation getSegregationOfMaterialRequest(SGuiSession session, final int idMaterialRequest) {
         String query = "SELECT id_stk_seg "
@@ -418,7 +420,8 @@ public abstract class SMaterialRequestUtils {
                         in += (in.isEmpty() ? "" : ")");
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
-                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3 " 
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "a.b_inv AS " + ITEM_INV + " "
                                 + "FROM ("
                                 + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
@@ -438,7 +441,8 @@ public abstract class SMaterialRequestUtils {
                     case SLibConstants.UNDEFINED:
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
-                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3 " 
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "a.b_inv AS " + ITEM_INV + " "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
                                 + "WHERE NOT a.b_del ";
                 }
