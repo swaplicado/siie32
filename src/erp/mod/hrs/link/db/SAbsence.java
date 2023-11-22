@@ -24,6 +24,7 @@ public class SAbsence {
     protected int fk_class_abs;
     protected int fk_type_abs;
     protected String company;
+    protected String json_days;
 
     public void setCompanie(String company) {
         this.company = company;
@@ -146,6 +147,12 @@ public class SAbsence {
     public void setIs_deleted(boolean is_deleted) {
         this.is_deleted = is_deleted;
     }
-    
-    
+
+    public String getJson_days() {
+        return json_days;
+    }
+
+    public void setJson_days(String json_days) {
+        this.json_days = json_days;
+    }
 }

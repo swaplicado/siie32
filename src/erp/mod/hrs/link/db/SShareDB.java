@@ -610,8 +610,8 @@ public class SShareDB {
         }
 
         String query = "SELECT  "
-                + "    id_emp, "
-                + "    id_abs, "
+                + "    hrs_abs.id_emp, "
+                + "    hrs_abs.id_abs, "
                 + "    num, "
                 + "    dt, "
                 + "    dt_sta, "
@@ -623,9 +623,11 @@ public class SShareDB {
                 + "    fk_tp_abs, "
                 + "    nts, "
                 + "    b_clo, "
-                + "    b_del "
+                + "    b_del, "
+                + "    cmp.json_days "
                 + "FROM"
-                + "    hrs_abs"
+                + "    hrs_abs "
+                + " LEFT JOIN hrs_abs_cmp as cmp ON cmp.id_emp = hrs_abs.id_emp AND cmp.id_abs = hrs_abs.id_abs "
                 + " WHERE "
                 + "    (ts_usr_ins >= '" + strDate + "' "
                 + "        OR ts_usr_upd >= '" + strDate + "') "
@@ -658,6 +660,7 @@ public class SShareDB {
                 abs.is_closed = res.getBoolean("b_clo");
                 abs.is_deleted = res.getBoolean("b_del");
                 abs.company = dbName;
+                abs.json_days = res.getString("json_days");
 
                 lAbss.add(abs);
             }
@@ -1208,7 +1211,7 @@ public class SShareDB {
                                     + "WHERE hrs_abs.id_emp = " + root.get("employee_id").toString() + " AND ( "
                                     + "hrs_abs.dt_sta BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' OR "
                                     + "hrs_abs.dt_end BETWEEN '" + root.get("date_ini").toString() + "' AND '" + root.get("date_end").toString() + "' ) AND "
-                                    + "NOT hrs_abs.b_del;";
+                                    + "NOT hrs_abs.b_del AND NOT hrs_abs.b_clo";
             stCon = conn.createStatement();
 
             resultSet = stCon.executeQuery(incidents);
@@ -1532,48 +1535,74 @@ public class SShareDB {
         session.setModuleUtils(new SModUtils());
         session.getModules().add(new SModuleHrs(session.getClient()));
         
+        ArrayList<ArrayList<Integer>> lInsertIds = new ArrayList<>();
+        Statement oSt = session.getStatement();
+        Connection oCon = oSt.getConnection();
         try {
             root = (JSONObject) parser.parse(sJsonInc);
             JSONArray rows = (JSONArray) root.get("rows");
-            for (int i = 0 ; rows.size() > i ; i++){
-                JSONObject row = (JSONObject) rows.get(i);
-                
-                SDbAbsence insert = new SDbAbsence();
-                insert.initRegistry();
-                
-                Date date_send = new SimpleDateFormat("yyyy-MM-dd").parse(root.get("date_send").toString());
-                Date start_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("start_date").toString());
-                Date end_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("end_date").toString());
-                
-                insert.setPkEmployeeId(Integer.parseInt(root.get("employee_id").toString()));
-                insert.computePrimaryKey(session);
-                insert.setNumber(row.get("folio").toString());
-                insert.setDate(date_send);
-                insert.setDateStart(start_date);
-                insert.setDateEnd(end_date);
-                insert.setEffectiveDays(Integer.parseInt(row.get("effective_days").toString()));
-                insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
-                insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
-                insert.setExternarRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
-                insert.setFkAbsenceClassId(Integer.parseInt(root.get("cl_abs").toString()));
-                insert.setFkAbsenceTypeId(Integer.parseInt(root.get("tp_abs").toString()));
-                insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
-                           
-                insert.save(session);
-                
+            
+            oCon.setAutoCommit(false);
+            
+            try (Statement st = session.getStatement()) {
+                // Realizar los inserts
+                for (int i = 0 ; rows.size() > i ; i++){
+                    JSONObject row = (JSONObject) rows.get(i);
+
+                    SDbAbsence insert = new SDbAbsence();
+                    insert.initRegistry();
+
+                    Date date_send = new SimpleDateFormat("yyyy-MM-dd").parse(root.get("date_send").toString());
+                    Date start_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("start_date").toString());
+                    Date end_date = new SimpleDateFormat("yyyy-MM-dd").parse(row.get("end_date").toString());
+
+                    insert.setPkEmployeeId(Integer.parseInt(root.get("employee_id").toString()));
+                    insert.computePrimaryKey(session);
+                    insert.setNumber(row.get("folio").toString());
+                    insert.setDate(date_send);
+                    insert.setDateStart(start_date);
+                    insert.setDateEnd(end_date);
+                    insert.setEffectiveDays(Integer.parseInt(row.get("effective_days").toString()));
+                    insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
+                    insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
+                    insert.setExternarRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
+                    insert.setFkAbsenceClassId(Integer.parseInt(root.get("cl_abs").toString()));
+                    insert.setFkAbsenceTypeId(Integer.parseInt(root.get("tp_abs").toString()));
+                    insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
+
+                    insert.save(session);
+
+                    ArrayList<Integer> arrInsert = new ArrayList<>();
+
+                    arrInsert.add(insert.getPkEmployeeId());
+                    arrInsert.add(insert.getPkAbsenceId());
+
+                    lInsertIds.add(arrInsert);
+
+                    String sQuery = "";
+                    sQuery = "INSERT INTO hrs_abs_cmp (id_emp, id_abs, json_days)"
+                            + " VALUES (" + insert.getPkEmployeeId() + ", " + insert.getPkAbsenceId() + ", " + "'" + row.get("lDays").toString() + "'" + "); ";
+
+                    st.execute(sQuery);
+                }
             }
+            oCon.commit();
             
         } catch (ParseException ex) {
+            oCon.rollback();
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
             objResponse.setCode(RESPONSE_ERROR );
             objResponse.setMessage(SShareDB.class.getName());
             return objResponse;
         } catch (Exception ex) {
+            oCon.rollback();
             Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
             objResponse.setCode(RESPONSE_ERROR );
             objResponse.setMessage(SShareDB.class.getName());
             return objResponse;
         }
+        
+        oCon.close();
         
         objResponse.setCode(RESPONSE_OK_INS );
         objResponse.setMessage("Se insertaron las incidencias correctamente");
