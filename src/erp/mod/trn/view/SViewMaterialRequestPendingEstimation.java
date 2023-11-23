@@ -276,7 +276,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
 
         filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_DELETED)).getValue();
         if ((Boolean) filter) {
-            where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+            where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 AND ve.b_del = 0 ";
         }
 
         if (moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD) != null) {

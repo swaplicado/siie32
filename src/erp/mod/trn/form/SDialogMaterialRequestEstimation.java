@@ -459,7 +459,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         };
         jpOptions.add(moGridMatReqEty, BorderLayout.CENTER);
         
-        moGridProviderRows = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_EST_PROVID_ROW, SLibConsts.UNDEFINED, "Proveedores para cotización") {
+        moGridProviderRows = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_EST_PROVID_ROW, SProviderMailRow.GRID_ESTIMATION, "Proveedores para cotización") {
             @Override
             public void initGrid() {
                 jbRowNew.setEnabled(false);
@@ -751,7 +751,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         
         SProviderMailRow oRow;
         if (moProviderRow == null) {
-            oRow = new SProviderMailRow();
+            oRow = new SProviderMailRow(SProviderMailRow.GRID_ESTIMATION);
         }
         else {
             oRow = moProviderRow;
