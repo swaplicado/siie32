@@ -211,13 +211,17 @@ public class SFormConfMatCostCenterGroupVsUser extends SBeanForm implements Acti
                 row.setLinkId(moKeyLink.getValue()[0]);
                 row.setReferenceId(moKeyReference.getValue()[0]);
                 row.readReference(miClient.getSession());
+                boolean found = false;
                 for (SRowCCGroupVsUser rows : maRows) {
-                    if (!SLibUtilities.compareKeys(rows.getRowPrimaryKey(), row.getRowPrimaryKey())) {
-                        maRows.add(row);
+                    if (SLibUtilities.compareKeys(rows.getRowPrimaryKey(), row.getRowPrimaryKey())) {
+                        found = true;
                     }
-                    else {
-                        miClient.showMsgBoxInformation("No se puede agregar debido a que ya existe la referencia");
-                    }
+                }
+                if (!found) {
+                    maRows.add(row);
+                }
+                else {
+                    miClient.showMsgBoxInformation("No se puede agregar debido a que ya existe la referencia");
                 }
 
                 populateGrid();

@@ -49,6 +49,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected int mnFkItemReferenceId_n;
     
     protected ArrayList<SDbMaterialRequestEntryNote> maChildNotes;
+    protected ArrayList<SDbMaterialRequestEntryItemChange> maChildItemChange;
     
     protected int mnAuxRowId;
     
@@ -113,12 +114,13 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public int getFkItemReferenceId_n() { return mnFkItemReferenceId_n; }
     
     public ArrayList<SDbMaterialRequestEntryNote> getChildNotes() { return maChildNotes; }
+    public ArrayList<SDbMaterialRequestEntryItemChange> getChildItemChange() { return maChildItemChange; }
     
     public int getAuxRowId() { return mnAuxRowId; }
     public SDataItem getDataItem() { return moDataItem; }
     public SDataItem getDataItemRef() { return moDataItemRef; }
     
-    private String getDescription() {
+    public String getItemNewDescription() {
         for (SDbMaterialRequestEntryNote note : maChildNotes) {
             if (note.getIsDescription()) {
                 return note.getNotes();
@@ -239,6 +241,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mnFkItemReferenceId_n = 0;
         
         maChildNotes = new ArrayList<>();
+        maChildItemChange = new ArrayList<>();
         
         mnAuxRowId = 0;
         moDataItem = null;
@@ -282,6 +285,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         ResultSet resultSet;
         Statement statement;
         SDbMaterialRequestEntryNote note;
+        SDbMaterialRequestEntryItemChange change;
                 
         initRegistry();
         initQueryMembers();
@@ -329,6 +333,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                 note = new SDbMaterialRequestEntryNote();
                 note.read(session, new int[] { mnPkMatRequestId, mnPkEntryId, resultSet.getInt(1) });
                 maChildNotes.add(note);
+            }
+            
+            msSql = "SELECT id_chg " + 
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY_ITEM_CHG) + " " +
+                    "WHERE id_mat_req = " + mnPkMatRequestId + " AND id_ety = " + mnPkEntryId + " " +
+                    "ORDER BY id_chg ";
+            
+            resultSet = statement.executeQuery(msSql);
+            while (resultSet.next()) {
+                change = new SDbMaterialRequestEntryItemChange();
+                change.read(session, new int[] { mnPkMatRequestId, mnPkEntryId, resultSet.getInt(1) });
+                maChildItemChange.add(change);
             }
             
             // Read ítem:
@@ -428,6 +444,16 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             note.save(session);
         }
         
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY_ITEM_CHG) + " " + 
+                "WHERE id_mat_req = " + mnPkMatRequestId + " AND id_ety = " + mnPkEntryId + " ";
+        session.getStatement().execute(msSql);
+        for (SDbMaterialRequestEntryItemChange change : maChildItemChange) {
+            change.setPkMatRequestId(mnPkMatRequestId);
+            change.setPkEntryId(mnPkEntryId);
+            change.setRegistryNew(true);
+            change.save(session);
+        }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -460,6 +486,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         
         for (SDbMaterialRequestEntryNote note : this.getChildNotes()) {
             registry.getChildNotes().add(note);
+        }
+        
+        for (SDbMaterialRequestEntryItemChange change : this.getChildItemChange()) {
+            registry.getChildItemChange().add(change);
         }
         
         registry.setDataItem(this.getDataItem());
@@ -511,10 +541,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         Object value = null;
         
         switch (row) {
-            case 0: value = mbNewItem ? "" : moDataItem.getCode(); break;
-            case 1: value = mbNewItem ? getDescription() : moDataItem.getName(); break;
+            case 0: value = mbNewItem ? "" : moDataItem.getKey(); break;
+            case 1: value = mbNewItem ? getItemNewDescription() : moDataItem.getName(); break;
             case 2: value = mbNewItem ? "" : moDataItem.getPartNumber(); break;
-            case 3: value = moDataItemRef == null ? "" : moDataItemRef.getCode(); break;
+            case 3: value = moDataItemRef == null ? "" : moDataItemRef.getKey(); break;
             case 4: value = mdQuantity; break;
             case 5: value = mbNewItem ? "" : moDataItem.getDbmsDataUnit().getSymbol(); break;
             case 6: value = mdTotal_r; break;

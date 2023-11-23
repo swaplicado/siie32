@@ -5,27 +5,45 @@
  */
 package erp.mod.trn.form;
 
+import erp.mod.trn.db.SMaterialRequestUtils;
+import erp.mod.trn.db.SRowItemPicker;
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.Vector;
+import javax.swing.JRadioButton;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
+import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridRow;
-import sa.lib.grid.SGridRowOptionPicker;
+import sa.lib.grid.SGridUtils;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
  * @author Isabel Servin
  */
-public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener {
+public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener, ItemListener {
 
     /**
      * Creates new form SBeanItemPicker
      */
     
+    private javax.swing.JPanel jpControl;
     private sa.lib.gui.bean.SBeanFieldText moTextItem;
     protected Vector<SGridRow> moAllRows;
+    protected Vector<SGridRow> moAllRowsAux;
+    private javax.swing.JRadioButton jrbAllItems;
+    private javax.swing.JRadioButton jrbInvItem;
+    private javax.swing.JRadioButton jrbNoInvItem;
+    private javax.swing.ButtonGroup jbgItems;
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -44,13 +62,176 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener 
     // End of variables declaration//GEN-END:variables
 
     public void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 800, 500);
+        
+        jpControl = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        
+        jbgItems = new javax.swing.ButtonGroup();
+        
+        jrbAllItems = new javax.swing.JRadioButton();
+        jrbAllItems.setText("Todos los ítems");
+        jrbAllItems.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbAllItems.addItemListener(this);
+        jbgItems.add(jrbAllItems);
+        
+        jrbInvItem = new javax.swing.JRadioButton();
+        jrbInvItem.setText("Ítems inventariables");
+        jrbInvItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbInvItem.addItemListener(this);
+        jbgItems.add(jrbInvItem);
+        
+        jrbNoInvItem = new javax.swing.JRadioButton();
+        jrbNoInvItem.setText("Ítems no inventariables");
+        jrbNoInvItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbNoInvItem.addItemListener(this);
+        jbgItems.add(jrbNoInvItem);
+        
         moAllRows = new Vector<>(moGridPicker.getModel().getGridRows());
+        moAllRowsAux = new Vector<>(moGridPicker.getModel().getGridRows());
         
         moTextItem = new sa.lib.gui.bean.SBeanFieldText();
-        moTextItem.setPreferredSize(new java.awt.Dimension(600, 23));
+        moTextItem.setPreferredSize(new java.awt.Dimension(200, 23));
         moTextItem.addKeyListener(this);
         
-        jpGrid.add(moTextItem, BorderLayout.NORTH);
+        jpGrid.add(jpControl, BorderLayout.NORTH);
+        jpControl.add(moTextItem);
+        jpControl.add(jrbAllItems);
+        jpControl.add(jrbInvItem);
+        jpControl.add(jrbNoInvItem);
+    }
+    
+    private void stateChangeAllItems() {
+        moAllRowsAux.addAll(moAllRows);
+        moGridPicker.populateGrid(moAllRowsAux);
+    }
+
+    private void stateChangeInvItem() {
+        moAllRowsAux.clear();
+        for (SGridRow row : moAllRows) {
+            if (((SRowItemPicker) row).getInv()) {
+                moAllRowsAux.add(row);
+            }
+        }
+        moGridPicker.populateGrid(moAllRowsAux);
+    }
+
+    private void stateChangeNoInvItem() {
+        moAllRowsAux.clear();
+        for (SGridRow row : moAllRows) {
+            if (!((SRowItemPicker) row).getInv()) {
+                moAllRowsAux.add(row);
+            }
+        }
+        moGridPicker.populateGrid(moAllRowsAux);
+    }
+    
+    public void setItemPickerInvDefault(boolean inv) {
+        if (inv) {
+            jrbInvItem.setSelected(true);
+            stateChangeInvItem();
+        }
+        else {
+            jrbNoInvItem.setSelected(true);
+            stateChangeNoInvItem();
+        }
+    }
+    
+    @Override
+    protected void populateGridPicker() {
+        int col;
+        int cols = moSettings.getGridColumns().size();
+        int[] key = null;
+        Class colClass;
+        ResultSet resultSet;
+        SRowItemPicker row;
+        Vector<SGridRow> rows = new Vector<>();
+        
+        try {
+            resultSet = miClient.getSession().getStatement().executeQuery(moSettings.getSql());
+            while (resultSet.next()) {
+                if (moSettings.getPrimaryKeyLength() > 0) {
+                    key = new int[moSettings.getPrimaryKeyLength()];
+                    for (col = 0; col < moSettings.getPrimaryKeyLength(); col++) {
+                        key[col] = resultSet.getInt(SDbConsts.FIELD_ID + (col + 1));
+                    }
+                }
+
+                row = new SRowItemPicker(key);
+                for (col = 0; col < cols; col++) {
+                    colClass = SGridUtils.getDataTypeClass(moSettings.getGridColumns().get(col).getColumnType());
+
+                    if (colClass == Long.class) {
+                        row.getValues().add(resultSet.getLong(SDbConsts.FIELD_PICK + (col + 1)));
+                    }
+                    else if (colClass == Integer.class) {
+                        row.getValues().add(resultSet.getInt(SDbConsts.FIELD_PICK + (col + 1)));
+                    }
+                    else if (colClass == Double.class) {
+                        row.getValues().add(resultSet.getDouble(SDbConsts.FIELD_PICK + (col + 1)));
+                    }
+                    else if (colClass == Float.class) {
+                        row.getValues().add(resultSet.getFloat(SDbConsts.FIELD_PICK + (col + 1)));
+                    }
+                    else if (colClass == Boolean.class) {
+                        row.getValues().add(resultSet.getBoolean(SDbConsts.FIELD_PICK + (col + 1)));
+                    }
+                    else if (colClass == String.class) {
+                        row.getValues().add(resultSet.getString(SDbConsts.FIELD_PICK + (col + 1)));
+                    }
+                    else if (colClass == Date.class) {
+                        switch (moSettings.getGridColumns().get(col).getColumnType()) {
+                            case SGridConsts.COL_TYPE_DATE:
+                                row.getValues().add(resultSet.getDate(SDbConsts.FIELD_PICK + (col + 1)));
+                                break;
+                            case SGridConsts.COL_TYPE_DATE_DATETIME:
+                                row.getValues().add(resultSet.getTimestamp(SDbConsts.FIELD_PICK + (col + 1)));
+                                break;
+                            case SGridConsts.COL_TYPE_DATE_TIME:
+                                row.getValues().add(resultSet.getTime(SDbConsts.FIELD_PICK + (col + 1)));
+                                break;
+                            default:
+                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                        }
+                    }
+                    else {
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                    }
+                }
+
+                if (moSettings.isMainOptionApplying()) {
+                    switch (moSettings.getMainOptionDataType()) {
+                        case SLibConsts.DATA_TYPE_INT:
+                            row.setMainOption(resultSet.getLong(SDbConsts.FIELD_VALUE));
+                            break;
+                        case SLibConsts.DATA_TYPE_DEC:
+                            row.setMainOption(resultSet.getDouble(SDbConsts.FIELD_VALUE));
+                            break;
+                        case SLibConsts.DATA_TYPE_BOOL:
+                            row.setMainOption(resultSet.getBoolean(SDbConsts.FIELD_VALUE));
+                            break;
+                        case SLibConsts.DATA_TYPE_TEXT:
+                            row.setMainOption(resultSet.getString(SDbConsts.FIELD_VALUE));
+                            break;
+                        case SLibConsts.DATA_TYPE_DATE:
+                            row.setMainOption(resultSet.getDate(SDbConsts.FIELD_VALUE));
+                            break;
+                        default:
+                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                    }
+                }
+                row.setInv(resultSet.getBoolean(SMaterialRequestUtils.ITEM_INV));
+
+                rows.add(row);
+            }
+
+            moGridPicker.populateGrid(rows);
+        }
+        catch (SQLException e) {
+            SLibUtils.showException(this, e);
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
     @Override
@@ -66,21 +247,50 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener 
         Vector<SGridRow> items = new Vector<>();
         String textToSearch = moTextItem.getValue();
         if (textToSearch.isEmpty()) {
-            items.addAll(moAllRows);
+            items.addAll(moAllRowsAux);
         }
         else {
-            for (SGridRow item : moAllRows) {
-                if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(0).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
+            for (SGridRow item : moAllRowsAux) {
+                if (SLibUtils.textToAscii(((SRowItemPicker) item).getValues().get(0).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
                     items.add(item);
                 }
-                else if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(1).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
+                else if (SLibUtils.textToAscii(((SRowItemPicker) item).getValues().get(1).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
                     items.add(item);
                 }
-                else if (SLibUtils.textToAscii(((SGridRowOptionPicker) item).getValues().get(2).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
+                else if (SLibUtils.textToAscii(((SRowItemPicker) item).getValues().get(2).toString()).contains(SLibUtils.textToAscii(textToSearch).toUpperCase())) {
                     items.add(item);
                 }
             }
         }
         moGridPicker.populateGrid(items);
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JRadioButton) {
+            JRadioButton radioButton = (JRadioButton) e.getSource();
+            
+            if (radioButton == jrbAllItems) {
+                stateChangeAllItems();
+            }
+            else if (radioButton == jrbInvItem) {
+                stateChangeInvItem();
+            }
+            if (radioButton == jrbNoInvItem) {
+                stateChangeNoInvItem();
+            }
+        }
+    }
+    
+    @Override
+    public Object getOption() {
+        Object option = null;
+        SRowItemPicker row = (SRowItemPicker) moGridPicker.getSelectedGridRow();
+
+        if (row != null) {
+            option = moSettings.isMainOptionApplying() ? row.getMainOption() : row.getRowPrimaryKey();
+        }
+
+        return option;
     }
 }

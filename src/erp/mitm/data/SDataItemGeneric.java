@@ -566,7 +566,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ? ) }");
+                    "?, ?, ?, ?, ? ) }");
             callableStatement.setInt(nParam++, mnPkItemGenericId);
             callableStatement.setString(nParam++, msItemGeneric);
             callableStatement.setString(nParam++, msItemGenericShort);

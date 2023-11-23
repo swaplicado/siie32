@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -41,6 +44,8 @@ import sa.lib.gui.SGuiSession;
  * @author Edwin Carmona, Isabel Servín
  */
 public abstract class SMaterialRequestUtils {
+
+    public static String ITEM_INV = "is_inv";
     
     public static SDataStockSegregation getSegregationOfMaterialRequest(SGuiSession session, final int idMaterialRequest) {
         String query = "SELECT id_stk_seg "
@@ -415,7 +420,8 @@ public abstract class SMaterialRequestUtils {
                         in += (in.isEmpty() ? "" : ")");
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
-                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3 " 
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "a.b_inv AS " + ITEM_INV + " "
                                 + "FROM ("
                                 + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
@@ -435,7 +441,8 @@ public abstract class SMaterialRequestUtils {
                     case SLibConstants.UNDEFINED:
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
-                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3 " 
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "a.b_inv AS " + ITEM_INV + " "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
                                 + "WHERE NOT a.b_del ";
                 }
@@ -701,6 +708,17 @@ public abstract class SMaterialRequestUtils {
     
     public static String updateStatusOfMaterialRequest(SGuiSession session, int[] pkMatReq, int statusId) {
         try {
+            JTextArea textArea = new JTextArea(5, 40); // Set the number of rows and columns
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            int option = JOptionPane.showOptionDialog(null, scrollPane, "Ingrese comentario/observación:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+            String reason = "";
+            if (option == JOptionPane.OK_OPTION) {
+                reason = textArea.getText();
+            }
+            else {
+                return "Acción cancelada";
+            }
+            
             SDbMaterialRequest req = new SDbMaterialRequest();
             req.read(session, pkMatReq);
             req.setFkMatRequestStatusId(statusId);
@@ -717,6 +735,7 @@ public abstract class SMaterialRequestUtils {
                 req.setClosePurchase(true);
             }
             
+            req.setAuxNotesChangeStatus_n(reason);
             req.save(session);
             
             return "";
@@ -725,5 +744,58 @@ public abstract class SMaterialRequestUtils {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
             return ex.getMessage();
         }
+    }
+    
+    public static boolean hasMatReqEtyEstimation(SGuiSession session, int[] pkMatReqEty) {
+        String sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ_ETY) + " "
+                    + "WHERE fk_mat_req_n = " + pkMatReqEty[0] + " "
+                    + "AND fk_mat_req_ety_n = " + pkMatReqEty[1] + " "
+                    + "AND NOT b_del;";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        
+            return resultSet.next();
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Determina si la partida de una RM ya ha sido agregada a una solicitud de cotización.
+     * Basándose en la tabla @see SModConsts.TRN_MAT_REQ_ST_LOG
+     * 
+     * @param session
+     * @param pkMatReq
+     * 
+     * @return true si la partida ya fue cotizada
+     */
+    public static ArrayList<SDbMaterialRequestStatusLog> getMaterialRequestLogs(SGuiSession session, int pkMatReq) {
+        String sql = "SELECT id_log FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG) + " "
+                    + "WHERE id_mat_req = " + pkMatReq + " ;";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+            ArrayList<SDbMaterialRequestStatusLog> lLogs = new ArrayList<>();
+            SDbMaterialRequestStatusLog oLog;
+            while (resultSet.next()) {
+                oLog = new SDbMaterialRequestStatusLog();
+                oLog.read(session, new int[] { pkMatReq, resultSet.getInt("id_log") });
+                lLogs.add(oLog);
+            }
+            
+            return lLogs;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 }
