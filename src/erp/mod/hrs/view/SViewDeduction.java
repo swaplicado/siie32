@@ -4,17 +4,28 @@
  */
 package erp.mod.hrs.view;
 
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
+import erp.mod.hrs.db.SDbCfgAccountingDeduction;
+import erp.mod.hrs.db.SHrsConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiParams;
 
 /**
  *
@@ -22,9 +33,28 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewDeduction extends SGridPaneView implements ActionListener {
 
+    private int mnParamPayrollAccProcess;
+    private JButton mjCfgAccounting;
+    
     public SViewDeduction(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_DED, SLibConsts.UNDEFINED, title);
+        initComponentsCustom();
+    }
+    
+    private void initComponentsCustom() {
         setRowButtonsEnabled(true, true, true, false, true);
+        
+        try {
+            mnParamPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        
+        if (mnParamPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_DYNAMIC) {
+            mjCfgAccounting = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_lot.gif")), "Configurar contabilización", this);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjCfgAccounting);
+        }
     }
 
     @Override
@@ -58,6 +88,7 @@ public class SViewDeduction extends SGridPaneView implements ActionListener {
                 + "ta.name, "
                 + "v.b_who, "
                 + "v.b_pay_tax, "
+                + "IF(cacc.id_ded IS NULL, " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_OK + ") AS _ico_cfg, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -87,6 +118,8 @@ public class SViewDeduction extends SGridPaneView implements ActionListener {
                 + "v.fk_cl_abs_n = ca.id_cl_abs "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_ABS) + " AS ta ON "
                 + "v.fk_cl_abs_n = ta.id_cl_abs AND v.fk_tp_abs_n = ta.id_tp_abs "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DED) + " AS cacc ON "
+                + "v.id_ded = cacc.id_ded "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.code, v.name, v.id_ded ";
     }
@@ -98,7 +131,10 @@ public class SViewDeduction extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.name_abbr", SGridConsts.COL_TITLE_NAME + " corto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo deducción"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "vt.name", "Tipo deducción"));
+        if (mnParamPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_DYNAMIC) {
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico_cfg", "Configuración contabilización"));
+        }
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "dc.code", "Tipo cálculo deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.ret_per", "% retención"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "l.name", "Tipo crédito/préstamo"));
@@ -125,10 +161,53 @@ public class SViewDeduction extends SGridPaneView implements ActionListener {
         moSuscriptionsSet.add(SModConsts.USRU_USR);
         moSuscriptionsSet.add(SModConsts.HRSU_CL_ABS);
         moSuscriptionsSet.add(SModConsts.HRSU_TP_ABS);
+        
+        // suscriptions when dynamic processing of accounting has been set in configuration:
+        moSuscriptionsSet.add(SModConsts.HRS_CFG_ACC_DED);
+    }
+
+    private void actionPerformedCfgAccounting() {
+        if (mjCfgAccounting.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        SGuiParams params;
+                        int existingRegistries = SDbCfgAccountingDeduction.countExistingRegistries(miClient.getSession(), gridRow.getRowPrimaryKey()[0]);
+
+                        if (existingRegistries == 0) {
+                            params = new SGuiParams();
+                            params.getParamsMap().put(SModConsts.HRS_CFG_ACC_DED, gridRow.getRowPrimaryKey()[0]);
+                        }
+                        else {
+                            params = new SGuiParams(gridRow.getRowPrimaryKey());
+                        }
+
+                        miClient.getSession().showForm(SModConsts.HRS_CFG_ACC_DED, 0, params);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == mjCfgAccounting) {
+                actionPerformedCfgAccounting();
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -140,12 +141,27 @@ public class SDbCfgAccountingDepartment extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.READ_OK;
     }
 
+    /**
+     * Validate own bookkeeping account.
+     * @param session GUI session.
+     * @param forAccountingRecordType Validate for required accounting record type.
+     * @return
+     * @throws Exception 
+     */
+    public boolean validateAccount(final SGuiSession session, final int forAccountingRecordType) throws Exception {
+        boolean valid = true;
+        
+        valid = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, forAccountingRecordType == SModSysConsts.HRSS_TP_ACC_DEP || mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
+        
+        return valid;
+    }
+    
     @Override
     public boolean canSave(final SGuiSession session) throws SQLException, Exception {
         boolean can = super.canSave(session);
         
         if (can) {
-            can = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
+            can = validateAccount(session, 0);
         }
         
         return can;

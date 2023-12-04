@@ -18,10 +18,16 @@ import erp.mod.fin.db.SFinUtils;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -245,7 +251,7 @@ public abstract class SHrsFinUtils {
      * @return
      * @throws Exception 
      */
-    public static boolean validateAccountingSettingsForPayroll(final SGuiSession session, final int payrollId) throws Exception {
+    public static boolean validateAccountingSettingsOriginal(final SGuiSession session, final int payrollId) throws Exception {
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             try (Statement statementAcc = session.getStatement().getConnection().createStatement()) {
                 String sql = "SELECT DISTINCT " + SModConsts.HRS_ACC_EAR + " AS _move_type, "
@@ -322,17 +328,211 @@ public abstract class SHrsFinUtils {
         return true;
     }
     
-    /** Validate that all required settings of accounting configurations (dynamic proccessing) are ready and available.
-     * @param session User session.
-     * @param payrollId ID of payroll.
-     * @param employeeIds Array of ID of employees.
-     * @return <code>true</code> if all settings are ready and available.
-     * @throws java.lang.Exception
+    /**
+     * Retrive and validate accounting configuration for earning.
+     * @param session GUI session.
+     * @param earningId ID of accounting configuration to be retrieved and validated.
+     * @param earningName Name of earning.
+     * @param accountingRecordType Accounting record type of earning. (Constants declared in class <code>SModSysConsts</code> HRSS_TP_ACC_...)
+     * @return
+     * @throws Exception 
      */
-    public static boolean validateCfgAccountingSettings(final SGuiSession session, final int payrollId, final int[] employeeIds) throws Exception {
+    private static SDbCfgAccountingEarning retrieveCfgAccountingEarning(final SGuiSession session, final int earningId, final String earningName, final int accountingRecordType) throws Exception {
+        SDbCfgAccountingEarning cfg = (SDbCfgAccountingEarning) session.readRegistry(SModConsts.HRS_CFG_ACC_EAR, new int[] { earningId }, SDbConsts.MODE_STEALTH);
+        String msg = "La percepción '" + earningName + "', cuyo tipo de registro contable es '" + session.readField(SModConsts.HRSS_TP_ACC, new int[] { accountingRecordType }, SDbRegistry.FIELD_NAME) + "', ";
+
+        if (cfg.isRegistryNew()) {
+            throw new Exception(msg + "no tiene configuración de contabilización.");
+        }
+        else if (cfg.isDeleted()) {
+            throw new Exception(msg + "tiene eliminada su configuración de contabilización.");
+        }
+        else if (cfg.getFkAccountingRecordTypeId() != accountingRecordType) {
+            throw new Exception(msg + "tiene su configuración de contabilización para un tipo de registro contable distinto.");
+        }
+        
+        return cfg;
+    }
+    
+    /**
+     * Retrive and validate accounting configuration for deduction.
+     * @param session GUI session.
+     * @param deductionId ID of accounting configuration to be retrieved and validated.
+     * @param deductionName Name of deduction.
+     * @param accountingRecordType Accounting record type of deduction. (Constants declared in class <code>SModSysConsts</code> HRSS_TP_ACC_...)
+     * @return
+     * @throws Exception 
+     */
+    private static SDbCfgAccountingDeduction retrieveCfgAccountingDeduction(final SGuiSession session, final int deductionId, final String deductionName, final int accountingRecordType) throws Exception {
+        SDbCfgAccountingDeduction cfg = (SDbCfgAccountingDeduction) session.readRegistry(SModConsts.HRS_CFG_ACC_DED, new int[] { deductionId }, SDbConsts.MODE_STEALTH);
+        String msg = "La deducción '" + deductionName + "', cuyo tipo de registro contable es '" + session.readField(SModConsts.HRSS_TP_ACC, new int[] { accountingRecordType }, SDbRegistry.FIELD_NAME) + "', ";
+
+        if (cfg.isRegistryNew()) {
+            throw new Exception(msg + "no tiene configuración de contabilización.");
+        }
+        else if (cfg.isDeleted()) {
+            throw new Exception(msg + "tiene eliminada su configuración de contabilización.");
+        }
+        else if (cfg.getFkAccountingRecordTypeId() != accountingRecordType) {
+            throw new Exception(msg + "tiene su configuración de contabilización para un tipo de registro contable distinto.");
+        }
+        
+        return cfg;
+    }
+    
+    /**
+     * Retrive and validate accounting configuration for department.
+     * @param session GUI session.
+     * @param departmentId ID of accounting configuration to be retrieved and validated.
+     * @return
+     * @throws Exception 
+     */
+    private static SDbCfgAccountingDepartment retrieveCfgAccountingDepartment(final SGuiSession session, final int departmentId, final String deductionName) throws Exception {
+        SDbCfgAccountingDepartment cfg = (SDbCfgAccountingDepartment) session.readRegistry(SModConsts.HRS_CFG_ACC_DEP, new int[] { departmentId }, SDbConsts.MODE_STEALTH);
+        String msg = "El departamento '" + deductionName + "' ";
+
+        if (cfg.isRegistryNew()) {
+            throw new Exception(msg + "no tiene configuración de contabilización.");
+        }
+        else if (cfg.isDeleted()) {
+            throw new Exception(msg + "tiene eliminada su configuración de contabilización.");
+        }
+        
+        return cfg;
+    }
+    
+    /**
+     * Get suitable pack of cost centers for department.
+     * @param session GUI session.
+     * @param departmentId ID of required department.
+     * @param cutoff Date cutoff.
+     * @return 
+     */
+    public static int getSuitablePackCostCentersIdForDepartment(final SGuiSession session, final int departmentId, final Date cutoff) throws Exception {
+        int id = 0;
+        
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String sql;
             ResultSet resultSet;
+            
+            // lookup suitable setting considering its start of validity:
+            
+            sql = "SELECT fk_pack_cc "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP_PACK_CC) + " "
+                    + "WHERE NOT b_del AND id_dep = " + departmentId + " "
+                    + "AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
+                    + "ORDER BY dt_sta DESC, id_cfg_acc DESC "
+                    + "LIMIT 1;";
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        }
+        
+        return id;
+    }
+    
+    /**
+     * Get suitable pack of cost centers for employee.
+     * @param session GUI session.
+     * @param employeeId ID of required employee.
+     * @param cutoff Date cutoff.
+     * @return 
+     */
+    public static int getSuitablePackCostCentersIdForEmployee(final SGuiSession session, final int employeeId, final Date cutoff) throws Exception {
+        int id = 0;
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String sql;
+            ResultSet resultSet;
+            
+            // attempt to lookup suitable setting considering its period of validity:
+            
+            sql = "SELECT fk_pack_cc "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EMP_PACK_CC) + " "
+                    + "WHERE NOT b_del AND id_emp = " + employeeId + " "
+                    + "AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
+                    + "AND (dt_end_n IS NOT NULL AND dt_end_n >= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "') "
+                    + "ORDER BY dt_sta DESC, id_cfg_acc DESC "
+                    + "LIMIT 1;";
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+            
+            if (id == 0) {
+                // lookup suitable setting considering only its start of validity:
+            
+                sql = "SELECT fk_pack_cc "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EMP_PACK_CC) + " "
+                        + "WHERE NOT b_del AND id_emp = " + employeeId + " "
+                        + "AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
+                        + "AND dt_end_n IS NULL "
+                        + "ORDER BY dt_sta DESC, id_cfg_acc DESC "
+                        + "LIMIT 1;";
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    id = resultSet.getInt(1);
+                }
+            }
+        }
+        
+        return id;
+    }
+    
+    /**
+     * Get list of employees who have a suitable pack of cost centers.
+     * @param session GUI session.
+     * @param payrollId ID of payroll.
+     * @param cutoff Date cutoff.
+     * @return List of employees who have a suitable pack of cost centers.
+     * @throws java.lang.Exception 
+     */
+    public static ArrayList<Integer> getEmployeeIdsWithSuitablePackCostCenters(final SGuiSession session, final int payrollId, final Date cutoff) throws Exception {
+        ArrayList<Integer> employeeIds = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String sql = "SELECT pcc.id_emp "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EMP_PACK_CC) + " AS pcc "
+                    + "WHERE NOT pcc.b_del "
+                    + "AND pcc.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
+                    + "AND (pcc.dt_end_n IS NOT NULL AND pcc.dt_end_n >= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "') "
+                    + "AND pcc.id_emp IN (SELECT pr.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr WHERE pr.id_pay = " + payrollId + " AND NOT pr.b_del ORDER BY pr.id_emp) "
+                    + "UNION "
+                    + "SELECT pcc.id_emp "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EMP_PACK_CC) + " AS pcc "
+                    + "WHERE NOT pcc.b_del "
+                    + "AND pcc.dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
+                    + "AND pcc.dt_end_n IS NULL "
+                    + "AND pcc.id_emp IN (SELECT pr.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr WHERE pr.id_pay = " + payrollId + " AND NOT pr.b_del ORDER BY pr.id_emp) "
+                    + "ORDER BY id_emp;";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                employeeIds.add(resultSet.getInt(1));
+            }
+        }
+        
+        return employeeIds;
+    }
+    
+    /** Validate that all required settings of accounting configurations (dynamic proccessing) are ready and available.
+     * @param session User session.
+     * @param payrollId ID of payroll.
+     * @param cutoff Date cutoff.
+     * @param employeeIds Array of ID of employees.
+     * @return List of all validation exception messages, if they occur.
+     * @throws java.lang.Exception
+     */
+    public static ArrayList<String> validateAccountingSettingsDynamic(final SGuiSession session, final int payrollId, final Date cutoff, final int[] employeeIds) throws Exception {
+        ArrayList<String> exceptions = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement(); Statement statementAux = statement.getConnection().createStatement()) {
+            String sql;
+            ResultSet resultSet;
+            ResultSet resultSetAux;
+            HashSet<Integer> departmentsValidatedForDepSet = new HashSet<>();
+            HashSet<Integer> departmentsValidatedForEmpSet = new HashSet<>();
+            HashMap<Integer, SDbCfgAccountingDepartment> departmentsRetrievedMap = new HashMap<>();
             
             // validate payroll's earnings:
             
@@ -340,34 +540,190 @@ public abstract class SHrsFinUtils {
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e ON e.id_ear = pre.fk_ear "
                     + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
                     + "AND p.id_pay = " + payrollId + " AND pr.id_emp IN (" + StringUtils.join(ArrayUtils.toObject(employeeIds), ",") + ") "
                     + "ORDER BY e.code, e.name, e.id_ear;";
             resultSet = statement.executeQuery(sql);
+            EAR:
             while (resultSet.next()) {
-                switch (resultSet.getInt("e.fi_tp_acc_rec")) {
+                ArrayList<Integer> departmentIdsList = new ArrayList<>(); // to preserve alphabetical order of found departments
+                HashMap<Integer, String> departmentsMap = new HashMap<>(); // to preserve names of departments
+                int accountingRecordType = resultSet.getInt("e.fk_tp_acc_rec");
+                
+                // validate current earning's configuration:
+                try {
+                    SDbCfgAccountingEarning cfgAccountingEarning = retrieveCfgAccountingEarning(session, resultSet.getInt("e.id_ear"), resultSet.getString("e.name"), accountingRecordType);
+                    cfgAccountingEarning.validateAccount(session); // validate setting
+                }
+                catch (Exception e) {
+                    exceptions.add(e.getMessage());
+                    continue; // go to next earning
+                }
+                
+                switch (accountingRecordType) {
                     case SModSysConsts.HRSS_TP_ACC_GBL:
-                        SDbCfgAccountingEarning cfgAccountingEarning = (SDbCfgAccountingEarning) session.readRegistry(SModConsts.HRS_CFG_ACC_EAR, new int[] { resultSet.getInt("e.id_ear") });
+                        // nothing
                         break;
                         
                     case SModSysConsts.HRSS_TP_ACC_DEP:
                     case SModSysConsts.HRSS_TP_ACC_EMP:
+                        // retrieve departments in payroll of current earning:
+                        
+                        sql = "SELECT DISTINCT dep.name, dep.code, dep.id_dep "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                                + "AND p.id_pay = " + payrollId + " AND pr.id_emp IN (" + StringUtils.join(ArrayUtils.toObject(employeeIds), ",") + ") "
+                                + "AND pre.fk_ear = " + resultSet.getInt("e.id_ear") + " "
+                                + "ORDER BY dep.name, dep.code, dep.id_dep;";
+                        resultSetAux = statementAux.executeQuery(sql);
+                        while (resultSetAux.next()) {
+                            departmentIdsList.add(resultSetAux.getInt("dep.id_dep"));
+                            departmentsMap.put(resultSetAux.getInt("dep.id_dep"), resultSetAux.getString("dep.name") + " - " + resultSetAux.getString("dep.code"));
+                        }
+                        
+                        for (Integer departmentId : departmentIdsList) {
+                            HashSet<Integer> setDepartmentsValidated = accountingRecordType == SModSysConsts.HRSS_TP_ACC_DEP ? departmentsValidatedForDepSet : departmentsValidatedForEmpSet; // both accounting record types validate the same way
+                            
+                            if (!setDepartmentsValidated.contains(departmentId)) {
+                                try {
+                                    SDbCfgAccountingDepartment cfgAccountingDepartment = departmentsRetrievedMap.get(departmentId); // prevent from reading the same setting over and over again
+
+                                    if (cfgAccountingDepartment == null) {
+                                        cfgAccountingDepartment = retrieveCfgAccountingDepartment(session, departmentId, departmentsMap.get(departmentId));
+                                        departmentsRetrievedMap.put(departmentId, cfgAccountingDepartment);
+                                    }
+
+                                    // validate setting and preserve result for corresponding accounting record type:
+
+                                    if (cfgAccountingDepartment.validateAccount(session, accountingRecordType)) {
+                                        if (checkIfAccountRequiresCostCenter(session, cfgAccountingDepartment.getFkAccountId())) {
+                                            int id = getSuitablePackCostCentersIdForDepartment(session, departmentId, cutoff);
+                                            if (id == 0) {
+                                                throw new Exception("La cuenta contable de la configuración de contabilizción del departamento '" + departmentsMap.get(departmentId) + "' requiere centro de costos,\n"
+                                                        + "pero no hay un paquete de centro de costos cuya vigencia de asignación a este departamento corresponda para la fecha '" + SLibUtils.DateFormatDate.format(cutoff)+ "'.");
+                                            }
+                                        }
+
+                                        setDepartmentsValidated.add(departmentId);
+                                    }
+                                }
+                                catch (Exception e) {
+                                    exceptions.add(e.getMessage());
+                                    continue EAR; // go to next earning
+                                }
+                            }
+                        }
                         break;
                         
                     default:
-                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
+                        exceptions.add(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
                                 + "(Tipo de registro contable en la configuración de contabilización de la percepción '" + resultSet.getString("e.name") + "'.)");
+                }
+            }
+            
+            // validate payroll's deductions:
+            
+            sql = "SELECT DISTINCT d.code, d.name, d.id_ded, d.fk_tp_acc_rec "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS d ON d.id_ded = prd.fk_ded "
+                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
+                    + "AND p.id_pay = " + payrollId + " AND pr.id_emp IN (" + StringUtils.join(ArrayUtils.toObject(employeeIds), ",") + ") "
+                    + "ORDER BY d.code, d.name, d.id_ded;";
+            resultSet = statement.executeQuery(sql);
+            DED:
+            while (resultSet.next()) {
+                ArrayList<Integer> departmentIdsList = new ArrayList<>(); // to preserve alphabetical order of found departments
+                HashMap<Integer, String> departmentsMap = new HashMap<>(); // to preserve names of departments
+                int accountingRecordType = resultSet.getInt("d.fk_tp_acc_rec");
+                
+                // validate current deduction's configuration:
+                try {
+                    SDbCfgAccountingDeduction cfgAccountingDeduction = retrieveCfgAccountingDeduction(session, resultSet.getInt("d.id_ded"), resultSet.getString("d.name"), accountingRecordType);
+                    cfgAccountingDeduction.validateAccount(session); // validate setting
+                }
+                catch (Exception e) {
+                    exceptions.add(e.getMessage());
+                    continue; // go to next deduction
+                }
+                
+                switch (accountingRecordType) {
+                    case SModSysConsts.HRSS_TP_ACC_GBL:
+                        // nothing
+                        break;
+                        
+                    case SModSysConsts.HRSS_TP_ACC_DEP:
+                    case SModSysConsts.HRSS_TP_ACC_EMP:
+                        // retrieve departments in payroll of current deduction:
+                        
+                        sql = "SELECT DISTINCT dep.name, dep.code, dep.id_dep "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
+                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
+                                + "AND p.id_pay = " + payrollId + " AND pr.id_emp IN (" + StringUtils.join(ArrayUtils.toObject(employeeIds), ",") + ") "
+                                + "AND prd.fk_ded = " + resultSet.getInt("d.id_ded") + " "
+                                + "ORDER BY dep.name, dep.code, dep.id_dep;";
+                        resultSetAux = statementAux.executeQuery(sql);
+                        while (resultSetAux.next()) {
+                            departmentIdsList.add(resultSetAux.getInt("dep.id_dep"));
+                            departmentsMap.put(resultSetAux.getInt("dep.id_dep"), resultSetAux.getString("dep.name") + " - " + resultSetAux.getString("dep.code"));
+                        }
+                        
+                        for (Integer departmentId : departmentIdsList) {
+                            try {
+                                HashSet<Integer> setDepartmentsValidated = accountingRecordType == SModSysConsts.HRSS_TP_ACC_DEP ? departmentsValidatedForDepSet : departmentsValidatedForEmpSet; // both accounting record types validate the same way
+
+                                if (!setDepartmentsValidated.contains(departmentId)) {
+                                    SDbCfgAccountingDepartment cfgAccountingDepartment = departmentsRetrievedMap.get(departmentId); // prevent from reading the same setting over and over again
+
+                                    if (cfgAccountingDepartment == null) {
+                                        cfgAccountingDepartment = retrieveCfgAccountingDepartment(session, departmentId, departmentsMap.get(departmentId));
+                                        departmentsRetrievedMap.put(departmentId, cfgAccountingDepartment);
+                                    }
+
+                                    // validate setting and preserve result for corresponding accounting record type:
+
+                                    if (cfgAccountingDepartment.validateAccount(session, accountingRecordType)) {
+                                        if (checkIfAccountRequiresCostCenter(session, cfgAccountingDepartment.getFkAccountId())) {
+                                            int id = getSuitablePackCostCentersIdForDepartment(session, departmentId, cutoff);
+                                            if (id == 0) {
+                                                throw new Exception("La cuenta contable de la configuración de contabilizción del departamento '" + departmentsMap.get(departmentId) + "' requiere centro de costos,\n"
+                                                        + "pero no hay un paquete de centro de costos cuya vigencia de asignación a este departamento corresponda para la fecha '" + SLibUtils.DateFormatDate.format(cutoff)+ "'.");
+                                            }
+                                        }
+
+                                        setDepartmentsValidated.add(departmentId);
+                                    }
+                                }
+                            }
+                            catch (Exception e) {
+                                exceptions.add(e.getMessage());
+                                continue DED; // go to next deduction
+                            }
+                        }
+                        break;
+                        
+                    default:
+                        exceptions.add(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
+                                + "(Tipo de registro contable en la configuración de contabilización de la deducción '" + resultSet.getString("d.name") + "'.)");
                 }
             }
         }
         
-        return true;
+        return exceptions;
     }
     
     /**
      * Get account by its numeric ID.
-     * @param session
-     * @param accountId
+     * @param session GUI session.
+     * @param accountId Account numeric ID.
      * @return 
      */
     public static SDataAccount getAccount(final SGuiSession session, final int accountId) {
@@ -377,8 +733,8 @@ public abstract class SHrsFinUtils {
     
     /**
      * Get ledger account from given account.
-     * @param session
-     * @param account
+     * @param session GUI session.
+     * @param account Account.
      * @return 
      */
     public static SDataAccount getAccountLedger(final SGuiSession session, SDataAccount account) {
@@ -387,8 +743,8 @@ public abstract class SHrsFinUtils {
     
     /**
      * Get cost center by its numeric ID.
-     * @param session
-     * @param costCenterId
+     * @param session GUI session.
+     * @param costCenterId Cost center numeric ID.
      * @return 
      */
     public static SDataCostCenter getCostCenter(final SGuiSession session, final int costCenterId) {
@@ -398,8 +754,8 @@ public abstract class SHrsFinUtils {
     
     /**
      * Validate account.
-     * @param session
-     * @param account
+     * @param session GUI session.
+     * @param account Account to validate.
      * @throws Exception 
      */
     private static void validateAccount(final SGuiSession session, SDataAccount account, final boolean validatingLedger) throws Exception {
@@ -413,8 +769,8 @@ public abstract class SHrsFinUtils {
     
     /**
      * Validate cost center.
-     * @param session
-     * @param costCenter
+     * @param session GUI session.
+     * @param costCenter Cost center to validate.
      * @throws Exception 
      */
     private static void validateCostCenter(final SGuiSession session, SDataCostCenter costCenter) throws Exception {
@@ -426,20 +782,74 @@ public abstract class SHrsFinUtils {
         }
     }
     
+    /**
+     * Check if account's type for results.
+     * @param account Account to check.
+     * @return 
+     */
     public static boolean isAccountTypeForResults(final SDataAccount account) {
         return account.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES;
     }
     
+    /**
+     * Check if account's type for business partner.
+     * @param account Account to check.
+     * @return 
+     */
     public static boolean isAccountSystemTypeForBizPartner(final SDataAccount account) {
         int[] types = new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR };
         
         return SLibUtils.belongsTo(account.getFkAccountSystemTypeId(), types);
     }
     
+    /**
+     * Check if account's type for tax.
+     * @param account Account to check.
+     * @return 
+     */
     public static boolean isAccountSystemTypeForTax(final SDataAccount account) {
         int[] types = new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT };
         
         return SLibUtils.belongsTo(account.getFkAccountSystemTypeId(), types);
+    }
+    
+    /**
+     * Check if cost center is required.
+     * @param session GUI session.
+     * @param accountId Account numeric ID to check.
+     * @return 
+     */
+    public static boolean checkIfAccountRequiresCostCenter(final SGuiSession session, final int accountId) {
+        SDataAccount account = SHrsFinUtils.getAccount(session, accountId);
+        SDataAccount accountLedger = SHrsFinUtils.getAccountLedger(session, account);
+        
+        return account.getIsRequiredCostCenter() || accountLedger.getIsRequiredCostCenter() || SHrsFinUtils.isAccountTypeForResults(accountLedger);
+    }
+    
+    /**
+     * Check if item is required.
+     * @param session GUI session.
+     * @param accountId Account numeric ID to check.
+     * @return 
+     */
+    public static boolean checkIfAccountRequiresItem(final SGuiSession session, final int accountId) {
+        SDataAccount account = SHrsFinUtils.getAccount(session, accountId);
+        SDataAccount accountLedger = SHrsFinUtils.getAccountLedger(session, account);
+        
+        return account.getIsRequiredItem() || accountLedger.getIsRequiredItem() || SHrsFinUtils.isAccountTypeForResults(accountLedger);
+    }
+    
+    /**
+     * Check if business partner is required.
+     * @param session GUI session.
+     * @param accountId Account numeric ID to check.
+     * @return 
+     */
+    public static boolean checkIfAccountRequiresBizPartner(final SGuiSession session, final int accountId) {
+        SDataAccount account = SHrsFinUtils.getAccount(session, accountId);
+        SDataAccount accountLedger = SHrsFinUtils.getAccountLedger(session, account);
+        
+        return account.getIsRequiredBizPartner()|| accountLedger.getIsRequiredBizPartner() || SHrsFinUtils.isAccountSystemTypeForBizPartner(accountLedger);
     }
     
     /**

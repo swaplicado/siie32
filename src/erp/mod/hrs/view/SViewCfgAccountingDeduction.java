@@ -43,7 +43,7 @@ public class SViewCfgAccountingDeduction extends SGridPaneView implements Action
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "") + "ca.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "") + "NOT ca.b_del AND NOT ded.b_del ";
         }
 
         msSql = "SELECT "
@@ -88,16 +88,16 @@ public class SViewCfgAccountingDeduction extends SGridPaneView implements Action
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " deducción"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ta.name", SGridConsts.COL_TITLE_TYPE + " registro contable"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ta_ok", "Coincidencia registro contable deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "pe.name", SGridConsts.COL_TITLE_NAME + " paquete gastos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "pe.code", SGridConsts.COL_TITLE_CODE + " paquete gastos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "_acc", "No. cuenta contable"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "acc.acc", "Cuenta contable"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bb.bp", "Asociado negocios"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tax.tax", "Impuesto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ta_ok", "Coincidencia registro contable deducción"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ta.name", SGridConsts.COL_TITLE_TYPE + " registro contable"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pcc.name", SGridConsts.COL_TITLE_NAME + " paquete centros costo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "pcc.code", SGridConsts.COL_TITLE_CODE + " paquete centros costo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bb.bp", "Asociado negocios"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tax.tax", "Impuesto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "ded.b_del", SGridConsts.COL_TITLE_IS_DEL + " deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

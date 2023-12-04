@@ -60,6 +60,24 @@ public class SDbPackExpenses extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public ArrayList<SDbPackExpensesItem> getChildItems() { return maChildItems; }
+    
+    /**
+     * Get expense item by expense type.
+     * @param expenseType ID of expense type. Constants declared in SModSysConsts.HRSS_TP_EXP_
+     * @return 
+     */
+    public SDbPackExpensesItem getChildItem(final int expenseType) {
+        SDbPackExpensesItem item = null;
+        
+        for (SDbPackExpensesItem child : maChildItems) {
+            if (child.getPkExpenseTypeId() == expenseType) {
+                item = child;
+                break;
+            }
+        }
+        
+        return item;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

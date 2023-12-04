@@ -60,6 +60,16 @@ public class SDbPackCostCenters extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public ArrayList<SDbPackCostCentersCostCenter> getChildCostCenters() { return maChildCostCenters; }
+    
+    public double[] getProrationPercentages() {
+        double[] percentages = new double[getChildCostCenters().size()];
+        
+        for (int i = 0; i < maChildCostCenters.size(); i++) {
+            percentages[i] = maChildCostCenters.get(i).getProrationPercentage();
+        }
+        
+        return percentages;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

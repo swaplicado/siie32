@@ -10,6 +10,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
@@ -161,10 +162,12 @@ public class SDbDepartment extends SDbRegistryUser {
             
             // read child registry:
             
-            msSql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + getSqlWhere();
-            resultSet = session.getStatement().executeQuery(msSql);
-            if (resultSet.getInt(1) > 0) {
-                moChildCfgAccountingDepartment = (SDbCfgAccountingDepartment) session.readRegistry(SModConsts.HRS_CFG_ACC_DEP, new int[] { mnPkDepartmentId });
+            try (Statement statement = session.getStatement().getConnection().createStatement()) {
+                msSql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " " + getSqlWhere();
+                resultSet = statement.executeQuery(msSql);
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    moChildCfgAccountingDepartment = (SDbCfgAccountingDepartment) session.readRegistry(SModConsts.HRS_CFG_ACC_DEP, new int[] { mnPkDepartmentId });
+                }
             }
 
             // finish reading this registry:
@@ -234,9 +237,9 @@ public class SDbDepartment extends SDbRegistryUser {
         
         // save accounting configuration:
         
-        int payrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+        int paramPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
         
-        switch (payrollAccProcess) {
+        switch (paramPayrollAccProcess) {
             case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
                 if (mbRegistryNew) {
                     SHrsAccounting accounting = new SHrsAccounting(session);

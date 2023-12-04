@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewDepartment extends SGridPaneView {
 
-    private int mnPayrollAccProcess;
+    private int mnParamPayrollAccProcess;
     
     public SViewDepartment(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, title);
@@ -35,7 +35,7 @@ public class SViewDepartment extends SGridPaneView {
         setRowButtonsEnabled(true, true, true, false, true);
         
         try {
-            mnPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+            mnParamPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -65,6 +65,7 @@ public class SViewDepartment extends SGridPaneView {
                 + "v.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", "
                 + "COALESCE(d.name, '') AS _dep_sup, "
                 + "COALESCE(bp.bp, '') AS _emp_head, "
+                + "IF(caccd.id_dep IS NULL, " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_OK + ") AS _ico_cfg, "
                 + "cte.name AS _cte_name, "
                 + "cacc.id_acc, cacc.acc, "
                 + "cbp.bp AS _cbp_name, "
@@ -93,7 +94,7 @@ public class SViewDepartment extends SGridPaneView {
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS cbp ON "
                 + "caccd.fk_bp_n = cbp.id_bp "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FINU_TAX) + " AS ctax ON "
-                + "caccd.fk_tax_bas_n = ctax.id_tax_bas AND caccd.fk_tax_n = ctax.id_tax "
+                + "caccd.fk_tax_bas_n = ctax.id_tax_bas AND caccd.fk_tax_tax_n = ctax.id_tax "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.name, v.id_dep ";
     }
@@ -109,7 +110,8 @@ public class SViewDepartment extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "_dep_sup", "Depto. superior"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_head", "Titular depto."));
         
-        if (mnPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_DYNAMIC) {
+        if (mnParamPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_DYNAMIC) {
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico_cfg", "Configuración contabilización"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "_cte_name", "Tipo gasto"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "cacc.id_acc", "No. cuenta contable"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "cacc.acc", "Cuenta contable"));
@@ -131,11 +133,11 @@ public class SViewDepartment extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.HRSU_EMP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
         
-        if (mnPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_DYNAMIC) {
-            moSuscriptionsSet.add(SModConsts.HRSU_TP_EXP);
-            moSuscriptionsSet.add(SModConsts.FIN_ACC);
-            moSuscriptionsSet.add(SModConsts.BPSU_BP);
-            moSuscriptionsSet.add(SModConsts.FINU_TAX);
-        }
+        // suscriptions when dynamic processing of accounting has been set in configuration:
+        moSuscriptionsSet.add(SModConsts.HRSU_TP_EXP);
+        moSuscriptionsSet.add(SModConsts.HRS_CFG_ACC_DEP);
+        moSuscriptionsSet.add(SModConsts.FIN_ACC);
+        moSuscriptionsSet.add(SModConsts.BPSU_BP);
+        moSuscriptionsSet.add(SModConsts.FINU_TAX);
     }
 }

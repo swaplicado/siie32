@@ -5,6 +5,7 @@
 
 package erp.mod.hrs.db;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.utils.SAnniversary;
@@ -38,6 +39,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public static final int FIELD_ACTIVE = FIELD_BASE + 1;
     public static final int FIELD_DATE_LAST_HIRE = FIELD_BASE + 2;
     public static final int FIELD_DATE_LAST_DISMISS = FIELD_BASE + 3;
+    public static final int FIELD_BRANCH_HQ = FIELD_BASE + 11;
 
     protected int mnPkEmployeeId;
     protected String msNumber;
@@ -880,6 +882,9 @@ public class SDbEmployee extends SDbRegistryUser {
             case FIELD_CODE:
                 msSql += "num FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " WHERE id_emp = " + pk[0] + ";";
                 break;
+            case FIELD_BRANCH_HQ:
+                msSql += "id_bpb FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " WHERE fid_bp = " + pk[0] + " AND fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + ";";
+                break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -894,6 +899,9 @@ public class SDbEmployee extends SDbRegistryUser {
                 case FIELD_NAME:
                 case FIELD_CODE:
                     value = resultSet.getString(1);
+                    break;
+                case FIELD_BRANCH_HQ:
+                    value = resultSet.getInt(1);
                     break;
                 default:
             }

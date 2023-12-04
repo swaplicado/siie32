@@ -32,7 +32,7 @@ import sa.lib.gui.bean.SBeanForm;
 public class SFormDepartment extends SBeanForm implements ActionListener {
 
     private SDbDepartment moRegistry;
-    private int mnPayrollAccProcess;
+    private int mnParamPayrollAccProcess;
 
     /**
      * Creates new form SFormDepartment
@@ -278,7 +278,7 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
         moKeyExpenseType.setNextField(moPanelAccount.getTextNumberFirst());
         
         try {
-            mnPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+            mnParamPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -390,7 +390,7 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
         moKeyBizPartner.resetField();
         moKeyTax.resetField();
         
-        switch (mnPayrollAccProcess) {
+        switch (mnParamPayrollAccProcess) {
             case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
                 moKeyExpenseType.setEnabled(false);
                 moPanelAccount.setPanelEditable(false);
@@ -448,7 +448,7 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
         
         // getting accounting configuration:
         
-        switch (mnPayrollAccProcess) {
+        switch (mnParamPayrollAccProcess) {
             case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
                 registry.setChildCfgAccountingDepartment(null);
                 break;
@@ -463,9 +463,9 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
                 
                 child.setFkExpenseTypeId(moKeyExpenseType.getValue()[0]);
                 child.setFkAccountId(moPanelAccount.getSelectedAccount().getAccountId());
-                child.setFkBizPartnerId_n(moKeyBizPartner.getValue()[0]);
-                child.setFkTaxBasicId_n(moKeyTax.getValue()[0]);
-                child.setFkTaxTaxId_n(moKeyTax.getValue()[1]);
+                child.setFkBizPartnerId_n(moKeyBizPartner.getSelectedIndex() <= 0 ? 0 : moKeyBizPartner.getValue()[0]);
+                child.setFkTaxBasicId_n(moKeyTax.getSelectedIndex() <= 0 ? 0 : moKeyTax.getValue()[0]);
+                child.setFkTaxTaxId_n(moKeyTax.getSelectedIndex() <= 0 ? 0 : moKeyTax.getValue()[1]);
                 break;
                 
             default:
@@ -485,7 +485,7 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
                 validation.setComponent(moKeyDepartmentSuperior);
             }
             else {
-                switch (mnPayrollAccProcess) {
+                switch (mnParamPayrollAccProcess) {
                     case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
                         break;
 

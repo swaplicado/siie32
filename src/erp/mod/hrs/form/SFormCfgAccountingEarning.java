@@ -7,7 +7,6 @@ package erp.mod.hrs.form;
 import erp.data.SDataConstantsSys;
 import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModDataConsts;
 import erp.mod.SModSysConsts;
@@ -67,15 +66,18 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         jPanel8 = new javax.swing.JPanel();
         jlAccountingRecordType = new javax.swing.JLabel();
         jtfAccountingRecordType = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jlPackExpenses = new javax.swing.JLabel();
+        moKeyPackExpenses = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel3 = new javax.swing.JPanel();
+        jlAccountingRecordTypeHelp = new javax.swing.JLabel();
+        jlAccountingRecordTypeHelpText = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         moPanelAccount = new erp.gui.account.SBeanPanelAccount();
         jPanel14 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlPackCostCenters = new javax.swing.JLabel();
         moKeyPackCostCenters = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel4 = new javax.swing.JPanel();
-        jlPackExpenses = new javax.swing.JLabel();
-        moKeyPackExpenses = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel5 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
         moKeyBizPartner = new sa.lib.gui.bean.SBeanFieldKey();
@@ -92,7 +94,7 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
 
         jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel12.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel12.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -119,6 +121,27 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
 
         jPanel12.add(jPanel8);
 
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPackExpenses.setText("Paquete gastos:*");
+        jlPackExpenses.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlPackExpenses);
+
+        moKeyPackExpenses.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel4.add(moKeyPackExpenses);
+
+        jPanel12.add(jPanel4);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlAccountingRecordTypeHelp);
+
+        jlAccountingRecordTypeHelpText.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel3.add(jlAccountingRecordTypeHelpText);
+
+        jPanel12.add(jPanel3);
+
         jPanel2.add(jPanel12, java.awt.BorderLayout.NORTH);
 
         jPanel10.setLayout(new java.awt.BorderLayout());
@@ -126,7 +149,7 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
 
         jPanel2.add(jPanel10, java.awt.BorderLayout.CENTER);
 
-        jPanel14.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel14.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -138,17 +161,6 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         jPanel7.add(moKeyPackCostCenters);
 
         jPanel14.add(jPanel7);
-
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPackExpenses.setText("Paquete gastos:*");
-        jlPackExpenses.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlPackExpenses);
-
-        moKeyPackExpenses.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel4.add(moKeyPackExpenses);
-
-        jPanel14.add(jPanel4);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -210,6 +222,7 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -220,6 +233,8 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
     private javax.swing.JButton jbPickBizPartner;
     private javax.swing.JButton jbPickTax;
     private javax.swing.JLabel jlAccountingRecordType;
+    private javax.swing.JLabel jlAccountingRecordTypeHelp;
+    private javax.swing.JLabel jlAccountingRecordTypeHelpText;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlEarning;
     private javax.swing.JLabel jlPackCostCenters;
@@ -238,22 +253,22 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         SGuiUtils.setWindowBounds(this, 640, 400);
 
         moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning), true);
+        moKeyPackExpenses.setKeySettings(miClient, SGuiUtils.getLabelName(jlPackExpenses), true);
         moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, true);
         moKeyPackCostCenters.setKeySettings(miClient, SGuiUtils.getLabelName(jlPackCostCenters), true);
-        moKeyPackExpenses.setKeySettings(miClient, SGuiUtils.getLabelName(jlPackExpenses), true);
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), false);
         moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), false);
 
         moPanelAccount.setAccountNameWidth(500);
 
-        moPanelAccount.setComponentPrevious(moKeyEarning);
-        moPanelAccount.setComponentNext(moKeyPackExpenses); // this control stands after cost centers package, but the latter is not always enabled
+        moPanelAccount.setComponentPrevious(moKeyPackExpenses);
+        moPanelAccount.setComponentNext(moKeyPackCostCenters);
         
         moPanelAccount.initPanel();
         
         moFields.addField(moKeyEarning);
-        moFields.addField(moKeyPackCostCenters);
         moFields.addField(moKeyPackExpenses);
+        moFields.addField(moKeyPackCostCenters);
         moFields.addField(moKeyBizPartner);
         moFields.addField(moKeyTax);
 
@@ -310,15 +325,36 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         moKeyTax.requestFocus();
     }
     
-    private void updatePackCostCentersStatus() {
-        moKeyPackCostCenters.setEnabled(moEarning != null && moEarning.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL);
+    private void updateAccountComplements() {
+        boolean enable = moEarning != null && moEarning.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL;
+        
+        moPanelAccount.setPanelEditable(enable);
+        moKeyPackCostCenters.setEnabled(enable);
+        moKeyBizPartner.setEnabled(enable);
+        jbPickBizPartner.setEnabled(enable);
+        jbClearBizPartner.setEnabled(enable);
+        moKeyTax.setEnabled(enable);
+        jbPickTax.setEnabled(enable);
+        jbClearTax.setEnabled(enable);
     }
     
     private void itemStateChangedEarning() {
         moEarning = null;
+        
+        moPanelAccount.setPanelEditable(false);
+        moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
         jtfAccountingRecordType.setText("");
+        jlAccountingRecordTypeHelpText.setText("");
         moKeyPackCostCenters.setEnabled(false);
         moKeyPackCostCenters.setValue(new int[] { SDataConstantsSys.NA });
+        moKeyBizPartner.setEnabled(false);
+        moKeyBizPartner.resetField();
+        jbPickBizPartner.setEnabled(false);
+        jbClearBizPartner.setEnabled(false);
+        moKeyTax.setEnabled(false);
+        moKeyTax.resetField();
+        jbPickTax.setEnabled(false);
+        jbClearTax.setEnabled(false);
         
         if (moKeyEarning.getSelectedIndex() > 0) {
             moEarning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, moKeyEarning.getValue());
@@ -328,7 +364,14 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
             jtfAccountingRecordType.setText((String) miClient.getSession().readField(SModConsts.HRSS_TP_ACC, new int[] { moEarning.getFkAccountingRecordTypeId() }, SDbRegistry.FIELD_NAME));
             jtfAccountingRecordType.setCaretPosition(0);
             
-            updatePackCostCentersStatus();
+            if (moEarning.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL) {
+                jlAccountingRecordTypeHelpText.setText("(¡Es necesario especificar una cuenta contable para contabilizar esta percepción!)");
+            }
+            else {
+                jlAccountingRecordTypeHelpText.setText("(No es necesario especificar una cuenta contable.)");
+            }
+            
+            updateAccountComplements();
         }
     }
     
@@ -385,13 +428,13 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         moKeyEarning.setValue(new int[] { moRegistry.getPkEarningId() });
         itemStateChangedEarning();
         moKeyPackCostCenters.setValue(new int[] { moRegistry.getFkPackCostCentersId() });
-        moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountId() }, SDbRegistry.FIELD_CODE), "", false, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED));
+        moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
         moKeyPackExpenses.setValue(new int[] { moRegistry.getFkPackExpensesId() });
         moKeyBizPartner.setValue(new int[] { moRegistry.getFkBizPartnerId_n() });
         moKeyTax.setValue(new int[] { moRegistry.getFkTaxBasicId_n(), moRegistry.getFkTaxTaxId_n() });
         
         setFormEditable(true);
-        updatePackCostCentersStatus();
+        updateAccountComplements();
         
         if (moRegistry.isRegistryNew()) {
             moKeyEarning.setEnabled(true);
@@ -448,6 +491,19 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         }
             
         return validation;
+    }
+    
+    @Override
+    public void setValue(final int type, final Object value) {
+        switch (type) {
+            case SModConsts.HRS_CFG_ACC_EAR:
+                moKeyEarning.setValue(new int[] { (int) value });
+                moKeyEarning.setEnabled(false);
+                break;
+                
+            default:
+                // nothing
+        }
     }
 
     @Override

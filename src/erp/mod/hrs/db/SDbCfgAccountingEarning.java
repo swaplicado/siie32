@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -154,6 +155,53 @@ public class SDbCfgAccountingEarning extends SDbRegistryUser {
 
         mnQueryResultId = SDbConsts.READ_OK;
     }
+
+    /**
+     * Validate own bookkeeping account.
+     * @param session GUI session.
+     * @return
+     * @throws Exception 
+     */
+    public boolean validateAccount(final SGuiSession session) throws Exception {
+        boolean valid = true;
+        
+        if (mnFkAccountId == 0) {
+            throw new Exception("Se debe especificar una cuenta contable.");
+        }
+
+        boolean isAccountingRecordTypeGlobal = mnFkAccountingRecordTypeId == SModSysConsts.HRSS_TP_ACC_GBL; // convenience variable
+
+        if (isAccountingRecordTypeGlobal) {
+            if (mnFkAccountId == SDataConstantsSys.NA) {
+                throw new Exception("Se debe especificar una cuenta contable, porque el tipo de registro contable de la percepción es '" + session.readField(SModConsts.HRSS_TP_ACC, new int[] { SModSysConsts.HRSS_TP_ACC_GBL }, SDbRegistry.FIELD_NAME) + "'.");
+            }
+        }
+        else {
+            if (mnFkAccountId != SDataConstantsSys.NA) {
+                throw new Exception("No se debe especificar una cuenta contable. Sólo es necesaria si el tipo de registro contable de la percepción es '" + session.readField(SModConsts.HRSS_TP_ACC, new int[] { SModSysConsts.HRSS_TP_ACC_GBL }, SDbRegistry.FIELD_NAME) + "'.");
+            }
+        }
+        
+        if (mnFkAccountId != SDataConstantsSys.NA) {
+            valid = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, isAccountingRecordTypeGlobal || mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
+
+            if (valid) {
+                SDataAccount account = SHrsFinUtils.getAccount(session, mnFkAccountId);
+
+                if (SHrsFinUtils.checkIfAccountRequiresItem(session, mnFkAccountId) && (mnFkPackExpensesId == 0 || mnFkPackExpensesId == SModSysConsts.HRSU_PACK_EXP_NA)) {
+                    throw new Exception("Se debe especificar un paquete de gastos porque así lo requiere la cuenta contable '" + account.getPkAccountIdXXX() + " " + account.getAccount() + "'.");
+                }
+
+                if (isAccountingRecordTypeGlobal) {
+                    if (SHrsFinUtils.checkIfAccountRequiresCostCenter(session, mnFkAccountId) && (mnFkPackCostCentersId == 0 || mnFkPackCostCentersId == SModSysConsts.HRS_PACK_CC_NA)) {
+                        throw new Exception("Se debe especificar un paquete de centros de costo porque así lo requiere la cuenta contable '" + account.getPkAccountIdXXX() + " " + account.getAccount() + "'.");
+                    }
+                }
+            }
+        }
+        
+        return valid;
+    }
     
     @Override
     public boolean canSave(final SGuiSession session) throws SQLException, Exception {
@@ -167,35 +215,7 @@ public class SDbCfgAccountingEarning extends SDbRegistryUser {
                 }
             }
             
-            if (mnFkAccountId == 0) {
-                throw new Exception("Se debe especificar una cuenta contable.");
-            }
-            
-            boolean isAccountingRecordTypeGlobal = mnFkAccountingRecordTypeId == SModSysConsts.HRSS_TP_ACC_GBL; // convenience variable
-            
-            if (isAccountingRecordTypeGlobal) {
-                if (mnFkAccountId == SDataConstantsSys.NA) {
-                    throw new Exception("Se debe especificar una cuenta contable, porque el tipo de registro contable de la percepción es 'global'.");
-                }
-            }
-            else {
-                can = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, isAccountingRecordTypeGlobal || mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
-
-                if (can) {
-                    SDataAccount account = SHrsFinUtils.getAccount(session, mnFkAccountId);
-                    SDataAccount accountLedger = SHrsFinUtils.getAccountLedger(session, account);
-
-                    if ((account.getIsRequiredItem() || accountLedger.getIsRequiredItem() || SHrsFinUtils.isAccountTypeForResults(accountLedger)) && (mnFkPackExpensesId == 0 || mnFkPackExpensesId == SModSysConsts.HRSU_PACK_EXP_NA)) {
-                        throw new Exception("Se debe especificar un paquete de gastos porque así lo requiere la cuenta contable '" + account.getPkAccountIdXXX() + " " + account.getAccount() + "'.");
-                    }
-
-                    if (isAccountingRecordTypeGlobal) {
-                        if ((account.getIsRequiredCostCenter() || accountLedger.getIsRequiredCostCenter() || SHrsFinUtils.isAccountTypeForResults(accountLedger)) && (mnFkPackCostCentersId == 0 || mnFkPackCostCentersId == SModSysConsts.HRS_PACK_CC_NA)) {
-                            throw new Exception("Se debe especificar un paquete de centros de costo porque así lo requiere la cuenta contable '" + account.getPkAccountIdXXX() + " " + account.getAccount() + "'.");
-                        }
-                    }
-                }
-            }
+            can = validateAccount(session);
         }
         
         return can;
@@ -279,9 +299,16 @@ public class SDbCfgAccountingEarning extends SDbRegistryUser {
         return registry;
     }
     
-    public static final int countExistingRegistries(final SGuiSession session, final int idToCount) throws Exception {
+    /**
+     * Count existing registries of accounting configuration for this earning.
+     * @param session GUI session.
+     * @param idToBeCounted Earning ID to counted.
+     * @return
+     * @throws Exception 
+     */
+    public static final int countExistingRegistries(final SGuiSession session, final int idToBeCounted) throws Exception {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EAR) + " WHERE id_ear = " + idToCount + ";";
+        String sql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EAR) + " WHERE id_ear = " + idToBeCounted + ";";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             if (resultSet.next()) {

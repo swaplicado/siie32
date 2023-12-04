@@ -41,7 +41,7 @@ public class SViewPackCostCentersCostCenter extends SGridPaneView {
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "pc.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "NOT pc.b_del ";
         }
 
         msSql = "SELECT "
