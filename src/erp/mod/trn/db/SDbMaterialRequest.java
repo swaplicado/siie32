@@ -21,7 +21,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Edwin Carmona
  */
 public class SDbMaterialRequest extends SDbRegistryUser {
     
@@ -74,6 +74,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnAuxReqAuthStatusIdOld;
     protected int mnAuxReqProvStatusIdOld;
     protected int mnAuxReqPurStatusIdOld;
+    protected String msAuxNotesChangeStatus_n;
     protected String msAuxProvEntName;
     
     protected String msAuxAuthUser;
@@ -127,6 +128,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxReqAuthStatusIdOld(int n) { mnAuxReqAuthStatusIdOld = n; }
     public void setAuxReqProvStatusIdOld(int n) { mnAuxReqProvStatusIdOld = n; }
     public void setAuxReqPurStatusIdOld(int n) { mnAuxReqPurStatusIdOld = n; }
+    public void setAuxNotesChangeStatus_n(String s) { msAuxNotesChangeStatus_n = s; }
     
     public void setAuxLastProvClosedSta(boolean b) { mbAuxLastProvClosedSta = b; }
     public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
@@ -175,7 +177,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getAuxReqAuthStatusId() { return mnAuxReqAuthStatusId; }
     public int getAuxReqAuthStatusIdOld() { return mnAuxReqAuthStatusIdOld; }
     public int getAuxReqProvStatusIdOld() { return mnAuxReqProvStatusIdOld; }
-    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; } 
+    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; }
+    public String getAuxNotesChangeStatus_n() { return msAuxNotesChangeStatus_n; }
     
     public String getAuxProvEntName() { return msAuxProvEntName; }
     
@@ -194,6 +197,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     private void saveLog(SGuiSession session) throws Exception {
         SDbMaterialRequestStatusLog log = new SDbMaterialRequestStatusLog();
         log.setPkMatRequestId(mnPkMatRequestId);
+        log.setNotes_n(msAuxNotesChangeStatus_n == null ? "" : msAuxNotesChangeStatus_n);
         log.setFkMatRequestStatusId(mnFkMatRequestStatusId);
         log.setFkMatRequestAuthotizationStatusId(mnAuxReqAuthStatusId);
         log.setFkMatProvisionStatusId(mnFkMatProvisionStatusId);
@@ -261,6 +265,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnAuxReqAuthStatusIdOld = 0;
         mnAuxReqProvStatusIdOld = 0;
         mnAuxReqPurStatusIdOld = 0;
+        msAuxNotesChangeStatus_n = null;
         
         msAuxProvEntName = "";
         mbAuxLastProvClosedSta = false;
@@ -594,6 +599,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         
         // Si el estatus de requisición esta "En autorización"
         if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_AUTH) {
+            String prov = "";
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
             boolean reset = false;
             SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId }, reset);
@@ -602,7 +608,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
             // Si el estatus de autorización esta "Autorizado" o "NA", y el estatus de requisición esta "En autorización", este pasa a "En suministro"
             if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_AUTHORIZED || mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_NA){
-                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV; 
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV;
+                prov += "b_clo_prov = 0 ";
             }
             // Si el estatus de autorización esta "Rechazado", y el estatus de requisición esta "En autorización", este pasa a "Cancelado"
             else if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_REJECTED) {
@@ -610,6 +617,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             }
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 
+                    (prov.isEmpty() ? "" : ", " + prov + " ") +
                     getSqlWhere();
             session.getStatement().execute(msSql);
             

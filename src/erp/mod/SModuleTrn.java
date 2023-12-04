@@ -158,6 +158,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaintArea moFormMaintArea;
     private SFormItemCost moFormItemCost;
     private SFormMaterialRequest moFormMaterialReq;
+    private SFormMaterialRequest moFormMaterialReqSup;
     private SFormMaterialRequestCostCenter moFormMaterialRequestCostCenter;
     private SFormMaintUser moFormMaintUserEmployee;
     private SFormMaintUser moFormMaintUserContractor;
@@ -439,13 +440,6 @@ public class SModuleTrn extends SGuiModule {
                                 + "WHERE NOT b_del "
                                 + "ORDER BY a.name";
                         break;
-                    case SModConsts.TRNX_MAT_REQ_STK_SUP:
-                        sql = "SELECT c.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(c.code, ' - ', c.name) AS " + SDbConsts.FIELD_ITEM + " "
-                                + "FROM " + SModConsts.TablesMap.get(type) + " AS c "
-                                + "INNER JOIN trn_mat_cons_subent_cc AS s ON c.id_mat_cons_ent = s.id_mat_cons_ent "
-                                + "WHERE NOT c.b_del AND s.id_cc = 1 "
-                                + "ORDER BY name";
-                        break;
                     default:
                         sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                                 + "FROM " + SModConsts.TablesMap.get(type) + " "
@@ -602,6 +596,7 @@ public class SModuleTrn extends SGuiModule {
                             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis req. x autorizar"; break;
                             case SModSysConsts.TRNS_ST_MAT_REQ_PROV: title = "Mis req. en proceso"; break;
                             case SLibConsts.UNDEFINED: title = "Todas mis requisiciones"; break;
+                            default: title = "Requisiciones de materiales"; break;
                         }
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_REV:
@@ -626,11 +621,11 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de suministro x suministrar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de resurtido x suministrar a detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de suministro suministradas";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de resutido suministradas";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM de suministro x suministrar";
+                    case SLibConsts.UNDEFINED: title = "RM de resurtido x suministrar";
                         break;
                 }
                 view = new SViewMaterialRequesPendingSupply(miClient, SModConsts.TRNX_MAT_REQ_STK_SUP, subtype, title, params);
@@ -855,12 +850,15 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormMaterialProvisionEntity;
                 break;
             case SModConsts.TRN_MAT_REQ: 
-            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
-            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
             case SModConsts.TRNX_MAT_REQ_EST:
                 if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
                 form = moFormMaterialReq;
+                break;
+            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
+            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
+                if (moFormMaterialReqSup == null) moFormMaterialReqSup = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                form = moFormMaterialReqSup;
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
                 if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, subtype, "Requisición de materiales y centros de costo");

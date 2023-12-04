@@ -11430,29 +11430,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
 
-                    // validar cuando es importación de requisición que se hayan abierto todos los ítems???
-
-                    if (!validation.getIsError() && mbMatRequestImport) {
-                        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-                            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
-
-                            try {
-                                if (! entry.getFlagOpenedByMatRequestImport()) { // condition for check items
-                                    validation.setMessage("Es necesario revisar la información de las partidas del documento cuando se importa una requisición.");
-                                    validation.setComponent(moPaneGridEntries);
-                                    validation.setTabbedPaneIndex(TAB_ETY);
-                                }
-                            }
-                            catch (Exception e) {
-                                SLibUtilities.printOutException(this, e);
-                                validation.setMessage(e.getMessage());
-                                validation.setComponent(moPaneGridEntries);
-                                validation.setTabbedPaneIndex(TAB_ETY);
-                                break;
-                            }
-                        }
-                    }
-
                     double prepaymentsCy = mdPrepaymentsCy;
                     double applicationsCy = 0;
 
@@ -12029,7 +12006,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         // tailor form extra data and controls:
         
         if (mbMatRequestImport) {
+            calculateTotal();
             renderEntries();
+            moPaneGridEntries.renderTableRows();
+            moPaneGridEntries.setTableRowSelection(0);
         }
 
         renderBasicSettings();

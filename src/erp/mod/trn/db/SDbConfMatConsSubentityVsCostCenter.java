@@ -119,20 +119,31 @@ public class SDbConfMatConsSubentityVsCostCenter extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
+        Statement statement = session.getDatabase().getConnection().createStatement();
         
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC) + " " +
+        msSql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC_CC_GRP) + " " +
                 "WHERE id_mat_cons_ent = " + mnPkConsumptionEntity + " " +
                 "AND id_mat_cons_subent = " + mnPkConsumptionSubentity + " ";
-        session.getStatement().execute(msSql);
-        for (SDbMaterialConsumptionSubentityCostCenter ent : maMatConsSubCC) {
-            ent.setPkMatConsumptionEntityId(mnPkConsumptionEntity);
-            ent.setPkMatConsumptionSubentityId(mnPkConsumptionSubentity);
-            ent.setRegistryNew(true);
-            ent.save(session);
+        ResultSet resultSet = statement.executeQuery(msSql);
+        if (resultSet.next()) {
+            throw new Exception("No se puede modificar debido a que ya hay una configuración en un registro dependiente, favor de eliminar la configuración existente.\n"
+                    + "Subcentro de consumo x centro de costo x grupo de centro de costo.");
         }
-        
-        mbRegistryNew = false;
-        mnQueryResultId = SDbConsts.SAVE_OK;
+        else {
+            msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC) + " " +
+                    "WHERE id_mat_cons_ent = " + mnPkConsumptionEntity + " " +
+                    "AND id_mat_cons_subent = " + mnPkConsumptionSubentity + " ";
+            session.getStatement().execute(msSql);
+            for (SDbMaterialConsumptionSubentityCostCenter ent : maMatConsSubCC) {
+                ent.setPkMatConsumptionEntityId(mnPkConsumptionEntity);
+                ent.setPkMatConsumptionSubentityId(mnPkConsumptionSubentity);
+                ent.setRegistryNew(true);
+                ent.save(session);
+            }
+
+            mbRegistryNew = false;
+            mnQueryResultId = SDbConsts.SAVE_OK;
+        }
     }
 
     @Override

@@ -96,7 +96,8 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jlCC = new javax.swing.JLabel();
         moTextCC = new sa.lib.gui.bean.SBeanFieldText();
         jPanel22 = new javax.swing.JPanel();
-        jlCCO1 = new javax.swing.JLabel();
+        jlDateEstimation = new javax.swing.JLabel();
+        moFieldDateEstimation = new sa.lib.gui.bean.SBeanFieldDatetime();
         jPanel21 = new javax.swing.JPanel();
         jlCCO = new javax.swing.JLabel();
         moTextCCO = new sa.lib.gui.bean.SBeanFieldText();
@@ -137,7 +138,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlProviderName.setText("Nombre:*");
+        jlProviderName.setText("Nombre:");
         jlProviderName.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jlProviderName);
 
@@ -149,7 +150,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTo.setText("Para:*");
+        jlTo.setText("Para:");
         jlTo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(jlTo);
 
@@ -161,7 +162,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSubject.setText("Asunto:*");
+        jlSubject.setText("Asunto:");
         jlSubject.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel24.add(jlSubject);
 
@@ -185,8 +186,12 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCCO1.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel22.add(jlCCO1);
+        jlDateEstimation.setText("Fecha cotiz.:");
+        jlDateEstimation.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel22.add(jlDateEstimation);
+
+        moFieldDateEstimation.setEnabled(false);
+        jPanel22.add(moFieldDateEstimation);
 
         jPanel10.add(jPanel22);
 
@@ -249,7 +254,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jlCC;
     private javax.swing.JLabel jlCCO;
-    private javax.swing.JLabel jlCCO1;
+    private javax.swing.JLabel jlDateEstimation;
     private javax.swing.JLabel jlProviderName;
     private javax.swing.JLabel jlSubject;
     private javax.swing.JLabel jlTo;
@@ -258,6 +263,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
     private javax.swing.JPanel jpProviderMailRows;
     private javax.swing.JPanel jpRequisitionMaterialRows1;
     private javax.swing.JTextArea jtAreaBody;
+    private sa.lib.gui.bean.SBeanFieldDatetime moFieldDateEstimation;
     private sa.lib.gui.bean.SBeanFieldText moTextCC;
     private sa.lib.gui.bean.SBeanFieldText moTextCCO;
     private sa.lib.gui.bean.SBeanFieldText moTextProvider;
@@ -281,7 +287,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
         
-        moGridProviderRows = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_EST_PROVID_ROW, SLibConsts.UNDEFINED, "Proveedores para cotización") {
+        moGridProviderRows = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_EST_PROVID_ROW, SProviderMailRow.GRID_KARDEX, "Proveedores para cotización") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false, false, false);
@@ -291,6 +297,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha Cotiz."));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Proveedor"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Para"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "CC"));
@@ -336,8 +343,9 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
                 
                 if (oRequest.getChildRecipients() != null && oRequest.getChildRecipients().size() > 0) {
                     for (SDbEstimationRequestRecipient oMailRow : oRequest.getChildRecipients()) {
-                        oRow = new SProviderMailRow();
+                        oRow = new SProviderMailRow(SProviderMailRow.GRID_KARDEX);
                         
+                        oRow.setDateEstimation(oRequest.getTsUser());
                         oRow.setProvider(oMailRow.getProviderName());
                         oRow.setTo(oMailRow.getMailsTo());
                         oRow.setCc(oMailRow.getMailsCc());
@@ -367,6 +375,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
     }
     
     private void setProvider(SProviderMailRow oRow) {
+        moFieldDateEstimation.setValue(oRow.getDateEstimation());
         moTextProvider.setValue(oRow.getProvider());
         moTextTo.setValue(oRow.getTo());
         moTextCC.setValue(oRow.getCc());

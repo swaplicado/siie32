@@ -57,9 +57,6 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jlPkBizPartnerId = new javax.swing.JLabel();
-        jtfMaterialType = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jpAvailableAttributes = new javax.swing.JPanel();
@@ -73,7 +70,7 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
         jbDown = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Descripción de ítems para asoc. de negocios");
+        setTitle("Atributos de la familia de insumo");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -97,18 +94,6 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPkBizPartnerId.setText("Tipo de material: *");
-        jlPkBizPartnerId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(jlPkBizPartnerId);
-
-        jtfMaterialType.setEditable(false);
-        jtfMaterialType.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel3.add(jtfMaterialType);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         jPanel10.setLayout(new java.awt.GridLayout(1, 2));
 
@@ -214,8 +199,7 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
         }
     }
     
-    public void setMaterialType(String materialType, int idMaterialType) {
-        jtfMaterialType.setText(materialType);
+    public void setMaterialType(int idMaterialType) {
         mnMaterialTypeId = idMaterialType;
         setAttributes();
     }
@@ -339,7 +323,6 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -350,10 +333,8 @@ public class SFormMaterialTypeVsAttributes extends javax.swing.JDialog implement
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRemove;
     private javax.swing.JButton jbUp;
-    private javax.swing.JLabel jlPkBizPartnerId;
     private javax.swing.JPanel jpAvailableAttributes;
     private javax.swing.JPanel jpSelectedAttributes;
-    private javax.swing.JTextField jtfMaterialType;
     // End of variables declaration//GEN-END:variables
 
     @Override

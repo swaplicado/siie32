@@ -1185,7 +1185,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsPrepayment.setText("Es anticipo");
         jPanel39.add(jckIsPrepayment);
 
-        jlMaterialType.setText("Tipo de material:");
+        jlMaterialType.setText("Familia de insumo:");
         jlMaterialType.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel39.add(jlMaterialType);
         jPanel39.add(moKeyFkMaterialTypeId_n);
@@ -1434,7 +1434,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
 
-        jLabel3.setText("Tipo de material:");
+        jLabel3.setText("Familia de insumo:");
         jLabel3.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel19.add(jLabel3);
 
@@ -3403,7 +3403,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                 }
                 
                 if (oCurrentJLabel != null) {
-                    oCurrentJLabel.setText(name);
+                    oCurrentJLabel.setText(name.length() > 0 ? (name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase()) : name);
                 }
                 if (oCurrentTextField != null) {
                     oCurrentTextField.setEnabled(true);

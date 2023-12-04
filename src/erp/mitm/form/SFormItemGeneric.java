@@ -638,8 +638,8 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jckIsBulk.setPreferredSize(new java.awt.Dimension(125, 23));
         jpRegistry2215.add(jckIsBulk);
 
-        jckIsMaterial.setText("Es material");
-        jckIsMaterial.setPreferredSize(new java.awt.Dimension(125, 23));
+        jckIsMaterial.setText("Con familia de insumo");
+        jckIsMaterial.setPreferredSize(new java.awt.Dimension(150, 23));
         jpRegistry2215.add(jckIsMaterial);
 
         jpRegistry221.add(jpRegistry2215);

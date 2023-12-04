@@ -1631,7 +1631,7 @@
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlMaterialType">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo de material:"/>
+                        <Property name="text" type="java.lang.String" value="Familia de insumo:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[165, 23]"/>
                         </Property>
@@ -2246,7 +2246,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jLabel3">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo de material:"/>
+                        <Property name="text" type="java.lang.String" value="Familia de insumo:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[100, 23]"/>
                         </Property>

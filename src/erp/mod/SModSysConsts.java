@@ -717,6 +717,9 @@ public abstract class SModSysConsts {
     public static final int TRNS_ST_MAT_PUR_PROC = 3; // processing
     public static final int TRNS_ST_MAT_PUR_DONE = 9; // done
     
+    public static final String TRNS_MAT_REQ_TP_R = "R"; // Resurtido
+    public static final String TRNS_MAT_REQ_TP_C = "C"; // Consumo
+    
     public static final int TRNX_TP_MAINT_MOV_PART = 1;    // Part
     public static final int TRNX_TP_MAINT_MOV_TOOL = 2;    // Tool
     public static final int TRNX_TP_MAINT_MOV_ALL = 3;     // All

@@ -13,10 +13,12 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
+import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SFormMaterialRequest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -48,12 +50,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbNewSupReq;
     private JButton jbPrint;
     private JButton jbAuthCardex;
+    private JButton jbLogCardex;
     private JButton jbAuthorize;
     private JButton jbReject;
     private JButton jbSegregate;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
+    private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
     private SDialogMaterialRequestSegregation moDialogSegregations;
     
     private boolean hasSupReq;
@@ -80,9 +84,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasPetSupRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight &&
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         
-        jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva requisición de suministro", this);
+        jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva requisición de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Kardex de autorizaciones", this);
+        jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Bitácora de cambios", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
@@ -90,6 +95,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
@@ -98,6 +104,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbPrint.setEnabled(hasPetSupRight);
         jbPrint.setEnabled(true);
         jbAuthCardex.setEnabled(true);
+        jbLogCardex.setEnabled(true);
         jbAuthorize.setEnabled(hasAuthRight);
         jbReject.setEnabled(hasAuthRight);
         jbSegregate.setEnabled(hasAuthRight);
@@ -107,12 +114,13 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moFilterMatReqStatus = new SGridFilterPanelMatReqStatus(miClient, this);
         moFilterMatReqStatus.initFilter(mnGridMode);
         
-        if (mnGridMode == SLibConsts.UNDEFINED) {
+        if (mnGridMode == SLibConsts.UNDEFINED || mnGridMode == SModConsts.TRN_MAT_CONS_ENT_USR) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterMatReqStatus);
         
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
+        moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
         
         if (mnGridMode != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
@@ -153,7 +161,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 }
                 else {
                     try {
-                        print(gridRow.getRowPrimaryKey()[0]);
+                        createParamsMap(gridRow.getRowPrimaryKey()[0]);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -182,6 +190,34 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     
                         moDialogAuthCardex.setFormParams(SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ), key);
                         moDialogAuthCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+    private void actionLog() {
+        int[] key;
+        
+        if (jbLogCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                        moDialogLogsCardex.setFormParams(key[0]);
+                        moDialogLogsCardex.setVisible(true);
                     }
                 }
                 catch (Exception ex) {
@@ -264,11 +300,27 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
-    private void print(int idMatReq) throws Exception {
+    private void createParamsMap(int idMatReq) throws Exception {
+        String aut = "";
+        String rec = "";
+        String sql = "SELECT ua.usr autorizo, ur.usr rechazo, comments comentario " +
+                "FROM cfgu_authorn_step AS a " +
+                "LEFT JOIN erp.usru_usr AS ua ON a.fk_usr_authorn_n = ua.id_usr " +
+                "LEFT JOIN erp.usru_usr AS ur ON a.fk_usr_reject_n = ur.id_usr " + 
+                "WHERE a.res_pk_n1_n = " + idMatReq + " AND fk_tp_authorn = 1";
+        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            aut += resultSet.getString("autorizo") + "; ";
+            String com = resultSet.getString("comentario");
+            rec += resultSet.getString("rechazo") != null ? resultSet.getString("rechazo") + (com.isEmpty() ? "; " : "(" + com + "); ") : "";
+        }
+        
         HashMap<String, Object> params;
         
         params = miClient.createReportParams();
         params.put("nMatReqId", idMatReq);
+        params.put("sMatReqAut", aut);
+        params.put("sMatReqRec", rec);
         
         miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
     }
@@ -298,8 +350,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
-                            + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
+                    where += (where.isEmpty() ? "" : "AND ") + "v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " ";
                 }
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
@@ -321,6 +372,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " OR v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") " ;
                 break;
+            case SModConsts.TRN_MAT_CONS_ENT_USR:
+                if (usrId != 2 ) { // SUPER
+                    needJoin = true;
+                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
+                            + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
+                }
             default:
                 filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
                 if (filter != null && ((int[]) filter).length == 1) {
@@ -340,10 +397,13 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
                 + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
-            if (usrId != 2 ) { // SUPER
-                needJoin = true;
-                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
+        if (usrId != 2 ) { // SUPER
+            needJoin = true;
+            if (mnGridMode != SModConsts.TRN_MAT_CONS_ENT_USR) {
+                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
+            }
+            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
+                where += (where.isEmpty() ? "" : "AND ") + "(v.ts_usr_ins = " + usrId + " "
                         + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") OR aut.fk_usr_step = " + usrId + ") ";
             }
         }
@@ -440,7 +500,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_req", "Tipo requisición", 20));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "item_key", "Ítem referencia"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "item_key", "Concepto/gasto"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "contractor", "Contratista"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ref", "Referencia"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));
@@ -499,6 +559,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbAuthCardex) {
                 actionCardex();
+            }
+            else if (button == jbLogCardex) {
+                actionLog();
             }
             else if (button == jbAuthorize) {
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_AUTHORIZE);

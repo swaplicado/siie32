@@ -506,8 +506,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         try {
             moKeyMaintUser.setSelectedIndex(0);
             moKeyWarehouseCompanyBranch.setSelectedIndex(0);
-//            moKeyWarehouseCompanyBranch.setValue(((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey());
-//            SGuiUtils.locateItem(moKeyWarehouseCompanyBranch, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey());
         }
         catch (NullPointerException ex) {
             Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
@@ -561,6 +559,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());
                 oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
+                oRow.setIsItemNew(oMaterialRequestEntry.isNewItem());
                 
                 double dSegregated = 0d;
                 if (mnSegregationId > 0) {
@@ -685,7 +684,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         SMaterialRequestEntryRow oMatReqRow;
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
-            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied() > 0) {
+            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied() > 0 && ! oMatReqRow.isItemNew()) {
                 oMatReqRow.setAuxToSupply(oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied());
             }
         }
@@ -708,7 +707,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
             if (oMatReqRow.getAuxToSupply() > 0) {
-                if (oMatReqRow.getFkItemId() == mnItemDefaultId) {
+                if (oMatReqRow.getFkItemId() == mnItemDefaultId || oMatReqRow.isItemNew()) {
                     miClient.showMsgBoxWarning("No se puede suministrar esta partida, el ítem debe ser cambiado.");
                     return;
                 }
@@ -904,10 +903,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             miClient.getSession().populateCatalogue(moKeyMaintUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, new SGuiParams(moKeyMaintUser.getValue()));
             moKeyMaintUserSupervisor.setEnabled(true);
         }
-        
-//        int idBp = ((SGuiItem) moKeyMaintUser.getSelectedItem()).getPrimaryKey()[0];
-//        int idConsumeEntity = STrnConsumeUtils.getDefaultEntityOfBp(miClient.getSession(), idBp);
-//        SGuiUtils.locateItem(jcbEntryConsEntity, new int[] { idConsumeEntity });
     }
     
     private boolean shouldEnableMaintUserSupervisor() {
