@@ -75,7 +75,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar requisición", this);
-        mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver solicitudes de cotización", this);
+        mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
         mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
@@ -193,7 +193,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
             else {
                 moDialogEstimationKardex = new SDialogMaterialRequestEstimationKardex(miClient, "Solicitudes de cotización");
                 int[] key = (int[]) gridRow.getRowPrimaryKey();
-                moDialogEstimationKardex.setValue(SModConsts.TRN_MAT_REQ, key);
+                moDialogEstimationKardex.setValue(SModConsts.TRN_MAT_REQ_ETY, key);
                 moDialogEstimationKardex.setVisible(true);
             }
         }

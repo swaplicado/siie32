@@ -136,7 +136,6 @@
                         </Component>
                         <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextProvider">
                           <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[400, 23]"/>
                             </Property>
@@ -161,7 +160,6 @@
                         </Component>
                         <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextTo">
                           <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[400, 23]"/>
                             </Property>
@@ -186,7 +184,6 @@
                         </Component>
                         <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextSubject">
                           <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[400, 23]"/>
                             </Property>

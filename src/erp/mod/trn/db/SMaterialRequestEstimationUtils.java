@@ -6,12 +6,18 @@
 package erp.mod.trn.db;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
 import erp.mtrn.data.STrnUtilities;
+import erp.musr.data.SDataUser;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,8 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.mail.SMailSender;
@@ -89,11 +93,21 @@ public abstract class SMaterialRequestEstimationUtils {
     public static void sendMails(SGuiClient client, ArrayList<SProviderMailRow> lProviderRows) {
         SDbMms mms = STrnUtilities.getMms((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ);
         SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+        SDataUser user = (SDataUser) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.USRU_USR, new int[] { client.getSession().getUser().getPkUserId() }, SLibConstants.EXEC_MODE_SILENT);
+        if (user != null && user.getEmail() != null && user.getEmail().length() > 0) {
+            //sender.setMailFrom(user.getEmail());
+            sender.setMailReplyTo(user.getEmail());
+        }
         String img = "firmas/" + client.getSession().getUser().getName() + ".jpg";
         String basePath = System.getProperty("user.dir");
         String imageFilePath = basePath + "/" + img;
         Map<String, String> inlineImages = new HashMap<>();
-        inlineImages.put("AbcXyz123", imageFilePath);
+        try {
+            if (Files.exists(Paths.get(imageFilePath))) {
+                inlineImages.put("AbcXyz123", imageFilePath);
+            }
+        }
+        catch (Exception e) { }
         
         for (SProviderMailRow oProviderRow : lProviderRows) {
             if (oProviderRow.getTo().isEmpty()) {
@@ -170,8 +184,8 @@ public abstract class SMaterialRequestEstimationUtils {
                 oRec.setMailsTo(oProviderRow.getTo());
                 oRec.setMailsCc(oProviderRow.getCc());
                 oRec.setMailsCco(oProviderRow.getCco());
-                oRec.setSubject(oProviderRow.getSubject());
-                oRec.setBody(oProviderRow.getBody());
+                oRec.setSubject(SLibUtils.textToSql(oProviderRow.getSubject()));
+                oRec.setBody(SLibUtils.textToSql(oProviderRow.getBody()));
                 oRec.setDeleted(false);
                 oRec.setFkBusinessPartnerId_n(oProviderRow.getFkProviderId_n());
                 

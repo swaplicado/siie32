@@ -1,4 +1,19 @@
 ================================================================================
+SIIE 3.2 228.2/ 2023-12-05
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Se corrigen las notas de crédito cuando se quieren aplicar a facturas de monedas en moneda extrangera 
+
+================================================================================
+SIIE 3.2 228.1/ 2023-12-05
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega funcionalidad para cerrar RM para surtido.
+2) Se agregan cambios de estatus en RM por suministrar y por comprar
+3) Se modifica el email origen para las solicitudes de cotización de las RM
+4) Reordenamiento de columnas en la importación de partidas de RM
+
+================================================================================
 SIIE 3.2 228.0/ 2023-12-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

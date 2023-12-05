@@ -56,7 +56,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         moAuxUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { moMatRequestEntry.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
         double linkedFromDb = SMaterialRequestUtils.getQuantityLinkedOfReqEty(miClient.getSession(), moMatRequestEntry.getPrimaryKey(), maDpsType, this.maDpsPk == null ? null : this.maDpsPk);
         mdQuantityLinked = linkedFromDb + getMemoryLinkedQuantity();
-        mdQuantitySupplied = SMaterialRequestUtils.getQuantitySupplied(miClient.getSession(), moMatRequestEntry.getPrimaryKey());
+        mdQuantitySupplied = SMaterialRequestUtils.getQuantitySuppliedOfReqEty(miClient.getSession(), moMatRequestEntry.getPrimaryKey());
         mdUnitaryPrice = moMatRequestEntry.getPriceUnitary();
     }
     
@@ -87,15 +87,16 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         mvValues.clear();
         mvValues.add(moMatRequestEntry.getDataItem().getCode());
         mvValues.add(moMatRequestEntry.getDataItem().getName());
+        mvValues.add(moMatRequestEntry.getDataItem().getPartNumber());
         mvValues.add(moMatRequestEntry.getQuantity());
-        mvValues.add(moAuxUnit.getSymbol());
-        mvValues.add(mdQuantitySupplied);
-        mvValues.add(mdQuantityLinked);
-        double qty = moMatRequestEntry.getQuantity() - mdQuantitySupplied - mdQuantityLinked;
-        mvValues.add(qty < 0d ? 0d : qty);
         mvValues.add(mdQuantityToLink);
         mvValues.add(moAuxUnit.getSymbol());
         mvValues.add(mdUnitaryPrice);
+        double qty = moMatRequestEntry.getQuantity() - mdQuantitySupplied - mdQuantityLinked;
+        mvValues.add(qty < 0d ? 0d : qty);
+        mvValues.add(mdQuantitySupplied);
+        mvValues.add(mdQuantityLinked);
+        mvValues.add(moAuxUnit.getSymbol());
         mvValues.add(mdExceed);
     }
     

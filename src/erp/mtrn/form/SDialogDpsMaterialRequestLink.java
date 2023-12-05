@@ -224,7 +224,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(900, 600));
+        setSize(new java.awt.Dimension(976, 639));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -239,17 +239,11 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         moTablePane = new STablePane(miClient);
         jpOptions.add(moTablePane, BorderLayout.CENTER);
 
-        columns = new STableColumnForm[11];
+        columns = new STableColumnForm[12];
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", 250);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "# parte", 100);
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant.", STableConstants.WIDTH_QUANTITY);
-        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. surt.", STableConstants.WIDTH_QUANTITY);
-        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. vinc.", STableConstants.WIDTH_QUANTITY);
-        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. a vinc.", STableConstants.WIDTH_QUANTITY);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. actual", STableConstants.WIDTH_QUANTITY);
         columns[i].setEditable(true);
@@ -258,6 +252,13 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio.", STableConstants.WIDTH_VALUE);
         columns[i].setEditable(true);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererCurrency());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. a vinc.", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. surt.", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. vinc.", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "% excedente", STableConstants.WIDTH_PERCENTAGE);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
 

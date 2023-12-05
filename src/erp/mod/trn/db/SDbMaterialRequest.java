@@ -5,6 +5,7 @@
  */
 package erp.mod.trn.db;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -459,6 +460,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
+        boolean updateProvisionStatus = false;
         
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -502,7 +504,6 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     ")";
         }
         else {
-            boolean updateProvisionStatus = false;
             boolean updatePurchaseStatus = false;
             
             mnFkUserUpdateId = session.getUser().getPkUserId();
@@ -593,13 +594,31 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
         mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
         if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqProvStatusIdOld != mnFkMatProvisionStatusId
-                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId) {
+                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId || updateProvisionStatus) {
+            if (updateProvisionStatus && mnAuxReqStatusIdOld == mnFkMatRequestStatusId && mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
+                String st = "";
+                if (! mbAuxLastProvClosedSta) {
+                    st = "Abierto ";
+                }
+                else {
+                    st = "Cerrado ";
+                }
+                
+                if (msAuxNotesChangeStatus_n == null || msAuxNotesChangeStatus_n.isEmpty()) {
+                    msAuxNotesChangeStatus_n = st + "para suministro.";
+                }
+                else {
+                    msAuxNotesChangeStatus_n += " " + st + "para suministro.";
+                }
+            }
+            
             saveLog(session);
         }
         
         // Si el estatus de requisición esta "En autorización"
         if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_AUTH) {
             String prov = "";
+            String pur = "";
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
             boolean reset = false;
             SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId }, reset);
@@ -610,6 +629,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_AUTHORIZED || mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_NA){
                 mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV;
                 prov += "b_clo_prov = 0 ";
+                pur += "b_clo_pur = 1 ";
             }
             // Si el estatus de autorización esta "Rechazado", y el estatus de requisición esta "En autorización", este pasa a "Cancelado"
             else if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_REJECTED) {
@@ -618,6 +638,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 
                     (prov.isEmpty() ? "" : ", " + prov + " ") +
+                    (pur.isEmpty() ? "" : ", " + pur + " ") +
                     getSqlWhere();
             session.getStatement().execute(msSql);
             
@@ -625,6 +646,46 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                 saveLog(session);
             }
         }
+        
+        /**
+        * Actualización de estatus específicos
+        */
+        if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV || mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
+           /**
+            * Actualización de estatus de compras
+            */
+           double percPurchasedByOrd = SMaterialRequestUtils.getPurchasedPercent(session, mnPkMatRequestId, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
+           if (percPurchasedByOrd == 0d) {
+               setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_PEND);
+           }
+           else if (percPurchasedByOrd > 0d && percPurchasedByOrd < 1d) {
+               setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_PROC);
+           }
+           else {
+               setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_DONE);
+           }
+
+           /**
+            * Actualización de estatus de suministro
+            */
+           double percSupplied = SMaterialRequestUtils.getSuppliedPercent(session, mnPkMatRequestId);
+           if (percSupplied == 0d) {
+               setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_PEND);
+           }
+           else if (percSupplied > 0d && percSupplied < 1d) {
+               setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_PROC);
+           }
+           else {
+               setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_DONE);
+           }
+           
+           msSql = "UPDATE " + getSqlTable() + " SET " + 
+                    "fk_st_mat_prov = " + mnFkMatProvisionStatusId + ", " + 
+                    "fk_st_mat_pur = " + mnFkMatPurchaseStatusId + " " +
+                    getSqlWhere();
+           
+            session.getStatement().execute(msSql);
+       }
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
