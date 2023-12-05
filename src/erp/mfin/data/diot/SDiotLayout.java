@@ -246,14 +246,14 @@ public class SDiotLayout {
                     addAccount(account);
                 }
                 
-                SDataAccount majorAccount = getMajorAccount(account.getDbmsPkAccountMajorId());
+                SDataAccount majorAccount = getMajorAccount(account.getDbmsPkAccountMajorIdXXX());
                 
                 if (majorAccount == null) {
                     if (account.getLevel() == 1) {
                         majorAccount = account; // input account is a ledger account:
                     }
                     else {
-                        majorAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                        majorAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
                     }
                     
                     addMajorAccount(majorAccount);

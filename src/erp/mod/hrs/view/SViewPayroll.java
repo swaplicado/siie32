@@ -223,7 +223,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                                 }
                             }
                             else {
-                                miClient.showMsgBoxWarning("Cuando se contabilizó la nómina '" + payroll.composePayrollYearAndNumber() + "' no se indicó que fuera gradualmente.");
+                                miClient.showMsgBoxWarning("Cuando se contabilizó la nómina '" + payroll.composePayrollYearAndNumber() + "' no se indicó que se haría gradualmente.");
                             }
                         }
                         else {
@@ -267,7 +267,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         }
                     }
                     else {
-                        miClient.showMsgBoxWarning("Para ver la contabilización de la nómina '" + payroll.composePayrollYearAndNumber() + "' es necesario que esté cerrada y, por supuesto, contabilizada.");
+                        miClient.showMsgBoxWarning("Para ver la información de contabilización de la nómina '" + payroll.composePayrollYearAndNumber() + "' es necesario que esté cerrada y, por supuesto, contabilizada.");
                     }
                 }
                 catch (Exception e) {

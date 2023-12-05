@@ -66,7 +66,7 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
     protected boolean mbDbmsIsRequiredBizPartner;
     protected boolean mbDbmsIsRequiredItem;
     protected int mnDbmsMajorDeep;
-    protected java.lang.String msDbmsPkAccountMajorId;
+    protected java.lang.String msDbmsPkAccountMajorIdXXX;
 
     public SDataAccount() {
         super(SDataConstants.FIN_ACC);
@@ -153,7 +153,7 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
 
     public boolean getDbmsIsRequiredCostCenter() { return mbDbmsIsRequiredCostCenter; }
     public int getDbmsMajorDeep() { return mnDbmsMajorDeep; }
-    public java.lang.String getDbmsPkAccountMajorId() { return msDbmsPkAccountMajorId; }
+    public java.lang.String getDbmsPkAccountMajorIdXXX() { return msDbmsPkAccountMajorIdXXX; }
     
     public int[] getAccountClassKey() { return new int[] { mnFkAccountTypeId_r, mnFkAccountClassId_r }; }
     public int[] getAccountSubclassKey() { return new int[] { mnFkAccountTypeId_r, mnFkAccountClassId_r, mnFkAccountSubclassId_r }; }
@@ -213,7 +213,7 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
 
         mnDbmsMajorDeep = 0;
         mbDbmsIsRequiredCostCenter = false;
-        msDbmsPkAccountMajorId = "";
+        msDbmsPkAccountMajorIdXXX = "";
     }
 
     @Override
@@ -278,7 +278,7 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
                 if (mnDeep != 0) {
                     // This account is allready a major account:
 
-                    msDbmsPkAccountMajorId = msPkAccountIdXXX;
+                    msDbmsPkAccountMajorIdXXX = msPkAccountIdXXX;
                     mnDbmsMajorDeep = mnDeep;
                     mbDbmsIsRequiredCostCenter = mbIsRequiredCostCenter;
                 }
@@ -292,9 +292,9 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
                         // Major account's deep:
 
                         accountFormat = resultSet.getString(1).replace('9', '0');
-                        msDbmsPkAccountMajorId = msPkAccountIdXXX.substring(0, msPkAccountIdXXX.indexOf('-')) + accountFormat.substring(msPkAccountIdXXX.indexOf('-'));
+                        msDbmsPkAccountMajorIdXXX = msPkAccountIdXXX.substring(0, msPkAccountIdXXX.indexOf('-')) + accountFormat.substring(msPkAccountIdXXX.indexOf('-'));
 
-                        sql = "SELECT deep FROM fin_acc WHERE id_acc = '" + msDbmsPkAccountMajorId + "' ";
+                        sql = "SELECT deep FROM fin_acc WHERE id_acc = '" + msDbmsPkAccountMajorIdXXX + "' ";
                         resultSet = statement.executeQuery(sql);
                         if (!resultSet.next()) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);

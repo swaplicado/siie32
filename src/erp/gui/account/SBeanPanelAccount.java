@@ -524,10 +524,10 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
      */
 
     /**
-     * Reset this panel.
+     * Initialize this panel.
      * Method <code>setPanelSettings()</code> must be called first.
      */
-    public void resetPanel() {
+    public void initPanel() {
         maoAccounts = new SAccount[SAccountConsts.LEVELS];
 
         for (int i = 0; i < maoTextCodeLevelStds.length; i++) {
@@ -598,7 +598,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
         mbOnlyTerminalAccounts = onlyTerminalAccounts;
         moPickerAccount = new SPickerAccount(miClient, mnAccountType);
 
-        switch (type) {
+        switch (mnAccountType) {
             case SAccountConsts.TYPE_ACCOUNT:
                 jlNumber.setText(SAccountConsts.NUM_ACCOUNT + ":" + (!mbMandatory ? "" : "*"));
                 jlName.setText(SAccountConsts.NAME_ACCOUNT + ":");
@@ -655,7 +655,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
         moFields.addField(moTextCodeLevel7);
         moFields.addField(moTextCodeLevel8);
     }
-
+    
     public void setSelectedAccount(SAccount account) {
         String codeLevelStd = "";
 
@@ -699,6 +699,23 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
     public boolean isPanelEditable() {
         return moTextCodeLevel1.isEditable();
     }
+    
+    public String getPanelAccountName() {
+        String name = "";
+        
+        switch (mnAccountType) {
+            case SAccountConsts.TYPE_ACCOUNT:
+                name = SAccountConsts.NAME_ACCOUNT;
+                break;
+            case SAccountConsts.TYPE_COST_CENTER:
+                name = SAccountConsts.NAME_COST_CENTER;
+                break;
+            default:
+                // nothing
+        }
+        
+        return name;
+    }
 
     public SBeanFieldText getTextNumberFirst() {
         return maoTextCodeLevelStds[0];
@@ -740,7 +757,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
             }
             else if (mbOnlyExistingAccounts && account == null && accountStd.compareTo(SAccountUtils.composeCodeStdMin()) != 0) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlNumber) + "'.\n"
-                        + "(" + SGuiUtils.getLabelName(jlNumber) + " " + SAccountConsts.TXT_EXISTING+ ")");
+                        + "(" + SGuiUtils.getLabelName(jlNumber) + " " + SAccountConsts.TXT_EXISTING + ")");
                 validation.setComponent(moTextCodeLevel1);
             }
             else if (mbOnlyTerminalAccounts && account != null && maoAccounts[0] != null && account.getLevel() != ((SAccountLedger) maoAccounts[0]).getDeep()) {

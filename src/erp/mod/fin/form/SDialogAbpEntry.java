@@ -121,8 +121,8 @@ public class SDialogAbpEntry extends SBeanFormDialog {
         moCostCenterPanel.setComponentPrevious(moAccountPanel.getTextNumberFirst());
         moCostCenterPanel.setComponentNext(jbSave);
 
-        moAccountPanel.resetPanel();
-        moCostCenterPanel.resetPanel();
+        moAccountPanel.initPanel();
+        moCostCenterPanel.initPanel();
     }
 
     @Override
@@ -151,8 +151,8 @@ public class SDialogAbpEntry extends SBeanFormDialog {
         removeAllListeners();
         reloadCatalogues();
 
-        moAccountPanel.resetPanel();
-        moCostCenterPanel.resetPanel();
+        moAccountPanel.setSelectedAccount(null);
+        moCostCenterPanel.setSelectedAccount(null);
 
         if (moRegistry.isRegistryNew()) { }
 

@@ -90,6 +90,11 @@ public class SHrsConsts {
     /** Cómputo de prestaciones: por aniversario. */
     public static final int BEN_COMP_ANNIVERSARY = 2;
     
+    /** Configuración del procesamiento de contabilización original. */
+    public static final int CFG_ACC_PROCESS_ORIGINAL = 1;
+    /** Configuración del procesamiento de contabilización dinámico y con prorrateos. */
+    public static final int CFG_ACC_PROCESS_DYNAMIC = 2;
+    
     public static final String TXT_ACTIVE_NO = "Inactivo";
     public static final String TXT_ACTIVE_YES = "Activo";
     public static final String TXT_INDISTINCT = "Indistinto";

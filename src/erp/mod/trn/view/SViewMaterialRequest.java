@@ -114,7 +114,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moFilterMatReqStatus = new SGridFilterPanelMatReqStatus(miClient, this);
         moFilterMatReqStatus.initFilter(mnGridMode);
         
-        if (mnGridMode == SLibConsts.UNDEFINED) {
+        if (mnGridMode == SLibConsts.UNDEFINED || mnGridMode == SModConsts.TRN_MAT_CONS_ENT_USR) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterMatReqStatus);

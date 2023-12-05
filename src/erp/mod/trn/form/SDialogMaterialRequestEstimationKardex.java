@@ -142,7 +142,6 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jlProviderName.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jlProviderName);
 
-        moTextProvider.setEditable(false);
         moTextProvider.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel12.add(moTextProvider);
 
@@ -154,7 +153,6 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jlTo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(jlTo);
 
-        moTextTo.setEditable(false);
         moTextTo.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel16.add(moTextTo);
 
@@ -166,7 +164,6 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jlSubject.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel24.add(jlSubject);
 
-        moTextSubject.setEditable(false);
         moTextSubject.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel24.add(moTextSubject);
 
@@ -426,7 +423,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
     @Override
     public void setValue(final int type, final Object value) {
         switch (type) {
-            case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRN_MAT_REQ_ETY:
                 int[]pk = (int[]) value;
                 showRows(pk);
                 break;

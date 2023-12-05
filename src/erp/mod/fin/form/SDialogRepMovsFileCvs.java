@@ -188,8 +188,8 @@ public class SDialogRepMovsFileCvs extends SBeanFormDialog implements ActionList
         moPanelStartAccount.setAccountNameWidth(275);
         moPanelEndAccount.setAccountNameWidth(275);
 
-        moPanelStartAccount.resetPanel();
-        moPanelEndAccount.resetPanel();
+        moPanelStartAccount.initPanel();
+        moPanelEndAccount.initPanel();
         
         moDateStartDate.setValue(new Date());
         moDateEndDate.setValue(new Date());

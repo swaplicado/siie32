@@ -135,7 +135,7 @@ public class SFormAccountItemLink extends sa.lib.gui.bean.SBeanForm {
 
         moFields.setFormButton(jbSave);
 
-        moAccountPanel.resetPanel();
+        moAccountPanel.initPanel();
     }
 
     private void itemStateChangedLinkType() {

@@ -9,10 +9,10 @@ import java.sql.ResultSet;
 import sa.lib.gui.SGuiSession;
 
 /**
- * Clase de utileria
+ * Clase de utilerías.
  * @author Isabel Servín
  */
-public class SModDataUtils {
+public abstract class SModDataUtils {
     
      /**
      * Devuelve el campo nombre de una tabla a traves del código.
