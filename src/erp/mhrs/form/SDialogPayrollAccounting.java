@@ -1188,7 +1188,25 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         return entry;
     }
-    
+
+    /**
+     * Compute record entry.
+     * NOTE: Invoke this method after computeFormerPayrollMove().
+     * @param accountingRecordType
+     * @param record
+     * @param accountId
+     * @param costCenterId
+     * @param itemId
+     * @param bizPartnerId
+     * @param bizPartnerBranchId
+     * @param taxKey
+     * @param conceptType
+     * @param conceptName
+     * @param referenceName
+     * @param referenceCode
+     * @param amount
+     * @return 
+     */
     private SDataRecordEntry computeRecordEntry(final int accountingRecordType, final SDataRecord record, final int accountId, 
             final int costCenterId, final int itemId, final int bizPartnerId, final int bizPartnerBranchId, final int[] taxKey, 
             final int conceptType, final String conceptName, final String referenceName, final String referenceCode, final double amount) {
@@ -1309,6 +1327,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     /**
      * Compute former payroll movement.
      * Increments new move ID and adds one to current record's last entry ID.
+     * NOTE: Invoke this method before computeRecordEntry().
      * @param conceptType
      * @param conceptId
      * @param concept
@@ -1958,6 +1977,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 referenceCode = resultSetRec.getString("f_ref_cve");
                                 double amount = resultSetRec.getDouble("f_amt");
 
+                                // Create former payroll move:
+
+                                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, concept, 
+                                        referenceId, referenceName, referenceCode, amount, record));
+                                
                                 // Create record entry:
 
                                 int bpId = bizPartner == null ? 0 : bizPartner.getPkBizPartnerId();
@@ -1967,10 +1991,6 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         costCenterId, itemId, bpId, bpbId, new int[] { taxBasicId, taxTaxId }, 
                                         conceptType, conceptAbbr, referenceName, referenceCode, amount));
 
-                                // Create former payroll move:
-
-                                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, concept, 
-                                        referenceId, referenceName, referenceCode, amount, record));
                             } // end record
                         } // end configuration
                     } // end processing of perceptions and deductions
