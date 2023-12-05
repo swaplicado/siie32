@@ -177,14 +177,15 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         moPaneOptions.setDoubleClickAction(this, "publicActionOk");
         jpOptions.add(moPaneOptions, BorderLayout.CENTER);
         
-        tableColumns = new STableColumnForm[6];
+        tableColumns = new STableColumnForm[7];
         
-        tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro suministro", STableConstants.WIDTH_ITEM_2X);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", STableConstants.WIDTH_DOC_NUM);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
-        tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia", 100);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usuario requisición", 150);
+        tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", 200);
         tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro de consumo", STableConstants.WIDTH_ITEM_2X);
+        tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro suministro", STableConstants.WIDTH_ITEM_2X);
+        tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia", 100);
 
         for (i = 0; i < tableColumns.length; i++) {
             moPaneOptions.addTableColumn(tableColumns[i]);

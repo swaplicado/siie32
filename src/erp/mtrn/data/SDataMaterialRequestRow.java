@@ -40,13 +40,12 @@ public class SDataMaterialRequestRow extends erp.lib.table.STableRow {
         this.setRowPrimaryKey(moMatRequest.getPrimaryKey());
         
         mvValues.clear();
-        mvValues.add(moMatRequest.getAuxProvEntName());
         mvValues.add(String.format("%05d", moMatRequest.getNumber()));
         mvValues.add(moMatRequest.getDate());
-        mvValues.add(moMatRequest.getReference());
         mvValues.add(msUserRequester);
+        mvValues.add(moMatRequest.getChildEntries().size() > 0 ? moMatRequest.getChildEntries().get(0).getDataItem().getName() : "");
         mvValues.add(moMatRequest.getConsumptionInfo());
+        mvValues.add(moMatRequest.getAuxProvEntName());
+        mvValues.add(moMatRequest.getReference());
     }
-    
-    
 }

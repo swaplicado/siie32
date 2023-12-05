@@ -552,7 +552,7 @@ public abstract class SMaterialRequestUtils {
         return 0d;
     }
     
-    public static double getQuantitySupplied(SGuiSession session, final int[] pkMatRequestEty) {
+    public static double getQuantitySuppliedOfReqEty(SGuiSession session, final int[] pkMatRequestEty) {
         String query = "SELECT " +
                         "SUM(mov_out) AS qty_supplied " +
                         "FROM " +
@@ -570,6 +570,90 @@ public abstract class SMaterialRequestUtils {
             if (resultSet.next()) {
                 return resultSet.getDouble("qty_supplied");
             }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return 0d;
+    }
+    
+    public static double getPurchasedPercent(SGuiSession session, final int idMatReq, final int[] dpsType) {
+        String query = "SELECT " +
+                        "tmre.id_mat_req, " +
+                        "tmre.id_ety, " +
+                        "tmre.qty " +
+                        "FROM " +
+                        SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS tmr " +
+                        "INNER JOIN " +
+                        SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS tmre ON (tmr.id_mat_req = tmre.id_mat_req) " +
+                        "WHERE " +
+                        "NOT tmr.b_del AND NOT tmre.b_del AND tmr.id_mat_req = " + idMatReq + ";";
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
+            double qtyReq = 0d;
+            double qtySupplied = 0d;
+            double qtyLinked = 0d;
+            while (resultSet.next()) {
+                qtyReq += resultSet.getDouble("qty");
+                qtySupplied += SMaterialRequestUtils.getQuantitySuppliedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") });
+                qtyLinked += SMaterialRequestUtils.getQuantityLinkedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") }, dpsType, null);
+            }
+            
+            double percent = 0d;
+            
+            if (qtyLinked <= 0d || qtyReq <= 0d) {
+                percent = 0d;
+            }
+            else if (qtyLinked > (qtyReq - qtySupplied)) {
+                percent = 1d;
+            }
+            else {
+                percent = qtyLinked / (qtyReq - qtySupplied);
+            }
+            
+            return percent < 0d ? 0d : percent;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return 0d;
+    }
+    
+    public static double getSuppliedPercent(SGuiSession session, final int idMatReq) {
+        String query = "SELECT " +
+                        "tmre.id_mat_req, " +
+                        "tmre.id_ety, " +
+                        "tmre.qty " +
+                        "FROM " +
+                        SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS tmr " +
+                        "INNER JOIN " +
+                        SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS tmre ON (tmr.id_mat_req = tmre.id_mat_req) " +
+                        "WHERE " +
+                        "NOT tmr.b_del AND NOT tmre.b_del AND tmr.id_mat_req = " + idMatReq + ";";
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
+            double qtyReq = 0d;
+            double qtySupplied = 0d;
+            while (resultSet.next()) {
+                qtyReq += resultSet.getDouble("qty");
+                qtySupplied += SMaterialRequestUtils.getQuantitySuppliedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") });
+            }
+            
+            double percent = 0d;
+            
+            if (qtySupplied <= 0d || qtyReq <= 0d) {
+                percent = 0d;
+            }
+            else if (qtySupplied > qtyReq) {
+                percent = 1d;
+            }
+            else {
+                percent = qtySupplied / qtyReq;
+            }
+            
+            return percent < 0d ? 0d : percent;
         }
         catch (SQLException ex) {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
@@ -735,6 +819,33 @@ public abstract class SMaterialRequestUtils {
                 req.setClosePurchase(true);
             }
             
+            req.setAuxNotesChangeStatus_n(reason);
+            req.save(session);
+            
+            return "";
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
+        }
+    }
+    
+    public static String openOrCloseToSupply(SGuiSession session, int[] pkMatReq) {
+        try {
+            JTextArea textArea = new JTextArea(5, 40); // Set the number of rows and columns
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            int option = JOptionPane.showOptionDialog(null, scrollPane, "Ingrese comentario/observación:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+            String reason = "";
+            if (option == JOptionPane.OK_OPTION) {
+                reason = textArea.getText();
+            }
+            else {
+                return "Acción cancelada";
+            }
+            
+            SDbMaterialRequest req = new SDbMaterialRequest();
+            req.read(session, pkMatReq);
+            req.setCloseProvision(! req.isCloseProvision());
             req.setAuxNotesChangeStatus_n(reason);
             req.save(session);
             

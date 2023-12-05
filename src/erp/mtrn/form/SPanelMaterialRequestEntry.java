@@ -306,7 +306,7 @@ public class SPanelMaterialRequestEntry extends javax.swing.JPanel {
             }
             
             jtfQuantityReqEty.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(moMaterialRequestEty.getQuantity()));
-            double dSupplied = SMaterialRequestUtils.getQuantitySupplied(miClient.getSession(), moMaterialRequestEty.getPrimaryKey());
+            double dSupplied = SMaterialRequestUtils.getQuantitySuppliedOfReqEty(miClient.getSession(), moMaterialRequestEty.getPrimaryKey());
             jtfQuantitySupplied.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(dSupplied));
             double dLinked = SMaterialRequestUtils.getQuantityLinkedOfReqEty(miClient.getSession(), 
                                                                             moMaterialRequestEty.getPrimaryKey(), 
