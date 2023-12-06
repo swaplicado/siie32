@@ -126,7 +126,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
     }
     
     public double getQuantityToLinkV() {
-        return (double) mvValues.get(7);
+        return (double) mvValues.get(4);
     }
 
     public void setQuantityToLink(double mdToLinkQuantity) {
@@ -134,7 +134,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
     }
     
     public double getUnitaryPrice() {
-        return (double) mvValues.get(9);
+        return (double) mvValues.get(6);
     }
     
     public SDataItem getItem() {
