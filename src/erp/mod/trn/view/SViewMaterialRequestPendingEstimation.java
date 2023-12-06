@@ -12,7 +12,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogMaterialRequestEstimation;
-import erp.mod.trn.form.SDialogMaterialRequestEstimationKardex;
+import erp.mod.trn.form.SDialogMaterialRequestEstimationCardex;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,7 +54,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
     //private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogMaterialRequestEstimation moDialogEstimate;
-    private SDialogMaterialRequestEstimationKardex moDialogEstimationKardex;
+    private SDialogMaterialRequestEstimationCardex moDialogEstimationKardex;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -75,7 +75,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar requisición", this);
-        mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver solicitudes de cotización", this);
+        mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
         mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
@@ -191,9 +191,9 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
             else {
-                moDialogEstimationKardex = new SDialogMaterialRequestEstimationKardex(miClient, "Solicitudes de cotización");
+                moDialogEstimationKardex = new SDialogMaterialRequestEstimationCardex(miClient, "Solicitudes de cotización");
                 int[] key = (int[]) gridRow.getRowPrimaryKey();
-                moDialogEstimationKardex.setValue(SModConsts.TRN_MAT_REQ, key);
+                moDialogEstimationKardex.setValue(SModConsts.TRN_MAT_REQ_ETY, key);
                 moDialogEstimationKardex.setVisible(true);
             }
         }

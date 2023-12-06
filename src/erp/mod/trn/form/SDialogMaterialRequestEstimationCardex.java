@@ -42,7 +42,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Edwin Carmona
  */
-public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog implements ListSelectionListener, ItemListener, ActionListener {
+public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog implements ListSelectionListener, ItemListener, ActionListener {
     
     protected SDbMaterialRequest moMaterialRequest;
     protected ArrayList<SDbMaterialRequestEntry> mlMaterialRequestEntries;
@@ -62,7 +62,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
      * @param client
      * @param title
      */
-    public SDialogMaterialRequestEstimationKardex(SGuiClient client, String title) {
+    public SDialogMaterialRequestEstimationCardex(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_MAT_REQ_ESTIMATE, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -142,7 +142,6 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jlProviderName.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jlProviderName);
 
-        moTextProvider.setEditable(false);
         moTextProvider.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel12.add(moTextProvider);
 
@@ -154,7 +153,6 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jlTo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(jlTo);
 
-        moTextTo.setEditable(false);
         moTextTo.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel16.add(moTextTo);
 
@@ -166,7 +164,6 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
         jlSubject.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel24.add(jlSubject);
 
-        moTextSubject.setEditable(false);
         moTextSubject.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel24.add(moTextSubject);
 
@@ -324,7 +321,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
             addAllListeners();
         }
         catch (NullPointerException ex) {
-            Logger.getLogger(SDialogMaterialRequestEstimationKardex.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDialogMaterialRequestEstimationCardex.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -361,10 +358,10 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
             moGridProviderRows.populateGrid(lRows, this);
         }
         catch (SQLException ex) {
-            Logger.getLogger(SDialogMaterialRequestEstimationKardex.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDialogMaterialRequestEstimationCardex.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (Exception ex) {
-            Logger.getLogger(SDialogMaterialRequestEstimationKardex.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDialogMaterialRequestEstimationCardex.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -426,7 +423,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
     @Override
     public void setValue(final int type, final Object value) {
         switch (type) {
-            case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRN_MAT_REQ_ETY:
                 int[]pk = (int[]) value;
                 showRows(pk);
                 break;

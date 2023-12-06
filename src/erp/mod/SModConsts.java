@@ -534,6 +534,7 @@ public abstract class SModConsts {
     public static final int TRNX_DET_WHS_VS_CON_ENT = 2024353;
     public static final int TRNX_MAT_REQ_ITM_SUP = 2024354;
     public static final int TRNX_MAT_REQ_ITM_SUP_SEL = 2024355;
+    public static final int TRNX_MAT_REQ_DOCS_KAR = 2024358;
     public static final int TRNX_MAT_CONS = 2024356;
     public static final int TRNX_MAT_CONS_CC = 2024357;
     public static final int TRNX_MAT_CONS_CC_R = 1;
