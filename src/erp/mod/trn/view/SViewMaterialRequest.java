@@ -13,6 +13,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
+import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SFormMaterialRequest;
@@ -54,11 +55,13 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbAuthorize;
     private JButton jbReject;
     private JButton jbSegregate;
+    private JButton jbDocsCardex;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
     private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
     private SDialogMaterialRequestSegregation moDialogSegregations;
+    private SDialogMaterialRequestDocsCardex moDialogDocsCardex;
     
     private boolean hasSupReq;
     private boolean hasAuthRight;
@@ -91,6 +94,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbPrint);
@@ -99,6 +103,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         
         jbNewSupReq.setEnabled(mbApplyNew);
         jbPrint.setEnabled(hasPetSupRight);
@@ -108,6 +113,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbAuthorize.setEnabled(hasAuthRight);
         jbReject.setEnabled(hasAuthRight);
         jbSegregate.setEnabled(hasAuthRight);
+        jbDocsCardex.setEnabled(true);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -122,6 +128,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
         moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
+        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos de la requisición");
         
         if (mnGridMode != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
             jbRowNew.setEnabled(false);
@@ -300,6 +307,38 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
+    private void actionDocsKardex() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                    moDialogDocsCardex.setFormParams(key[0]);
+                    moDialogDocsCardex.setVisible(true);
+                    
+                    miClient.getSession().notifySuscriptors(mnGridType);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+    
     private void createParamsMap(int idMatReq) throws Exception {
         String aut = "";
         String rec = "";
@@ -444,6 +483,26 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + " THEN 'EN PROCESO' "
                     + "ELSE '(NO APLICA)' "
                 + "END AS auth_status, "
+                + "(SELECT  " +
+                    "COUNT(*) > 0 " +
+                    "FROM " +
+                    "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " dmr " +
+                    "INNER JOIN " +
+                    "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " ety ON dmr.fid_dps_year = ety.id_year " +
+                    "AND dmr.fid_dps_doc = ety.id_doc " +
+                    "AND dmr.fid_dps_ety = ety.id_ety " +
+                    "INNER JOIN " +
+                    "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON ety.id_year = dps.id_year " +
+                    "AND ety.id_doc = dps.id_doc " +
+                    "WHERE " +
+                    "NOT ety.b_del AND NOT dps.b_del " +
+                    "AND dmr.fid_mat_req = v.id_mat_req " +
+                    "AND ((dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
+                    "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
+                    "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ") " +
+                    "OR (dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
+                    "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
+                    "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + "))) AS comp_doc, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_clo_prov, "
                 + "v.fk_usr_clo_pur, "
@@ -513,6 +572,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "sum_status", "Suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "comp_status", "Compras"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "comp_doc", "Doc compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cob.ent", "Almacén"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_L, "b_clo_prov", "Terminado suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_clo", "Usr terminado suministro"));
@@ -571,6 +631,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbSegregate) {
                 actionSegregateOrRelease();
+            }
+            else if (button == jbDocsCardex) {
+                actionDocsKardex();
             }
         }
     }

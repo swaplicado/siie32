@@ -12,7 +12,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogMaterialRequestEstimation;
-import erp.mod.trn.form.SDialogMaterialRequestEstimationKardex;
+import erp.mod.trn.form.SDialogMaterialRequestEstimationCardex;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,7 +54,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
     //private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogMaterialRequestEstimation moDialogEstimate;
-    private SDialogMaterialRequestEstimationKardex moDialogEstimationKardex;
+    private SDialogMaterialRequestEstimationCardex moDialogEstimationKardex;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -191,7 +191,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
             else {
-                moDialogEstimationKardex = new SDialogMaterialRequestEstimationKardex(miClient, "Solicitudes de cotización");
+                moDialogEstimationKardex = new SDialogMaterialRequestEstimationCardex(miClient, "Solicitudes de cotización");
                 int[] key = (int[]) gridRow.getRowPrimaryKey();
                 moDialogEstimationKardex.setValue(SModConsts.TRN_MAT_REQ_ETY, key);
                 moDialogEstimationKardex.setVisible(true);

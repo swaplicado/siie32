@@ -42,7 +42,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Edwin Carmona
  */
-public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog implements ListSelectionListener, ItemListener, ActionListener {
+public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog implements ListSelectionListener, ItemListener, ActionListener {
     
     protected SDbMaterialRequest moMaterialRequest;
     protected ArrayList<SDbMaterialRequestEntry> mlMaterialRequestEntries;
@@ -62,7 +62,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
      * @param client
      * @param title
      */
-    public SDialogMaterialRequestEstimationKardex(SGuiClient client, String title) {
+    public SDialogMaterialRequestEstimationCardex(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_MAT_REQ_ESTIMATE, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -321,7 +321,7 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
             addAllListeners();
         }
         catch (NullPointerException ex) {
-            Logger.getLogger(SDialogMaterialRequestEstimationKardex.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDialogMaterialRequestEstimationCardex.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -358,10 +358,10 @@ public class SDialogMaterialRequestEstimationKardex extends SBeanFormDialog impl
             moGridProviderRows.populateGrid(lRows, this);
         }
         catch (SQLException ex) {
-            Logger.getLogger(SDialogMaterialRequestEstimationKardex.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDialogMaterialRequestEstimationCardex.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (Exception ex) {
-            Logger.getLogger(SDialogMaterialRequestEstimationKardex.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SDialogMaterialRequestEstimationCardex.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

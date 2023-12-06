@@ -909,4 +909,99 @@ public abstract class SMaterialRequestUtils {
         
         return null;
     }
+    
+    public static ArrayList<SRowMaterialRequestDocs> getMaterialRequestDocs(SGuiSession session, int pkMatReq) {
+        String sql = "SELECT  " +
+                "    req.id_mat_req, " +
+                "    req.num, " +
+                "    req.dt, " +
+                "    req.fk_usr_req, " +
+                "    reqty.id_ety, " +
+                "    reqty.qty, " +
+                "    reqty.fk_item, " +
+                "    reqty.fk_unit, " +
+                "    itm.item_key, " +
+                "    itm.item, " +
+                "    itm.part_num, " +
+                "    uni.symbol," +
+                "    MAX(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
+                "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[1] + " " +
+                "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[2] + ", " +
+                "        CONCAT('COT ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
+                "        '')) AS cot, " +
+                "    MAX(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
+                "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
+                "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ", " +
+                "        CONCAT('PED ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
+                "        '')) AS ped, " +
+                "    MAX(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
+                "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
+                "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + ", " +
+                "        CONCAT('FACT ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
+                "        '')) AS fact " +
+                "FROM " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS req " +
+                "        INNER JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS reqty ON req.id_mat_req = reqty.id_mat_req " +
+                "        INNER JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS itm ON reqty.fk_item = itm.id_item " +
+                "        INNER JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS uni ON reqty.fk_unit = uni.id_unit " +
+                "        LEFT JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " dmr ON reqty.id_mat_req = dmr.fid_mat_req " +
+                "        AND reqty.id_ety = dmr.fid_mat_req_ety " +
+                "        LEFT JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " ety ON dmr.fid_dps_year = ety.id_year " +
+                "        AND dmr.fid_dps_doc = ety.id_doc " +
+                "        AND dmr.fid_dps_ety = ety.id_ety " +
+                "        LEFT JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON ety.id_year = dps.id_year " +
+                "        AND ety.id_doc = dps.id_doc " +
+                "WHERE " +
+                "    req.id_mat_req = " + pkMatReq + " AND NOT reqty.b_del " +
+                "        AND (dmr.fid_mat_req IS NULL " +
+                "        OR (NOT ety.b_del AND NOT dps.b_del " +
+                "        AND ((dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
+                "        AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[1] + " " +
+                "        AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[2] + ") " +
+                "        OR (dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
+                "        AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
+                "        AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ") " +
+                "        OR (dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
+                "        AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
+                "        AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + ")))) " +
+                "GROUP BY reqty.id_mat_req, reqty.id_ety;";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+            ArrayList<SRowMaterialRequestDocs> lMatReqDocsRows = new ArrayList<>();
+            SRowMaterialRequestDocs oMatReqEtyDocsRow;
+            while (resultSet.next()) {
+                oMatReqEtyDocsRow = new SRowMaterialRequestDocs();
+                oMatReqEtyDocsRow.mnMatReqId = resultSet.getInt("id_mat_req");
+                oMatReqEtyDocsRow.mnMatReqEtyId = resultSet.getInt("id_ety");
+                oMatReqEtyDocsRow.mnItemId = resultSet.getInt("fk_item");
+                oMatReqEtyDocsRow.mnUnitId = resultSet.getInt("fk_unit");
+                oMatReqEtyDocsRow.msItemKey = resultSet.getString("item_key");
+                oMatReqEtyDocsRow.msItem = resultSet.getString("item");
+                oMatReqEtyDocsRow.msPartNumber = resultSet.getString("part_num");
+                oMatReqEtyDocsRow.msUnitSymbol = resultSet.getString("symbol");
+                oMatReqEtyDocsRow.msCot = resultSet.getString("cot");
+                oMatReqEtyDocsRow.msPed = resultSet.getString("ped");
+                oMatReqEtyDocsRow.msFact = resultSet.getString("fact");
+                        
+                lMatReqDocsRows.add(oMatReqEtyDocsRow);
+            }
+            
+            return lMatReqDocsRows;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
 }
