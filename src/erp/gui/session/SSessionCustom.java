@@ -80,6 +80,7 @@ public class SSessionCustom implements SGuiSessionCustom {
     
     private SCfdXmlCatalogs moCfdXmlCatalogs;
     private HashMap<Integer, Integer> mhmCfdTypeXmlTypes;  // CFDI type, XML type (version)
+    private HashMap<Integer, Integer> mhmCfdTypeXmlCompVer;  // CFDI type, XML Complement version
 
     /**
      * Creates new SSessionCustom object.
@@ -106,6 +107,7 @@ public class SSessionCustom implements SGuiSessionCustom {
         
         moCfdXmlCatalogs = null;
         mhmCfdTypeXmlTypes = null;
+        mhmCfdTypeXmlCompVer = null;
     }
 
     /*
@@ -248,6 +250,12 @@ public class SSessionCustom implements SGuiSessionCustom {
      * @return 
      */
     public HashMap<Integer, Integer> getCfdTypeXmlTypes() { return mhmCfdTypeXmlTypes; }
+
+    /**
+     * Hash map of CFD type's XML Complement versions.
+     * @return 
+     */
+    public HashMap<Integer, Integer> getCfdTypeXmlCompVer() { return mhmCfdTypeXmlCompVer; }
 
     @Override
     public int[] getLocalCountryKey() {
@@ -650,6 +658,18 @@ public class SSessionCustom implements SGuiSessionCustom {
                 int typeCfd = resultSetAux.getInt("id_tp_cfd"); // convenience variable
                 String typeXml = paramValues.getKeyValue("" + typeCfd); // check if CFD type is overloaded for this company
                 mhmCfdTypeXmlTypes.put(typeCfd, typeXml != null ? SLibUtils.parseInt(typeXml) : resultSetAux.getInt("fid_tp_xml"));
+            }
+            
+            mhmCfdTypeXmlCompVer = new HashMap<>();
+            sql = "SELECT id_tp_cfd, comp_ver "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_CFD) + " "
+                    + "WHERE NOT b_del "
+                    + "ORDER BY id_tp_cfd ";
+            resultSetAux = statementAux.executeQuery(sql);
+            while (resultSetAux.next()) {
+                int typeCfd = resultSetAux.getInt("id_tp_cfd"); // convenience variable
+                String typeXml = paramValues.getKeyValue("" + typeCfd); // check if CFD type is overloaded for this company
+                mhmCfdTypeXmlCompVer.put(typeCfd, typeXml != null ? SLibUtils.parseInt(typeXml) : resultSetAux.getInt("comp_ver"));
             }
         }
         catch (SQLException e) {

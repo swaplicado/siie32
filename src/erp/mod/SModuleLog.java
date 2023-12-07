@@ -696,7 +696,10 @@ public class SModuleLog extends SGuiModule {
         switch (moLastRegistry.getRegistryType()) {
             case SModConsts.LOG_BOL:
                 try {
-                    SCfdUtils.computeCfdiBol((SClientInterface) miClient, (SDbBillOfLading) moLastRegistry, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_BOL));
+                    SCfdUtils.computeCfdiBol((SClientInterface) miClient, (SDbBillOfLading) moLastRegistry, 
+                            ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_BOL),
+                            ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlCompVer().get(SDataConstantsSys.TRNS_TP_CFD_BOL))
+                    ;
                 }
                 catch (java.lang.Exception e) {
                     miClient.showMsgBoxError("Ha ocurrido una excepción al generar el CFD: " + e);

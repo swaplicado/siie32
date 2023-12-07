@@ -1399,6 +1399,82 @@ public class SCfdPrint {
                     paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
                     paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
                     
+                    for (cfd.ver3.ccp20.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                        if (f.getAttTipoFigura().getString().equals("01")) {
+                            paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                            paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                            paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                            paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                            paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                        }
+                    }
+                    
+                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
+                }
+                else if (element.getName().compareTo("cartaporte30:CartaPorte") == 0) {
+                    cfd.ver4.ccp30.DElementCartaPorte ccp = (cfd.ver4.ccp30.DElementCartaPorte) element;
+                    SDbBillOfLading bol = new SDbBillOfLading();
+                    bol.read(miClient.getSession(), new int[] { dps.getDbmsDataCfdBol().getFkBillOfLadingId_n() });
+                    
+                    paramsMap.put("bCcp", true);
+                    paramsMap.put("sCcpComplemento", ccp.getElementForXml());
+                    paramsMap.put("sIdCcp", ccp.getAttIdCCP().getString());
+                    paramsMap.put("sCcpVersion", ccp.getAttVersion().getString());
+                    paramsMap.put("sCcpTranspInternac", ccp.getAttTransInternac().getString());
+                    paramsMap.put("dCcpTotalDistRec", ccp.getAttTotalDistRec().getDouble());
+                    
+                    for (cfd.ver4.ccp30.DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
+                        cfd.ver4.ccp30.DElementDomicilio dom = ub.getEltDomicilio();
+                        if (!dom.getAttLocalidad().getString().isEmpty()) {
+                            dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                        }
+                        if (!dom.getAttMunicipio().getString().isEmpty()) {
+                            dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                        }
+                        dom.getAttEstado().setString(dom.getAttEstado().getString());
+                        dom.getAttPais().setString(dom.getAttPais().getString());
+                    }
+                    
+                    paramsMap.put("oCcpUbicaciones", ccp.getEltUbicaciones().getEltUbicaciones());
+                    paramsMap.put("dCcpPesoBrutoTotal", ccp.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                    paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
+                    paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                    paramsMap.put("sCcpLogisticaInversa", ccp.getEltMercancias().getAttLogisticaInversaRecoleccionDevolucion().getString());
+                    paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
+                    
+                    cfd.ver4.ccp30.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
+                    paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
+                    paramsMap.put("sCcpNumPermSCT", aut.getAttNumPermisoSCT().getString());
+                    paramsMap.put("sCcpConfVeh", aut.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                    paramsMap.put("sCcpPlacaVM", aut.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                    paramsMap.put("nCcpAnio", aut.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                    paramsMap.put("dCcpPesoVeh", aut.getEltIdentificacionVehicular().getAttPesoBrutoVehicular().getDouble());
+                    if (aut.getEltRemolques() != null) {
+                        int i = 1;
+                        for (cfd.ver4.ccp30.DElementRemolque rem : aut.getEltRemolques().getEltRemolques()) {
+                            paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                            paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                            i++;
+                        }
+                    }
+                    paramsMap.put("sCcpAsegRespCivil", aut.getEltSeguros().getAttAseguraRespCivil().getString());
+                    paramsMap.put("sCcpPolRespCivil", aut.getEltSeguros().getAttPolizaRespCivil().getString());
+                    paramsMap.put("sCcpAsegMedAmbiente", aut.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                    paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                    paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
+                    paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                    
+                    for (cfd.ver4.ccp30.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                        if (f.getAttTipoFigura().getString().equals("01")) {
+                            paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                            paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                            paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                            paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                            paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                        }
+                    }
+                    
                     paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 }
             }
@@ -3660,7 +3736,7 @@ public class SCfdPrint {
      */
     @Deprecated
     @SuppressWarnings("deprecation")
-    public void printBolReceip33_20(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
+    public void printBolReceip33(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
         Map<String, Object> paramsMap = miClient.createReportParams();
         
         // Comprobante:
@@ -3817,7 +3893,7 @@ public class SCfdPrint {
      * @param bol
      * @throws java.lang.Exception 
      */
-    public void printBolReceip40_20(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
+    public void printBolReceip40(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
         Map<String, Object> paramsMap = miClient.createReportParams();
         
         // Comprobante:
@@ -3974,8 +4050,83 @@ public class SCfdPrint {
                         paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                         paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
                         paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                        
+                        for (cfd.ver3.ccp20.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                            if (f.getAttTipoFigura().getString().equals("01")) {
+                                paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                                paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                                paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                                paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                                paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                            }
+                        }
 
                         paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
+                
+                        break;
+                        
+                    case "cartaporte30:CartaPorte":
+                        cfd.ver4.ccp30.DElementCartaPorte ccp30 = (cfd.ver4.ccp30.DElementCartaPorte) element;
+                    
+                        paramsMap.put("bCcp", true);
+                        paramsMap.put("sIdCcp", ccp30.getAttIdCCP().getString());
+                        paramsMap.put("sCcpComplemento", ccp30.getElementForXml());
+                        paramsMap.put("sCcpVersion", ccp30.getAttVersion().getString());
+                        paramsMap.put("sCcpTranspInternac", ccp30.getAttTransInternac().getString());
+                        paramsMap.put("dCcpTotalDistRec", ccp30.getAttTotalDistRec().getDouble());
+
+                        for (cfd.ver4.ccp30.DElementUbicacion ub : ccp30.getEltUbicaciones().getEltUbicaciones()) {
+                            cfd.ver4.ccp30.DElementDomicilio dom = ub.getEltDomicilio();
+                            if (!dom.getAttLocalidad().getString().isEmpty()) {
+                                dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                            }
+                            if (!dom.getAttMunicipio().getString().isEmpty()) {
+                                dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                            }
+                            dom.getAttEstado().setString(dom.getAttEstado().getString());
+                            dom.getAttPais().setString(dom.getAttPais().getString());
+                        }
+
+                        paramsMap.put("oCcpUbicaciones", ccp30.getEltUbicaciones().getEltUbicaciones());
+                        paramsMap.put("dCcpPesoBrutoTotal", ccp30.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                        paramsMap.put("sCcpUnidadPeso", ccp30.getEltMercancias().getAttUnidadPeso().getString());
+                        paramsMap.put("nCcpNoTotalMercancias", ccp30.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                        paramsMap.put("oCcpMercancias", ccp30.getEltMercancias().getEltMercancias());
+
+                        cfd.ver4.ccp30.DElementAutotransporte aut30 = ccp30.getEltMercancias().getEltAutotransporte();
+                        paramsMap.put("sCcpPermSCT", aut30.getAttPermSCT().getString());
+                        paramsMap.put("sCcpNumPermSCT", aut30.getAttNumPermisoSCT().getString());
+                        paramsMap.put("sCcpConfVeh", aut30.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                        paramsMap.put("sCcpPlacaVM", aut30.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                        paramsMap.put("nCcpAnio", aut30.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                        paramsMap.put("dCcpPesoVeh", aut30.getEltIdentificacionVehicular().getAttPesoBrutoVehicular().getDouble());
+                        if (aut30.getEltRemolques() != null) {
+                            int i = 1;
+                            for (cfd.ver4.ccp30.DElementRemolque rem : aut30.getEltRemolques().getEltRemolques()) {
+                                paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                                paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                                i++;
+                            }
+                        }
+                        paramsMap.put("sCcpAsegRespCivil", aut30.getEltSeguros().getAttAseguraRespCivil().getString());
+                        paramsMap.put("sCcpPolRespCivil", aut30.getEltSeguros().getAttPolizaRespCivil().getString());
+                        paramsMap.put("sCcpAsegMedAmbiente", aut30.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                        paramsMap.put("sCcpPolMedAmbiente", aut30.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                        paramsMap.put("sCcpAsegCarga", aut30.getEltSeguros().getAttAseguraCarga().getString());
+                        paramsMap.put("sCcpPolCarga", aut30.getEltSeguros().getAttPolizaCarga().getString());
+                        paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut30.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                        
+                        for (cfd.ver4.ccp30.DElementTiposFigura f : ccp30.getEltFiguraTransporte().getEltTiposFigura()) {
+                            if (f.getAttTipoFigura().getString().equals("01")) {
+                                paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                                paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                                paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                                paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                                paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                            }
+                        }
+
+                        paramsMap.put("oCcpFiguraTransp", ccp30.getEltFiguraTransporte().getEltTiposFigura());
                 
                         break;
                         

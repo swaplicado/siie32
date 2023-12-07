@@ -845,6 +845,7 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setXmlTotalCy(cfdiSignature.getTotalCy());
                         packet.setCfdUuid(cfdiSignature.getUuid());
                         packet.setCancellationStatus(dataCfd.getCancellationStatus());
+                        packet.setComplementVersion(dataCfd.getComplementVersion());
                         packet.setAcknowledgmentCancellationXml(xmlAckCancellation.isEmpty() ? dataCfd.getAcknowledgmentCancellationXml() : xmlAckCancellation);
                         packet.setFkCfdTypeId(dataCfd.getFkCfdTypeId());
                         packet.setFkXmlTypeId(dataCfd.getFkXmlTypeId());
@@ -3087,12 +3088,12 @@ public abstract class SCfdUtils implements Serializable {
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                         bol = new SDbBillOfLading();
                         bol.read(client.getSession(), new int[]{ cfd.getFkBillOfLadingId_n() });
-                        cfdPrint.printBolReceip33_20(client, cfd, printMode, bol);
+                        cfdPrint.printBolReceip33(client, cfd, printMode, bol);
                         break;
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
                         bol = new SDbBillOfLading();
                         bol.read(client.getSession(), new int[]{ cfd.getFkBillOfLadingId_n() });
-                        cfdPrint.printBolReceip40_20(client, cfd, printMode, bol);
+                        cfdPrint.printBolReceip40(client, cfd, printMode, bol);
                         break;
                     default:
                 }
@@ -3154,7 +3155,7 @@ public abstract class SCfdUtils implements Serializable {
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
                         bol = new SDbBillOfLading();
                         bol.read(client.getSession(), new int[]{ cfd.getFkBillOfLadingId_n() });
-                        cfdPrint.printBolReceip40_20(client, cfd, printMode, bol);
+                        cfdPrint.printBolReceip40(client, cfd, printMode, bol);
                         break;
                     default:
                 }
@@ -3705,7 +3706,7 @@ public abstract class SCfdUtils implements Serializable {
         saveCfd(client, packet);
     }
     
-    public static void computeCfdiBol(final SClientInterface client, final SDbBillOfLading bol, final int xmlType) throws Exception {
+    public static void computeCfdiBol(final SClientInterface client, final SDbBillOfLading bol, final int xmlType, final int compVersion) throws Exception {
         SDataCfd cfd = bol.getDataCfd();
         SCfdPacket packet = new SCfdPacket();
         
@@ -3715,6 +3716,9 @@ public abstract class SCfdUtils implements Serializable {
             packet.setCfdNumber(0);
             packet.setFkCompanyBranchId(SLibConsts.UNDEFINED);
             packet.setFkFactoringBankId(SLibConsts.UNDEFINED);
+            cfd = new SDataCfd();
+            cfd.setComplementVersion(compVersion);
+            bol.setDataCfd(cfd);
         }
         else {
             packet.setCfdId(cfd.getPkCfdId());
@@ -3722,6 +3726,7 @@ public abstract class SCfdUtils implements Serializable {
             packet.setCfdNumber(cfd.getNumber());
             packet.setFkCompanyBranchId(SLibConsts.UNDEFINED);
             packet.setFkFactoringBankId(SLibConsts.UNDEFINED);
+            cfd.setComplementVersion(compVersion);
         }
 
         float cfdVersion = SLibConsts.UNDEFINED;
@@ -3752,6 +3757,7 @@ public abstract class SCfdUtils implements Serializable {
         packet.setBillOfLadingId(bol.getPkBillOfLadingId());
         packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_BOL);
         packet.setFkXmlTypeId(xmlType);
+        packet.setComplementVersion(compVersion);
         packet.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
         packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
         packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());

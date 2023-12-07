@@ -87,6 +87,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.sql.Blob moAcknowledgmentCancellationPdf_n;
     protected java.lang.String msAcknowledgmentDelivery;
     protected java.lang.String msMessageDelivery;
+    protected int mnComplementVersion;
     protected boolean mbIsProcessingWebService;
     protected boolean mbIsProcessingStorageXml;
     protected boolean mbIsProcessingStoragePdf;
@@ -228,6 +229,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAcknowledgmentCancellationPdf_n(java.sql.Blob o) { moAcknowledgmentCancellationPdf_n = o; }
     public void setAcknowledgmentDelivery(java.lang.String s) { msAcknowledgmentDelivery = s; }
     public void setMessageDelivery(java.lang.String s) { msMessageDelivery = s; }
+    public void setComplementVersion(int n) { mnComplementVersion = n; }
     public void setIsProcessingWebService(boolean b) { mbIsProcessingWebService = b; }
     public void setIsProcessingStorageXml(boolean b) { mbIsProcessingStorageXml = b; }
     public void setIsProcessingStoragePdf(boolean b) { mbIsProcessingStoragePdf = b; }
@@ -299,6 +301,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.sql.Blob getAcknowledgmentCancellationPdf_n() { return moAcknowledgmentCancellationPdf_n; }
     public java.lang.String getAcknowledgmentDelivery() { return msAcknowledgmentDelivery; }
     public java.lang.String getMessageDelivery() { return msMessageDelivery; }
+    public int getComplementVersion() { return mnComplementVersion; }
     public boolean getIsProcessingWebService() { return mbIsProcessingWebService; }
     public boolean getIsProcessingStorageXml() { return mbIsProcessingStorageXml; }
     public boolean getIsProcessingStoragePdf() { return mbIsProcessingStoragePdf; }
@@ -494,6 +497,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         moAcknowledgmentCancellationPdf_n = null;
         msAcknowledgmentDelivery = "";
         msMessageDelivery = "";
+        mnComplementVersion = 0;
         mbIsProcessingWebService = false;
         mbIsProcessingStorageXml = false;
         mbIsProcessingStoragePdf = false;
@@ -583,6 +587,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 //moAcknowledgmentCancellationPdf_n = resultSet.getBlob("ack_can_pdf_n"); cannot read a object blob (2014-09-01, jbarajas)
                 msAcknowledgmentDelivery = resultSet.getString("ack_dvy");
                 msMessageDelivery = resultSet.getString("msg_dvy");
+                mnComplementVersion = resultSet.getInt("comp_ver");
                 mbIsProcessingWebService = resultSet.getBoolean("b_prc_ws");
                 mbIsProcessingStorageXml = resultSet.getBoolean("b_prc_sto_xml");
                 mbIsProcessingStoragePdf = resultSet.getBoolean("b_prc_sto_pdf");
@@ -704,6 +709,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "ser, num, " +
                         "ts, cert_num, str_signed, signature, doc_xml_uuid, xml_rfc_emi, xml_rfc_rec, " +
                         "xml_tot, xml_mon, xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_dvy, msg_dvy, " +
+                        "comp_ver, " +
                         "b_prc_ws, b_prc_sto_xml, b_prc_sto_pdf, " +
                         "b_con, " +
                         "fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, " +
@@ -734,8 +740,9 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "?, " + // 51
                         "?, " + // 52
                         "?, " + // 53
-                        "NOW(), " + // 54
-                        "NOW())"; // 55
+                        "?, " + // 54
+                        "NOW(), " + // 55
+                        "NOW())"; // 56
             }
             else {
                 isUpddate = true;
@@ -743,6 +750,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 sql = "UPDATE trn_cfd SET ser = ?, num = ?, " +
                         "ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_uuid = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, " +
                         "xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, uuid = ?, qrc_n = ?, can_st = ?, ack_dvy = ?, msg_dvy = ?, " +
+                        "comp_ver = ?, " +
                         //"b_prc_ws = ?, b_prc_sto_xml = ?, b_prc_sto_pdf = ?, " + // managed separately
                         "b_con = ?, " +
                         "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, " +
@@ -795,6 +803,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             preparedStatement.setString(index++, msAcknowledgmentDelivery);
             preparedStatement.setString(index++, msMessageDelivery);
+            preparedStatement.setInt(index++, mnComplementVersion);
             
             if (!isUpddate) {
                 preparedStatement.setBoolean(index++, mbIsProcessingWebService);

@@ -6241,21 +6241,32 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (moDbmsDataCfdBol != null) {
             cfd.ver40.DElementComprobante comprobanteCartaPorte = DCfdUtils.getCfdi40(moDbmsDataCfdBol.getDocXml());
-            cfd.ver3.ccp20.DElementCartaPorte ccp = null;
+            cfd.ver3.ccp20.DElementCartaPorte ccp20 = null;
+            cfd.ver4.ccp30.DElementCartaPorte ccp30 = null;
             if (comprobanteCartaPorte.getEltOpcComplemento() != null) {
                 for (DElement element : comprobanteCartaPorte.getEltOpcComplemento().getElements()) {
                     if (element.getName().compareTo("cartaporte20:CartaPorte") == 0) {
-                        ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        ccp20 = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        break;
+                    }
+                    else if (element.getName().compareTo("cartaporte30:CartaPorte") == 0) {
+                        ccp30 = (cfd.ver4.ccp30.DElementCartaPorte) element;
                         break;
                     }
                 }
             }
             
-            if (ccp != null) {
+            if (ccp20 != null) {
                 if (complemento == null) {
                     complemento = new cfd.ver40.DElementComplemento();
                 }
-                complemento.getElements().add((DElement) ccp);
+                complemento.getElements().add((DElement) ccp20);
+            }
+            else if (ccp30 != null) {
+                if (complemento == null) {
+                    complemento = new cfd.ver40.DElementComplemento();
+                }
+                complemento.getElements().add((DElement) ccp30);
             }
         }
         
