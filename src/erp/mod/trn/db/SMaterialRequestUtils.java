@@ -12,6 +12,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.form.SDialogItemPicker;
+import erp.mod.trn.form.SDialogUnitPicker;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataMaterialRequestRow;
@@ -31,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -403,7 +405,7 @@ public abstract class SMaterialRequestUtils {
     }
     
     @SuppressWarnings("unchecked")
-    public static SDialogItemPicker getOptionPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
+    public static SDialogItemPicker getOptionItemPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
         String sql = "";
         ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
         SGuiOptionPickerSettings settings;
@@ -450,6 +452,33 @@ public abstract class SMaterialRequestUtils {
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Parte"));
                 settings = new SGuiOptionPickerSettings("Ítem", sql, gridColumns, 1);
+                
+                picker.setPickerSettings(client, type, subtype, settings);
+                break;
+        }
+        
+        return picker;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static SDialogUnitPicker getOptionUnitPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
+        String sql = "";
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
+        SGuiOptionPickerSettings settings;
+        SDialogUnitPicker picker = new SDialogUnitPicker();
+        switch (type) {
+            case SModConsts.ITMU_UNIT:
+                switch (subtype) {
+                    case SLibConsts.UNDEFINED:
+                        sql = "SELECT a.id_unit AS " + SDbConsts.FIELD_ID + "1, "
+                                + "a.unit AS " + SDbConsts.FIELD_PICK + "1, a.symbol AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS a " 
+                                + "WHERE NOT a.b_del ";
+                        break;
+                }
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Unidad"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Símbolo"));
+                settings = new SGuiOptionPickerSettings("Unidad", sql, gridColumns, 1);
                 
                 picker.setPickerSettings(client, type, subtype, settings);
                 break;

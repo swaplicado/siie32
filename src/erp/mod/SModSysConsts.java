@@ -699,8 +699,6 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
     public static final int TRNS_TP_MAINT_MOV_OUT_CONS_MAT = 261; // out consumption of material
     
-    public static final int TRNU_MAT_PRES_NA = 1; // not applicable
-    
     public static final int TRNS_ST_MAT_REQ_NEW = 1; // new
     public static final int TRNS_ST_MAT_REQ_AUTH = 2; // in authorization
     public static final int TRNS_ST_MAT_REQ_PROV = 3; // in provision
@@ -723,6 +721,9 @@ public abstract class SModSysConsts {
     public static final int TRNX_TP_MAINT_MOV_PART = 1;    // Part
     public static final int TRNX_TP_MAINT_MOV_TOOL = 2;    // Tool
     public static final int TRNX_TP_MAINT_MOV_ALL = 3;     // All
+    
+    public static final int TRNX_ST_MAT_REQ_PROV_PROV = 100;
+    public static final int TRNX_ST_MAT_REQ_PROV_PUR = 101;
 
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
@@ -757,7 +758,8 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_REV = 2; // Revisor
     public static final int TRNX_MAT_REQ_PROV = 3; // Suministrador
     public static final int TRNX_MAT_REQ_PUR = 4; // Comprador
-    public static final int TRNX_MAT_REQ_AUTHO_RECH = 100; // autorizado/rechazado
+    public static final int TRNX_MAT_REQ_AUTHO = 100; // autorizado
+    public static final int TRNX_MAT_REQ_AUTHO_RECH = 106; // rechazado
     public static final int TRNX_MAT_REQ_PEND_DETAIL = 101; // pendiente a detalle
     public static final int TRNX_MAT_REQ_PROVIDED = 102; // suministrado
     public static final int TRNX_MAT_REQ_PURCHASED = 103; // comprado

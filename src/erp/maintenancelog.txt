@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 230.0*/ 2023-12-14
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de cambio de unidad en las requisiciones de materiales.
+2) Eliminación de las presentaciones de materiales.
+3) Refactorización general de las vistas de requisiciones de materiales.
+
+================================================================================
 SIIE 3.2 229.0/ 2023-12-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

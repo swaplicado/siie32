@@ -373,8 +373,7 @@ public abstract class SModConsts {
     public static final int TRNU_TP_IOG_ADJ = 2022004;
     public static final int TRNU_TP_DPS_ANN = 2022005;
     public static final int TRNU_MAT_REQ_PTY = 2022007;
-    public static final int TRNU_MAT_PRES = 2022008;
-
+    
     public static final int TRN_DNS_DPS = 2023001;
     public static final int TRN_DNS_DIOG = 2023002;
     public static final int TRN_DNC_DPS_COB = 2023003;
@@ -1164,7 +1163,6 @@ public abstract class SModConsts {
         TablesMap.put(TRNU_TP_IOG_ADJ, "erp.trnu_tp_iog_adj");
         TablesMap.put(TRNU_TP_DPS_ANN, "erp.trnu_tp_dps_ann");
         TablesMap.put(TRNU_MAT_REQ_PTY, "erp.trnu_mat_req_pty");
-        TablesMap.put(TRNU_MAT_PRES, "erp.trnu_mat_pres");
 
         TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");
         TablesMap.put(TRN_DNS_DIOG, "trn_dns_diog");

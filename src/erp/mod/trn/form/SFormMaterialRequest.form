@@ -590,7 +590,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlQty">
+                            <Component class="javax.swing.JLabel" name="jlQtyUsr">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Cantidad:*"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -598,18 +598,20 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecQty">
+                            <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecQtyUsr">
                             </Component>
-                            <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyUnit">
+                            <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextUnitUsr">
                               <Properties>
-                                <Property name="editable" type="boolean" value="true"/>
                                 <Property name="enabled" type="boolean" value="false"/>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jLabel6">
+                            <Component class="javax.swing.JButton" name="jbPickUnitUsr">
                               <Properties>
+                                <Property name="text" type="java.lang.String" value="..."/>
+                                <Property name="toolTipText" type="java.lang.String" value="Seleccionar &#xed;tem"/>
+                                <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[25, 23]"/>
+                                  <Dimension value="[23, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -653,33 +655,32 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlConsDays">
+                            <Component class="javax.swing.JLabel" name="jlQty">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Tiempo consumo:"/>
+                                <Property name="text" type="java.lang.String" value="Cant. equivalente:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntConsDays">
-                            </Component>
-                            <Component class="javax.swing.JLabel" name="jLabel5">
+                            <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecQty">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="(d&#xed;as estimados)"/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[100, 23]"/>
-                                </Property>
-                                <Property name="verifyInputWhenFocusTarget" type="boolean" value="false"/>
+                                <Property name="enabled" type="boolean" value="false"/>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jLabel7">
+                            <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextUnit">
+                              <Properties>
+                                <Property name="enabled" type="boolean" value="false"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel2">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[25, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlUnitPrice">
+                            <Component class="javax.swing.JLabel" name="jlUnitPriceUsr">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Precio u.:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -687,7 +688,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecUnitPrice">
+                            <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecUnitPriceUsr">
                             </Component>
                             <Component class="javax.swing.JLabel" name="jlPriEty">
                               <Properties>
@@ -721,19 +722,29 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlPresentation">
+                            <Component class="javax.swing.JLabel" name="jlConsDays">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Presentaci&#xf3;n:"/>
+                                <Property name="text" type="java.lang.String" value="Tiempo consumo:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyPresentation">
+                            <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntConsDays">
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel5">
                               <Properties>
-                                <Property name="enabled" type="boolean" value="false"/>
+                                <Property name="text" type="java.lang.String" value="(d&#xed;as estimados)"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[236, 23]"/>
+                                  <Dimension value="[100, 23]"/>
+                                </Property>
+                                <Property name="verifyInputWhenFocusTarget" type="boolean" value="false"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel4">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[25, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -774,27 +785,6 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlFactConv">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="Factor conversi&#xf3;n:"/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[100, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                            <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecFactConv">
-                              <Properties>
-                                <Property name="toolTipText" type="java.lang.String" value="Factor de conversi&#xf3;n"/>
-                                <Property name="enabled" type="boolean" value="false"/>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JLabel" name="jLabel1">
-                              <Properties>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[131, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
                             <Component class="javax.swing.JLabel" name="jlUnitPriceRef">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Ref. precio u.:"/>
@@ -804,6 +794,18 @@
                               </Properties>
                             </Component>
                             <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextUnitPriceRef">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[200, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel8">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[240, 23]"/>
+                                </Property>
+                              </Properties>
                             </Component>
                             <Component class="javax.swing.JLabel" name="jlConsSubentEty">
                               <Properties>
