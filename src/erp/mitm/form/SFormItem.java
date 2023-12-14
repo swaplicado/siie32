@@ -126,6 +126,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldMass;
     private erp.lib.form.SFormField moFieldMassUnitary;
     private erp.lib.form.SFormField moFieldIsMassVariable;
+    private erp.lib.form.SFormField moFieldFkCommercialId_n;
     private erp.lib.form.SFormField moFieldFkUnitAlternativeTypeId;
     private erp.lib.form.SFormField moFieldFkLevelTypeId;
     private erp.lib.form.SFormField moFieldUnitAlternativeBaseEquivalence;
@@ -346,6 +347,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlMassUnitary = new javax.swing.JLabel();
         jtfMassUnitary = new javax.swing.JTextField();
         jckIsMassVariable = new javax.swing.JCheckBox();
+        jPanel36 = new javax.swing.JPanel();
+        jlFkUnitCommercialId_n = new javax.swing.JLabel();
+        jcbFkUnitCommercialId_n = new javax.swing.JComboBox();
         jPanel32 = new javax.swing.JPanel();
         jlFkUnitAlternativeTypeId = new javax.swing.JLabel();
         jcbFkUnitAlternativeTypeId = new javax.swing.JComboBox();
@@ -809,7 +813,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel14.setLayout(new java.awt.GridLayout(1, 2));
 
-        jPanel10.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel10.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -963,7 +967,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel14.add(jPanel10);
 
-        jPanel11.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel11.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1090,6 +1094,19 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel38.add(jckIsMassVariable);
 
         jPanel11.add(jPanel38);
+
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkUnitCommercialId_n.setText("Unidad comercial:");
+        jlFkUnitCommercialId_n.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel36.add(jlFkUnitCommercialId_n);
+
+        jcbFkUnitCommercialId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkUnitCommercialId_n.setToolTipText("Unidad comercial");
+        jcbFkUnitCommercialId_n.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel36.add(jcbFkUnitCommercialId_n);
+
+        jPanel11.add(jPanel36);
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1828,6 +1845,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldMassUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsMassVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsMassVariable);
         moFieldIsMassVariable.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldFkCommercialId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitCommercialId_n, jlFkUnitCommercialId_n);
+        moFieldFkCommercialId_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkUnitAlternativeTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitAlternativeTypeId, jlFkUnitAlternativeTypeId);
         moFieldFkUnitAlternativeTypeId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkLevelTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkLevelTypeId, jlFkLevelTypeId);
@@ -1969,6 +1988,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldMass);
         mvFields.add(moFieldMassUnitary);
         mvFields.add(moFieldIsMassVariable);
+        mvFields.add(moFieldFkCommercialId_n);
         mvFields.add(moFieldFkUnitAlternativeTypeId);
         mvFields.add(moFieldFkLevelTypeId);
         mvFields.add(moFieldUnitAlternativeBaseEquivalence);
@@ -2053,6 +2073,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jcbFkVariety02Id.addItemListener(this);
         jcbFkVariety03Id.addItemListener(this);
         jcbFkUnitId.addItemListener(this);
+        jcbFkUnitCommercialId_n.addItemListener(this);
         jcbFkUnitAlternativeTypeId.addItemListener(this);
         
         moKeyFkMaterialTypeId_n.addItemListener(this);
@@ -3165,6 +3186,22 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private void actionFkFiscalAccountExpId() {
         miClient.pickOption(SDataConstants.FINS_FISCAL_ACC, moFieldFkFiscalAccountExpId, null);
     }
+    
+    @SuppressWarnings("unchecked")
+    private void actionUnitChanges() {
+        if (jcbFkUnitId.getSelectedIndex() > 0) {
+            int flagIsItemApplying = 1;
+            SFormUtilities.populateComboBox(miClient, 
+                                            jcbFkUnitCommercialId_n, 
+                                            SDataConstants.ITMU_UNIT, 
+                                            new int[] { moFieldFkUnitId.getKeyAsIntArray()[0], moItem != null ? moItem.getPkItemId() : 0, flagIsItemApplying, moFieldFkUnitAlternativeTypeId.getKeyAsIntArray()[0] });
+            jcbFkUnitCommercialId_n.setEnabled(true);
+        }
+        else {
+            jcbFkUnitCommercialId_n.setSelectedIndex(-1);
+            jcbFkUnitCommercialId_n.setEnabled(false);
+        }
+    }
 
     /*
      * Focus listener methods:
@@ -3289,6 +3326,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         jtfUnitAlternativeBaseRo.setText(text);
+        actionUnitChanges();
     }
     
     private void itemStateFkMaterialTypeId() {
@@ -3488,6 +3526,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
@@ -3562,6 +3601,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JComboBox<SFormComponentItem> jcbFkManufacturerId;
     private javax.swing.JComboBox jcbFkTaxableConceptTypeId;
     private javax.swing.JComboBox jcbFkUnitAlternativeTypeId;
+    private javax.swing.JComboBox jcbFkUnitCommercialId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUnitId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUnitNetContentId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUnitNetContentUnitaryId;
@@ -3621,6 +3661,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlFkManufacturerId;
     private javax.swing.JLabel jlFkTaxableConceptTypeId;
     private javax.swing.JLabel jlFkUnitAlternativeTypeId;
+    private javax.swing.JLabel jlFkUnitCommercialId_n;
     private javax.swing.JLabel jlFkUnitId;
     private javax.swing.JLabel jlFkUnitNetContentId;
     private javax.swing.JLabel jlFkUnitNetContentUnitaryId;
@@ -4115,6 +4156,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         itemStateIsInventoriable();
         computeItemKeyAndName();
         
+        moFieldFkCommercialId_n.setFieldValue(new int[] { moItem.getFkUnitCommercial_n() });
+        
         switch (moItem.getFkItemStatusId()) {
             case SModSysConsts.ITMS_ST_ITEM_ACT:
                 jrbStatusActive.setSelected(true);
@@ -4210,6 +4253,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setMass(moFieldMass.getDouble());
         moItem.setMassUnitary(moFieldMassUnitary.getDouble());
         moItem.setIsMassVariable(moFieldIsMassVariable.getBoolean());
+        moItem.setFkUnitCommercial_n(moFieldFkCommercialId_n.getKeyAsIntArray()[0]);
         moItem.setFkUnitAlternativeTypeId(moFieldFkUnitAlternativeTypeId.getKeyAsIntArray()[0]);
         moItem.setFkLevelTypeId(moFieldFkLevelTypeId.getKeyAsIntArray()[0]);
         moItem.setUnitAlternativeBaseEquivalence(moFieldUnitAlternativeBaseEquivalence.getDouble());

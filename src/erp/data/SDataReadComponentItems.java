@@ -908,10 +908,63 @@ public abstract class SDataReadComponentItems {
                 lenFk = 1;
                 sql = "SELECT id_unit AS f_id_1, CONCAT(unit, ' (', symbol, ')') AS f_item, " +
                         "fid_tp_unit AS f_fid_1, symbol as f_comp " +
-                        "FROM erp.itmu_unit " +
-                        "WHERE b_del = 0 " + (pk == null ? "" : pk.getClass() == int[].class ? "AND fid_tp_unit = " + ((int[]) pk)[0] + " " :
-                            "AND (fid_tp_unit = " + (Integer) ((Object[]) pk)[0] + " OR fid_tp_unit = " + (Integer) ((Object[]) pk)[1] + ") ") +
-                        "ORDER BY fid_tp_unit, sort_pos, unit, id_unit ";
+                        "FROM erp.itmu_unit ";
+                if (pk != null && ((int[]) pk).length >= 3) {
+                    /**
+                     * [0] id_unit
+                     * [1] id_item
+                     * [2] flag
+                     * [3] tp_unit_alt
+                     */
+                    sql += "AS u " +
+                            "WHERE " +
+                            "    NOT u.b_del " +
+                            "        AND (fid_tp_unit = (SELECT  " +
+                            "            fid_tp_unit " +
+                            "        FROM " +
+                            "            erp.itmu_unit AS ui " +
+                            "        WHERE " +
+                            "            ui.id_unit = " + ((int[]) pk)[0] + ") " +
+                            "        OR fid_tp_unit = ";
+                    
+                    if (((int[]) pk).length > 3 && ((int[]) pk)[3] > 0) {
+                        sql +=  "" + ((int[]) pk)[3] + " ";
+                    }
+                    else {
+                        sql +=  "(COALESCE((SELECT  " +
+                                "                    fid_tp_unit_alt " +
+                                "                FROM " +
+                                "                    erp.itmu_item AS itm " +
+                                "                WHERE " +
+                                "                    id_item = " + ((int[]) pk)[1] + "), " +
+                                "            0)) ";
+                    }
+                    
+                    sql +=  "        OR u.id_unit = (COALESCE((SELECT  " +
+                            "                    fid_unit_comm_n " +
+                            "                FROM " +
+                            "                    erp.itmu_item AS itm " +
+                            "                WHERE " +
+                            "                    id_item = " + ((int[]) pk)[1] + "), " +
+                            "            0)) " +
+                            "        OR u.id_unit IN (SELECT  " +
+                            "            id_unit " +
+                            "        FROM " +
+                            "            erp.itmu_unit_equiv AS ue " +
+                            "        WHERE " +
+                            "            ue.id_unit_equiv = " + ((int[]) pk)[0] + " AND NOT ue.b_del) " +
+                            "        OR u.id_unit IN (SELECT " +
+                            "            id_unit_equiv " +
+                            "        FROM " +
+                            "            erp.itmu_unit_equiv AS ue " +
+                            "        WHERE " +
+                            "            ue.id_unit = " + ((int[]) pk)[0] + " AND NOT ue.b_del)) ";
+                }
+                else {
+                    sql += "WHERE b_del = 0 " + (pk == null ? "" : pk.getClass() == int[].class ? "AND fid_tp_unit = " + ((int[]) pk)[0] + " " :
+                            "AND (fid_tp_unit = " + (Integer) ((Object[]) pk)[0] + " OR fid_tp_unit = " + (Integer) ((Object[]) pk)[1] + ") ");
+                }
+                sql += "ORDER BY fid_tp_unit, sort_pos, unit, id_unit ";
                 text = "unidad";
                 isComplementApplying = true;
                 break;

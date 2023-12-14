@@ -6,14 +6,16 @@
 package erp.mitm.data;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.mod.bps.db.SBpsUtils;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Edwin Carmona
  */
 public abstract class SItemUtilities {
     
@@ -104,5 +106,44 @@ public abstract class SItemUtilities {
         }
         
         return id;
+    }
+    
+    public static ArrayList<SDataUnitEquivalence> getUnitEquivalencesRows(final SClientInterface client, final int unitId) {
+        try {
+            String sql = "SELECT id_unit_equiv FROM " + SDataConstants.TablesMap.get(SDataConstants.ITMU_UNIT_EQUIV) + " "
+                    + "WHERE NOT b_del AND id_unit = " + unitId + ";";
+            try (ResultSet resultSet = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql)) {
+                ArrayList<SDataUnitEquivalence> rows = new ArrayList<>();
+                SDataUnitEquivalence oData;
+                while (resultSet.next()){
+                    oData = new SDataUnitEquivalence();
+                    oData.read(new int[] { unitId, resultSet.getInt("id_unit_equiv") }, client.getSession().getStatement());
+                    rows.add(oData);
+                }
+                
+                return rows;
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(SBpsUtils.class.getName(), e);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    public static boolean getUnitEquivalenceExists(final SClientInterface client, final int unitId, final int unitEquivId) {
+        try {
+            String sql = "SELECT id_unit_equiv FROM " + SDataConstants.TablesMap.get(SDataConstants.ITMU_UNIT_EQUIV) + " "
+                    + "WHERE (id_unit = " + unitId + " AND id_unit_equiv = " + unitEquivId + ") OR "
+                        + "(id_unit_equiv = " + unitId + " AND id_unit = " + unitEquivId + ");";
+            try (ResultSet resultSet = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql)) {
+                return (resultSet.next());
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(SBpsUtils.class.getName(), e);
+        }
+        
+        return false;
     }
 }

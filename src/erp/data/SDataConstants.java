@@ -256,6 +256,7 @@ public abstract class SDataConstants {
     public static final int ITMU_TP_UNIT = 205014;
     public static final int ITMU_TP_LEV = 205015;
     public static final int ITMU_UNIT = 205016;
+    public static final int ITMU_UNIT_EQUIV = 205031;
     public static final int ITMU_TP_VAR = 205017;
     public static final int ITMU_VAR = 205018;
     public static final int ITMU_TP_BRD = 205022;
@@ -846,6 +847,7 @@ public abstract class SDataConstants {
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
+        TablesMap.put(ITMU_UNIT_EQUIV, "erp.itmu_unit_equiv");
         TablesMap.put(ITMU_TP_VAR, "erp.itmu_tp_var");
         TablesMap.put(ITMU_VAR, "erp.itmu_var");
         TablesMap.put(ITMU_TP_BRD, "erp.itmu_tp_brd");

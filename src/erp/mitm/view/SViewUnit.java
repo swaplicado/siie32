@@ -13,6 +13,8 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mitm.form.SFormUnitEquivalences;
+import java.awt.Dimension;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 
@@ -23,6 +25,9 @@ import sa.gui.util.SUtilConsts;
 public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
+    private SFormUnitEquivalences moUnitEquivalencesForm;
+    
+    private JButton jbEditAttributes;
 
     public SViewUnit(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.ITMU_UNIT);
@@ -37,6 +42,14 @@ public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
+        
+        jbEditAttributes = new JButton(miClient.getImageIcon(SLibConstants.ICON_KARDEX));
+        jbEditAttributes.setPreferredSize(new Dimension(23, 23));
+        jbEditAttributes.setToolTipText("Modificar atributos");
+        jbEditAttributes.addActionListener(this);
+
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jbEditAttributes);
 
         STableField[] aoKeyFields = new STableField[1];
         STableColumn[] aoTableColumns = new STableColumn[19];
@@ -81,8 +94,19 @@ public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.ITMU_TP_UNIT);
         mvSuscriptors.add(SDataConstants.USRU_USR);
+        
+        moUnitEquivalencesForm = new SFormUnitEquivalences(miClient);
 
         populateTable();
+    }
+    
+    private void actionModifyAttributes() {
+        if (jbEditAttributes.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                moUnitEquivalencesForm.setIdUnit(((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
+                moUnitEquivalencesForm.setVisible(true);
+            }
+        }
     }
 
     @Override
@@ -154,6 +178,10 @@ public class SViewUnit extends erp.lib.table.STableTab implements java.awt.event
 
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
+            
+            if (button == jbEditAttributes) {
+                actionModifyAttributes();
+            }
         }
     }
 }

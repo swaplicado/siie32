@@ -207,6 +207,7 @@ public abstract class SModConsts {
     public static final int ITMU_TP_LEV = 1052501;
     public static final int ITMU_TP_UNIT = 1052502;
     public static final int ITMU_UNIT = 1052503;
+    public static final int ITMU_UNIT_EQUIV = 1052514;
     public static final int ITMU_TP_VAR = 1052504;
     public static final int ITMU_VAR = 1052505;
     public static final int ITMU_TP_BRD = 1052506;
@@ -1015,6 +1016,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
+        TablesMap.put(ITMU_UNIT_EQUIV, "erp.itmu_unit_equiv");
         TablesMap.put(ITMU_TP_VAR, "erp.itmu_tp_var");
         TablesMap.put(ITMU_VAR, "erp.itmu_var");
         TablesMap.put(ITMU_TP_BRD, "erp.itmu_tp_brd");

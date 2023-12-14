@@ -35,6 +35,8 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
+    
+    protected boolean mbAuxHasEquivalentUnits;
 
     public SDataUnit() {
         super(SDataConstants.ITMU_UNIT);
@@ -78,6 +80,8 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Date getUserNewTs() { return mtUserNewTs; }
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
+    
+    public boolean hasEquivalentUnits() { return mbAuxHasEquivalentUnits; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -111,6 +115,8 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
+        
+        mbAuxHasEquivalentUnits = false;
     }
 
     @Override
@@ -150,6 +156,19 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
+            }
+            
+            sql = "SELECT " +
+                "COUNT(*) > 0 AS has_equiv " +
+                "FROM " +
+                "    erp.itmu_unit_equiv " +
+                "WHERE " +
+                "    NOT b_del " +
+                "        AND (id_unit = " + key[0] + " OR id_unit_equiv = " + key[0] + ");";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                mbAuxHasEquivalentUnits = resultSet.getBoolean("has_equiv");
             }
         }
         catch (java.sql.SQLException e) {
